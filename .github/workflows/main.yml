@@ -1,0 +1,30 @@
+name: Angular CI
+on:
+    push: 
+        branches: ["main", "develop"]
+    pull_request:
+        branches: ["main", "develop"]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4   
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Lint (Calidad de código)
+        run: npm run lint
+        
+      - name: Tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+        
+      - name: Build
+        run: npm run build -- --configuration=production
