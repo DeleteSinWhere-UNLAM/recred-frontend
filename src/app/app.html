@@ -1,2 +1,17 @@
 <h1>Recred</h1>
-<router-outlet />
+<router-outlet></router-outlet>
+
+<!-- borrar antes de subir -->
+    <app-button-component variant="primary" (onClick)="forzarAperturaModal()">
+        Disparar Modal PWA
+    </app-button-component>
+
+<modal-component
+    [isOpen]="pwaService.updateAvailable()"
+    title="¡Nueva versión disponible!"
+    message="Descargamos mejoras y correcciones de seguridad para tu billetera. Por favor, actualizá para continuar."
+    confirmText="Actualizar ahora"
+    (onConfirm)="pwaService.applyUpdate()"
+    [showCancel]="false"
+    >
+</modal-component>
