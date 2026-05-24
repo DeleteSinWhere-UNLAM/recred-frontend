@@ -1,0 +1,175 @@
+.alumno-card {
+  background-color: var(--color-superficie);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  grid-template-rows: auto auto auto;
+  column-gap: 18px;
+  row-gap: 14px;
+  align-items: start;
+}
+
+.alumno-card__avatar {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 1px;
+  box-shadow: var(--shadow-neu-convex);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.alumno-card__header {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.alumno-card__identidad {
+  min-width: 0;
+}
+
+.alumno-card__nombre {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  line-height: 1.2;
+}
+
+.alumno-card__grado {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--color-texto-claro);
+}
+
+.alumno-card__saldo {
+  flex-shrink: 0;
+  min-width: 96px;
+  padding: 8px 14px;
+  background-color: var(--color-superficie-alt);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-neu-concave);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.alumno-card__saldo-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--color-texto-claro);
+}
+
+.alumno-card__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-pizarra);
+}
+
+.alumno-card__saldo--negativo .alumno-card__saldo-valor {
+  color: var(--color-melocoton);
+}
+
+.alumno-card__acciones {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.alumno-card__accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background-color: var(--color-superficie);
+  color: var(--color-texto-claro);
+  border-radius: var(--radius-button);
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: var(--shadow-neu-convex);
+  transition: color 0.15s ease, transform 0.1s ease;
+}
+
+.alumno-card__accion:hover {
+  color: var(--color-texto-oscuro);
+}
+
+.alumno-card__accion:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.alumno-card__accion i {
+  font-size: 12px;
+}
+
+.alumno-card__cta {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  padding: 14px;
+  background-color: var(--color-dorado);
+  color: var(--color-texto-oscuro);
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 10px rgba(242, 183, 5, 0.3);
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.alumno-card__cta:hover {
+  background-color: var(--color-dorado-dark);
+}
+
+.alumno-card__cta:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 480px) {
+  .alumno-card {
+    grid-template-columns: 72px 1fr;
+    padding: 16px;
+    column-gap: 12px;
+  }
+
+  .alumno-card__avatar {
+    width: 72px;
+    height: 72px;
+    font-size: 24px;
+  }
+
+  .alumno-card__nombre {
+    font-size: 17px;
+  }
+
+  .alumno-card__saldo {
+    min-width: 80px;
+    padding: 6px 10px;
+  }
+
+  .alumno-card__saldo-valor {
+    font-size: 15px;
+  }
+}
