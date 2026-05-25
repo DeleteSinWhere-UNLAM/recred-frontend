@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Alumno } from '../../../../core/models/alumno.model';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
@@ -11,6 +12,7 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   selector: 'app-alumno-card',
   templateUrl: './alumno-card.component.html',
   styleUrl: './alumno-card.component.css',
+  imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlumnoCardComponent {
