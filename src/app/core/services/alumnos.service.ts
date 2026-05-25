@@ -33,4 +33,8 @@ export class AlumnosService {
   getAlumnos(): Alumno[] {
     return this.alumnos;
   }
+
+  getAlumnoById(id: string): Alumno | undefined {
+    return this.alumnos.find((alumno) => alumno.id === id);
+  }
 }
