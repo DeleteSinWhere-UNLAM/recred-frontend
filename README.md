@@ -1,59 +1,35 @@
-# Recreopago
+# 🔔​ RECRED CI/CD​🔔​​
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
+Este proyecto utiliza **GitHub Actions** como sistema de Integración Continua (CI) y **Netlify** para el Despliegue Continuo (CD). 
 
-## Development server
+Cada vez que se haga un *push* o un *Pull Request* a la rama Main o Develop, el código pasará por el pipeline automaticamente, si este falla, el código no se desplegará. 
 
-To start a local development server, run:
+Para asegurar que el código pase el pipeline, podemos ejecutar las siguientes comandos en local antes de subir los cambios.
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## ✅ Comandos antes de hacer Push
+1. Control de Calidad (Lint)
+Verifica que el código esté limpio y cumpla con las reglas de estilo y buenas prácticas establecidas.
 
 ```bash
-ng generate component component-name
+npm run lint
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+2. Pruebas Unitarias (Tests)
+Comprueba que la lógica de la aplicación siga funcionando. El comando a continuación ejecuta los tests exactamente de la misma manera que lo hace el entorno de CI.
 
 ```bash
-ng generate --help
+npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-## Building
-
-To build the project run:
+3. Prueba de Compilación (Build)
+Asegura que la aplicación compila correctamente sin errores de TypeScript ni problemas de dependencias.
 
 ```bash
-ng build
+npm run build -- --configuration=production
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 💡 Comando rápido "Todo en Uno"
+Evita ejecutar los comandos uno por uno. Ejecuta el linter, los tests y el build en secuencia. Si alguno falla, el proceso se detendrá.
 
 ```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+npm run lint && npm test -- --watch=false --browsers=ChromeHeadless && npm run build -- --configuration=production
