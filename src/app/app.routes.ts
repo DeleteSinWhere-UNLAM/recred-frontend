@@ -13,4 +13,9 @@ export const routes: Routes = [
         (m) => m.RestriccionesPage
       ),
   },
+  {
+    path: 'buffet/:alumnoId',
+    loadComponent: () =>
+      import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
+  },
 ];
