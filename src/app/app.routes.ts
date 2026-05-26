@@ -7,6 +7,13 @@ export const routes: Routes = [
       import('./features/home/home.page').then((m) => m.HomePage),
   },
   {
+    path: 'restricciones/:alumnoId',
+    loadComponent: () =>
+      import('./features/restricciones/restricciones.page').then(
+        (m) => m.RestriccionesPage
+      ),
+  },
+  {
     path: 'preferencias',
     loadComponent: () =>
       import('./features/preferencias/preferencias.page')
