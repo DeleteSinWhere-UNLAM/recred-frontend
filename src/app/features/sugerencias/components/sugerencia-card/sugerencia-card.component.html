@@ -1,0 +1,30 @@
+<div class="card">
+
+  <h3 class="producto-original">
+    {{ sugerencia.productoOriginal }}
+  </h3>
+
+  <p class="producto-sugerido">
+    Sugerencia IA:
+    {{ sugerencia.productoSugerido }}
+  </p>
+
+  <p class="motivo">
+    {{ sugerencia.motivo }}
+  </p>
+
+  @if (sugerencia.bloqueado) {
+
+    <span class="estado bloqueado">
+      Producto bloqueado
+    </span>
+
+  } @else {
+
+    <span class="estado disponible">
+      Producto permitido
+    </span>
+
+  }
+
+</div>

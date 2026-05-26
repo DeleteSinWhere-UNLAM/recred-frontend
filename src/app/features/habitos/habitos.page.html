@@ -1,0 +1,21 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="habitos">
+
+  <h1 class="titulo">
+    Hábitos de consumo
+  </h1>
+
+  <div class="lista-alertas">
+
+    @for (alerta of alertas; track alerta.alumno) {
+
+      <app-habito-alert-card
+        [alerta]="alerta"
+      />
+
+    }
+
+  </div>
+
+</main>

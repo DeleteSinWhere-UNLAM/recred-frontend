@@ -1,0 +1,23 @@
+.card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 1rem;
+  background: white;
+}
+
+.alumno {
+  margin-bottom: 1rem;
+}
+
+.producto,
+.frecuencia {
+  margin-bottom: 0.5rem;
+}
+
+.recomendacion {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: #eef6ff;
+}

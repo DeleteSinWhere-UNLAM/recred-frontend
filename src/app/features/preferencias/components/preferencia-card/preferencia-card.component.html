@@ -1,0 +1,25 @@
+<div class="card">
+
+  <h3 class="producto">
+    {{ preferencia.producto }}
+  </h3>
+
+  <p class="score">
+    Probabilidad: {{ preferencia.score }}%
+  </p>
+
+  @if (preferencia.disponible) {
+
+    <span class="estado disponible">
+      Disponible
+    </span>
+
+  } @else {
+
+    <span class="estado no-disponible">
+      No disponible
+    </span>
+
+  }
+
+</div>

@@ -1,0 +1,33 @@
+.card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 1rem;
+  background: white;
+}
+
+.producto-original {
+  margin-bottom: 0.5rem;
+}
+
+.producto-sugerido {
+  font-weight: bold;
+}
+
+.motivo {
+  margin: 1rem 0;
+}
+
+.estado {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.bloqueado {
+  background: #ffd6d6;
+}
+
+.disponible {
+  background: #d6ffe0;
+}
