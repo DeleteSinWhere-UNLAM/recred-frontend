@@ -1,0 +1,125 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="buffet">
+  <div class="buffet__container">
+    <header class="buffet__cabecera">
+      <button
+        type="button"
+        class="buffet__volver"
+        (click)="presenter.volver()"
+      >
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Volver</span>
+      </button>
+
+      <div class="buffet__titulo-bloque">
+        <h2 class="buffet__titulo">Menú del Buffet</h2>
+        @if (presenter.buffet(); as buffet) {
+          <p class="buffet__buffet-nombre">{{ buffet.nombre }}</p>
+        }
+      </div>
+
+      @if (presenter.alumno(); as alumno) {
+        <div class="buffet__alumno">
+          <div class="buffet__avatar" aria-hidden="true">
+            <span>{{ presenter.iniciales() }}</span>
+          </div>
+          <div class="buffet__alumno-info">
+            <p class="buffet__alumno-nombre">{{ presenter.nombreCompleto() }}</p>
+            <p class="buffet__alumno-grado">{{ alumno.grado }}</p>
+          </div>
+          <div class="buffet__saldo">
+            <span class="buffet__saldo-label">SALDO</span>
+            <span class="buffet__saldo-valor">{{ saldoFormateado }}</span>
+          </div>
+        </div>
+      }
+    </header>
+
+    <section class="buffet__filtros" aria-label="Filtros del menú">
+      <div class="buffet__filtro buffet__filtro--busqueda">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input
+          type="search"
+          class="buffet__busqueda"
+          placeholder="Buscar por nombre..."
+          [value]="presenter.filtros().busqueda"
+          (input)="onBusqueda($event)"
+          aria-label="Buscar productos"
+        />
+      </div>
+
+      <div class="buffet__filtro buffet__filtro--slider" aria-hidden="true">
+        <div class="buffet__slider-rotulos">
+          <span>MIN</span>
+          <span>MAX</span>
+        </div>
+        <div class="buffet__slider-track">
+          <div class="buffet__slider-fill"></div>
+          <span class="buffet__slider-thumb buffet__slider-thumb--izq"></span>
+          <span class="buffet__slider-thumb buffet__slider-thumb--der"></span>
+        </div>
+        <p class="buffet__slider-nota">Rango de precio</p>
+      </div>
+
+      <div class="buffet__filtro buffet__filtro--select">
+        <select
+          class="buffet__select"
+          [value]="presenter.filtros().categoriaId"
+          (change)="onCategoria($event)"
+          aria-label="Filtrar por categoría"
+        >
+          <option value="todas">Categorías</option>
+          @for (cat of presenter.categorias(); track cat.id) {
+            <option [value]="cat.id">{{ cat.descripcion }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="buffet__filtro buffet__filtro--select">
+        <select
+          class="buffet__select"
+          [value]="presenter.filtros().clasificacionId"
+          (change)="onClasificacion($event)"
+          aria-label="Filtrar por restricción"
+        >
+          <option value="todas">Restricciones</option>
+          @for (cla of presenter.clasificaciones(); track cla.id) {
+            <option [value]="cla.id">{{ cla.descripcion }}</option>
+          }
+        </select>
+      </div>
+
+      <button
+        type="button"
+        class="buffet__limpiar"
+        (click)="presenter.limpiarFiltros()"
+      >
+        Limpiar
+      </button>
+    </section>
+
+    @if (presenter.productosFiltrados().length > 0) {
+      <section class="buffet__grid" aria-label="Productos del buffet">
+        @for (producto of presenter.productosFiltrados(); track producto.id) {
+          <app-producto-card
+            [producto]="producto"
+            (agregar)="presenter.agregarAlCarrito($event)"
+          />
+        }
+      </section>
+    } @else {
+      <div class="buffet__vacio" role="status">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <p>No hay productos que coincidan con los filtros.</p>
+        <button
+          type="button"
+          class="buffet__vacio-cta"
+          (click)="presenter.limpiarFiltros()"
+        >
+          Limpiar filtros
+        </button>
+      </div>
+    }
+  </div>
+</main>
