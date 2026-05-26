@@ -14,6 +14,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'buffet/:alumnoId',
+    loadComponent: () =>
+      import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
+  },
+  {
     path: 'preferencias',
     loadComponent: () =>
       import('./features/preferencias/preferencias.page')
