@@ -1,0 +1,68 @@
+@let producto = productoActual();
+@if (producto) {
+  <article
+    class="producto-card"
+    [class.producto-card--sin-stock]="!disponible()"
+  >
+    <div class="producto-card__media">
+      <img
+        class="producto-card__imagen"
+        [src]="producto.imagen"
+        [alt]="producto.nombre"
+        loading="lazy"
+        (error)="onImagenError($event)"
+      />
+      @if (producto.clasificacionesSalud.length > 0) {
+        <span class="producto-card__badge">
+          {{ producto.clasificacionesSalud[0].descripcion }}
+        </span>
+      }
+    </div>
+
+    <div class="producto-card__cuerpo">
+      <p class="producto-card__categoria">{{ producto.categoria.descripcion }}</p>
+      <h3 class="producto-card__nombre">{{ producto.nombre }}</h3>
+      <p class="producto-card__precio">{{ precioFormateado() }}</p>
+
+      <div class="producto-card__cantidad" aria-hidden="true">
+        <button
+          type="button"
+          class="producto-card__cantidad-btn"
+          disabled
+          title="Próximamente"
+        >
+          <i class="fa-solid fa-minus"></i>
+        </button>
+        <span class="producto-card__cantidad-valor">1</span>
+        <button
+          type="button"
+          class="producto-card__cantidad-btn"
+          disabled
+          title="Próximamente"
+        >
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      @if (disponible()) {
+        <button
+          type="button"
+          class="producto-card__cta"
+          (click)="onAgregar()"
+        >
+          <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+          <span>Agregar</span>
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="producto-card__cta producto-card__cta--bloqueado"
+          disabled
+        >
+          <i class="fa-solid fa-ban" aria-hidden="true"></i>
+          <span>Sin stock</span>
+        </button>
+      }
+    </div>
+  </article>
+}

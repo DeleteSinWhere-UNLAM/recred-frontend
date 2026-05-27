@@ -1,0 +1,21 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="consumo">
+
+  <h1 class="titulo">
+    Aprendizaje de consumo
+  </h1>
+
+  <div class="lista-consumos">
+
+    @for (consumo of consumos; track consumo.alumno) {
+
+      <app-consumo-card
+        [consumo]="consumo"
+      />
+
+    }
+
+  </div>
+
+</main>

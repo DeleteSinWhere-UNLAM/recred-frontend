@@ -1,0 +1,47 @@
+<article class="alumno-card">
+  <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreCompleto">
+    <div class="alumno-card__avatar">
+      <span>{{ iniciales }}</span>
+    </div>
+  </div>
+
+  <div class="alumno-card__body">
+    <header class="alumno-card__header">
+      <div class="alumno-card__identidad">
+        <h3 class="alumno-card__nombre">{{ nombreCompleto }}</h3>
+        <p class="alumno-card__grado">{{ alumno.grado }}</p>
+      </div>
+      <div class="alumno-card__saldo" [class.alumno-card__saldo--negativo]="saldoNegativo">
+        <span class="alumno-card__saldo-label">SALDO</span>
+        <span class="alumno-card__saldo-valor">{{ saldoFormateado }}</span>
+      </div>
+    </header>
+
+    <div class="alumno-card__acciones" role="group" aria-label="Acciones rápidas">
+      <button type="button" class="alumno-card__accion">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        <span>Acreditar</span>
+      </button>
+      <button type="button" class="alumno-card__accion">
+        <i class="fa-solid fa-list" aria-hidden="true"></i>
+        <span>Movimientos</span>
+      </button>
+      <button type="button" class="alumno-card__accion">
+        <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+        <span>Pendientes</span>
+      </button>
+      <a
+        class="alumno-card__accion"
+        [routerLink]="['/restricciones', alumno.id]"
+      >
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        <span>Restricciones</span>
+      </a>
+    </div>
+
+    <a
+      class="alumno-card__cta"
+      [routerLink]="['/buffet', alumno.id]"
+    >Ir al Buffet</a>
+  </div>
+</article>

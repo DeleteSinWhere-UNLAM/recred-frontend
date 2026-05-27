@@ -1,0 +1,13 @@
+.sugerencias {
+  padding: 2rem;
+}
+
+.titulo {
+  margin-bottom: 2rem;
+}
+
+.lista-sugerencias {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

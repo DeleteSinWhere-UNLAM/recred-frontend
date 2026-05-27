@@ -1,0 +1,201 @@
+.alumno-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 28px;
+  background-color: var(--color-fondo);
+  border-radius: 24px;
+  box-shadow: var(--shadow-neu-convex);
+}
+
+.alumno-card__avatar-wrap {
+  flex-shrink: 0;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: var(--color-fondo);
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.alumno-card__avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 1px;
+}
+
+.alumno-card__body {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+}
+
+.alumno-card__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.alumno-card__identidad {
+  min-width: 0;
+}
+
+.alumno-card__nombre {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  line-height: 1.2;
+}
+
+.alumno-card__grado {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-texto-claro);
+}
+
+.alumno-card__saldo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 18px;
+  background-color: var(--color-fondo);
+  border-radius: 16px;
+  box-shadow: var(--shadow-neu-concave);
+  flex-shrink: 0;
+}
+
+.alumno-card__saldo-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+  margin-bottom: 2px;
+}
+
+.alumno-card__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+.alumno-card__saldo--negativo .alumno-card__saldo-valor {
+  color: var(--color-melocoton);
+}
+
+.alumno-card__acciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.alumno-card__accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background-color: var(--color-fondo);
+  color: var(--color-texto-claro);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: var(--shadow-neu-convex);
+  transition: color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.alumno-card__accion:hover {
+  color: var(--color-pizarra);
+}
+
+.alumno-card__accion:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.alumno-card__accion i {
+  font-size: 12px;
+}
+
+.alumno-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 16px;
+  background-color: var(--color-dorado);
+  color: var(--color-texto-oscuro);
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow:
+    4px 4px 10px rgba(242, 183, 5, 0.3),
+    -4px -4px 10px rgba(255, 255, 255, 0.8);
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.alumno-card__cta:hover {
+  background-color: var(--color-dorado-dark);
+}
+
+.alumno-card__cta:active {
+  transform: scale(0.98);
+  box-shadow:
+    inset 2px 2px 5px rgba(180, 130, 0, 0.4),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.5);
+}
+
+@media (min-width: 640px) {
+  .alumno-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 32px;
+    gap: 32px;
+  }
+
+  .alumno-card__body {
+    text-align: left;
+  }
+
+  .alumno-card__header {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .alumno-card__saldo {
+    align-items: flex-end;
+  }
+}
+
+@media (max-width: 380px) {
+  .alumno-card {
+    padding: 22px;
+  }
+
+  .alumno-card__avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 26px;
+  }
+}
