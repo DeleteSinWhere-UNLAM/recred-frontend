@@ -1,0 +1,49 @@
+.card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 1rem;
+  background: white;
+}
+
+.alumno {
+  margin-bottom: 1rem;
+}
+
+.mensaje {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.categoria,
+.porcentaje {
+  margin-bottom: 0.5rem;
+}
+
+.sugerencia {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: #fff4e5;
+}
+
+.acciones {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.limitar {
+  background: #ffd6d6;
+}
+
+.ignorar {
+  background: #eee;
+}
