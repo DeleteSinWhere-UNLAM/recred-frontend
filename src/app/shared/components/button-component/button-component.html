@@ -1,6 +1,6 @@
 <button
-  (click)="onClick.emit()"
+  (click)="Click.emit()"
   [class]="getClasses()"
   [disabled]="disabled">
-  <ng-content></ng-content> <!-- Esto permite poner texto adentro: <app-button>Texto</app-button> -->
+  <ng-content></ng-content>
 </button>

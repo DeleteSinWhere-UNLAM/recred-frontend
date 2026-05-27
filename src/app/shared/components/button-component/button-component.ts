@@ -10,7 +10,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 export class ButtonComponent {
   @Input() variant: 'primary' | 'success' | 'danger' | 'outline' = 'primary';
   @Input() disabled = false;
-  @Output() onClick = new EventEmitter<void>();
+  @Output() Click = new EventEmitter<void>();
 
   getClasses(): string {
     const base = 'px-4 py-2 rounded-lg font-semibold transition-all duration-200 ';

@@ -1,0 +1,22 @@
+<div class="stock-load-container">
+  <h2>Cargar Stock con IA</h2>
+  
+  <div class="form-group">
+    <label for="stockText">Descripción del producto:</label>
+    <input type="text" id="stockText" [(ngModel)]="textInput" [disabled]="isLoading" placeholder="Ej: pack de agua">
+  </div>
+
+  <div class="form-group">
+    <label for="stockImage">O sube una foto:</label>
+    <input type="file" id="stockImage" (change)="onFileChange($event)" accept="image/*" [disabled]="isLoading">
+  </div>
+
+  <button (click)="onSubmit()" [disabled]="isLoading">
+    <span *ngIf="isLoading">Cargando...</span>
+    <span *ngIf="!isLoading">Enviar</span>
+  </button>
+
+  <div *ngIf="message" [ngClass]="{'error': isError, 'success': !isError}">
+    {{ message }}
+  </div>
+</div>
