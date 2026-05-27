@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { CarritoService } from '../../../features/compra/data/carrito.service';
 
 @Component({
   selector: 'app-navbar',
@@ -7,6 +9,19 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
+  private readonly router = inject(Router);
+  private readonly carritoService = inject(CarritoService);
+
   @Input() userName = '';
-  @Input() cartCount = 0;
+
+  protected readonly cartCount = this.carritoService.cantidadTotal;
+
+  protected irAlCarrito(): void {
+    this.router.navigateByUrl('/compra');
+  }
+
+  protected irAInicio(event: Event): void {
+    event.preventDefault();
+    this.router.navigateByUrl('/');
+  }
 }

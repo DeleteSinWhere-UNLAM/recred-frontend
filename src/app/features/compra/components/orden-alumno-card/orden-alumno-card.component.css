@@ -1,0 +1,201 @@
+.orden-alumno {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  background-color: var(--color-fondo);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-neu-convex);
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.orden-alumno--seleccionado {
+  border-color: var(--color-dorado);
+}
+
+.orden-alumno__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.orden-alumno__check {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.orden-alumno__check input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.orden-alumno__check-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background-color: var(--color-fondo);
+  box-shadow: var(--shadow-neu-concave);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  font-size: 12px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.orden-alumno__check input:checked + .orden-alumno__check-box {
+  background-color: var(--color-dorado);
+  color: var(--color-texto-oscuro);
+  box-shadow: none;
+}
+
+.orden-alumno__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.orden-alumno__identidad {
+  flex: 1;
+  min-width: 0;
+}
+
+.orden-alumno__nombre {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  line-height: 1.2;
+}
+
+.orden-alumno__grado {
+  font-size: 12px;
+  color: var(--color-texto-claro);
+  margin-top: 2px;
+}
+
+.orden-alumno__saldo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.orden-alumno__saldo-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+.orden-alumno__saldo-valor--negativo {
+  color: var(--color-melocoton);
+}
+
+.orden-alumno__alerta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: rgba(231, 111, 81, 0.12);
+  color: var(--color-melocoton);
+  border-radius: var(--radius-button);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.orden-alumno__items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.orden-alumno__opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.orden-alumno__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.orden-alumno__campo-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__input {
+  padding: 10px 12px;
+  background-color: var(--color-fondo);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-neu-concave);
+  border: none;
+  color: var(--color-texto-oscuro);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.orden-alumno__input:focus {
+  outline: 2px solid var(--color-dorado);
+  outline-offset: 2px;
+}
+
+.orden-alumno__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(74, 111, 165, 0.2);
+}
+
+.orden-alumno__pie-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__pie-valor {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+@media (max-width: 640px) {
+  .orden-alumno__opciones {
+    grid-template-columns: 1fr;
+  }
+  .orden-alumno__saldo {
+    display: none;
+  }
+}

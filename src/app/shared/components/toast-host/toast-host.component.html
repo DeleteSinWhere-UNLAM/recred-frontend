@@ -1,0 +1,25 @@
+<div class="toast-host" aria-live="polite" aria-atomic="true">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="toast toast--{{ toast.variante }}"
+      role="status"
+    >
+      <i
+        class="fa-solid"
+        [class.fa-circle-check]="toast.variante === 'success'"
+        [class.fa-circle-info]="toast.variante === 'info'"
+        [class.fa-circle-exclamation]="toast.variante === 'error'"
+        aria-hidden="true"
+      ></i>
+      <span class="toast__mensaje">{{ toast.mensaje }}</span>
+      <button
+        type="button"
+        class="toast__cerrar"
+        (click)="toastService.cerrar(toast.id)"
+        aria-label="Cerrar notificación"
+      >
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+</div>

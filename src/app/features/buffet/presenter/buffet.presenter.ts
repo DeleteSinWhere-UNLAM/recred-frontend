@@ -2,6 +2,9 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
+import { CarritoService } from '../../compra/data/carrito.service';
+import { ColegiosService } from '../../../data-access/services/colegios.service';
+import { ToastService } from '../../../shared/services/toast.service';
 import { BuffetService } from '../data/buffet.service';
 import { Buffet } from '../models/buffet.model';
 import {
@@ -26,6 +29,9 @@ const filtrosPorDefecto: FiltrosBuffet = {
 export class BuffetPresenter {
   private readonly alumnosService = inject(AlumnosService);
   private readonly buffetService = inject(BuffetService);
+  private readonly carritoService = inject(CarritoService);
+  private readonly colegiosService = inject(ColegiosService);
+  private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
@@ -57,6 +63,16 @@ export class BuffetPresenter {
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');
 
   readonly saldo = computed(() => this.alumnoState()?.saldo ?? 0);
+
+  readonly nombreColegio = computed(() => {
+    const alumno = this.alumnoState();
+    if (!alumno) return '';
+    return (
+      this.colegiosService
+        .getColegios()
+        .find((c) => c.id === alumno.colegioId)?.nombre ?? ''
+    );
+  });
 
   readonly productosFiltrados = computed<Producto[]>(() => {
     const { busqueda, categoriaId, clasificacionId } = this.filtrosState();
@@ -120,7 +136,19 @@ export class BuffetPresenter {
     this.router.navigateByUrl('/');
   }
 
-  agregarAlCarrito(producto: Producto): void {
-    console.info('[Buffet] agregar', producto);
+  cambiarAlumno(nuevoAlumnoId: string): void {
+    if (!nuevoAlumnoId || nuevoAlumnoId === this.alumnoState()?.id) return;
+    this.init(nuevoAlumnoId);
+    this.router.navigate(['/buffet', nuevoAlumnoId]);
+  }
+
+  agregarAlCarrito(producto: Producto, cantidad = 1): void {
+    const alumno = this.alumnoState();
+    if (!alumno) return;
+    this.carritoService.agregar(producto, alumno.id, cantidad);
+    const verbo = cantidad === 1 ? 'Se agregó' : 'Se agregaron';
+    this.toastService.mostrar(
+      `${verbo} ${cantidad}x "${producto.nombre}" al carrito`,
+    );
   }
 }

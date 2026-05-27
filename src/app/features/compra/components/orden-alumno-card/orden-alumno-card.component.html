@@ -1,0 +1,90 @@
+@let alumno = alumnoActual();
+@if (alumno) {
+  <article
+    class="orden-alumno"
+    [class.orden-alumno--seleccionado]="seleccionado"
+  >
+    <header class="orden-alumno__cabecera">
+      <label class="orden-alumno__check">
+        <input
+          type="checkbox"
+          [checked]="seleccionado"
+          (change)="toggleSeleccion.emit()"
+          [attr.aria-label]="'Incluir compra de ' + nombreCompleto()"
+        />
+        <span class="orden-alumno__check-box" aria-hidden="true">
+          <i class="fa-solid fa-check"></i>
+        </span>
+      </label>
+
+      <div class="orden-alumno__avatar" aria-hidden="true">
+        <span>{{ iniciales() }}</span>
+      </div>
+
+      <div class="orden-alumno__identidad">
+        <h3 class="orden-alumno__nombre">{{ nombreCompleto() }}</h3>
+        <p class="orden-alumno__grado">{{ alumno.grado }}</p>
+      </div>
+
+      <div class="orden-alumno__saldo">
+        <span class="orden-alumno__saldo-label">SALDO</span>
+        <span
+          class="orden-alumno__saldo-valor"
+          [class.orden-alumno__saldo-valor--negativo]="saldoInsuficiente()"
+        >
+          {{ saldoFormateado() }}
+        </span>
+      </div>
+    </header>
+
+    @if (saldoInsuficiente()) {
+      <p class="orden-alumno__alerta" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        El saldo no alcanza para este pedido.
+      </p>
+    }
+
+    <div class="orden-alumno__items">
+      @for (item of itemsActuales(); track item.id) {
+        <app-carrito-item
+          [item]="item"
+          (sumar)="sumarItem.emit($event)"
+          (restar)="restarItem.emit($event)"
+          (eliminar)="eliminarItem.emit($event)"
+        />
+      }
+    </div>
+
+    <div class="orden-alumno__opciones">
+      <label class="orden-alumno__campo">
+        <span class="orden-alumno__campo-label">Día de retiro</span>
+        <input
+          type="date"
+          class="orden-alumno__input"
+          [value]="fecha"
+          [min]="fechaMinima"
+          (change)="onFechaCambia($event)"
+        />
+      </label>
+
+      <label class="orden-alumno__campo">
+        <span class="orden-alumno__campo-label">Recreo</span>
+        <select
+          class="orden-alumno__input"
+          [value]="recreo"
+          (change)="onRecreoCambia($event)"
+        >
+          <option value="PRIMER_RECREO">1er Recreo</option>
+          <option value="SEGUNDO_RECREO">2do Recreo</option>
+          <option value="MEDIODIA">Mediodía</option>
+          <option value="FUERA_HORA">Fuera de hora</option>
+        </select>
+      </label>
+    </div>
+
+    <footer class="orden-alumno__pie">
+      <span class="orden-alumno__pie-label">Subtotal</span>
+      <span class="orden-alumno__pie-valor">{{ subtotalFormateado() }}</span>
+    </footer>
+  </article>
+}

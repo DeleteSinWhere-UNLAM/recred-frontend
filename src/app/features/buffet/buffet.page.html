@@ -24,9 +24,22 @@
           <div class="buffet__avatar" aria-hidden="true">
             <span>{{ presenter.iniciales() }}</span>
           </div>
-          <div class="buffet__alumno-info">
-            <p class="buffet__alumno-nombre">{{ presenter.nombreCompleto() }}</p>
-            <p class="buffet__alumno-grado">{{ alumno.grado }}</p>
+          <div class="buffet__alumno-textos">
+            <div class="buffet__alumno-linea">
+              <p class="buffet__alumno-nombre">{{ presenter.nombreCompleto() }}</p>
+              <button
+                type="button"
+                class="buffet__alumno-editar"
+                (click)="abrirSelector()"
+                aria-label="Cambiar alumno"
+                title="Cambiar alumno"
+              >
+                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p class="buffet__alumno-colegio">
+              en <strong>{{ presenter.nombreColegio() }}</strong>
+            </p>
           </div>
           <div class="buffet__saldo">
             <span class="buffet__saldo-label">SALDO</span>
@@ -104,7 +117,8 @@
         @for (producto of presenter.productosFiltrados(); track producto.id) {
           <app-producto-card
             [producto]="producto"
-            (agregar)="presenter.agregarAlCarrito($event)"
+            [alumnoId]="presenter.alumno()?.id ?? ''"
+            (agregar)="presenter.agregarAlCarrito($event.producto, $event.cantidad)"
           />
         }
       </section>
@@ -123,3 +137,13 @@
     }
   </div>
 </main>
+
+@if (mostrarSelector()) {
+  <app-seleccionar-alumno-modal
+    [alumnos]="todosLosAlumnos"
+    [colegios]="todosLosColegios"
+    [alumnoActualId]="presenter.alumno()?.id ?? ''"
+    (seleccionar)="onAlumnoSeleccionado($event)"
+    (cerrar)="cerrarSelector()"
+  />
+}

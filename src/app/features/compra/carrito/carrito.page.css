@@ -1,0 +1,121 @@
+.carrito-page {
+  min-height: calc(100vh - 64px);
+  padding: 32px 0 80px;
+  background-color: var(--color-fondo);
+}
+
+.carrito-page__container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.carrito-page__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.carrito-page__volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: var(--color-fondo);
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-neu-convex);
+  transition: transform 0.1s ease;
+}
+
+.carrito-page__volver:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.carrito-page__titulo-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.carrito-page__titulo {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+}
+
+.carrito-page__subtitulo {
+  font-size: 13px;
+  color: var(--color-texto-claro);
+}
+
+.carrito-page__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.carrito-page__grupos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.carrito-page__vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 24px;
+  background-color: var(--color-fondo);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-neu-convex);
+  text-align: center;
+}
+
+.carrito-page__vacio i {
+  font-size: 42px;
+  color: var(--color-texto-claro);
+}
+
+.carrito-page__vacio h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+}
+
+.carrito-page__vacio p {
+  color: var(--color-texto-claro);
+  font-size: 14px;
+}
+
+.carrito-page__vacio-cta {
+  margin-top: 12px;
+  padding: 12px 22px;
+  background-color: var(--color-dorado);
+  color: var(--color-texto-oscuro);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: var(--radius-button);
+  box-shadow: 0 4px 12px rgba(242, 183, 5, 0.35);
+}
+
+@media (max-width: 920px) {
+  .carrito-page__grid {
+    grid-template-columns: 1fr;
+  }
+}
