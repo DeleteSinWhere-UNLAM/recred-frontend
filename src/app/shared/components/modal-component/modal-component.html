@@ -13,11 +13,11 @@
           
           <div class="flex justify-end gap-3">
             @if (showCancel) {
-              <app-button-component variant="outline" (onClick)="onCancel.emit()">
+              <app-button-component variant="outline" (onClick)="dismiss.emit()">
                 {{ cancelText }}
               </app-button-component>
             }
-            <app-button-component variant="success" (onClick)="onConfirm.emit()">
+            <app-button-component variant="success" (onClick)="confirm.emit()">
               {{ confirmText }}
             </app-button-component>
           </div>

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+
 export const routes: Routes = [
   {
     path: '',
@@ -25,7 +26,7 @@ export const routes: Routes = [
         .then((m) => m.PreferenciasPage),
   },
 
-    {
+  {
     path: 'sugerencias',
     loadComponent: () =>
       import('./features/sugerencias/sugerencias.page')
@@ -33,16 +34,22 @@ export const routes: Routes = [
   },
 
   {
-  path: 'consumo',
-  loadComponent: () =>
-    import('./features/consumo/consumo.page')
-      .then((m) => m.ConsumoPage),
-},
+    path: 'consumo',
+    loadComponent: () =>
+      import('./features/consumo/consumo.page')
+        .then((m) => m.ConsumoPage),
+  },
 
-{
-  path: 'habitos',
-  loadComponent: () =>
-    import('./features/habitos/habitos.page')
-      .then((m) => m.HabitosPage),
-},
+  {
+    path: 'habitos',
+    loadComponent: () =>
+      import('./features/habitos/habitos.page')
+        .then((m) => m.HabitosPage),
+  },
+  {
+    path: 'cargar-producto-ia',
+    loadChildren: () => import('./features/ai-product-upload/ai-product-upload.routes').then(m => m.aiProductUploadRoutes)
+  }
+
+
 ];

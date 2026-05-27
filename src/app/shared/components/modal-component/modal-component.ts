@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ButtonComponent } from '../button-component/button-component';
 
 @Component({
-  selector: 'modal-component',
+  selector: 'app-modal-component',
   standalone: true,
   imports: [ButtonComponent],
   templateUrl: './modal-component.html',
@@ -16,6 +16,6 @@ export class ModalComponent {
   @Input() cancelText = 'Cancelar';
   @Input() showCancel = true;
 
-  @Output() onConfirm = new EventEmitter<void>();
-  @Output() onCancel = new EventEmitter<void>();
+  @Output() confirm = new EventEmitter<void>();
+  @Output() dismiss = new EventEmitter<void>();
 }
