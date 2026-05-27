@@ -1,7 +1,7 @@
 <header class="navbar">
   <div class="navbar__inner">
     <div class="navbar__brand">
-      <a class="navbar__logo" href="/" aria-label="RECRED — Inicio">
+      <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
         <img src="logoHeader.png" alt="" class="navbar__logo-img">
         <span class="navbar__logo-text">RECRED</span>
       </a>
@@ -11,9 +11,16 @@
 
     <nav class="navbar__actions" aria-label="Acciones principales">
       <a class="navbar__link" href="#">Movimientos</a>
-      <button type="button" class="navbar__cart" aria-label="Carrito, {{ cartCount }} ítems">
+      <button
+        type="button"
+        class="navbar__cart"
+        (click)="irAlCarrito()"
+        [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'"
+      >
         <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-        <span class="navbar__cart-badge">{{ cartCount }}</span>
+        @if (cartCount() > 0) {
+          <span class="navbar__cart-badge">{{ cartCount() }}</span>
+        }
       </button>
     </nav>
   </div>

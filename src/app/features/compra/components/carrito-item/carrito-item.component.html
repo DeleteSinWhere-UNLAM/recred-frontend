@@ -1,0 +1,51 @@
+@let item = itemActual();
+@if (item) {
+  <div class="carrito-item">
+    <div class="carrito-item__media">
+      <img
+        class="carrito-item__imagen"
+        [src]="item.producto.imagen"
+        [alt]="item.producto.nombre"
+        loading="lazy"
+        (error)="onImagenError($event)"
+      />
+    </div>
+
+    <div class="carrito-item__info">
+      <p class="carrito-item__categoria">{{ item.producto.categoria.descripcion }}</p>
+      <h4 class="carrito-item__nombre">{{ item.producto.nombre }}</h4>
+      <p class="carrito-item__precio-unit">{{ precioFormateado() }} c/u</p>
+    </div>
+
+    <div class="carrito-item__qty">
+      <button
+        type="button"
+        class="carrito-item__qty-btn"
+        (click)="restar.emit(item.id)"
+        aria-label="Restar uno"
+      >
+        <i class="fa-solid fa-minus" aria-hidden="true"></i>
+      </button>
+      <span class="carrito-item__qty-valor">{{ item.cantidad }}</span>
+      <button
+        type="button"
+        class="carrito-item__qty-btn"
+        (click)="sumar.emit(item.id)"
+        aria-label="Sumar uno"
+      >
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <p class="carrito-item__subtotal">{{ subtotalFormateado() }}</p>
+
+    <button
+      type="button"
+      class="carrito-item__eliminar"
+      (click)="eliminar.emit(item.id)"
+      aria-label="Eliminar del carrito"
+    >
+      <i class="fa-solid fa-trash" aria-hidden="true"></i>
+    </button>
+  </div>
+}

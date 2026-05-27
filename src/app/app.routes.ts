@@ -45,4 +45,10 @@ export const routes: Routes = [
     import('./features/habitos/habitos.page')
       .then((m) => m.HabitosPage),
 },
+
+  {
+    path: 'compra',
+    loadChildren: () =>
+      import('./features/compra/compra.routes').then((m) => m.compraRoutes),
+  },
 ];

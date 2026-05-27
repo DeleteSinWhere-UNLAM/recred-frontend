@@ -1,0 +1,44 @@
+<aside class="resumen">
+  <h3 class="resumen__titulo">Resumen de Orden</h3>
+
+  @if (advertencia) {
+    <p class="resumen__alerta" role="alert">
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      {{ advertencia }}
+    </p>
+  }
+
+  <ul class="resumen__lineas">
+    @for (linea of lineasActuales(); track linea.alumnoId) {
+      <li
+        class="resumen__linea"
+        [class.resumen__linea--excluida]="!linea.incluido"
+      >
+        <span class="resumen__linea-nombre">{{ linea.nombre }}</span>
+        <span class="resumen__linea-valor">{{ formatear(linea.subtotal) }}</span>
+      </li>
+    } @empty {
+      <li class="resumen__vacio">El carrito está vacío.</li>
+    }
+  </ul>
+
+  <div class="resumen__total">
+    <span class="resumen__total-label">Total</span>
+    <span class="resumen__total-valor">{{ totalFormateado() }}</span>
+  </div>
+
+  <button
+    type="button"
+    class="resumen__cta"
+    (click)="accion.emit()"
+    [disabled]="ctaDeshabilitado || cargando"
+  >
+    @if (cargando) {
+      <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>Procesando...</span>
+    } @else {
+      <i class="fa-solid fa-lock" aria-hidden="true"></i>
+      <span>{{ ctaLabel }}</span>
+    }
+  </button>
+</aside>

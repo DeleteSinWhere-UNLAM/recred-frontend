@@ -1,0 +1,67 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="carrito-page">
+  <div class="carrito-page__container">
+    <header class="carrito-page__cabecera">
+      <button
+        type="button"
+        class="carrito-page__volver"
+        (click)="presenter.volverAlBuffet()"
+      >
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Volver</span>
+      </button>
+      <div class="carrito-page__titulo-bloque">
+        <h2 class="carrito-page__titulo">Mi Carrito</h2>
+        <p class="carrito-page__subtitulo">
+          Revisá lo que pediste y elegí cuándo retirarlo.
+        </p>
+      </div>
+    </header>
+
+    @if (presenter.carritoVacio()) {
+      <section class="carrito-page__vacio" role="status">
+        <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+        <h3>Tu carrito está vacío</h3>
+        <p>Volvé al buffet para agregar productos.</p>
+        <button
+          type="button"
+          class="carrito-page__vacio-cta"
+          (click)="presenter.volverAlBuffet()"
+        >
+          Ir al inicio
+        </button>
+      </section>
+    } @else {
+      <div class="carrito-page__grid">
+        <section class="carrito-page__grupos" aria-label="Pedidos por alumno">
+          @for (grupo of presenter.grupos(); track grupo.alumno.id) {
+            <app-orden-alumno-card
+              [alumno]="grupo.alumno"
+              [items]="grupo.items"
+              [seleccionado]="grupo.seleccionado"
+              [fecha]="grupo.fecha"
+              [recreo]="grupo.recreo"
+              [fechaMinima]="presenter.fechaMinima"
+              (toggleSeleccion)="presenter.toggleSeleccion(grupo.alumno.id)"
+              (fechaCambia)="presenter.setFecha(grupo.alumno.id, $event)"
+              (recreoCambia)="presenter.setRecreo(grupo.alumno.id, $event)"
+              (sumarItem)="presenter.sumarItem($event)"
+              (restarItem)="presenter.restarItem($event)"
+              (eliminarItem)="presenter.eliminarItem($event)"
+            />
+          }
+        </section>
+
+        <app-resumen-orden-card
+          [lineas]="lineasResumen()"
+          [total]="presenter.totalSeleccionado()"
+          [ctaDeshabilitado]="!presenter.avanzarPosible()"
+          [advertencia]="presenter.advertencia()"
+          ctaLabel="Avanzar al Pago"
+          (accion)="presenter.avanzar()"
+        />
+      </div>
+    }
+  </div>
+</main>
