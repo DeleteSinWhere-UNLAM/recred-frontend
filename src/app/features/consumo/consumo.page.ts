@@ -2,10 +2,10 @@ import { Component, inject } from '@angular/core';
 
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
-import { UsuarioService } from '../../core/services/usuario.service';
-import { ConsumoService } from '../../core/services/consumo.service';
+import { UsuarioService } from '../../data-access/services/usuario.service';
+import { ConsumoService } from '../../data-access/services/consumo.service';
 
-import { ConsumoAprendizaje } from '../../core/models/consumo-aprendizaje.model';
+import { ConsumoAprendizaje } from '../../data-access/models/consumo-aprendizaje.model';
 
 import { ConsumoCardComponent } from './components/consumo-card/consumo-card.component';
 

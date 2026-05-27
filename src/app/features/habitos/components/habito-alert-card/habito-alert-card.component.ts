@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { HabitoAlerta } from '../../../../core/models/habito-alerta.model';
+import { HabitoAlerta } from '../../../../data-access/models/habito-alerta.model';
 
 @Component({
   selector: 'app-habito-alert-card',

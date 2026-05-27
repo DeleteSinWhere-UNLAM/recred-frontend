@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Alumno } from '../../../../core/models/alumno.model';
+import { Alumno } from '../../../../data-access/models/alumno.model';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { ConsumoAprendizaje } from '../../../../core/models/consumo-aprendizaje.model';
+import { ConsumoAprendizaje } from '../../../../data-access/models/consumo-aprendizaje.model';
 
 @Component({
   selector: 'app-consumo-card',

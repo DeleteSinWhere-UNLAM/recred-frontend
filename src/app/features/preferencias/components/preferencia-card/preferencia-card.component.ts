@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Preferencia } from '../../../../core/models/preferencia.model';
+import { Preferencia } from '../../../../data-access/models/preferencia.model';
 
 @Component({
   selector: 'app-preferencia-card',

@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 
-import { Preferencia } from '../../core/models/preferencia.model';
-import { PreferenciasService } from '../../core/services/preferencias.service';
-import { UsuarioService } from '../../core/services/usuario.service';
+import { Preferencia } from '../../data-access/models/preferencia.model';
+import { PreferenciasService } from '../../data-access/services/preferencias.service';
+import { UsuarioService } from '../../data-access/services/usuario.service';
 
 import { PreferenciaCardComponent } from './components/preferencia-card/preferencia-card.component';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
