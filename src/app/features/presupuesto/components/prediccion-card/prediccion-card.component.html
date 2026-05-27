@@ -1,0 +1,125 @@
+@if (prediccionActual(); as prediccion) {
+  <article
+    class="prediccion-card"
+    [class]="'prediccion-card--' + nivelActual()"
+    aria-labelledby="prediccion-titulo"
+  >
+    <header class="prediccion-card__cabecera">
+      <div>
+        <p class="prediccion-card__eyebrow">Predicción IA</p>
+        <h3 id="prediccion-titulo" class="prediccion-card__titulo">
+          Gasto proyectado del período
+        </h3>
+      </div>
+      <span class="prediccion-card__badge" aria-hidden="true">
+        {{ nivelLabel() }}
+      </span>
+    </header>
+
+    <div class="prediccion-card__cuerpo">
+      <div class="prediccion-card__donut" aria-hidden="true">
+        <svg viewBox="0 0 120 120" class="donut">
+          <circle
+            class="donut__pista"
+            cx="60"
+            cy="60"
+            r="52"
+            fill="none"
+            stroke-width="12"
+          />
+          <circle
+            class="donut__valor"
+            cx="60"
+            cy="60"
+            r="52"
+            fill="none"
+            stroke-width="12"
+            stroke-linecap="round"
+            [attr.stroke-dasharray]="dashArray()"
+            [attr.stroke-dashoffset]="circumferencia / 4"
+          />
+        </svg>
+        <div class="prediccion-card__porcentaje">
+          <span class="prediccion-card__valor">{{ porcentajeRedondeado() }}%</span>
+          <span class="prediccion-card__leyenda">del límite</span>
+        </div>
+      </div>
+
+      <dl class="prediccion-card__stats">
+        <div class="prediccion-card__stat">
+          <dt>Gasto actual</dt>
+          <dd>{{ formatear(prediccion.gastoActual) }}</dd>
+        </div>
+        <div class="prediccion-card__stat">
+          <dt>Gasto predicho</dt>
+          <dd>{{ formatear(prediccion.gastoPredicho) }}</dd>
+        </div>
+        <div class="prediccion-card__stat">
+          <dt>Límite</dt>
+          <dd>{{ formatear(prediccion.montoLimite) }}</dd>
+        </div>
+        <div class="prediccion-card__stat">
+          <dt>Días restantes</dt>
+          <dd>{{ prediccion.diasRestantes }}</dd>
+        </div>
+        <div class="prediccion-card__stat">
+          <dt>Promedio diario</dt>
+          <dd>{{ formatear(prediccion.promedioGastoDiario) }}</dd>
+        </div>
+        <div class="prediccion-card__stat">
+          <dt>Confianza IA</dt>
+          <dd>{{ confianzaPorcentaje(prediccion.confianza) }}%</dd>
+        </div>
+      </dl>
+    </div>
+
+    @if (prediccion.categoriasMasConsumidas.length) {
+      <section class="prediccion-card__categorias" aria-label="Categorías más consumidas">
+        <h4 class="prediccion-card__subtitulo">Top categorías</h4>
+        <ul role="list">
+          @for (cat of prediccion.categoriasMasConsumidas; track cat.descripcion) {
+            <li>
+              <span class="prediccion-card__categoria-nombre">{{ cat.descripcion }}</span>
+              <span class="prediccion-card__categoria-monto">
+                {{ formatear(cat.montoTotal) }}
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <section class="prediccion-card__ia" aria-label="Análisis IA">
+      <p class="prediccion-card__resumen">
+        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+        {{ prediccion.resumenIa }}
+      </p>
+
+      @if (prediccion.alertas.length) {
+        <ul class="prediccion-card__badges prediccion-card__badges--alerta" role="list">
+          @for (alerta of prediccion.alertas; track alerta) {
+            <li>
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              {{ alerta }}
+            </li>
+          }
+        </ul>
+      }
+
+      @if (prediccion.recomendaciones.length) {
+        <ul class="prediccion-card__badges prediccion-card__badges--recomendacion" role="list">
+          @for (reco of prediccion.recomendaciones; track reco) {
+            <li>
+              <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+              {{ reco }}
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </article>
+} @else {
+  <article class="prediccion-card prediccion-card--vacio">
+    <p>Todavía no hay datos suficientes para mostrar una predicción.</p>
+  </article>
+}

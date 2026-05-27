@@ -19,6 +19,13 @@ export const routes: Routes = [
       import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
   },
   {
+    path: 'presupuesto/:alumnoId',
+    loadComponent: () =>
+      import('./features/presupuesto/presupuesto.page').then(
+        (m) => m.PresupuestoPage,
+      ),
+  },
+  {
     path: 'preferencias',
     loadComponent: () =>
       import('./features/preferencias/preferencias.page')
