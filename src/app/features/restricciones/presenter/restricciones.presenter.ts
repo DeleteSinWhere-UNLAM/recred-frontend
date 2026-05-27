@@ -1,7 +1,7 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Alumno } from '../../../core/models/alumno.model';
-import { AlumnosService } from '../../../core/services/alumnos.service';
+import { Alumno } from '../../../data-access/models/alumno.model';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { RestriccionesService } from '../data/restricciones.service';
 import {
   ClaveRestriccion,

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Alumno } from '../../../../core/models/alumno.model';
-import { Colegio } from '../../../../core/models/colegio.model';
+import { Alumno } from '../../../../data-access/models/alumno.model';
+import { Colegio } from '../../../../data-access/models/colegio.model';
 import { AlumnoCardComponent } from '../alumno-card/alumno-card.component';
 
 @Component({

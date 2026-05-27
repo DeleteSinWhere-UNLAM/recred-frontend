@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { UsuarioService } from '../../core/services/usuario.service';
+import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ProductoCardComponent } from './components/producto-card/producto-card.component';
 import { BuffetPresenter } from './presenter/buffet.presenter';
 

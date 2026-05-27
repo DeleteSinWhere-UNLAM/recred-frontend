@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Alumno } from '../../core/models/alumno.model';
-import { Colegio } from '../../core/models/colegio.model';
-import { AlumnosService } from '../../core/services/alumnos.service';
-import { ColegiosService } from '../../core/services/colegios.service';
-import { UsuarioService } from '../../core/services/usuario.service';
+import { Alumno } from '../../data-access/models/alumno.model';
+import { Colegio } from '../../data-access/models/colegio.model';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
+import { ColegiosService } from '../../data-access/services/colegios.service';
+import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ColegioSectionComponent } from './components/colegio-section/colegio-section.component';
 
