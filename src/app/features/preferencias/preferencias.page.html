@@ -1,0 +1,9 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="preferencias">
+  <h1>Preferencias de consumo</h1>
+
+  @for (p of preferencias; track p.producto) {
+    <app-preferencia-card [preferencia]="p" />
+  }
+</main>
