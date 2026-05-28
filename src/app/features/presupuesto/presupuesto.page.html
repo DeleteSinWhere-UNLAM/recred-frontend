@@ -1,0 +1,171 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="presupuesto">
+  <button
+    type="button"
+    class="presupuesto__volver"
+    (click)="presenter.volver()"
+  >
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
+
+  <div class="presupuesto__container">
+    <header class="presupuesto__cabecera">
+      <div class="presupuesto__avatar" aria-hidden="true">
+        <span>{{ presenter.iniciales() }}</span>
+      </div>
+      <div class="presupuesto__identidad">
+        <h2 class="presupuesto__titulo">Presupuesto</h2>
+        <p class="presupuesto__subtitulo">
+          {{ presenter.nombreCompleto() }}
+          @if (presenter.grado()) {
+            <span aria-hidden="true"> · </span>{{ presenter.grado() }}
+          }
+        </p>
+      </div>
+    </header>
+
+    <app-prediccion-card
+      [prediccion]="presenter.prediccion()"
+      [nivel]="presenter.nivelAlerta()"
+    />
+
+    <section class="presupuesto__panel" aria-labelledby="general-titulo">
+      <header class="presupuesto__panel-cabecera">
+        <h3 id="general-titulo" class="presupuesto__panel-titulo">
+          Presupuesto general
+        </h3>
+        <p class="presupuesto__panel-descripcion">
+          Definí el monto total y la frecuencia con la que se renueva.
+        </p>
+      </header>
+
+      <div class="presupuesto__grid">
+        <label class="campo">
+          <span class="campo__label">Monto límite</span>
+          <div class="campo__input-prefijo">
+            <span aria-hidden="true">$</span>
+            <input
+              type="number"
+              min="0"
+              step="100"
+              [value]="presenter.presupuesto().montoLimiteGeneral"
+              (input)="onMontoChange($event)"
+              aria-label="Monto límite"
+            />
+          </div>
+        </label>
+
+        <label class="campo">
+          <span class="campo__label">Período</span>
+          <select
+            class="campo__select"
+            [value]="presenter.presupuesto().periodo"
+            (change)="onPeriodoChange($event)"
+          >
+            @for (periodo of presenter.periodos; track periodo) {
+              <option [value]="periodo">{{ etiquetaPeriodo(periodo) }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="campo">
+          <span class="campo__label">Fecha de inicio</span>
+          <input
+            type="date"
+            class="campo__input"
+            [value]="presenter.presupuesto().fechaInicio"
+            (change)="onFechaChange($event)"
+          />
+        </label>
+      </div>
+    </section>
+
+    <section class="presupuesto__panel" aria-labelledby="reglas-titulo">
+      <header class="presupuesto__panel-cabecera">
+        <h3 id="reglas-titulo" class="presupuesto__panel-titulo">
+          Reglas por categoría
+        </h3>
+        <p class="presupuesto__panel-descripcion">
+          Limitá el porcentaje del presupuesto que puede gastarse en cada categoría.
+        </p>
+      </header>
+
+      @if (presenter.reglas().length) {
+        <ul class="presupuesto__reglas" role="list">
+          @for (regla of presenter.reglas(); track regla.id) {
+            <app-regla-categoria-item
+              [regla]="regla"
+              (porcentajeChange)="onPorcentajeChange($event)"
+              (eliminar)="onEliminarRegla($event)"
+            />
+          }
+        </ul>
+      } @else {
+        <p class="presupuesto__vacio">
+          Todavía no hay reglas por categoría. Agregá la primera abajo.
+        </p>
+      }
+
+      <div
+        class="presupuesto__total"
+        [class.presupuesto__total--invalido]="!presenter.porcentajeValido()"
+      >
+        <div class="presupuesto__total-info">
+          <span>Total asignado</span>
+          <strong>{{ presenter.totalPorcentaje() }}%</strong>
+        </div>
+        <div class="presupuesto__barra">
+          <div
+            class="presupuesto__barra-fill"
+            [style.width.%]="totalPorcentajeAcotado"
+          ></div>
+        </div>
+        @if (!presenter.porcentajeValido()) {
+          <p class="presupuesto__error">
+            La suma supera 100%. Ajustá las reglas antes de guardar.
+          </p>
+        }
+      </div>
+
+      @if (presenter.puedeAgregarRegla()) {
+        <label class="presupuesto__agregar">
+          <span class="presupuesto__agregar-label">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Agregar categoría
+          </span>
+          <select
+            class="campo__select"
+            (change)="onAgregarRegla($event)"
+            aria-label="Agregar categoría"
+          >
+            <option value="" selected>Elegí una categoría…</option>
+            @for (cat of presenter.categoriasUsables(); track cat.id) {
+              <option [value]="cat.id">{{ cat.descripcion }}</option>
+            }
+          </select>
+        </label>
+      }
+    </section>
+
+    <button
+      type="button"
+      class="presupuesto__guardar"
+      [disabled]="!presenter.porcentajeValido()"
+      (click)="presenter.guardar()"
+    >
+      Guardar presupuesto
+    </button>
+
+    @if (presenter.presupuesto().activo) {
+      <button
+        type="button"
+        class="presupuesto__desactivar"
+        (click)="presenter.desactivar()"
+      >
+        Desactivar presupuesto
+      </button>
+    }
+  </div>
+</main>

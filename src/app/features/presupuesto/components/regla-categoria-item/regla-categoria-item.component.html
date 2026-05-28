@@ -1,0 +1,43 @@
+@if (reglaActual(); as regla) {
+  <li class="regla-item">
+    <div class="regla-item__cabecera">
+      <span class="regla-item__categoria">{{ regla.descripcionCategoria }}</span>
+      <button
+        type="button"
+        class="regla-item__eliminar"
+        (click)="onEliminar()"
+        [attr.aria-label]="'Quitar regla de ' + regla.descripcionCategoria"
+      >
+        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="regla-item__control">
+      <input
+        type="range"
+        class="regla-item__slider"
+        min="0"
+        max="100"
+        step="1"
+        [value]="regla.porcentajeLimite"
+        (input)="onSliderChange($event)"
+        [attr.aria-label]="'Porcentaje para ' + regla.descripcionCategoria"
+      />
+      <label class="regla-item__pct">
+        <input
+          type="number"
+          min="0"
+          max="100"
+          step="1"
+          [value]="regla.porcentajeLimite"
+          (input)="onInputChange($event)"
+        />
+        <span>%</span>
+      </label>
+    </div>
+
+    <p class="regla-item__monto">
+      Hasta <strong>{{ formatear(regla.montoLimiteCalculado) }}</strong> en {{ regla.descripcionCategoria }}
+    </p>
+  </li>
+}
