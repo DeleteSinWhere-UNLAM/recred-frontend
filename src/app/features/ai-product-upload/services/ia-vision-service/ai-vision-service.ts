@@ -7,6 +7,7 @@ import { delay, of } from 'rxjs';
   providedIn: 'root',
 })
 export class AiVisionService {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   analyzeImage(file: File): Observable<AiProductResponse> {
     const mockResponse: AiProductResponse = {
       nombre: 'Jugo de Naranja Múltiple',

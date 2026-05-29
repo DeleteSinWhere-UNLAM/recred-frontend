@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AiProductUploadPageComponent } from './ai-product-upload-page.component';
 import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
 import { of, throwError } from 'rxjs';
@@ -10,8 +10,7 @@ describe('AiProductUploadPageComponent', () => {
 
   beforeEach(async () => {
     aiVisionServiceMock = jasmine.createSpyObj('AiVisionService', ['analyzeImage']);
-    
-    // Set a default return value that matches the updated interface
+
     aiVisionServiceMock.analyzeImage.and.returnValue(of({
       nombre: 'Galletas de arroz integral',
       marca: '-',
@@ -40,7 +39,7 @@ describe('AiProductUploadPageComponent', () => {
   it('debería activar estado de carga y llamar al servicio al recibir una foto', () => {
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
     component.handlePhoto(file);
-    
+
     expect(component.isLoading).toBeFalse(); // After subscribe it becomes false
     expect(aiVisionServiceMock.analyzeImage).toHaveBeenCalledWith(file);
     expect(component.scannedProductData?.nombre).toBe('Galletas de arroz integral');
@@ -50,7 +49,7 @@ describe('AiProductUploadPageComponent', () => {
     spyOn(console, 'error');
     spyOn(window, 'alert');
     aiVisionServiceMock.analyzeImage.and.returnValue(throwError(() => new Error('API Error')));
-    
+
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
     component.handlePhoto(file);
 
