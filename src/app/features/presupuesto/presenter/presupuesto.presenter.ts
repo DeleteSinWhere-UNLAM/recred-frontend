@@ -4,7 +4,7 @@ import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { CategoriaProducto } from '../../buffet/models/producto.model';
-import { PresupuestoService } from '../data/presupuesto.service';
+import { PresupuestoService } from '../services/presupuesto.service';
 import {
   NivelAlerta,
   PERIODOS,
@@ -87,7 +87,7 @@ export class PresupuestoPresenter {
   init(alumnoId: string): void {
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
     if (!alumno) {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/padre');
       return;
     }
     this.alumnoState.set(alumno);
@@ -178,7 +178,7 @@ export class PresupuestoPresenter {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 }
 

@@ -7,8 +7,8 @@ import {
   Recreo,
 } from '../../models/orden-compra.model';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
-import { CarritoService } from '../../data/carrito.service';
-import { CompraService } from '../../data/compra.service';
+import { CarritoService } from '../../services/carrito.service';
+import { CompraService } from '../../services/compra.service';
 
 export interface GrupoCarrito {
   alumno: Alumno;
@@ -132,7 +132,7 @@ export class CarritoPresenter {
   }
 
   volverAlBuffet(): void {
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 
   private calcularFechaMinima(): string {

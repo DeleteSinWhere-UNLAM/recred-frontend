@@ -1,6 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CompraService } from '../../data/compra.service';
+import { CompraService } from '../../services/compra.service';
 
 @Injectable()
 export class ExitoPresenter {
@@ -19,11 +19,11 @@ export class ExitoPresenter {
   }
 
   volverInicio(): void {
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 
   verPendientes(): void {
     // TODO: navegar a /movimientos cuando exista
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CarritoService } from '../../../features/compra/data/carrito.service';
+import { CarritoService } from '../../../features/compra/services/carrito.service';
 
 @Component({
   selector: 'app-navbar',
@@ -22,6 +22,6 @@ export class NavbarComponent {
 
   protected irAInicio(event: Event): void {
     event.preventDefault();
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 }

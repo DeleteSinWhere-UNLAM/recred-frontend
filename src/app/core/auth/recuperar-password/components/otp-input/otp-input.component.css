@@ -1,0 +1,53 @@
+.otp {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.otp__etiqueta {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-pizarra);
+  letter-spacing: 0.01em;
+}
+
+.otp__grupo {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.otp__digito {
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 0;
+  border: none;
+  border-radius: var(--radius-button);
+  background-color: var(--color-fondo);
+  box-shadow: var(--shadow-neu-concave);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--color-texto-oscuro);
+  transition: box-shadow 140ms ease;
+  padding: 0;
+}
+
+.otp__digito:focus {
+  outline: none;
+  box-shadow:
+    var(--shadow-neu-concave),
+    0 0 0 2px var(--color-dorado);
+}
+
+@media (max-width: 400px) {
+  .otp__digito {
+    font-size: 1.25rem;
+  }
+
+  .otp__grupo {
+    gap: 6px;
+  }
+}
