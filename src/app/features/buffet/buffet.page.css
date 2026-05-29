@@ -42,6 +42,10 @@
   margin: 0 0 28px;
 }
 
+.buffet__volver {
+  justify-self: start;
+}
+
 .buffet__titulo-bloque {
   text-align: center;
   display: flex;
@@ -65,36 +69,44 @@
 }
 
 .buffet__alumno {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
-  padding: 10px 16px;
+  gap: 12px;
+  padding: 10px 12px;
   background-color: var(--color-fondo);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-neu-convex);
   flex-shrink: 0;
   justify-self: end;
+  white-space: nowrap;
 }
 
 .buffet__avatar {
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background-color: var(--color-pizarra);
-  color: #fff;
+  background-color: var(--color-superficie-alt);
+  color: var(--color-pizarra);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
-.buffet__alumno-info {
+.buffet__alumno-textos {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  min-width: 0;
+}
+
+.buffet__alumno-linea {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .buffet__alumno-nombre {
@@ -102,26 +114,58 @@
   font-weight: 700;
   color: var(--color-pizarra);
   font-size: 15px;
+  line-height: 1;
 }
 
-.buffet__alumno-grado {
+.buffet__alumno-editar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra);
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-neu-convex);
+  transition: transform 0.1s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.buffet__alumno-editar:hover {
+  color: var(--color-pizarra-dark);
+}
+
+.buffet__alumno-editar:active {
+  transform: scale(0.92);
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.buffet__alumno-colegio {
   font-size: 12px;
   color: var(--color-texto-claro);
   font-weight: 500;
+  line-height: 1.1;
+}
+
+.buffet__alumno-colegio strong {
+  color: var(--color-pizarra);
+  font-weight: 700;
 }
 
 .buffet__saldo {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 8px 16px;
-  margin-left: 8px;
+  gap: 2px;
+  padding: 8px 14px;
+  margin-left: 4px;
   background-color: var(--color-fondo);
   border-radius: 14px;
   box-shadow: var(--shadow-neu-concave);
 }
 
 .buffet__saldo-label {
+  font-family: var(--font-display);
   font-size: 10px;
   letter-spacing: 0.6px;
   font-weight: 700;
@@ -133,6 +177,7 @@
   font-size: 16px;
   font-weight: 800;
   color: var(--color-pizarra);
+  line-height: 1;
 }
 
 .buffet__filtros {

@@ -20,6 +20,13 @@ export const routes: Routes = [
       import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
   },
   {
+    path: 'presupuesto/:alumnoId',
+    loadComponent: () =>
+      import('./features/presupuesto/presupuesto.page').then(
+        (m) => m.PresupuestoPage,
+      ),
+  },
+  {
     path: 'preferencias',
     loadComponent: () =>
       import('./features/preferencias/preferencias.page')
@@ -39,7 +46,11 @@ export const routes: Routes = [
       import('./features/consumo/consumo.page')
         .then((m) => m.ConsumoPage),
   },
-
+  {
+    path: 'compra',
+    loadChildren: () =>
+      import('./features/compra/compra.routes').then((m) => m.compraRoutes),
+  },
   {
     path: 'habitos',
     loadComponent: () =>

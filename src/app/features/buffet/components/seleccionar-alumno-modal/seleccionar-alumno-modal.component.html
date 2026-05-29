@@ -1,0 +1,62 @@
+<div
+  class="modal-alumno__backdrop"
+  role="presentation"
+  (click)="onBackdropClick($event)"
+>
+  <div
+    class="modal-alumno"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-alumno-titulo"
+  >
+    <header class="modal-alumno__cabecera">
+      <h3 id="modal-alumno-titulo" class="modal-alumno__titulo">
+        Seleccionar Alumno
+      </h3>
+      <button
+        type="button"
+        class="modal-alumno__cerrar"
+        (click)="cerrar.emit()"
+        aria-label="Cerrar"
+      >
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <ul class="modal-alumno__lista" role="list">
+      @for (alumno of alumnosActuales(); track alumno.id) {
+        <li class="modal-alumno__item">
+          <button
+            type="button"
+            class="modal-alumno__opcion"
+            [class.modal-alumno__opcion--actual]="alumno.id === alumnoActualId"
+            (click)="seleccionar.emit(alumno.id)"
+          >
+            <span class="modal-alumno__avatar" aria-hidden="true">
+              {{ iniciales(alumno) }}
+            </span>
+            <span class="modal-alumno__datos">
+              <span class="modal-alumno__nombre">
+                {{ alumno.nombre }} {{ alumno.apellido }}
+              </span>
+              <span class="modal-alumno__colegio">
+                {{ nombreColegio(alumno.colegioId) }}
+              </span>
+            </span>
+            @if (alumno.id === alumnoActualId) {
+              <i
+                class="fa-solid fa-circle-check modal-alumno__check"
+                aria-label="Alumno actual"
+              ></i>
+            } @else {
+              <i
+                class="fa-solid fa-chevron-right modal-alumno__chevron"
+                aria-hidden="true"
+              ></i>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+</div>

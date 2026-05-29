@@ -5,8 +5,10 @@ import {
   Input,
   Output,
   computed,
+  inject,
   signal,
 } from '@angular/core';
+import { CarritoService } from '../../../compra/data/carrito.service';
 import { Producto, disponible } from '../../models/producto.model';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
@@ -15,6 +17,11 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   maximumFractionDigits: 0,
 });
 
+export interface AgregarEvento {
+  producto: Producto;
+  cantidad: number;
+}
+
 @Component({
   selector: 'app-producto-card',
   templateUrl: './producto-card.component.html',
@@ -22,29 +29,59 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductoCardComponent {
+  private readonly carritoService = inject(CarritoService);
+
   private readonly productoState = signal<Producto | undefined>(undefined);
+  private readonly alumnoIdState = signal<string>('');
+  protected readonly cantidad = signal<number>(1);
 
   @Input({ required: true })
   set producto(valor: Producto) {
     this.productoState.set(valor);
+    this.cantidad.set(1);
   }
 
-  @Output() agregar = new EventEmitter<Producto>();
+  @Input({ required: true })
+  set alumnoId(valor: string) {
+    this.alumnoIdState.set(valor);
+  }
+
+  @Output() agregar = new EventEmitter<AgregarEvento>();
 
   readonly productoActual = computed(() => this.productoState());
+
   readonly disponible = computed(() => {
     const p = this.productoState();
     return p ? disponible(p) : false;
   });
+
   readonly precioFormateado = computed(() => {
     const p = this.productoState();
     return p ? formateadorPrecio.format(p.precio) : '';
   });
 
+  readonly cantidadEnCarrito = computed(() => {
+    const p = this.productoState();
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return 0;
+    return this.carritoService.cantidadDe(p.id, alumnoId);
+  });
+
+  readonly estaEnCarrito = computed(() => this.cantidadEnCarrito() > 0);
+
+  protected sumar(): void {
+    this.cantidad.update((v) => v + 1);
+  }
+
+  protected restar(): void {
+    this.cantidad.update((v) => (v > 1 ? v - 1 : 1));
+  }
+
   protected onAgregar(): void {
     const p = this.productoState();
     if (p && disponible(p)) {
-      this.agregar.emit(p);
+      this.agregar.emit({ producto: p, cantidad: this.cantidad() });
+      this.cantidad.set(1);
     }
   }
 

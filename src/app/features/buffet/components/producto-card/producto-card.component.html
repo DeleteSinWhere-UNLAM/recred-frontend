@@ -24,27 +24,28 @@
       <h3 class="producto-card__nombre">{{ producto.nombre }}</h3>
       <p class="producto-card__precio">{{ precioFormateado() }}</p>
 
-      <div class="producto-card__cantidad" aria-hidden="true">
-        <button
-          type="button"
-          class="producto-card__cantidad-btn"
-          disabled
-          title="Próximamente"
-        >
-          <i class="fa-solid fa-minus"></i>
-        </button>
-        <span class="producto-card__cantidad-valor">1</span>
-        <button
-          type="button"
-          class="producto-card__cantidad-btn"
-          disabled
-          title="Próximamente"
-        >
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </div>
-
       @if (disponible()) {
+        <div class="producto-card__cantidad">
+          <button
+            type="button"
+            class="producto-card__cantidad-btn"
+            (click)="restar()"
+            [disabled]="cantidad() <= 1"
+            aria-label="Restar uno"
+          >
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+          </button>
+          <span class="producto-card__cantidad-valor" aria-live="polite">{{ cantidad() }}</span>
+          <button
+            type="button"
+            class="producto-card__cantidad-btn"
+            (click)="sumar()"
+            aria-label="Sumar uno"
+          >
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          </button>
+        </div>
+
         <button
           type="button"
           class="producto-card__cta"
@@ -53,6 +54,13 @@
           <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
           <span>Agregar</span>
         </button>
+
+        @if (estaEnCarrito()) {
+          <p class="producto-card__en-carrito" role="status">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            En el carrito ({{ cantidadEnCarrito() }})
+          </p>
+        }
       } @else {
         <button
           type="button"
