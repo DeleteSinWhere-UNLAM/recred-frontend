@@ -1,16 +1,63 @@
 <header class="navbar">
   <div class="navbar__inner">
+
     <div class="navbar__brand">
       <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
         <img src="logoHeader.png" alt="" class="navbar__logo-img">
         <span class="navbar__logo-text">RECRED</span>
       </a>
+
       <span class="navbar__divider" aria-hidden="true"></span>
-      <span class="navbar__greeting">Hola, {{ userName }}</span>
+
+      <span class="navbar__greeting">
+        Hola, {{ userName }}
+      </span>
     </div>
 
     <nav class="navbar__actions" aria-label="Acciones principales">
+
       <a class="navbar__link" href="#">Movimientos</a>
+
+      <!-- 🔔 NOTIFICACIONES IA (SAFE) -->
+      <div class="navbar__notifications">
+
+<button
+  type="button"
+  class="navbar__bell"
+  (click)="toggleNotifications()"
+  aria-label="Notificaciones"
+>
+  <i class="fa-solid fa-bell"></i>
+
+  @if (unreadCount > 0) {
+    <span class="navbar__cart-badge">
+      {{ unreadCount }}
+    </span>
+  }
+
+</button>
+
+@if (showNotifications) {
+  <div class="navbar__dropdown">
+
+    @for (n of notifications; track n.title; let i = $index) {
+
+      <button
+        type="button"
+        class="navbar__notification-item"
+        (click)="goToNotification(n.route, i)"
+      >
+        <strong>{{ n.title }}</strong>
+        <span>{{ n.message }}</span>
+      </button>
+
+    }
+
+  </div>
+}
+
+      </div>
+
       <button
         type="button"
         class="navbar__cart"
@@ -18,10 +65,15 @@
         [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'"
       >
         <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+
         @if (cartCount() > 0) {
-          <span class="navbar__cart-badge">{{ cartCount() }}</span>
+          <span class="navbar__cart-badge">
+            {{ cartCount() }}
+          </span>
         }
       </button>
+
     </nav>
+
   </div>
 </header>

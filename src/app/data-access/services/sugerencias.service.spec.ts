@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { SugerenciasService } from './sugerencias.service';
 
 describe('SugerenciasService', () => {
@@ -7,66 +6,48 @@ describe('SugerenciasService', () => {
   let service: SugerenciasService;
 
   beforeEach(() => {
-
     TestBed.configureTestingModule({});
-
     service = TestBed.inject(SugerenciasService);
-
   });
 
   it('debería devolver sugerencias', () => {
-
     const data = service.getSugerencias();
-
     expect(data.length).toBeGreaterThan(0);
-
   });
 
-  it('debería contener producto original Gaseosa', () => {
-
+  it('debería contener producto original', () => {
     const data = service.getSugerencias();
 
     expect(
-      data.some(s => s.productoOriginal === 'Gaseosa')
+      data.some(s => s.productoOriginal.length > 0)
     ).toBeTrue();
-
   });
 
-  it('debería contener productos sugeridos', () => {
-
+  it('debería tener productos sugeridos', () => {
     const data = service.getSugerencias();
 
     expect(
-      data.some(s => s.productoSugerido === 'Jugo')
+      data.some(s => s.productosSugeridos.length > 0)
     ).toBeTrue();
-
-    expect(
-      data.some(s => s.productoSugerido === 'Barra de cereal')
-    ).toBeTrue();
-
   });
 
-  it('debería tener motivos de sugerencia', () => {
-
+  it('debería tener resumen y motivo IA', () => {
     const data = service.getSugerencias();
 
     expect(
-      data.every(s => s.motivo.length > 0)
+      data.every(s =>
+        s.resumen.length > 0 &&
+        s.motivoIA.length > 0
+      )
     ).toBeTrue();
-
   });
 
-  it('debería identificar productos bloqueados', () => {
-
+  it('debería tener modelo IA definido', () => {
     const data = service.getSugerencias();
 
-    const bloqueados =
-      data.filter(s => s.bloqueado);
-
     expect(
-      bloqueados.length
-    ).toBeGreaterThan(0);
-
+      data.every(s => s.modeloIA.includes('gemini'))
+    ).toBeTrue();
   });
 
 });

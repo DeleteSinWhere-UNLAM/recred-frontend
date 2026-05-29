@@ -16,6 +16,71 @@ export class NavbarComponent {
 
   protected readonly cartCount = this.carritoService.cantidadTotal;
 
+  showNotifications = false;
+
+  notifications = this.loadNotifications();
+
+  protected get unreadCount(): number {
+    return this.notifications.length;
+  }
+
+private intervalId: any;
+
+ngOnInit(): void {
+  this.intervalId = setInterval(() => {
+    this.notifications.push({
+      title: 'Nuevo análisis IA',
+      message: 'Se detectó un cambio en patrones de consumo',
+      route: '/sugerencias',
+    });
+
+    this.saveNotifications();
+  }, 100000); // 10 segundos
+}
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+  }
+
+goToNotification(route: string, index?: number): void {
+  this.router.navigateByUrl(route);
+
+  if (index !== undefined) {
+    this.notifications.splice(index, 1);
+    this.saveNotifications();
+  }
+
+  this.showNotifications = false;
+}
+
+  private saveNotifications(): void {
+    localStorage.setItem(
+      'navbar_notifications',
+      JSON.stringify(this.notifications)
+    );
+  }
+
+  private loadNotifications(): any[] {
+    const data = localStorage.getItem('navbar_notifications');
+
+    if (data) {
+      return JSON.parse(data);
+    }
+
+    return [
+      {
+        title: 'Bajo consumos detectado',
+        message: 'La IA detectó productos con ventas bajas.',
+        route: '/sugerencias',
+      },
+      {
+        title: 'Reemplazo sugerido',
+        message: 'Se encontraron alternativas más vendidas.',
+        route: '/sugerencias',
+      },
+    ];
+  }
+
   protected irAlCarrito(): void {
     this.router.navigateByUrl('/compra');
   }

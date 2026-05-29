@@ -5,6 +5,7 @@ import { SugerenciaCardComponent } from './sugerencia-card.component';
 describe('SugerenciaCardComponent', () => {
 
   let component: SugerenciaCardComponent;
+
   let fixture: ComponentFixture<SugerenciaCardComponent>;
 
   beforeEach(async () => {
@@ -13,16 +14,38 @@ describe('SugerenciaCardComponent', () => {
       imports: [SugerenciaCardComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SugerenciaCardComponent);
+    fixture =
+      TestBed.createComponent(SugerenciaCardComponent);
 
-    component = fixture.componentInstance;
+    component =
+      fixture.componentInstance;
 
     component.sugerencia = {
-      productoOriginal: 'Gaseosa',
-      productoSugerido: 'Jugo',
-      motivo: 'Producto bloqueado por adulto',
-      bloqueado: true,
-      disponible: true,
+
+      productoOriginal:
+        'Paso de los Toros Pomelo 500ml',
+
+      resumen:
+        'Te sugiero una alternativa popular de gaseosa.',
+
+      alertas: [
+        'Precio extremadamente bajo.'
+      ],
+
+      productosSugeridos: [
+
+        'Sprite Lima Limón 500ml',
+
+        'Schweppes Pomelo 500ml'
+
+      ],
+
+      motivoIA:
+        'Bajo consumo detectado.',
+
+      modeloIA:
+        'gemini-2.5-flash'
+
     };
 
     fixture.detectChanges();
@@ -30,61 +53,71 @@ describe('SugerenciaCardComponent', () => {
   });
 
   it('debería crear el componente', () => {
+
     expect(component).toBeTruthy();
+
   });
 
   it('debería renderizar el producto original', () => {
 
-    const compiled = fixture.nativeElement as HTMLElement;
+    const compiled =
+      fixture.nativeElement as HTMLElement;
 
     expect(compiled.textContent)
-      .toContain('Gaseosa');
+      .toContain('Paso de los Toros Pomelo 500ml');
 
   });
 
-  it('debería renderizar la sugerencia IA', () => {
+  it('debería mostrar el resumen IA', () => {
 
-    const compiled = fixture.nativeElement as HTMLElement;
+    const compiled =
+      fixture.nativeElement as HTMLElement;
 
     expect(compiled.textContent)
-      .toContain('Jugo');
+      .toContain('Te sugiero una alternativa popular');
 
   });
 
-  it('debería mostrar el motivo de la sugerencia', () => {
+  it('debería mostrar las alertas', () => {
 
-    const compiled = fixture.nativeElement as HTMLElement;
+    const compiled =
+      fixture.nativeElement as HTMLElement;
 
     expect(compiled.textContent)
-      .toContain('Producto bloqueado por adulto');
+      .toContain('Precio extremadamente bajo.');
 
   });
 
-  it('debería mostrar el estado bloqueado', () => {
+  it('debería renderizar productos sugeridos', () => {
 
-    const compiled = fixture.nativeElement as HTMLElement;
+    const compiled =
+      fixture.nativeElement as HTMLElement;
 
     expect(compiled.textContent)
-      .toContain('Producto bloqueado');
+      .toContain('Sprite Lima Limón 500ml');
+
+    expect(compiled.textContent)
+      .toContain('Schweppes Pomelo 500ml');
 
   });
 
-  it('debería mostrar el estado permitido cuando no está bloqueado', () => {
+  it('debería mostrar el motivo IA', () => {
 
-    component.sugerencia = {
-      productoOriginal: 'Chocolate',
-      productoSugerido: 'Barra de cereal',
-      motivo: 'Sugerencia saludable',
-      bloqueado: false,
-      disponible: true,
-    };
-
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement as HTMLElement;
+    const compiled =
+      fixture.nativeElement as HTMLElement;
 
     expect(compiled.textContent)
-      .toContain('Producto permitido');
+      .toContain('Bajo consumo detectado.');
+
+  });
+
+  it('debería mostrar el modelo IA utilizado', () => {
+
+    const compiled =
+      fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent)
+      .toContain('gemini-2.5-flash');
 
   });
 

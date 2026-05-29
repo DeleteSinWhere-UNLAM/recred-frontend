@@ -21,53 +21,29 @@ describe('SugerenciasPage', () => {
 
   });
 
-  it('debería crear la página', () => {
-    expect(component).toBeTruthy();
-  });
+  it('debería mostrar sugerencias IA', () => {
+  const compiled = fixture.nativeElement;
+  expect(compiled.textContent).toContain('Sugerencias IA');
+});
 
-  it('debería mostrar el título de sugerencias', () => {
+it('debería mostrar resumen de IA', () => {
+  const compiled = fixture.nativeElement;
+  expect(compiled.textContent.length).toBeGreaterThan(100);
+});
 
-    const compiled = fixture.nativeElement as HTMLElement;
+it('debería mostrar productos sugeridos', () => {
+  const compiled = fixture.nativeElement;
 
-    expect(compiled.textContent)
-      .toContain('Sugerencias IA');
+  expect(
+    compiled.textContent.includes('Sprite') ||
+    compiled.textContent.includes('Schweppes') ||
+    compiled.textContent.includes('Pomelo')
+  ).toBeTrue();
+});
 
-  });
-
-  it('debería renderizar productos sugeridos', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('Gaseosa');
-
-    expect(compiled.textContent)
-      .toContain('Chocolate');
-
-  });
-
-  it('debería mostrar productos sugeridos por IA', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('Jugo');
-
-    expect(compiled.textContent)
-      .toContain('Barra de cereal');
-
-  });
-
-  it('debería mostrar estados bloqueado y permitido', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('Producto bloqueado');
-
-    expect(compiled.textContent)
-      .toContain('Producto permitido');
-
-  });
+it('debería mostrar modelo IA', () => {
+  const compiled = fixture.nativeElement;
+  expect(compiled.textContent).toContain('gemini');
+});
 
 });
