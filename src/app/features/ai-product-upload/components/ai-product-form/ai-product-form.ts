@@ -17,7 +17,10 @@ export class AiProductForm implements OnChanges {
   productForm: FormGroup = this.fb.group({
     nombre: ['', Validators.required],
     marca: ['', Validators.required],
-    categoria: ['', Validators.required]
+    peso: ['', Validators.required],
+    contiene_azucar: ['no', Validators.required],
+    contiene_lactosa: ['no', Validators.required],
+    contiene_mani: ['no', Validators.required]
   });
 
   ngOnChanges(changes: SimpleChanges) {
@@ -29,6 +32,8 @@ export class AiProductForm implements OnChanges {
   submitForm() {
     if (this.productForm.valid) {
       this.save.emit(this.productForm.value as AiProductResponse);
+    } else {
+      this.productForm.markAllAsTouched();
     }
   }
 }

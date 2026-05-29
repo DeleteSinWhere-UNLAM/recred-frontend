@@ -1,6 +1,27 @@
 .page-container {
-  max-width: 500px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: sans-serif;
+  padding: 30px 20px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+.page-container h2 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+.page-container p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+.success-message {
+  background-color: #d1fae5;
+  border-left: 4px solid #10b981;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+}
+.success-message p {
+  margin: 0;
+  color: #065f46;
+  font-weight: 600;
 }

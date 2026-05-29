@@ -8,11 +8,13 @@ import { delay, of } from 'rxjs';
 })
 export class AiVisionService {
   analyzeImage(file: File): Observable<AiProductResponse> {
-    console.log('Analyzing file:', file.name);
     const mockResponse: AiProductResponse = {
       nombre: 'Jugo de Naranja Múltiple',
       marca: 'Cepita',
-      categoria: 'Bebidas'
+      peso: '1L',
+      contiene_azucar: 'si',
+      contiene_lactosa: 'no',
+      contiene_mani: 'no'
     };
 
     return of(mockResponse).pipe(delay(3000));

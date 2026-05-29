@@ -22,7 +22,7 @@ describe('SeasonalPageComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 });

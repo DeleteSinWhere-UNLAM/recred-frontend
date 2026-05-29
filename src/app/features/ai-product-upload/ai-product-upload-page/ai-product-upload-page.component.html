@@ -1,18 +1,21 @@
 <div class="page-container">
-  <h2>Carga con Inteligencia Artificial</h2>
-  <p>Toma una foto del envase frontal para autocompletar los datos.</p>
+  <h2>Carga de Producto</h2>
+  <p>Carga los datos manualmente o toma una foto del envase frontal para autocompletar.</p>
 
   <app-camera-capture (photoTaken)="handlePhoto($event)"></app-camera-capture>
 
   <app-scanner-loader [isScanning]="isLoading"></app-scanner-loader>
 
-  @if (scannedProductData && !isLoading) {
-    <div style="margin-top: 30px;">
-      <h3>Verifica y corrige los datos detectados:</h3>
-      <app-ai-product-form 
-        [prefillData]="scannedProductData" 
-        (save)="saveProduct($event)">
-      </app-ai-product-form>
-    </div>
-  }
+  <div style="margin-top: 30px;">
+    @if (scannedProductData) {
+      <div class="success-message">
+        <p>✅ ¡Datos detectados! Verifica y corrige la información:</p>
+      </div>
+    }
+    
+    <app-ai-product-form 
+      [prefillData]="scannedProductData" 
+      (save)="saveProduct($event)">
+    </app-ai-product-form>
+  </div>
 </div>

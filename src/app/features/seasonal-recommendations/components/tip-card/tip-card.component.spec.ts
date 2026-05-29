@@ -17,11 +17,11 @@ describe('TipCardComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display the promotional tip text', () => {
+  it('debería mostrar el texto del tip promocional', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.tip-content p')?.textContent).toContain('Prueba de tip promocional');
   });
