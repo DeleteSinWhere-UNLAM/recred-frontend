@@ -1,0 +1,60 @@
+.seasonal-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+.loading-state, .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #f9fafb;
+  border-radius: 16px;
+  border: 1px dashed #d1d5db;
+}
+.loading-state p {
+  color: #4b5563;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.error-state {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.error-state p {
+  color: #991b1b;
+  font-weight: 500;
+  font-size: 1.05rem;
+  margin: 0 0 1.5rem 0;
+}
+button {
+  padding: 0.6rem 1.5rem;
+  cursor: pointer;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #dc2626;
+}

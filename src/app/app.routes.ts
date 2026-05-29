@@ -49,7 +49,10 @@ export const routes: Routes = [
   {
     path: 'cargar-producto-ia',
     loadChildren: () => import('./features/ai-product-upload/ai-product-upload.routes').then(m => m.aiProductUploadRoutes)
+  },
+  {
+    path: 'recomendaciones-estacionales',
+    loadComponent: () => import('./features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component').then(m => m.SeasonalPageComponent)
   }
-
 
 ];

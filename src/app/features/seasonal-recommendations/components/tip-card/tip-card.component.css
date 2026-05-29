@@ -1,0 +1,34 @@
+.tip-card {
+  display: flex;
+  gap: 1.25rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fcd34d;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.15);
+  align-items: flex-start;
+  transition: transform 0.2s ease;
+}
+.tip-card:hover {
+  transform: translateY(-2px);
+}
+.tip-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.tip-content h4 {
+  margin: 0 0 0.35rem 0;
+  color: #92400e;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tip-content p {
+  margin: 0;
+  color: #b45309;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
