@@ -1,4 +1,7 @@
 .otp {
+  border: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -10,6 +13,7 @@
   font-size: 0.875rem;
   color: var(--color-pizarra);
   letter-spacing: 0.01em;
+  padding: 0;
 }
 
 .otp__grupo {

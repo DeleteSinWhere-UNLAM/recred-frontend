@@ -1,5 +1,5 @@
-<div class="otp">
-  <label class="otp__etiqueta">{{ etiqueta }}</label>
+<fieldset class="otp">
+  <legend class="otp__etiqueta">{{ etiqueta }}</legend>
   <div class="otp__grupo" (paste)="onPaste($event)">
     @for (i of indices; track i) {
       <input
@@ -16,4 +16,4 @@
       />
     }
   </div>
-</div>
+</fieldset>
