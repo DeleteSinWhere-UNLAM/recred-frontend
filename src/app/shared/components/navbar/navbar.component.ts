@@ -1,14 +1,20 @@
-import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CarritoService } from '../../../features/compra/data/carrito.service';
 
+
+interface NavbarNotification {
+  title: string;
+  message: string;
+  route: string;
+}
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly carritoService = inject(CarritoService);
 
@@ -24,7 +30,7 @@ export class NavbarComponent {
     return this.notifications.length;
   }
 
-private intervalId: any;
+private intervalId!: ReturnType<typeof setInterval>;
 
 ngOnInit(): void {
   this.intervalId = setInterval(() => {
@@ -60,7 +66,7 @@ goToNotification(route: string, index?: number): void {
     );
   }
 
-  private loadNotifications(): any[] {
+  private loadNotifications(): NavbarNotification[] {
     const data = localStorage.getItem('navbar_notifications');
 
     if (data) {
