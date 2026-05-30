@@ -10,7 +10,7 @@ describe('AiProductForm', () => {
     await TestBed.configureTestingModule({
       imports: [AiProductForm]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(AiProductForm);
     component = fixture.componentInstance;
@@ -47,7 +47,7 @@ describe('AiProductForm', () => {
 
   it('debería emitir el evento save cuando el formulario es válido y se envía', () => {
     spyOn(component.save, 'emit');
-    
+
     component.productForm.patchValue({
       nombre: 'Galletas',
       descripcion: 'Galletas de chocolate',
@@ -63,20 +63,20 @@ describe('AiProductForm', () => {
     });
 
     component.submitForm();
-    
+
     expect(component.save.emit).toHaveBeenCalled();
     const emittedRequest = (component.save.emit as jasmine.Spy).calls.mostRecent().args[0];
     expect(emittedRequest.nombre).toBe('Galletas');
     expect(emittedRequest.descripcion).toBe('Galletas de chocolate');
     expect(emittedRequest.peso).toBe(0.12);
     expect(emittedRequest.nuevaCategoriaNombre).toBe('Galletita');
-    expect(emittedRequest.buffetId).toBe('ebfc7afc-6b2e-46a6-ba8f-bb2902a6bfd9');
-    expect(emittedRequest.clasificacionesSaludIds).toEqual(['214e9d21-b049-43af-be09-08fb0b445828']);
+    expect(emittedRequest.buffetId).toBe('2c4153b3-d0f9-489c-93c0-8b3ad7b89758');
+    expect(emittedRequest.clasificacionesSaludIds).toEqual(['52062d7f-fbf5-4757-ad5f-d716025b05d5']);
   });
 
   it('NO debería emitir el evento save si el formulario es inválido', () => {
     spyOn(component.save, 'emit');
-    
+
     component.productForm.patchValue({
       nombre: '', // inválido
       descripcion: 'Galletas de chocolate'
