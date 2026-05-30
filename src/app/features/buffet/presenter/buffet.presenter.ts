@@ -2,10 +2,10 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
-import { CarritoService } from '../../compra/data/carrito.service';
+import { CarritoService } from '../../compra/services/carrito.service';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { ToastService } from '../../../shared/services/toast.service';
-import { BuffetService } from '../data/buffet.service';
+import { BuffetService } from '../services/buffet.service';
 import { Buffet } from '../models/buffet.model';
 import {
   CategoriaProducto,
@@ -98,13 +98,13 @@ export class BuffetPresenter {
   init(alumnoId: string): void {
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
     if (!alumno) {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/padre');
       return;
     }
 
     const buffet = this.buffetService.getBuffetDelAlumno(alumno.colegioId);
     if (!buffet) {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/padre');
       return;
     }
 
@@ -133,7 +133,7 @@ export class BuffetPresenter {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 
   cambiarAlumno(nuevoAlumnoId: string): void {

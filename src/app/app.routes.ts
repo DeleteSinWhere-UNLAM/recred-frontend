@@ -4,7 +4,29 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./features/home/home.page').then((m) => m.HomePage),
+      import('./features/landing/landing.page').then((m) => m.LandingPage),
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./core/auth/login/login.page').then((m) => m.LoginPage),
+  },
+  {
+    path: 'registro',
+    loadComponent: () =>
+      import('./core/auth/registro/registro.page').then((m) => m.RegistroPage),
+  },
+  {
+    path: 'recuperar-password',
+    loadChildren: () =>
+      import('./core/auth/recuperar-password/recuperar-password.routes').then(
+        (m) => m.recuperarPasswordRoutes,
+      ),
+  },
+  {
+    path: 'padre',
+    loadComponent: () =>
+      import('./features/home-padre/home-padre.page').then((m) => m.HomePadrePage),
   },
   {
     path: 'restricciones/:alumnoId',

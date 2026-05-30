@@ -33,7 +33,7 @@ export class ExitoPage implements OnInit {
 
   ngOnInit(): void {
     if (this.presenter.vacia()) {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/padre');
     }
   }
 

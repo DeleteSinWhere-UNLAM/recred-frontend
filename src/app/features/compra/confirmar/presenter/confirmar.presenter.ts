@@ -1,9 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { RECREO_LABELS } from '../../models/orden-compra.model';
-import { CarritoService } from '../../data/carrito.service';
+import { CarritoService } from '../../services/carrito.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { CompraService } from '../../data/compra.service';
+import { CompraService } from '../../services/compra.service';
 
 @Injectable()
 export class ConfirmarPresenter {
