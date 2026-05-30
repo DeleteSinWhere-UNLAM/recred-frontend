@@ -16,9 +16,9 @@ export class AsistenteFabComponent {
   @Input() oculto = false;
   @Input() mostrarBadge = true;
 
-  @Output() toggle = new EventEmitter<void>();
+  @Output() togglePanel = new EventEmitter<void>();
 
   protected onClick(): void {
-    this.toggle.emit();
+    this.togglePanel.emit();
   }
 }
