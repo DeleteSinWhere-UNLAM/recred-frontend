@@ -1,8 +1,9 @@
 export interface AiProductResponse {
-    nombre: string;
-    marca: string;
-    peso: string;
-    contiene_azucar: string;
-    contiene_lactosa: string;
-    contiene_mani: string;
+  nombre: string;
+  descripcion: string;
+  peso: string;
+  contiene_azucar: boolean;
+  contiene_mani: boolean;
+  contiene_lactosa: boolean;
+  contiene_tacc: boolean;
 }

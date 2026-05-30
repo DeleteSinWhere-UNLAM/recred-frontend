@@ -1,23 +1,24 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AiProductResponse } from '../../models/ai-product-response.interface';
-import { delay, of } from 'rxjs';
+import { SaveProductRequest } from '../../models/save-product-request.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AiVisionService {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  analyzeImage(file: File): Observable<AiProductResponse> {
-    const mockResponse: AiProductResponse = {
-      nombre: 'Jugo de Naranja Múltiple',
-      marca: 'Cepita',
-      peso: '1L',
-      contiene_azucar: 'si',
-      contiene_lactosa: 'no',
-      contiene_mani: 'no'
-    };
+  private readonly http = inject(HttpClient);
+  private readonly uploadUrl = 'http://localhost:8080/api/load-stock/upload-image';
+  private readonly saveUrl = 'http://localhost:8080/api/load-stock/save-product';
 
-    return of(mockResponse).pipe(delay(3000));
+  analyzeImage(file: File): Observable<AiProductResponse> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.http.post<AiProductResponse>(this.uploadUrl, formData);
+  }
+
+  saveProduct(request: SaveProductRequest): Observable<unknown> {
+    return this.http.post(this.saveUrl, request);
   }
 }

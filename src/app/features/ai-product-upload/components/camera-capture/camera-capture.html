@@ -1,13 +1,16 @@
 <div class="camera-container">
-      <input 
-        type="file" 
-        accept="image/*" 
-        capture="environment" 
-        #fileInput 
-        (change)="onFileSelected($event)" 
-        style="display: none;"
-      >
-      <button type="button" class="btn-camera" (click)="fileInput.click()">
-        📸 Tomar Foto del Producto
-      </button>
-    </div>
+  <input
+    type="file"
+    accept="image/*"
+    capture="environment"
+    #fileInput
+    (change)="onFileSelected($event)"
+    style="display: none;"
+  >
+  <button type="button" class="btn-camera" (click)="fileInput.click()">
+    📸 Tomar Foto del Producto
+  </button>
+  @if (errorMessage) {
+    <p class="camera-error">{{ errorMessage }}</p>
+  }
+</div>

@@ -9,16 +9,18 @@ describe('AiProductUploadPageComponent', () => {
   let aiVisionServiceMock: jasmine.SpyObj<AiVisionService>;
 
   beforeEach(async () => {
-    aiVisionServiceMock = jasmine.createSpyObj('AiVisionService', ['analyzeImage']);
+    aiVisionServiceMock = jasmine.createSpyObj('AiVisionService', ['analyzeImage', 'saveProduct']);
 
-    aiVisionServiceMock.analyzeImage.and.returnValue(of({
-      nombre: 'Galletas de arroz integral',
-      marca: '-',
-      peso: '100g',
-      contiene_azucar: 'no',
-      contiene_lactosa: 'no',
-      contiene_mani: 'no'
-    }));
+    aiVisionServiceMock.analyzeImage.and.returnValue(of(
+      {
+        nombre: 'Galletas de arroz integral',
+        descripcion: '-',
+        peso: '100g',
+        contiene_azucar: false,
+        contiene_lactosa: false,
+        contiene_mani: false,
+        contiene_tacc: false
+      }));
 
     await TestBed.configureTestingModule({
       imports: [AiProductUploadPageComponent],
