@@ -8,7 +8,7 @@ import { RecomendacionesResponse } from '../models/recomendacion.model';
 })
 export class RecomendacionesService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/v1/recomendations/seasonal';
+  private readonly apiUrl = 'https://18-119-187-167.sslip.io/api/v1/recomendations/seasonal';
 
   getSeasonalRecommendations(lat: number, lng: number): Observable<RecomendacionesResponse> {
     const params = new HttpParams()
