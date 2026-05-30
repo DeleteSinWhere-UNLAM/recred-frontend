@@ -133,4 +133,4 @@ goToNotification(route: string, index?: number): void {
     if (this.menuAbierto()) this.menuAbierto.set(false);
     }
   }
-}
+
