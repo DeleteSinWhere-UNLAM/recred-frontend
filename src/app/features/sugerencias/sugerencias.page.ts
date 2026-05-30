@@ -13,18 +13,14 @@ import { SugerenciaCardComponent } from './components/sugerencia-card/sugerencia
   selector: 'app-sugerencias-page',
   templateUrl: './sugerencias.page.html',
   styleUrl: './sugerencias.page.css',
-  imports: [NavbarComponent, SugerenciaCardComponent]
+  imports: [NavbarComponent, SugerenciaCardComponent],
 })
 export class SugerenciasPage {
+  private readonly usuarioService = inject(UsuarioService);
 
-  private readonly usuarioService =
-    inject(UsuarioService);
+  private readonly sugerenciasService = inject(SugerenciasService);
 
-  private readonly sugerenciasService =
-    inject(SugerenciasService);
-
-  readonly nombreUsuario =
-    this.usuarioService.getUsuarioActual().nombre;
+  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
   readonly sugerencias: SugerenciaProducto[] =
     this.sugerenciasService.getSugerencias();

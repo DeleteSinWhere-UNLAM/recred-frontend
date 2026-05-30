@@ -37,9 +37,14 @@ it('debería mostrar productos sugeridos', () => {
   ).toBeTrue();
 });
 
-it('debería mostrar modelo IA', () => {
-  const compiled = fixture.nativeElement;
-  expect(compiled.textContent).toContain('gemini');
+it('debería mostrar tarjetas de sugerencias', () => {
+
+  const compiled =
+    fixture.nativeElement as HTMLElement;
+
+  expect(compiled.textContent)
+    .toContain('Ver detalle');
+
 });
 
 });

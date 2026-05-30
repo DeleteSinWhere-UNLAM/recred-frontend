@@ -10,7 +10,7 @@ export const routes: Routes = [
     path: 'restricciones/:alumnoId',
     loadComponent: () =>
       import('./features/restricciones/restricciones.page').then(
-        (m) => m.RestriccionesPage
+        (m) => m.RestriccionesPage,
       ),
   },
   {
@@ -28,34 +28,42 @@ export const routes: Routes = [
   {
     path: 'preferencias',
     loadComponent: () =>
-      import('./features/preferencias/preferencias.page')
-        .then((m) => m.PreferenciasPage),
-  },
-
-    {
-    path: 'sugerencias',
-    loadComponent: () =>
-      import('./features/sugerencias/sugerencias.page')
-        .then((m) => m.SugerenciasPage),
+      import('./features/preferencias/preferencias.page').then(
+        (m) => m.PreferenciasPage,
+      ),
   },
 
   {
-  path: 'consumo',
-  loadComponent: () =>
-    import('./features/consumo/consumo.page')
-      .then((m) => m.ConsumoPage),
-},
+    path: 'sugerencias',
+    loadComponent: () =>
+      import('./features/sugerencias/sugerencias.page').then(
+        (m) => m.SugerenciasPage,
+      ),
+  },
 
-{
-  path: 'habitos',
-  loadComponent: () =>
-    import('./features/habitos/habitos.page')
-      .then((m) => m.HabitosPage),
-},
+  {
+    path: 'consumo',
+    loadComponent: () =>
+      import('./features/consumo/consumo.page').then((m) => m.ConsumoPage),
+  },
+
+  {
+    path: 'habitos',
+    loadComponent: () =>
+      import('./features/habitos/habitos.page').then((m) => m.HabitosPage),
+  },
 
   {
     path: 'compra',
     loadChildren: () =>
       import('./features/compra/compra.routes').then((m) => m.compraRoutes),
+  },
+
+  {
+    path: 'vendedor-home',
+    loadComponent: () =>
+      import('./features/vendedor-home/vendedor-home.page').then(
+        (m) => m.VendedorHomePage,
+      ),
   },
 ];

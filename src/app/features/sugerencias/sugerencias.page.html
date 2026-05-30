@@ -1,21 +1,11 @@
 <app-navbar [userName]="nombreUsuario" />
 
 <main class="sugerencias">
-
-  <h1 class="titulo">
-    Sugerencias IA
-  </h1>
+  <h1 class="titulo">Sugerencias IA</h1>
 
   <div class="lista-sugerencias">
-
     @for (sugerencia of sugerencias; track sugerencia.productoOriginal) {
-
-      <app-sugerencia-card
-        [sugerencia]="sugerencia"
-      />
-
+      <app-sugerencia-card [sugerencia]="sugerencia" />
     }
-
   </div>
-
 </main>

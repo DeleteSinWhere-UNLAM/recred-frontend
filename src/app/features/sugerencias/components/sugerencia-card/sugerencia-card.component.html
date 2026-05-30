@@ -1,105 +1,64 @@
 <div class="ia-card">
+  <div class="ia-card__resumen">
+    <div class="ia-card__cabecera">
+      <span class="ia-badge"> IA </span>
 
-  <div class="ia-card__header">
-
-    <span class="ia-badge">
-      IA
-    </span>
-
-    <h2 class="ia-title">
-      Producto con bajo rendimiento
-    </h2>
-
-  </div>
-
-  <div class="ia-card__product">
-
-    <h3>
-      {{ sugerencia.productoOriginal }}
-    </h3>
-
-  </div>
-
-  <div class="ia-card__summary">
-
-    <p>
-      💡 {{ sugerencia.resumen }}
-    </p>
-
-  </div>
-
-  <div class="ia-card__alerts">
-
-    <h4>
-      Alertas detectadas
-    </h4>
-
-    @for (alerta of sugerencia.alertas; track alerta) {
-
-      <div class="alert-item">
-
-        ⚠ {{ alerta }}
-
-      </div>
-
-    }
-
-  </div>
-
-  <div class="ia-card__recommendations">
-
-    <h4>
-      Productos recomendados
-    </h4>
-
-    <div class="recommendation-list">
-
-      @for (
-        producto of sugerencia.productosSugeridos;
-        track producto
-      ) {
-
-        <div class="recommendation-item">
-
-          ✅ {{ producto }}
-
-        </div>
-
-      }
-
+      <h3>
+        {{ sugerencia.productoOriginal }}
+      </h3>
     </div>
 
-  </div>
-
-  <div class="ia-card__reason">
-
-    <strong>
-      Motivo IA:
-    </strong>
-
-    <p>
-      {{ sugerencia.motivoIA }}
+    <p class="ia-card__texto">
+      {{ sugerencia.resumen }}
     </p>
 
-  </div>
+    <div class="ia-card__stats">
+      <span>{{ sugerencia.alertas.length }} alertas </span>
 
-  <div class="ia-card__actions">
+      <span>{{ sugerencia.productosSugeridos.length }} sugerencias </span>
+    </div>
 
-    <button class="primary-btn">
-      Ver producto
+    <button class="detalle-btn" (click)="toggleDetalle()">
+      {{ expandido ? "Ocultar detalle" : "Ver detalle" }}
     </button>
-
-    <button class="secondary-btn">
-      Aplicar sugerencia
-    </button>
-
   </div>
 
-  <div class="ia-card__footer">
+  @if (expandido) {
+    <div class="ia-card__detalle">
+      <div class="ia-card__alerts">
+        <h4>Alertas detectadas</h4>
 
-    Modelo IA:
-    {{ sugerencia.modeloIA }}
+        @for (alerta of sugerencia.alertas; track alerta) {
+          <div class="alert-item">{{ alerta }}</div>
+        }
+      </div>
 
-  </div>
+      <div class="ia-card__recommendations">
+        <h4>Productos recomendados</h4>
 
+        @for (producto of sugerencia.productosSugeridos; track producto) {
+          <div class="recommendation-item">{{ producto }}</div>
+        }
+      </div>
+
+      <div class="ia-card__reason">
+        <strong>Motivo IA</strong>
+
+        <p>
+          {{ sugerencia.motivoIA }}
+        </p>
+      </div>
+
+      <div class="ia-card__actions">
+        <button class="primary-btn">Ver producto</button>
+
+        <button class="secondary-btn">Aplicar sugerencia</button>
+      </div>
+
+      <div class="ia-card__footer">
+        Modelo IA:
+        {{ sugerencia.modeloIA }}
+      </div>
+    </div>
+  }
 </div>
