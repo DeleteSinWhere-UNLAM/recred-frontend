@@ -1,0 +1,33 @@
+.tarjeta-accion {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  min-height: 140px;
+
+  border-radius: 24px;
+
+  background-color: var(--color-fondo);
+
+  box-shadow: var(--shadow-neu-convex);
+
+  transition: all 0.15s ease;
+}
+
+.tarjeta-accion:hover {
+  transform: translateY(-2px);
+}
+
+.tarjeta-accion i {
+  font-size: 28px;
+  color: var(--color-pizarra);
+}
+
+.tarjeta-accion span {
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+}
