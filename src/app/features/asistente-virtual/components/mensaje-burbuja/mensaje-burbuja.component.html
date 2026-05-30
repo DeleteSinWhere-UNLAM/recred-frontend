@@ -1,0 +1,13 @@
+<div
+  class="mensaje-burbuja"
+  [class.mensaje-burbuja--alumno]="esAlumno"
+  [class.mensaje-burbuja--cred]="!esAlumno"
+>
+  @if (!esAlumno) {
+    <div class="mensaje-burbuja__avatar" aria-hidden="true">🤖</div>
+  }
+  <div class="mensaje-burbuja__contenido">
+    <p class="mensaje-burbuja__texto">{{ mensaje.texto }}</p>
+    <span class="mensaje-burbuja__hora">{{ horaFormateada }}</span>
+  </div>
+</div>

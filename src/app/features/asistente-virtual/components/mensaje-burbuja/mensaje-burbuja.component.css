@@ -1,0 +1,85 @@
+.mensaje-burbuja {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 88%;
+  animation: mensaje-burbuja-aparecer 0.25s ease-out;
+}
+
+.mensaje-burbuja--cred {
+  align-self: flex-start;
+}
+
+.mensaje-burbuja--alumno {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.mensaje-burbuja__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-dorado) 0%, var(--color-dorado-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow:
+    0 0 0 2px var(--color-superficie),
+    0 3px 6px rgba(217, 163, 4, 0.3);
+}
+
+.mensaje-burbuja__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mensaje-burbuja__texto {
+  margin: 0;
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.mensaje-burbuja--cred .mensaje-burbuja__texto {
+  background-color: var(--color-fondo);
+  color: var(--color-texto-oscuro);
+  border-radius: 18px 18px 18px 6px;
+}
+
+.mensaje-burbuja--alumno .mensaje-burbuja__texto {
+  background: linear-gradient(135deg, var(--color-menta) 0%, #6da085 100%);
+  color: #fff;
+  border-radius: 18px 18px 6px 18px;
+  box-shadow: 0 3px 8px rgba(129, 178, 154, 0.3);
+}
+
+.mensaje-burbuja__hora {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+  padding: 0 6px;
+}
+
+.mensaje-burbuja--alumno .mensaje-burbuja__hora {
+  align-self: flex-end;
+}
+
+@keyframes mensaje-burbuja-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
