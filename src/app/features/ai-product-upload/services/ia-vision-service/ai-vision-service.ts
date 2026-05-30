@@ -9,8 +9,8 @@ import { SaveProductRequest } from '../../models/save-product-request.interface'
 })
 export class AiVisionService {
   private readonly http = inject(HttpClient);
-  private readonly uploadUrl = 'http://localhost:8080/api/load-stock/upload-image';
-  private readonly saveUrl = 'http://localhost:8080/api/load-stock/save-product';
+  private readonly uploadUrl = 'https://18-119-187-167.sslip.io/api/load-stock/upload-image';
+  private readonly saveUrl = 'https://18-119-187-167.sslip.io/api/load-stock/save-product';
 
   analyzeImage(file: File): Observable<AiProductResponse> {
     const formData = new FormData();
