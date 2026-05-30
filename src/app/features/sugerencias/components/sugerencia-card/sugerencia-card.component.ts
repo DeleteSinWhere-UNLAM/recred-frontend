@@ -8,8 +8,12 @@ import { SugerenciaProducto } from '../../../../data-access/models/sugerencia-pr
   styleUrl: './sugerencia-card.component.css',
 })
 export class SugerenciaCardComponent {
-
   @Input({ required: true })
   sugerencia!: SugerenciaProducto;
 
+  expandido = false;
+
+  toggleDetalle(): void {
+    this.expandido = !this.expandido;
+  }
 }

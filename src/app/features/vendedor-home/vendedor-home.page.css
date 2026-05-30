@@ -1,0 +1,86 @@
+.vendedor-home {
+  min-height: calc(100vh - 64px);
+  padding: 32px 0 48px;
+  background-color: var(--color-fondo);
+}
+
+.vendedor-home__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.vendedor-home__titulo {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+  margin-bottom: 8px;
+}
+
+/* =========================
+   ESTADÍSTICAS (DASHBOARD)
+========================= */
+.estadisticas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* =========================
+   ACCIONES
+========================= */
+.acciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* =========================
+   NEUMORFISMO BASE WRAPPER
+========================= */
+.estadisticas app-estadistica-card,
+.acciones app-accion-card {
+  display: block;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .estadisticas {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .vendedor-home {
+    padding: 20px 0 32px;
+  }
+
+  .vendedor-home__container {
+    padding: 0 16px;
+    gap: 20px;
+  }
+
+  .vendedor-home__titulo {
+    font-size: 22px;
+  }
+
+  .estadisticas {
+    gap: 14px;
+  }
+
+  .acciones {
+    gap: 14px;
+  }
+}
