@@ -1,32 +1,49 @@
 .seasonal-list-container {
-  font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
 }
+
 .header-section {
-  margin-bottom: 2rem;
+  margin-bottom: 40px;
 }
+
 .header-section h2 {
   margin: 0;
-  color: #1f2937;
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
 }
+
 .subtitle {
-  color: #6b7280;
+  color: var(--color-texto-claro);
   margin-top: 0.5rem;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
+
 .recommendations-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
+  gap: 24px;
 }
+
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: #6b7280;
-  background: #f9fafb;
-  border-radius: 12px;
-  border: 2px dashed #e5e7eb;
-  font-weight: 500;
+  color: var(--color-texto-claro);
+  background: var(--color-superficie);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-neu-convex);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 640px) {
+  .header-section h2 {
+    font-size: 24px;
+  }
+  
+  .recommendations-grid {
+    gap: 16px;
+  }
 }
