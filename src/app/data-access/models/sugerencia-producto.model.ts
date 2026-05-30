@@ -1,7 +1,8 @@
 export interface SugerenciaProducto {
   productoOriginal: string;
-  productoSugerido: string;
-  motivo: string;
-  bloqueado: boolean;
-  disponible: boolean;
+  resumen: string;
+  alertas: string[];
+  productosSugeridos: string[];
+  motivoIA: string;
+  modeloIA: string;
 }

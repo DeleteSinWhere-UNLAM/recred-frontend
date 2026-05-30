@@ -1,0 +1,12 @@
+<button
+  type="submit"
+  class="cta cta--primario"
+  [disabled]="disabled || cargando"
+  (click)="onClick()"
+>
+  @if (cargando) {
+    {{ textoCargando }}
+  } @else {
+    {{ texto }}
+  }
+</button>

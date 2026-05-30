@@ -2,7 +2,7 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
-import { RestriccionesService } from '../data/restricciones.service';
+import { RestriccionesService } from '../services/restricciones.service';
 import {
   ClaveRestriccion,
   RESTRICCIONES_CATALOGO,
@@ -42,7 +42,7 @@ export class RestriccionesPresenter {
   init(alumnoId: string): void {
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
     if (!alumno) {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl('/padre');
       return;
     }
     this.alumnoState.set(alumno);
@@ -58,10 +58,10 @@ export class RestriccionesPresenter {
 
   guardar(): void {
     this.restriccionesService.guardar(this.restriccionesState());
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 
   volver(): void {
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/padre');
   }
 }

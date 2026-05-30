@@ -1,10 +1,12 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CompraService } from '../../data/compra.service';
+import { UsuarioService } from '../../../../data-access/services/usuario.service';
+import { CompraService } from '../../services/compra.service';
 
 @Injectable()
 export class ExitoPresenter {
   private readonly compraService = inject(CompraService);
+  private readonly usuarioService = inject(UsuarioService);
   private readonly router = inject(Router);
 
   readonly orden = this.compraService.ultimaOrden;
@@ -19,11 +21,10 @@ export class ExitoPresenter {
   }
 
   volverInicio(): void {
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl(this.usuarioService.homeUrl());
   }
 
   verPendientes(): void {
-    // TODO: navegar a /movimientos cuando exista
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl(this.usuarioService.homeUrl());
   }
 }

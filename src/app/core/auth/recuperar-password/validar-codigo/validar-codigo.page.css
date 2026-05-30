@@ -1,0 +1,144 @@
+.validar {
+  min-height: 100dvh;
+  background-color: var(--color-fondo);
+  display: flex;
+  flex-direction: column;
+}
+
+.validar__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 32px;
+}
+
+@media (min-width: 880px) {
+  .validar__header {
+    padding: 28px 64px;
+  }
+}
+
+.validar__logo {
+  width: 44px;
+  height: auto;
+}
+
+.validar__marca {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.375rem;
+  color: var(--color-pizarra);
+  letter-spacing: 0.02em;
+}
+
+.validar__hero {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 24px 64px;
+}
+
+@media (min-width: 880px) {
+  .validar__hero {
+    padding: 32px 64px 80px;
+  }
+}
+
+.validar__card {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--color-superficie);
+  border-radius: var(--radius-card);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+@media (min-width: 880px) {
+  .validar__card {
+    padding: 40px 36px;
+  }
+}
+
+.validar__titulo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  color: var(--color-pizarra);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.validar__subtitulo {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--color-texto-oscuro);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.validar__subtitulo strong {
+  color: var(--color-pizarra);
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.validar__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.validar__error {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-melocoton);
+  line-height: 1.4;
+}
+
+.validar__login {
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--color-texto-oscuro);
+  margin-top: 8px;
+}
+
+.validar__link {
+  background: transparent;
+  border: none;
+  color: var(--color-pizarra);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.validar__link:hover {
+  color: var(--color-pizarra-dark);
+}
+
+.validar__volver {
+  align-self: center;
+  background: transparent;
+  border: none;
+  color: var(--color-texto-claro);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.validar__volver:hover {
+  color: var(--color-pizarra);
+}

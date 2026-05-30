@@ -1,0 +1,44 @@
+<div class="landing">
+  <header class="landing__header">
+    <img
+      class="landing__logo"
+      src="logoHeader.png"
+      alt="Logo RECRED"
+    />
+    <span class="landing__marca">RECRED</span>
+  </header>
+
+  <main class="landing__hero">
+    <section class="landing__contenido">
+      <h1 class="landing__titulo">
+        Menos filas,
+        <span class="landing__titulo-acento">más tiempo de recreo</span>
+      </h1>
+
+      <p class="landing__tagline">
+        Controlá restricciones, gestioná el presupuesto y comprá en el buffet
+        escolar desde casa. Tranquilidad para vos, recreo feliz para tus hijos.
+      </p>
+
+      <div class="landing__ctas">
+        @for (cta of presenter.ctas; track cta.ruta) {
+          <app-landing-cta-button
+            [cta]="cta"
+            (clicked)="onCtaClick(cta)"
+          />
+        }
+      </div>
+    </section>
+
+    <aside class="landing__media">
+      <div class="landing__media-frame">
+        <img
+          class="landing__media-img"
+          src="landing.png"
+          alt="Buffet escolar con frutas, sandwiches y bebidas saludables"
+          (error)="onImagenError($event)"
+        />
+      </div>
+    </aside>
+  </main>
+</div>

@@ -1,0 +1,52 @@
+<section
+  class="asistente-panel"
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="asistente-panel-titulo"
+>
+  <header class="asistente-panel__header">
+    <div class="asistente-panel__avatar-wrap">
+      <span class="asistente-panel__avatar" aria-hidden="true">🤖</span>
+      <span class="asistente-panel__status" aria-hidden="true"></span>
+    </div>
+    <div class="asistente-panel__identidad">
+      <h2 id="asistente-panel-titulo" class="asistente-panel__nombre">Cred</h2>
+      <span class="asistente-panel__subtitulo">Tu ayudante en RECRED</span>
+    </div>
+    <button
+      type="button"
+      class="asistente-panel__cerrar"
+      (click)="onCerrar()"
+      aria-label="Cerrar asistente"
+    >
+      <span aria-hidden="true">✕</span>
+    </button>
+  </header>
+
+  <div #scroll class="asistente-panel__mensajes" aria-live="polite">
+    @for (m of mensajes_(); track trackById($index, m)) {
+      <app-mensaje-burbuja [mensaje]="m" />
+    }
+    @if (enviando_()) {
+      <div class="asistente-panel__typing" aria-label="Cred está escribiendo">
+        <span class="asistente-panel__typing-avatar" aria-hidden="true">🤖</span>
+        <div class="asistente-panel__typing-burbuja" aria-hidden="true">
+          <span class="asistente-panel__typing-dot"></span>
+          <span class="asistente-panel__typing-dot"></span>
+          <span class="asistente-panel__typing-dot"></span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <app-sugerencias-chips
+    [sugerencias]="sugerencias_()"
+    [deshabilitado]="enviando_()"
+    (elegir)="onSugerencia($event)"
+  />
+
+  <app-input-mensaje
+    [deshabilitado]="enviando_()"
+    (enviar)="onEnviar($event)"
+  />
+</section>
