@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, inject } from '@angular/core';
 import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
   HostListener,
   Input,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -118,7 +118,6 @@ goToNotification(route: string, index?: number): void {
     this.menuAbierto.set(false);
     this.router.navigateByUrl('/');
   }
-}
 
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
@@ -132,5 +131,6 @@ goToNotification(route: string, index?: number): void {
   @HostListener('document:keydown.escape')
   protected onEscape(): void {
     if (this.menuAbierto()) this.menuAbierto.set(false);
+    }
   }
 }
