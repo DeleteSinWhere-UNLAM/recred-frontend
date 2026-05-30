@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+
 export const routes: Routes = [
   {
     path: '',
@@ -97,4 +98,12 @@ export const routes: Routes = [
         (m) => m.VendedorHomePage,
       ),
   },
+  {
+    path: 'cargar-producto-ia',
+    loadChildren: () => import('./features/ai-product-upload/ai-product-upload.routes').then(m => m.aiProductUploadRoutes)
+  },
+  {
+    path: 'recomendaciones-estacionales',
+    loadComponent: () => import('./features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component').then(m => m.SeasonalPageComponent)
+  }
 ];

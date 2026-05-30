@@ -8,4 +8,4 @@ import { ToastHostComponent } from './shared/components/toast-host/toast-host.co
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {}
+export class App { }

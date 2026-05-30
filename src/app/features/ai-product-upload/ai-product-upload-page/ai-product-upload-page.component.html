@@ -1,0 +1,34 @@
+<div class="page-container">
+  <h2>Carga de Producto</h2>
+  <p>Carga los datos manualmente o toma una foto del envase frontal para autocompletar.</p>
+
+  <app-camera-capture (photoTaken)="handlePhoto($event)"></app-camera-capture>
+
+  <app-scanner-loader [isScanning]="isLoading"></app-scanner-loader>
+
+  @if (saveSuccess) {
+    <div class="feedback-message feedback-message--success">
+      <p>✅ ¡Producto guardado exitosamente!</p>
+    </div>
+  }
+
+  @if (saveError) {
+    <div class="feedback-message feedback-message--error">
+      <p>❌ {{ saveError }}</p>
+    </div>
+  }
+
+  <div class="form-wrapper">
+    @if (scannedProductData) {
+      <div class="feedback-message feedback-message--info">
+        <p>✅ ¡Datos detectados! Verifica y corrige la información:</p>
+      </div>
+    }
+
+    <app-ai-product-form
+      [prefillData]="scannedProductData"
+      [isSaving]="isSaving"
+      (save)="saveProduct($event)">
+    </app-ai-product-form>
+  </div>
+</div>
