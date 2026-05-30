@@ -1,0 +1,23 @@
+<form class="input-mensaje" (submit)="onSubmit($event)">
+  <input
+    #inputEl
+    type="text"
+    class="input-mensaje__campo"
+    placeholder="Escribí tu pregunta..."
+    autocomplete="off"
+    maxlength="280"
+    [disabled]="deshabilitado"
+    [ngModel]="texto()"
+    (ngModelChange)="texto.set($event)"
+    name="mensaje-asistente"
+    aria-label="Tu pregunta para Cred"
+  />
+  <button
+    type="submit"
+    class="input-mensaje__enviar"
+    [disabled]="!puedeEnviar"
+    aria-label="Enviar mensaje"
+  >
+    <span aria-hidden="true">➤</span>
+  </button>
+</form>

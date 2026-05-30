@@ -1,0 +1,15 @@
+<app-asistente-fab
+  [oculto]="presenter.abierto()"
+  (toggle)="presenter.toggle()"
+/>
+
+@if (presenter.abierto()) {
+  <app-asistente-panel
+    [mensajes]="presenter.mensajes()"
+    [sugerencias]="presenter.sugerencias"
+    [enviando]="presenter.enviando()"
+    (cerrar)="presenter.cerrar()"
+    (enviar)="presenter.enviar($event)"
+    (sugerencia)="presenter.enviarSugerencia($event)"
+  />
+}
