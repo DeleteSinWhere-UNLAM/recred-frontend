@@ -29,6 +29,11 @@ export const routes: Routes = [
       import('./features/home-padre/home-padre.page').then((m) => m.HomePadrePage),
   },
   {
+    path: 'alumno',
+    loadComponent: () =>
+      import('./features/home-alumno/home-alumno.page').then((m) => m.HomeAlumnoPage),
+  },
+  {
     path: 'restricciones/:alumnoId',
     loadComponent: () =>
       import('./features/restricciones/restricciones.page').then(

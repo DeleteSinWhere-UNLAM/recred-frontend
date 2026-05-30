@@ -7,6 +7,7 @@ import {
   Recreo,
 } from '../../models/orden-compra.model';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
+import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { CarritoService } from '../../services/carrito.service';
 import { CompraService } from '../../services/compra.service';
 
@@ -24,6 +25,7 @@ export class CarritoPresenter {
   private readonly carritoService = inject(CarritoService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly compraService = inject(CompraService);
+  private readonly usuarioService = inject(UsuarioService);
   private readonly router = inject(Router);
 
   private readonly seleccionState = signal<Record<string, boolean>>({});
@@ -132,7 +134,7 @@ export class CarritoPresenter {
   }
 
   volverAlBuffet(): void {
-    this.router.navigateByUrl('/padre');
+    this.router.navigateByUrl(this.usuarioService.homeUrl());
   }
 
   private calcularFechaMinima(): string {

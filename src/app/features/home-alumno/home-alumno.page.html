@@ -1,0 +1,27 @@
+<app-navbar [userName]="presenter.nombreAlumno()" />
+
+<main class="home-alumno">
+  <div class="home-alumno__container">
+    <app-perfil-header
+      [iniciales]="presenter.iniciales()"
+      [nombreCompleto]="presenter.nombreCompleto()"
+      [grado]="presenter.grado()"
+      [colegio]="presenter.nombreColegio()"
+      [saldoFormateado]="presenter.saldoFormateado()"
+      [saldoNegativo]="presenter.saldoNegativo()"
+    />
+
+    <app-acciones-grid
+      [acciones]="presenter.acciones()"
+      (accion)="presenter.ejecutarAccion($event)"
+    />
+
+    <app-pedido-recreo-card
+      [pedido]="presenter.pedidoEnCurso()"
+      [recreo]="presenter.proximoRecreo()"
+      [estadoLabel]="presenter.estadoPedidoLabel()"
+      [iconoEstado]="presenter.iconoEstadoPedido()"
+      (verPedido)="presenter.verPedido()"
+    />
+  </div>
+</main>

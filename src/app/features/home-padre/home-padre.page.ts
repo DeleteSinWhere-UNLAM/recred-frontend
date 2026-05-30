@@ -27,6 +27,11 @@ export class HomePadrePage {
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
   readonly grupos: GrupoColegio[] = this.armarGrupos();
 
+  constructor() {
+    this.usuarioService.setHomeUrl('/padre');
+    this.usuarioService.setNombreNavbar(this.nombreUsuario);
+  }
+
   private armarGrupos(): GrupoColegio[] {
     const alumnos = this.alumnosService.getAlumnos();
     return this.colegiosService
