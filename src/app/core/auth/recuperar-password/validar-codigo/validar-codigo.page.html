@@ -1,0 +1,51 @@
+<div class="validar">
+  <header class="validar__header">
+    <img class="validar__logo" src="logoHeader.png" alt="Logo RECRED" />
+    <span class="validar__marca">RECRED</span>
+  </header>
+
+  <main class="validar__hero">
+    <section class="validar__card" aria-labelledby="validar-titulo">
+      <h1 id="validar-titulo" class="validar__titulo">Ingresá el código</h1>
+      <p class="validar__subtitulo">
+        Te enviamos un código de 6 dígitos a
+        <strong>{{ presenter.email() }}</strong>. Ingresálo abajo.
+      </p>
+
+      <form
+        class="validar__form"
+        novalidate
+        (submit)="$event.preventDefault(); onSubmit()"
+      >
+        <app-otp-input
+          etiqueta="Código"
+          [valor]="presenter.codigo()"
+          (valorCambiado)="onCodigoChange($event)"
+        />
+
+        @if (presenter.error(); as msg) {
+          <p class="validar__error" role="alert">{{ msg }}</p>
+        }
+
+        <app-login-submit-button
+          texto="Continuar"
+          textoCargando="Validando…"
+          [disabled]="!presenter.formValido()"
+          [cargando]="false"
+          (clicked)="onSubmit()"
+        />
+      </form>
+
+      <p class="validar__login">
+        ¿No te llegó el código?
+        <button type="button" class="validar__link" (click)="onReenviar()">
+          Reenviar
+        </button>
+      </p>
+
+      <button type="button" class="validar__volver" (click)="onVolver()">
+        ← Volver al inicio
+      </button>
+    </section>
+  </main>
+</div>

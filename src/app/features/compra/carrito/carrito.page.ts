@@ -20,7 +20,7 @@ export class CarritoPage {
   private readonly usuarioService = inject(UsuarioService);
   protected readonly presenter = inject(CarritoPresenter);
 
-  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly nombreUsuario = this.usuarioService.nombreNavbar;
 
   protected readonly lineasResumen = computed<ResumenLinea[]>(() =>
     this.presenter.grupos().map((g) => ({
