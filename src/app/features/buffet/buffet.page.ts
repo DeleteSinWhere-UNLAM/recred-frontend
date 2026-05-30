@@ -29,7 +29,8 @@ export class BuffetPage implements OnInit {
   private readonly colegiosService = inject(ColegiosService);
   protected readonly presenter = inject(BuffetPresenter);
 
-  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly nombreUsuario = this.usuarioService.nombreNavbar;
+  protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly todosLosAlumnos = this.alumnosService.getAlumnos();
   readonly todosLosColegios = this.colegiosService.getColegios();
 

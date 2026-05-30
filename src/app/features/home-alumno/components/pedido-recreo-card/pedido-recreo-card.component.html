@@ -1,0 +1,73 @@
+<section class="pedido-recreo" aria-label="Pedido en curso y próximo recreo">
+  <div class="pedido-recreo__banda" aria-hidden="true"></div>
+
+  <div class="pedido-recreo__contenido">
+    <article class="pedido-recreo__pedido">
+      <header class="pedido-recreo__header">
+        <span class="pedido-recreo__icono pedido-recreo__icono--pedido" aria-hidden="true">
+          <i class="fa-solid" [class]="iconoEstado"></i>
+        </span>
+        <div>
+          <p class="pedido-recreo__label">Tu pedido</p>
+          <h3 class="pedido-recreo__titulo">{{ estadoLabel }}</h3>
+        </div>
+      </header>
+
+      @if (tienePedido && pedido) {
+        <ul class="pedido-recreo__chips" aria-label="Items del pedido">
+          @for (item of pedido.itemsResumen; track item) {
+            <li class="pedido-recreo__chip">{{ item }}</li>
+          }
+        </ul>
+
+        <div class="pedido-recreo__pie">
+          <div class="pedido-recreo__total">
+            <span class="pedido-recreo__total-label">Total</span>
+            <span class="pedido-recreo__total-valor">{{ pedido.totalFormateado }}</span>
+          </div>
+          <div class="pedido-recreo__retira">
+            <i class="fa-solid fa-clock" aria-hidden="true"></i>
+            <span>Retirás {{ pedido.retiraEn }}</span>
+          </div>
+        </div>
+
+        <button type="button" class="pedido-recreo__cta" (click)="onCta()">
+          Ver mi pedido
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </button>
+      } @else {
+        <p class="pedido-recreo__vacio">
+          Todavía no pediste nada para hoy. ¡Mirá qué hay en el buffet!
+        </p>
+        <button type="button" class="pedido-recreo__cta" (click)="onCta()">
+          Ir al buffet
+          <i class="fa-solid fa-utensils" aria-hidden="true"></i>
+        </button>
+      }
+    </article>
+
+    <article class="pedido-recreo__recreo">
+      <header class="pedido-recreo__header">
+        <span class="pedido-recreo__icono pedido-recreo__icono--recreo" aria-hidden="true">
+          <i class="fa-solid fa-clock"></i>
+        </span>
+        <div>
+          <p class="pedido-recreo__label">Próximo recreo</p>
+          @if (recreo) {
+            <h3 class="pedido-recreo__titulo">{{ recreo.nombre }}</h3>
+          } @else {
+            <h3 class="pedido-recreo__titulo">Sin recreo a la vista</h3>
+          }
+        </div>
+      </header>
+
+      @if (recreo) {
+        <div class="pedido-recreo__horario">
+          <span class="pedido-recreo__hora">{{ recreo.horaInicio }}</span>
+          <span class="pedido-recreo__separador" aria-hidden="true">→</span>
+          <span class="pedido-recreo__hora">{{ recreo.horaFin }}</span>
+        </div>
+      }
+    </article>
+  </div>
+</section>

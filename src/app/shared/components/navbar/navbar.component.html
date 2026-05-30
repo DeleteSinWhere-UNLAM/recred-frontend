@@ -5,12 +5,16 @@
         <img src="logoHeader.png" alt="" class="navbar__logo-img">
         <span class="navbar__logo-text">RECRED</span>
       </a>
-      <span class="navbar__divider" aria-hidden="true"></span>
-      <span class="navbar__greeting">Hola, {{ userName }}</span>
+      @if (!esVistaAlumno()) {
+        <span class="navbar__divider" aria-hidden="true"></span>
+        <span class="navbar__greeting">Hola, {{ userName }}</span>
+      }
     </div>
 
     <nav class="navbar__actions" aria-label="Acciones principales">
-      <a class="navbar__link" href="#">Movimientos</a>
+      @if (!esVistaAlumno()) {
+        <a class="navbar__link" href="#">Movimientos</a>
+      }
       <button
         type="button"
         class="navbar__cart"

@@ -1,0 +1,30 @@
+<section class="perfil-header" [attr.aria-label]="'Perfil de ' + nombreCompleto">
+  <div class="perfil-header__avatar-wrap">
+    <div class="perfil-header__avatar">
+      <span>{{ iniciales }}</span>
+    </div>
+  </div>
+
+  <div class="perfil-header__info">
+    <p class="perfil-header__saludo">
+      <span class="perfil-header__saludo-mano" aria-hidden="true">👋</span>
+      ¡Hola,
+    </p>
+    <h1 class="perfil-header__nombre">{{ nombreCompleto }}!</h1>
+    <p class="perfil-header__subtitulo">
+      <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+      <span>{{ grado }} · {{ colegio }}</span>
+    </p>
+  </div>
+
+  <div
+    class="perfil-header__saldo"
+    [class.perfil-header__saldo--negativo]="saldoNegativo"
+  >
+    <span class="perfil-header__saldo-label">
+      <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+      Tu saldo
+    </span>
+    <span class="perfil-header__saldo-valor">{{ saldoFormateado }}</span>
+  </div>
+</section>
