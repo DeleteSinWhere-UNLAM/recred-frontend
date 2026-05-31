@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
+import { NotificacionesService } from '../../../data-access/services/notificaciones.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 @Component({
@@ -21,13 +22,17 @@ export class NavbarComponent {
   private readonly router = inject(Router);
   private readonly carritoService = inject(CarritoService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly notificacionesService = inject(NotificacionesService);
   private readonly host = inject(ElementRef<HTMLElement>);
 
   @Input() userName = '';
 
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
+  protected readonly esVistaVendedor = this.usuarioService.esVistaVendedor;
+  protected readonly notifCount = this.notificacionesService.cantidad;
   protected readonly menuAbierto = signal(false);
+  protected readonly menuNotifAbierto = signal(false);
 
   protected irAlCarrito(): void {
     this.router.navigateByUrl('/compra');
@@ -40,6 +45,12 @@ export class NavbarComponent {
 
   protected toggleMenu(): void {
     this.menuAbierto.update((abierto) => !abierto);
+    if (this.menuAbierto()) this.menuNotifAbierto.set(false);
+  }
+
+  protected toggleNotificaciones(): void {
+    this.menuNotifAbierto.update((abierto) => !abierto);
+    if (this.menuNotifAbierto()) this.menuAbierto.set(false);
   }
 
   protected cerrarSesion(): void {
@@ -49,15 +60,17 @@ export class NavbarComponent {
 
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
-    if (!this.menuAbierto()) return;
+    if (!this.menuAbierto() && !this.menuNotifAbierto()) return;
     const target = event.target as Node | null;
     if (target && !this.host.nativeElement.contains(target)) {
       this.menuAbierto.set(false);
+      this.menuNotifAbierto.set(false);
     }
   }
 
   @HostListener('document:keydown.escape')
   protected onEscape(): void {
     if (this.menuAbierto()) this.menuAbierto.set(false);
+    if (this.menuNotifAbierto()) this.menuNotifAbierto.set(false);
   }
 }

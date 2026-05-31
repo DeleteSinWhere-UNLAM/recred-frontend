@@ -2,19 +2,17 @@ import { Injectable } from '@angular/core';
 
 import { ResumenVendedor } from '../models/resumen-vendedor.model';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class VendedorHomeService {
+@Injectable({ providedIn: 'root' })
+export class HomeVendedorService {
   getResumen(): ResumenVendedor {
     return {
       gananciasHoy: 12450,
-
       ventasHoy: 34,
-
       productosSinStock: 5,
-
-      alertasPendientes: 2,
     };
+  }
+
+  getNombreVendedor(): string {
+    return 'Carlos';
   }
 }

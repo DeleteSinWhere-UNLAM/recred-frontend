@@ -17,6 +17,7 @@ export class UsuarioService {
   private readonly homeUrlState = signal<string>('/padre');
   readonly homeUrl: Signal<string> = this.homeUrlState.asReadonly();
   readonly esVistaAlumno: Signal<boolean> = computed(() => this.homeUrlState() === '/alumno');
+  readonly esVistaVendedor: Signal<boolean> = computed(() => this.homeUrlState() === '/vendedor');
 
   private readonly nombreNavbarState = signal<string>(this.usuarioActual.nombre);
   readonly nombreNavbar: Signal<string> = this.nombreNavbarState.asReadonly();

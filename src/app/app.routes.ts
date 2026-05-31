@@ -92,10 +92,10 @@ export const routes: Routes = [
   },
 
   {
-    path: 'vendedor-home',
+    path: 'vendedor',
     loadComponent: () =>
-      import('./features/vendedor-home/vendedor-home.page').then(
-        (m) => m.VendedorHomePage,
+      import('./features/home-vendedor/home-vendedor.page').then(
+        (m) => m.HomeVendedorPage,
       ),
   },
   {
