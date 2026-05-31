@@ -7,8 +7,8 @@ import { ProductTableComponent } from '../components/product-table/product-table
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 
-const BUFFET_ID = 'ebfc7afc-6b2e-46a6-ba8f-bb2902a6bfd9';
-const HEALTH_CLASSIFICATION_IDS = ['214e9d21-b049-43af-be09-08fb0b445828'];
+const BUFFET_ID = 'da1439ae-487b-4e99-90fa-7488a5adc39f';
+const HEALTH_CLASSIFICATION_IDS = ['f86358e0-0faf-4db0-bdda-09d8fb3a7cf2'];
 
 @Component({
   selector: 'app-updated-inventory-page',

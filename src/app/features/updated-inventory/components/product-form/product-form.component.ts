@@ -12,6 +12,10 @@ export interface ProductFormData {
   categoriaId: string | null;
   nuevaCategoriaNombre: string;
   requierePreparacion: boolean;
+  contiene_azucar: boolean;
+  contiene_mani: boolean;
+  contiene_lactosa: boolean;
+  contiene_tacc: boolean;
 }
 
 @Component({
@@ -39,6 +43,10 @@ export class ProductFormComponent implements OnInit, OnChanges {
     categoriaId: [null, Validators.required],
     nuevaCategoriaNombre: [''],
     requierePreparacion: [false],
+    contiene_azucar: [false],
+    contiene_mani: [false],
+    contiene_lactosa: [false],
+    contiene_tacc: [false],
   });
 
   ngOnInit(): void {
@@ -69,11 +77,21 @@ export class ProductFormComponent implements OnInit, OnChanges {
         categoriaId: this.product.categoriaId || 'NEW',
         nuevaCategoriaNombre: this.product.categoriaId ? '' : (this.product.categoriaNombre || ''),
         requierePreparacion: this.product.requierePreparacion,
+        contiene_azucar: false, // Update with actual product health flags if available in Product interface
+        contiene_mani: false,
+        contiene_lactosa: false,
+        contiene_tacc: false,
       });
     }
 
     if (changes['product'] && !this.product) {
-      this.productForm.reset({ requierePreparacion: false });
+      this.productForm.reset({ 
+        requierePreparacion: false,
+        contiene_azucar: false,
+        contiene_mani: false,
+        contiene_lactosa: false,
+        contiene_tacc: false,
+      });
     }
   }
 

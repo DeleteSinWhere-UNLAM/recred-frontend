@@ -55,6 +55,7 @@ describe('AiProductForm', () => {
       precio: 100,
       stockActual: 10,
       nuevaCategoriaNombre: 'Dulces',
+      categoriaId: 'NEW',
       requierePreparacion: false,
       contiene_azucar: true,
       contiene_lactosa: true,
@@ -69,9 +70,9 @@ describe('AiProductForm', () => {
     expect(emittedRequest.nombre).toBe('Galletas');
     expect(emittedRequest.descripcion).toBe('Galletas de chocolate');
     expect(emittedRequest.peso).toBe(0.12);
-    expect(emittedRequest.nuevaCategoriaNombre).toBe('Galletita');
-    expect(emittedRequest.buffetId).toBe('2c4153b3-d0f9-489c-93c0-8b3ad7b89758');
-    expect(emittedRequest.clasificacionesSaludIds).toEqual(['52062d7f-fbf5-4757-ad5f-d716025b05d5']);
+    expect(emittedRequest.nuevaCategoriaNombre).toBe('Dulces');
+    expect(emittedRequest.buffetId).toBe('da1439ae-487b-4e99-90fa-7488a5adc39f');
+    expect(emittedRequest.clasificacionesSaludIds).toEqual(['f86358e0-0faf-4db0-bdda-09d8fb3a7cf2']);
   });
 
   it('NO debería emitir el evento save si el formulario es inválido', () => {
