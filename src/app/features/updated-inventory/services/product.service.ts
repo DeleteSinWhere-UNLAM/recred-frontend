@@ -1,0 +1,36 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ProductService {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = 'http://localhost:8080/api/v1/products';
+
+  getAll(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.baseUrl);
+  }
+
+  getAllByBuffetId(buffetId: string): Observable<Product[]> {
+    return this.http.get<Product[]>(this.baseUrl, { params: { buffetId } });
+  }
+
+  getById(id: string): Observable<Product> {
+    return this.http.get<Product>(`${this.baseUrl}/${id}`);
+  }
+
+  create(payload: CreateProductRequest): Observable<Product> {
+    return this.http.post<Product>(this.baseUrl, payload);
+  }
+
+  update(id: string, payload: UpdateProductRequest): Observable<Product> {
+    return this.http.put<Product>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+}
