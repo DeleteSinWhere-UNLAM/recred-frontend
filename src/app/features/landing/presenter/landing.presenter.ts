@@ -1,17 +1,17 @@
 import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { AuthService } from '../../../core/auth/services/auth.service';
 import { CtaLanding } from '../models/cta-landing.model';
 
 @Injectable()
 export class LandingPresenter {
-  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   readonly ctas: readonly CtaLanding[] = [
-    { texto: 'Iniciar sesión', ruta: '/login', variante: 'primario' },
-    { texto: 'Registrarme', ruta: '/registro', variante: 'secundario' },
+    { texto: 'Iniciar sesión', ruta: 'login', variante: 'primario' },
+    { texto: 'Registrarme', ruta: 'registro', variante: 'secundario' },
   ];
 
-  navegar(cta: CtaLanding): void {
-    this.router.navigateByUrl(cta.ruta);
+  async iniciarLogin(): Promise<void> {
+    await this.authService.login();
   }
 }

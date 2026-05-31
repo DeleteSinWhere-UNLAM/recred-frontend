@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { PreferenciasPage } from './preferencias.page';
 
 describe('PreferenciasPage', () => {
@@ -8,6 +10,7 @@ describe('PreferenciasPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PreferenciasPage],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PreferenciasPage);

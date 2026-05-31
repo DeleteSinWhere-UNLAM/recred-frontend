@@ -8,21 +8,11 @@ export const routes: Routes = [
       import('./features/landing/landing.page').then((m) => m.LandingPage),
   },
   {
-    path: 'login',
+    path: 'seleccion-tipo-cuenta',
     loadComponent: () =>
-      import('./core/auth/login/login.page').then((m) => m.LoginPage),
-  },
-  {
-    path: 'registro',
-    loadComponent: () =>
-      import('./core/auth/registro/registro.page').then((m) => m.RegistroPage),
-  },
-  {
-    path: 'recuperar-password',
-    loadChildren: () =>
-      import('./core/auth/recuperar-password/recuperar-password.routes').then(
-        (m) => m.recuperarPasswordRoutes,
-      ),
+      import(
+        './features/seleccion-tipo-cuenta/seleccion-tipo-cuenta.page'
+      ).then((m) => m.SeleccionTipoCuentaPage),
   },
   {
     path: 'tutor',
