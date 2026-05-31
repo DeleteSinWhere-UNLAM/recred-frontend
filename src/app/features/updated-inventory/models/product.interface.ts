@@ -6,8 +6,12 @@ export interface Product {
   peso: number;
   requierePreparacion: boolean;
   stockActual: number;
-  categoriaId: string | null;
-  categoriaNombre: string;
+  categoria?: {
+    id: string;
+    descripcion: string;
+  };
+  categoriaId?: string | null;
+  categoriaNombre?: string;
 }
 
 export interface CreateProductRequest {

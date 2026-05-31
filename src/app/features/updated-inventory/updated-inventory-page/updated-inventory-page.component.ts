@@ -49,7 +49,11 @@ export class UpdatedInventoryPageComponent implements OnInit {
     this.isLoading = true;
     this.productService.getAllByBuffetId(BUFFET_ID).subscribe({
       next: (data) => {
-        this.products = data;
+        this.products = data.map(p => ({
+          ...p,
+          categoriaId: p.categoria?.id || null,
+          categoriaNombre: p.categoria?.descripcion || ''
+        }));
         this.isLoading = false;
       },
       error: () => {
