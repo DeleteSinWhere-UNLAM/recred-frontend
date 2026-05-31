@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AiProductResponse } from '../../models/ai-product-response.interface';
 import { SaveProductRequest } from '../../models/save-product-request.interface';
+import { Category } from '../../../updated-inventory/models/category.interface';
 
 @Component({
   selector: 'app-ai-product-form',
@@ -10,8 +11,9 @@ import { SaveProductRequest } from '../../models/save-product-request.interface'
   templateUrl: './ai-product-form.html',
   styleUrl: './ai-product-form.css',
 })
-export class AiProductForm implements OnChanges {
+export class AiProductForm implements OnInit, OnChanges {
   @Input() prefillData: AiProductResponse | null = null;
+  @Input() categories: Category[] = [];
   @Input() isSaving = false;
   @Output() save = new EventEmitter<SaveProductRequest>();
 
@@ -22,7 +24,8 @@ export class AiProductForm implements OnChanges {
     peso: [0, [Validators.required, Validators.min(0.001)]],
     precio: [0, [Validators.required, Validators.min(0.01)]],
     stockActual: [0, [Validators.required, Validators.min(0)]],
-    nuevaCategoriaNombre: ['', Validators.required],
+    categoriaId: [null, Validators.required],
+    nuevaCategoriaNombre: [''],
     requierePreparacion: [false],
     contiene_azucar: [false],
     contiene_mani: [false],
@@ -44,6 +47,34 @@ export class AiProductForm implements OnChanges {
     }
   }
 
+  ngOnInit(): void {
+    this.productForm.get('categoriaId')?.valueChanges.subscribe(value => {
+      const nuevaCategoriaCtrl = this.productForm.get('nuevaCategoriaNombre');
+      if (value === 'NEW') {
+        nuevaCategoriaCtrl?.setValidators([Validators.required]);
+      } else {
+        nuevaCategoriaCtrl?.clearValidators();
+        nuevaCategoriaCtrl?.setValue('');
+      }
+      nuevaCategoriaCtrl?.updateValueAndValidity();
+    });
+  }
+
+  hasError(field: string): boolean {
+    const control = this.productForm.get(field);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  getErrorMessage(field: string): string {
+    const control = this.productForm.get(field);
+    if (!control || !control.errors) return '';
+
+    if (control.errors['required']) return 'Este campo es obligatorio';
+    if (control.errors['min']) return `El valor mínimo es ${control.errors['min'].min}`;
+
+    return 'Valor inválido';
+  }
+
   submitForm() {
     if (this.productForm.valid) {
       const formValue = this.productForm.value;
@@ -53,11 +84,11 @@ export class AiProductForm implements OnChanges {
         precio: formValue.precio,
         peso: formValue.peso,
         requierePreparacion: formValue.requierePreparacion,
-        categoriaId: null,
-        nuevaCategoriaNombre: 'Galletita',//formValue.nuevaCategoriaNombre,
-        buffetId: '2c4153b3-d0f9-489c-93c0-8b3ad7b89758',
+        categoriaId: formValue.categoriaId === 'NEW' ? null : formValue.categoriaId,
+        nuevaCategoriaNombre: formValue.categoriaId === 'NEW' ? formValue.nuevaCategoriaNombre : '',
+        buffetId: 'da1439ae-487b-4e99-90fa-7488a5adc39f',
         stockActual: formValue.stockActual,
-        clasificacionesSaludIds: ['52062d7f-fbf5-4757-ad5f-d716025b05d5'],//this.buildHealthClassificationIds(formValue),
+        clasificacionesSaludIds: ['f86358e0-0faf-4db0-bdda-09d8fb3a7cf2'],//this.buildHealthClassificationIds(formValue),
         tiposIds: [],
       };
       this.save.emit(request);

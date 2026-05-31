@@ -105,5 +105,9 @@ export const routes: Routes = [
   {
     path: 'recomendaciones-estacionales',
     loadComponent: () => import('./features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component').then(m => m.SeasonalPageComponent)
+  },
+  {
+    path: 'admin-productos',
+    loadChildren: () => import('./features/updated-inventory/updated-inventory.routes').then(m => m.updatedInventoryRoutes)
   }
 ];

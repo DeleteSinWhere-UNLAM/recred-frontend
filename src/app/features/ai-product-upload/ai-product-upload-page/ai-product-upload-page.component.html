@@ -27,6 +27,7 @@
 
     <app-ai-product-form
       [prefillData]="scannedProductData"
+      [categories]="categories"
       [isSaving]="isSaving"
       (save)="saveProduct($event)">
     </app-ai-product-form>

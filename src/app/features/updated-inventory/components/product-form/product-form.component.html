@@ -1,0 +1,140 @@
+<div class="form-backdrop" tabindex="0" role="button" (click)="formCancel.emit()" (keydown.enter)="formCancel.emit()" (keydown.space)="formCancel.emit()">
+  <form [formGroup]="productForm" tabindex="-1" (ngSubmit)="submitForm()" class="product-form" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
+    <div class="form-header">
+      <h3 class="form-header__title">
+        @if (isEditing) {
+          Editar producto
+        } @else {
+          Nuevo producto
+        }
+      </h3>
+      <button type="button" class="form-header__close" (click)="formCancel.emit()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="form-body">
+      <div class="form-grid">
+        <div class="form-group" [class.form-group--error]="hasError('nombre')">
+          <label for="prod-nombre">Nombre del producto</label>
+          <input id="prod-nombre" formControlName="nombre" type="text" placeholder="Ej: Manzana Roja">
+          @if (hasError('nombre')) {
+            <span class="form-error">{{ getErrorMessage('nombre') }}</span>
+          }
+        </div>
+
+        <div class="form-group" [class.form-group--error]="hasError('categoriaId')">
+          <label for="prod-categoria">Categoría</label>
+          <select id="prod-categoria" formControlName="categoriaId">
+            <option [ngValue]="null" disabled selected>Selecciona una categoría</option>
+            @for (cat of categories; track cat.id) {
+              <option [value]="cat.id">{{ cat.descripcion }}</option>
+            }
+            <option value="NEW">➕ Crear nueva categoría</option>
+          </select>
+          @if (hasError('categoriaId')) {
+            <span class="form-error">{{ getErrorMessage('categoriaId') }}</span>
+          }
+        </div>
+      </div>
+
+      @if (productForm.get('categoriaId')?.value === 'NEW') {
+        <div class="form-group" [class.form-group--error]="hasError('nuevaCategoriaNombre')">
+          <label for="prod-nueva-categoria">Nombre de la nueva categoría</label>
+          <input id="prod-nueva-categoria" formControlName="nuevaCategoriaNombre" type="text" placeholder="Ej: Frutas y Verduras">
+          @if (hasError('nuevaCategoriaNombre')) {
+            <span class="form-error">{{ getErrorMessage('nuevaCategoriaNombre') }}</span>
+          }
+        </div>
+      }
+
+      <div class="form-group form-group--full" [class.form-group--error]="hasError('descripcion')">
+        <label for="prod-descripcion">Descripción</label>
+        <input id="prod-descripcion" formControlName="descripcion" type="text" placeholder="Ej: Manzana roja fresca por unidad">
+        @if (hasError('descripcion')) {
+          <span class="form-error">{{ getErrorMessage('descripcion') }}</span>
+        }
+      </div>
+
+      <div class="form-grid form-grid--three">
+        <div class="form-group" [class.form-group--error]="hasError('precio')">
+          <label for="prod-precio">Precio ($)</label>
+          <input id="prod-precio" formControlName="precio" type="number" step="0.01" min="0" placeholder="800.00">
+          @if (hasError('precio')) {
+            <span class="form-error">{{ getErrorMessage('precio') }}</span>
+          }
+        </div>
+
+        <div class="form-group" [class.form-group--error]="hasError('peso')">
+          <label for="prod-peso">Peso (kg)</label>
+          <input id="prod-peso" formControlName="peso" type="number" step="0.001" min="0" placeholder="0.150">
+          @if (hasError('peso')) {
+            <span class="form-error">{{ getErrorMessage('peso') }}</span>
+          }
+        </div>
+
+        <div class="form-group" [class.form-group--error]="hasError('stockActual')">
+          <label for="prod-stock">Stock actual</label>
+          <input id="prod-stock" formControlName="stockActual" type="number" min="0" placeholder="120">
+          @if (hasError('stockActual')) {
+            <span class="form-error">{{ getErrorMessage('stockActual') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-section-divider"></div>
+
+      <div class="toggles-grid">
+        <label class="toggle-item">
+          <span class="toggle-item__label">Requiere preparación</span>
+          <input type="checkbox" formControlName="requierePreparacion">
+          <span class="toggle-item__switch"></span>
+        </label>
+
+        <label class="toggle-item">
+          <span class="toggle-item__label">Contiene Azúcar</span>
+          <input type="checkbox" formControlName="contiene_azucar">
+          <span class="toggle-item__switch"></span>
+        </label>
+
+        <label class="toggle-item">
+          <span class="toggle-item__label">Contiene Maní</span>
+          <input type="checkbox" formControlName="contiene_mani">
+          <span class="toggle-item__switch"></span>
+        </label>
+
+        <label class="toggle-item">
+          <span class="toggle-item__label">Contiene Lactosa</span>
+          <input type="checkbox" formControlName="contiene_lactosa">
+          <span class="toggle-item__switch"></span>
+        </label>
+
+        <label class="toggle-item">
+          <span class="toggle-item__label">Contiene TACC</span>
+          <input type="checkbox" formControlName="contiene_tacc">
+          <span class="toggle-item__switch"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button type="button" class="form-btn form-btn--cancel" (click)="formCancel.emit()">
+        Cancelar
+      </button>
+      <button type="submit" class="form-btn form-btn--submit" [disabled]="isSaving">
+        @if (isSaving) {
+          <span class="form-btn__spinner"></span>
+          Guardando...
+        } @else if (isEditing) {
+          Actualizar producto
+        } @else {
+          Crear producto
+        }
+      </button>
+    </div>
+  </form>
+</div>

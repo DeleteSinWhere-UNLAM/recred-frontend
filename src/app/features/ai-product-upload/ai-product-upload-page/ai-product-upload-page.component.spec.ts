@@ -1,15 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AiProductUploadPageComponent } from './ai-product-upload-page.component';
 import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
+import { ProductService } from '../../updated-inventory/services/product.service';
 import { of, throwError } from 'rxjs';
 
 describe('AiProductUploadPageComponent', () => {
   let component: AiProductUploadPageComponent;
   let fixture: ComponentFixture<AiProductUploadPageComponent>;
   let aiVisionServiceMock: jasmine.SpyObj<AiVisionService>;
+  let productServiceMock: jasmine.SpyObj<ProductService>;
 
   beforeEach(async () => {
     aiVisionServiceMock = jasmine.createSpyObj('AiVisionService', ['analyzeImage', 'saveProduct']);
+    productServiceMock = jasmine.createSpyObj('ProductService', ['getCategories']);
+
+    productServiceMock.getCategories.and.returnValue(of([]));
 
     aiVisionServiceMock.analyzeImage.and.returnValue(of(
       {
@@ -25,7 +30,8 @@ describe('AiProductUploadPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AiProductUploadPageComponent],
       providers: [
-        { provide: AiVisionService, useValue: aiVisionServiceMock }
+        { provide: AiVisionService, useValue: aiVisionServiceMock },
+        { provide: ProductService, useValue: productServiceMock }
       ]
     }).compileComponents();
 

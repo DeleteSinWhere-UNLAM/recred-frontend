@@ -1,0 +1,108 @@
+@if (isLoading) {
+  <div class="table-loading">
+    <div class="table-spinner"></div>
+    <p>Cargando productos...</p>
+  </div>
+} @else if (products.length === 0) {
+  <div class="table-empty">
+    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
+    </svg>
+    <p class="table-empty__title">Sin productos</p>
+    <p class="table-empty__subtitle">Agrega tu primer producto con el botón de arriba.</p>
+  </div>
+} @else {
+  <div class="table-wrapper">
+    <table class="product-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th class="col-number">Precio</th>
+          <th class="col-number">Stock</th>
+          <th class="col-actions">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of products; track product.id) {
+          <tr>
+            <td>
+              <span class="product-name">{{ product.nombre }}</span>
+              <span class="product-desc">{{ product.descripcion }}</span>
+            </td>
+            <td>
+              <span class="category-badge">{{ product.categoriaNombre || '—' }}</span>
+            </td>
+            <td class="col-number">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</td>
+            <td class="col-number">
+              <span class="stock-badge" [class.stock-badge--low]="product.stockActual <= 5">
+                {{ product.stockActual }}
+              </span>
+            </td>
+            <td class="col-actions">
+              <div class="action-buttons">
+                <button class="action-btn action-btn--edit" (click)="edit.emit(product)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  <span>Editar</span>
+                </button>
+                <button class="action-btn action-btn--delete" (click)="remove.emit(product)" title="Eliminar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  </svg>
+                  <span>Eliminar</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-list">
+    @for (product of products; track product.id) {
+      <div class="product-card">
+        <div class="product-card__header">
+          <div>
+            <span class="product-name">{{ product.nombre }}</span>
+            <span class="category-badge">{{ product.categoriaNombre || '—' }}</span>
+          </div>
+          <span class="stock-badge" [class.stock-badge--low]="product.stockActual <= 5">
+            {{ product.stockActual }} uds.
+          </span>
+        </div>
+        <p class="product-card__desc">{{ product.descripcion }}</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
+          <div class="action-buttons">
+            <button class="action-btn action-btn--edit" (click)="edit.emit(product)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              <span>Editar</span>
+            </button>
+            <button class="action-btn action-btn--delete" (click)="remove.emit(product)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
