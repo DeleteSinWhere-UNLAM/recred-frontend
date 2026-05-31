@@ -6,8 +6,8 @@ import { ProductTableComponent } from '../components/product-table/product-table
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 
-const BUFFET_ID = '2c4153b3-d0f9-489c-93c0-8b3ad7b89758';
-const HEALTH_CLASSIFICATION_IDS = ['f86358e0-0faf-4db0-bdda-09d8fb3a7cf2'];
+const BUFFET_ID = '4db665be-98f9-443b-809c-f88651ba6350';
+const HEALTH_CLASSIFICATION_IDS = ['214e9d21-b049-43af-be09-08fb0b445828'];
 
 @Component({
   selector: 'app-updated-inventory-page',
@@ -102,8 +102,8 @@ export class UpdatedInventoryPageComponent implements OnInit {
       precio: data.precio,
       peso: data.peso,
       requierePreparacion: data.requierePreparacion,
-      categoriaId: null,
-      nuevaCategoriaNombre: data.nuevaCategoriaNombre,
+      categoriaId: "2d6a96e7-b58c-4c3c-a662-e71346a7fb05",
+      nuevaCategoriaNombre: "",
       buffetId: BUFFET_ID,
       stockActual: data.stockActual,
       clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
