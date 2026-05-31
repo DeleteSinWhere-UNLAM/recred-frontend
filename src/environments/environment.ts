@@ -12,5 +12,5 @@ export const environment = {
       scopes: ['openid', 'email', 'profile'] as const,
     },
   },
-  apiUrl: 'https://18-118-145-33.sslip.io/api/v1',
+  apiUrl: 'https://18-119-187-167.sslip.io/api/v1',
 };
