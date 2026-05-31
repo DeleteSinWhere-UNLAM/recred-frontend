@@ -29,7 +29,7 @@ export class NavbarComponent {
 
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
-  protected readonly esVistaVendedor = this.usuarioService.esVistaVendedor;
+  protected readonly esVistaKiosquero = this.usuarioService.esVistaKiosquero;
   protected readonly notifCount = this.notificacionesService.cantidad;
   protected readonly menuAbierto = signal(false);
   protected readonly menuNotifAbierto = signal(false);

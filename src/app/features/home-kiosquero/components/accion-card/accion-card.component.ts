@@ -6,7 +6,7 @@ import {
   Output,
 } from '@angular/core';
 
-import { AccionVendedor } from '../../models/accion-vendedor.model';
+import { AccionKiosquero } from '../../models/accion-kiosquero.model';
 
 @Component({
   selector: 'app-accion-card',
@@ -15,9 +15,9 @@ import { AccionVendedor } from '../../models/accion-vendedor.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccionCardComponent {
-  @Input({ required: true }) accion!: AccionVendedor;
+  @Input({ required: true }) accion!: AccionKiosquero;
   @Input() destacada = false;
-  @Output() seleccionar = new EventEmitter<AccionVendedor>();
+  @Output() seleccionar = new EventEmitter<AccionKiosquero>();
 
   protected onClick(): void {
     this.seleccionar.emit(this.accion);

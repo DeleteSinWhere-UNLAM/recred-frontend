@@ -87,7 +87,7 @@ export class PresupuestoPresenter {
   init(alumnoId: string): void {
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
     if (!alumno) {
-      this.router.navigateByUrl('/padre');
+      this.router.navigateByUrl('/tutor');
       return;
     }
     this.alumnoState.set(alumno);
@@ -178,7 +178,7 @@ export class PresupuestoPresenter {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/padre');
+    this.router.navigateByUrl('/tutor');
   }
 }
 

@@ -6,7 +6,7 @@ import {
   Output,
 } from '@angular/core';
 
-import { AccionVendedor } from '../../models/accion-vendedor.model';
+import { AccionKiosquero } from '../../models/accion-kiosquero.model';
 import { AccionCardComponent } from '../accion-card/accion-card.component';
 
 @Component({
@@ -17,10 +17,10 @@ import { AccionCardComponent } from '../accion-card/accion-card.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccionesGridComponent {
-  @Input({ required: true }) acciones: AccionVendedor[] = [];
-  @Output() accion = new EventEmitter<AccionVendedor>();
+  @Input({ required: true }) acciones: AccionKiosquero[] = [];
+  @Output() accion = new EventEmitter<AccionKiosquero>();
 
-  protected onSeleccionar(accion: AccionVendedor): void {
+  protected onSeleccionar(accion: AccionKiosquero): void {
     this.accion.emit(accion);
   }
 }

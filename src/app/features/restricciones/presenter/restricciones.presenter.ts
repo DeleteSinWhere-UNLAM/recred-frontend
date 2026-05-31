@@ -42,7 +42,7 @@ export class RestriccionesPresenter {
   init(alumnoId: string): void {
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
     if (!alumno) {
-      this.router.navigateByUrl('/padre');
+      this.router.navigateByUrl('/tutor');
       return;
     }
     this.alumnoState.set(alumno);
@@ -58,10 +58,10 @@ export class RestriccionesPresenter {
 
   guardar(): void {
     this.restriccionesService.guardar(this.restriccionesState());
-    this.router.navigateByUrl('/padre');
+    this.router.navigateByUrl('/tutor');
   }
 
   volver(): void {
-    this.router.navigateByUrl('/padre');
+    this.router.navigateByUrl('/tutor');
   }
 }

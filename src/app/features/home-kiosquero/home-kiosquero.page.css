@@ -1,4 +1,4 @@
-.home-vendedor {
+.home-kiosquero {
   position: relative;
   min-height: calc(100vh - 64px);
   padding: 32px 0 48px;
@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 
-.home-vendedor__container {
+.home-kiosquero__container {
   position: relative;
   z-index: 1;
 
@@ -22,11 +22,11 @@
 }
 
 @media (max-width: 640px) {
-  .home-vendedor {
+  .home-kiosquero {
     padding: 20px 0 32px;
   }
 
-  .home-vendedor__container {
+  .home-kiosquero__container {
     padding: 0 16px;
     gap: 20px;
   }

@@ -14,10 +14,10 @@ export class UsuarioService {
 
   private readonly alumnoActualId = 'julian-garcia';
 
-  private readonly homeUrlState = signal<string>('/padre');
+  private readonly homeUrlState = signal<string>('/tutor');
   readonly homeUrl: Signal<string> = this.homeUrlState.asReadonly();
   readonly esVistaAlumno: Signal<boolean> = computed(() => this.homeUrlState() === '/alumno');
-  readonly esVistaVendedor: Signal<boolean> = computed(() => this.homeUrlState() === '/vendedor');
+  readonly esVistaKiosquero: Signal<boolean> = computed(() => this.homeUrlState() === '/kiosquero');
 
   private readonly nombreNavbarState = signal<string>(this.usuarioActual.nombre);
   readonly nombreNavbar: Signal<string> = this.nombreNavbarState.asReadonly();

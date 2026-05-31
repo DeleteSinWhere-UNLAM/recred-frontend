@@ -1,10 +1,10 @@
-<app-navbar [userName]="presenter.nombreVendedor()" />
+<app-navbar [userName]="presenter.nombreKiosquero()" />
 
-<main class="home-vendedor">
-  <div class="home-vendedor__container">
-    <app-perfil-vendedor-header
+<main class="home-kiosquero">
+  <div class="home-kiosquero__container">
+    <app-perfil-kiosquero-header
       [iniciales]="presenter.iniciales()"
-      [nombreVendedor]="presenter.nombreVendedor()"
+      [nombreKiosquero]="presenter.nombreKiosquero()"
       [saludo]="presenter.saludo()"
       [gananciasFormateadas]="presenter.gananciasFormateadas()"
       [ventasHoy]="presenter.ventasHoy()"

@@ -1,4 +1,4 @@
-.perfil-vendedor-header {
+.perfil-kiosquero-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -11,14 +11,14 @@
   box-shadow: var(--shadow-neu-convex);
 }
 
-.perfil-vendedor-header__identidad {
+.perfil-kiosquero-header__identidad {
   display: flex;
   align-items: center;
   gap: 20px;
   flex-shrink: 0;
 }
 
-.perfil-vendedor-header__avatar-wrap {
+.perfil-kiosquero-header__avatar-wrap {
   flex-shrink: 0;
 
   padding: 4px;
@@ -28,7 +28,7 @@
   box-shadow: var(--shadow-neu-convex);
 }
 
-.perfil-vendedor-header__avatar {
+.perfil-kiosquero-header__avatar {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,14 +47,14 @@
   color: #334155;
 }
 
-.perfil-vendedor-header__texto {
+.perfil-kiosquero-header__texto {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.perfil-vendedor-header__saludo {
+.perfil-kiosquero-header__saludo {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -62,7 +62,7 @@
   color: var(--color-texto-claro);
 }
 
-.perfil-vendedor-header__nombre {
+.perfil-kiosquero-header__nombre {
   font-family: var(--font-display);
   font-size: 26px;
   font-weight: 800;
@@ -70,12 +70,12 @@
   color: #334155;
 }
 
-.perfil-vendedor-header__rol {
+.perfil-kiosquero-header__rol {
   font-size: 13px;
   color: var(--color-texto-claro);
 }
 
-.perfil-vendedor-header__stats {
+.perfil-kiosquero-header__stats {
   display: flex;
   align-items: stretch;
   gap: 24px;
@@ -87,18 +87,18 @@
   box-shadow: var(--shadow-neu-concave);
 }
 
-.perfil-vendedor-header__stat {
+.perfil-kiosquero-header__stat {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.perfil-vendedor-header__stat + .perfil-vendedor-header__stat {
+.perfil-kiosquero-header__stat + .perfil-kiosquero-header__stat {
   padding-left: 24px;
   border-left: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-.perfil-vendedor-header__stat-icono {
+.perfil-kiosquero-header__stat-icono {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -114,14 +114,14 @@
   font-size: 14px;
 }
 
-.perfil-vendedor-header__stat-texto {
+.perfil-kiosquero-header__stat-texto {
   display: flex;
   flex-direction: column;
   gap: 2px;
   line-height: 1.1;
 }
 
-.perfil-vendedor-header__stat-label {
+.perfil-kiosquero-header__stat-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -129,66 +129,66 @@
   color: var(--color-texto-claro);
 }
 
-.perfil-vendedor-header__stat-valor {
+.perfil-kiosquero-header__stat-valor {
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
   color: #334155;
 }
 
-.perfil-vendedor-header__stat--alerta .perfil-vendedor-header__stat-icono {
+.perfil-kiosquero-header__stat--alerta .perfil-kiosquero-header__stat-icono {
   color: var(--color-melocoton);
 }
 
-.perfil-vendedor-header__stat--alerta .perfil-vendedor-header__stat-valor {
+.perfil-kiosquero-header__stat--alerta .perfil-kiosquero-header__stat-valor {
   color: var(--color-melocoton);
 }
 
 @media (max-width: 900px) {
-  .perfil-vendedor-header {
+  .perfil-kiosquero-header {
     flex-direction: column;
     align-items: stretch;
     gap: 20px;
   }
 
-  .perfil-vendedor-header__stats {
+  .perfil-kiosquero-header__stats {
     justify-content: space-between;
   }
 }
 
 @media (max-width: 640px) {
-  .perfil-vendedor-header {
+  .perfil-kiosquero-header {
     padding: 18px 20px;
     gap: 16px;
   }
 
-  .perfil-vendedor-header__avatar {
+  .perfil-kiosquero-header__avatar {
     width: 56px;
     height: 56px;
     font-size: 19px;
   }
 
-  .perfil-vendedor-header__nombre {
+  .perfil-kiosquero-header__nombre {
     font-size: 22px;
   }
 
-  .perfil-vendedor-header__stats {
+  .perfil-kiosquero-header__stats {
     padding: 12px 14px;
     gap: 12px;
     overflow-x: auto;
   }
 
-  .perfil-vendedor-header__stat + .perfil-vendedor-header__stat {
+  .perfil-kiosquero-header__stat + .perfil-kiosquero-header__stat {
     padding-left: 12px;
   }
 
-  .perfil-vendedor-header__stat-icono {
+  .perfil-kiosquero-header__stat-icono {
     width: 32px;
     height: 32px;
     font-size: 13px;
   }
 
-  .perfil-vendedor-header__stat-valor {
+  .perfil-kiosquero-header__stat-valor {
     font-size: 17px;
   }
 }

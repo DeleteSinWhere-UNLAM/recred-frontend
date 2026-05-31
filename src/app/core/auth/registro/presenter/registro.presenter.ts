@@ -92,7 +92,7 @@ export class RegistroPresenter {
       next: (resultado) => {
         this.cargandoSig.set(false);
         if (resultado.exito) {
-          this.router.navigateByUrl(tipo === 'tutor' ? '/padre' : '/kiosquero');
+          this.router.navigateByUrl(tipo === 'tutor' ? '/tutor' : '/kiosquero');
         } else {
           this.errorSig.set(
             'No pudimos crear tu cuenta. Verificá los datos e intentá de nuevo.',

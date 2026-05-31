@@ -50,7 +50,7 @@ export class LoginPresenter {
       next: (resultado) => {
         this.cargandoSig.set(false);
         if (resultado.exito) {
-          this.router.navigateByUrl('/padre');
+          this.router.navigateByUrl('/tutor');
         } else {
           this.errorSig.set('Email o contraseña incorrectos');
         }
