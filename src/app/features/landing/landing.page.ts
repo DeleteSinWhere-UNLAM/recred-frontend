@@ -1,7 +1,19 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/auth/services/auth.service';
+import { RolUsuario } from '../../data-access/models/perfil.model';
+import {
+  PerfilService,
+  UsuarioSinPerfilError,
+} from '../../data-access/services/perfil.service';
 import { LandingCtaButtonComponent } from './components/landing-cta-button/landing-cta-button.component';
-import { CtaLanding } from './models/cta-landing.model';
 import { LandingPresenter } from './presenter/landing.presenter';
+
+const ROL_A_RUTA: Record<RolUsuario, string> = {
+  TUTOR: '/tutor',
+  ALUMNO: '/alumno',
+  KIOSQUERO: '/kiosquero',
+};
 
 @Component({
   selector: 'app-landing-page',
@@ -11,11 +23,29 @@ import { LandingPresenter } from './presenter/landing.presenter';
   providers: [LandingPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LandingPage {
+export class LandingPage implements OnInit {
   protected readonly presenter = inject(LandingPresenter);
+  private readonly authService = inject(AuthService);
+  private readonly perfilService = inject(PerfilService);
+  private readonly router = inject(Router);
 
-  protected onCtaClick(cta: CtaLanding): void {
-    this.presenter.navegar(cta);
+  async ngOnInit(): Promise<void> {
+    const autenticado = await this.authService.isAutenticado();
+    if (!autenticado) return;
+    try {
+      const perfil = await this.perfilService.cargarPerfil();
+      this.router.navigateByUrl(ROL_A_RUTA[perfil.rol]);
+    } catch (err) {
+      if (err instanceof UsuarioSinPerfilError) {
+        this.router.navigateByUrl('/seleccion-tipo-cuenta');
+        return;
+      }
+      console.error('Error cargando perfil tras login', err);
+    }
+  }
+
+  protected onCtaClick(): void {
+    void this.presenter.iniciarLogin();
   }
 
   protected onImagenError(event: Event): void {

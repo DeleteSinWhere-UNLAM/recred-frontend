@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/auth/services/auth.service';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
 import { NotificacionesService } from '../../../data-access/services/notificaciones.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
@@ -20,6 +21,7 @@ import { UsuarioService } from '../../../data-access/services/usuario.service';
 })
 export class NavbarComponent {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly carritoService = inject(CarritoService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly notificacionesService = inject(NotificacionesService);
@@ -53,9 +55,14 @@ export class NavbarComponent {
     if (this.menuNotifAbierto()) this.menuAbierto.set(false);
   }
 
-  protected cerrarSesion(): void {
+  protected async cerrarSesion(): Promise<void> {
     this.menuAbierto.set(false);
-    this.router.navigateByUrl('/');
+    try {
+      await this.authService.logout();
+    } catch (err) {
+      console.error('Error al cerrar sesión', err);
+      this.router.navigateByUrl('/');
+    }
   }
 
   @HostListener('document:click', ['$event'])
