@@ -27,14 +27,30 @@
           }
         </div>
 
-        <div class="form-group" [class.form-group--error]="hasError('nuevaCategoriaNombre')">
+        <div class="form-group" [class.form-group--error]="hasError('categoriaId')">
           <label for="prod-categoria">Categoría</label>
-          <input id="prod-categoria" formControlName="nuevaCategoriaNombre" type="text" placeholder="Ej: Frutas y Verduras">
+          <select id="prod-categoria" formControlName="categoriaId">
+            <option [ngValue]="null" disabled selected>Selecciona una categoría</option>
+            @for (cat of categories; track cat.id) {
+              <option [value]="cat.id">{{ cat.descripcion }}</option>
+            }
+            <option value="NEW">➕ Crear nueva categoría</option>
+          </select>
+          @if (hasError('categoriaId')) {
+            <span class="form-error">{{ getErrorMessage('categoriaId') }}</span>
+          }
+        </div>
+      </div>
+
+      @if (productForm.get('categoriaId')?.value === 'NEW') {
+        <div class="form-group" [class.form-group--error]="hasError('nuevaCategoriaNombre')">
+          <label for="prod-nueva-categoria">Nombre de la nueva categoría</label>
+          <input id="prod-nueva-categoria" formControlName="nuevaCategoriaNombre" type="text" placeholder="Ej: Frutas y Verduras">
           @if (hasError('nuevaCategoriaNombre')) {
             <span class="form-error">{{ getErrorMessage('nuevaCategoriaNombre') }}</span>
           }
         </div>
-      </div>
+      }
 
       <div class="form-group form-group--full" [class.form-group--error]="hasError('descripcion')">
         <label for="prod-descripcion">Descripción</label>

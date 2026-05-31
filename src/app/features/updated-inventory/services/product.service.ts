@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+import { Category } from '../models/category.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,10 @@ export class ProductService {
 
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl);
+  }
+
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>('http://localhost:8080/api/v1/categories');
   }
 
   getAllByBuffetId(buffetId: string): Observable<Product[]> {

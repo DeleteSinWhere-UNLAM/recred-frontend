@@ -90,7 +90,8 @@
   font-size: 0.85rem;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   padding: 0.7rem 0.85rem;
   border: 1.5px solid #d1d5db;
   border-radius: var(--radius-button);
@@ -99,9 +100,19 @@
   transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
   background-color: var(--color-superficie-alt);
   color: var(--color-texto-oscuro);
+  width: 100%;
 }
 
-.form-group input:focus {
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--color-pizarra);
   box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.12);
@@ -112,11 +123,13 @@
   color: var(--color-texto-claro);
 }
 
-.form-group--error input {
+.form-group--error input,
+.form-group--error select {
   border-color: var(--color-melocoton);
 }
 
-.form-group--error input:focus {
+.form-group--error input:focus,
+.form-group--error select:focus {
   box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.12);
   border-color: var(--color-melocoton);
 }

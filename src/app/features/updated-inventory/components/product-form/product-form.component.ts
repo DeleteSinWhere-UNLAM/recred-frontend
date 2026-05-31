@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Product } from '../../models/product.interface';
+import { Category } from '../../models/category.interface';
 
 export interface ProductFormData {
   nombre: string;
@@ -8,6 +9,7 @@ export interface ProductFormData {
   precio: number;
   peso: number;
   stockActual: number;
+  categoriaId: string | null;
   nuevaCategoriaNombre: string;
   requierePreparacion: boolean;
 }
@@ -19,8 +21,9 @@ export interface ProductFormData {
   templateUrl: './product-form.component.html',
   styleUrl: './product-form.component.css'
 })
-export class ProductFormComponent implements OnChanges {
+export class ProductFormComponent implements OnInit, OnChanges {
   @Input() product: Product | null = null;
+  @Input() categories: Category[] = [];
   @Input() isSaving = false;
   @Output() formSubmit = new EventEmitter<ProductFormData>();
   @Output() formCancel = new EventEmitter<void>();
@@ -33,9 +36,23 @@ export class ProductFormComponent implements OnChanges {
     precio: [null, [Validators.required, Validators.min(0.01)]],
     peso: [null, [Validators.required, Validators.min(0.001)]],
     stockActual: [null, [Validators.required, Validators.min(0)]],
-    nuevaCategoriaNombre: ['', Validators.required],
+    categoriaId: [null, Validators.required],
+    nuevaCategoriaNombre: [''],
     requierePreparacion: [false],
   });
+
+  ngOnInit(): void {
+    this.productForm.get('categoriaId')?.valueChanges.subscribe(value => {
+      const nuevaCategoriaCtrl = this.productForm.get('nuevaCategoriaNombre');
+      if (value === 'NEW') {
+        nuevaCategoriaCtrl?.setValidators([Validators.required]);
+      } else {
+        nuevaCategoriaCtrl?.clearValidators();
+        nuevaCategoriaCtrl?.setValue('');
+      }
+      nuevaCategoriaCtrl?.updateValueAndValidity();
+    });
+  }
 
   get isEditing(): boolean {
     return this.product !== null;
@@ -49,7 +66,8 @@ export class ProductFormComponent implements OnChanges {
         precio: this.product.precio,
         peso: this.product.peso,
         stockActual: this.product.stockActual,
-        nuevaCategoriaNombre: this.product.categoriaNombre || '',
+        categoriaId: this.product.categoriaId || 'NEW',
+        nuevaCategoriaNombre: this.product.categoriaId ? '' : (this.product.categoriaNombre || ''),
         requierePreparacion: this.product.requierePreparacion,
       });
     }

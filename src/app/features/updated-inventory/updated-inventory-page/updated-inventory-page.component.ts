@@ -1,12 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ProductService } from '../services/product.service';
 import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+import { Category } from '../models/category.interface';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 
-const BUFFET_ID = '4db665be-98f9-443b-809c-f88651ba6350';
+const BUFFET_ID = 'ebfc7afc-6b2e-46a6-ba8f-bb2902a6bfd9';
 const HEALTH_CLASSIFICATION_IDS = ['214e9d21-b049-43af-be09-08fb0b445828'];
 
 @Component({
@@ -21,6 +22,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
   private toastService = inject(ToastService);
 
   products: Product[] = [];
+  categories: Category[] = [];
   isLoading = false;
   isSaving = false;
   isFormVisible = false;
@@ -28,7 +30,19 @@ export class UpdatedInventoryPageComponent implements OnInit {
   deleteTarget: Product | null = null;
 
   ngOnInit(): void {
+    this.loadCategories();
     this.loadProducts();
+  }
+
+  loadCategories(): void {
+    this.productService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: () => {
+        this.toastService.mostrar('Error al cargar las categorías', 'error');
+      }
+    });
   }
 
   loadProducts(): void {
@@ -96,14 +110,15 @@ export class UpdatedInventoryPageComponent implements OnInit {
   }
 
   private createProduct(data: ProductFormData): void {
+    const isNewCategory = data.categoriaId === 'NEW';
     const payload: CreateProductRequest = {
       nombre: data.nombre,
       descripcion: data.descripcion,
       precio: data.precio,
       peso: data.peso,
       requierePreparacion: data.requierePreparacion,
-      categoriaId: "2d6a96e7-b58c-4c3c-a662-e71346a7fb05",
-      nuevaCategoriaNombre: "",
+      categoriaId: isNewCategory ? null : data.categoriaId,
+      nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : "",
       buffetId: BUFFET_ID,
       stockActual: data.stockActual,
       clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
@@ -125,6 +140,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
   }
 
   private updateProduct(id: string, data: ProductFormData): void {
+    const isNewCategory = data.categoriaId === 'NEW';
     const payload: UpdateProductRequest = {
       nombre: data.nombre,
       descripcion: data.descripcion,
@@ -133,7 +149,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
       requierePreparacion: data.requierePreparacion,
       stockActual: data.stockActual,
       buffetId: BUFFET_ID,
-      categoriaId: this.selectedProduct?.categoriaId || '',
+      categoriaId: isNewCategory ? "" : (data.categoriaId || ''), // Update might not support creating categories on the fly, but we adapt it
       clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
     };
 

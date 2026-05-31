@@ -24,6 +24,7 @@
   @if (isFormVisible) {
     <app-product-form
       [product]="selectedProduct"
+      [categories]="categories"
       [isSaving]="isSaving"
       (formSubmit)="handleFormSubmit($event)"
       (formCancel)="closeForm()">
