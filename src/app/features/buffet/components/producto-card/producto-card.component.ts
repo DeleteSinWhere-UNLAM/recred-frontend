@@ -8,7 +8,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { CarritoService } from '../../../compra/data/carrito.service';
+import { CarritoService } from '../../../compra/services/carrito.service';
 import { Producto, disponible } from '../../models/producto.model';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {

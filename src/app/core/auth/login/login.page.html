@@ -1,0 +1,71 @@
+<div class="login">
+  <header class="login__header">
+    <img class="login__logo" src="logoHeader.png" alt="Logo RECRED" />
+    <span class="login__marca">RECRED</span>
+  </header>
+
+  <main class="login__hero">
+    <section class="login__card" aria-labelledby="login-titulo">
+      <h1 id="login-titulo" class="login__titulo">Iniciar sesión</h1>
+      <p class="login__subtitulo">
+        Ingresá tus credenciales para continuar.
+      </p>
+
+      <form
+        class="login__form"
+        novalidate
+        (submit)="$event.preventDefault(); onSubmit()"
+      >
+        <app-login-text-field
+          etiqueta="Email"
+          tipo="email"
+          autocomplete="email"
+          placeholder="tu@email.com"
+          [valor]="presenter.email()"
+          (valorCambiado)="onEmailChange($event)"
+        />
+
+        <app-login-text-field
+          etiqueta="Contraseña"
+          tipo="password"
+          autocomplete="current-password"
+          placeholder="Mínimo 6 caracteres"
+          [valor]="presenter.password()"
+          (valorCambiado)="onPasswordChange($event)"
+        />
+
+        @if (presenter.error(); as msg) {
+          <p class="login__error" role="alert">{{ msg }}</p>
+        }
+
+        <app-login-submit-button
+          texto="Ingresar"
+          [disabled]="!presenter.formValido()"
+          [cargando]="presenter.cargando()"
+          (clicked)="onSubmit()"
+        />
+      </form>
+
+      <p class="login__olvido">
+        <button
+          type="button"
+          class="login__link login__link--sutil"
+          (click)="onIrARecuperar()"
+        >
+          ¿Olvidaste tu contraseña?
+        </button>
+      </p>
+
+      <p class="login__registro">
+        ¿No tenés cuenta?
+        <button type="button" class="login__link" (click)="onIrARegistro()">
+          Registrate
+        </button>
+      </p>
+
+      <button type="button" class="login__volver" (click)="onVolver()">
+        ← Volver al inicio
+      </button>
+    </section>
+  </main>
+</div>

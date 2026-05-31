@@ -29,11 +29,11 @@ export class ExitoPage implements OnInit {
   private readonly router = inject(Router);
   protected readonly presenter = inject(ExitoPresenter);
 
-  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly nombreUsuario = this.usuarioService.nombreNavbar;
 
   ngOnInit(): void {
     if (this.presenter.vacia()) {
-      this.router.navigateByUrl('/');
+      this.router.navigateByUrl(this.usuarioService.homeUrl());
     }
   }
 

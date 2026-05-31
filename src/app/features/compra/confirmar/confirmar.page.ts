@@ -33,7 +33,7 @@ export class ConfirmarPage implements OnInit {
   private readonly router = inject(Router);
   protected readonly presenter = inject(ConfirmarPresenter);
 
-  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly nombreUsuario = this.usuarioService.nombreNavbar;
 
   protected readonly lineas = computed<ResumenLinea[]>(() =>
     this.presenter.ordenes().map((o) => ({

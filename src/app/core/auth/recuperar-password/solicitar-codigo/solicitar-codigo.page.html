@@ -1,0 +1,56 @@
+<div class="solicitar">
+  <header class="solicitar__header">
+    <img class="solicitar__logo" src="logoHeader.png" alt="Logo RECRED" />
+    <span class="solicitar__marca">RECRED</span>
+  </header>
+
+  <main class="solicitar__hero">
+    <section class="solicitar__card" aria-labelledby="solicitar-titulo">
+      <h1 id="solicitar-titulo" class="solicitar__titulo">
+        Recuperar contraseña
+      </h1>
+      <p class="solicitar__subtitulo">
+        Ingresá tu email y te enviaremos un código de 6 dígitos para
+        restablecerla.
+      </p>
+
+      <form
+        class="solicitar__form"
+        novalidate
+        (submit)="$event.preventDefault(); onSubmit()"
+      >
+        <app-login-text-field
+          etiqueta="Email"
+          tipo="email"
+          autocomplete="email"
+          placeholder="tu@email.com"
+          [valor]="presenter.email()"
+          (valorCambiado)="onEmailChange($event)"
+        />
+
+        @if (presenter.error(); as msg) {
+          <p class="solicitar__error" role="alert">{{ msg }}</p>
+        }
+
+        <app-login-submit-button
+          texto="Enviar código"
+          textoCargando="Enviando…"
+          [disabled]="!presenter.formValido()"
+          [cargando]="presenter.cargando()"
+          (clicked)="onSubmit()"
+        />
+      </form>
+
+      <p class="solicitar__login">
+        ¿Recordaste tu contraseña?
+        <button type="button" class="solicitar__link" (click)="onIrALogin()">
+          Iniciá sesión
+        </button>
+      </p>
+
+      <button type="button" class="solicitar__volver" (click)="onVolver()">
+        ← Volver al inicio
+      </button>
+    </section>
+  </main>
+</div>

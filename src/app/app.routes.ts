@@ -5,13 +5,44 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./features/home/home.page').then((m) => m.HomePage),
+      import('./features/landing/landing.page').then((m) => m.LandingPage),
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./core/auth/login/login.page').then((m) => m.LoginPage),
+  },
+  {
+    path: 'registro',
+    loadComponent: () =>
+      import('./core/auth/registro/registro.page').then((m) => m.RegistroPage),
+  },
+  {
+    path: 'recuperar-password',
+    loadChildren: () =>
+      import('./core/auth/recuperar-password/recuperar-password.routes').then(
+        (m) => m.recuperarPasswordRoutes,
+      ),
+  },
+  {
+    path: 'padre',
+    loadComponent: () =>
+      import('./features/home-padre/home-padre.page').then(
+        (m) => m.HomePadrePage,
+      ),
+  },
+  {
+    path: 'alumno',
+    loadComponent: () =>
+      import('./features/home-alumno/home-alumno.page').then(
+        (m) => m.HomeAlumnoPage,
+      ),
   },
   {
     path: 'restricciones/:alumnoId',
     loadComponent: () =>
       import('./features/restricciones/restricciones.page').then(
-        (m) => m.RestriccionesPage
+        (m) => m.RestriccionesPage,
       ),
   },
   {
@@ -29,33 +60,43 @@ export const routes: Routes = [
   {
     path: 'preferencias',
     loadComponent: () =>
-      import('./features/preferencias/preferencias.page')
-        .then((m) => m.PreferenciasPage),
+      import('./features/preferencias/preferencias.page').then(
+        (m) => m.PreferenciasPage,
+      ),
   },
 
   {
     path: 'sugerencias',
     loadComponent: () =>
-      import('./features/sugerencias/sugerencias.page')
-        .then((m) => m.SugerenciasPage),
+      import('./features/sugerencias/sugerencias.page').then(
+        (m) => m.SugerenciasPage,
+      ),
   },
 
   {
     path: 'consumo',
     loadComponent: () =>
-      import('./features/consumo/consumo.page')
-        .then((m) => m.ConsumoPage),
+      import('./features/consumo/consumo.page').then((m) => m.ConsumoPage),
   },
+
+  {
+    path: 'habitos',
+    loadComponent: () =>
+      import('./features/habitos/habitos.page').then((m) => m.HabitosPage),
+  },
+
   {
     path: 'compra',
     loadChildren: () =>
       import('./features/compra/compra.routes').then((m) => m.compraRoutes),
   },
+
   {
-    path: 'habitos',
+    path: 'vendedor-home',
     loadComponent: () =>
-      import('./features/habitos/habitos.page')
-        .then((m) => m.HabitosPage),
+      import('./features/vendedor-home/vendedor-home.page').then(
+        (m) => m.VendedorHomePage,
+      ),
   },
   {
     path: 'cargar-producto-ia',
@@ -69,5 +110,4 @@ export const routes: Routes = [
     path: 'admin-productos',
     loadChildren: () => import('./features/updated-inventory/updated-inventory.routes').then(m => m.updatedInventoryRoutes)
   }
-
 ];

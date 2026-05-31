@@ -1,0 +1,45 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="vendedor-home">
+  <div class="vendedor-home__container">
+    <h1 class="vendedor-home__titulo">Inicio del Vendedor</h1>
+
+    <section class="estadisticas">
+      <app-estadistica-card
+        titulo="Ganancias de hoy"
+        [valor]="'$ ' + resumen.gananciasHoy"
+        icono="fa-dollar-sign"
+      />
+
+      <app-estadistica-card
+        titulo="Ventas realizadas"
+        [valor]="resumen.ventasHoy.toString()"
+        icono="fa-cart-shopping"
+      />
+
+      <app-estadistica-card
+        titulo="Productos sin stock"
+        [valor]="resumen.productosSinStock.toString()"
+        icono="fa-box-open"
+      />
+    </section>
+
+    <section class="acciones">
+      <app-accion-card titulo="Tienda" icono="fa-store" ruta="/tienda" />
+
+      <app-accion-card
+        titulo="Dashboard"
+        icono="fa-chart-line"
+        ruta="/dashboard"
+      />
+
+      <app-accion-card titulo="Stock" icono="fa-boxes-stacked" ruta="/stock" />
+
+      <app-accion-card
+        titulo="Sugerencias IA"
+        icono="fa-robot"
+        ruta="/sugerencias"
+      />
+    </section>
+  </div>
+</main>

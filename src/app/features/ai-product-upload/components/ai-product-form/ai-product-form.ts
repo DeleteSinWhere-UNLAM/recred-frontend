@@ -55,9 +55,9 @@ export class AiProductForm implements OnChanges {
         requierePreparacion: formValue.requierePreparacion,
         categoriaId: null,
         nuevaCategoriaNombre: 'Galletita',//formValue.nuevaCategoriaNombre,
-        buffetId: 'ebfc7afc-6b2e-46a6-ba8f-bb2902a6bfd9',
+        buffetId: '2c4153b3-d0f9-489c-93c0-8b3ad7b89758',
         stockActual: formValue.stockActual,
-        clasificacionesSaludIds: ['214e9d21-b049-43af-be09-08fb0b445828'],//this.buildHealthClassificationIds(formValue),
+        clasificacionesSaludIds: ['52062d7f-fbf5-4757-ad5f-d716025b05d5'],//this.buildHealthClassificationIds(formValue),
         tiposIds: [],
       };
       this.save.emit(request);

@@ -1,0 +1,190 @@
+.accion-tile {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  min-height: 130px;
+  padding: 22px 24px;
+  border: none;
+  border-radius: 26px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  text-align: left;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+  box-shadow: var(--shadow-card);
+}
+
+.accion-tile:hover {
+  transform: translateY(-4px) rotate(-1deg);
+  filter: brightness(1.05);
+  box-shadow:
+    0 14px 28px rgba(74, 111, 165, 0.2),
+    0 6px 10px rgba(74, 111, 165, 0.08);
+}
+
+.accion-tile:nth-child(even):hover {
+  transform: translateY(-4px) rotate(1deg);
+}
+
+.accion-tile:hover .accion-tile__flecha {
+  transform: translateX(4px);
+}
+
+.accion-tile:hover .accion-tile__sticker {
+  transform: rotate(15deg) scale(1.12);
+}
+
+.accion-tile:active {
+  transform: scale(0.98);
+}
+
+.accion-tile:focus-visible {
+  outline: 3px solid var(--color-pizarra);
+  outline-offset: 3px;
+}
+
+.accion-tile__sticker {
+  position: absolute;
+  top: -18px;
+  right: -10px;
+  font-size: 80px;
+  line-height: 1;
+  opacity: 0.18;
+  transform: rotate(8deg);
+  pointer-events: none;
+  transition: transform 0.25s ease;
+}
+
+.accion-tile__icono {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.25);
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.accion-tile__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.accion-tile__label {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+}
+
+.accion-tile__descripcion {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.88;
+  line-height: 1.25;
+}
+
+.accion-tile__flecha {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.28);
+  font-size: 14px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.accion-tile__badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: var(--color-texto-oscuro);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.accion-tile--menta {
+  background: linear-gradient(135deg, var(--color-menta) 0%, #6da085 100%);
+  color: #fff;
+}
+
+.accion-tile--pizarra {
+  background: linear-gradient(135deg, var(--color-pizarra) 0%, var(--color-pizarra-dark) 100%);
+  color: #fff;
+}
+
+.accion-tile--dorado {
+  background: linear-gradient(135deg, var(--color-dorado) 0%, var(--color-dorado-dark) 100%);
+  color: var(--color-texto-oscuro);
+}
+
+.accion-tile--dorado .accion-tile__icono,
+.accion-tile--dorado .accion-tile__flecha {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.accion-tile--melocoton {
+  background: linear-gradient(135deg, var(--color-melocoton) 0%, #c75a3f 100%);
+  color: #fff;
+}
+
+.accion-tile--mandarina {
+  background: linear-gradient(135deg, #f4a261 0%, #d97f3e 100%);
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .accion-tile {
+    min-height: 160px;
+    padding: 28px 30px;
+    gap: 22px;
+    border-radius: 30px;
+  }
+
+  .accion-tile__icono {
+    width: 76px;
+    height: 76px;
+    font-size: 34px;
+  }
+
+  .accion-tile__label {
+    font-size: 22px;
+  }
+
+  .accion-tile__descripcion {
+    font-size: 14px;
+  }
+
+  .accion-tile__sticker {
+    font-size: 110px;
+    top: -24px;
+    right: -16px;
+  }
+
+  .accion-tile__flecha {
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+  }
+}
