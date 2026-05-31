@@ -1,0 +1,50 @@
+<header class="perfil-vendedor-header">
+  <div class="perfil-vendedor-header__identidad">
+    <div class="perfil-vendedor-header__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreVendedor">
+      <div class="perfil-vendedor-header__avatar">
+        <span>{{ iniciales }}</span>
+      </div>
+    </div>
+
+    <div class="perfil-vendedor-header__texto">
+      <p class="perfil-vendedor-header__saludo">{{ saludo }}</p>
+      <h1 class="perfil-vendedor-header__nombre">{{ nombreVendedor }}</h1>
+      <p class="perfil-vendedor-header__rol">Panel del vendedor</p>
+    </div>
+  </div>
+
+  <div class="perfil-vendedor-header__stats" role="group" aria-label="Resumen del día">
+    <div class="perfil-vendedor-header__stat">
+      <span class="perfil-vendedor-header__stat-icono" aria-hidden="true">
+        <i class="fa-solid fa-dollar-sign"></i>
+      </span>
+      <div class="perfil-vendedor-header__stat-texto">
+        <span class="perfil-vendedor-header__stat-label">Ganancias hoy</span>
+        <strong class="perfil-vendedor-header__stat-valor">{{ gananciasFormateadas }}</strong>
+      </div>
+    </div>
+
+    <div class="perfil-vendedor-header__stat">
+      <span class="perfil-vendedor-header__stat-icono" aria-hidden="true">
+        <i class="fa-solid fa-cart-shopping"></i>
+      </span>
+      <div class="perfil-vendedor-header__stat-texto">
+        <span class="perfil-vendedor-header__stat-label">Ventas</span>
+        <strong class="perfil-vendedor-header__stat-valor">{{ ventasHoy }}</strong>
+      </div>
+    </div>
+
+    <div
+      class="perfil-vendedor-header__stat"
+      [class.perfil-vendedor-header__stat--alerta]="productosSinStock > 0"
+    >
+      <span class="perfil-vendedor-header__stat-icono" aria-hidden="true">
+        <i class="fa-solid fa-box-open"></i>
+      </span>
+      <div class="perfil-vendedor-header__stat-texto">
+        <span class="perfil-vendedor-header__stat-label">Sin stock</span>
+        <strong class="perfil-vendedor-header__stat-valor">{{ productosSinStock }}</strong>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,194 @@
+.perfil-vendedor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+
+  padding: 24px 28px;
+
+  background-color: var(--color-fondo);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-neu-convex);
+}
+
+.perfil-vendedor-header__identidad {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.perfil-vendedor-header__avatar-wrap {
+  flex-shrink: 0;
+
+  padding: 4px;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, var(--color-dorado), var(--color-dorado-dark));
+  box-shadow: var(--shadow-neu-convex);
+}
+
+.perfil-vendedor-header__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 64px;
+  height: 64px;
+
+  border-radius: 50%;
+
+  background-color: var(--color-fondo);
+  box-shadow: var(--shadow-neu-concave);
+
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.perfil-vendedor-header__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.perfil-vendedor-header__saludo {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.perfil-vendedor-header__nombre {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #334155;
+}
+
+.perfil-vendedor-header__rol {
+  font-size: 13px;
+  color: var(--color-texto-claro);
+}
+
+.perfil-vendedor-header__stats {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+
+  padding: 14px 22px;
+
+  background-color: var(--color-fondo);
+  border-radius: 18px;
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.perfil-vendedor-header__stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.perfil-vendedor-header__stat + .perfil-vendedor-header__stat {
+  padding-left: 24px;
+  border-left: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.perfil-vendedor-header__stat-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 12px;
+  background-color: var(--color-superficie);
+  box-shadow: var(--shadow-neu-convex);
+
+  color: var(--color-pizarra);
+  font-size: 14px;
+}
+
+.perfil-vendedor-header__stat-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.1;
+}
+
+.perfil-vendedor-header__stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.perfil-vendedor-header__stat-valor {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.perfil-vendedor-header__stat--alerta .perfil-vendedor-header__stat-icono {
+  color: var(--color-melocoton);
+}
+
+.perfil-vendedor-header__stat--alerta .perfil-vendedor-header__stat-valor {
+  color: var(--color-melocoton);
+}
+
+@media (max-width: 900px) {
+  .perfil-vendedor-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .perfil-vendedor-header__stats {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .perfil-vendedor-header {
+    padding: 18px 20px;
+    gap: 16px;
+  }
+
+  .perfil-vendedor-header__avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 19px;
+  }
+
+  .perfil-vendedor-header__nombre {
+    font-size: 22px;
+  }
+
+  .perfil-vendedor-header__stats {
+    padding: 12px 14px;
+    gap: 12px;
+    overflow-x: auto;
+  }
+
+  .perfil-vendedor-header__stat + .perfil-vendedor-header__stat {
+    padding-left: 12px;
+  }
+
+  .perfil-vendedor-header__stat-icono {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .perfil-vendedor-header__stat-valor {
+    font-size: 17px;
+  }
+}

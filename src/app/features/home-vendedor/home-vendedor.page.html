@@ -1,0 +1,19 @@
+<app-navbar [userName]="presenter.nombreVendedor()" />
+
+<main class="home-vendedor">
+  <div class="home-vendedor__container">
+    <app-perfil-vendedor-header
+      [iniciales]="presenter.iniciales()"
+      [nombreVendedor]="presenter.nombreVendedor()"
+      [saludo]="presenter.saludo()"
+      [gananciasFormateadas]="presenter.gananciasFormateadas()"
+      [ventasHoy]="presenter.ventasHoy()"
+      [productosSinStock]="presenter.productosSinStock()"
+    />
+
+    <app-acciones-grid
+      [acciones]="presenter.acciones()"
+      (accion)="presenter.ejecutarAccion($event)"
+    />
+  </div>
+</main>
