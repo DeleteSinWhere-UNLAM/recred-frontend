@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AiProductResponse } from '../../models/ai-product-response.interface';
 import { SaveProductRequest } from '../../models/save-product-request.interface';
@@ -11,7 +11,7 @@ import { Category } from '../../../updated-inventory/models/category.interface';
   templateUrl: './ai-product-form.html',
   styleUrl: './ai-product-form.css',
 })
-export class AiProductForm implements OnChanges {
+export class AiProductForm implements OnInit, OnChanges {
   @Input() prefillData: AiProductResponse | null = null;
   @Input() categories: Category[] = [];
   @Input() isSaving = false;
