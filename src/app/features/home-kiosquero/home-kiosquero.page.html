@@ -1,0 +1,19 @@
+<app-navbar [userName]="presenter.nombreKiosquero()" />
+
+<main class="home-kiosquero">
+  <div class="home-kiosquero__container">
+    <app-perfil-kiosquero-header
+      [iniciales]="presenter.iniciales()"
+      [nombreKiosquero]="presenter.nombreKiosquero()"
+      [saludo]="presenter.saludo()"
+      [gananciasFormateadas]="presenter.gananciasFormateadas()"
+      [ventasHoy]="presenter.ventasHoy()"
+      [productosSinStock]="presenter.productosSinStock()"
+    />
+
+    <app-acciones-grid
+      [acciones]="presenter.acciones()"
+      (accion)="presenter.ejecutarAccion($event)"
+    />
+  </div>
+</main>

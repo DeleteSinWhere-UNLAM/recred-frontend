@@ -5,13 +5,39 @@
         <img src="logoHeader.png" alt="" class="navbar__logo-img">
         <span class="navbar__logo-text">RECRED</span>
       </a>
-      @if (!esVistaAlumno()) {
+      @if (!esVistaAlumno() && !esVistaKiosquero()) {
         <span class="navbar__divider" aria-hidden="true"></span>
         <span class="navbar__greeting">Hola, {{ userName }}</span>
       }
     </div>
 
     <nav class="navbar__actions" aria-label="Acciones principales">
+      <div class="navbar__notif-wrap">
+        <button
+          type="button"
+          class="navbar__notif"
+          [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'"
+          [attr.aria-expanded]="menuNotifAbierto()"
+          aria-haspopup="menu"
+          (click)="toggleNotificaciones()"
+        >
+          <i class="fa-solid fa-bell" aria-hidden="true"></i>
+          @if (notifCount() > 0) {
+            <span class="navbar__notif-badge">{{ notifCount() }}</span>
+          }
+        </button>
+        @if (menuNotifAbierto()) {
+          <div class="navbar__menu navbar__menu--notif" role="menu">
+            <p class="navbar__menu-titulo">Notificaciones</p>
+            @if (notifCount() === 0) {
+              <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
+            } @else {
+              <p class="navbar__menu-vacio">Tenés {{ notifCount() }} notificaciones pendientes.</p>
+            }
+          </div>
+        }
+      </div>
+
       <div class="navbar__perfil-wrap">
         <button
           type="button"
@@ -37,17 +63,19 @@
           </div>
         }
       </div>
-      <button
-        type="button"
-        class="navbar__cart"
-        (click)="irAlCarrito()"
-        [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'"
-      >
-        <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-        @if (cartCount() > 0) {
-          <span class="navbar__cart-badge">{{ cartCount() }}</span>
-        }
-      </button>
+      @if (!esVistaKiosquero()) {
+        <button
+          type="button"
+          class="navbar__cart"
+          (click)="irAlCarrito()"
+          [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'"
+        >
+          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+          @if (cartCount() > 0) {
+            <span class="navbar__cart-badge">{{ cartCount() }}</span>
+          }
+        </button>
+      }
     </nav>
   </div>
 </header>

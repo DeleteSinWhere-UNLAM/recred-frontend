@@ -1,9 +1,5 @@
-export interface ResumenVendedor {
+export interface ResumenKiosquero {
   gananciasHoy: number;
-
   ventasHoy: number;
-
   productosSinStock: number;
-
-  alertasPendientes: number;
 }
