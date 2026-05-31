@@ -1,5 +1,5 @@
-<div class="form-backdrop" (click)="formCancel.emit()">
-  <form [formGroup]="productForm" (ngSubmit)="submitForm()" class="product-form" (click)="$event.stopPropagation()">
+<div class="form-backdrop" tabindex="0" role="button" (click)="formCancel.emit()" (keydown.enter)="formCancel.emit()" (keydown.space)="formCancel.emit()">
+  <form [formGroup]="productForm" tabindex="-1" (ngSubmit)="submitForm()" class="product-form" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
     <div class="form-header">
       <h3 class="form-header__title">
         @if (isEditing) {

@@ -1,6 +1,6 @@
 @if (isOpen) {
-  <div class="modal-overlay" (click)="cancelled.emit()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
+  <div class="modal-overlay" tabindex="0" role="button" (click)="cancelled.emit()" (keydown.enter)="cancelled.emit()" (keydown.space)="cancelled.emit()">
+    <div class="modal-card" tabindex="-1" role="presentation" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
       <div class="modal-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
