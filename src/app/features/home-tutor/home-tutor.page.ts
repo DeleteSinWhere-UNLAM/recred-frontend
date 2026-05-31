@@ -13,13 +13,13 @@ interface GrupoColegio {
 }
 
 @Component({
-  selector: 'app-home-padre-page',
-  templateUrl: './home-padre.page.html',
-  styleUrl: './home-padre.page.css',
+  selector: 'app-home-tutor-page',
+  templateUrl: './home-tutor.page.html',
+  styleUrl: './home-tutor.page.css',
   imports: [NavbarComponent, ColegioSectionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomePadrePage {
+export class HomeTutorPage {
   private readonly usuarioService = inject(UsuarioService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly alumnosService = inject(AlumnosService);
@@ -28,7 +28,7 @@ export class HomePadrePage {
   readonly grupos: GrupoColegio[] = this.armarGrupos();
 
   constructor() {
-    this.usuarioService.setHomeUrl('/padre');
+    this.usuarioService.setHomeUrl('/tutor');
     this.usuarioService.setNombreNavbar(this.nombreUsuario);
   }
 

@@ -25,10 +25,10 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'padre',
+    path: 'tutor',
     loadComponent: () =>
-      import('./features/home-padre/home-padre.page').then(
-        (m) => m.HomePadrePage,
+      import('./features/home-tutor/home-tutor.page').then(
+        (m) => m.HomeTutorPage,
       ),
   },
   {
@@ -92,10 +92,10 @@ export const routes: Routes = [
   },
 
   {
-    path: 'vendedor',
+    path: 'kiosquero',
     loadComponent: () =>
-      import('./features/home-vendedor/home-vendedor.page').then(
-        (m) => m.HomeVendedorPage,
+      import('./features/home-kiosquero/home-kiosquero.page').then(
+        (m) => m.HomeKiosqueroPage,
       ),
   },
   {

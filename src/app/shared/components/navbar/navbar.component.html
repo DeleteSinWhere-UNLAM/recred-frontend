@@ -5,7 +5,7 @@
         <img src="logoHeader.png" alt="" class="navbar__logo-img">
         <span class="navbar__logo-text">RECRED</span>
       </a>
-      @if (!esVistaAlumno() && !esVistaVendedor()) {
+      @if (!esVistaAlumno() && !esVistaKiosquero()) {
         <span class="navbar__divider" aria-hidden="true"></span>
         <span class="navbar__greeting">Hola, {{ userName }}</span>
       }
@@ -63,7 +63,7 @@
           </div>
         }
       </div>
-      @if (!esVistaVendedor()) {
+      @if (!esVistaKiosquero()) {
         <button
           type="button"
           class="navbar__cart"

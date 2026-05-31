@@ -2,9 +2,9 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { UsuarioService } from '../../../data-access/services/usuario.service';
-import { AccionVendedor } from '../models/accion-vendedor.model';
-import { ResumenVendedor } from '../models/resumen-vendedor.model';
-import { HomeVendedorService } from '../services/home-vendedor.service';
+import { AccionKiosquero } from '../models/accion-kiosquero.model';
+import { ResumenKiosquero } from '../models/resumen-kiosquero.model';
+import { HomeKiosqueroService } from '../services/home-kiosquero.service';
 
 const formateadorGanancias = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -13,18 +13,18 @@ const formateadorGanancias = new Intl.NumberFormat('es-AR', {
 });
 
 @Injectable()
-export class HomeVendedorPresenter {
+export class HomeKiosqueroPresenter {
   private readonly usuarioService = inject(UsuarioService);
-  private readonly homeVendedorService = inject(HomeVendedorService);
+  private readonly homeKiosqueroService = inject(HomeKiosqueroService);
   private readonly router = inject(Router);
 
-  private readonly resumenState = signal<ResumenVendedor | undefined>(undefined);
-  private readonly nombreVendedorState = signal<string>('');
+  private readonly resumenState = signal<ResumenKiosquero | undefined>(undefined);
+  private readonly nombreKiosqueroState = signal<string>('');
 
-  readonly nombreVendedor: Signal<string> = this.nombreVendedorState.asReadonly();
+  readonly nombreKiosquero: Signal<string> = this.nombreKiosqueroState.asReadonly();
 
   readonly iniciales = computed(() => {
-    const partes = this.nombreVendedorState().trim().split(/\s+/);
+    const partes = this.nombreKiosqueroState().trim().split(/\s+/);
     const primera = partes[0]?.[0] ?? '';
     const segunda = partes[1]?.[0] ?? partes[0]?.[1] ?? '';
     return (primera + segunda).toUpperCase();
@@ -47,7 +47,7 @@ export class HomeVendedorPresenter {
     () => this.resumenState()?.productosSinStock ?? 0,
   );
 
-  readonly acciones: Signal<AccionVendedor[]> = computed(() => [
+  readonly acciones: Signal<AccionKiosquero[]> = computed(() => [
     {
       id: 'cargar-productos',
       titulo: 'Carga de producto',
@@ -90,11 +90,11 @@ export class HomeVendedorPresenter {
   ]);
 
   init(): void {
-    this.resumenState.set(this.homeVendedorService.getResumen());
-    this.nombreVendedorState.set(this.homeVendedorService.getNombreVendedor());
+    this.resumenState.set(this.homeKiosqueroService.getResumen());
+    this.nombreKiosqueroState.set(this.homeKiosqueroService.getNombreKiosquero());
   }
 
-  ejecutarAccion(accion: AccionVendedor): void {
+  ejecutarAccion(accion: AccionKiosquero): void {
     this.router.navigateByUrl(accion.ruta);
   }
 }
