@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { SugerenciaProducto } from '../../../../data-access/models/sugerencia-producto.model';
+import { SugerenciaProducto } from '../../models/sugerencia-producto.model';
 
 @Component({
   selector: 'app-sugerencia-card',
