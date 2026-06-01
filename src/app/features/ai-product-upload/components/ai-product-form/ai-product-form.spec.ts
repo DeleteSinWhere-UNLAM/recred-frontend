@@ -71,8 +71,8 @@ describe('AiProductForm', () => {
     expect(emittedRequest.descripcion).toBe('Galletas de chocolate');
     expect(emittedRequest.peso).toBe(0.12);
     expect(emittedRequest.nuevaCategoriaNombre).toBe('Dulces');
-    expect(emittedRequest.buffetId).toBe('da1439ae-487b-4e99-90fa-7488a5adc39f');
-    expect(emittedRequest.clasificacionesSaludIds).toEqual(['f86358e0-0faf-4db0-bdda-09d8fb3a7cf2']);
+    expect(emittedRequest.buffetId).toBe('2c4153b3-d0f9-489c-93c0-8b3ad7b89758');
+    expect(emittedRequest.clasificacionesSaludIds).toEqual(['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8']);
   });
 
   it('NO debería emitir el evento save si el formulario es inválido', () => {

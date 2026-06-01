@@ -9,14 +9,14 @@ import { Category } from '../models/category.interface';
 })
 export class ProductService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/v1/products';
+  private readonly baseUrl = 'https://18-119-187-167.sslip.io/api/v1/products';
 
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl);
   }
 
   getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>('http://localhost:8080/api/v1/categories');
+    return this.http.get<Category[]>('https://18-119-187-167.sslip.io/api/v1/categories');
   }
 
   getAllByBuffetId(buffetId: string): Observable<Product[]> {

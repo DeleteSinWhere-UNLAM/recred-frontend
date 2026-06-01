@@ -37,7 +37,7 @@ describe('ProductService', () => {
       expect(products).toEqual(mockProducts);
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/products');
+    const req = httpMock.expectOne('https://18-119-187-167.sslip.io/api/v1/products');
     expect(req.request.method).toBe('GET');
     req.flush(mockProducts);
   });
@@ -48,7 +48,7 @@ describe('ProductService', () => {
       expect(categories).toEqual(mockCategories);
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/categories');
+    const req = httpMock.expectOne('https://18-119-187-167.sslip.io/api/v1/categories');
     expect(req.request.method).toBe('GET');
     req.flush(mockCategories);
   });
@@ -61,7 +61,7 @@ describe('ProductService', () => {
       }
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/categories');
+    const req = httpMock.expectOne('https://18-119-187-167.sslip.io/api/v1/categories');
     req.flush('Error fetching categories', { status: 500, statusText: 'Server Error' });
   });
 
@@ -72,7 +72,7 @@ describe('ProductService', () => {
       expect(products).toEqual(mockProducts);
     });
 
-    const req = httpMock.expectOne(req => req.url === 'http://localhost:8080/api/v1/products' && req.params.get('buffetId') === buffetId);
+    const req = httpMock.expectOne(req => req.url === 'https://18-119-187-167.sslip.io/api/v1/products' && req.params.get('buffetId') === buffetId);
     expect(req.request.method).toBe('GET');
     req.flush(mockProducts);
   });
@@ -84,7 +84,7 @@ describe('ProductService', () => {
       expect(product).toEqual(mockProducts[0]);
     });
 
-    const req = httpMock.expectOne(`http://localhost:8080/api/v1/products/${productId}`);
+    const req = httpMock.expectOne(`https://18-119-187-167.sslip.io/api/v1/products/${productId}`);
     expect(req.request.method).toBe('GET');
     req.flush(mockProducts[0]);
   });
@@ -110,7 +110,7 @@ describe('ProductService', () => {
       expect(product).toEqual(expectedResponse);
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/products');
+    const req = httpMock.expectOne('https://18-119-187-167.sslip.io/api/v1/products');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(expectedResponse);
@@ -126,7 +126,7 @@ describe('ProductService', () => {
       }
     });
 
-    const req = httpMock.expectOne('http://localhost:8080/api/v1/products');
+    const req = httpMock.expectOne('https://18-119-187-167.sslip.io/api/v1/products');
     req.flush('Bad Request', { status: 400, statusText: 'Bad Request' });
   });
 
@@ -150,7 +150,7 @@ describe('ProductService', () => {
       expect(product).toEqual(expectedResponse);
     });
 
-    const req = httpMock.expectOne(`http://localhost:8080/api/v1/products/${productId}`);
+    const req = httpMock.expectOne(`https://18-119-187-167.sslip.io/api/v1/products/${productId}`);
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual(payload);
     req.flush(expectedResponse);
@@ -163,7 +163,7 @@ describe('ProductService', () => {
       expect(res).toBeNull();
     });
 
-    const req = httpMock.expectOne(`http://localhost:8080/api/v1/products/${productId}`);
+    const req = httpMock.expectOne(`https://18-119-187-167.sslip.io/api/v1/products/${productId}`);
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });
