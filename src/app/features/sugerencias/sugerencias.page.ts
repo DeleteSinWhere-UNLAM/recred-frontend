@@ -3,9 +3,9 @@ import { Component, inject } from '@angular/core';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { SugerenciasService } from '../../data-access/services/sugerencias.service';
+import { SugerenciasService } from './services/sugerencias.service';
 
-import { SugerenciaProducto } from '../../data-access/models/sugerencia-producto.model';
+import { SugerenciaProducto } from './models/sugerencia-producto.model';
 
 import { SugerenciaCardComponent } from './components/sugerencia-card/sugerencia-card.component';
 

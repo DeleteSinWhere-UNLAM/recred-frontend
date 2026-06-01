@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 
-import { Preferencia } from '../../data-access/models/preferencia.model';
-import { PreferenciasService } from '../../data-access/services/preferencias.service';
+import { Preferencia } from './models/preferencia.model';
+import { PreferenciasService } from './services/preferencias.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 
 import { PreferenciaCardComponent } from './components/preferencia-card/preferencia-card.component';
