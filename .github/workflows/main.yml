@@ -20,6 +20,22 @@ jobs:
         
       - name: Tests
         run: npm test -- --watch=false --browsers=ChromeHeadless
+        env:
+          COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
+          COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+          COGNITO_REGION: ${{ secrets.COGNITO_REGION }}
+          COGNITO_DOMAIN: ${{ secrets.COGNITO_DOMAIN }}
+          REDIRECT_SIGN_IN: ${{ secrets.REDIRECT_SIGN_IN }}
+          REDIRECT_SIGN_OUT: ${{ secrets.REDIRECT_SIGN_OUT }}
+          API_URL: ${{ secrets.API_URL }}
         
       - name: Build
         run: npm run build -- --configuration=production
+        env:
+          COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
+          COGNITO_CLIENT_ID: ${{ secrets.COGNITO_CLIENT_ID }}
+          COGNITO_REGION: ${{ secrets.COGNITO_REGION }}
+          COGNITO_DOMAIN: ${{ secrets.COGNITO_DOMAIN }}
+          REDIRECT_SIGN_IN: ${{ secrets.REDIRECT_SIGN_IN }}
+          REDIRECT_SIGN_OUT: ${{ secrets.REDIRECT_SIGN_OUT }}
+          API_URL: ${{ secrets.API_URL }}
