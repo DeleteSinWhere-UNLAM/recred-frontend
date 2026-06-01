@@ -2,7 +2,10 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const targetPath = path.join(__dirname, './src/environments/environment.development.ts');
+// Determinar si es producción (por defecto true, a menos que se especifique lo contrario)
+const isProduction = process.env.NODE_ENV === 'production' || process.argv.includes('--production');
+const targetFileName = isProduction ? 'environment.ts' : 'environment.development.ts';
+const targetPath = path.join(__dirname, `./src/environments/${targetFileName}`);
 
 // Variables obligatorias
 const requiredEnvs = [
@@ -24,7 +27,7 @@ requiredEnvs.forEach(env => {
 });
 
 const envConfigFile = `export const environment = {
-  production: false,
+  production: ${isProduction},
   cognito: {
     userPoolId: '${process.env.COGNITO_USER_POOL_ID}',
     userPoolClientId: '${process.env.COGNITO_CLIENT_ID}',
@@ -41,12 +44,13 @@ const envConfigFile = `export const environment = {
 };
 `;
 
-console.log('Generando archivo de entorno en: ' + targetPath);
+console.log(`Generando archivo de entorno (${isProduction ? 'PROD' : 'DEV'}) en: ${targetPath}`);
 
-fs.writeFile(targetPath, envConfigFile, function (err) {
-  if (err) {
-    console.error('Error al generar el archivo:', err);
-    process.exit(1);
-  }
-  console.log('✅ Archivo de entorno generado correctamente.');
-});
+// Asegurar que el directorio existe
+const dir = path.dirname(targetPath);
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+fs.writeFileSync(targetPath, envConfigFile);
+console.log('✅ Archivo de entorno generado correctamente.');
