@@ -1,0 +1,77 @@
+<app-navbar [userName]="nombreUsuario()" />
+
+<main class="confirmar-page">
+  <div class="confirmar-page__container">
+    <div class="confirmar-page__barra-acento" aria-hidden="true"></div>
+
+    <header class="confirmar-page__cabecera">
+      <button
+        type="button"
+        class="confirmar-page__volver"
+        (click)="presenter.cancelar()"
+      >
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Editar carrito</span>
+      </button>
+      <div>
+        <h2 class="confirmar-page__titulo">Confirmar Compra</h2>
+        <p class="confirmar-page__subtitulo">
+          Revisá los pedidos antes de pagar. Una vez confirmado se generan el código de retiro.
+        </p>
+      </div>
+    </header>
+
+    <div class="confirmar-page__grid">
+      <section class="confirmar-page__ordenes" aria-label="Pedidos a procesar">
+        <h3 class="confirmar-page__seccion-titulo">Pedidos a procesar</h3>
+
+        @for (orden of presenter.ordenes(); track orden.alumno.id) {
+          <article class="confirmar-page__orden">
+            <header class="confirmar-page__orden-cabecera">
+              <div class="confirmar-page__orden-alumno">
+                <h4>{{ orden.alumno.nombre }} {{ orden.alumno.apellido }}</h4>
+                <p>{{ orden.alumno.grado }}</p>
+              </div>
+              <div class="confirmar-page__orden-meta">
+                <span>
+                  <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+                  {{ orden.fecha }}
+                </span>
+                <span>
+                  <i class="fa-solid fa-clock" aria-hidden="true"></i>
+                  {{ presenter.recreoLabel(orden.recreo) }}
+                </span>
+              </div>
+            </header>
+
+            <ul class="confirmar-page__items">
+              @for (item of orden.items; track item.id) {
+                <li class="confirmar-page__item">
+                  <span class="confirmar-page__item-cant">{{ item.cantidad }}x</span>
+                  <span class="confirmar-page__item-nombre">{{ item.producto.nombre }}</span>
+                  <span class="confirmar-page__item-valor">
+                    {{ formatear(item.producto.precio * item.cantidad) }}
+                  </span>
+                </li>
+              }
+            </ul>
+
+            <footer class="confirmar-page__orden-pie">
+              <span>Subtotal</span>
+              <span>{{ formatear(orden.subtotal) }}</span>
+            </footer>
+          </article>
+        }
+      </section>
+
+      <app-resumen-orden-card
+        [lineas]="lineas()"
+        [total]="presenter.total()"
+        [advertencia]="presenter.advertenciaSaldo()"
+        [cargando]="presenter.cargando()"
+        ctaLabel="Confirmar y Pagar"
+        (accion)="presenter.confirmar()"
+      />
+    </div>
+  </div>
+</main>

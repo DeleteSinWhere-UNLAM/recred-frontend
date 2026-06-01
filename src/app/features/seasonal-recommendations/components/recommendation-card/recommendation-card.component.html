@@ -1,0 +1,9 @@
+<div class="recommendation-card" [ngClass]="item.accion.toLowerCase()">
+  <div class="card-header">
+    <h3>{{ item.categoria }}</h3>
+    <span class="badge" [ngClass]="item.accion.toLowerCase()">
+      {{ item.accion === 'AUMENTAR' ? '⬆ Aumentar Stock' : item.accion === 'REDUCIR' ? '⬇ Reducir Stock' : item.accion }}
+    </span>
+  </div>
+  <p class="motivo">{{ item.motivo }}</p>
+</div>

@@ -1,0 +1,11 @@
+<section class="acciones-grid" aria-label="Acciones rápidas">
+  @for (accion of acciones; track accion.id; let first = $first) {
+    <app-accion-card
+      class="acciones-grid__item"
+      [class.acciones-grid__item--full]="first"
+      [accion]="accion"
+      [destacada]="first"
+      (seleccionar)="onSeleccionar($event)"
+    />
+  }
+</section>

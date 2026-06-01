@@ -1,0 +1,14 @@
+<section class="colegio-section" [attr.aria-label]="colegio.nombre">
+  <header class="colegio-section__header">
+    <span class="colegio-section__icono" aria-hidden="true">
+      <i class="fa-solid fa-school"></i>
+    </span>
+    <h2 class="colegio-section__nombre">{{ colegio.nombre }}</h2>
+  </header>
+
+  <div class="colegio-section__grid">
+    @for (alumno of alumnos; track alumno.id) {
+      <app-alumno-card [alumno]="alumno" />
+    }
+  </div>
+</section>

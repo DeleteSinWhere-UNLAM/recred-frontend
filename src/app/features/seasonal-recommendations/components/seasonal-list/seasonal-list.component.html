@@ -1,0 +1,22 @@
+<div class="seasonal-list-container">
+  <div class="header-section">
+    <h2>Recomendaciones Estacionales</h2>
+    <p class="subtitle">Basadas en tu ubicación y el clima del entorno escolar</p>
+  </div>
+  
+  @if (tipPromocional) {
+    <app-tip-card [tipPromocional]="tipPromocional"></app-tip-card>
+  }
+
+  @if (sugerencias.length > 0) {
+    <div class="recommendations-grid">
+      @for (item of sugerencias; track item.categoria) {
+        <app-recommendation-card [item]="item"></app-recommendation-card>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <p>No hay sugerencias disponibles en tu zona para esta temporada.</p>
+    </div>
+  }
+</div>

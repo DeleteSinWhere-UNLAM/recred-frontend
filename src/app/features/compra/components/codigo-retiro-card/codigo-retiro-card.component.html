@@ -1,0 +1,20 @@
+@let alumno = alumnoActual();
+@if (alumno) {
+  <article class="codigo-retiro">
+    <div class="codigo-retiro__avatar" aria-hidden="true">
+      <span>{{ iniciales() }}</span>
+    </div>
+
+    <div class="codigo-retiro__info">
+      <p class="codigo-retiro__nombre">{{ nombreCompleto() }}</p>
+      <p class="codigo-retiro__meta">
+        {{ fecha }} · {{ recreoLabel() }}
+      </p>
+    </div>
+
+    <div class="codigo-retiro__codigo-bloque">
+      <span class="codigo-retiro__label">Código de retiro</span>
+      <span class="codigo-retiro__codigo">{{ codigo }}</span>
+    </div>
+  </article>
+}

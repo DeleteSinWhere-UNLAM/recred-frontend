@@ -1,0 +1,51 @@
+<app-navbar [userName]="nombreUsuario()" />
+
+<main class="exito-page">
+  <div class="exito-page__container">
+    <section class="exito-page__hero">
+      <div class="exito-page__check" aria-hidden="true">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h2 class="exito-page__titulo">¡Pago Realizado!</h2>
+      <p class="exito-page__subtitulo">
+        El pedido se procesó correctamente. Mostrá el código al personal del buffet para retirar.
+      </p>
+      <p class="exito-page__total">
+        Total pagado: <strong>{{ totalFormateado }}</strong>
+      </p>
+    </section>
+
+    <section class="exito-page__codigos" aria-label="Códigos de retiro">
+      <span class="exito-page__codigos-tag">Códigos de retiro</span>
+      <div class="exito-page__codigos-lista">
+        @for (orden of presenter.ordenes(); track orden.alumno.id) {
+          <app-codigo-retiro-card
+            [alumno]="orden.alumno"
+            [codigo]="presenter.codigoDe(orden.alumno.id)"
+            [fecha]="orden.fecha"
+            [recreo]="orden.recreo"
+          />
+        }
+      </div>
+    </section>
+
+    <section class="exito-page__acciones">
+      <button
+        type="button"
+        class="exito-page__cta exito-page__cta--secundaria"
+        (click)="presenter.verPendientes()"
+      >
+        <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+        Ver compras pendientes
+      </button>
+      <button
+        type="button"
+        class="exito-page__cta exito-page__cta--primaria"
+        (click)="presenter.volverInicio()"
+      >
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        Volver al Inicio
+      </button>
+    </section>
+  </div>
+</main>

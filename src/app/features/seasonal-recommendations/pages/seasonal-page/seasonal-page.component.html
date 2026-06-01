@@ -1,0 +1,19 @@
+<div class="seasonal-page">
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Analizando el clima de tu zona y generando recomendaciones...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-state">
+      <div class="error-icon">⚠️</div>
+      <p>{{ error }}</p>
+      <button (click)="loadRecommendations()">Reintentar</button>
+    </div>
+  } @else {
+    <app-seasonal-list 
+      [sugerencias]="sugerencias" 
+      [tipPromocional]="tipPromocional">
+    </app-seasonal-list>
+  }
+</div>

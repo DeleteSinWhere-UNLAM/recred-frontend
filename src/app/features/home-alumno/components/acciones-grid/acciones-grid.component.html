@@ -1,0 +1,12 @@
+<section class="acciones-grid" aria-label="Acciones rápidas">
+  <h2 class="acciones-grid__titulo">
+    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+    ¿Qué querés hacer?
+  </h2>
+
+  <div class="acciones-grid__items">
+    @for (item of acciones; track item.id) {
+      <app-accion-tile [accion]="item" (seleccionar)="onSeleccionar($event)" />
+    }
+  </div>
+</section>

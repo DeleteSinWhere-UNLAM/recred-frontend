@@ -1,0 +1,76 @@
+@let producto = productoActual();
+@if (producto) {
+  <article
+    class="producto-card"
+    [class.producto-card--sin-stock]="!disponible()"
+  >
+    <div class="producto-card__media">
+      <img
+        class="producto-card__imagen"
+        [src]="producto.imagen"
+        [alt]="producto.nombre"
+        loading="lazy"
+        (error)="onImagenError($event)"
+      />
+      @if (producto.clasificacionesSalud.length > 0) {
+        <span class="producto-card__badge">
+          {{ producto.clasificacionesSalud[0].descripcion }}
+        </span>
+      }
+    </div>
+
+    <div class="producto-card__cuerpo">
+      <p class="producto-card__categoria">{{ producto.categoria.descripcion }}</p>
+      <h3 class="producto-card__nombre">{{ producto.nombre }}</h3>
+      <p class="producto-card__precio">{{ precioFormateado() }}</p>
+
+      @if (disponible()) {
+        <div class="producto-card__cantidad">
+          <button
+            type="button"
+            class="producto-card__cantidad-btn"
+            (click)="restar()"
+            [disabled]="cantidad() <= 1"
+            aria-label="Restar uno"
+          >
+            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+          </button>
+          <span class="producto-card__cantidad-valor" aria-live="polite">{{ cantidad() }}</span>
+          <button
+            type="button"
+            class="producto-card__cantidad-btn"
+            (click)="sumar()"
+            aria-label="Sumar uno"
+          >
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="producto-card__cta"
+          (click)="onAgregar()"
+        >
+          <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+          <span>Agregar</span>
+        </button>
+
+        @if (estaEnCarrito()) {
+          <p class="producto-card__en-carrito" role="status">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            En el carrito ({{ cantidadEnCarrito() }})
+          </p>
+        }
+      } @else {
+        <button
+          type="button"
+          class="producto-card__cta producto-card__cta--bloqueado"
+          disabled
+        >
+          <i class="fa-solid fa-ban" aria-hidden="true"></i>
+          <span>Sin stock</span>
+        </button>
+      }
+    </div>
+  </article>
+}

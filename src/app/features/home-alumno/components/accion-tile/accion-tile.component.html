@@ -1,0 +1,26 @@
+<button
+  type="button"
+  class="accion-tile"
+  [class]="colorClass"
+  [attr.aria-label]="accion.label"
+  (click)="onClick()"
+>
+  <span class="accion-tile__sticker" aria-hidden="true">{{ accion.emoji }}</span>
+
+  <span class="accion-tile__icono" aria-hidden="true">
+    <i class="fa-solid" [class]="accion.icono"></i>
+  </span>
+
+  <span class="accion-tile__texto">
+    <span class="accion-tile__label">{{ accion.label }}</span>
+    <span class="accion-tile__descripcion">{{ accion.descripcion }}</span>
+  </span>
+
+  <span class="accion-tile__flecha" aria-hidden="true">
+    <i class="fa-solid fa-arrow-right"></i>
+  </span>
+
+  @if (esPlaceholder) {
+    <span class="accion-tile__badge">Próximamente</span>
+  }
+</button>
