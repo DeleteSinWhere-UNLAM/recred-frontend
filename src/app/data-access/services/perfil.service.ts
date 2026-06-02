@@ -1,8 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, Signal, inject, signal } from '@angular/core';
+import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Perfil } from '../models/perfil.model';
+import { Perfil, RolUsuario } from '../models/perfil.model';
+
+const PERFIL_STORAGE_KEY = 'recred.perfil';
 
 export class UsuarioSinPerfilError extends Error {
   constructor() {
@@ -15,8 +17,9 @@ export class UsuarioSinPerfilError extends Error {
 export class PerfilService {
   private readonly http = inject(HttpClient);
 
-  private readonly perfilState = signal<Perfil | null>(null);
+  private readonly perfilState = signal<Perfil | null>(this.leerDeStorage());
   readonly perfil: Signal<Perfil | null> = this.perfilState.asReadonly();
+  readonly rol: Signal<RolUsuario | null> = computed(() => this.perfilState()?.rol ?? null);
 
   async cargarPerfil(): Promise<Perfil> {
     await firstValueFrom(
@@ -27,6 +30,7 @@ export class PerfilService {
         this.http.get<Perfil>(`${environment.apiUrl}/usuarios/me`),
       );
       this.perfilState.set(perfil);
+      this.guardarEnStorage(perfil);
       return perfil;
     } catch (err) {
       if (err instanceof HttpErrorResponse && err.status === 404) {
@@ -36,7 +40,28 @@ export class PerfilService {
     }
   }
 
+  getPerfil(): Perfil | null {
+    return this.perfilState();
+  }
+
   limpiar(): void {
     this.perfilState.set(null);
+    localStorage.removeItem(PERFIL_STORAGE_KEY);
+  }
+
+  private leerDeStorage(): Perfil | null {
+    const raw = localStorage.getItem(PERFIL_STORAGE_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as Perfil;
+    } catch {
+      localStorage.removeItem(PERFIL_STORAGE_KEY);
+      return null;
+    }
+  }
+
+  private guardarEnStorage(perfil: Perfil): void {
+    localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
+    console.log('Perfil guardado en storage:', perfil);
   }
 }
