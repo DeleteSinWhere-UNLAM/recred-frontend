@@ -43,7 +43,7 @@
       </span>
       <span class="alumno-card__accion-label">Presupuesto</span>
     </a>
-    <a class="alumno-card__accion alumno-card__accion--pizarra" [routerLink]="['/prediccion-gasto', alumno.id]">
+    <a class="alumno-card__accion alumno-card__accion--pizarra" [routerLink]="['/estadistica', alumno.id]">
       <span class="alumno-card__accion-icono" aria-hidden="true">
         <i class="fa-solid fa-chart-line"></i>
       </span>
@@ -60,6 +60,10 @@
       <i class="fa-solid fa-list" aria-hidden="true"></i>
       <span>Movimientos</span>
     </button>
+    <a class="alumno-card__config-link" [routerLink]="['/prediccion-gasto', alumno.id]">
+      <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
+      <span>Predicción</span>
+    </a>
   </nav>
 
   <a class="alumno-card__cta" [routerLink]="['/buffet', alumno.id]">

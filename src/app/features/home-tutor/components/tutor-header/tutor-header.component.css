@@ -115,20 +115,15 @@
   align-items: center;
   gap: 4px;
   padding: 16px 24px;
-  background: linear-gradient(135deg, var(--color-dorado) 0%, var(--color-dorado-dark) 100%);
+  background-color: color-mix(in srgb, var(--color-pizarra) 12%, var(--color-fondo));
   border-radius: 20px;
-  color: var(--color-texto-oscuro);
-  box-shadow:
-    6px 6px 14px rgba(242, 183, 5, 0.35),
-    -6px -6px 14px rgba(255, 255, 255, 0.85);
+  color: var(--color-pizarra);
+  box-shadow: var(--shadow-neu-concave);
 }
 
 .tutor-header__saldo--negativo {
-  background: linear-gradient(135deg, var(--color-melocoton) 0%, #c75a3f 100%);
-  color: #fff;
-  box-shadow:
-    6px 6px 14px rgba(231, 111, 81, 0.35),
-    -6px -6px 14px rgba(255, 255, 255, 0.85);
+  background-color: color-mix(in srgb, var(--color-melocoton) 14%, var(--color-fondo));
+  color: var(--color-melocoton);
 }
 
 .tutor-header__saldo-label {
