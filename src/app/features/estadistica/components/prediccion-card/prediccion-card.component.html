@@ -6,7 +6,6 @@
   >
     <header class="prediccion-card__cabecera">
       <div>
-        <p class="prediccion-card__eyebrow">Predicción IA</p>
         <h3 id="prediccion-titulo" class="prediccion-card__titulo">
           Gasto proyectado del período
         </h3>
@@ -59,16 +58,8 @@
           <dd>{{ formatear(prediccion.montoLimite) }}</dd>
         </div>
         <div class="prediccion-card__stat">
-          <dt>Días restantes</dt>
-          <dd>{{ prediccion.diasRestantes }}</dd>
-        </div>
-        <div class="prediccion-card__stat">
           <dt>Promedio diario</dt>
           <dd>{{ formatear(prediccion.promedioGastoDiario) }}</dd>
-        </div>
-        <div class="prediccion-card__stat">
-          <dt>Confianza IA</dt>
-          <dd>{{ confianzaPorcentaje(prediccion.confianza) }}%</dd>
         </div>
       </dl>
     </div>
