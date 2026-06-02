@@ -122,8 +122,8 @@
 
 .alumno-card__acciones {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .alumno-card__accion {
@@ -194,7 +194,7 @@
 
 .alumno-card__config {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
