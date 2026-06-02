@@ -1,40 +1,54 @@
 <div class="prediction-analysis">
   <div class="analysis-section categories-section">
     <h3 class="section-title">Categorías Más Consumidas</h3>
-    <div class="categories-list" *ngIf="categoriasMasConsumidas && categoriasMasConsumidas.length > 0">
-      <span class="category-tag" *ngFor="let cat of categoriasMasConsumidas">
-        {{ cat }}
-      </span>
-    </div>
-    <div class="empty-state" *ngIf="!categoriasMasConsumidas || categoriasMasConsumidas.length === 0">
-      No hay suficientes datos de categorías para mostrar.
-    </div>
-  </div>
-
-  <div class="analysis-section" *ngIf="analisisIa">
-    <div class="ia-header">
-      <h3 class="section-title">Análisis de IA</h3>
-      <span class="ia-model">Modelo: {{ analisisIa.modelo }}</span>
-    </div>
-
-    <p class="ia-summary">{{ analisisIa.resumen }}</p>
-
-    <div class="ia-alerts" *ngIf="analisisIa.alertas && analisisIa.alertas.length > 0">
-      <h4 class="subsection-title alerts-title">Alertas</h4>
-      <ul class="alerts-list">
-        <li *ngFor="let alerta of analisisIa.alertas">{{ alerta }}</li>
-      </ul>
-    </div>
     
-    <div class="ia-recommendations" *ngIf="analisisIa.recomendaciones && analisisIa.recomendaciones.length > 0">
-      <h4 class="subsection-title rec-title">Recomendaciones</h4>
-      <ul class="rec-list">
-        <li *ngFor="let rec of analisisIa.recomendaciones">{{ rec }}</li>
-      </ul>
-    </div>
+    @if (categoriasMasConsumidas && categoriasMasConsumidas.length > 0) {
+      <div class="categories-list">
+        @for (cat of categoriasMasConsumidas; track cat) {
+          <span class="category-tag">{{ cat }}</span>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        No hay suficientes datos de categorías para mostrar.
+      </div>
+    }
   </div>
 
-  <div class="empty-state" *ngIf="!analisisIa">
-    No hay un análisis disponible en este momento.
-  </div>
+  @if (analisisIa) {
+    <div class="analysis-section">
+      <div class="ia-header">
+        <h3 class="section-title">Análisis de IA</h3>
+        <span class="ia-model">Modelo: {{ analisisIa.modelo }}</span>
+      </div>
+
+      <p class="ia-summary">{{ analisisIa.resumen }}</p>
+
+      @if (analisisIa.alertas && analisisIa.alertas.length > 0) {
+        <div class="ia-alerts">
+          <h4 class="subsection-title alerts-title">Alertas</h4>
+          <ul class="alerts-list">
+            @for (alerta of analisisIa.alertas; track alerta) {
+              <li>{{ alerta }}</li>
+            }
+          </ul>
+        </div>
+      }
+      
+      @if (analisisIa.recomendaciones && analisisIa.recomendaciones.length > 0) {
+        <div class="ia-recommendations">
+          <h4 class="subsection-title rec-title">Recomendaciones</h4>
+          <ul class="rec-list">
+            @for (rec of analisisIa.recomendaciones; track rec) {
+              <li>{{ rec }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      No hay un análisis disponible en este momento.
+    </div>
+  }
 </div>
