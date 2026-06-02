@@ -10,9 +10,9 @@ import { LandingCtaButtonComponent } from './components/landing-cta-button/landi
 import { LandingPresenter } from './presenter/landing.presenter';
 
 const ROL_A_RUTA: Record<RolUsuario, string> = {
-  TUTOR: '/tutor',
+  PADRE: '/tutor',
   ALUMNO: '/alumno',
-  KIOSQUERO: '/kiosquero',
+  VENDEDOR: '/kiosquero',
 };
 
 @Component({
