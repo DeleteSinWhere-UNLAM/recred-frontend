@@ -28,7 +28,7 @@ describe('SugerenciasPage', () => {
   it('debería mostrar el título de sugerencias', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.textContent).toContain('Sugerencias IA');
+    expect(compiled.textContent).toContain('Sugerencias del día');
   });
 
   it('debería renderizar productos sugeridos', () => {

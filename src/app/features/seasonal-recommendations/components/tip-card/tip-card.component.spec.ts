@@ -23,6 +23,6 @@ describe('TipCardComponent', () => {
 
   it('debería mostrar el texto del tip promocional', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.tip-content p')?.textContent).toContain('Prueba de tip promocional');
+    expect(compiled.querySelector('.tip-card__texto')?.textContent).toContain('Prueba de tip promocional');
   });
 });
