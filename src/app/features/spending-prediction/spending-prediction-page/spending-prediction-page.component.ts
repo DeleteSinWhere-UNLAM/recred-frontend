@@ -5,6 +5,7 @@ import { SpendingPredictionService } from '../services/spending-prediction.servi
 import { SpendingPrediction } from '../models/spending-prediction.interface';
 import { PredictionSummaryComponent } from '../components/prediction-summary/prediction-summary.component';
 import { PredictionAnalysisComponent } from '../components/prediction-analysis/prediction-analysis.component';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 
 @Component({
   selector: 'app-spending-prediction-page',
@@ -16,6 +17,7 @@ import { PredictionAnalysisComponent } from '../components/prediction-analysis/p
 export class SpendingPredictionPageComponent implements OnInit {
   private readonly predictionService = inject(SpendingPredictionService);
   private readonly route = inject(ActivatedRoute);
+  private readonly perfilService = inject(PerfilService);
 
   predictionData: SpendingPrediction | null = null;
   isLoading = false;
@@ -23,8 +25,13 @@ export class SpendingPredictionPageComponent implements OnInit {
 
   ngOnInit(): void {
     const routeId = this.route.snapshot.paramMap.get('alumnoId');
-    const defaultId = '11111111-1111-1111-1111-111111111112';
-    const alumnoId = routeId || defaultId;
+    const perfilId = this.perfilService.getPerfil()?.id;
+    const alumnoId = routeId || perfilId;
+
+    if (!alumnoId) {
+      this.errorMessage = 'No se encontró un usuario en sesión para obtener la predicción.';
+      return;
+    }
 
     this.loadPrediction(alumnoId);
   }
