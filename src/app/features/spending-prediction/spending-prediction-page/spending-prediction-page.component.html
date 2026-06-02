@@ -1,0 +1,47 @@
+<main class="prediction-page">
+  <div class="prediction-container">
+    
+    <div class="header-section">
+      <h1 class="page-title">Predicción de Gastos</h1>
+      <p class="page-subtitle">Analiza tu comportamiento de consumo y proyecta tus próximos gastos</p>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Analizando tus consumos...</p>
+    </div>
+
+    <div class="error-state" *ngIf="errorMessage && !isLoading">
+      <div class="error-icon">!</div>
+      <p>{{ errorMessage }}</p>
+      <button class="retry-button" (click)="ngOnInit()">Reintentar</button>
+    </div>
+
+    <div class="content-grid" *ngIf="predictionData && !isLoading">
+      
+      <app-prediction-summary 
+        class="summary-wrapper"
+        [periodo]="predictionData.periodo"
+        [fechaCalculo]="predictionData.fechaCalculo"
+        [fechaInicio]="predictionData.fechaInicio"
+        [fechaFin]="predictionData.fechaFin"
+        [gastoActual]="predictionData.gastoActual"
+        [gastoPredicho]="predictionData.gastoPredicho"
+        [promedioGastoDiario]="predictionData.promedioGastoDiario"
+        [montoLimite]="predictionData.montoLimite"
+        [porcentajePresupuesto]="predictionData.porcentajePresupuesto"
+        [confianza]="predictionData.confianza"
+        [diasHistoricosUsados]="predictionData.diasHistoricosUsados"
+        [diasRestantes]="predictionData.diasRestantes">
+      </app-prediction-summary>
+
+      <app-prediction-analysis 
+        class="analysis-wrapper"
+        [analisisIa]="predictionData.analisisIa"
+        [categoriasMasConsumidas]="predictionData.categoriasMasConsumidas">
+      </app-prediction-analysis>
+
+    </div>
+
+  </div>
+</main>
