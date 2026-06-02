@@ -1,9 +1,4 @@
-export interface IaAnalysis {
-  resumen: string;
-  alertas: string[];
-  recomendaciones: string[];
-  modelo: string;
-}
+import { IaAnalysis } from './ia-analysis.interface';
 
 export interface SpendingPrediction {
   periodo: string;

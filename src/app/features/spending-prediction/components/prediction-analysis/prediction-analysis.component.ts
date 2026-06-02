@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IaAnalysis } from '../../models/spending-prediction.interface';
+import { IaAnalysis } from '../../models/ia-analysis.interface';
 
 @Component({
   selector: 'app-prediction-analysis',
