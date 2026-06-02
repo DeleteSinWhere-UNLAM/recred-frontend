@@ -1,14 +1,27 @@
 <section class="colegio-section" [attr.aria-label]="colegio.nombre">
-  <header class="colegio-section__header">
+  <button
+    type="button"
+    class="colegio-section__header"
+    [class.colegio-section__header--expandido]="expandido()"
+    [attr.aria-expanded]="expandido()"
+    [attr.aria-controls]="'colegio-' + colegio.id + '-alumnos'"
+    (click)="toggle()"
+  >
     <span class="colegio-section__icono" aria-hidden="true">
       <i class="fa-solid fa-school"></i>
     </span>
     <h2 class="colegio-section__nombre">{{ colegio.nombre }}</h2>
-  </header>
+    <span class="colegio-section__contador">{{ alumnos.length }}</span>
+    <span class="colegio-section__chevron" aria-hidden="true">
+      <i class="fa-solid fa-chevron-down"></i>
+    </span>
+  </button>
 
-  <div class="colegio-section__grid">
-    @for (alumno of alumnos; track alumno.id) {
-      <app-alumno-card [alumno]="alumno" />
-    }
-  </div>
+  @if (expandido()) {
+    <div class="colegio-section__grid" [id]="'colegio-' + colegio.id + '-alumnos'">
+      @for (alumno of alumnos; track alumno.id) {
+        <app-alumno-card [alumno]="alumno" />
+      }
+    </div>
+  }
 </section>

@@ -1,47 +1,67 @@
 <article class="alumno-card">
-  <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreCompleto">
-    <div class="alumno-card__avatar">
-      <span>{{ iniciales }}</span>
-    </div>
-    <div>
-      <a [routerLink]="['/presupuesto', alumno.id]" class="alumno-card__presupuesto-btn">
-        Ver presupuesto
-      </a>
-    </div>
-  </div>
-
-
-  <div class="alumno-card__body">
-    <header class="alumno-card__header">
-      <div class="alumno-card__identidad">
+  <header class="alumno-card__header">
+    <div class="alumno-card__identidad">
+      <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreCompleto">
+        <div class="alumno-card__avatar">
+          <span>{{ iniciales }}</span>
+        </div>
+      </div>
+      <div class="alumno-card__texto">
         <h3 class="alumno-card__nombre">{{ nombreCompleto }}</h3>
-        <p class="alumno-card__grado">{{ alumno.grado }}</p>
+        <p class="alumno-card__grado">
+          <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+          {{ alumno.grado }}
+        </p>
       </div>
-      <div class="alumno-card__saldo" [class.alumno-card__saldo--negativo]="saldoNegativo">
-        <span class="alumno-card__saldo-label">SALDO</span>
-        <span class="alumno-card__saldo-valor">{{ saldoFormateado }}</span>
-      </div>
-    </header>
-
-    <div class="alumno-card__acciones" role="group" aria-label="Acciones rápidas">
-      <button type="button" class="alumno-card__accion">
-        <i class="fa-solid fa-plus" aria-hidden="true"></i>
-        <span>Acreditar</span>
-      </button>
-      <button type="button" class="alumno-card__accion">
-        <i class="fa-solid fa-list" aria-hidden="true"></i>
-        <span>Movimientos</span>
-      </button>
-      <button type="button" class="alumno-card__accion">
-        <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-        <span>Pendientes</span>
-      </button>
-      <a class="alumno-card__accion" [routerLink]="['/restricciones', alumno.id]">
-        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-        <span>Restricciones</span>
-      </a>
     </div>
 
-    <a class="alumno-card__cta" [routerLink]="['/buffet', alumno.id]">Ir al Buffet</a>
+    <div class="alumno-card__saldo" [class.alumno-card__saldo--negativo]="saldoNegativo">
+      <span class="alumno-card__saldo-label">
+        <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+        Saldo
+      </span>
+      <span class="alumno-card__saldo-valor">{{ saldoFormateado }}</span>
+    </div>
+  </header>
+
+  <div class="alumno-card__acciones" role="group" aria-label="Acciones rápidas">
+    <button type="button" class="alumno-card__accion alumno-card__accion--menta">
+      <span class="alumno-card__accion-icono" aria-hidden="true">
+        <i class="fa-solid fa-plus"></i>
+      </span>
+      <span class="alumno-card__accion-label">Acreditar</span>
+    </button>
+    <a class="alumno-card__accion alumno-card__accion--melocoton" [routerLink]="['/restricciones', alumno.id]">
+      <span class="alumno-card__accion-icono" aria-hidden="true">
+        <i class="fa-solid fa-shield-halved"></i>
+      </span>
+      <span class="alumno-card__accion-label">Restricciones</span>
+    </a>
+    <a class="alumno-card__accion alumno-card__accion--dorado" [routerLink]="['/presupuesto', alumno.id]">
+      <span class="alumno-card__accion-icono" aria-hidden="true">
+        <i class="fa-solid fa-piggy-bank"></i>
+      </span>
+      <span class="alumno-card__accion-label">Presupuesto</span>
+    </a>
   </div>
+
+  <nav class="alumno-card__config" aria-label="Configuración">
+    <button type="button" class="alumno-card__config-link">
+      <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+      <span>Pendientes</span>
+    </button>
+    <button type="button" class="alumno-card__config-link">
+      <i class="fa-solid fa-list" aria-hidden="true"></i>
+      <span>Movimientos</span>
+    </button>
+    <a class="alumno-card__config-link" [routerLink]="['/prediccion-gasto', alumno.id]">
+      <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+      <span>Estadística</span>
+    </a>
+  </nav>
+
+  <a class="alumno-card__cta" [routerLink]="['/buffet', alumno.id]">
+    <i class="fa-solid fa-utensils" aria-hidden="true"></i>
+    Ir al Buffet
+  </a>
 </article>
