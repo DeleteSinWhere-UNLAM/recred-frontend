@@ -62,6 +62,5 @@ export class PerfilService {
 
   private guardarEnStorage(perfil: Perfil): void {
     localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
-    console.log('Perfil guardado en storage:', perfil);
   }
 }
