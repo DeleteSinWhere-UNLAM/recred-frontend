@@ -5,7 +5,10 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { NivelAlerta, PrediccionGasto } from '../../models/presupuesto.model';
+import {
+  NivelAlerta,
+  PrediccionGasto,
+} from '../../../presupuesto/models/presupuesto.model';
 
 const CIRCUMFERENCIA = 2 * Math.PI * 52;
 
@@ -63,9 +66,5 @@ export class PrediccionCardComponent {
       currency: 'ARS',
       maximumFractionDigits: 0,
     }).format(monto ?? 0);
-  }
-
-  confianzaPorcentaje(confianza: number | undefined): number {
-    return Math.round((confianza ?? 0) * 100);
   }
 }
