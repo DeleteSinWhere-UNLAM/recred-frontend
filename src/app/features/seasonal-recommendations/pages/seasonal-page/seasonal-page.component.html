@@ -1,19 +1,52 @@
-<div class="seasonal-page">
-  @if (isLoading) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Analizando el clima de tu zona y generando recomendaciones...</p>
-    </div>
-  } @else if (error) {
-    <div class="error-state">
-      <div class="error-icon">⚠️</div>
-      <p>{{ error }}</p>
-      <button (click)="loadRecommendations()">Reintentar</button>
-    </div>
-  } @else {
-    <app-seasonal-list 
-      [sugerencias]="sugerencias" 
-      [tipPromocional]="tipPromocional">
-    </app-seasonal-list>
-  }
-</div>
+<app-navbar />
+
+<main class="seasonal-page">
+  <button
+    type="button"
+    class="seasonal-page__volver"
+    (click)="volver()"
+  >
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
+
+  <div class="seasonal-page__container">
+    <header class="seasonal-page__cabecera">
+      <div class="seasonal-page__icono" aria-hidden="true">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+      <div class="seasonal-page__identidad">
+        <h2 class="seasonal-page__titulo">Recomendaciones estacionales</h2>
+        <p class="seasonal-page__subtitulo">
+          Basadas en tu ubicación y el clima del entorno escolar
+        </p>
+      </div>
+    </header>
+
+    @if (isLoading) {
+      <div class="seasonal-page__estado">
+        <div class="seasonal-page__spinner"></div>
+        <p>Analizando el clima de tu zona y generando recomendaciones...</p>
+      </div>
+    } @else if (error) {
+      <div class="seasonal-page__estado seasonal-page__estado--error">
+        <div class="seasonal-page__error-icono">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        </div>
+        <p>{{ error }}</p>
+        <button
+          type="button"
+          class="seasonal-page__reintentar"
+          (click)="loadRecommendations()"
+        >
+          Reintentar
+        </button>
+      </div>
+    } @else {
+      <app-seasonal-list
+        [sugerencias]="sugerencias"
+        [tipPromocional]="tipPromocional">
+      </app-seasonal-list>
+    }
+  </div>
+</main>

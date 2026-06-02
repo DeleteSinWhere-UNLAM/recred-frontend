@@ -1,21 +1,38 @@
 <app-navbar [userName]="nombreUsuario" />
 
 <main class="sugerencias">
+  <button
+    type="button"
+    class="sugerencias__volver"
+    (click)="volver()"
+  >
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
 
-  <h1 class="titulo">
-    Sugerencias IA
-  </h1>
+  <div class="sugerencias__container">
+    <header class="sugerencias__cabecera">
+      <div class="sugerencias__icono" aria-hidden="true">
+        <i class="fa-solid fa-robot"></i>
+      </div>
+      <div class="sugerencias__identidad">
+        <h2 class="sugerencias__titulo">Sugerencias del día</h2>
+        <p class="sugerencias__subtitulo">
+          Productos detectados según el consumo de hoy
+        </p>
+      </div>
+    </header>
 
-  <div class="lista-sugerencias">
-
-    @for (sugerencia of sugerencias; track sugerencia.productoOriginal) {
-
-      <app-sugerencia-card
-        [sugerencia]="sugerencia"
-      />
-
+    @if (sugerencias.length > 0) {
+      <div class="sugerencias__lista">
+        @for (sugerencia of sugerencias; track sugerencia.productoOriginal) {
+          <app-sugerencia-card [sugerencia]="sugerencia" />
+        }
+      </div>
+    } @else {
+      <p class="sugerencias__vacio">
+        Todavía no hay sugerencias disponibles para hoy.
+      </p>
     }
-
   </div>
-
 </main>
