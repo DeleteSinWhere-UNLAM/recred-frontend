@@ -6,11 +6,11 @@ export const environment = {
     region: 'us-east-2',
     oauth: {
       domain: 'us-east-2qzg5xbeuj.auth.us-east-2.amazoncognito.com',
-      redirectSignIn: 'http://localhost:4200',
-      redirectSignOut: 'http://localhost:4200',
+      redirectSignIn: 'https://localhost:4200',
+      redirectSignOut: 'https://localhost:4200',
       responseType: 'code' as const,
       scopes: ['openid', 'email', 'profile'] as const,
     },
   },
-  apiUrl: 'https://18-119-187-167.sslip.io/api/v1',
+  apiUrl: 'http://localhost/api/v1',
 };
