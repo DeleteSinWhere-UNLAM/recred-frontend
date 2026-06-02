@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { PrediccionCardComponent } from './components/prediccion-card/prediccion-card.component';
 import {
   CambioPorcentaje,
   ReglaCategoriaItemComponent,
@@ -16,7 +15,6 @@ import { PresupuestoPresenter } from './presenter/presupuesto.presenter';
   styleUrl: './presupuesto.page.css',
   imports: [
     NavbarComponent,
-    PrediccionCardComponent,
     ReglaCategoriaItemComponent,
   ],
   providers: [PresupuestoPresenter],
