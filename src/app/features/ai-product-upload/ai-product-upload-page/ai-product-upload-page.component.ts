@@ -1,9 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
 import { AiProductResponse } from '../models/ai-product-response.interface';
 import { SaveProductRequest } from '../models/save-product-request.interface';
 import { ProductService } from '../../updated-inventory/services/product.service';
 import { Category } from '../../updated-inventory/models/category.interface';
+import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { CameraCapture } from '../components/camera-capture/camera-capture';
 import { ScannerLoader } from '../components/scanner-loader/scanner-loader';
 import { AiProductForm } from '../components/ai-product-form/ai-product-form';
@@ -11,13 +14,15 @@ import { AiProductForm } from '../components/ai-product-form/ai-product-form';
 @Component({
     selector: 'app-ai-product-upload-page',
     standalone: true,
-    imports: [CameraCapture, ScannerLoader, AiProductForm],
+    imports: [NavbarComponent, CameraCapture, ScannerLoader, AiProductForm],
     templateUrl: './ai-product-upload-page.component.html',
     styleUrl: './ai-product-upload-page.component.css'
 })
 export class AiProductUploadPageComponent implements OnInit {
     private aiVisionService = inject(AiVisionService);
     private productService = inject(ProductService);
+    private router = inject(Router);
+    private usuarioService = inject(UsuarioService);
 
     categories: Category[] = [];
 
@@ -26,6 +31,14 @@ export class AiProductUploadPageComponent implements OnInit {
     scannedProductData: AiProductResponse | null = null;
     saveSuccess = false;
     saveError: string | null = null;
+
+    constructor() {
+        this.usuarioService.setHomeUrl('/kiosquero');
+    }
+
+    volver(): void {
+        this.router.navigateByUrl('/kiosquero');
+    }
 
     ngOnInit(): void {
         this.productService.getCategories().subscribe({

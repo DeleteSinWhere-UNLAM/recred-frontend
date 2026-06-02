@@ -1,40 +1,58 @@
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <h2>Inventario de Productos</h2>
-      <p class="page-header__subtitle">Gestiona el stock de tu kiosco</p>
-    </div>
-    <button class="add-btn" (click)="openCreateForm()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"/>
-        <line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      <span>Nuevo producto</span>
-    </button>
+<app-navbar />
+
+<main class="inventario">
+  <button
+    type="button"
+    class="inventario__volver"
+    (click)="volver()"
+  >
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
+
+  <div class="inventario__container">
+    <header class="inventario__cabecera">
+      <div class="inventario__icono" aria-hidden="true">
+        <i class="fa-solid fa-boxes-stacked"></i>
+      </div>
+      <div class="inventario__identidad">
+        <h2 class="inventario__titulo">Inventario</h2>
+        <p class="inventario__subtitulo">
+          Gestiona el stock de tu kiosco
+        </p>
+      </div>
+      <button
+        type="button"
+        class="inventario__nuevo"
+        (click)="openCreateForm()"
+      >
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        <span>Nuevo producto</span>
+      </button>
+    </header>
+
+    <app-product-table
+      [products]="products"
+      [isLoading]="isLoading"
+      (edit)="openEditForm($event)"
+      (remove)="requestDelete($event)">
+    </app-product-table>
+
+    @if (isFormVisible) {
+      <app-product-form
+        [product]="selectedProduct"
+        [categories]="categories"
+        [isSaving]="isSaving"
+        (formSubmit)="handleFormSubmit($event)"
+        (formCancel)="closeForm()">
+      </app-product-form>
+    }
+
+    <app-confirm-delete-modal
+      [isOpen]="deleteTarget !== null"
+      [productName]="deleteTarget?.nombre ?? ''"
+      (confirmed)="confirmDelete()"
+      (cancelled)="cancelDelete()">
+    </app-confirm-delete-modal>
   </div>
-
-  <app-product-table
-    [products]="products"
-    [isLoading]="isLoading"
-    (edit)="openEditForm($event)"
-    (remove)="requestDelete($event)">
-  </app-product-table>
-
-  @if (isFormVisible) {
-    <app-product-form
-      [product]="selectedProduct"
-      [categories]="categories"
-      [isSaving]="isSaving"
-      (formSubmit)="handleFormSubmit($event)"
-      (formCancel)="closeForm()">
-    </app-product-form>
-  }
-
-  <app-confirm-delete-modal
-    [isOpen]="deleteTarget !== null"
-    [productName]="deleteTarget?.nombre ?? ''"
-    (confirmed)="confirmDelete()"
-    (cancelled)="cancelDelete()">
-  </app-confirm-delete-modal>
-</div>
+</main>

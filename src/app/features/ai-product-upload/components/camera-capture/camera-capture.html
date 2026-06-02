@@ -1,16 +1,47 @@
-<div class="camera-container">
+<section class="camera-capture" aria-labelledby="camera-capture-titulo">
   <input
     type="file"
     accept="image/*"
     capture="environment"
     #fileInput
     (change)="onFileSelected($event)"
-    style="display: none;"
+    class="camera-capture__input"
   >
-  <button type="button" class="btn-camera" (click)="fileInput.click()">
-    📸 Tomar Foto del Producto
+
+  <h3 id="camera-capture-titulo" class="camera-capture__titulo">
+    Escaneo del producto
+  </h3>
+
+  <button
+    type="button"
+    class="camera-capture__viewport"
+    (click)="fileInput.click()"
+    aria-label="Tomar foto del producto"
+  >
+    <div class="camera-capture__marco" aria-hidden="true">
+      <div class="camera-capture__placeholder">
+        <i class="fa-solid fa-camera-retro camera-capture__placeholder-icono"></i>
+        <span class="camera-capture__placeholder-texto">Tocá para tomar una foto</span>
+      </div>
+
+      <div class="camera-capture__dashed"></div>
+      <div class="camera-capture__scan-line"></div>
+
+      <div class="camera-capture__badge">
+        <i
+          class="fa-solid fa-microchip"
+          [class.camera-capture__badge-icono--pulse]="isScanning"
+          aria-hidden="true"
+        ></i>
+        <span>{{ isScanning ? 'Analizando...' : 'Listo para escanear' }}</span>
+      </div>
+    </div>
   </button>
+
   @if (errorMessage) {
-    <p class="camera-error">{{ errorMessage }}</p>
+    <p class="camera-capture__error">
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      {{ errorMessage }}
+    </p>
   }
-</div>
+</section>

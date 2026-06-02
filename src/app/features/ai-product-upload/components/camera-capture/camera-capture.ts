@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE_MB = 10;
@@ -13,6 +13,7 @@ const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 })
 export class CameraCapture {
   @Output() photoTaken = new EventEmitter<File>();
+  @Input() isScanning = false;
 
   errorMessage: string | null = null;
 
