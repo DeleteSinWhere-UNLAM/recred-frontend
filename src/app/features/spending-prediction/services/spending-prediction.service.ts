@@ -9,9 +9,9 @@ import { environment } from '../../../../environments/environment';
 })
 export class SpendingPredictionService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/ia/alumnos';
 
   getPrediction(alumnoId: string): Observable<SpendingPrediction> {
-    return this.http.get<SpendingPrediction>(`${this.baseUrl}/${alumnoId}/prediccion-gasto`);
+    return this.http.get<SpendingPrediction>(`${environment.apiUrl}/${alumnoId}/prediccion-gasto`);
   }
 }
+
