@@ -9,16 +9,16 @@ import { CommonModule, DecimalPipe, PercentPipe, DatePipe } from '@angular/commo
   styleUrl: './prediction-summary.component.css'
 })
 export class PredictionSummaryComponent {
-  @Input() periodo: string = '';
-  @Input() fechaCalculo: string = '';
-  @Input() fechaInicio: string = '';
-  @Input() fechaFin: string = '';
-  @Input() gastoActual: number = 0;
-  @Input() gastoPredicho: number = 0;
-  @Input() promedioGastoDiario: number = 0;
+  @Input() periodo = '';
+  @Input() fechaCalculo = '';
+  @Input() fechaInicio = '';
+  @Input() fechaFin = '';
+  @Input() gastoActual = 0;
+  @Input() gastoPredicho = 0;
+  @Input() promedioGastoDiario = 0;
   @Input() montoLimite: number | null = null;
   @Input() porcentajePresupuesto: number | null = null;
-  @Input() confianza: number = 0;
-  @Input() diasHistoricosUsados: number = 0;
-  @Input() diasRestantes: number = 0;
+  @Input() confianza = 0;
+  @Input() diasHistoricosUsados = 0;
+  @Input() diasRestantes = 0;
 }
