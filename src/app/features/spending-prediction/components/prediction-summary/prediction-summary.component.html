@@ -1,0 +1,71 @@
+<div class="prediction-summary">
+  <div class="summary-header">
+    <h2 class="summary-title">Resumen del Periodo {{ periodo }}</h2>
+    <span class="summary-date">Calculado: {{ fechaCalculo | date:'dd/MM/yyyy' }}</span>
+  </div>
+
+  <div class="summary-dates">
+    <span>Inicio: {{ fechaInicio | date:'dd/MM/yyyy' }}</span>
+    <span>Fin: {{ fechaFin | date:'dd/MM/yyyy' }}</span>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <span class="card-label">Gasto Actual</span>
+      <span class="card-value">{{ gastoActual | number:'1.2-2' }} $</span>
+    </div>
+    
+    <div class="summary-card">
+      <span class="card-label">Gasto Predicho</span>
+      <span class="card-value">{{ gastoPredicho | number:'1.2-2' }} $</span>
+    </div>
+
+    <div class="summary-card">
+      <span class="card-label">Promedio Diario</span>
+      <span class="card-value">{{ promedioGastoDiario | number:'1.2-2' }} $</span>
+    </div>
+  </div>
+
+  @if (montoLimite !== null) {
+    <div class="summary-budget">
+      <div class="budget-info">
+        <span class="budget-label">Límite: {{ montoLimite | number:'1.2-2' }} $</span>
+        @if (porcentajePresupuesto !== null) {
+          <span class="budget-percent">
+            {{ porcentajePresupuesto | percent:'1.0-2' }}
+          </span>
+        } @else {
+          <span class="budget-percent">
+            0%
+          </span>
+        }
+      </div>
+      <div class="budget-bar-bg">
+        <div 
+          class="budget-bar-fill" 
+          [style.width]="(porcentajePresupuesto || 0) * 100 + '%'"
+          [class.danger]="(porcentajePresupuesto || 0) > 0.8"
+        ></div>
+      </div>
+    </div>
+  } @else {
+    <div class="summary-budget-empty">
+      <span>No hay un límite de presupuesto definido para este periodo.</span>
+    </div>
+  }
+
+  <div class="summary-footer">
+    <div class="footer-stat">
+      <span class="stat-value">{{ confianza | percent:'1.0-0' }}</span>
+      <span class="stat-label">Confianza</span>
+    </div>
+    <div class="footer-stat">
+      <span class="stat-value">{{ diasHistoricosUsados }}</span>
+      <span class="stat-label">Días Analizados</span>
+    </div>
+    <div class="footer-stat">
+      <span class="stat-value">{{ diasRestantes }}</span>
+      <span class="stat-label">Días Restantes</span>
+    </div>
+  </div>
+</div>
