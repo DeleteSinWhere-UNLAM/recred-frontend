@@ -3,6 +3,7 @@ import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ColegioSectionComponent } from './components/colegio-section/colegio-section.component';
@@ -21,10 +22,12 @@ interface GrupoColegio {
 })
 export class HomeTutorPage {
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly alumnosService = inject(AlumnosService);
 
-  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly nombreUsuario =
+    this.perfilService.getPerfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre;
   readonly grupos: GrupoColegio[] = this.armarGrupos();
 
   constructor() {

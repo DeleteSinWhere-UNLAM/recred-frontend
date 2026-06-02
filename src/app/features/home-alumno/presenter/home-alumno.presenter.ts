@@ -2,6 +2,7 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { HomeAlumnoService } from '../services/home-alumno.service';
 import { AccionRapida } from '../models/accion-rapida.model';
@@ -17,6 +18,7 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
 @Injectable()
 export class HomeAlumnoPresenter {
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
   private readonly router = inject(Router);
@@ -110,10 +112,14 @@ export class HomeAlumnoPresenter {
   ]);
 
   init(): void {
-    const alumno = this.usuarioService.getAlumnoActual();
+    const alumnoMock = this.usuarioService.getAlumnoActual();
+    const perfil = this.perfilService.getPerfil();
+    const alumno: Alumno = perfil
+      ? { ...alumnoMock, nombre: perfil.nombre, apellido: perfil.apellido }
+      : alumnoMock;
     this.alumnoState.set(alumno);
-    this.pedidoState.set(this.homeAlumnoService.getPedidoEnCurso(alumno.id));
-    this.recreoState.set(this.homeAlumnoService.getProximoRecreo(alumno.id));
+    this.pedidoState.set(this.homeAlumnoService.getPedidoEnCurso(alumnoMock.id));
+    this.recreoState.set(this.homeAlumnoService.getProximoRecreo(alumnoMock.id));
   }
 
   ejecutarAccion(accion: AccionRapida): void {
