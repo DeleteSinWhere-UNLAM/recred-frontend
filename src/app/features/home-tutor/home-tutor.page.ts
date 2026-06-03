@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
@@ -27,28 +27,52 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   imports: [NavbarComponent, ColegioSectionComponent, TutorHeaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomeTutorPage {
+export class HomeTutorPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly alumnosService = inject(AlumnosService);
 
   private readonly perfil = this.perfilService.getPerfil();
-  private readonly alumnos = this.alumnosService.getAlumnos();
+  private readonly alumnos = this.alumnosService.alumnos;
 
   readonly nombreUsuario = this.perfil?.nombre ?? this.usuarioService.getUsuarioActual().nombre;
   readonly nombreCompletoTutor = this.armarNombreCompleto();
   readonly inicialesTutor = this.armarIniciales();
-  readonly grupos: GrupoColegio[] = this.armarGrupos();
-  readonly cantidadHijos = this.alumnos.length;
-  readonly cantidadColegios = this.grupos.length;
-  readonly saldoTotal = this.alumnos.reduce((sum, a) => sum + a.saldo, 0);
-  readonly saldoTotalFormateado = formateadorSaldo.format(this.saldoTotal);
-  readonly saldoTotalNegativo = this.saldoTotal < 0;
+
+  readonly grupos = computed<GrupoColegio[]>(() => {
+    const alumnos = this.alumnos();
+    const colegios = this.colegiosService.getColegios();
+    const porColegio = new Map<string, GrupoColegio>();
+    for (const alumno of alumnos) {
+      const id = alumno.colegioId || 'sin-colegio';
+      let grupo = porColegio.get(id);
+      if (!grupo) {
+        const conocido = colegios.find((c) => c.id === id);
+        grupo = {
+          colegio: conocido ?? { id, nombre: 'Mi colegio' },
+          alumnos: [],
+        };
+        porColegio.set(id, grupo);
+      }
+      grupo.alumnos.push(alumno);
+    }
+    return Array.from(porColegio.values());
+  });
+
+  readonly cantidadHijos = computed(() => this.alumnos().length);
+  readonly cantidadColegios = computed(() => this.grupos().length);
+  readonly saldoTotal = computed(() => this.alumnos().reduce((sum, a) => sum + a.saldo, 0));
+  readonly saldoTotalFormateado = computed(() => formateadorSaldo.format(this.saldoTotal()));
+  readonly saldoTotalNegativo = computed(() => this.saldoTotal() < 0);
 
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
     this.usuarioService.setNombreNavbar(this.nombreUsuario);
+  }
+
+  ngOnInit(): void {
+    void this.alumnosService.asegurarCargados();
   }
 
   private armarNombreCompleto(): string {
@@ -63,15 +87,5 @@ export class HomeTutorPage {
     const apellido = this.perfil?.apellido ?? '';
     const ini = (nombre[0] ?? '') + (apellido[0] ?? '');
     return ini.toUpperCase();
-  }
-
-  private armarGrupos(): GrupoColegio[] {
-    return this.colegiosService
-      .getColegios()
-      .map((colegio) => ({
-        colegio,
-        alumnos: this.alumnos.filter((alumno) => alumno.colegioId === colegio.id),
-      }))
-      .filter((grupo) => grupo.alumnos.length > 0);
   }
 }

@@ -1,44 +1,87 @@
-<div class="landing">
-  <header class="landing__header">
-    <img
-      class="landing__logo"
-      src="logoHeader.png"
-      alt="Logo RECRED"
-    />
-    <span class="landing__marca">RECRED</span>
-  </header>
+@if (cargando()) {
+  <div class="dino-loader" role="status" aria-live="polite">
+    <div class="dino-loader__stage">
+      <svg
+        class="dino-loader__dino"
+        viewBox="0 0 22 24"
+        xmlns="http://www.w3.org/2000/svg"
+        shape-rendering="crispEdges"
+        aria-hidden="true"
+      >
+        <g fill="#535353">
+          <rect x="14" y="0" width="6" height="6" />
+          <rect x="20" y="2" width="1" height="2" />
+          <rect x="14" y="6" width="4" height="2" />
+          <rect x="6" y="8" width="12" height="7" />
+          <rect x="0" y="11" width="6" height="3" />
+          <rect x="13" y="12" width="2" height="1" />
+        </g>
+        <rect x="18" y="2" width="1" height="1" fill="#ffffff" />
+        <g class="dino-loader__legs dino-loader__legs--a" fill="#535353">
+          <rect x="7" y="15" width="2" height="5" />
+          <rect x="7" y="20" width="3" height="1" />
+          <rect x="13" y="15" width="2" height="3" />
+          <rect x="13" y="18" width="3" height="1" />
+        </g>
+        <g class="dino-loader__legs dino-loader__legs--b" fill="#535353">
+          <rect x="7" y="15" width="2" height="3" />
+          <rect x="7" y="18" width="3" height="1" />
+          <rect x="13" y="15" width="2" height="5" />
+          <rect x="13" y="20" width="3" height="1" />
+        </g>
+      </svg>
+      <div class="dino-loader__ground"></div>
+    </div>
+    <p class="dino-loader__texto">
+      Cargando<span class="dino-loader__puntos" aria-hidden="true"></span>
+    </p>
+    <span class="dino-loader__sr-only">Cargando tu perfil</span>
+  </div>
+} @else {
+  <div class="landing-container">
+    <div class="landing">
+    <header class="landing__header">
+      <img
+        class="landing__logo"
+        src="logoHeader.png"
+        alt="Logo RECRED"
+      />
+      <span class="landing__marca">RECRED</span>
+    </header>
 
-  <main class="landing__hero">
-    <section class="landing__contenido">
-      <h1 class="landing__titulo">
-        Menos filas,
-        <span class="landing__titulo-acento">más tiempo de recreo</span>
-      </h1>
+    <main class="landing__hero">
+      <section class="landing__contenido">
+        <h1 class="landing__titulo">
+          Menos filas,
+          <span class="landing__titulo-acento">más tiempo de recreo</span>
+        </h1>
 
-      <p class="landing__tagline">
-        Controlá restricciones, gestioná el presupuesto y comprá en el buffet
-        escolar desde casa. Tranquilidad para vos, recreo feliz para tus hijos.
-      </p>
+        <p class="landing__tagline">
+          Controlá restricciones, gestioná el presupuesto y comprá en el buffet
+          escolar desde casa. Tranquilidad para vos, recreo feliz para tus hijos.
+        </p>
 
-      <div class="landing__ctas">
-        @for (cta of presenter.ctas; track cta.ruta) {
-          <app-landing-cta-button
-            [cta]="cta"
-            (clicked)="onCtaClick()"
+        <div class="landing__ctas">
+          @for (cta of presenter.ctas; track cta.ruta) {
+            <app-landing-cta-button
+              [cta]="cta"
+              (clicked)="onCtaClick()"
+            />
+          }
+        </div>
+      </section>
+
+      <aside class="landing__media">
+        <div class="landing__media-frame">
+          <img
+            class="landing__media-img"
+            src="landing.png"
+            alt="Buffet escolar con frutas, sandwiches y bebidas saludables"
+            (error)="onImagenError($event)"
           />
-        }
-      </div>
-    </section>
-
-    <aside class="landing__media">
-      <div class="landing__media-frame">
-        <img
-          class="landing__media-img"
-          src="landing.png"
-          alt="Buffet escolar con frutas, sandwiches y bebidas saludables"
-          (error)="onImagenError($event)"
-        />
-      </div>
-    </aside>
-  </main>
-</div>
+        </div>
+      </aside>
+    </main>
+  </div>
+  </div>
+}

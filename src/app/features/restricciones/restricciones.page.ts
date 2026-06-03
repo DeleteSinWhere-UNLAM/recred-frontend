@@ -21,6 +21,6 @@ export class RestriccionesPage implements OnInit {
 
   ngOnInit(): void {
     const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
-    this.presenter.init(alumnoId);
+    void this.presenter.init(alumnoId);
   }
 }

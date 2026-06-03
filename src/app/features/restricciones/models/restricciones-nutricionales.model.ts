@@ -5,7 +5,6 @@ export type ClaveRestriccion =
   | 'vegano';
 
 export interface RestriccionesNutricionales {
-  alumnoId: string;
   sinTacc: boolean;
   sinAzucar: boolean;
   alergiaMani: boolean;
@@ -20,6 +19,7 @@ export interface DescriptorRestriccion {
   descripcion: string;
   icono: string;
   colorIcono: ColorIcono;
+  palabrasClave: readonly string[];
 }
 
 export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
@@ -29,6 +29,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
     descripcion: 'Bloquea productos con gluten.',
     icono: 'fa-wheat-awn-circle-exclamation',
     colorIcono: 'melocoton',
+    palabrasClave: ['tacc', 'gluten', 'celiac'],
   },
   {
     clave: 'sinAzucar',
@@ -36,6 +37,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
     descripcion: 'Perfil apto para diabéticos.',
     icono: 'fa-cubes-stacked',
     colorIcono: 'pizarra',
+    palabrasClave: ['azucar', 'diabet'],
   },
   {
     clave: 'alergiaMani',
@@ -43,6 +45,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
     descripcion: 'Bloquea snacks y trazas.',
     icono: 'fa-seedling',
     colorIcono: 'dorado',
+    palabrasClave: ['mani'],
   },
   {
     clave: 'vegano',
@@ -50,15 +53,22 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
     descripcion: 'Libre de productos animales.',
     icono: 'fa-leaf',
     colorIcono: 'menta',
+    palabrasClave: ['vegan'],
   },
 ] as const;
 
-export function restriccionesPorDefecto(alumnoId: string): RestriccionesNutricionales {
+export function restriccionesPorDefecto(): RestriccionesNutricionales {
   return {
-    alumnoId,
     sinTacc: false,
     sinAzucar: false,
     alergiaMani: false,
     vegano: false,
   };
+}
+
+export function normalizarDescripcion(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
 }

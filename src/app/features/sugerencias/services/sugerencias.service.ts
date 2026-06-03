@@ -1,39 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { SugerenciaProducto } from '../models/sugerencia-producto.model';
 
 @Injectable({ providedIn: 'root' })
 export class SugerenciasService {
-  private readonly sugerencias: SugerenciaProducto[] = [
-    {
-      productoOriginal: 'Gaseosa Cola 500ml',
+  private readonly http = inject(HttpClient);
 
-      resumen: 'Te sugiero una alternativa más saludable.',
+  private readonly baseUrl = 'https://18-119-187-167.sslip.io';
 
-      alertas: ['Producto con bajo rendimiento', 'Consumo elevado de azúcar'],
-
-      productosSugeridos: ['Jugo de Manzana 500ml', 'Agua mineral 500ml'],
-
-      motivoIA: 'Producto bloqueado por alto consumo de azúcar detectado',
-
-      modeloIA: 'gemini-2.5-flash',
-    },
-
-    {
-      productoOriginal: 'Chocolate',
-
-      resumen: 'Sugerencia de reemplazo más saludable',
-
-      alertas: ['Sustitución recomendada'],
-
-      productosSugeridos: ['Barra de cereal', 'Yogur con cereales'],
-
-      motivoIA: 'Sugerencia saludable por patrón de consumo',
-
-      modeloIA: 'gemini-2.5-flash',
-    },
-  ];
-
-  getSugerencias(): SugerenciaProducto[] {
-    return this.sugerencias;
+  getSugerencias(usuarioId: string): Observable<SugerenciaProducto[]> {
+    return this.http
+      .get<SugerenciaProducto>(
+        `${this.baseUrl}/ia/usuarios/${usuarioId}/sugerencia-cambio-producto`,
+      )
+      .pipe(map((response) => [response]));
   }
 }
