@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Observable, Subscription, catchError, finalize, of, switchMap } from 'rxjs';
+import { Observable, Subscription, catchError, finalize, of } from 'rxjs';
 import { RecomendacionesService } from '../../services/recomendaciones.service';
 import { Sugerencia } from '../../models/recomendacion.model';
 import { SeasonalListComponent } from '../../components/seasonal-list/seasonal-list.component';
@@ -38,7 +38,8 @@ export class SeasonalPageComponent implements OnInit, OnDestroy {
 
     // By-pass geolocation and use default coordinates since the service is hardcoded
     const sub = this.recomendacionesService.getSeasonalRecommendations(0, 0).pipe(
-      catchError(err => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      catchError(_err => {
         this.error = 'Ocurrió un error al conectar con el motor de recomendaciones.';
         return of(null);
       }),

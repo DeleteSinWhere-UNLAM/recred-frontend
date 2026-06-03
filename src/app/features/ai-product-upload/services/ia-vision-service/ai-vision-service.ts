@@ -14,7 +14,8 @@ export class AiVisionService {
   private readonly uploadUrl = `${this.baseUrl}/api/load-stock/upload-image`;
   private readonly saveUrl = `${this.baseUrl}/api/load-stock/save-product`;
 
-  analyzeImage(file: File): Observable<AiProductResponse> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  analyzeImage(_file: File): Observable<AiProductResponse> {
     // Hardcoded response for testing
     return of({
       nombre: 'Pepas Terepín',

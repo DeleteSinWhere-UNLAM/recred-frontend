@@ -62,7 +62,7 @@ export class HomeTutorPage implements OnInit {
 
   readonly cantidadHijos = computed(() => this.alumnos().length);
   readonly cantidadColegios = computed(() => this.grupos().length);
-  readonly saldoTotal = computed(() => this.alumnos().reduce((sum, a) => sum + a.saldo, 0));
+  readonly saldoTotal = computed(() => this.alumnos().reduce((sum: number, a: Alumno) => sum + a.saldo, 0));
   readonly saldoTotalFormateado = computed(() => formateadorSaldo.format(this.saldoTotal()));
   readonly saldoTotalNegativo = computed(() => this.saldoTotal() < 0);
 

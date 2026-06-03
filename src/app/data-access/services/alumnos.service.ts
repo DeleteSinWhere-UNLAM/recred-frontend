@@ -17,45 +17,89 @@ interface StudentDTO {
 
 @Injectable({ providedIn: 'root' })
 export class AlumnosService {
-  private readonly STORAGE_KEY = 'recred_alumnos_saldo';
+  private readonly http = inject(HttpClient);
+  private readonly perfilService = inject(PerfilService);
 
-  private readonly alumnos: Alumno[] = [
-    {
-      id: 'julian-garcia',
-      nombre: 'Rocio',
-      apellido: 'Nemeth',
-      grado: '4to Año A',
-      colegioId: 'instituto-san-jose',
-      saldo: 2580,
-    },
-    {
-      id: 'sofia-garcia',
-      nombre: 'Sofía',
-      apellido: 'García',
-      grado: '1er Año B',
-      colegioId: 'instituto-san-jose',
-      saldo: 1200,
-    },
-    {
-      id: 'mateo-garcia',
-      nombre: 'Mateo',
-      apellido: 'García',
-      grado: '6to Año C',
-      colegioId: 'colegio-santa-maria',
-      saldo: 800,
-    },
-  ];
+  private readonly alumnosState = signal<Alumno[]>([]);
+  readonly alumnos: Signal<Alumno[]> = this.alumnosState.asReadonly();
+  private cargaInFlight: Promise<Alumno[]> | null = null;
+
+  private readonly STORAGE_KEY = 'recred_alumnos_saldo';
 
   constructor() {
     this.cargarSaldos();
   }
 
+  async cargarHijosDelTutor(): Promise<Alumno[]> {
+    const dtos = await firstValueFrom(
+      this.http.get<StudentDTO[]>(`${environment.apiUrl}/tutores/572fd792-ba90-4574-aaeb-1e386d31376f/hijos`),
+    );
+    const alumnos = dtos.map((dto) => this.fromDto(dto));
+    this.aplicarSaldosGuardados(alumnos);
+    this.alumnosState.set(alumnos);
+    return alumnos;
+  }
+
+  asegurarCargados(): Promise<Alumno[]> {
+    if (this.alumnosState().length > 0) {
+      return Promise.resolve(this.alumnosState());
+    }
+    if (this.cargaInFlight) {
+      return this.cargaInFlight;
+    }
+    
+    // Validamos si hay perfil antes de cargar
+    const perfil = this.perfilService.getPerfil();
+    if (!perfil) {
+      // Si no hay perfil, podríamos retornar vacío o cargar igual si es un entorno de prueba
+    }
+
+    this.cargaInFlight = this.cargarHijosDelTutor().finally(() => {
+      this.cargaInFlight = null;
+    });
+    return this.cargaInFlight;
+  }
+
+  getAlumnos(): Alumno[] {
+    return this.alumnosState();
+  }
+
+  getAlumnoById(id: string): Alumno | undefined {
+    return this.alumnosState().find((alumno) => alumno.id === id);
+  }
+
+  descontarSaldo(alumnoId: string, monto: number): void {
+    const alumnos = this.alumnosState();
+    const index = alumnos.findIndex(a => a.id === alumnoId);
+    if (index !== -1) {
+      const nuevoAlumnos = [...alumnos];
+      nuevoAlumnos[index] = { ...nuevoAlumnos[index], saldo: nuevoAlumnos[index].saldo - monto };
+      this.alumnosState.set(nuevoAlumnos);
+      this.guardarSaldos(nuevoAlumnos);
+    }
+  }
+
+  private fromDto(dto: StudentDTO): Alumno {
+    return {
+      id: dto.id,
+      nombre: dto.nombre,
+      apellido: dto.apellido,
+      grado: dto.grado ?? '',
+      colegioId: dto.colegioId ?? '',
+      saldo: Number(dto.saldo ?? 0),
+    };
+  }
+
   private cargarSaldos(): void {
+    // Los saldos se aplicarán cuando se carguen los alumnos desde el servidor
+  }
+
+  private aplicarSaldosGuardados(alumnos: Alumno[]): void {
     const stored = localStorage.getItem(this.STORAGE_KEY);
     if (stored) {
       try {
         const saldos = JSON.parse(stored) as Record<string, number>;
-        this.alumnos.forEach((a) => {
+        alumnos.forEach((a) => {
           if (saldos[a.id] !== undefined) {
             a.saldo = saldos[a.id];
           }
@@ -66,27 +110,11 @@ export class AlumnosService {
     }
   }
 
-  private guardarSaldos(): void {
+  private guardarSaldos(alumnos: Alumno[]): void {
     const saldos: Record<string, number> = {};
-    this.alumnos.forEach((a) => {
+    alumnos.forEach((a) => {
       saldos[a.id] = a.saldo;
     });
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(saldos));
-  }
-
-  getAlumnos(): Alumno[] {
-    return this.alumnosState();
-  }
-
-  getAlumnoById(id: string): Alumno | undefined {
-    return this.alumnos.find((alumno) => alumno.id === id);
-  }
-
-  descontarSaldo(alumnoId: string, monto: number): void {
-    const alumno = this.getAlumnoById(alumnoId);
-    if (alumno) {
-      alumno.saldo -= monto;
-      this.guardarSaldos();
-    }
   }
 }

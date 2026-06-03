@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of, delay } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RecomendacionesResponse } from '../models/recomendacion.model';
@@ -11,7 +11,8 @@ export class RecomendacionesService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/recomendations/seasonal`;
 
-  getSeasonalRecommendations(lat: number, lng: number): Observable<RecomendacionesResponse> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getSeasonalRecommendations(_lat: number, _lng: number): Observable<RecomendacionesResponse> {
     // Hardcoded response for testing
     return of({
       "sugerencias": [
