@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { RECREO_LABELS } from '../../models/orden-compra.model';
@@ -37,7 +38,7 @@ export class ConfirmarPresenter {
   confirmar(): void {
     if (this.cargandoState() || this.vacia()) return;
     this.cargandoState.set(true);
-    this.compraService.simularPago().subscribe({
+    this.compraService.procesarPago().subscribe({
       next: (orden) => {
         for (const o of orden.ordenes) {
           this.carritoService.limpiarAlumno(o.alumno.id);
@@ -45,11 +46,33 @@ export class ConfirmarPresenter {
         this.cargandoState.set(false);
         this.router.navigateByUrl('/compra/exito');
       },
-      error: () => {
+      error: (err: unknown) => {
         this.cargandoState.set(false);
-        this.toastService.mostrar('No pudimos procesar el pago. Intentalo de nuevo.', 'error');
+        this.toastService.mostrar(this.mensajeError(err), 'error');
       },
     });
+  }
+
+  private mensajeError(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      const detalleBack =
+        typeof err.error === 'string'
+          ? err.error
+          : (err.error?.message ?? err.error?.error ?? '');
+      if (err.status === 400) {
+        return detalleBack || 'Saldo insuficiente o pedido inválido.';
+      }
+      if (err.status === 404) {
+        return detalleBack || 'No se encontró el alumno o el producto.';
+      }
+      if (err.status === 0) {
+        return 'No pudimos conectarnos con el servidor. Revisá tu conexión.';
+      }
+      if (detalleBack) {
+        return detalleBack;
+      }
+    }
+    return 'No pudimos procesar el pago. Intentalo de nuevo.';
   }
 
   cancelar(): void {
