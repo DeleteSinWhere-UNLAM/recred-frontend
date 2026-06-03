@@ -1,5 +1,4 @@
 import { Injectable, Signal, inject, signal } from '@angular/core';
-import { PerfilService } from '../../../data-access/services/perfil.service';
 import {
   CapacidadAsistente,
   SUGERENCIAS_CAPACIDADES,
@@ -9,10 +8,10 @@ import { MensajeAsistente } from '../models/mensaje-asistente.model';
 import { AsistenteVirtualService } from '../services/asistente-virtual.service';
 
 const MENSAJE_BIENVENIDA = '¡Hola! Soy Cred 🤖 ¿En qué te puedo ayudar?';
+const ALUMNO_ID_HARDCODEADO = 'demo';
 
 @Injectable()
 export class AsistenteVirtualPresenter {
-  private readonly perfilService = inject(PerfilService);
   private readonly asistenteService = inject(AsistenteVirtualService);
 
   private readonly abiertoState = signal(false);
@@ -56,12 +55,8 @@ export class AsistenteVirtualPresenter {
     this.enviandoState.set(true);
 
     try {
-      const perfil = this.perfilService.getPerfil();
-      if (!perfil) {
-        throw new Error('No hay perfil cargado: el alumno tiene que estar logueado para usar el asistente.');
-      }
       const respuesta = await this.asistenteService.enviarMensaje(
-        perfil.id,
+        ALUMNO_ID_HARDCODEADO,
         limpio,
         this.sesionIdState(),
       );

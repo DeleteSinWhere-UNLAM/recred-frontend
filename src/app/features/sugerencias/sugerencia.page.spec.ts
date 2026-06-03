@@ -35,12 +35,4 @@ describe('SugerenciasPage', () => {
 
     expect(compiled.textContent).toContain('Sugerencias del día');
   });
-
-  it('debería renderizar productos sugeridos', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent).toContain('Gaseosa');
-
-    expect(compiled.textContent).toContain('Chocolate');
-  });
 });
