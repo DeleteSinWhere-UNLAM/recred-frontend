@@ -27,14 +27,9 @@
     </header>
 
     <section class="presupuesto__panel" aria-labelledby="general-titulo">
-      <header class="presupuesto__panel-cabecera">
-        <h3 id="general-titulo" class="presupuesto__panel-titulo">
-          Presupuesto general
-        </h3>
-        <p class="presupuesto__panel-descripcion">
-          Definí el monto total y la frecuencia con la que se renueva.
-        </p>
-      </header>
+      <h3 id="general-titulo" class="presupuesto__panel-titulo">
+        Configuración general
+      </h3>
 
       <div class="presupuesto__grid">
         <label class="campo">
@@ -78,14 +73,9 @@
     </section>
 
     <section class="presupuesto__panel" aria-labelledby="reglas-titulo">
-      <header class="presupuesto__panel-cabecera">
-        <h3 id="reglas-titulo" class="presupuesto__panel-titulo">
-          Reglas por categoría
-        </h3>
-        <p class="presupuesto__panel-descripcion">
-          Limitá el porcentaje del presupuesto que puede gastarse en cada categoría.
-        </p>
-      </header>
+      <h3 id="reglas-titulo" class="presupuesto__panel-titulo">
+        Reglas por categoría
+      </h3>
 
       @if (presenter.reglas().length) {
         <ul class="presupuesto__reglas" role="list">
@@ -153,14 +143,5 @@
       Guardar presupuesto
     </button>
 
-    @if (presenter.presupuesto().activo) {
-      <button
-        type="button"
-        class="presupuesto__desactivar"
-        (click)="presenter.desactivar()"
-      >
-        Desactivar presupuesto
-      </button>
-    }
   </div>
 </main>

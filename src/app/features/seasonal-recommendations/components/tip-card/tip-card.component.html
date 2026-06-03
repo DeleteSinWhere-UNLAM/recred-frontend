@@ -1,7 +1,9 @@
-<div class="tip-card">
-  <div class="tip-icon">💡</div>
-  <div class="tip-content">
-    <h4>Tip Promocional</h4>
-    <p>{{ tipPromocional }}</p>
-  </div>
-</div>
+<section class="tip-card" aria-labelledby="tip-titulo">
+  <header class="tip-card__header">
+    <div class="tip-card__icono" aria-hidden="true">
+      <i class="fa-solid fa-lightbulb"></i>
+    </div>
+    <h3 id="tip-titulo" class="tip-card__titulo">Tip promocional</h3>
+  </header>
+  <p class="tip-card__texto">{{ tipPromocional }}</p>
+</section>

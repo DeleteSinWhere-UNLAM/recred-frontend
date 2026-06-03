@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AiProductUploadPageComponent } from './ai-product-upload-page.component';
 import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
 import { ProductService } from '../../updated-inventory/services/product.service';
@@ -31,7 +34,10 @@ describe('AiProductUploadPageComponent', () => {
       imports: [AiProductUploadPageComponent],
       providers: [
         { provide: AiVisionService, useValue: aiVisionServiceMock },
-        { provide: ProductService, useValue: productServiceMock }
+        { provide: ProductService, useValue: productServiceMock },
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ]
     }).compileComponents();
 

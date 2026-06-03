@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { UpdatedInventoryPageComponent } from './updated-inventory-page.component';
 import { ProductService } from '../services/product.service';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -51,7 +54,10 @@ describe('UpdatedInventoryPageComponent', () => {
       imports: [UpdatedInventoryPageComponent],
       providers: [
         { provide: ProductService, useValue: productServiceMock },
-        { provide: ToastService, useValue: toastServiceMock }
+        { provide: ToastService, useValue: toastServiceMock },
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ]
     })
       .compileComponents();

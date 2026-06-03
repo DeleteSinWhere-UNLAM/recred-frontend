@@ -1,79 +1,76 @@
 .recommendation-card {
-  border-radius: var(--radius-card);
-  padding: 1.5rem;
-  background: var(--color-superficie);
-  box-shadow: var(--shadow-neu-convex);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  position: relative;
-  overflow: hidden;
+  background-color: var(--color-fondo);
+  border-radius: 14px;
+  box-shadow: var(--shadow-neu-concave);
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
-.recommendation-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 100%;
-}
-
-.recommendation-card.aumentar::before { background-color: var(--color-menta); }
-.recommendation-card.reducir::before { background-color: var(--color-melocoton); }
-.recommendation-card.mantener::before { background-color: var(--color-dorado); }
-
-.recommendation-card:hover {
-  transform: translateY(-4px);
-}
-
-.card-header {
+.recommendation-card__header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1.25rem;
-  gap: 1rem;
+  gap: 10px;
 }
 
-.card-header h3 {
+.recommendation-card__titulo {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.15rem;
-  color: var(--color-pizarra);
+  font-size: 14px;
   font-weight: 700;
+  color: var(--color-pizarra);
   line-height: 1.3;
 }
 
-.badge {
-  padding: 0.4rem 0.8rem;
+.recommendation-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
-.badge.aumentar {
-  background: rgba(129, 178, 154, 0.15);
+.recommendation-card__badge--aumentar {
+  background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
   color: var(--color-menta);
 }
 
-.badge.reducir {
-  background: rgba(231, 111, 81, 0.15);
+.recommendation-card__badge--reducir {
+  background-color: color-mix(in srgb, var(--color-melocoton) 18%, var(--color-fondo));
   color: var(--color-melocoton);
 }
 
-.badge.mantener {
-  background: rgba(242, 183, 5, 0.15);
+.recommendation-card__badge--mantener {
+  background-color: color-mix(in srgb, var(--color-dorado) 18%, var(--color-fondo));
   color: var(--color-dorado-dark);
 }
 
-.motivo {
-  color: var(--color-texto-oscuro);
-  font-size: 0.95rem;
-  line-height: 1.6;
+.recommendation-card__motivo {
   margin: 0;
-  flex-grow: 1;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-texto-oscuro);
+}
+
+@media (max-width: 480px) {
+  .recommendation-card {
+    padding: 12px 14px;
+  }
+
+  .recommendation-card__titulo {
+    font-size: 13px;
+  }
+
+  .recommendation-card__motivo {
+    font-size: 12px;
+  }
 }

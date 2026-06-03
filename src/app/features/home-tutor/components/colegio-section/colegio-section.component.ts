@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { Colegio } from '../../../../data-access/models/colegio.model';
 import { AlumnoCardComponent } from '../alumno-card/alumno-card.component';
@@ -13,4 +13,10 @@ import { AlumnoCardComponent } from '../alumno-card/alumno-card.component';
 export class ColegioSectionComponent {
   @Input({ required: true }) colegio!: Colegio;
   @Input({ required: true }) alumnos!: Alumno[];
+
+  readonly expandido = signal(true);
+
+  toggle(): void {
+    this.expandido.update((v) => !v);
+  }
 }

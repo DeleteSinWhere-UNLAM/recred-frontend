@@ -1,8 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
 import { Category } from '../models/category.interface';
 import { ToastService } from '../../../shared/services/toast.service';
+import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
@@ -13,13 +16,23 @@ const HEALTH_CLASSIFICATION_IDS = ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'];
 @Component({
   selector: 'app-updated-inventory-page',
   standalone: true,
-  imports: [ProductTableComponent, ProductFormComponent, ConfirmDeleteModalComponent],
+  imports: [NavbarComponent, ProductTableComponent, ProductFormComponent, ConfirmDeleteModalComponent],
   templateUrl: './updated-inventory-page.component.html',
   styleUrl: './updated-inventory-page.component.css'
 })
 export class UpdatedInventoryPageComponent implements OnInit {
   private productService = inject(ProductService);
   private toastService = inject(ToastService);
+  private router = inject(Router);
+  private usuarioService = inject(UsuarioService);
+
+  constructor() {
+    this.usuarioService.setHomeUrl('/kiosquero');
+  }
+
+  volver(): void {
+    this.router.navigateByUrl('/kiosquero');
+  }
 
   products: Product[] = [];
   categories: Category[] = [];
