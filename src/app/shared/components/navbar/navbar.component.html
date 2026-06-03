@@ -34,6 +34,19 @@
         }
       </div>
 
+      @if (!esVistaKiosquero()) {
+        <button
+          type="button"
+          class="navbar__cart"
+          (click)="irAlCarrito()"
+          [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'"
+        >
+          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+          @if (cartCount() > 0) {
+            <span class="navbar__cart-badge">{{ cartCount() }}</span>
+          }
+        </button>
+      }
       <div class="navbar__perfil-wrap">
         <button
           type="button"
@@ -59,19 +72,6 @@
           </div>
         }
       </div>
-      @if (!esVistaKiosquero()) {
-        <button
-          type="button"
-          class="navbar__cart"
-          (click)="irAlCarrito()"
-          [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'"
-        >
-          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-          @if (cartCount() > 0) {
-            <span class="navbar__cart-badge">{{ cartCount() }}</span>
-          }
-        </button>
-      }
     </nav>
   </div>
 </header>

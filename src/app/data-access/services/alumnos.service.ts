@@ -6,8 +6,8 @@ export class AlumnosService {
   private readonly alumnos: Alumno[] = [
     {
       id: 'julian-garcia',
-      nombre: 'Julián',
-      apellido: 'García',
+      nombre: 'Rocio',
+      apellido: 'Nemeth',
       grado: '4to Año A',
       colegioId: 'instituto-san-jose',
       saldo: 2580,
