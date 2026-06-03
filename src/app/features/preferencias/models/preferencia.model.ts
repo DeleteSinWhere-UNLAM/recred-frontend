@@ -1,5 +1,6 @@
 export interface Preferencia {
-  producto: string;
-  score: number;
-  disponible: boolean;
+  titulo: string;
+  mensaje: string;
+  productoId: string;
+  razonIA: string;
 }

@@ -1,25 +1,18 @@
-<div class="card">
-
-  <h3 class="producto">
-    {{ preferencia.producto }}
-  </h3>
-
-  <p class="score">
-    Probabilidad: {{ preferencia.score }}%
-  </p>
-
-  @if (preferencia.disponible) {
-
-    <span class="estado disponible">
-      Disponible
+<article class="preferencia-card">
+  <header class="preferencia-card__cabecera">
+    <span class="preferencia-card__icono" aria-hidden="true">
+      <i class="fa-solid fa-bowl-food"></i>
     </span>
+    <h3 class="preferencia-card__titulo">{{ preferencia.titulo }}</h3>
+  </header>
 
-  } @else {
+  <p class="preferencia-card__mensaje">{{ preferencia.mensaje }}</p>
 
-    <span class="estado no-disponible">
-      No disponible
-    </span>
-
-  }
-
-</div>
+  <div class="preferencia-card__motivo-bloque">
+    <h4 class="preferencia-card__subtitulo">
+      <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+      Motivo
+    </h4>
+    <p class="preferencia-card__motivo">{{ preferencia.razonIA }}</p>
+  </div>
+</article>
