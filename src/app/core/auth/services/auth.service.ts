@@ -55,8 +55,8 @@ export class AuthService {
         if (session.tokens?.accessToken) {
           return true;
         }
-      } catch (e) {
-
+      } catch {
+        console.debug('Esperando resolución de sesión...');
       }
 
       if (i < maxIntentos - 1) {
