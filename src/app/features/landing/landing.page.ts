@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { RolUsuario } from '../../data-access/models/perfil.model';
@@ -29,9 +29,18 @@ export class LandingPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
 
+  // 1. Agregamos el estado de carga (arranca asumiendo que estamos cargando)
+  protected readonly cargando = signal<boolean>(true);
+
   async ngOnInit(): Promise<void> {
     const autenticado = await this.authService.isAutenticado();
-    if (!autenticado) return;
+    
+    // Si no está autenticado, cortamos la carga y mostramos la Landing
+    if (!autenticado) {
+      this.cargando.set(false);
+      return;
+    }
+
     try {
       const perfil = await this.perfilService.cargarPerfil();
       this.router.navigateByUrl(ROL_A_RUTA[perfil.rol]);
@@ -41,6 +50,8 @@ export class LandingPage implements OnInit {
         return;
       }
       console.error('Error cargando perfil tras login', err);
+      // Si hay un error grave, mostramos la Landing para que intente de nuevo
+      this.cargando.set(false); 
     }
   }
 

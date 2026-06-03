@@ -7,8 +7,8 @@ const isProduction = process.env.NODE_ENV === 'production' || process.argv.inclu
 
 // Siempre generamos environment.ts porque es el archivo base que busca el compilador.
 // En desarrollo, también generamos environment.development.ts para cumplir con angular.json
-const targetFiles = isProduction 
-  ? ['environment.ts'] 
+const targetFiles = isProduction
+  ? ['environment.ts']
   : ['environment.ts', 'environment.development.ts'];
 
 const environmentsDir = path.join(__dirname, `./src/environments`);
@@ -21,7 +21,15 @@ const requiredEnvs = [
   'COGNITO_DOMAIN',
   'REDIRECT_SIGN_IN',
   'REDIRECT_SIGN_OUT',
-  'API_URL'
+  'API_URL',
+  'FIREBASE_API_KEY',
+  'FIREBASE_AUTH_DOMAIN',
+  'FIREBASE_PROJECT_ID',
+  'FIREBASE_STORAGE_BUCKET',
+  'FIREBASE_MESSAGING_SENDER_ID',
+  'FIREBASE_APP_ID',
+  'FIREBASE_MEASUREMENT_ID',
+  'FIREBASE_VAPID_KEY'
 ];
 
 // Validar que todas existan
@@ -47,6 +55,15 @@ const envConfigFile = `export const environment = {
     },
   },
   apiUrl: '${process.env.API_URL}',
+  firebaseConfig: {
+    apiKey: "${process.env.FIREBASE_API_KEY}",
+    authDomain: "${process.env.FIREBASE_AUTH_DOMAIN}",
+    projectId: "${process.env.FIREBASE_PROJECT_ID}",
+    storageBucket: "${process.env.FIREBASE_STORAGE_BUCKET}",
+    messagingSenderId: "${process.env.FIREBASE_MESSAGING_SENDER_ID}",
+    appId: "${process.env.FIREBASE_APP_ID}",
+    vapidKey: "${process.env.FIREBASE_VAPID_KEY}"
+  }
 };
 `;
 
