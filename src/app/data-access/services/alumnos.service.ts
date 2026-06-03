@@ -3,6 +3,8 @@ import { Alumno } from '../models/alumno.model';
 
 @Injectable({ providedIn: 'root' })
 export class AlumnosService {
+  private readonly STORAGE_KEY = 'recred_alumnos_saldo';
+
   private readonly alumnos: Alumno[] = [
     {
       id: 'julian-garcia',
@@ -30,11 +32,47 @@ export class AlumnosService {
     },
   ];
 
+  constructor() {
+    this.cargarSaldos();
+  }
+
+  private cargarSaldos(): void {
+    const stored = localStorage.getItem(this.STORAGE_KEY);
+    if (stored) {
+      try {
+        const saldos = JSON.parse(stored) as Record<string, number>;
+        this.alumnos.forEach((a) => {
+          if (saldos[a.id] !== undefined) {
+            a.saldo = saldos[a.id];
+          }
+        });
+      } catch (e) {
+        console.error('Error al cargar saldos de localStorage', e);
+      }
+    }
+  }
+
+  private guardarSaldos(): void {
+    const saldos: Record<string, number> = {};
+    this.alumnos.forEach((a) => {
+      saldos[a.id] = a.saldo;
+    });
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(saldos));
+  }
+
   getAlumnos(): Alumno[] {
     return this.alumnos;
   }
 
   getAlumnoById(id: string): Alumno | undefined {
     return this.alumnos.find((alumno) => alumno.id === id);
+  }
+
+  descontarSaldo(alumnoId: string, monto: number): void {
+    const alumno = this.getAlumnoById(alumnoId);
+    if (alumno) {
+      alumno.saldo -= monto;
+      this.guardarSaldos();
+    }
   }
 }
