@@ -30,7 +30,7 @@ describe('RecommendationCardComponent', () => {
 
   it('debería mostrar la categoría y el motivo', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.card-header h3')?.textContent).toContain('Test Categoria');
-    expect(compiled.querySelector('.motivo')?.textContent).toContain('Test Motivo');
+    expect(compiled.querySelector('.recommendation-card__titulo')?.textContent).toContain('Test Categoria');
+    expect(compiled.querySelector('.recommendation-card__motivo')?.textContent).toContain('Test Motivo');
   });
 });

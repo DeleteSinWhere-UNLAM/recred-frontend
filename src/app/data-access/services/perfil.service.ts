@@ -22,20 +22,24 @@ export class PerfilService {
   readonly rol: Signal<RolUsuario | null> = computed(() => this.perfilState()?.rol ?? null);
 
   async cargarPerfil(): Promise<Perfil> {
-    await firstValueFrom(
-      this.http.post(`${environment.apiUrl}/usuarios/sync`, {}),
-    );
     try {
       const perfil = await firstValueFrom(
-        this.http.get<Perfil>(`${environment.apiUrl}/usuarios/me`),
+        this.http.post<Perfil>(`${environment.apiUrl}/usuarios/sync`, {})
       );
+
+      if (!perfil.rol || perfil.rol.toString() === 'PENDIENTE') {
+        throw new UsuarioSinPerfilError();
+      }
+
       this.perfilState.set(perfil);
       this.guardarEnStorage(perfil);
       return perfil;
+
     } catch (err) {
-      if (err instanceof HttpErrorResponse && err.status === 404) {
-        throw new UsuarioSinPerfilError();
+      if (err instanceof UsuarioSinPerfilError) {
+        throw err;
       }
+      console.error('Error al sincronizar el perfil:', err);
       throw err;
     }
   }

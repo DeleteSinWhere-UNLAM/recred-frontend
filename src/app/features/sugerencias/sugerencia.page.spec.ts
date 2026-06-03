@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 import { SugerenciasPage } from './sugerencias.page';
 
@@ -11,7 +12,11 @@ describe('SugerenciasPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SugerenciasPage],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SugerenciasPage);
@@ -28,7 +33,7 @@ describe('SugerenciasPage', () => {
   it('debería mostrar el título de sugerencias', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.textContent).toContain('Sugerencias IA');
+    expect(compiled.textContent).toContain('Sugerencias del día');
   });
 
   it('debería renderizar productos sugeridos', () => {

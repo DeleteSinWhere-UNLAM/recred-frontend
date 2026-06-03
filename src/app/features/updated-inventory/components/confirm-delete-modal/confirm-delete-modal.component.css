@@ -1,4 +1,4 @@
-.modal-overlay {
+.confirm-delete__overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -7,98 +7,141 @@
   justify-content: center;
   background-color: rgba(51, 65, 85, 0.6);
   backdrop-filter: blur(4px);
-  animation: overlayFadeIn 0.2s ease-out;
+  animation: confirm-delete-overlay-in 0.2s ease-out;
 }
 
-.modal-card {
-  background: var(--color-superficie);
-  border-radius: var(--radius-card);
-  padding: 2rem;
+.confirm-delete__card {
+  background-color: var(--color-fondo);
+  border-radius: 20px;
+  padding: 24px;
   width: 90%;
   max-width: 420px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    var(--shadow-neu-convex),
+    0 20px 60px rgba(0, 0, 0, 0.2);
   text-align: center;
-  animation: modalSlideUp 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: confirm-delete-slide-up 0.25s ease-out;
 }
 
-.modal-icon {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
+.confirm-delete__icono {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--color-melocoton) 18%, var(--color-fondo));
   color: var(--color-melocoton);
-}
-
-.modal-title {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--color-texto-oscuro);
-  margin-bottom: 0.75rem;
-}
-
-.modal-message {
-  font-size: 0.95rem;
-  color: var(--color-texto-claro);
-  line-height: 1.6;
-  margin-bottom: 1.75rem;
-}
-
-.modal-message strong {
-  color: var(--color-texto-oscuro);
-}
-
-.modal-actions {
   display: flex;
-  gap: 0.75rem;
+  align-items: center;
   justify-content: center;
+  font-size: 26px;
+  box-shadow: var(--shadow-neu-concave);
 }
 
-.modal-btn {
-  padding: 0.7rem 1.5rem;
-  border-radius: var(--radius-button);
+.confirm-delete__titulo {
+  margin: 0;
   font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-pizarra);
 }
 
-.modal-btn:active {
-  transform: scale(0.97);
-}
-
-.modal-btn--cancel {
-  background-color: var(--color-superficie-alt);
+.confirm-delete__mensaje {
+  margin: 0;
+  padding: 12px 14px;
+  background-color: var(--color-fondo);
+  border-radius: 12px;
+  box-shadow: var(--shadow-neu-concave);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--color-texto-oscuro);
+  width: 100%;
 }
 
-.modal-btn--cancel:hover {
-  background-color: #d1d8e3;
+.confirm-delete__mensaje strong {
+  color: var(--color-pizarra);
+  font-weight: 700;
 }
 
-.modal-btn--delete {
+.confirm-delete__acciones {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.confirm-delete__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.confirm-delete__btn:active {
+  transform: translateY(1px);
+}
+
+.confirm-delete__btn--cancel {
+  background-color: var(--color-fondo);
+  color: var(--color-pizarra);
+  box-shadow: var(--shadow-neu-convex);
+}
+
+.confirm-delete__btn--cancel:active {
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.confirm-delete__btn--delete {
   background-color: var(--color-melocoton);
-  color: white;
-  box-shadow: 0 4px 12px rgba(231, 111, 81, 0.3);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(231, 111, 81, 0.32);
 }
 
-.modal-btn--delete:hover {
-  background-color: #d45d3c;
+.confirm-delete__btn--delete:hover {
+  background-color: color-mix(in srgb, var(--color-melocoton) 85%, #000);
 }
 
-@keyframes overlayFadeIn {
+@keyframes confirm-delete-overlay-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes modalSlideUp {
+@keyframes confirm-delete-slide-up {
   from {
     opacity: 0;
-    transform: translateY(16px) scale(0.96);
+    transform: translateY(12px) scale(0.96);
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .confirm-delete__card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .confirm-delete__icono {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+
+  .confirm-delete__titulo {
+    font-size: 16px;
   }
 }

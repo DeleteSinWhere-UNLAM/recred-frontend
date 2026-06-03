@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SpendingPredictionService } from '../services/spending-prediction.service';
 import { SpendingPrediction } from '../models/spending-prediction.interface';
 import { PredictionSummaryComponent } from '../components/prediction-summary/prediction-summary.component';
@@ -10,7 +11,7 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 @Component({
   selector: 'app-spending-prediction-page',
   standalone: true,
-  imports: [CommonModule, PredictionSummaryComponent, PredictionAnalysisComponent],
+  imports: [CommonModule, NavbarComponent, PredictionSummaryComponent, PredictionAnalysisComponent],
   templateUrl: './spending-prediction-page.component.html',
   styleUrl: './spending-prediction-page.component.css'
 })
@@ -18,10 +19,15 @@ export class SpendingPredictionPageComponent implements OnInit {
   private readonly predictionService = inject(SpendingPredictionService);
   private readonly route = inject(ActivatedRoute);
   private readonly perfilService = inject(PerfilService);
+  private readonly router = inject(Router);
 
   predictionData: SpendingPrediction | null = null;
   isLoading = false;
   errorMessage: string | null = null;
+
+  volver(): void {
+    this.router.navigateByUrl('/tutor');
+  }
 
   ngOnInit(): void {
     const routeId = this.route.snapshot.paramMap.get('alumnoId');

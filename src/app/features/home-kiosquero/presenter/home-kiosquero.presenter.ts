@@ -70,7 +70,7 @@ export class HomeKiosqueroPresenter {
       titulo: 'Stock',
       descripcion: 'Inventario y reposición',
       icono: 'fa-boxes-stacked',
-      ruta: '/stock',
+      ruta: '/admin-productos',
       color: 'menta',
     },
     {

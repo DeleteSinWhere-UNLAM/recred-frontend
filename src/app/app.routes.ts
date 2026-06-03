@@ -103,5 +103,12 @@ export const routes: Routes = [
   {
     path: 'prediccion-gasto',
     loadChildren: () => import('./features/spending-prediction/spending-prediction.routes').then(m => m.SPENDING_PREDICTION_ROUTES)
+  },
+  {
+    path: 'estadistica/:alumnoId',
+    loadComponent: () =>
+      import('./features/estadistica/estadistica.page').then(
+        (m) => m.EstadisticaPage,
+      ),
   }
 ];

@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
@@ -23,9 +24,19 @@ export class SugerenciasPage {
   private readonly sugerenciasService =
     inject(SugerenciasService);
 
+  private readonly router = inject(Router);
+
   readonly nombreUsuario =
     this.usuarioService.getUsuarioActual().nombre;
 
   readonly sugerencias: SugerenciaProducto[] =
     this.sugerenciasService.getSugerencias();
+
+  constructor() {
+    this.usuarioService.setHomeUrl('/kiosquero');
+  }
+
+  volver(): void {
+    this.router.navigateByUrl('/kiosquero');
+  }
 }

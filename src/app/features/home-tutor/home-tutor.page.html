@@ -2,7 +2,16 @@
 
 <main class="home">
   <div class="home__container">
-    <h1 class="home__title">Mis Hijos</h1>
+    <app-tutor-header
+      [iniciales]="inicialesTutor"
+      [nombreCompleto]="nombreCompletoTutor"
+      [cantidadHijos]="cantidadHijos"
+      [cantidadColegios]="cantidadColegios"
+      [saldoTotalFormateado]="saldoTotalFormateado"
+      [saldoTotalNegativo]="saldoTotalNegativo"
+    />
+
+    <h2 class="home__subtitulo">Mis Hijos</h2>
 
     <div class="home__sections">
       @for (grupo of grupos; track grupo.colegio.id) {

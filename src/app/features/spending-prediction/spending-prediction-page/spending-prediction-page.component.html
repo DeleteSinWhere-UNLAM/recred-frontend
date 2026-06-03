@@ -1,51 +1,67 @@
+<app-navbar />
+
 <main class="prediction-page">
-  <div class="prediction-container">
-    
-    <div class="header-section">
-      <h1 class="page-title">Predicción de Gastos</h1>
-      <p class="page-subtitle">Analiza tu comportamiento de consumo y proyecta tus próximos gastos</p>
-    </div>
+  <button
+    type="button"
+    class="prediction-page__volver"
+    (click)="volver()"
+  >
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
+
+  <div class="prediction-page__container">
+    <header class="prediction-page__cabecera">
+      <div class="prediction-page__icono" aria-hidden="true">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+      <div class="prediction-page__identidad">
+        <h2 class="prediction-page__titulo">Predicción</h2>
+        <p class="prediction-page__subtitulo">
+          Comportamiento de consumo y proyección de gastos
+        </p>
+      </div>
+    </header>
 
     @if (isLoading) {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p>Analizando tus consumos...</p>
-      </div>
+      <section class="prediction-page__estado">
+        <div class="prediction-page__spinner" aria-hidden="true"></div>
+        <p>Analizando tus consumos…</p>
+      </section>
     }
 
     @if (errorMessage && !isLoading) {
-      <div class="error-state">
-        <div class="error-icon">!</div>
+      <section class="prediction-page__estado prediction-page__estado--error">
+        <div class="prediction-page__error-icono" aria-hidden="true">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
         <p>{{ errorMessage }}</p>
-        <button class="retry-button" (click)="ngOnInit()">Reintentar</button>
-      </div>
+        <button type="button" class="prediction-page__reintentar" (click)="ngOnInit()">
+          Reintentar
+        </button>
+      </section>
     }
 
     @if (predictionData && !isLoading) {
-      <div class="content-grid">
-        <app-prediction-summary 
-          class="summary-wrapper"
-          [periodo]="predictionData.periodo"
-          [fechaCalculo]="predictionData.fechaCalculo"
-          [fechaInicio]="predictionData.fechaInicio"
-          [fechaFin]="predictionData.fechaFin"
-          [gastoActual]="predictionData.gastoActual"
-          [gastoPredicho]="predictionData.gastoPredicho"
-          [promedioGastoDiario]="predictionData.promedioGastoDiario"
-          [montoLimite]="predictionData.montoLimite"
-          [porcentajePresupuesto]="predictionData.porcentajePresupuesto"
-          [confianza]="predictionData.confianza"
-          [diasHistoricosUsados]="predictionData.diasHistoricosUsados"
-          [diasRestantes]="predictionData.diasRestantes">
-        </app-prediction-summary>
+      <app-prediction-summary
+        [periodo]="predictionData.periodo"
+        [fechaCalculo]="predictionData.fechaCalculo"
+        [fechaInicio]="predictionData.fechaInicio"
+        [fechaFin]="predictionData.fechaFin"
+        [gastoActual]="predictionData.gastoActual"
+        [gastoPredicho]="predictionData.gastoPredicho"
+        [promedioGastoDiario]="predictionData.promedioGastoDiario"
+        [montoLimite]="predictionData.montoLimite"
+        [porcentajePresupuesto]="predictionData.porcentajePresupuesto"
+        [confianza]="predictionData.confianza"
+        [diasHistoricosUsados]="predictionData.diasHistoricosUsados"
+        [diasRestantes]="predictionData.diasRestantes">
+      </app-prediction-summary>
 
-        <app-prediction-analysis 
-          class="analysis-wrapper"
-          [analisisIa]="predictionData.analisisIa"
-          [categoriasMasConsumidas]="predictionData.categoriasMasConsumidas">
-        </app-prediction-analysis>
-      </div>
+      <app-prediction-analysis
+        [analisisIa]="predictionData.analisisIa"
+        [categoriasMasConsumidas]="predictionData.categoriasMasConsumidas">
+      </app-prediction-analysis>
     }
-
   </div>
 </main>
