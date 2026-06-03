@@ -9,10 +9,10 @@ export class SugerenciasService {
 
   private readonly baseUrl = 'https://18-119-187-167.sslip.io';
 
-  getSugerencias(_usuarioId: string): Observable<SugerenciaProducto[]> {
+  getSugerencias(usuarioId: string): Observable<SugerenciaProducto[]> {
     return this.http
       .get<SugerenciaProducto>(
-        `${this.baseUrl}/ia/usuarios/ba5d1b87-8602-42ea-a75d-30debf41f1da/sugerencia-cambio-producto`,
+        `${this.baseUrl}/ia/usuarios/${usuarioId}/sugerencia-cambio-producto`,
       )
       .pipe(map((response) => [response]));
   }

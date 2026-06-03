@@ -30,10 +30,18 @@ export class SugerenciasPage {
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
 
-    this.sugerenciasService.getSugerencias(this.usuarioId).subscribe((data) => {
-      this.sugerencias = data;
-      console.log('SUGERENCIAS:', data);
-    });
+    const perfilRaw = localStorage.getItem('recred.perfil');
+
+    const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
+
+    console.log('ID DESDE LOCALSTORAGE:', usuarioId);
+
+    if (usuarioId) {
+      this.sugerenciasService.getSugerencias(usuarioId).subscribe((data) => {
+        this.sugerencias = data;
+        console.log('SUGERENCIAS:', data);
+      });
+    }
   }
 
   volver(): void {
