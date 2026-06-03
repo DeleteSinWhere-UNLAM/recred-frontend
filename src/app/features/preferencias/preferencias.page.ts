@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Preferencia } from './models/preferencia.model';
 import { PreferenciasService } from './services/preferencias.service';
@@ -16,18 +17,21 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 export class PreferenciasPage {
   private readonly preferenciasService = inject(PreferenciasService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly router = inject(Router);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
   preferencias: Preferencia[] = [];
 
   constructor() {
-    const nombre = this.usuarioService.getUsuarioActual().nombre;
-    console.log(nombre);
+    this.usuarioService.setHomeUrl('/alumno');
 
     this.preferenciasService.getPreferencias().subscribe((data) => {
       this.preferencias = data;
-      console.log('PREFERENCIAS:', data);
     });
+  }
+
+  volver(): void {
+    this.router.navigateByUrl('/alumno');
   }
 }

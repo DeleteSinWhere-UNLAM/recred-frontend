@@ -1,15 +1,18 @@
-<div class="card">
-  <h3 class="producto">
-    {{ preferencia.titulo }}
-  </h3>
+<article class="preferencia-card">
+  <header class="preferencia-card__cabecera">
+    <span class="preferencia-card__icono" aria-hidden="true">
+      <i class="fa-solid fa-bowl-food"></i>
+    </span>
+    <h3 class="preferencia-card__titulo">{{ preferencia.titulo }}</h3>
+  </header>
 
-  <p class="mensaje">
-    {{ preferencia.mensaje }}
-  </p>
+  <p class="preferencia-card__mensaje">{{ preferencia.mensaje }}</p>
 
-  <p class="razon">
-    {{ preferencia.razonIA }}
-  </p>
-
-  <small class="id"> Producto ID: {{ preferencia.productoId }} </small>
-</div>
+  <div class="preferencia-card__motivo-bloque">
+    <h4 class="preferencia-card__subtitulo">
+      <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+      Motivo
+    </h4>
+    <p class="preferencia-card__motivo">{{ preferencia.razonIA }}</p>
+  </div>
+</article>
