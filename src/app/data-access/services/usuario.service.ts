@@ -1,18 +1,22 @@
-import { Injectable, Signal, computed, inject, signal } from '@angular/core';
+import { Injectable, Signal, computed, signal } from '@angular/core';
 import { Usuario } from '../models/usuario.model';
 import { Alumno } from '../models/alumno.model';
-import { AlumnosService } from './alumnos.service';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private readonly alumnosService = inject(AlumnosService);
-
   private readonly usuarioActual: Usuario = {
     id: 'usuario-1',
     nombre: 'Martín',
   };
 
-  private readonly alumnoActualId = 'julian-garcia';
+  private readonly alumnoActualMock: Alumno = {
+    id: 'julian-garcia',
+    nombre: 'Julián',
+    apellido: 'García',
+    grado: '4to Año A',
+    colegioId: 'instituto-san-jose',
+    saldo: 2580,
+  };
 
   private readonly homeUrlState = signal<string>('/tutor');
   readonly homeUrl: Signal<string> = this.homeUrlState.asReadonly();
@@ -27,11 +31,7 @@ export class UsuarioService {
   }
 
   getAlumnoActual(): Alumno {
-    const alumno = this.alumnosService.getAlumnoById(this.alumnoActualId);
-    if (!alumno) {
-      throw new Error(`Alumno actual "${this.alumnoActualId}" no existe en AlumnosService`);
-    }
-    return alumno;
+    return this.alumnoActualMock;
   }
 
   setHomeUrl(url: string): void {
