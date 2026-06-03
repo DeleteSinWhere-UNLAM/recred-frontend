@@ -36,19 +36,10 @@ export class SeasonalPageComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.error = null;
 
-    const sub = this.getCurrentPosition().pipe(
-      switchMap(position => {
-        return this.recomendacionesService.getSeasonalRecommendations(
-          position.coords.latitude,
-          position.coords.longitude
-        );
-      }),
+    // By-pass geolocation and use default coordinates since the service is hardcoded
+    const sub = this.recomendacionesService.getSeasonalRecommendations(0, 0).pipe(
       catchError(err => {
-        if (err instanceof GeolocationPositionError) {
-          this.error = 'No pudimos acceder a tu ubicación. Por favor, permite el acceso para ver recomendaciones.';
-        } else {
-          this.error = 'Ocurrió un error al conectar con el motor de recomendaciones.';
-        }
+        this.error = 'Ocurrió un error al conectar con el motor de recomendaciones.';
         return of(null);
       }),
       finalize(() => {

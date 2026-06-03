@@ -2,6 +2,7 @@ export interface AiProductResponse {
   nombre: string;
   descripcion: string;
   peso: string;
+  categoriaNombre?: string;
   contiene_azucar: boolean;
   contiene_mani: boolean;
   contiene_lactosa: boolean;

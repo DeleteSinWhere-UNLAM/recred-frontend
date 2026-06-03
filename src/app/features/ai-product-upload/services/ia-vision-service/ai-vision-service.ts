@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, delay } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 import { AiProductResponse } from '../../models/ai-product-response.interface';
 import { SaveProductRequest } from '../../models/save-product-request.interface';
 
@@ -9,13 +10,22 @@ import { SaveProductRequest } from '../../models/save-product-request.interface'
 })
 export class AiVisionService {
   private readonly http = inject(HttpClient);
-  private readonly uploadUrl = 'https://18-119-187-167.sslip.io/api/load-stock/upload-image';
-  private readonly saveUrl = 'https://18-119-187-167.sslip.io/api/load-stock/save-product';
+  private readonly baseUrl = environment.apiUrl.replace(/\/api\/v\d+\/?$/, '');
+  private readonly uploadUrl = `${this.baseUrl}/api/load-stock/upload-image`;
+  private readonly saveUrl = `${this.baseUrl}/api/load-stock/save-product`;
 
   analyzeImage(file: File): Observable<AiProductResponse> {
-    const formData = new FormData();
-    formData.append('image', file);
-    return this.http.post<AiProductResponse>(this.uploadUrl, formData);
+    // Hardcoded response for testing
+    return of({
+      nombre: 'Pepas Terepín',
+      descripcion: 'Pepas de membrillo',
+      peso: '0.200 kg',
+      categoriaNombre: 'Galletita',
+      contiene_azucar: true,
+      contiene_mani: false,
+      contiene_lactosa: false,
+      contiene_tacc: true,
+    }).pipe(delay(1500));
   }
 
   saveProduct(request: SaveProductRequest): Observable<unknown> {

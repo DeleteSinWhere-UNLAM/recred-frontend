@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, delay } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { RecomendacionesResponse } from '../models/recomendacion.model';
 
 @Injectable({
@@ -8,13 +9,29 @@ import { RecomendacionesResponse } from '../models/recomendacion.model';
 })
 export class RecomendacionesService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'https://18-119-187-167.sslip.io/api/v1/recomendations/seasonal';
+  private readonly apiUrl = `${environment.apiUrl}/recomendations/seasonal`;
 
   getSeasonalRecommendations(lat: number, lng: number): Observable<RecomendacionesResponse> {
-    const params = new HttpParams()
-      .set('latitude', lat.toString())
-      .set('longitude', lng.toString());
-
-    return this.http.get<RecomendacionesResponse>(this.apiUrl, { params });
+    // Hardcoded response for testing
+    return of({
+      "sugerencias": [
+        {
+          "categoria": "Bebidas Calientes",
+          "accion": "AUMENTAR",
+          "motivo": "El clima fresco y nublado incrementa la demanda de infusiones calientes en el recreo."
+        },
+        {
+          "categoria": "Panificados y Horneados",
+          "accion": "AUMENTAR",
+          "motivo": "Los productos horneados son altamente demandados como acompañamiento en días de bajas temperaturas."
+        },
+        {
+          "categoria": "Helados y Congelados",
+          "accion": "REDUCIR",
+          "motivo": "La baja temperatura ambiental disminuye drásticamente el consumo de productos congelados."
+        }
+      ],
+      "tip_promocional": "Ofrece un combo de leche chocolatada caliente con un alfajor o galletita horneada."
+    }).pipe(delay(1500));
   }
 }

@@ -35,10 +35,15 @@ export class AiProductForm implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['prefillData'] && this.prefillData) {
+      const categoryMatch = this.categories.find(
+        (c) => c.descripcion.toLowerCase() === this.prefillData?.categoriaNombre?.toLowerCase()
+      );
+
       this.productForm.patchValue({
         nombre: this.prefillData.nombre,
         descripcion: this.prefillData.descripcion,
         peso: this.parseWeight(this.prefillData.peso),
+        categoriaId: categoryMatch ? categoryMatch.id : null,
         contiene_azucar: this.prefillData.contiene_azucar,
         contiene_mani: this.prefillData.contiene_mani,
         contiene_lactosa: this.prefillData.contiene_lactosa,
