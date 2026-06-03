@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideMessaging(() => getMessaging()),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: true,
+      enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
     })
   ]

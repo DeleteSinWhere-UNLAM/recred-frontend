@@ -24,7 +24,7 @@ export class AlumnosService {
   readonly alumnos: Signal<Alumno[]> = this.alumnosState.asReadonly();
   private cargaInFlight: Promise<Alumno[]> | null = null;
 
-  async cargarHijosDelTutor(tutorId: string): Promise<Alumno[]> {
+  async cargarHijosDelTutor(): Promise<Alumno[]> {
     const dtos = await firstValueFrom(
       this.http.get<StudentDTO[]>(`${environment.apiUrl}/tutores/572fd792-ba90-4574-aaeb-1e386d31376f/hijos`),
     );
@@ -45,7 +45,7 @@ export class AlumnosService {
     if (!perfil) {
       return Promise.resolve([]);
     }
-    this.cargaInFlight = this.cargarHijosDelTutor(perfil.id).finally(() => {
+    this.cargaInFlight = this.cargarHijosDelTutor().finally(() => {
       this.cargaInFlight = null;
     });
     return this.cargaInFlight;

@@ -159,7 +159,7 @@ export class BuffetService {
   };
 
   getBuffetDelAlumno(colegioId: string): Buffet | undefined {
-    return this.buffetsPorColegio[colegioId];
+    return this.buffetsPorColegio[colegioId] ?? Object.values(this.buffetsPorColegio)[0];
   }
 
   getProductosDelBuffet(buffetId: string): Producto[] {
