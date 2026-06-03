@@ -1,6 +1,7 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { AccionKiosquero } from '../models/accion-kiosquero.model';
 import { ResumenKiosquero } from '../models/resumen-kiosquero.model';
@@ -15,6 +16,7 @@ const formateadorGanancias = new Intl.NumberFormat('es-AR', {
 @Injectable()
 export class HomeKiosqueroPresenter {
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
   private readonly homeKiosqueroService = inject(HomeKiosqueroService);
   private readonly router = inject(Router);
 
@@ -68,7 +70,7 @@ export class HomeKiosqueroPresenter {
       titulo: 'Stock',
       descripcion: 'Inventario y reposición',
       icono: 'fa-boxes-stacked',
-      ruta: '/stock',
+      ruta: '/admin-productos',
       color: 'menta',
     },
     {
@@ -91,7 +93,11 @@ export class HomeKiosqueroPresenter {
 
   init(): void {
     this.resumenState.set(this.homeKiosqueroService.getResumen());
-    this.nombreKiosqueroState.set(this.homeKiosqueroService.getNombreKiosquero());
+    const perfil = this.perfilService.getPerfil();
+    const nombre = perfil
+      ? `${perfil.nombre} ${perfil.apellido}`
+      : this.homeKiosqueroService.getNombreKiosquero();
+    this.nombreKiosqueroState.set(nombre);
   }
 
   ejecutarAccion(accion: AccionKiosquero): void {

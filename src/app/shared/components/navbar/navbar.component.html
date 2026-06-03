@@ -5,10 +5,6 @@
         <img src="logoHeader.png" alt="" class="navbar__logo-img">
         <span class="navbar__logo-text">RECRED</span>
       </a>
-      @if (!esVistaAlumno() && !esVistaKiosquero()) {
-        <span class="navbar__divider" aria-hidden="true"></span>
-        <span class="navbar__greeting">Hola, {{ userName }}</span>
-      }
     </div>
 
     <nav class="navbar__actions" aria-label="Acciones principales">

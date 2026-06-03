@@ -1,0 +1,30 @@
+<section class="tutor-header" [attr.aria-label]="'Perfil de ' + nombreCompleto">
+  <div class="tutor-header__avatar-wrap">
+    <div class="tutor-header__avatar">
+      <span>{{ iniciales }}</span>
+    </div>
+  </div>
+
+  <div class="tutor-header__info">
+    <p class="tutor-header__saludo">
+      <span class="tutor-header__saludo-mano" aria-hidden="true">👋</span>
+      ¡Hola,
+    </p>
+    <h1 class="tutor-header__nombre">{{ nombreCompleto }}!</h1>
+    <p class="tutor-header__subtitulo">
+      <i class="fa-solid fa-children" aria-hidden="true"></i>
+      <span>{{ resumenHijos }}</span>
+    </p>
+  </div>
+
+  <div
+    class="tutor-header__saldo"
+    [class.tutor-header__saldo--negativo]="saldoTotalNegativo"
+  >
+    <span class="tutor-header__saldo-label">
+      <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+      Saldo total
+    </span>
+    <span class="tutor-header__saldo-valor">{{ saldoTotalFormateado }}</span>
+  </div>
+</section>

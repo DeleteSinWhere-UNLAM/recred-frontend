@@ -216,10 +216,4 @@ export class PresupuestoService {
     console.info('[PresupuestoService] guardado', normalizado);
   }
 
-  desactivar(alumnoId: string): void {
-    const actual = this.presupuestos.get(alumnoId);
-    if (!actual) return;
-    this.presupuestos.set(alumnoId, { ...actual, activo: false });
-    console.info('[PresupuestoService] desactivado', alumnoId);
-  }
 }

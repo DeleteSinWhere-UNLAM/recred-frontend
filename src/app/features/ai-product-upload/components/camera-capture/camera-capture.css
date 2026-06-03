@@ -1,44 +1,183 @@
-.camera-container {
+.camera-capture {
+  background-color: var(--color-fondo);
+  border-radius: 20px;
+  box-shadow: var(--shadow-neu-convex);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.camera-capture__input {
+  display: none;
+}
+
+.camera-capture__titulo {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-pizarra);
+  margin: 0;
+}
+
+.camera-capture__viewport {
+  position: relative;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.camera-capture__marco {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: var(--color-fondo);
+  border-radius: 18px;
+  box-shadow: var(--shadow-neu-concave);
+  overflow: hidden;
+  transition: transform 0.15s ease;
+}
+
+.camera-capture__viewport:hover .camera-capture__marco {
+  transform: scale(1.005);
+}
+
+.camera-capture__viewport:active .camera-capture__marco {
+  transform: scale(0.99);
+}
+
+.camera-capture__placeholder {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 10px;
+  color: var(--color-texto-claro);
 }
 
-.btn-camera {
+.camera-capture__placeholder-icono {
+  font-size: 38px;
+  color: color-mix(in srgb, var(--color-pizarra) 35%, var(--color-fondo));
+}
+
+.camera-capture__placeholder-texto {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.camera-capture__dashed {
+  position: absolute;
+  inset: 16px;
+  border: 2px dashed color-mix(in srgb, var(--color-dorado) 70%, transparent);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.camera-capture__scan-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-dorado);
+  box-shadow:
+    0 0 10px var(--color-dorado),
+    0 0 20px var(--color-dorado);
+  animation: camera-capture-scan 3s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes camera-capture-scan {
+  0%   { top: 0; }
+  50%  { top: calc(100% - 3px); }
+  100% { top: 0; }
+}
+
+.camera-capture__badge {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 28px;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: var(--font-display);
-  color: #ffffff;
+  padding: 6px 14px;
   background-color: var(--color-pizarra);
-  border: none;
-  border-radius: var(--radius-button);
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-  box-shadow: var(--shadow-card);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(74, 111, 165, 0.32);
+  z-index: 3;
 }
 
-.btn-camera:hover {
-  background-color: var(--color-pizarra-dark);
-  box-shadow: 0 6px 16px rgba(74, 111, 165, 0.15);
+.camera-capture__badge-icono--pulse {
+  animation: camera-capture-pulse 1.2s ease-in-out infinite;
 }
 
-.btn-camera:active {
-  transform: scale(0.97);
+@keyframes camera-capture-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
 }
 
-.camera-error {
-  color: #dc2626;
-  font-size: 0.9rem;
-  font-weight: 500;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  padding: 10px 16px;
-  text-align: center;
-  max-width: 400px;
+.camera-capture__error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  background-color: color-mix(in srgb, var(--color-melocoton) 12%, var(--color-fondo));
+  color: var(--color-melocoton);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .camera-capture {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .camera-capture__placeholder-icono {
+    font-size: 32px;
+  }
+
+  .camera-capture__placeholder-texto {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .camera-capture {
+    padding: 14px;
+    border-radius: 16px;
+    gap: 10px;
+  }
+
+  .camera-capture__titulo {
+    font-size: 15px;
+  }
+
+  .camera-capture__marco {
+    aspect-ratio: 4 / 3;
+    border-radius: 14px;
+  }
+
+  .camera-capture__dashed {
+    inset: 10px;
+  }
 }

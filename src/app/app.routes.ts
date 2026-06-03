@@ -99,5 +99,16 @@ export const routes: Routes = [
   {
     path: 'admin-productos',
     loadChildren: () => import('./features/updated-inventory/updated-inventory.routes').then(m => m.updatedInventoryRoutes)
+  },
+  {
+    path: 'prediccion-gasto',
+    loadChildren: () => import('./features/spending-prediction/spending-prediction.routes').then(m => m.SPENDING_PREDICTION_ROUTES)
+  },
+  {
+    path: 'estadistica/:alumnoId',
+    loadComponent: () =>
+      import('./features/estadistica/estadistica.page').then(
+        (m) => m.EstadisticaPage,
+      ),
   }
 ];

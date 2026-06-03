@@ -169,14 +169,6 @@ export class PresupuestoPresenter {
     this.toastService.mostrar('Presupuesto guardado.', 'success');
   }
 
-  desactivar(): void {
-    const alumnoId = this.alumnoState()?.id;
-    if (!alumnoId) return;
-    this.presupuestoService.desactivar(alumnoId);
-    this.presupuestoState.update((actual) => ({ ...actual, activo: false }));
-    this.toastService.mostrar('Presupuesto desactivado.', 'info');
-  }
-
   volver(): void {
     this.router.navigateByUrl('/tutor');
   }

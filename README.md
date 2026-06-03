@@ -4,6 +4,14 @@ Este proyecto utiliza **GitHub Actions** como sistema de Integración Continua (
 
 Cada vez que se haga un *push* o un *Pull Request* a la rama Main o Develop, el código pasará por el pipeline automáticamente. Si este falla, el código no se desplegará.
 
+
+### Pruebas locales (Start)
+Asegura que la aplicación corre localmente y puede utilizar los endpoints del backend productivo
+
+```bash
+npm start
+```
+
 ---
 
 ## 🔐 Configuración de Seguridad Local (Obligatorio)

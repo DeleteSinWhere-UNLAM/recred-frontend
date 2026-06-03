@@ -1,28 +1,45 @@
 @if (isOpen) {
-  <div class="modal-overlay" tabindex="0" role="button" (click)="cancelled.emit()" (keydown.enter)="cancelled.emit()" (keydown.space)="cancelled.emit()">
-    <div class="modal-card" tabindex="-1" role="presentation" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
-      <div class="modal-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
+  <div
+    class="confirm-delete__overlay"
+    tabindex="0"
+    role="button"
+    (click)="cancelled.emit()"
+    (keydown.enter)="cancelled.emit()"
+    (keydown.space)="cancelled.emit()"
+  >
+    <div
+      class="confirm-delete__card"
+      tabindex="-1"
+      role="presentation"
+      (click)="$event.stopPropagation()"
+      (keydown.enter)="$event.stopPropagation()"
+    >
+      <div class="confirm-delete__icono" aria-hidden="true">
+        <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
 
-      <h2 class="modal-title">Confirmar eliminación</h2>
+      <h2 class="confirm-delete__titulo">Confirmar eliminación</h2>
 
-      <p class="modal-message">
-        ¿Estás seguro de que deseas eliminar
+      <p class="confirm-delete__mensaje">
+        ¿Estás seguro de que querés eliminar
         <strong>{{ productName }}</strong>?
         Esta acción no se puede deshacer.
       </p>
 
-      <div class="modal-actions">
-        <button class="modal-btn modal-btn--cancel" (click)="cancelled.emit()">
+      <div class="confirm-delete__acciones">
+        <button
+          type="button"
+          class="confirm-delete__btn confirm-delete__btn--cancel"
+          (click)="cancelled.emit()"
+        >
           Cancelar
         </button>
-        <button class="modal-btn modal-btn--delete" (click)="confirmed.emit()">
+        <button
+          type="button"
+          class="confirm-delete__btn confirm-delete__btn--delete"
+          (click)="confirmed.emit()"
+        >
+          <i class="fa-solid fa-trash" aria-hidden="true"></i>
           Eliminar
         </button>
       </div>

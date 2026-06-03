@@ -1,108 +1,113 @@
 @if (isLoading) {
-  <div class="table-loading">
-    <div class="table-spinner"></div>
+  <div class="product-table__estado">
+    <div class="product-table__spinner"></div>
     <p>Cargando productos...</p>
   </div>
 } @else if (products.length === 0) {
-  <div class="table-empty">
-    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-      <line x1="12" y1="22.08" x2="12" y2="12"/>
-    </svg>
-    <p class="table-empty__title">Sin productos</p>
-    <p class="table-empty__subtitle">Agrega tu primer producto con el botón de arriba.</p>
+  <div class="product-table__estado product-table__estado--vacio">
+    <div class="product-table__estado-icono" aria-hidden="true">
+      <i class="fa-solid fa-box-open"></i>
+    </div>
+    <p class="product-table__estado-titulo">Sin productos</p>
+    <p class="product-table__estado-subtitulo">Agregá tu primer producto con el botón de arriba.</p>
   </div>
 } @else {
-  <div class="table-wrapper">
-    <table class="product-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Categoría</th>
-          <th class="col-number">Precio</th>
-          <th class="col-number">Stock</th>
-          <th class="col-actions">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (product of products; track product.id) {
-          <tr>
-            <td>
-              <span class="product-name">{{ product.nombre }}</span>
-              <span class="product-desc">{{ product.descripcion }}</span>
-            </td>
-            <td>
-              <span class="category-badge">{{ product.categoriaNombre || '—' }}</span>
-            </td>
-            <td class="col-number">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</td>
-            <td class="col-number">
-              <span class="stock-badge" [class.stock-badge--low]="product.stockActual <= 5">
-                {{ product.stockActual }}
-              </span>
-            </td>
-            <td class="col-actions">
-              <div class="action-buttons">
-                <button class="action-btn action-btn--edit" (click)="edit.emit(product)" title="Editar">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                  <span>Editar</span>
-                </button>
-                <button class="action-btn action-btn--delete" (click)="remove.emit(product)" title="Eliminar">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                  </svg>
-                  <span>Eliminar</span>
-                </button>
-              </div>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+  <section class="product-table" aria-labelledby="tabla-productos-titulo">
+    <h3 id="tabla-productos-titulo" class="product-table__titulo">
+      Productos cargados
+    </h3>
 
-  <div class="card-list">
-    @for (product of products; track product.id) {
-      <div class="product-card">
-        <div class="product-card__header">
-          <div>
-            <span class="product-name">{{ product.nombre }}</span>
-            <span class="category-badge">{{ product.categoriaNombre || '—' }}</span>
-          </div>
-          <span class="stock-badge" [class.stock-badge--low]="product.stockActual <= 5">
-            {{ product.stockActual }} uds.
-          </span>
-        </div>
-        <p class="product-card__desc">{{ product.descripcion }}</p>
-        <div class="product-card__footer">
-          <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
-          <div class="action-buttons">
-            <button class="action-btn action-btn--edit" (click)="edit.emit(product)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-              <span>Editar</span>
-            </button>
-            <button class="action-btn action-btn--delete" (click)="remove.emit(product)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-              </svg>
-              <span>Eliminar</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    }
-  </div>
+    <div class="product-table__wrapper">
+      <table class="product-table__tabla">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th class="product-table__col-number">Precio</th>
+            <th class="product-table__col-number">Stock</th>
+            <th class="product-table__col-actions">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of products; track product.id) {
+            <tr>
+              <td>
+                <span class="product-table__nombre">{{ product.nombre }}</span>
+                <span class="product-table__desc">{{ product.descripcion }}</span>
+              </td>
+              <td>
+                <span class="product-table__categoria">{{ product.categoriaNombre || '—' }}</span>
+              </td>
+              <td class="product-table__col-number">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</td>
+              <td class="product-table__col-number">
+                <span class="product-table__stock" [class.product-table__stock--low]="product.stockActual <= 5">
+                  {{ product.stockActual }}
+                </span>
+              </td>
+              <td class="product-table__col-actions">
+                <div class="product-table__acciones">
+                  <button
+                    type="button"
+                    class="product-table__btn product-table__btn--edit"
+                    (click)="edit.emit(product)"
+                    aria-label="Editar producto"
+                  >
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    <span>Editar</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="product-table__btn product-table__btn--delete"
+                    (click)="remove.emit(product)"
+                    aria-label="Eliminar producto"
+                  >
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                    <span>Eliminar</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="product-table__cards">
+      @for (product of products; track product.id) {
+        <article class="product-table__card">
+          <header class="product-table__card-header">
+            <div class="product-table__card-info">
+              <span class="product-table__nombre">{{ product.nombre }}</span>
+              <span class="product-table__categoria">{{ product.categoriaNombre || '—' }}</span>
+            </div>
+            <span class="product-table__stock" [class.product-table__stock--low]="product.stockActual <= 5">
+              {{ product.stockActual }} uds.
+            </span>
+          </header>
+          <p class="product-table__card-desc">{{ product.descripcion }}</p>
+          <footer class="product-table__card-footer">
+            <span class="product-table__card-precio">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
+            <div class="product-table__acciones">
+              <button
+                type="button"
+                class="product-table__btn product-table__btn--edit"
+                (click)="edit.emit(product)"
+              >
+                <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                <span>Editar</span>
+              </button>
+              <button
+                type="button"
+                class="product-table__btn product-table__btn--delete"
+                (click)="remove.emit(product)"
+              >
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                <span>Eliminar</span>
+              </button>
+            </div>
+          </footer>
+        </article>
+      }
+    </div>
+  </section>
 }

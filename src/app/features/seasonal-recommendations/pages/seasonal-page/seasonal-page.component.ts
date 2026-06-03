@@ -1,20 +1,27 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Observable, Subscription, catchError, finalize, of, switchMap } from 'rxjs';
 import { RecomendacionesService } from '../../services/recomendaciones.service';
 import { Sugerencia } from '../../models/recomendacion.model';
 import { SeasonalListComponent } from '../../components/seasonal-list/seasonal-list.component';
+import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-seasonal-page',
   standalone: true,
-  imports: [CommonModule, SeasonalListComponent],
+  imports: [CommonModule, SeasonalListComponent, NavbarComponent],
   templateUrl: './seasonal-page.component.html',
   styleUrls: ['./seasonal-page.component.css']
 })
 export class SeasonalPageComponent implements OnInit, OnDestroy {
   private readonly recomendacionesService = inject(RecomendacionesService);
+  private readonly router = inject(Router);
   private subscription = new Subscription();
+
+  volver(): void {
+    this.router.navigateByUrl('/kiosquero');
+  }
 
   isLoading = false;
   error: string | null = null;
