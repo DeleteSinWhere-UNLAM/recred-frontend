@@ -29,13 +29,13 @@ export class LandingPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
 
-  // 1. Agregamos el estado de carga (arranca asumiendo que estamos cargando)
+
   protected readonly cargando = signal<boolean>(true);
 
   async ngOnInit(): Promise<void> {
-    const autenticado = await this.authService.isAutenticado();
-    
-    // Si no está autenticado, cortamos la carga y mostramos la Landing
+    const autenticado = await this.authService.esperarSesion();
+
+
     if (!autenticado) {
       this.cargando.set(false);
       return;
@@ -50,8 +50,8 @@ export class LandingPage implements OnInit {
         return;
       }
       console.error('Error cargando perfil tras login', err);
-      // Si hay un error grave, mostramos la Landing para que intente de nuevo
-      this.cargando.set(false); 
+
+      this.cargando.set(false);
     }
   }
 

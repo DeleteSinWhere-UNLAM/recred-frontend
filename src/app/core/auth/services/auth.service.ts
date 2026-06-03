@@ -13,9 +13,13 @@ export class AuthService {
   private readonly perfilService = inject(PerfilService);
 
   async login(): Promise<void> {
-    if (await this.isAutenticado()) {
-      await this.logout();
-      return;
+    try {
+      if (await this.isAutenticado()) {
+        await this.logout();
+        await new Promise(r => setTimeout(r, 300));
+      }
+    } catch (e) {
+      console.warn('Ignorando error al limpiar', e);
     }
     this.interceptarRedirectParaForzarIdioma('es');
     await signInWithRedirect();
@@ -23,16 +27,43 @@ export class AuthService {
 
   async logout(): Promise<void> {
     this.perfilService.limpiar();
-    await signOut();
+    try {
+      await signOut({ global: true });
+    } catch (err) {
+      console.error('Error durante el signOut', err);
+    }
   }
 
   async isAutenticado(): Promise<boolean> {
     try {
-      const session = await fetchAuthSession();
+      const session = await fetchAuthSession({ forceRefresh: true });
       return !!session.tokens?.accessToken;
     } catch {
       return false;
     }
+  }
+
+  async esperarSesion(): Promise<boolean> {
+
+    const isRedirect = window.location.search.includes('code=');
+    const maxIntentos = isRedirect ? 15 : 1;
+    const delayMs = 400;
+
+    for (let i = 0; i < maxIntentos; i++) {
+      try {
+        const session = await fetchAuthSession();
+        if (session.tokens?.accessToken) {
+          return true;
+        }
+      } catch {
+        console.debug('Esperando resolución de sesión...');
+      }
+
+      if (i < maxIntentos - 1) {
+        await new Promise(r => setTimeout(r, delayMs));
+      }
+    }
+    return false;
   }
 
   async getSub(): Promise<string | undefined> {
