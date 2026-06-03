@@ -1,12 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SpendingPredictionService } from '../services/spending-prediction.service';
 import { SpendingPrediction } from '../models/spending-prediction.interface';
 import { PredictionSummaryComponent } from '../components/prediction-summary/prediction-summary.component';
 import { PredictionAnalysisComponent } from '../components/prediction-analysis/prediction-analysis.component';
-import { PerfilService } from '../../../data-access/services/perfil.service';
 
 @Component({
   selector: 'app-spending-prediction-page',
@@ -17,8 +16,6 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 })
 export class SpendingPredictionPageComponent implements OnInit {
   private readonly predictionService = inject(SpendingPredictionService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
 
   predictionData: SpendingPrediction | null = null;
@@ -30,23 +27,18 @@ export class SpendingPredictionPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const routeId = this.route.snapshot.paramMap.get('alumnoId');
-    const perfilId = this.perfilService.getPerfil()?.id;
-    const alumnoId = routeId || perfilId;
-
-    if (!alumnoId) {
+    try {
+      this.loadPrediction();
+    } catch {
       this.errorMessage = 'No se encontró un usuario en sesión para obtener la predicción.';
-      return;
     }
-
-    this.loadPrediction(alumnoId);
   }
 
-  private loadPrediction(alumnoId: string): void {
+  private loadPrediction(): void {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.predictionService.getPrediction(alumnoId).subscribe({
+    this.predictionService.getPrediction().subscribe({
       next: (data) => {
         this.predictionData = data;
         this.isLoading = false;
