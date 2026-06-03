@@ -1,40 +1,72 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, Signal, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { Alumno } from '../models/alumno.model';
+import { PerfilService } from './perfil.service';
+
+interface StudentDTO {
+  readonly id: string;
+  readonly nombre: string;
+  readonly apellido: string;
+  readonly activo?: boolean;
+  readonly grado?: string | null;
+  readonly colegioId?: string | null;
+  readonly saldo?: number | string | null;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AlumnosService {
-  private readonly alumnos: Alumno[] = [
-    {
-      id: 'julian-garcia',
-      nombre: 'Julián',
-      apellido: 'García',
-      grado: '4to Año A',
-      colegioId: 'instituto-san-jose',
-      saldo: 2580,
-    },
-    {
-      id: 'sofia-garcia',
-      nombre: 'Sofía',
-      apellido: 'García',
-      grado: '1er Año B',
-      colegioId: 'instituto-san-jose',
-      saldo: 1200,
-    },
-    {
-      id: 'mateo-garcia',
-      nombre: 'Mateo',
-      apellido: 'García',
-      grado: '6to Año C',
-      colegioId: 'colegio-santa-maria',
-      saldo: 800,
-    },
-  ];
+  private readonly http = inject(HttpClient);
+  private readonly perfilService = inject(PerfilService);
+
+  private readonly alumnosState = signal<Alumno[]>([]);
+  readonly alumnos: Signal<Alumno[]> = this.alumnosState.asReadonly();
+  private cargaInFlight: Promise<Alumno[]> | null = null;
+
+  async cargarHijosDelTutor(tutorId: string): Promise<Alumno[]> {
+    const dtos = await firstValueFrom(
+      this.http.get<StudentDTO[]>(`${environment.apiUrl}/tutores/572fd792-ba90-4574-aaeb-1e386d31376f/hijos`),
+    );
+    const alumnos = dtos.map((dto) => this.fromDto(dto));
+    this.alumnosState.set(alumnos);
+    console.log('Alumnos cargados:', alumnos);
+    return alumnos;
+  }
+
+  asegurarCargados(): Promise<Alumno[]> {
+    if (this.alumnosState().length > 0) {
+      return Promise.resolve(this.alumnosState());
+    }
+    if (this.cargaInFlight) {
+      return this.cargaInFlight;
+    }
+    const perfil = this.perfilService.getPerfil();
+    if (!perfil) {
+      return Promise.resolve([]);
+    }
+    this.cargaInFlight = this.cargarHijosDelTutor(perfil.id).finally(() => {
+      this.cargaInFlight = null;
+    });
+    return this.cargaInFlight;
+  }
 
   getAlumnos(): Alumno[] {
-    return this.alumnos;
+    return this.alumnosState();
   }
 
   getAlumnoById(id: string): Alumno | undefined {
-    return this.alumnos.find((alumno) => alumno.id === id);
+    return this.alumnosState().find((alumno) => alumno.id === id);
+  }
+
+  private fromDto(dto: StudentDTO): Alumno {
+    return {
+      id: dto.id,
+      nombre: dto.nombre,
+      apellido: dto.apellido,
+      grado: dto.grado ?? '',
+      colegioId: dto.colegioId ?? '',
+      saldo: Number(dto.saldo ?? 0),
+    };
   }
 }
