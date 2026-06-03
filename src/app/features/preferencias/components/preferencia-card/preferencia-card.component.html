@@ -1,25 +1,15 @@
 <div class="card">
-
   <h3 class="producto">
-    {{ preferencia.producto }}
+    {{ preferencia.titulo }}
   </h3>
 
-  <p class="score">
-    Probabilidad: {{ preferencia.score }}%
+  <p class="mensaje">
+    {{ preferencia.mensaje }}
   </p>
 
-  @if (preferencia.disponible) {
+  <p class="razon">
+    {{ preferencia.razonIA }}
+  </p>
 
-    <span class="estado disponible">
-      Disponible
-    </span>
-
-  } @else {
-
-    <span class="estado no-disponible">
-      No disponible
-    </span>
-
-  }
-
+  <small class="id"> Producto ID: {{ preferencia.productoId }} </small>
 </div>

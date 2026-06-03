@@ -11,16 +11,23 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
   selector: 'app-preferencias-page',
   templateUrl: './preferencias.page.html',
   styleUrl: './preferencias.page.css',
-  imports: [NavbarComponent, PreferenciaCardComponent]
+  imports: [NavbarComponent, PreferenciaCardComponent],
 })
 export class PreferenciasPage {
-
   private readonly preferenciasService = inject(PreferenciasService);
   private readonly usuarioService = inject(UsuarioService);
 
-  readonly nombreUsuario =
-    this.usuarioService.getUsuarioActual().nombre;
+  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
-  readonly preferencias: Preferencia[] =
-    this.preferenciasService.getPreferencias();
+  preferencias: Preferencia[] = [];
+
+  constructor() {
+    const nombre = this.usuarioService.getUsuarioActual().nombre;
+    console.log(nombre);
+
+    this.preferenciasService.getPreferencias().subscribe((data) => {
+      this.preferencias = data;
+      console.log('PREFERENCIAS:', data);
+    });
+  }
 }

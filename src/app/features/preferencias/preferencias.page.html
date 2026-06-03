@@ -3,7 +3,7 @@
 <main class="preferencias">
   <h1>Preferencias de consumo</h1>
 
-  @for (p of preferencias; track p.producto) {
+  @for (p of preferencias; track p.productoId) {
     <app-preferencia-card [preferencia]="p" />
   }
 </main>
