@@ -24,7 +24,7 @@ export class PreferenciasPage {
   preferencias: Preferencia[] = [];
 
   constructor() {
-    this.usuarioService.setHomeUrl('/alumno');
+    this.usuarioService.setHomeUrl('/tutor');
 
     this.preferenciasService.getPreferencias().subscribe((data) => {
       this.preferencias = data;
@@ -32,6 +32,6 @@ export class PreferenciasPage {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/alumno');
+    this.router.navigateByUrl('/tutor');
   }
 }

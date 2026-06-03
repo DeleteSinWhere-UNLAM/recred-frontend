@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { RECREO_LABELS } from '../../models/orden-compra.model';
+import { AlumnosService } from '../../../../data-access/services/alumnos.service';
 import { CarritoService } from '../../services/carrito.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CompraService } from '../../services/compra.service';
@@ -9,6 +10,7 @@ import { CompraService } from '../../services/compra.service';
 export class ConfirmarPresenter {
   private readonly compraService = inject(CompraService);
   private readonly carritoService = inject(CarritoService);
+  private readonly alumnosService = inject(AlumnosService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -41,6 +43,7 @@ export class ConfirmarPresenter {
       next: (orden) => {
         for (const o of orden.ordenes) {
           this.carritoService.limpiarAlumno(o.alumno.id);
+          this.alumnosService.descontarSaldo(o.alumno.id, o.subtotal);
         }
         this.cargandoState.set(false);
         this.router.navigateByUrl('/compra/exito');

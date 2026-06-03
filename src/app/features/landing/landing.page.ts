@@ -29,28 +29,27 @@ export class LandingPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
 
-
-  protected readonly cargando = signal<boolean>(true);
+  protected readonly cargando = signal(true);
 
   async ngOnInit(): Promise<void> {
-    const autenticado = await this.authService.esperarSesion();
-
-
-    if (!autenticado) {
-      this.cargando.set(false);
-      return;
-    }
-
     try {
-      const perfil = await this.perfilService.cargarPerfil();
-      this.router.navigateByUrl(ROL_A_RUTA[perfil.rol]);
-    } catch (err) {
-      if (err instanceof UsuarioSinPerfilError) {
-        this.router.navigateByUrl('/seleccion-tipo-cuenta');
+      const autenticado = await this.authService.isAutenticado();
+      if (!autenticado) {
+        this.cargando.set(false);
         return;
       }
-      console.error('Error cargando perfil tras login', err);
-
+      try {
+        const perfil = await this.perfilService.cargarPerfil();
+        await this.router.navigateByUrl(ROL_A_RUTA[perfil.rol]);
+      } catch (err) {
+        if (err instanceof UsuarioSinPerfilError) {
+          await this.router.navigateByUrl('/seleccion-tipo-cuenta');
+          return;
+        }
+        console.error('Error cargando perfil tras login', err);
+        this.cargando.set(false);
+      }
+    } catch {
       this.cargando.set(false);
     }
   }
