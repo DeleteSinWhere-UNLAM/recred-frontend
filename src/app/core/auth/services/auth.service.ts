@@ -1,20 +1,20 @@
 import { Injectable, inject } from '@angular/core';
 import {
-  fetchAuthSession,
   fetchUserAttributes,
   signInWithRedirect,
   signOut,
 } from 'aws-amplify/auth';
 import { environment } from '../../../../environments/environment';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { AuthSessionService } from './auth-session.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly perfilService = inject(PerfilService);
+  private readonly authSessionService = inject(AuthSessionService);
 
   async login(): Promise<void> {
     if (await this.isAutenticado()) {
-      await this.logout();
       return;
     }
     this.interceptarRedirectParaForzarIdioma('es');
@@ -27,12 +27,12 @@ export class AuthService {
   }
 
   async isAutenticado(): Promise<boolean> {
-    try {
-      const session = await fetchAuthSession();
-      return !!session.tokens?.accessToken;
-    } catch {
-      return false;
-    }
+    return this.authSessionService.haySesionAutenticada();
+  }
+
+  async esperarAutenticacion(): Promise<boolean> {
+    const session = await this.authSessionService.esperarSesionAutenticada();
+    return !!session;
   }
 
   async getSub(): Promise<string | undefined> {

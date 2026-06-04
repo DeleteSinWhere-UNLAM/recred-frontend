@@ -1,11 +1,13 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { inject } from '@angular/core';
 import { from, switchMap } from 'rxjs';
+import { AuthSessionService } from '../services/auth-session.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  return from(fetchAuthSession()).pipe(
-    switchMap((session) => {
-      const token = session.tokens?.idToken?.toString();
+  const authSessionService = inject(AuthSessionService);
+
+  return from(authSessionService.obtenerIdTokenParaApi()).pipe(
+    switchMap((token) => {
       if (token) {
         const authReq = req.clone({
           setHeaders: { Authorization: `Bearer ${token}` },
