@@ -13,31 +13,49 @@ export class NotificationService {
     console.log('Solicitando permisos para notificaciones push...');
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
-        console.log('Permiso concedido. Obteniendo token FCM...');
-        runInInjectionContext(this.injector, () => {
-          getToken(this.messaging, { vapidKey: environment.firebaseConfig.vapidKey })
-            .then((fcmToken) => {
-              if (fcmToken) {
-                console.log('FCM Token obtenido. Enviando al backend...');
-                this.sendTokenToBackend(fcmToken);
-              } else {
-                console.log('No se pudo obtener el token de registro FCM.');
-              }
-            })
-            .catch((err) => console.error('Error al obtener FCM token:', err));
-        });
+        console.log('Permiso concedido. Procesando token FCM...');
+        this.handleTokenRegistration();
       } else {
-        console.log('Permiso denegado.');
+        console.log('Permiso denegado por el usuario.');
       }
     });
+    this.listenToForegroundMessages();
+  }
 
+  handleTokenRegistration() {
+    runInInjectionContext(this.injector, () => {
+      getToken(this.messaging, { vapidKey: environment.firebaseConfig.vapidKey })
+        .then((fcmToken) => {
+          if (fcmToken) {
+            const currentToken = localStorage.getItem('fcm_token');
+            if (currentToken !== fcmToken) {
+              console.log('Token FCM nuevo o rotado. Enviando al backend...');
+              this.sendTokenToBackend(fcmToken);
+              localStorage.setItem('fcm_token', fcmToken);
+            } else {
+              console.log('El Token FCM no ha cambiado, no es necesario llamar al backend.');
+            }
+          } else {
+            console.log('No se pudo obtener el token de registro FCM.');
+          }
+        })
+        .catch((err) => console.error('Error al obtener FCM token:', err));
+    });
+  }
+
+  private listenToForegroundMessages() {
     runInInjectionContext(this.injector, () => {
       onMessage(this.messaging, (payload) => {
         console.log('Mensaje recibido en primer plano:', payload);
-        // Aqui podrias mostrar un Toast local usando tu propio ToastService
+
+        const title = payload.notification?.title || 'Cambiar este formato';
+        const body = payload.notification?.body || 'Por algun componente personalizado';
+
+        alert(`🔴 ${title}\n${body}`);
       });
     });
   }
+
 
   private sendTokenToBackend(fcmToken: string) {
     this.http.post(`${environment.apiUrl}/dispositivos`, { fcmToken })
