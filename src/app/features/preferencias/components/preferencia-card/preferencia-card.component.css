@@ -1,16 +1,125 @@
-.card {
-  border: 1px solid #ddd;
+.preferencia-card {
+  background-color: var(--color-fondo);
+  border-radius: 20px;
+  box-shadow: var(--shadow-neu-convex);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preferencia-card__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.preferencia-card__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
+  color: var(--color-menta);
+  font-size: 16px;
+  box-shadow: var(--shadow-neu-concave);
+  flex-shrink: 0;
+}
+
+.preferencia-card__titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-pizarra);
+  line-height: 1.3;
+}
+
+.preferencia-card__mensaje {
+  margin: 0;
+  padding: 14px 16px;
+  background-color: var(--color-fondo);
+  border-radius: 14px;
+  box-shadow: var(--shadow-neu-concave);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-texto-oscuro);
+}
+
+.preferencia-card__motivo-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preferencia-card__subtitulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-pizarra);
+  margin: 0;
+}
+
+.preferencia-card__motivo {
+  margin: 0;
+  padding: 12px 14px;
+  background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-fondo));
+  color: var(--color-pizarra);
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.disponible {
-  color: green;
-  font-weight: bold;
+@media (max-width: 640px) {
+  .preferencia-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .preferencia-card__titulo {
+    font-size: 15px;
+  }
+
+  .preferencia-card__mensaje {
+    font-size: 13px;
+    padding: 12px 14px;
+  }
 }
 
-.no-disponible {
-  color: red;
-  font-weight: bold;
+@media (max-width: 480px) {
+  .preferencia-card {
+    padding: 14px;
+    border-radius: 16px;
+    gap: 10px;
+  }
+
+  .preferencia-card__icono {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  .preferencia-card__titulo {
+    font-size: 14px;
+  }
+
+  .preferencia-card__mensaje {
+    font-size: 12px;
+  }
+
+  .preferencia-card__motivo {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
 }

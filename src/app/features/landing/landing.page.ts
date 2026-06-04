@@ -70,6 +70,7 @@ export class LandingPage implements OnInit, OnDestroy {
       }
       console.error('Error cargando perfil tras login', err);
       this.redirigiendo = false;
+
       this.cargando.set(false);
     }
   }

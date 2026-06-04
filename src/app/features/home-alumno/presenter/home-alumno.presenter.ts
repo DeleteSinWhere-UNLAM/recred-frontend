@@ -109,6 +109,15 @@ export class HomeAlumnoPresenter {
       color: 'mandarina',
       ruta: '/compra',
     },
+    {
+      id: 'preferencias',
+      label: 'Mis preferencias',
+      descripcion: 'Lo que más te gusta',
+      icono: 'fa-heart',
+      emoji: '❤️',
+      color: 'melocoton',
+      ruta: '/preferencias',
+    },
   ]);
 
   init(): void {
