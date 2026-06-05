@@ -6,6 +6,7 @@ import { ColegiosService } from '../../data-access/services/colegios.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { AsistenteVirtualComponent } from '../asistente-virtual/asistente-virtual.component';
 import { ColegioSectionComponent } from './components/colegio-section/colegio-section.component';
 import { TutorHeaderComponent } from './components/tutor-header/tutor-header.component';
 
@@ -24,7 +25,12 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   selector: 'app-home-tutor-page',
   templateUrl: './home-tutor.page.html',
   styleUrl: './home-tutor.page.css',
-  imports: [NavbarComponent, ColegioSectionComponent, TutorHeaderComponent],
+  imports: [
+    NavbarComponent,
+    ColegioSectionComponent,
+    TutorHeaderComponent,
+    AsistenteVirtualComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeTutorPage implements OnInit {

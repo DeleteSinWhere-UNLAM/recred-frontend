@@ -89,6 +89,27 @@ export class PerfilService {
     );
   }
 
+  obtenerAlumnoId(): string | null {
+    const perfil = this.perfilState();
+    if (!perfil) return null;
+
+    const candidatos = [
+      perfil.alumnoId,
+      perfil.alumno?.id,
+      perfil.alumnoEntity?.id,
+      perfil.studentId,
+      perfil.student?.id,
+      perfil.id,
+    ];
+
+    return (
+      candidatos.find(
+        (valor): valor is string =>
+          typeof valor === 'string' && valor.trim().length > 0,
+      ) ?? null
+    );
+  }
+
   limpiar(): void {
     this.perfilState.set(null);
     localStorage.removeItem(PERFIL_STORAGE_KEY);

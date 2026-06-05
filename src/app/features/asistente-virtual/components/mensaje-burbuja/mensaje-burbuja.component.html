@@ -1,9 +1,9 @@
 <div
   class="mensaje-burbuja"
-  [class.mensaje-burbuja--alumno]="esAlumno"
-  [class.mensaje-burbuja--cred]="!esAlumno"
+  [class.mensaje-burbuja--usuario]="esUsuario"
+  [class.mensaje-burbuja--cred]="!esUsuario"
 >
-  @if (!esAlumno) {
+  @if (!esUsuario) {
     <div class="mensaje-burbuja__avatar" aria-hidden="true">🤖</div>
   }
   <div class="mensaje-burbuja__contenido">
