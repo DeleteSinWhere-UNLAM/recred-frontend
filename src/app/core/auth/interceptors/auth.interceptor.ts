@@ -7,7 +7,7 @@ import { AuthSessionService } from '../services/auth-session.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authSessionService = inject(AuthSessionService);
 
-  const esApiPropia = req.url.startsWith(environment.apiUrl);
+  const esApiPropia = esUrlDeApiPropia(req.url);
 
   if (!esApiPropia) {
     return next(req);
@@ -63,3 +63,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     }),
   );
 };
+
+function esUrlDeApiPropia(url: string): boolean {
+  try {
+    const requestUrl = new URL(url, window.location.origin);
+    const apiUrl = new URL(environment.apiUrl, window.location.origin);
+
+    return requestUrl.origin === apiUrl.origin;
+  } catch {
+    return url.startsWith(environment.apiUrl);
+  }
+}
