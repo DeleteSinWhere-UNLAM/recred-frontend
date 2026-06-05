@@ -11,14 +11,14 @@
 }
 
 .confirm-delete__card {
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 20px;
   padding: 24px;
   width: 90%;
   max-width: 420px;
   box-shadow:
-    var(--shadow-neu-convex),
-    0 20px 60px rgba(0, 0, 0, 0.2);
+    var(--shadow-elevated);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@
   align-items: center;
   justify-content: center;
   font-size: 26px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: inset 0 0 0 1px rgba(231, 111, 81, 0.16);
 }
 
 .confirm-delete__titulo {
@@ -51,9 +51,10 @@
 .confirm-delete__mensaje {
   margin: 0;
   padding: 12px 14px;
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
   border-radius: 12px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
   font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.5;
@@ -94,9 +95,10 @@
 }
 
 .confirm-delete__btn--cancel {
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   color: var(--color-pizarra);
-  box-shadow: var(--shadow-neu-convex);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
 }
 
 .confirm-delete__btn--cancel:active {

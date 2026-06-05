@@ -14,9 +14,14 @@
 
       <div class="buffet__titulo-bloque">
         <h2 class="buffet__titulo">Menú del Buffet</h2>
-        @if (presenter.buffet(); as buffet) {
-          <p class="buffet__buffet-nombre">{{ buffet.nombre }}</p>
-        }
+        <div class="buffet__titulo-meta">
+          @if (presenter.buffet(); as buffet) {
+            <p class="buffet__buffet-nombre">{{ buffet.nombre }}</p>
+          }
+          <span class="buffet__productos-count">
+            {{ presenter.productosFiltrados().length }} productos
+          </span>
+        </div>
       </div>
 
       @if (presenter.alumno(); as alumno) {
@@ -110,7 +115,8 @@
         class="buffet__limpiar"
         (click)="presenter.limpiarFiltros()"
       >
-        Limpiar
+        <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+        <span>Limpiar</span>
       </button>
     </section>
 

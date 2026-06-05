@@ -4,6 +4,13 @@ import { App } from './app/app';
 import { appConfig } from './app/app.config';
 import { environment } from './environments/environment';
 
+function parseRedirectUrls(value: string): string[] {
+  return value
+    .split(',')
+    .map((url) => url.trim())
+    .filter((url) => url.length > 0);
+}
+
 Amplify.configure({
   Auth: {
     Cognito: {
@@ -13,8 +20,8 @@ Amplify.configure({
         oauth: {
           domain: environment.cognito.oauth.domain,
           scopes: [...environment.cognito.oauth.scopes],
-          redirectSignIn: [environment.cognito.oauth.redirectSignIn],
-          redirectSignOut: [environment.cognito.oauth.redirectSignOut],
+          redirectSignIn: parseRedirectUrls(environment.cognito.oauth.redirectSignIn),
+          redirectSignOut: parseRedirectUrls(environment.cognito.oauth.redirectSignOut),
           responseType: environment.cognito.oauth.responseType,
         },
       },

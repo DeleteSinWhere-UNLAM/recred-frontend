@@ -6,6 +6,7 @@ import { SaveProductRequest } from '../models/save-product-request.interface';
 import { ProductService } from '../../updated-inventory/services/product.service';
 import { Category } from '../../updated-inventory/models/category.interface';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { CameraCapture } from '../components/camera-capture/camera-capture';
 import { ScannerLoader } from '../components/scanner-loader/scanner-loader';
@@ -23,8 +24,10 @@ export class AiProductUploadPageComponent implements OnInit {
     private productService = inject(ProductService);
     private router = inject(Router);
     private usuarioService = inject(UsuarioService);
+    private perfilService = inject(PerfilService);
 
     categories: Category[] = [];
+    buffetId = '';
 
     isLoading = false;
     isSaving = false;
@@ -41,6 +44,8 @@ export class AiProductUploadPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.actualizarBuffetId();
+
         this.productService.getCategories().subscribe({
             next: (data) => {
                 this.categories = data;
@@ -71,11 +76,19 @@ export class AiProductUploadPageComponent implements OnInit {
     }
 
     saveProduct(request: SaveProductRequest) {
+        const buffetId = this.actualizarBuffetId();
+        if (!buffetId) {
+            this.isSaving = false;
+            this.saveSuccess = false;
+            this.saveError = 'No se encontro un buffet asociado a tu perfil.';
+            return;
+        }
+
         this.isSaving = true;
         this.saveSuccess = false;
         this.saveError = null;
 
-        this.aiVisionService.saveProduct(request).subscribe({
+        this.aiVisionService.saveProduct({ ...request, buffetId }).subscribe({
             next: () => {
                 this.isSaving = false;
                 this.saveSuccess = true;
@@ -87,5 +100,10 @@ export class AiProductUploadPageComponent implements OnInit {
                 this.saveError = 'Hubo un error al guardar el producto. Intenta nuevamente.';
             }
         });
+    }
+
+    private actualizarBuffetId(): string {
+        this.buffetId = this.perfilService.obtenerBuffetId() ?? '';
+        return this.buffetId;
     }
 }

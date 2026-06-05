@@ -5,10 +5,10 @@
   align-items: center;
   gap: 18px;
   width: 100%;
-  min-height: 130px;
+  min-height: 118px;
   padding: 22px 24px;
-  border: none;
-  border-radius: 26px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-card);
   cursor: pointer;
   font-family: var(--font-display);
   text-align: left;
@@ -21,15 +21,13 @@
 }
 
 .accion-tile:hover {
-  transform: translateY(-4px) rotate(-1deg);
-  filter: brightness(1.05);
-  box-shadow:
-    0 14px 28px rgba(74, 111, 165, 0.2),
-    0 6px 10px rgba(74, 111, 165, 0.08);
+  transform: translateY(-3px);
+  filter: brightness(1.02);
+  box-shadow: var(--shadow-elevated);
 }
 
 .accion-tile:nth-child(even):hover {
-  transform: translateY(-4px) rotate(1deg);
+  transform: translateY(-3px);
 }
 
 .accion-tile:hover .accion-tile__flecha {
@@ -37,7 +35,7 @@
 }
 
 .accion-tile:hover .accion-tile__sticker {
-  transform: rotate(15deg) scale(1.12);
+  transform: rotate(8deg) scale(1.06);
 }
 
 .accion-tile:active {
@@ -55,7 +53,7 @@
   right: -10px;
   font-size: 80px;
   line-height: 1;
-  opacity: 0.18;
+  opacity: 0.1;
   transform: rotate(8deg);
   pointer-events: none;
   transition: transform 0.25s ease;
@@ -64,11 +62,11 @@
 .accion-tile__icono {
   width: 64px;
   height: 64px;
-  border-radius: 50%;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.2);
   font-size: 28px;
   flex-shrink: 0;
 }
@@ -83,7 +81,7 @@
 .accion-tile__label {
   font-size: 19px;
   font-weight: 800;
-  letter-spacing: 0.3px;
+  letter-spacing: 0;
   line-height: 1.1;
 }
 
@@ -102,7 +100,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.28);
+  background-color: rgba(255, 255, 255, 0.24);
   font-size: 14px;
   transition: transform 0.2s ease;
   flex-shrink: 0;
@@ -141,7 +139,7 @@
 
 .accion-tile--dorado .accion-tile__icono,
 .accion-tile--dorado .accion-tile__flecha {
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: rgba(51, 65, 85, 0.13);
 }
 
 .accion-tile--melocoton {
@@ -156,10 +154,10 @@
 
 @media (min-width: 768px) {
   .accion-tile {
-    min-height: 160px;
-    padding: 28px 30px;
+    min-height: 140px;
+    padding: 26px 28px;
     gap: 22px;
-    border-radius: 30px;
+    border-radius: 20px;
   }
 
   .accion-tile__icono {

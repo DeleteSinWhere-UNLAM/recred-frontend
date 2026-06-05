@@ -17,11 +17,11 @@
   width: 100%;
   max-width: 560px;
   max-height: calc(100vh - 48px);
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 20px;
   box-shadow:
-    var(--shadow-neu-convex),
-    0 20px 60px rgba(0, 0, 0, 0.2);
+    var(--shadow-elevated);
   animation: product-form-slide-in 0.25s ease-out;
   overflow-y: auto;
 }
@@ -31,8 +31,9 @@
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
-  background-color: var(--color-fondo);
-  box-shadow: var(--shadow-neu-convex);
+  background-color: var(--color-superficie);
+  border-bottom: 1px solid var(--color-borde);
+  box-shadow: none;
   position: sticky;
   top: 0;
   z-index: 1;
@@ -48,7 +49,7 @@
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: inset 0 0 0 1px rgba(129, 178, 154, 0.16);
   flex-shrink: 0;
 }
 
@@ -78,11 +79,12 @@
   height: 36px;
   border-radius: 12px;
   border: none;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   color: var(--color-texto-claro);
   font-size: 15px;
   cursor: pointer;
-  box-shadow: var(--shadow-neu-convex);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
   transition: transform 0.1s ease, box-shadow 0.15s ease, color 0.15s ease;
   display: flex;
   align-items: center;
@@ -134,13 +136,13 @@
 
 .product-form__input {
   padding: 10px 14px;
-  border: none;
+  border: 1px solid var(--color-borde);
   border-radius: 12px;
   font-size: 14px;
   font-family: var(--font-body);
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   color: var(--color-texto-oscuro);
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
   width: 100%;
   transition: box-shadow 0.15s ease;
 }
@@ -152,8 +154,8 @@
 .product-form__input:focus {
   outline: none;
   box-shadow:
-    var(--shadow-neu-concave),
-    0 0 0 2px color-mix(in srgb, var(--color-pizarra) 40%, transparent);
+    0 0 0 4px var(--color-foco);
+  border-color: var(--color-pizarra);
 }
 
 .product-form__input--select {
@@ -207,9 +209,10 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 14px;
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
   border-radius: 12px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
   cursor: pointer;
 }
 
@@ -239,7 +242,7 @@
   position: absolute;
   width: 16px;
   height: 16px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   border-radius: 50%;
   top: 3px;
   left: 3px;
@@ -259,8 +262,9 @@
   display: flex;
   gap: 10px;
   padding: 16px 20px;
-  background-color: var(--color-fondo);
-  box-shadow: var(--shadow-neu-convex);
+  background-color: var(--color-superficie);
+  border-top: 1px solid var(--color-borde);
+  box-shadow: none;
   position: sticky;
   bottom: 0;
 }
@@ -286,9 +290,10 @@
 }
 
 .product-form__btn--cancel {
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   color: var(--color-pizarra);
-  box-shadow: var(--shadow-neu-convex);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
 }
 
 .product-form__btn--cancel:active {

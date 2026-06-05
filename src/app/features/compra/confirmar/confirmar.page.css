@@ -1,7 +1,9 @@
 .confirmar-page {
   min-height: calc(100vh - 64px);
   padding: 32px 0 80px;
-  background-color: var(--color-fondo);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 240px),
+    var(--color-fondo);
 }
 
 .confirmar-page__container {
@@ -32,13 +34,14 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   color: var(--color-pizarra);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 13px;
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-neu-convex);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-card);
   transition: transform 0.1s ease;
 }
 
@@ -51,7 +54,7 @@
   font-family: var(--font-display);
   font-size: 26px;
   font-weight: 800;
-  color: var(--color-texto-oscuro);
+  color: var(--color-pizarra);
 }
 
 .confirmar-page__subtitulo {
@@ -88,9 +91,10 @@
   flex-direction: column;
   gap: 14px;
   padding: 22px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
 }
 
 .confirmar-page__orden-cabecera {
@@ -134,9 +138,10 @@
   flex-direction: column;
   gap: 8px;
   padding: 14px 16px;
-  background-color: var(--color-fondo);
-  border-radius: 14px;
-  box-shadow: var(--shadow-neu-concave);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  box-shadow: none;
 }
 
 .confirmar-page__item {

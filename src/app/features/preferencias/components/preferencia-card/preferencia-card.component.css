@@ -1,7 +1,8 @@
 .preferencia-card {
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 20px;
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
   padding: 18px 20px;
   display: flex;
   flex-direction: column;
@@ -25,7 +26,7 @@
   background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
   color: var(--color-menta);
   font-size: 16px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: inset 0 0 0 1px rgba(129, 178, 154, 0.14);
   flex-shrink: 0;
 }
 
@@ -41,9 +42,10 @@
 .preferencia-card__mensaje {
   margin: 0;
   padding: 14px 16px;
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
   border-radius: 14px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.5;
