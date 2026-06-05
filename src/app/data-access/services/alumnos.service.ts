@@ -26,7 +26,7 @@ export class AlumnosService {
 
   async cargarHijosDelTutor(): Promise<Alumno[]> {
     const dtos = await firstValueFrom(
-      this.http.get<StudentDTO[]>(`${environment.apiUrl}/tutores/572fd792-ba90-4574-aaeb-1e386d31376f/hijos`),
+      this.http.get<StudentDTO[]>(`${environment.apiUrl}/tutores/me/hijos`),
     );
     const alumnos = dtos.map((dto) => this.fromDto(dto));
     this.alumnosState.set(alumnos);

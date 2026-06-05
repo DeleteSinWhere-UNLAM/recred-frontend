@@ -1,7 +1,8 @@
 .pedido-recreo {
   position: relative;
   background-color: var(--color-superficie);
-  border-radius: 24px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-card);
   overflow: hidden;
   box-shadow: var(--shadow-card);
 }
@@ -27,7 +28,7 @@
 }
 
 .pedido-recreo__pedido {
-  border-bottom: 1px solid var(--color-superficie-alt);
+  border-bottom: 1px solid var(--color-borde);
 }
 
 .pedido-recreo__header {
@@ -39,7 +40,7 @@
 .pedido-recreo__icono {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -87,7 +88,8 @@
 
 .pedido-recreo__chip {
   padding: 6px 14px;
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.06);
+  border: 1px solid var(--color-borde);
   border-radius: 999px;
   font-family: var(--font-body);
   font-size: 13px;
@@ -131,6 +133,7 @@
   gap: 8px;
   padding: 8px 14px;
   background-color: rgba(74, 111, 165, 0.08);
+  border: 1px solid rgba(74, 111, 165, 0.08);
   border-radius: 999px;
   font-family: var(--font-body);
   font-size: 13px;
@@ -155,7 +158,7 @@
   background-color: var(--color-dorado);
   color: var(--color-texto-oscuro);
   border: none;
-  border-radius: 14px;
+  border-radius: var(--radius-button);
   font-family: var(--font-display);
   font-size: 14px;
   font-weight: 800;
@@ -164,9 +167,7 @@
   transition:
     transform 0.12s ease,
     background-color 0.15s ease;
-  box-shadow:
-    4px 4px 10px rgba(242, 183, 5, 0.3),
-    -4px -4px 10px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 22px rgba(217, 163, 4, 0.18);
 }
 
 .pedido-recreo__cta:hover {
@@ -188,7 +189,8 @@
   gap: 12px;
   padding: 12px 18px;
   background-color: rgba(129, 178, 154, 0.12);
-  border-radius: 14px;
+  border: 1px solid rgba(129, 178, 154, 0.16);
+  border-radius: 12px;
   align-self: flex-start;
 }
 
@@ -212,7 +214,7 @@
 
   .pedido-recreo__pedido {
     border-bottom: none;
-    border-right: 1px solid var(--color-superficie-alt);
+    border-right: 1px solid var(--color-borde);
   }
 
   .pedido-recreo__pedido,

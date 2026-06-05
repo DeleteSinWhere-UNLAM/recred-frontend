@@ -32,7 +32,7 @@
   font-weight: 600;
   font-size: 14px;
   border-radius: var(--radius-button);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-elevated);
   animation: slideInTop 0.4s ease-out forwards;
 }
 

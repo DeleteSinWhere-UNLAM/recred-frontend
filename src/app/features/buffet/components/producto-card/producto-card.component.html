@@ -20,9 +20,11 @@
     </div>
 
     <div class="producto-card__cuerpo">
-      <p class="producto-card__categoria">{{ producto.categoria.descripcion }}</p>
+      <div class="producto-card__meta">
+        <p class="producto-card__categoria">{{ producto.categoria.descripcion }}</p>
+        <p class="producto-card__precio">{{ precioFormateado() }}</p>
+      </div>
       <h3 class="producto-card__nombre">{{ producto.nombre }}</h3>
-      <p class="producto-card__precio">{{ precioFormateado() }}</p>
 
       @if (disponible()) {
         <div class="producto-card__cantidad">

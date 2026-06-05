@@ -14,6 +14,7 @@ describe('AiProductForm', () => {
 
     fixture = TestBed.createComponent(AiProductForm);
     component = fixture.componentInstance;
+    component.buffetId = 'buffet-test-123';
     fixture.detectChanges();
   });
 
@@ -71,7 +72,7 @@ describe('AiProductForm', () => {
     expect(emittedRequest.descripcion).toBe('Galletas de chocolate');
     expect(emittedRequest.peso).toBe(0.12);
     expect(emittedRequest.nuevaCategoriaNombre).toBe('Dulces');
-    expect(emittedRequest.buffetId).toBe('2c4153b3-d0f9-489c-93c0-8b3ad7b89758');
+    expect(emittedRequest.buffetId).toBe('buffet-test-123');
     expect(emittedRequest.clasificacionesSaludIds).toEqual(['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8']);
   });
 

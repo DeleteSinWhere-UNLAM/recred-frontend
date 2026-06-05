@@ -3,15 +3,18 @@
   flex-direction: column;
   gap: 16px;
   padding: 22px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-neu-convex);
-  border: 2px solid transparent;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-borde);
   transition: border-color 0.2s ease;
 }
 
 .orden-alumno--seleccionado {
   border-color: var(--color-dorado);
+  box-shadow:
+    0 16px 36px rgba(217, 163, 4, 0.14),
+    0 3px 10px rgba(74, 111, 165, 0.06);
 }
 
 .orden-alumno__cabecera {
@@ -37,8 +40,9 @@
   width: 24px;
   height: 24px;
   border-radius: 8px;
-  background-color: var(--color-fondo);
-  box-shadow: var(--shadow-neu-concave);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -118,6 +122,7 @@
   gap: 8px;
   padding: 10px 14px;
   background-color: rgba(231, 111, 81, 0.12);
+  border: 1px solid rgba(231, 111, 81, 0.18);
   color: var(--color-melocoton);
   border-radius: var(--radius-button);
   font-size: 13px;
@@ -152,10 +157,10 @@
 
 .orden-alumno__input {
   padding: 10px 12px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   border-radius: var(--radius-button);
-  box-shadow: var(--shadow-neu-concave);
-  border: none;
+  box-shadow: none;
+  border: 1px solid var(--color-borde);
   color: var(--color-texto-oscuro);
   font-family: var(--font-body);
   font-size: 14px;
@@ -163,8 +168,9 @@
 }
 
 .orden-alumno__input:focus {
-  outline: 2px solid var(--color-dorado);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--color-pizarra);
+  box-shadow: 0 0 0 4px var(--color-foco);
 }
 
 .orden-alumno__pie {

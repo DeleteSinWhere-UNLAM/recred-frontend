@@ -5,6 +5,8 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AiProductUploadPageComponent } from './ai-product-upload-page.component';
 import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
 import { ProductService } from '../../updated-inventory/services/product.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
+import { SaveProductRequest } from '../models/save-product-request.interface';
 import { of, throwError } from 'rxjs';
 
 describe('AiProductUploadPageComponent', () => {
@@ -12,12 +14,16 @@ describe('AiProductUploadPageComponent', () => {
   let fixture: ComponentFixture<AiProductUploadPageComponent>;
   let aiVisionServiceMock: jasmine.SpyObj<AiVisionService>;
   let productServiceMock: jasmine.SpyObj<ProductService>;
+  let perfilServiceMock: jasmine.SpyObj<PerfilService>;
+  const mockBuffetId = 'buffet-test-123';
 
   beforeEach(async () => {
     aiVisionServiceMock = jasmine.createSpyObj('AiVisionService', ['analyzeImage', 'saveProduct']);
     productServiceMock = jasmine.createSpyObj('ProductService', ['getCategories']);
+    perfilServiceMock = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
 
     productServiceMock.getCategories.and.returnValue(of([]));
+    perfilServiceMock.obtenerBuffetId.and.returnValue(mockBuffetId);
 
     aiVisionServiceMock.analyzeImage.and.returnValue(of(
       {
@@ -35,6 +41,7 @@ describe('AiProductUploadPageComponent', () => {
       providers: [
         { provide: AiVisionService, useValue: aiVisionServiceMock },
         { provide: ProductService, useValue: productServiceMock },
+        { provide: PerfilService, useValue: perfilServiceMock },
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -70,5 +77,30 @@ describe('AiProductUploadPageComponent', () => {
     expect(component.isLoading).toBeFalse();
     expect(console.error).toHaveBeenCalled();
     expect(window.alert).toHaveBeenCalledWith('Hubo un error al procesar la imagen.');
+  });
+
+  it('deberia guardar el producto usando el buffet del perfil', () => {
+    const request: SaveProductRequest = {
+      nombre: 'Galletas',
+      descripcion: 'Galletas de arroz',
+      precio: 100,
+      peso: 0.1,
+      requierePreparacion: false,
+      categoriaId: 'cat-1',
+      nuevaCategoriaNombre: '',
+      buffetId: 'buffet-anterior',
+      stockActual: 10,
+      clasificacionesSaludIds: [],
+      tiposIds: [],
+    };
+    aiVisionServiceMock.saveProduct.and.returnValue(of({}));
+
+    component.saveProduct(request);
+
+    expect(aiVisionServiceMock.saveProduct).toHaveBeenCalledWith({
+      ...request,
+      buffetId: mockBuffetId,
+    });
+    expect(component.saveSuccess).toBeTrue();
   });
 });

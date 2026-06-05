@@ -3,9 +3,10 @@
   align-items: center;
   gap: 18px;
   padding: 22px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
 }
 
 .codigo-retiro__avatar {
@@ -62,7 +63,7 @@
   font-weight: 800;
   letter-spacing: 0.5px;
   color: var(--color-dorado);
-  text-shadow: 0 2px 6px rgba(242, 183, 5, 0.35);
+  text-shadow: none;
 }
 
 @media (max-width: 480px) {
