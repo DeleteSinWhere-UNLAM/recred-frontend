@@ -5,12 +5,12 @@ import { Product, CreateProductRequest, UpdateProductRequest } from '../models/p
 import { Category } from '../models/category.interface';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 
-const BUFFET_ID = '2c4153b3-d0f9-489c-93c0-8b3ad7b89758';
 const HEALTH_CLASSIFICATION_IDS = ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'];
 
 @Component({
@@ -25,6 +25,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
   private toastService = inject(ToastService);
   private router = inject(Router);
   private usuarioService = inject(UsuarioService);
+  private perfilService = inject(PerfilService);
 
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
@@ -59,8 +60,16 @@ export class UpdatedInventoryPageComponent implements OnInit {
   }
 
   loadProducts(): void {
+    const buffetId = this.obtenerBuffetIdActual();
+    if (!buffetId) {
+      this.products = [];
+      this.isLoading = false;
+      this.toastService.mostrar('No se encontro un buffet asociado a tu perfil', 'error');
+      return;
+    }
+
     this.isLoading = true;
-    this.productService.getAllByBuffetId(BUFFET_ID).subscribe({
+    this.productService.getAllByBuffetId(buffetId).subscribe({
       next: (data) => {
         this.products = data.map(p => ({
           ...p,
@@ -92,12 +101,19 @@ export class UpdatedInventoryPageComponent implements OnInit {
   }
 
   handleFormSubmit(data: ProductFormData): void {
+    const buffetId = this.obtenerBuffetIdActual();
+    if (!buffetId) {
+      this.isSaving = false;
+      this.toastService.mostrar('No se encontro un buffet asociado a tu perfil', 'error');
+      return;
+    }
+
     this.isSaving = true;
 
     if (this.selectedProduct) {
-      this.updateProduct(this.selectedProduct.id, data);
+      this.updateProduct(this.selectedProduct.id, data, buffetId);
     } else {
-      this.createProduct(data);
+      this.createProduct(data, buffetId);
     }
   }
 
@@ -126,7 +142,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
     this.deleteTarget = null;
   }
 
-  private createProduct(data: ProductFormData): void {
+  private createProduct(data: ProductFormData, buffetId: string): void {
     const isNewCategory = data.categoriaId === 'NEW';
     const payload: CreateProductRequest = {
       nombre: data.nombre,
@@ -136,7 +152,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
       requierePreparacion: data.requierePreparacion,
       categoriaId: isNewCategory ? null : data.categoriaId,
       nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : "",
-      buffetId: BUFFET_ID,
+      buffetId,
       stockActual: data.stockActual,
       clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
       tiposIds: null,
@@ -156,7 +172,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
     });
   }
 
-  private updateProduct(id: string, data: ProductFormData): void {
+  private updateProduct(id: string, data: ProductFormData, buffetId: string): void {
     const isNewCategory = data.categoriaId === 'NEW';
     const payload: UpdateProductRequest = {
       nombre: data.nombre,
@@ -165,7 +181,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
       peso: data.peso,
       requierePreparacion: data.requierePreparacion,
       stockActual: data.stockActual,
-      buffetId: BUFFET_ID,
+      buffetId,
       categoriaId: isNewCategory ? "" : (data.categoriaId || ''), // Update might not support creating categories on the fly, but we adapt it
       clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
     };
@@ -182,5 +198,9 @@ export class UpdatedInventoryPageComponent implements OnInit {
         this.toastService.mostrar('Error al actualizar el producto', 'error');
       }
     });
+  }
+
+  private obtenerBuffetIdActual(): string | null {
+    return this.perfilService.obtenerBuffetId();
   }
 }

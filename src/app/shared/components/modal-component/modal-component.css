@@ -13,9 +13,10 @@
 .modal__dialog {
   width: 91.6667%;
   max-width: 28rem;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radius-card);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-elevated);
   padding: 1.5rem;
   animation: modalFadeInUp 0.3s ease-out forwards;
 }

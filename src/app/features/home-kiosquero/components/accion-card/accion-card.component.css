@@ -7,9 +7,10 @@
   min-height: 96px;
   padding: 22px 24px;
 
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
 
   text-align: left;
   cursor: pointer;
@@ -19,6 +20,8 @@
 
 .accion-card:hover {
   transform: translateY(-2px);
+  border-color: var(--color-borde-fuerte);
+  box-shadow: var(--shadow-elevated);
 }
 
 .accion-card:active {
@@ -38,8 +41,8 @@
 
   border-radius: 18px;
 
-  background-color: var(--color-superficie);
-  box-shadow: var(--shadow-neu-concave);
+  background-color: rgba(74, 111, 165, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(74, 111, 165, 0.08);
 
   color: var(--color-pizarra);
   font-size: 22px;
@@ -58,7 +61,7 @@
   font-family: var(--font-display);
   font-size: 17px;
   font-weight: 700;
-  color: #334155;
+  color: var(--color-texto-oscuro);
 }
 
 .accion-card__descripcion {
@@ -98,7 +101,7 @@
   font-size: 26px;
   background: linear-gradient(135deg, var(--color-dorado), var(--color-dorado-dark));
   color: var(--color-superficie);
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: 0 10px 22px rgba(217, 163, 4, 0.18);
 }
 
 .accion-card--destacada .accion-card__titulo {
@@ -113,7 +116,7 @@
   width: 40px;
   height: 40px;
   font-size: 16px;
-  background-color: var(--color-fondo);
+  background-color: rgba(242, 183, 5, 0.14);
   box-shadow: var(--shadow-neu-concave);
 }
 

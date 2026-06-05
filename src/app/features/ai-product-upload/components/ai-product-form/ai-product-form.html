@@ -142,7 +142,7 @@
   <button
     type="submit"
     class="ai-product-form__submit"
-    [disabled]="productForm.invalid || isSaving"
+    [disabled]="productForm.invalid || isSaving || !buffetId"
   >
     @if (isSaving) {
       <span class="ai-product-form__submit-spinner"></span>

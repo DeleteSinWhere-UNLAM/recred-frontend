@@ -5,6 +5,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { UpdatedInventoryPageComponent } from './updated-inventory-page.component';
 import { ProductService } from '../services/product.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { of, throwError } from 'rxjs';
 import { Product } from '../models/product.interface';
 import { Category } from '../models/category.interface';
@@ -15,6 +16,8 @@ describe('UpdatedInventoryPageComponent', () => {
   let fixture: ComponentFixture<UpdatedInventoryPageComponent>;
   let productServiceMock: jasmine.SpyObj<ProductService>;
   let toastServiceMock: jasmine.SpyObj<ToastService>;
+  let perfilServiceMock: jasmine.SpyObj<PerfilService>;
+  const mockBuffetId = 'buffet-test-123';
 
   const mockCategories: Category[] = [
     { id: 'c1', descripcion: 'Category 1', activo: true },
@@ -46,15 +49,18 @@ describe('UpdatedInventoryPageComponent', () => {
   beforeEach(async () => {
     productServiceMock = jasmine.createSpyObj('ProductService', ['getCategories', 'getAllByBuffetId', 'create', 'update', 'delete']);
     toastServiceMock = jasmine.createSpyObj('ToastService', ['mostrar']);
+    perfilServiceMock = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
 
     productServiceMock.getCategories.and.returnValue(of(mockCategories));
     productServiceMock.getAllByBuffetId.and.returnValue(of(mockProducts));
+    perfilServiceMock.obtenerBuffetId.and.returnValue(mockBuffetId);
 
     await TestBed.configureTestingModule({
       imports: [UpdatedInventoryPageComponent],
       providers: [
         { provide: ProductService, useValue: productServiceMock },
         { provide: ToastService, useValue: toastServiceMock },
+        { provide: PerfilService, useValue: perfilServiceMock },
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -74,7 +80,7 @@ describe('UpdatedInventoryPageComponent', () => {
     fixture.detectChanges(); // Triggers ngOnInit
 
     expect(productServiceMock.getCategories).toHaveBeenCalled();
-    expect(productServiceMock.getAllByBuffetId).toHaveBeenCalled();
+    expect(productServiceMock.getAllByBuffetId).toHaveBeenCalledWith(mockBuffetId);
     expect(component.categories).toEqual(mockCategories);
     expect(component.products.length).toBe(2);
     expect(component.products[0].categoriaId).toBe('c1');
@@ -133,6 +139,7 @@ describe('UpdatedInventoryPageComponent', () => {
     component.handleFormSubmit(formData);
 
     expect(productServiceMock.create).toHaveBeenCalled();
+    expect(productServiceMock.create.calls.mostRecent().args[0].buffetId).toBe(mockBuffetId);
     expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto creado exitosamente', 'success');
     expect(component.isFormVisible).toBeFalse();
     expect(component.loadProducts).toHaveBeenCalled();
@@ -159,6 +166,7 @@ describe('UpdatedInventoryPageComponent', () => {
     component.handleFormSubmit(formData);
 
     expect(productServiceMock.update).toHaveBeenCalled();
+    expect(productServiceMock.update.calls.mostRecent().args[1].buffetId).toBe(mockBuffetId);
     expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto actualizado exitosamente', 'success');
     expect(component.isFormVisible).toBeFalse();
     expect(component.loadProducts).toHaveBeenCalled();

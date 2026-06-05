@@ -1,9 +1,10 @@
 .prediccion-card {
   position: relative;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 24px;
   padding: 28px;
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -162,10 +163,11 @@
 }
 
 .prediccion-card__categorias {
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
   border-radius: 16px;
   padding: 16px 18px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
 }
 
 .prediccion-card__subtitulo {

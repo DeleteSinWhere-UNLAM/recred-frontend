@@ -1,20 +1,65 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { from, switchMap } from 'rxjs';
+import { catchError, from, switchMap, throwError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { AuthSessionService } from '../services/auth-session.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authSessionService = inject(AuthSessionService);
 
-  return from(authSessionService.obtenerIdTokenParaApi()).pipe(
+  const esApiPropia = req.url.startsWith(environment.apiUrl);
+
+  if (!esApiPropia) {
+    return next(req);
+  }
+
+  return from(
+    authSessionService.obtenerAccessTokenParaApi({
+      reintentos: 20,
+      intervaloMs: 250,
+    }),
+  ).pipe(
     switchMap((token) => {
-      if (token) {
-        const authReq = req.clone({
-          setHeaders: { Authorization: `Bearer ${token}` },
-        });
-        return next(authReq);
+      if (!token) {
+        console.error('Request protegida sin token disponible:', req.url);
+        return throwError(() => new Error('No hay token de Cognito disponible'));
       }
-      return next(req);
+
+      const authReq = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return next(authReq).pipe(
+        catchError((err: HttpErrorResponse) => {
+          if (err.status !== 401) {
+            return throwError(() => err);
+          }
+
+          return from(
+            authSessionService.obtenerAccessTokenParaApi({
+              forceRefresh: true,
+              reintentos: 4,
+              intervaloMs: 250,
+            }),
+          ).pipe(
+            switchMap((tokenRefrescado) => {
+              if (!tokenRefrescado) {
+                return throwError(() => err);
+              }
+
+              const retryReq = req.clone({
+                setHeaders: {
+                  Authorization: `Bearer ${tokenRefrescado}`,
+                },
+              });
+
+              return next(retryReq);
+            }),
+          );
+        }),
+      );
     }),
   );
 };

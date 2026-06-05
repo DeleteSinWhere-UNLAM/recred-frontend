@@ -15,6 +15,7 @@ export class AiProductForm implements OnInit, OnChanges {
   @Input() prefillData: AiProductResponse | null = null;
   @Input() categories: Category[] = [];
   @Input() isSaving = false;
+  @Input() buffetId = '';
   @Output() save = new EventEmitter<SaveProductRequest>();
 
   private fb = inject(FormBuilder);
@@ -76,7 +77,7 @@ export class AiProductForm implements OnInit, OnChanges {
   }
 
   submitForm() {
-    if (this.productForm.valid) {
+    if (this.productForm.valid && this.buffetId) {
       const formValue = this.productForm.value;
       const request: SaveProductRequest = {
         nombre: formValue.nombre,
@@ -86,7 +87,7 @@ export class AiProductForm implements OnInit, OnChanges {
         requierePreparacion: formValue.requierePreparacion,
         categoriaId: formValue.categoriaId === 'NEW' ? null : formValue.categoriaId,
         nuevaCategoriaNombre: formValue.categoriaId === 'NEW' ? formValue.nuevaCategoriaNombre : '',
-        buffetId: '2c4153b3-d0f9-489c-93c0-8b3ad7b89758',
+        buffetId: this.buffetId,
         stockActual: formValue.stockActual,
         clasificacionesSaludIds: ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'],//this.buildHealthClassificationIds(formValue),
         tiposIds: [],
