@@ -84,6 +84,7 @@
   opacity: 0.85;
 }
 
+.asistente-panel__accion,
 .asistente-panel__cerrar {
   width: 36px;
   height: 36px;
@@ -100,15 +101,29 @@
   flex-shrink: 0;
 }
 
+.asistente-panel__accion {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.asistente-panel__accion:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.asistente-panel__accion:hover:not(:disabled),
 .asistente-panel__cerrar:hover {
   background-color: rgba(255, 255, 255, 0.3);
   transform: scale(1.08);
 }
 
+.asistente-panel__accion:active:not(:disabled),
 .asistente-panel__cerrar:active {
   transform: scale(0.92);
 }
 
+.asistente-panel__accion:focus-visible,
 .asistente-panel__cerrar:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
