@@ -1,4 +1,4 @@
-export type RolMensaje = 'alumno' | 'cred';
+export type RolMensaje = 'usuario' | 'cred';
 
 export interface MensajeAsistente {
   readonly id: string;

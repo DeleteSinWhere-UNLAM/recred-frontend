@@ -10,7 +10,7 @@
   align-self: flex-start;
 }
 
-.mensaje-burbuja--alumno {
+.mensaje-burbuja--usuario {
   align-self: flex-end;
   flex-direction: row-reverse;
 }
@@ -55,7 +55,7 @@
   border-radius: 18px 18px 18px 6px;
 }
 
-.mensaje-burbuja--alumno .mensaje-burbuja__texto {
+.mensaje-burbuja--usuario .mensaje-burbuja__texto {
   background: linear-gradient(135deg, var(--color-menta) 0%, #6da085 100%);
   color: #fff;
   border-radius: 18px 18px 6px 18px;
@@ -70,7 +70,7 @@
   padding: 0 6px;
 }
 
-.mensaje-burbuja--alumno .mensaje-burbuja__hora {
+.mensaje-burbuja--usuario .mensaje-burbuja__hora {
   align-self: flex-end;
 }
 

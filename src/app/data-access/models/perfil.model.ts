@@ -17,4 +17,9 @@ export interface Perfil {
   readonly comercio?: ReferenciaPerfil | null;
   readonly kioscoId?: string | null;
   readonly kiosco?: ReferenciaPerfil | null;
+  readonly alumnoId?: string | null;
+  readonly alumno?: ReferenciaPerfil | null;
+  readonly alumnoEntity?: ReferenciaPerfil | null;
+  readonly studentId?: string | null;
+  readonly student?: ReferenciaPerfil | null;
 }

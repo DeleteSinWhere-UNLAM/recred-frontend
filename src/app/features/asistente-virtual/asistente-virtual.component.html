@@ -6,10 +6,11 @@
 @if (presenter.abierto()) {
   <app-asistente-panel
     [mensajes]="presenter.mensajes()"
-    [sugerencias]="presenter.sugerencias"
-    [enviando]="presenter.enviando()"
+    [sugerencias]="presenter.sugerencias()"
+    [enviando]="presenter.procesando()"
     (cerrar)="presenter.cerrar()"
     (enviar)="presenter.enviar($event)"
     (sugerencia)="presenter.enviarSugerencia($event)"
+    (nuevaConversacion)="presenter.nuevaConversacion()"
   />
 }
