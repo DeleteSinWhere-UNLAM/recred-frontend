@@ -10,8 +10,8 @@ import { MensajeAsistente } from '../../models/mensaje-asistente.model';
 export class MensajeBurbujaComponent {
   @Input({ required: true }) mensaje!: MensajeAsistente;
 
-  protected get esAlumno(): boolean {
-    return this.mensaje.rol === 'alumno';
+  protected get esUsuario(): boolean {
+    return this.mensaje.rol === 'usuario';
   }
 
   protected get horaFormateada(): string {

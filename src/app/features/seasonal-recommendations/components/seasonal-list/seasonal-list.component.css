@@ -5,9 +5,10 @@
 }
 
 .seasonal-list__panel {
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 20px;
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
   padding: 18px 20px;
   display: flex;
   flex-direction: column;
@@ -31,9 +32,10 @@
 .seasonal-list__vacio {
   margin: 0;
   padding: 18px 20px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 20px;
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--color-texto-claro);

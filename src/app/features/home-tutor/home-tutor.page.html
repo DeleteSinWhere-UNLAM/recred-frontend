@@ -5,18 +5,20 @@
     <app-tutor-header
       [iniciales]="inicialesTutor"
       [nombreCompleto]="nombreCompletoTutor"
-      [cantidadHijos]="cantidadHijos"
-      [cantidadColegios]="cantidadColegios"
-      [saldoTotalFormateado]="saldoTotalFormateado"
-      [saldoTotalNegativo]="saldoTotalNegativo"
+      [cantidadHijos]="cantidadHijos()"
+      [cantidadColegios]="cantidadColegios()"
+      [saldoTotalFormateado]="saldoTotalFormateado()"
+      [saldoTotalNegativo]="saldoTotalNegativo()"
     />
 
     <h2 class="home__subtitulo">Mis Hijos</h2>
 
     <div class="home__sections">
-      @for (grupo of grupos; track grupo.colegio.id) {
+      @for (grupo of grupos(); track grupo.colegio.id) {
         <app-colegio-section [colegio]="grupo.colegio" [alumnos]="grupo.alumnos" />
       }
     </div>
   </div>
 </main>
+
+<app-asistente-virtual />

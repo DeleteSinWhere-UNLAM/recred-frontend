@@ -4,9 +4,10 @@
   flex-direction: column;
   gap: 8px;
   padding: 12px 14px;
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
   border-radius: 14px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
 }
 
 .regla-item__cabecera {
@@ -27,8 +28,9 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: var(--color-fondo);
-  box-shadow: var(--shadow-neu-convex);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
   color: var(--color-melocoton);
   display: flex;
   align-items: center;
@@ -93,10 +95,11 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   padding: 6px 10px;
   border-radius: 10px;
-  box-shadow: var(--shadow-neu-concave);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
 }
 
 .regla-item__pct input {

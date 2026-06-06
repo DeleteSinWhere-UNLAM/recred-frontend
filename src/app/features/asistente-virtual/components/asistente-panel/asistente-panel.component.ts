@@ -50,6 +50,7 @@ export class AsistentePanelComponent implements AfterViewInit {
   @Output() cerrar = new EventEmitter<void>();
   @Output() enviar = new EventEmitter<string>();
   @Output() sugerencia = new EventEmitter<CapacidadAsistente>();
+  @Output() nuevaConversacion = new EventEmitter<void>();
 
   @ViewChild('scroll') private readonly scrollEl?: ElementRef<HTMLDivElement>;
   @ViewChild(InputMensajeComponent) private readonly inputComp?: InputMensajeComponent;
@@ -78,6 +79,10 @@ export class AsistentePanelComponent implements AfterViewInit {
 
   protected onCerrar(): void {
     this.cerrar.emit();
+  }
+
+  protected onNuevaConversacion(): void {
+    this.nuevaConversacion.emit();
   }
 
   protected onEnviar(texto: string): void {

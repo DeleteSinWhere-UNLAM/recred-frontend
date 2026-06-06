@@ -2,6 +2,9 @@
   position: relative;
   min-height: calc(100vh - 64px);
   padding: 32px 0 48px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 240px),
+    var(--color-fondo);
 }
 
 .restricciones__container {
@@ -19,12 +22,13 @@
   gap: 10px;
   padding: 12px 22px;
   background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   color: var(--color-pizarra);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 14px;
   border-radius: var(--radius-button);
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
   transition: transform 0.1s ease, box-shadow 0.15s ease;
   z-index: 1;
 }
@@ -39,10 +43,11 @@
 }
 
 .restricciones__panel {
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 28px;
   padding: 40px;
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -67,7 +72,7 @@
   font-weight: 700;
   font-size: 28px;
   letter-spacing: 1px;
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: 0 12px 24px rgba(74, 111, 165, 0.18);
   flex-shrink: 0;
 }
 
@@ -103,17 +108,19 @@
   align-items: center;
   gap: 18px;
   padding: 18px 22px;
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
   border-radius: 18px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
 }
 
 .restriccion-item__icono {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background-color: var(--color-fondo);
-  box-shadow: var(--shadow-neu-convex);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;

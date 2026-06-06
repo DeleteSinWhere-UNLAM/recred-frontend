@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { Hub } from 'aws-amplify/utils';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { RolUsuario } from '../../data-access/models/perfil.model';
 import {
@@ -23,24 +24,42 @@ const ROL_A_RUTA: Record<RolUsuario, string> = {
   providers: [LandingPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LandingPage implements OnInit {
+export class LandingPage implements OnInit, OnDestroy {
   protected readonly presenter = inject(LandingPresenter);
   private readonly authService = inject(AuthService);
   private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
 
-  // 1. Agregamos el estado de carga (arranca asumiendo que estamos cargando)
   protected readonly cargando = signal<boolean>(true);
 
+  private hubUnsubscribe?: () => void;
+  private redirigiendo = false;
+
   async ngOnInit(): Promise<void> {
+    this.hubUnsubscribe = Hub.listen('auth', async ({ payload }) => {
+      if (payload.event === 'signInWithRedirect') {
+        await this.continuarLoginAutenticado();
+      } else if (payload.event === 'signInWithRedirect_failure') {
+        this.redirigiendo = false;
+        this.cargando.set(false);
+      }
+    });
+
     const autenticado = await this.authService.isAutenticado();
-    
-    // Si no está autenticado, cortamos la carga y mostramos la Landing
+
     if (!autenticado) {
       this.cargando.set(false);
       return;
     }
 
+    await this.continuarLoginAutenticado();
+  }
+
+  ngOnDestroy(): void {
+    this.hubUnsubscribe?.();
+  }
+
+  private async redirigirSegunPerfil(): Promise<void> {
     try {
       const perfil = await this.perfilService.cargarPerfil();
       this.router.navigateByUrl(ROL_A_RUTA[perfil.rol]);
@@ -50,9 +69,27 @@ export class LandingPage implements OnInit {
         return;
       }
       console.error('Error cargando perfil tras login', err);
-      // Si hay un error grave, mostramos la Landing para que intente de nuevo
-      this.cargando.set(false); 
+      this.redirigiendo = false;
+
+      this.cargando.set(false);
     }
+  }
+
+  private async continuarLoginAutenticado(): Promise<void> {
+    if (this.redirigiendo) return;
+
+    this.redirigiendo = true;
+    this.cargando.set(true);
+
+    const autenticado = await this.authService.esperarAutenticacion();
+
+    if (!autenticado) {
+      this.redirigiendo = false;
+      this.cargando.set(false);
+      return;
+    }
+
+    await this.redirigirSegunPerfil();
   }
 
   protected onCtaClick(): void {

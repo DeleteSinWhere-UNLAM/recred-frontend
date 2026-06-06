@@ -1,9 +1,34 @@
 <app-navbar [userName]="nombreUsuario" />
 
 <main class="preferencias">
-  <h1>Preferencias de consumo</h1>
+  <button type="button" class="preferencias__volver" (click)="volver()">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
 
-  @for (p of preferencias; track p.producto) {
-    <app-preferencia-card [preferencia]="p" />
-  }
+  <div class="preferencias__container">
+    <header class="preferencias__cabecera">
+      <div class="preferencias__icono" aria-hidden="true">
+        <i class="fa-solid fa-heart"></i>
+      </div>
+      <div class="preferencias__identidad">
+        <h2 class="preferencias__titulo">Preferencias de consumo</h2>
+        <p class="preferencias__subtitulo">
+          Productos sugeridos según los hábitos del alumno
+        </p>
+      </div>
+    </header>
+
+    @if (preferencias.length > 0) {
+      <div class="preferencias__lista">
+        @for (p of preferencias; track p.productoId) {
+          <app-preferencia-card [preferencia]="p" />
+        }
+      </div>
+    } @else {
+      <p class="preferencias__vacio">
+        Todavía no hay preferencias registradas para este alumno.
+      </p>
+    }
+  </div>
 </main>

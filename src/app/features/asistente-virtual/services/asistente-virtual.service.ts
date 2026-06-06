@@ -2,11 +2,21 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { RespuestaAsistente } from '../models/respuesta-asistente.model';
+import {
+  MensajeAsistenteResponse,
+  SesionAsistenteResponse,
+} from '../models/sesion-asistente.model';
 
 interface SchoolAssistantRequest {
   readonly sesionId: string | null;
   readonly mensaje: string;
+}
+
+export interface ContextoAsistente {
+  readonly rol: RolUsuario;
+  readonly alumnoId?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,16 +25,70 @@ export class AsistenteVirtualService {
   private readonly iaBase = environment.apiUrl.replace(/\/api\/v\d+\/?$/, '') + '/ia';
 
   enviarMensaje(
-    alumnoId: string,
+    contexto: ContextoAsistente,
     mensaje: string,
     sesionId: string | null,
   ): Promise<RespuestaAsistente> {
     const body: SchoolAssistantRequest = { sesionId, mensaje };
     return firstValueFrom(
       this.http.post<RespuestaAsistente>(
-        `${this.iaBase}/alumnos/${alumnoId}/asistente/mensajes`,
+        `${this.getBasePath(contexto)}/mensajes`,
         body,
       ),
     );
+  }
+
+  listarSesiones(
+    contexto: ContextoAsistente,
+  ): Promise<readonly SesionAsistenteResponse[]> {
+    return firstValueFrom(
+      this.http.get<readonly SesionAsistenteResponse[]>(
+        `${this.getBasePath(contexto)}/sesiones`,
+      ),
+    );
+  }
+
+  obtenerMensajes(
+    contexto: ContextoAsistente,
+    sesionId: string,
+  ): Promise<readonly MensajeAsistenteResponse[]> {
+    return firstValueFrom(
+      this.http.get<readonly MensajeAsistenteResponse[]>(
+        `${this.getBasePath(contexto)}/sesiones/${encodeURIComponent(sesionId)}/mensajes`,
+      ),
+    );
+  }
+
+  cerrarSesion(contexto: ContextoAsistente, sesionId: string): Promise<void> {
+    return firstValueFrom(
+      this.http.patch<void>(
+        `${this.getBasePath(contexto)}/sesiones/${encodeURIComponent(sesionId)}/cerrar`,
+        {},
+      ),
+    );
+  }
+
+  eliminarSesion(contexto: ContextoAsistente, sesionId: string): Promise<void> {
+    return firstValueFrom(
+      this.http.delete<void>(
+        `${this.getBasePath(contexto)}/sesiones/${encodeURIComponent(sesionId)}`,
+      ),
+    );
+  }
+
+  private getBasePath(contexto: ContextoAsistente): string {
+    switch (contexto.rol) {
+      case 'PADRE':
+        return `${this.iaBase}/tutores/me/asistente`;
+      case 'VENDEDOR':
+        return `${this.iaBase}/kiosqueros/me/asistente`;
+      case 'ALUMNO': {
+        const alumnoId = contexto.alumnoId?.trim();
+        if (!alumnoId) {
+          throw new Error('No se pudo resolver el alumno para usar el asistente.');
+        }
+        return `${this.iaBase}/alumnos/${encodeURIComponent(alumnoId)}/asistente`;
+      }
+    }
   }
 }

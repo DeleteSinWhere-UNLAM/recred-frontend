@@ -3,9 +3,10 @@
   min-height: calc(100vh - 64px);
   padding: 32px 0 48px;
 
-  background: var(--color-fondo);
-
-  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(240, 244, 248, 0) 260px),
+    linear-gradient(135deg, rgba(74, 111, 165, 0.08), rgba(129, 178, 154, 0.07)),
+    var(--color-fondo);
 }
 
 .home-kiosquero__container {
@@ -18,7 +19,7 @@
 
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
 }
 
 @media (max-width: 640px) {

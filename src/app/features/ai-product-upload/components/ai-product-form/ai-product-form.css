@@ -1,7 +1,8 @@
 .ai-product-form {
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
   border-radius: 20px;
-  box-shadow: var(--shadow-neu-convex);
+  box-shadow: var(--shadow-card);
   padding: 18px 20px;
   display: flex;
   flex-direction: column;
@@ -47,13 +48,13 @@
 
 .ai-product-form__input {
   padding: 10px 14px;
-  border: none;
+  border: 1px solid var(--color-borde);
   border-radius: 12px;
   font-size: 14px;
   font-family: var(--font-body);
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   color: var(--color-texto-oscuro);
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
   width: 100%;
   transition: box-shadow 0.15s ease;
 }
@@ -64,9 +65,8 @@
 
 .ai-product-form__input:focus {
   outline: none;
-  box-shadow:
-    var(--shadow-neu-concave),
-    0 0 0 2px color-mix(in srgb, var(--color-pizarra) 40%, transparent);
+  border-color: var(--color-pizarra);
+  box-shadow: 0 0 0 4px var(--color-foco);
 }
 
 .ai-product-form__input--select {
@@ -102,9 +102,10 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 14px;
-  background-color: var(--color-fondo);
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid var(--color-borde);
   border-radius: 12px;
-  box-shadow: var(--shadow-neu-concave);
+  box-shadow: none;
   cursor: pointer;
 }
 
@@ -134,7 +135,7 @@
   position: absolute;
   width: 16px;
   height: 16px;
-  background-color: var(--color-fondo);
+  background-color: var(--color-superficie);
   border-radius: 50%;
   top: 3px;
   left: 3px;

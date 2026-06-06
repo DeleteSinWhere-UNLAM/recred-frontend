@@ -61,8 +61,13 @@
         type="button"
         class="restricciones__guardar"
         (click)="presenter.guardar()"
+        [disabled]="presenter.cargando() || presenter.guardando()"
       >
-        Guardar Cambios
+        @if (presenter.guardando()) {
+          Guardando...
+        } @else {
+          Guardar Cambios
+        }
       </button>
     </section>
   </div>
