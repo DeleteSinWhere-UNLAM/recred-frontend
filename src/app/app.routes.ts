@@ -34,10 +34,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'restricciones/:alumnoId',
+        path: 'restricciones-nutricionales/:alumnoId',
         loadComponent: () =>
-          import('./features/restricciones/restricciones.page').then(
-            (m) => m.RestriccionesPage,
+          import('./features/restricciones-nutricionales/restricciones-nutricionales.page').then(
+            (m) => m.RestriccionesNutricionalesPage,
           ),
       },
       {
