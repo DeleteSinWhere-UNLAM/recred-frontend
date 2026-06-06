@@ -28,8 +28,10 @@ export class NotificationService {
         .then((fcmToken) => {
           if (fcmToken) {
             const currentToken = localStorage.getItem('fcm_token');
+            console.log(currentToken)
             if (currentToken !== fcmToken) {
               console.log('Token FCM nuevo o rotado. Enviando al backend...');
+              console.log(fcmToken)
               this.sendTokenToBackend(fcmToken);
               localStorage.setItem('fcm_token', fcmToken);
             } else {
