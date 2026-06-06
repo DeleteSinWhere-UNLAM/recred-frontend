@@ -1,14 +1,16 @@
 export type ClaveRestriccion =
   | 'sinTacc'
   | 'sinAzucar'
-  | 'alergiaMani'
-  | 'vegano';
+  | 'sinSodio'
+  | 'vegano'
+  | 'contieneLacteos';
 
 export interface RestriccionesNutricionales {
   sinTacc: boolean;
   sinAzucar: boolean;
-  alergiaMani: boolean;
+  sinSodio: boolean;
   vegano: boolean;
+  contieneLacteos: boolean;
 }
 
 export type ColorIcono = 'melocoton' | 'pizarra' | 'dorado' | 'menta';
@@ -40,12 +42,12 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
     palabrasClave: ['azucar', 'diabet'],
   },
   {
-    clave: 'alergiaMani',
-    titulo: 'Alergia al Maní',
-    descripcion: 'Bloquea snacks y trazas.',
-    icono: 'fa-seedling',
+    clave: 'sinSodio',
+    titulo: 'Sin Sodio',
+    descripcion: 'Bloquea productos con alto sodio.',
+    icono: 'fa-heart-pulse',
     colorIcono: 'dorado',
-    palabrasClave: ['mani'],
+    palabrasClave: ['sodio', 'sal'],
   },
   {
     clave: 'vegano',
@@ -55,14 +57,23 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
     colorIcono: 'menta',
     palabrasClave: ['vegan'],
   },
+  {
+    clave: 'contieneLacteos',
+    titulo: 'Contiene Lácteos',
+    descripcion: 'Bloquea productos con lácteos.',
+    icono: 'fa-cow',
+    colorIcono: 'melocoton',
+    palabrasClave: ['lacteo'],
+  },
 ] as const;
 
 export function restriccionesPorDefecto(): RestriccionesNutricionales {
   return {
     sinTacc: false,
     sinAzucar: false,
-    alergiaMani: false,
+    sinSodio: false,
     vegano: false,
+    contieneLacteos: false,
   };
 }
 
