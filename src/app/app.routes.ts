@@ -15,9 +15,9 @@ export const routes: Routes = [
       {
         path: 'seleccion-tipo-cuenta',
         loadComponent: () =>
-          import(
-            './features/seleccion-tipo-cuenta/seleccion-tipo-cuenta.page'
-          ).then((m) => m.SeleccionTipoCuentaPage),
+          import('./features/seleccion-tipo-cuenta/seleccion-tipo-cuenta.page').then(
+            (m) => m.SeleccionTipoCuentaPage,
+          ),
       },
       {
         path: 'tutor',
@@ -98,9 +98,9 @@ export const routes: Routes = [
       {
         path: 'recomendaciones-estacionales',
         loadComponent: () =>
-          import(
-            './features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component'
-          ).then((m) => m.SeasonalPageComponent),
+          import('./features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component').then(
+            (m) => m.SeasonalPageComponent,
+          ),
       },
       {
         path: 'admin-productos',
@@ -121,6 +121,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/estadistica/estadistica.page').then(
             (m) => m.EstadisticaPage,
+          ),
+      },
+      {
+        path: 'notificaciones-precio',
+        loadComponent: () =>
+          import('./features/notificaciones-precio/notificaciones-precio.page').then(
+            (m) => m.NotificacionesPrecioPage,
           ),
       },
     ],
