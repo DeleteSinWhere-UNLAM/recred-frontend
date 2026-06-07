@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { NotificacionPrecio } from '../models/notificacion-precio.model';
