@@ -130,6 +130,20 @@ export const routes: Routes = [
             (m) => m.EstadisticaPage,
           ),
       },
+      {
+        path: 'movimientos',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
+      {
+        path: 'movimientos/:alumnoId',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
     ],
   },
 ];

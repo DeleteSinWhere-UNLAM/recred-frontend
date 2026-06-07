@@ -56,10 +56,10 @@
       <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
       <span>Pendientes</span>
     </button>
-    <button type="button" class="alumno-card__config-link">
+    <a class="alumno-card__config-link" [routerLink]="['/movimientos', alumno.id]">
       <i class="fa-solid fa-list" aria-hidden="true"></i>
-      <span>Movimientos</span>
-    </button>
+      <span>Ver movimientos</span>
+    </a>
     <a class="alumno-card__config-link" [routerLink]="['/prediccion-gasto', alumno.id]">
       <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
       <span>Predicción</span>
