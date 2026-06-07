@@ -19,16 +19,91 @@
       </div>
     </header>
 
-    @if (preferencias.length > 0) {
-      <div class="preferencias__lista">
-        @for (p of preferencias; track p.productoId) {
-          <app-preferencia-card [preferencia]="p" />
-        }
-      </div>
-    } @else {
-      <p class="preferencias__vacio">
-        Todavía no hay preferencias registradas para este alumno.
-      </p>
-    }
+    <!-- SECCIÓN DE PRODUCTOS FAVORITOS -->
+    <section class="preferencias__seccion" aria-labelledby="titulo-favoritos">
+      <h3 id="titulo-favoritos" class="preferencias__seccion-titulo">
+        <i class="fa-solid fa-heart" aria-hidden="true"></i>
+        <span>Mis Productos Favoritos</span>
+      </h3>
+
+      @if (favoritos.length > 0) {
+        <div class="preferencias__favoritos-grid">
+          @for (f of favoritos; track f.id) {
+            <article class="preferencias-fav-card" [class.preferencias-fav-card--sin-stock]="f.estadoStock === 'SIN_STOCK'">
+              <div class="preferencias-fav-card__media">
+                <img
+                  class="preferencias-fav-card__imagen"
+                  [src]="f.imagen || IMAGEN_FALLBACK"
+                  [alt]="f.nombre"
+                  loading="lazy"
+                  (error)="onImagenError($event)"
+                />
+                <button
+                  type="button"
+                  class="preferencias-fav-card__quitar-btn"
+                  (click)="quitarFavorito(f.id)"
+                  title="Quitar de favoritos"
+                  aria-label="Quitar de favoritos"
+                >
+                  <i class="fa-solid fa-heart" aria-hidden="true"></i>
+                </button>
+              </div>
+
+              <div class="preferencias-fav-card__cuerpo">
+                <div class="preferencias-fav-card__meta">
+                  <span class="preferencias-fav-card__categoria">{{ f.categoria.descripcion }}</span>
+                  <span class="preferencias-fav-card__precio">{{ formatearPrecio(f.precio) }}</span>
+                </div>
+                <h4 class="preferencias-fav-card__nombre">{{ f.nombre }}</h4>
+                <p class="preferencias-fav-card__descripcion">{{ f.descripcion }}</p>
+
+                <button
+                  type="button"
+                  class="preferencias-fav-card__comprar-btn"
+                  (click)="agregarAlCarrito(f)"
+                  [disabled]="f.estadoStock === 'SIN_STOCK'"
+                >
+                  @if (f.estadoStock === 'SIN_STOCK') {
+                    <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                    <span>Sin stock</span>
+                  } @else {
+                    <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                    <span>Comprar rápido</span>
+                  }
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="preferencias__favoritos-vacio">
+          <i class="fa-regular fa-heart" aria-hidden="true"></i>
+          <p>Aún no tenés productos favoritos guardados.</p>
+          <p class="preferencias__favoritos-vacio-sub">
+            Hacé click en el corazón de los productos en el Buffet para agregarlos aquí.
+          </p>
+        </div>
+      }
+    </section>
+
+    <!-- SECCIÓN DE RECOMENDACIONES IA -->
+    <section class="preferencias__seccion" aria-labelledby="titulo-sugerencias">
+      <h3 id="titulo-sugerencias" class="preferencias__seccion-titulo">
+        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+        <span>Sugerencias de la IA</span>
+      </h3>
+
+      @if (preferencias.length > 0) {
+        <div class="preferencias__lista">
+          @for (p of preferencias; track p.productoId) {
+            <app-preferencia-card [preferencia]="p" />
+          }
+        </div>
+      } @else {
+        <p class="preferencias__vacio">
+          Todavía no hay sugerencias de consumo registradas para este alumno.
+        </p>
+      }
+    </section>
   </div>
 </main>

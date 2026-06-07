@@ -56,6 +56,10 @@ export class BuffetPage implements OnInit {
     this.presenter.seleccionarClasificacion(target.value);
   }
 
+  protected onToggleSoloFavoritos(): void {
+    this.presenter.toggleSoloFavoritos();
+  }
+
   protected abrirSelector(): void {
     this.mostrarSelector.set(true);
   }
