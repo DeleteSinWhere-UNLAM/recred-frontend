@@ -23,10 +23,19 @@ export class PreferenciasService {
 
   private readonly fallbackAlumnoId = '7058aa34-c843-41ca-a8dc-27c496fa7413';
 
+  private getPath(alumnoId: string): string {
+    const perfil = this.perfilService.getPerfil();
+    if (perfil && perfil.rol === 'ALUMNO' && perfil.id === alumnoId) {
+      return `usuarios/${alumnoId}`;
+    }
+    return `alumnos/${alumnoId}`;
+  }
+
   getPreferencias(): Observable<Preferencia[]> {
     const alumnoId = this.perfilService.obtenerAlumnoId() ?? this.fallbackAlumnoId;
+    const path = this.getPath(alumnoId);
     return this.http
-      .get<Preferencia[]>(`${environment.apiUrl}/alumnos/${alumnoId}/preferencias?ultima=true`)
+      .get<Preferencia[]>(`${environment.apiUrl}/${path}/preferencias?ultima=true`)
       .pipe(map((response) => response));
   }
 
@@ -35,7 +44,8 @@ export class PreferenciasService {
       return of(this.getFavoritosFromLocalStorage(alumnoId));
     }
 
-    return this.http.get<ProductDTO[]>(`${environment.apiUrl}/alumnos/${alumnoId}/preferencias/favoritos`).pipe(
+    const path = this.getPath(alumnoId);
+    return this.http.get<ProductDTO[]>(`${environment.apiUrl}/${path}/preferencias/favoritos`).pipe(
       map(dtos => dtos.map(dto => this.mapDtoToProducto(dto))),
       catchError((error) => {
         console.warn('Error fetching favorites from backend, falling back to localStorage:', error);
@@ -50,7 +60,8 @@ export class PreferenciasService {
       return of(undefined);
     }
 
-    return this.http.post<void>(`${environment.apiUrl}/alumnos/${alumnoId}/preferencias/favoritos/${producto.id}`, {}).pipe(
+    const path = this.getPath(alumnoId);
+    return this.http.post<void>(`${environment.apiUrl}/${path}/preferencias/favoritos/${producto.id}`, {}).pipe(
       catchError((error) => {
         console.warn('Error saving favorite to backend, saving to localStorage:', error);
         this.saveFavoritoToLocalStorage(alumnoId, producto);
@@ -65,7 +76,8 @@ export class PreferenciasService {
       return of(undefined);
     }
 
-    return this.http.delete<void>(`${environment.apiUrl}/alumnos/${alumnoId}/preferencias/favoritos/${productoId}`).pipe(
+    const path = this.getPath(alumnoId);
+    return this.http.delete<void>(`${environment.apiUrl}/${path}/preferencias/favoritos/${productoId}`).pipe(
       catchError((error) => {
         console.warn('Error removing favorite from backend, removing from localStorage:', error);
         this.removeFavoritoFromLocalStorage(alumnoId, productoId);
