@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter, Router, ActivatedRoute, convertToParamMap } from '@angular/router';
+import { provideRouter, Router, ActivatedRoute, convertToParamMap, ParamMap } from '@angular/router';
 import { of, throwError, BehaviorSubject } from 'rxjs';
 import { signal } from '@angular/core';
 
@@ -22,7 +22,7 @@ describe('MovimientosPage', () => {
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
 
-  let paramMapSubject: BehaviorSubject<any>;
+  let paramMapSubject: BehaviorSubject<ParamMap>;
 
   const mockAlumno1: Alumno = {
     id: 'alumno-1',
