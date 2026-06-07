@@ -193,7 +193,7 @@
 
 .alumno-card__config {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
@@ -306,7 +306,8 @@
   }
 
   .alumno-card__config {
-    gap: 4px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
     padding: 10px 12px;
   }
 }
