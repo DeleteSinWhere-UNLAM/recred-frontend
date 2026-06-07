@@ -5,6 +5,16 @@
     [class.producto-card--sin-stock]="!disponible()"
   >
     <div class="producto-card__media">
+      <button
+        type="button"
+        class="producto-card__favorito-btn"
+        [class.producto-card__favorito-btn--activo]="esFavorito"
+        (click)="onToggleFavorito($event)"
+        [attr.aria-label]="esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+      >
+        <i class="fa-heart" [class.fa-solid]="esFavorito" [class.fa-regular]="!esFavorito" aria-hidden="true"></i>
+      </button>
+
       <img
         class="producto-card__imagen"
         [src]="producto.imagen"
