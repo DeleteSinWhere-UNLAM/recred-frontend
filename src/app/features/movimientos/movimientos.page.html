@@ -1,0 +1,219 @@
+<app-navbar [userName]="nombreNavbar()" />
+
+<main class="movimientos">
+  <div class="movimientos__container">
+    <!-- Cabecera -->
+    <header class="movimientos__header">
+      <button type="button" class="movimientos__volver" (click)="volver()" aria-label="Volver al panel">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Volver</span>
+      </button>
+      <div class="movimientos__titulo-area">
+        <div class="movimientos__icono">
+          <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
+          @if (!esVistaAlumno()) {
+            <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- Panel de Controles y Filtros -->
+    <section class="movimientos__panel" aria-label="Filtros de búsqueda">
+      <!-- Selector de Alumno (Hijo) -->
+      @if (!esVistaAlumno()) {
+        <div class="movimientos__control-alumno">
+          <label for="select-alumno" class="movimientos__label">Seleccionar Hijo</label>
+          <div class="movimientos__select-wrapper">
+            <select
+              id="select-alumno"
+              [value]="selectedAlumnoId()"
+              (change)="onAlumnoChange($event)"
+              class="movimientos__select movimientos__select--alumno"
+            >
+              <option value="todos">Todos los hijos</option>
+              @for (alumno of alumnos(); track alumno.id) {
+                <option [value]="alumno.id">{{ alumno.nombre }} {{ alumno.apellido }}</option>
+              }
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
+          </div>
+        </div>
+      }
+
+      <!-- Filtros Secundarios -->
+      <div class="movimientos__filtros">
+        <!-- Estado -->
+        <div class="movimientos__filtro-group">
+          <label for="filtro-estado" class="movimientos__label">Estado</label>
+          <div class="movimientos__select-wrapper">
+            <select
+              id="filtro-estado"
+              [ngModel]="filtroEstado()"
+              (ngModelChange)="filtroEstado.set($event)"
+              class="movimientos__select"
+            >
+              <option value="TODOS">Todos los estados</option>
+              <option value="PENDIENTE">Pendientes</option>
+              <option value="ENTREGADO">Entregados</option>
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <!-- Rango de Fechas -->
+        <div class="movimientos__filtro-group">
+          <label for="fecha-desde" class="movimientos__label">Fecha Desde</label>
+          <input
+            id="fecha-desde"
+            type="date"
+            [ngModel]="filtroFechaDesde()"
+            (ngModelChange)="filtroFechaDesde.set($event)"
+            class="movimientos__input"
+          />
+        </div>
+        <div class="movimientos__filtro-group">
+          <label for="fecha-hasta" class="movimientos__label">Fecha Hasta</label>
+          <input
+            id="fecha-hasta"
+            type="date"
+            [ngModel]="filtroFechaHasta()"
+            (ngModelChange)="filtroFechaHasta.set($event)"
+            class="movimientos__input"
+          />
+        </div>
+
+        <!-- Rango de Precios -->
+        <div class="movimientos__filtro-group">
+          <label for="precio-min" class="movimientos__label">Precio Mín.</label>
+          <div class="movimientos__input-monto-wrapper">
+            <span class="monto-prefix">$</span>
+            <input
+              id="precio-min"
+              type="number"
+              placeholder="0"
+              [ngModel]="filtroPrecioMin()"
+              (ngModelChange)="filtroPrecioMin.set($event)"
+              class="movimientos__input movimientos__input--monto"
+            />
+          </div>
+        </div>
+        <div class="movimientos__filtro-group">
+          <label for="precio-max" class="movimientos__label">Precio Máx.</label>
+          <div class="movimientos__input-monto-wrapper">
+            <span class="monto-prefix">$</span>
+            <input
+              id="precio-max"
+              type="number"
+              placeholder="Max"
+              [ngModel]="filtroPrecioMax()"
+              (ngModelChange)="filtroPrecioMax.set($event)"
+              class="movimientos__input movimientos__input--monto"
+            />
+          </div>
+        </div>
+
+        <!-- Botón Limpiar -->
+        <div class="movimientos__filtro-group movimientos__filtro-group--btn">
+          <button type="button" class="movimientos__limpiar-btn" (click)="limpiarFiltros()">
+            <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
+            <span>Limpiar</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lista de Movimientos -->
+    <div class="movimientos__list-container">
+      @if (cargando()) {
+        <!-- Skeleton Loading -->
+        <div class="movimientos__loading">
+          @for (i of [1, 2, 3]; track i) {
+            <div class="movimientos__skeleton-card">
+              <div class="skeleton-circle"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--text"></div>
+              </div>
+              <div class="skeleton-right"></div>
+            </div>
+          }
+        </div>
+      } @else if (errorMsg()) {
+        <!-- Vista de Error -->
+        <div class="movimientos__error-card" role="alert">
+          <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+          <p class="error-text">{{ errorMsg() }}</p>
+          <button type="button" class="movimientos__reintentar-btn" (click)="cargarHistorial()">
+            Reintentar
+          </button>
+        </div>
+      } @else if (movimientosFiltrados().length === 0) {
+        <!-- Lista Vacía -->
+        <div class="movimientos__vacio-card">
+          <div class="vacio-icono-wrapper">
+            <i class="fa-solid fa-receipt vacio-icon" aria-hidden="true"></i>
+          </div>
+          <p class="vacio-titulo">No se encontraron movimientos</p>
+          <p class="vacio-subtitulo">
+            @if (esVistaAlumno()) {
+              Intentá cambiando los filtros de búsqueda.
+            } @else {
+              Intentá cambiando los filtros o seleccionando otro alumno.
+            }
+          </p>
+        </div>
+      } @else {
+        <!-- Listado -->
+        <div class="movimientos__lista">
+          @for (mov of movimientosFiltrados(); track mov.id) {
+            <article class="movimientos__card">
+              <div class="movimientos__card-left">
+                <div class="movimientos__iniciales" [attr.data-alumno]="mov.studentId">
+                  {{ getInicialesAlumno(mov.studentId) }}
+                </div>
+              </div>
+
+              <div class="movimientos__card-body">
+                <div class="movimientos__card-row">
+                  <h3 class="movimientos__card-nombre">{{ getNombreAlumno(mov.studentId) }}</h3>
+                  <span class="movimientos__card-fecha">{{ formatearFecha(mov.date) }}</span>
+                </div>
+                <p class="movimientos__card-resumen">
+                  @for (item of mov.items; track item.productId; let last = $last) {
+                    <span class="movimientos__card-item">{{ item.quantity }}x {{ item.productName }}</span>{{ !last ? ', ' : '' }}
+                  }
+                </p>
+              </div>
+
+              <div class="movimientos__card-right">
+                <div class="movimientos__card-monto">
+                  {{ formatearPrecio(mov.totalAmount) }}
+                </div>
+                <span class="movimientos__status-badge" [attr.data-status]="mov.status">
+                  <span class="status-dot"></span>
+                  {{ mov.statusLabel || mov.status }}
+                </span>
+                <button type="button" class="movimientos__detalles-btn" (click)="abrirDetalle(mov)">
+                  Ver detalles
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</main>
+
+<!-- Modal de Detalle Pop-up -->
+@if (modalMovimiento(); as mov) {
+  <app-movimiento-detalle-modal
+    [movimiento]="mov"
+    [nombreAlumno]="getNombreAlumno(mov.studentId)"
+    (cerrar)="cerrarDetalle()"
+  />
+}

@@ -7,38 +7,45 @@ import { ColegiosService } from '../../../data-access/services/colegios.service'
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { BuffetService } from '../services/buffet.service';
+import { FavoritosService } from '../../favoritos/services/favoritos.service';
 import { Buffet } from '../models/buffet.model';
 import {
   CategoriaProducto,
   ClasificacionSalud,
   Producto,
 } from '../models/producto.model';
+import { RestriccionProductoService } from '../../restriccion-producto/services/restriccion-producto.service';
 
 export interface FiltrosBuffet {
   busqueda: string;
   categoriaId: string | 'todas';
   clasificacionId: string | 'todas';
+  soloFavoritos: boolean;
 }
 
 const filtrosPorDefecto: FiltrosBuffet = {
   busqueda: '',
   categoriaId: 'todas',
   clasificacionId: 'todas',
+  soloFavoritos: false,
 };
 
 @Injectable()
 export class BuffetPresenter {
   private readonly alumnosService = inject(AlumnosService);
   private readonly buffetService = inject(BuffetService);
+  private readonly favoritosService = inject(FavoritosService);
   private readonly carritoService = inject(CarritoService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly restriccionProductoService = inject(RestriccionProductoService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly buffetState = signal<Buffet | undefined>(undefined);
   private readonly productosState = signal<Producto[]>([]);
+  private readonly favoritosState = signal<Set<string>>(new Set());
   private readonly categoriasState = signal<CategoriaProducto[]>([]);
   private readonly clasificacionesState = signal<ClasificacionSalud[]>([]);
   private readonly filtrosState = signal<FiltrosBuffet>({ ...filtrosPorDefecto });
@@ -46,6 +53,7 @@ export class BuffetPresenter {
   readonly alumno: Signal<Alumno | undefined> = this.alumnoState.asReadonly();
   readonly buffet: Signal<Buffet | undefined> = this.buffetState.asReadonly();
   readonly productos: Signal<Producto[]> = this.productosState.asReadonly();
+  readonly favoritos: Signal<Set<string>> = this.favoritosState.asReadonly();
   readonly categorias: Signal<CategoriaProducto[]> = this.categoriasState.asReadonly();
   readonly clasificaciones: Signal<ClasificacionSalud[]> =
     this.clasificacionesState.asReadonly();
@@ -77,10 +85,18 @@ export class BuffetPresenter {
   });
 
   readonly productosFiltrados = computed<Producto[]>(() => {
-    const { busqueda, categoriaId, clasificacionId } = this.filtrosState();
+    const { busqueda, categoriaId, clasificacionId, soloFavoritos } = this.filtrosState();
     const texto = busqueda.trim().toLowerCase();
+    const favs = this.favoritosState();
+    const esAlumno = this.usuarioService.esVistaAlumno();
 
     return this.productosState().filter((producto) => {
+      if (esAlumno && producto.bloqueado) {
+        return false;
+      }
+      if (soloFavoritos && !favs.has(producto.id)) {
+        return false;
+      }
       if (texto && !producto.nombre.toLowerCase().includes(texto)) {
         return false;
       }
@@ -112,9 +128,30 @@ export class BuffetPresenter {
 
     this.alumnoState.set(alumno);
     this.buffetState.set(buffet);
-    this.productosState.set(this.buffetService.getProductosDelBuffet(buffet.id));
-    this.categoriasState.set(this.buffetService.getCategorias(buffet.id));
-    this.clasificacionesState.set(this.buffetService.getClasificacionesSalud(buffet.id));
+    
+    // Carga dinámica de productos
+    this.buffetService.getProductosDelBuffet(buffet.id, alumnoId).subscribe({
+      next: (productos) => {
+        this.productosState.set(productos);
+        this.categoriasState.set(this.extractUniqueCategories(productos));
+        this.clasificacionesState.set(this.extractUniqueClassifications(productos));
+      },
+      error: (err) => {
+        console.error('Error loading products for buffet:', err);
+      }
+    });
+
+    // Carga de favoritos del alumno
+    this.favoritosService.getFavoritos(alumnoId).subscribe({
+      next: (favs) => {
+        const ids = new Set(favs.map((f) => f.id));
+        this.favoritosState.set(ids);
+      },
+      error: (err) => {
+        console.error('Error loading favorites:', err);
+      }
+    });
+
     this.filtrosState.set({ ...filtrosPorDefecto });
   }
 
@@ -128,6 +165,10 @@ export class BuffetPresenter {
 
   seleccionarClasificacion(clasificacionId: string | 'todas'): void {
     this.filtrosState.update((actual) => ({ ...actual, clasificacionId }));
+  }
+
+  toggleSoloFavoritos(): void {
+    this.filtrosState.update((actual) => ({ ...actual, soloFavoritos: !actual.soloFavoritos }));
   }
 
   limpiarFiltros(): void {
@@ -152,5 +193,84 @@ export class BuffetPresenter {
     this.toastService.mostrar(
       `${verbo} ${cantidad}x "${producto.nombre}" al carrito`,
     );
+  }
+
+  toggleFavorito(producto: Producto): void {
+    const alumno = this.alumnoState();
+    if (!alumno) return;
+
+    const ids = new Set(this.favoritosState());
+    if (ids.has(producto.id)) {
+      ids.delete(producto.id);
+      this.favoritosState.set(ids);
+      this.favoritosService.removerFavorito(alumno.id, producto.id).subscribe({
+        next: () => this.toastService.mostrar(`Se quitó "${producto.nombre}" de tus favoritos`, 'success'),
+        error: (err) => console.error('Error removing favorite:', err)
+      });
+    } else {
+      ids.add(producto.id);
+      this.favoritosState.set(ids);
+      this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({
+        next: () => this.toastService.mostrar(`Se agregó "${producto.nombre}" a tus favoritos`, 'success'),
+        error: (err) => console.error('Error adding favorite:', err)
+      });
+    }
+  }
+
+  toggleLock(producto: Producto): void {
+    const alumno = this.alumnoState();
+    if (!alumno) return;
+
+    const actualBloqueado = !!producto.bloqueado;
+    producto.bloqueado = !actualBloqueado;
+    this.productosState.set([...this.productosState()]);
+
+    if (actualBloqueado) {
+      this.restriccionProductoService.desbloquearProducto(alumno.id, producto.id).subscribe({
+        next: () => {
+          this.toastService.mostrar(`Se desbloqueó "${producto.nombre}"`, 'success');
+        },
+        error: (err) => {
+          console.error('Error unlocking product:', err);
+          producto.bloqueado = true;
+          this.productosState.set([...this.productosState()]);
+          this.toastService.mostrar('Error al desbloquear el producto', 'error');
+        }
+      });
+    } else {
+      this.restriccionProductoService.bloquearProducto(alumno.id, producto.id).subscribe({
+        next: () => {
+          this.toastService.mostrar(`Se bloqueó "${producto.nombre}"`, 'success');
+        },
+        error: (err) => {
+          console.error('Error blocking product:', err);
+          producto.bloqueado = false;
+          this.productosState.set([...this.productosState()]);
+          this.toastService.mostrar('Error al bloquear el producto', 'error');
+        }
+      });
+    }
+  }
+
+  private extractUniqueCategories(productos: Producto[]): CategoriaProducto[] {
+    const porId = new Map<string, CategoriaProducto>();
+    for (const p of productos) {
+      if (p.categoria) {
+        porId.set(p.categoria.id, p.categoria);
+      }
+    }
+    return [...porId.values()];
+  }
+
+  private extractUniqueClassifications(productos: Producto[]): ClasificacionSalud[] {
+    const porId = new Map<string, ClasificacionSalud>();
+    for (const p of productos) {
+      if (p.clasificacionesSalud) {
+        for (const c of p.clasificacionesSalud) {
+          porId.set(c.id, c);
+        }
+      }
+    }
+    return [...porId.values()];
   }
 }

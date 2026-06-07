@@ -1,0 +1,20 @@
+.notificaciones {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.notificaciones__titulo {
+  margin-bottom: 1.5rem;
+}
+
+.notificaciones__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notificaciones__vacio {
+  text-align: center;
+  opacity: 0.7;
+}

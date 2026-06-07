@@ -19,6 +19,7 @@ export interface Producto {
   clasificacionesSalud: ClasificacionSalud[];
   imagen: string;
   estadoStock: EstadoStock;
+  bloqueado?: boolean;
 }
 
 export function tieneClasificacion(producto: Producto, descripcion: string): boolean {

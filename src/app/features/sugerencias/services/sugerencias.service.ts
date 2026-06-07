@@ -2,17 +2,18 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { SugerenciaProducto } from '../models/sugerencia-producto.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SugerenciasService {
   private readonly http = inject(HttpClient);
 
-  private readonly baseUrl = 'https://18-119-187-167.sslip.io';
+  private readonly baseUrl = environment.apiUrl;
 
   getSugerencias(usuarioId: string): Observable<SugerenciaProducto[]> {
     return this.http
       .get<SugerenciaProducto>(
-        `${this.baseUrl}/ia/usuarios/${usuarioId}/sugerencia-cambio-producto`,
+        `${this.baseUrl}/kiosqueros/${usuarioId}/sugerencia-cambio-producto`,
       )
       .pipe(map((response) => [response]));
   }

@@ -5,8 +5,8 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import {
   ClasificacionSaludBackend,
-  RestriccionesService,
-} from '../services/restricciones.service';
+  RestriccionesNutricionalesService,
+} from '../services/restricciones-nutricionales.service';
 import {
   ClaveRestriccion,
   RESTRICCIONES_CATALOGO,
@@ -16,9 +16,9 @@ import {
 } from '../models/restricciones-nutricionales.model';
 
 @Injectable()
-export class RestriccionesPresenter {
+export class RestriccionesNutricionalesPresenter {
   private readonly alumnosService = inject(AlumnosService);
-  private readonly restriccionesService = inject(RestriccionesService);
+  private readonly restriccionesService = inject(RestriccionesNutricionalesService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -70,7 +70,7 @@ export class RestriccionesPresenter {
       this.idPorClave = this.construirMapeo(catalogo);
       this.restriccionesState.set(this.proyectarActivas(activas));
     } catch (error) {
-      console.error('[Restricciones] error cargando', error);
+      console.error('[RestriccionesNutricionales] error cargando', error);
       this.toastService.mostrar('No pudimos cargar las restricciones del alumno.', 'error');
     } finally {
       this.cargandoState.set(false);
@@ -91,7 +91,7 @@ export class RestriccionesPresenter {
       this.toastService.mostrar('Restricciones actualizadas.', 'success');
       this.router.navigateByUrl('/tutor');
     } catch (error) {
-      console.error('[Restricciones] error guardando', error);
+      console.error('[RestriccionesNutricionales] error guardando', error);
       this.toastService.mostrar('No pudimos guardar los cambios. Probá de nuevo.', 'error');
     } finally {
       this.guardandoState.set(false);

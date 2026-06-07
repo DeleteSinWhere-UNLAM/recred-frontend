@@ -15,9 +15,9 @@ export const routes: Routes = [
       {
         path: 'seleccion-tipo-cuenta',
         loadComponent: () =>
-          import(
-            './features/seleccion-tipo-cuenta/seleccion-tipo-cuenta.page'
-          ).then((m) => m.SeleccionTipoCuentaPage),
+          import('./features/seleccion-tipo-cuenta/seleccion-tipo-cuenta.page').then(
+            (m) => m.SeleccionTipoCuentaPage,
+          ),
       },
       {
         path: 'tutor',
@@ -34,10 +34,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'restricciones/:alumnoId',
+        path: 'restricciones-nutricionales/:alumnoId',
         loadComponent: () =>
-          import('./features/restricciones/restricciones.page').then(
-            (m) => m.RestriccionesPage,
+          import('./features/restricciones-nutricionales/restricciones-nutricionales.page').then(
+            (m) => m.RestriccionesNutricionalesPage,
           ),
       },
       {
@@ -57,6 +57,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/preferencias/preferencias.page').then(
             (m) => m.PreferenciasPage,
+          ),
+      },
+      {
+        path: 'favoritos',
+        loadComponent: () =>
+          import('./features/favoritos/favoritos.page').then(
+            (m) => m.FavoritosPage,
           ),
       },
       {
@@ -98,9 +105,9 @@ export const routes: Routes = [
       {
         path: 'recomendaciones-estacionales',
         loadComponent: () =>
-          import(
-            './features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component'
-          ).then((m) => m.SeasonalPageComponent),
+          import('./features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component').then(
+            (m) => m.SeasonalPageComponent,
+          ),
       },
       {
         path: 'admin-productos',
@@ -121,6 +128,27 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/estadistica/estadistica.page').then(
             (m) => m.EstadisticaPage,
+          ),
+      },
+      {
+        path: 'movimientos',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
+      {
+        path: 'movimientos/:alumnoId',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
+      {
+        path: 'notificaciones-precio',
+        loadComponent: () =>
+          import('./features/notificaciones-precio/notificaciones-precio.page').then(
+            (m) => m.NotificacionesPrecioPage,
           ),
       },
     ],
