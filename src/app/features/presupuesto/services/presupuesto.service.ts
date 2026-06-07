@@ -96,6 +96,7 @@ export class PresupuestoService {
   }
 
   getPrediccion(_alumnoId: string): PrediccionGasto | undefined {
+    void _alumnoId;
     return undefined;
   }
 
