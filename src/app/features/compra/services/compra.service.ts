@@ -1,18 +1,16 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, delay, map, of } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, forkJoin, map, of } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import {
   OrdenAlumno,
   OrdenCompra,
 } from '../models/orden-compra.model';
 
-const ANIMALES_CODIGO = [
-  'Lobo', 'Tigre', 'Puma', 'Oso', 'Gato', 'Perro', 'Zorro', 'Rana',
-  'Sapo', 'Búho', 'Pato', 'Cisne', 'Loro', 'Pez', 'Foca', 'Cebra',
-  'Morsa', 'Koala', 'Panda', 'Gallo', 'Pollo', 'Ganso', 'Toro', 'Vaca',
-];
-
 @Injectable({ providedIn: 'root' })
 export class CompraService {
+  private readonly http = inject(HttpClient);
+  
   private readonly ordenEnCursoState = signal<OrdenCompra | null>(null);
   private readonly ultimaOrdenState = signal<OrdenCompra | null>(null);
 
@@ -35,30 +33,49 @@ export class CompraService {
 
   simularPago(): Observable<OrdenCompra> {
     const enCurso = this.ordenEnCursoState();
-    if (!enCurso) {
+    if (!enCurso || enCurso.ordenes.length === 0) {
       return of({ id: '', ordenes: [], total: 0, codigos: {} });
     }
-    return of(enCurso).pipe(
-      delay(700),
-      map((orden) => {
+
+    const requests = enCurso.ordenes.map(orden => {
+      const payload = {
+        orders: [
+          {
+            studentId: orden.alumno.id,
+            date: new Date(orden.fecha).toISOString(),
+            recessTime: orden.recreo,
+            items: orden.items.map(item => ({
+              productId: item.producto.id,
+              quantity: item.cantidad
+            }))
+          }
+        ]
+      };
+      
+      return this.http.post<any>(`${environment.apiUrl}/purchases/advance`, payload).pipe(
+        map(response => ({
+          studentId: orden.alumno.id,
+          codigo: response.codes[orden.alumno.id]
+        }))
+      );
+    });
+
+    return forkJoin(requests).pipe(
+      map(results => {
         const codigos: Record<string, string> = {};
-        for (const o of orden.ordenes) {
-          codigos[o.alumno.id] = this.generarCodigoRetiro();
+        for (const res of results) {
+          codigos[res.studentId] = res.codigo;
         }
+
         const pagada: OrdenCompra = {
-          ...orden,
+          ...enCurso,
           id: crypto.randomUUID(),
           codigos,
         };
         this.ultimaOrdenState.set(pagada);
         this.ordenEnCursoState.set(null);
         return pagada;
-      }),
+      })
     );
-  }
-
-  generarCodigoRetiro(): string {
-    const idx = Math.floor(Math.random() * ANIMALES_CODIGO.length);
-    return ANIMALES_CODIGO[idx];
   }
 }
