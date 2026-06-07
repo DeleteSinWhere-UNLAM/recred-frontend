@@ -10,7 +10,7 @@ import {
 } from '../models/sesion-asistente.model';
 
 interface SchoolAssistantRequest {
-  readonly sesionId: string | null;
+  readonly sesionId?: string;
   readonly mensaje: string;
 }
 
@@ -29,7 +29,9 @@ export class AsistenteVirtualService {
     mensaje: string,
     sesionId: string | null,
   ): Promise<RespuestaAsistente> {
-    const body: SchoolAssistantRequest = { sesionId, mensaje };
+    const body: SchoolAssistantRequest = sesionId
+      ? { sesionId, mensaje }
+      : { mensaje };
     return firstValueFrom(
       this.http.post<RespuestaAsistente>(
         `${this.getBasePath(contexto)}/mensajes`,

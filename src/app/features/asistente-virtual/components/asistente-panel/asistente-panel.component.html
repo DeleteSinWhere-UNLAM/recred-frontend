@@ -17,7 +17,7 @@
       type="button"
       class="asistente-panel__accion"
       (click)="onNuevaConversacion()"
-      [disabled]="enviando_()"
+      [disabled]="deshabilitado_()"
       aria-label="Nueva conversación"
       title="Nueva conversación"
     >
@@ -35,7 +35,13 @@
 
   <div #scroll class="asistente-panel__mensajes" aria-live="polite">
     @for (m of mensajes_(); track trackById($index, m)) {
-      <app-mensaje-burbuja [mensaje]="m" />
+      @if (m.rol === 'separador') {
+        <div class="asistente-panel__separador" role="separator">
+          <span>{{ m.texto }}</span>
+        </div>
+      } @else {
+        <app-mensaje-burbuja [mensaje]="m" />
+      }
     }
     @if (enviando_()) {
       <div class="asistente-panel__typing" aria-label="Cred está escribiendo">
@@ -49,14 +55,27 @@
     }
   </div>
 
+  @if (mostrarHistorial_()) {
+    <div class="asistente-panel__historial">
+      <button
+        type="button"
+        class="asistente-panel__historial-boton"
+        [disabled]="deshabilitado_()"
+        (click)="onVerHistorial()"
+      >
+        Ver mensajes anteriores
+      </button>
+    </div>
+  }
+
   <app-sugerencias-chips
     [sugerencias]="sugerencias_()"
-    [deshabilitado]="enviando_()"
+    [deshabilitado]="deshabilitado_()"
     (elegir)="onSugerencia($event)"
   />
 
   <app-input-mensaje
-    [deshabilitado]="enviando_()"
+    [deshabilitado]="deshabilitado_()"
     (enviar)="onEnviar($event)"
   />
 </section>

@@ -12,11 +12,18 @@ export type CapacidadAsistente =
   | 'VENTAS'
   | 'PEDIDOS';
 
+export type TipoSugerenciaAsistente =
+  | 'consulta'
+  | 'confirmacion'
+  | 'cancelacion';
+
 export interface SugerenciaCapacidad {
-  readonly capacidad: CapacidadAsistente;
+  readonly id: string;
+  readonly capacidad?: CapacidadAsistente;
   readonly label: string;
   readonly emoji: string;
   readonly prompt: string;
+  readonly tipo?: TipoSugerenciaAsistente;
 }
 
 export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
@@ -25,50 +32,65 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
 > = {
   ALUMNO: [
     {
+      id: 'saldo',
       capacidad: 'SALDO',
-      label: 'Mi saldo',
+      label: 'Saldo',
       emoji: '💰',
-      prompt: '¿Cuánto saldo tengo?',
+      prompt: 'saldo',
     },
     {
+      id: 'ultimas-compras',
       capacidad: 'COMPRAS',
-      label: 'Mis compras',
+      label: 'Últimas compras',
       emoji: '🛒',
-      prompt: '¿Qué compré esta semana?',
+      prompt: 'mostrame mis ultimas compras',
     },
     {
-      capacidad: 'PAGOS',
-      label: 'Mis pagos',
+      id: 'compras-frecuentes',
+      capacidad: 'COMPRAS',
+      label: 'Compras frecuentes',
       emoji: '🧾',
-      prompt: '¿Cuándo fue mi último pago?',
+      prompt: 'mostrame mis compras frecuentes',
     },
     {
-      capacidad: 'EVENTOS',
-      label: 'Eventos',
-      emoji: '📅',
-      prompt: '¿Qué eventos tengo pronto?',
+      id: 'repetir-ultima-compra',
+      capacidad: 'COMPRAS',
+      label: 'Repetir última compra',
+      emoji: '🔁',
+      prompt: 'repeti mi ultima compra',
+    },
+    {
+      id: 'comprar-habitual',
+      capacidad: 'COMPRAS',
+      label: 'Comprar lo habitual',
+      emoji: '⭐',
+      prompt: 'comprame lo de siempre',
     },
   ],
   PADRE: [
     {
+      id: 'hijos',
       capacidad: 'HIJOS',
       label: 'Mis hijos',
       emoji: '👨‍👩‍👧',
       prompt: 'Resumime el estado de mis hijos.',
     },
     {
+      id: 'presupuestos',
       capacidad: 'PRESUPUESTOS',
       label: 'Presupuestos',
       emoji: '💳',
       prompt: '¿Cómo vienen los presupuestos de mis hijos?',
     },
     {
+      id: 'restricciones',
       capacidad: 'RESTRICCIONES',
       label: 'Restricciones',
       emoji: '🛡️',
       prompt: '¿Qué restricciones están activas?',
     },
     {
+      id: 'compras-hijos',
       capacidad: 'COMPRAS',
       label: 'Compras',
       emoji: '🧺',
@@ -77,24 +99,28 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
   ],
   VENDEDOR: [
     {
+      id: 'stock',
       capacidad: 'STOCK',
       label: 'Stock',
       emoji: '📦',
       prompt: '¿Qué productos necesitan reposición?',
     },
     {
+      id: 'ventas',
       capacidad: 'VENTAS',
       label: 'Ventas',
       emoji: '📈',
       prompt: 'Resumime las ventas de hoy.',
     },
     {
+      id: 'pedidos',
       capacidad: 'PEDIDOS',
       label: 'Pedidos',
       emoji: '🧾',
       prompt: '¿Qué pedidos tengo pendientes?',
     },
     {
+      id: 'eventos-kiosco',
       capacidad: 'EVENTOS',
       label: 'Eventos',
       emoji: '📅',
@@ -102,3 +128,20 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
     },
   ],
 };
+
+export const SUGERENCIAS_COMPRA_PENDIENTE: readonly SugerenciaCapacidad[] = [
+  {
+    id: 'confirmar-compra',
+    label: 'Confirmar compra',
+    emoji: 'OK',
+    prompt: 'confirmar',
+    tipo: 'confirmacion',
+  },
+  {
+    id: 'cancelar-compra',
+    label: 'Cancelar',
+    emoji: 'X',
+    prompt: 'cancelar',
+    tipo: 'cancelacion',
+  },
+];

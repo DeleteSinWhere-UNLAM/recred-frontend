@@ -11,10 +11,7 @@ import {
   effect,
   signal,
 } from '@angular/core';
-import {
-  CapacidadAsistente,
-  SugerenciaCapacidad,
-} from '../../models/capacidad-asistente.model';
+import { SugerenciaCapacidad } from '../../models/capacidad-asistente.model';
 import { MensajeAsistente } from '../../models/mensaje-asistente.model';
 import { InputMensajeComponent } from '../input-mensaje/input-mensaje.component';
 import { MensajeBurbujaComponent } from '../mensaje-burbuja/mensaje-burbuja.component';
@@ -31,6 +28,8 @@ export class AsistentePanelComponent implements AfterViewInit {
   private readonly mensajesState = signal<readonly MensajeAsistente[]>([]);
   private readonly sugerenciasState = signal<readonly SugerenciaCapacidad[]>([]);
   private readonly enviandoState = signal(false);
+  private readonly deshabilitadoState = signal(false);
+  private readonly mostrarHistorialState = signal(false);
 
   @Input({ required: true })
   set mensajes(valor: readonly MensajeAsistente[]) {
@@ -47,10 +46,21 @@ export class AsistentePanelComponent implements AfterViewInit {
     this.enviandoState.set(valor);
   }
 
+  @Input()
+  set deshabilitado(valor: boolean) {
+    this.deshabilitadoState.set(valor);
+  }
+
+  @Input()
+  set mostrarHistorial(valor: boolean) {
+    this.mostrarHistorialState.set(valor);
+  }
+
   @Output() cerrar = new EventEmitter<void>();
   @Output() enviar = new EventEmitter<string>();
-  @Output() sugerencia = new EventEmitter<CapacidadAsistente>();
+  @Output() sugerencia = new EventEmitter<string>();
   @Output() nuevaConversacion = new EventEmitter<void>();
+  @Output() verHistorial = new EventEmitter<void>();
 
   @ViewChild('scroll') private readonly scrollEl?: ElementRef<HTMLDivElement>;
   @ViewChild(InputMensajeComponent) private readonly inputComp?: InputMensajeComponent;
@@ -58,6 +68,8 @@ export class AsistentePanelComponent implements AfterViewInit {
   protected readonly mensajes_ = this.mensajesState.asReadonly();
   protected readonly sugerencias_ = this.sugerenciasState.asReadonly();
   protected readonly enviando_ = this.enviandoState.asReadonly();
+  protected readonly deshabilitado_ = this.deshabilitadoState.asReadonly();
+  protected readonly mostrarHistorial_ = this.mostrarHistorialState.asReadonly();
 
   constructor() {
     effect(() => {
@@ -85,12 +97,16 @@ export class AsistentePanelComponent implements AfterViewInit {
     this.nuevaConversacion.emit();
   }
 
+  protected onVerHistorial(): void {
+    this.verHistorial.emit();
+  }
+
   protected onEnviar(texto: string): void {
     this.enviar.emit(texto);
   }
 
-  protected onSugerencia(capacidad: CapacidadAsistente): void {
-    this.sugerencia.emit(capacidad);
+  protected onSugerencia(prompt: string): void {
+    this.sugerencia.emit(prompt);
   }
 
   protected trackById(_index: number, mensaje: MensajeAsistente): string {
