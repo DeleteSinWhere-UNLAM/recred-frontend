@@ -258,6 +258,7 @@ export class BuffetService {
       categoria = { id: 'snacks', descripcion: 'Snacks' };
     }
 
+    const esBloqueoManual = !!dto.bloqueado && dto.motivoBloqueo === 'Bloqueado por el tutor';
     return {
       id: dto.id,
       nombre: dto.nombre,
@@ -266,7 +267,8 @@ export class BuffetService {
       categoria: categoria,
       clasificacionesSalud: [],
       imagen: this.obtenerImagenProducto(dto.nombre),
-      estadoStock: dto.bloqueado ? 'SIN_STOCK' : 'DISPONIBLE'
+      estadoStock: dto.bloqueado ? 'SIN_STOCK' : 'DISPONIBLE',
+      bloqueado: esBloqueoManual
     };
   }
 

@@ -138,8 +138,10 @@
             [producto]="producto"
             [alumnoId]="presenter.alumno()?.id ?? ''"
             [esFavorito]="presenter.favoritos().has(producto.id)"
+            [mostrarCandado]="!esVistaAlumno()"
             (agregar)="presenter.agregarAlCarrito($event.producto, $event.cantidad)"
             (toggleFavorito)="presenter.toggleFavorito($event)"
+            (toggleLock)="presenter.toggleLock($event)"
           />
         }
       </section>

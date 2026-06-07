@@ -2,7 +2,8 @@
 @if (producto) {
   <article
     class="producto-card"
-    [class.producto-card--sin-stock]="!disponible()"
+    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado"
+    [class.producto-card--bloqueado]="producto.bloqueado"
   >
     <div class="producto-card__media">
       <button
@@ -15,6 +16,18 @@
         <i class="fa-heart" [class.fa-solid]="esFavorito" [class.fa-regular]="!esFavorito" aria-hidden="true"></i>
       </button>
 
+      @if (mostrarCandado) {
+        <button
+          type="button"
+          class="producto-card__lock-btn"
+          [class.producto-card__lock-btn--bloqueado]="producto.bloqueado"
+          (click)="onToggleLock($event)"
+          [attr.aria-label]="producto.bloqueado ? 'Desbloquear producto' : 'Bloquear producto'"
+        >
+          <i class="fa-solid" [class.fa-lock]="producto.bloqueado" [class.fa-lock-open]="!producto.bloqueado" aria-hidden="true"></i>
+        </button>
+      }
+
       <img
         class="producto-card__imagen"
         [src]="producto.imagen"
@@ -23,7 +36,10 @@
         (error)="onImagenError($event)"
       />
       @if (producto.clasificacionesSalud.length > 0) {
-        <span class="producto-card__badge">
+        <span
+          class="producto-card__badge"
+          [class.producto-card__badge--shifted]="mostrarCandado"
+        >
           {{ producto.clasificacionesSalud[0].descripcion }}
         </span>
       }
@@ -79,8 +95,13 @@
           class="producto-card__cta producto-card__cta--bloqueado"
           disabled
         >
-          <i class="fa-solid fa-ban" aria-hidden="true"></i>
-          <span>Sin stock</span>
+          @if (producto.bloqueado) {
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+            <span>Bloqueado</span>
+          } @else {
+            <i class="fa-solid fa-ban" aria-hidden="true"></i>
+            <span>Sin stock</span>
+          }
         </button>
       }
     </div>

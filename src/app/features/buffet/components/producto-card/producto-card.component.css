@@ -315,3 +315,61 @@
     height: 168px;
   }
 }
+
+.producto-card__lock-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  color: #64748b;
+  box-shadow: 0 4px 12px rgba(51, 65, 85, 0.12);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.producto-card__lock-btn:hover {
+  transform: scale(1.12);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 16px rgba(51, 65, 85, 0.18);
+}
+
+.producto-card__lock-btn:active {
+  transform: scale(0.92);
+}
+
+.producto-card__lock-btn--bloqueado {
+  color: #ef4444;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.producto-card__lock-btn--bloqueado:hover {
+  color: #dc2626;
+}
+
+.producto-card__badge--shifted {
+  right: 52px;
+}
+
+.producto-card--bloqueado {
+  border-color: rgba(239, 68, 68, 0.22);
+}
+
+.producto-card--bloqueado .producto-card__imagen {
+  filter: grayscale(0.85);
+  opacity: 0.6;
+}
+
+.producto-card--bloqueado .producto-card__nombre,
+.producto-card--bloqueado .producto-card__precio {
+  opacity: 0.55;
+}

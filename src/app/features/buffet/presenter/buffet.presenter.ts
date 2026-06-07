@@ -14,6 +14,7 @@ import {
   ClasificacionSalud,
   Producto,
 } from '../models/producto.model';
+import { RestriccionProductoService } from '../../restriccion-producto/services/restriccion-producto.service';
 
 export interface FiltrosBuffet {
   busqueda: string;
@@ -39,6 +40,7 @@ export class BuffetPresenter {
   private readonly usuarioService = inject(UsuarioService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly restriccionProductoService = inject(RestriccionProductoService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly buffetState = signal<Buffet | undefined>(undefined);
@@ -86,8 +88,12 @@ export class BuffetPresenter {
     const { busqueda, categoriaId, clasificacionId, soloFavoritos } = this.filtrosState();
     const texto = busqueda.trim().toLowerCase();
     const favs = this.favoritosState();
+    const esAlumno = this.usuarioService.esVistaAlumno();
 
     return this.productosState().filter((producto) => {
+      if (esAlumno && producto.bloqueado) {
+        return false;
+      }
       if (soloFavoritos && !favs.has(producto.id)) {
         return false;
       }
@@ -207,6 +213,41 @@ export class BuffetPresenter {
       this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({
         next: () => this.toastService.mostrar(`Se agregó "${producto.nombre}" a tus favoritos`, 'success'),
         error: (err) => console.error('Error adding favorite:', err)
+      });
+    }
+  }
+
+  toggleLock(producto: Producto): void {
+    const alumno = this.alumnoState();
+    if (!alumno) return;
+
+    const actualBloqueado = !!producto.bloqueado;
+    producto.bloqueado = !actualBloqueado;
+    this.productosState.set([...this.productosState()]);
+
+    if (actualBloqueado) {
+      this.restriccionProductoService.desbloquearProducto(alumno.id, producto.id).subscribe({
+        next: () => {
+          this.toastService.mostrar(`Se desbloqueó "${producto.nombre}"`, 'success');
+        },
+        error: (err) => {
+          console.error('Error unlocking product:', err);
+          producto.bloqueado = true;
+          this.productosState.set([...this.productosState()]);
+          this.toastService.mostrar('Error al desbloquear el producto', 'error');
+        }
+      });
+    } else {
+      this.restriccionProductoService.bloquearProducto(alumno.id, producto.id).subscribe({
+        next: () => {
+          this.toastService.mostrar(`Se bloqueó "${producto.nombre}"`, 'success');
+        },
+        error: (err) => {
+          console.error('Error blocking product:', err);
+          producto.bloqueado = false;
+          this.productosState.set([...this.productosState()]);
+          this.toastService.mostrar('Error al bloquear el producto', 'error');
+        }
       });
     }
   }
