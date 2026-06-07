@@ -91,12 +91,12 @@
 }
 
 .producto-card__favorito-btn--activo {
-  color: #e63946;
+  color: var(--color-menta);
   background: rgba(255, 255, 255, 0.92);
 }
 
 .producto-card__favorito-btn--activo:hover {
-  color: #d62828;
+  color: var(--color-pizarra);
 }
 
 .producto-card__badge {

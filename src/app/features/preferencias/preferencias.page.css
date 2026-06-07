@@ -179,7 +179,7 @@
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
-  color: #e63946;
+  color: var(--color-menta);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all var(--transition-ui);
@@ -187,7 +187,7 @@
 
 .preferencias-fav-card__quitar-btn:hover {
   transform: scale(1.1);
-  color: #d62828;
+  color: var(--color-pizarra);
   background: #fff;
 }
 

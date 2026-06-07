@@ -124,7 +124,7 @@ export class BuffetPresenter {
     this.buffetState.set(buffet);
     
     // Carga dinámica de productos
-    this.buffetService.getProductosDelBuffet(buffet.id).subscribe({
+    this.buffetService.getProductosDelBuffet(buffet.id, alumnoId).subscribe({
       next: (productos) => {
         this.productosState.set(productos);
         this.categoriasState.set(this.extractUniqueCategories(productos));

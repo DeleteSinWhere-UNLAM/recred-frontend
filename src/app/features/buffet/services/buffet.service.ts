@@ -18,6 +18,15 @@ interface ProductDTO {
   clasificacionesSalud?: { id: string; descripcion: string }[] | null;
 }
 
+interface MenuProductoDTO {
+  id: string;
+  nombre: string;
+  descripcion?: string | null;
+  precio: number;
+  bloqueado?: boolean;
+  motivoBloqueo?: string | null;
+}
+
 const CAT_COMIDAS: CategoriaProducto = { id: 'comidas', descripcion: 'Comidas' };
 const CAT_BEBIDAS: CategoriaProducto = { id: 'bebidas', descripcion: 'Bebidas' };
 const CAT_SNACKS: CategoriaProducto = { id: 'snacks', descripcion: 'Snacks' };
@@ -176,7 +185,20 @@ export class BuffetService {
     return this.buffetsPorColegio[colegioId] ?? Object.values(this.buffetsPorColegio)[0];
   }
 
-  getProductosDelBuffet(buffetId: string): Observable<Producto[]> {
+  getProductosDelBuffet(buffetId: string, alumnoId?: string): Observable<Producto[]> {
+    if (alumnoId && this.isUuid(alumnoId)) {
+      return this.http.get<MenuProductoDTO[]>(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).pipe(
+        map(dtos => dtos.map(dto => this.mapMenuProductDtoToProducto(dto))),
+        catchError((error) => {
+          console.warn('Error fetching menu buffet from backend, falling back to products query:', error);
+          return this.getProductosByBuffetId(buffetId);
+        })
+      );
+    }
+    return this.getProductosByBuffetId(buffetId);
+  }
+
+  private getProductosByBuffetId(buffetId: string): Observable<Producto[]> {
     if (!this.isUuid(buffetId)) {
       return of(this.productosPorBuffet[buffetId] ?? this.productosPorBuffet['buffet-san-jose']);
     }
@@ -224,6 +246,27 @@ export class BuffetService {
       clasificacionesSalud: dto.clasificacionesSalud ?? [],
       imagen: this.obtenerImagenProducto(dto.nombre),
       estadoStock: (dto.stockActual !== undefined ? dto.stockActual : 1) > 0 ? 'DISPONIBLE' : 'SIN_STOCK'
+    };
+  }
+
+  private mapMenuProductDtoToProducto(dto: MenuProductoDTO): Producto {
+    const nombre = dto.nombre.toLowerCase();
+    let categoria = { id: 'comidas', descripcion: 'Comidas' };
+    if (nombre.includes('coca') || nombre.includes('sprite') || nombre.includes('fanta') || nombre.includes('agua') || nombre.includes('jugo') || nombre.includes('gatorade') || nombre.includes('powerade') || nombre.includes('cafe') || nombre.includes('te') || nombre.includes('cindor') || nombre.includes('bebida') || nombre.includes('levite') || nombre.includes('aquarius')) {
+      categoria = { id: 'bebidas', descripcion: 'Bebidas' };
+    } else if (nombre.includes('papa') || nombre.includes('cheeto') || nombre.includes('dorito') || nombre.includes('palito') || nombre.includes('alfajor') || nombre.includes('oreo') || nombre.includes('pepito') || nombre.includes('chocolate') || nombre.includes('cookie') || nombre.includes('turron') || nombre.includes('cereal') || nombre.includes('caramelo') || nombre.includes('chicle') || nombre.includes('pochoclo') || nombre.includes('snack')) {
+      categoria = { id: 'snacks', descripcion: 'Snacks' };
+    }
+
+    return {
+      id: dto.id,
+      nombre: dto.nombre,
+      descripcion: dto.descripcion ?? '',
+      precio: dto.precio,
+      categoria: categoria,
+      clasificacionesSalud: [],
+      imagen: this.obtenerImagenProducto(dto.nombre),
+      estadoStock: dto.bloqueado ? 'SIN_STOCK' : 'DISPONIBLE'
     };
   }
 
