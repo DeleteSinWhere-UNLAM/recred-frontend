@@ -103,39 +103,49 @@ export class HomeAlumnoPresenter {
     {
       id: 'pedidos',
       label: 'Mis pedidos',
-      descripcion: 'Tus comidas pendientes',
+      descripcion: 'Tu historial de compras y consumos',
       icono: 'fa-receipt',
       emoji: '🛍️',
       color: 'mandarina',
-      ruta: '/compra',
+      ruta: '/movimientos',
     },
     {
       id: 'preferencias',
       label: 'Mis preferencias',
-      descripcion: 'Lo que más te gusta',
-      icono: 'fa-heart',
-      emoji: '❤️',
+      descripcion: 'Sugerencias de la IA',
+      icono: 'fa-wand-magic-sparkles',
+      emoji: '✨',
       color: 'melocoton',
       ruta: '/preferencias',
+    },
+    {
+      id: 'favoritos',
+      label: 'Mis favoritos',
+      descripcion: 'Tus productos preferidos',
+      icono: 'fa-heart',
+      emoji: '❤️',
+      color: 'menta',
+      ruta: '/favoritos',
     },
   ]);
 
   init(): void {
     const alumnoMock = this.usuarioService.getAlumnoActual();
     const perfil = this.perfilService.getPerfil();
+    const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;
     const alumno: Alumno = perfil
-      ? { ...alumnoMock, nombre: perfil.nombre, apellido: perfil.apellido }
+      ? { ...alumnoMock, id: alumnoId, nombre: perfil.nombre, apellido: perfil.apellido }
       : alumnoMock;
     this.alumnoState.set(alumno);
-    this.pedidoState.set(this.homeAlumnoService.getPedidoEnCurso(alumnoMock.id));
-    this.recreoState.set(this.homeAlumnoService.getProximoRecreo(alumnoMock.id));
+    this.pedidoState.set(this.homeAlumnoService.getPedidoEnCurso(alumnoId));
+    this.recreoState.set(this.homeAlumnoService.getProximoRecreo(alumnoId));
   }
 
   ejecutarAccion(accion: AccionRapida): void {
     if (!accion.ruta) return;
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
-    if (accion.id === 'buffet') {
+    if (accion.id === 'buffet' || accion.id === 'pedidos') {
       this.router.navigate([accion.ruta, alumnoId]);
       return;
     }

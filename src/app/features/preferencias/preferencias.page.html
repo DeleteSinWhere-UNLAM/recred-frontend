@@ -19,16 +19,24 @@
       </div>
     </header>
 
-    @if (preferencias.length > 0) {
-      <div class="preferencias__lista">
-        @for (p of preferencias; track p.productoId) {
-          <app-preferencia-card [preferencia]="p" />
-        }
-      </div>
-    } @else {
-      <p class="preferencias__vacio">
-        Todavía no hay preferencias registradas para este alumno.
-      </p>
-    }
+    <!-- SECCIÓN DE RECOMENDACIONES IA -->
+    <section class="preferencias__seccion" aria-labelledby="titulo-sugerencias">
+      <h3 id="titulo-sugerencias" class="preferencias__seccion-titulo">
+        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+        <span>Sugerencias de la IA</span>
+      </h3>
+
+      @if (preferencias.length > 0) {
+        <div class="preferencias__lista">
+          @for (p of preferencias; track p.productoId) {
+            <app-preferencia-card [preferencia]="p" />
+          }
+        </div>
+      } @else {
+        <p class="preferencias__vacio">
+          Todavía no hay sugerencias de consumo registradas para este alumno.
+        </p>
+      }
+    </section>
   </div>
 </main>

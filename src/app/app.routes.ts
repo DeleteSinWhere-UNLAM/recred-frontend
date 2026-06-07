@@ -60,6 +60,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'favoritos',
+        loadComponent: () =>
+          import('./features/favoritos/favoritos.page').then(
+            (m) => m.FavoritosPage,
+          ),
+      },
+      {
         path: 'sugerencias',
         loadComponent: () =>
           import('./features/sugerencias/sugerencias.page').then(
@@ -121,6 +128,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/estadistica/estadistica.page').then(
             (m) => m.EstadisticaPage,
+          ),
+      },
+      {
+        path: 'movimientos',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
+      {
+        path: 'movimientos/:alumnoId',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
           ),
       },
       {

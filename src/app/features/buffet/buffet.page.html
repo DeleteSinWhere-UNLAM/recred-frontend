@@ -112,6 +112,17 @@
 
       <button
         type="button"
+        class="buffet__filtro-favoritos"
+        [class.buffet__filtro-favoritos--activo]="presenter.filtros().soloFavoritos"
+        (click)="onToggleSoloFavoritos()"
+        aria-label="Filtrar solo favoritos"
+      >
+        <i class="fa-solid fa-heart" aria-hidden="true"></i>
+        <span>Favoritos</span>
+      </button>
+
+      <button
+        type="button"
         class="buffet__limpiar"
         (click)="presenter.limpiarFiltros()"
       >
@@ -126,7 +137,11 @@
           <app-producto-card
             [producto]="producto"
             [alumnoId]="presenter.alumno()?.id ?? ''"
+            [esFavorito]="presenter.favoritos().has(producto.id)"
+            [mostrarCandado]="!esVistaAlumno()"
             (agregar)="presenter.agregarAlCarrito($event.producto, $event.cantidad)"
+            (toggleFavorito)="presenter.toggleFavorito($event)"
+            (toggleLock)="presenter.toggleLock($event)"
           />
         }
       </section>
