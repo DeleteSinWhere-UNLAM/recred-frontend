@@ -96,6 +96,7 @@
       <div
         class="presupuesto__total"
         [class.presupuesto__total--invalido]="!presenter.porcentajeValido()"
+        [class.presupuesto__total--completo]="presenter.topeCompletado()"
       >
         <div class="presupuesto__total-info">
           <span>Total asignado</span>
@@ -109,7 +110,15 @@
         </div>
         @if (!presenter.porcentajeValido()) {
           <p class="presupuesto__error">
-            La suma supera 100%. Ajustá las reglas antes de guardar.
+            La suma supera el 100%. Ajustá las reglas antes de guardar.
+          </p>
+        } @else if (presenter.topeCompletado()) {
+          <p class="presupuesto__ok">
+            Ya asignaste el 100%. Podés guardar.
+          </p>
+        } @else {
+          <p class="presupuesto__ayuda">
+            La suma de las categorías no puede superar el 100%.
           </p>
         }
       </div>
@@ -137,10 +146,14 @@
     <button
       type="button"
       class="presupuesto__guardar"
-      [disabled]="!presenter.porcentajeValido()"
+      [disabled]="!presenter.porcentajeValido() || presenter.cargando() || presenter.guardando()"
       (click)="presenter.guardar()"
     >
-      Guardar presupuesto
+      @if (presenter.guardando()) {
+        Guardando...
+      } @else {
+        Guardar presupuesto
+      }
     </button>
 
   </div>

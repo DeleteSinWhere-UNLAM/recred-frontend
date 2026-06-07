@@ -33,6 +33,8 @@ export class PresupuestoPresenter {
     undefined,
   );
   private readonly categoriasDisponiblesState = signal<CategoriaProducto[]>([]);
+  private readonly cargandoState = signal(false);
+  private readonly guardandoState = signal(false);
 
   readonly periodos = PERIODOS;
   readonly alumno: Signal<Alumno | undefined> = this.alumnoState.asReadonly();
@@ -41,6 +43,8 @@ export class PresupuestoPresenter {
     this.prediccionState.asReadonly();
   readonly categoriasDisponibles: Signal<CategoriaProducto[]> =
     this.categoriasDisponiblesState.asReadonly();
+  readonly cargando = this.cargandoState.asReadonly();
+  readonly guardando = this.guardandoState.asReadonly();
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
@@ -84,18 +88,44 @@ export class PresupuestoPresenter {
     () => this.categoriasUsables().length > 0,
   );
 
-  init(alumnoId: string): void {
-    const alumno = this.alumnosService.getAlumnoById(alumnoId);
-    if (!alumno) {
-      this.router.navigateByUrl('/tutor');
-      return;
+  readonly topeCompletado = computed(() => this.totalPorcentaje() === 100);
+
+  async init(alumnoId: string): Promise<void> {
+    this.cargandoState.set(true);
+    try {
+      await this.alumnosService.asegurarCargados();
+      const alumno = this.alumnosService.getAlumnoById(alumnoId);
+      if (!alumno) {
+        this.router.navigateByUrl('/tutor');
+        return;
+      }
+      this.alumnoState.set(alumno);
+      this.presupuestoState.set(presupuestoPorDefecto(alumnoId));
+
+      const [categorias, presupuesto] = await Promise.all([
+        this.presupuestoService.getCategoriasDisponibles(),
+        this.presupuestoService.getPresupuesto(alumnoId),
+      ]);
+      this.categoriasDisponiblesState.set(categorias);
+      if (presupuesto) {
+        this.presupuestoState.set(presupuesto);
+      }
+
+      const periodoPrediccion = this.presupuestoState().periodo;
+      const prediccion = await this.presupuestoService.cargarPrediccion(
+        alumnoId,
+        periodoPrediccion,
+      );
+      this.prediccionState.set(prediccion);
+    } catch (error) {
+      console.error('[Presupuesto] error cargando', error);
+      this.toastService.mostrar(
+        'No pudimos cargar el presupuesto del alumno.',
+        'error',
+      );
+    } finally {
+      this.cargandoState.set(false);
     }
-    this.alumnoState.set(alumno);
-    this.presupuestoState.set(this.presupuestoService.getPresupuesto(alumnoId));
-    this.prediccionState.set(this.presupuestoService.getPrediccion(alumnoId));
-    this.categoriasDisponiblesState.set(
-      this.presupuestoService.getCategoriasDisponibles(),
-    );
   }
 
   setMontoGeneral(monto: number): void {
@@ -139,15 +169,19 @@ export class PresupuestoPresenter {
   }
 
   setPorcentajeRegla(reglaId: string, porcentaje: number): void {
-    const seguro = clamp(porcentaje, 0, 100);
-    this.presupuestoState.update((actual) =>
-      recalcularMontosReglas({
+    this.presupuestoState.update((actual) => {
+      const usadoOtros = actual.reglasCategoria
+        .filter((r) => r.id !== reglaId)
+        .reduce((acc, r) => acc + r.porcentajeLimite, 0);
+      const disponible = Math.max(0, 100 - usadoOtros);
+      const seguro = clamp(porcentaje, 0, disponible);
+      return recalcularMontosReglas({
         ...actual,
         reglasCategoria: actual.reglasCategoria.map((r) =>
           r.id === reglaId ? { ...r, porcentajeLimite: seguro } : r,
         ),
-      }),
-    );
+      });
+    });
   }
 
   eliminarRegla(reglaId: string): void {
@@ -157,7 +191,8 @@ export class PresupuestoPresenter {
     }));
   }
 
-  guardar(): void {
+  async guardar(): Promise<void> {
+    if (this.guardandoState() || this.cargandoState()) return;
     if (!this.porcentajeValido()) {
       this.toastService.mostrar(
         'La suma de porcentajes no puede superar 100%.',
@@ -165,8 +200,22 @@ export class PresupuestoPresenter {
       );
       return;
     }
-    this.presupuestoService.guardar(this.presupuestoState());
-    this.toastService.mostrar('Presupuesto guardado.', 'success');
+    this.guardandoState.set(true);
+    try {
+      const guardado = await this.presupuestoService.guardar(
+        this.presupuestoState(),
+      );
+      this.presupuestoState.set(guardado);
+      this.toastService.mostrar('Presupuesto guardado.', 'success');
+    } catch (error) {
+      console.error('[Presupuesto] error guardando', error);
+      this.toastService.mostrar(
+        'No pudimos guardar el presupuesto. Probá de nuevo.',
+        'error',
+      );
+    } finally {
+      this.guardandoState.set(false);
+    }
   }
 
   volver(): void {
