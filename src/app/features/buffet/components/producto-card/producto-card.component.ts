@@ -46,7 +46,18 @@ export class ProductoCardComponent {
     this.alumnoIdState.set(valor);
   }
 
+  @Input() esFavorito = false;
+
   @Output() agregar = new EventEmitter<AgregarEvento>();
+  @Output() toggleFavorito = new EventEmitter<Producto>();
+
+  protected onToggleFavorito(event: Event): void {
+    event.stopPropagation();
+    const p = this.productoState();
+    if (p) {
+      this.toggleFavorito.emit(p);
+    }
+  }
 
   readonly productoActual = computed(() => this.productoState());
 

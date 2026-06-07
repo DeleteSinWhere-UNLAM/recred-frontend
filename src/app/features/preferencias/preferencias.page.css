@@ -88,6 +88,36 @@
   margin: 0;
 }
 
+/* Secciones de la página */
+.preferencias__seccion {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preferencias__seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.preferencias__seccion-titulo i {
+  color: var(--color-melocoton);
+}
+
+.preferencias__seccion-titulo .fa-wand-magic-sparkles {
+  color: var(--color-dorado-dark);
+}
+
+
+
 .preferencias__lista {
   display: flex;
   flex-direction: column;
