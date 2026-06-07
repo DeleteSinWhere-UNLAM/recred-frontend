@@ -1,5 +1,12 @@
-<div class="mov-modal-overlay" (click)="onCerrar()">
-  <div class="mov-modal" (click)="$event.stopPropagation()" role="dialog" aria-labelledby="modal-titulo">
+<div
+  class="mov-modal-overlay"
+  (click)="onOverlayClick($event)"
+  (keydown)="onKeyDown($event)"
+  tabindex="0"
+  role="button"
+  aria-label="Cerrar modal"
+>
+  <div class="mov-modal" role="dialog" aria-labelledby="modal-titulo">
     <header class="mov-modal__header">
       <h3 id="modal-titulo" class="mov-modal__titulo">Detalles del Movimiento</h3>
       <button type="button" class="mov-modal__close-btn" (click)="onCerrar()" aria-label="Cerrar modal">

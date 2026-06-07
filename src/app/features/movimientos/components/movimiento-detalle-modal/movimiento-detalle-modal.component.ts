@@ -16,6 +16,19 @@ export class MovimientoDetalleModalComponent {
     this.cerrar.emit();
   }
 
+  onOverlayClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.onCerrar();
+    }
+  }
+
+  onKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.onCerrar();
+    }
+  }
+
   formatearPrecio(precio: number): string {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',

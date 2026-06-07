@@ -10,6 +10,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   animation: overlay-fadeIn 0.22s ease-out;
+  outline: none;
 }
 
 .mov-modal {
