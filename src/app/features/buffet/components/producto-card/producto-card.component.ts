@@ -47,9 +47,11 @@ export class ProductoCardComponent {
   }
 
   @Input() esFavorito = false;
-
+  @Input() mostrarCandado = false;
+ 
   @Output() agregar = new EventEmitter<AgregarEvento>();
   @Output() toggleFavorito = new EventEmitter<Producto>();
+  @Output() toggleLock = new EventEmitter<Producto>();
 
   protected onToggleFavorito(event: Event): void {
     event.stopPropagation();
@@ -59,11 +61,19 @@ export class ProductoCardComponent {
     }
   }
 
+  protected onToggleLock(event: Event): void {
+    event.stopPropagation();
+    const p = this.productoState();
+    if (p) {
+      this.toggleLock.emit(p);
+    }
+  }
+
   readonly productoActual = computed(() => this.productoState());
 
   readonly disponible = computed(() => {
     const p = this.productoState();
-    return p ? disponible(p) : false;
+    return p ? (disponible(p) && !p.bloqueado) : false;
   });
 
   readonly precioFormateado = computed(() => {
