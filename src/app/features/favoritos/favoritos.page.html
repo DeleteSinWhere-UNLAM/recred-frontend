@@ -1,0 +1,84 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="favoritos">
+  <button type="button" class="favoritos__volver" (click)="volver()">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
+
+  <div class="favoritos__container">
+    <header class="favoritos__cabecera">
+      <div class="favoritos__icono" aria-hidden="true">
+        <i class="fa-solid fa-heart"></i>
+      </div>
+      <div class="favoritos__identidad">
+        <h2 class="favoritos__titulo">Mis Productos Favoritos</h2>
+        <p class="favoritos__subtitulo">
+          Tus productos preferidos del Buffet
+        </p>
+      </div>
+    </header>
+
+    <!-- SECCIÓN DE PRODUCTOS FAVORITOS -->
+    <section class="favoritos__seccion" aria-labelledby="titulo-favoritos">
+      @if (favoritos.length > 0) {
+        <div class="favoritos__favoritos-grid">
+          @for (f of favoritos; track f.id) {
+            <article class="favoritos-fav-card" [class.favoritos-fav-card--sin-stock]="f.estadoStock === 'SIN_STOCK'">
+              <div class="favoritos-fav-card__media">
+                <img
+                  class="favoritos-fav-card__imagen"
+                  [src]="f.imagen || IMAGEN_FALLBACK"
+                  [alt]="f.nombre"
+                  loading="lazy"
+                  (error)="onImagenError($event)"
+                />
+                <button
+                  type="button"
+                  class="favoritos-fav-card__quitar-btn"
+                  (click)="quitarFavorito(f.id)"
+                  title="Quitar de favoritos"
+                  aria-label="Quitar de favoritos"
+                >
+                  <i class="fa-solid fa-heart" aria-hidden="true"></i>
+                </button>
+              </div>
+
+              <div class="favoritos-fav-card__cuerpo">
+                <div class="favoritos-fav-card__meta">
+                  <span class="favoritos-fav-card__categoria">{{ f.categoria.descripcion }}</span>
+                  <span class="favoritos-fav-card__precio">{{ formatearPrecio(f.precio) }}</span>
+                </div>
+                <h4 class="favoritos-fav-card__nombre">{{ f.nombre }}</h4>
+                <p class="favoritos-fav-card__descripcion">{{ f.descripcion }}</p>
+
+                <button
+                  type="button"
+                  class="favoritos-fav-card__comprar-btn"
+                  (click)="agregarAlCarrito(f)"
+                  [disabled]="f.estadoStock === 'SIN_STOCK'"
+                >
+                  @if (f.estadoStock === 'SIN_STOCK') {
+                    <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                    <span>Sin stock</span>
+                  } @else {
+                    <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                    <span>Comprar rápido</span>
+                  }
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="favoritos__favoritos-vacio">
+          <i class="fa-regular fa-heart" aria-hidden="true"></i>
+          <p>Aún no tenés productos favoritos guardados.</p>
+          <p class="favoritos__favoritos-vacio-sub">
+            Hacé click en el corazón de los productos en el Buffet para agregarlos aquí.
+          </p>
+        </div>
+      }
+    </section>
+  </div>
+</main>

@@ -112,11 +112,20 @@ export class HomeAlumnoPresenter {
     {
       id: 'preferencias',
       label: 'Mis preferencias',
-      descripcion: 'Lo que más te gusta',
-      icono: 'fa-heart',
-      emoji: '❤️',
+      descripcion: 'Sugerencias de la IA',
+      icono: 'fa-wand-magic-sparkles',
+      emoji: '✨',
       color: 'melocoton',
       ruta: '/preferencias',
+    },
+    {
+      id: 'favoritos',
+      label: 'Mis favoritos',
+      descripcion: 'Tus productos preferidos',
+      icono: 'fa-heart',
+      emoji: '❤️',
+      color: 'menta',
+      ruta: '/favoritos',
     },
   ]);
 

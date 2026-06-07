@@ -60,6 +60,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'favoritos',
+        loadComponent: () =>
+          import('./features/favoritos/favoritos.page').then(
+            (m) => m.FavoritosPage,
+          ),
+      },
+      {
         path: 'sugerencias',
         loadComponent: () =>
           import('./features/sugerencias/sugerencias.page').then(

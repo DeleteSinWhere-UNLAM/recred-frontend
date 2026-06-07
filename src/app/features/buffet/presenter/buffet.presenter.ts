@@ -7,7 +7,7 @@ import { ColegiosService } from '../../../data-access/services/colegios.service'
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { BuffetService } from '../services/buffet.service';
-import { PreferenciasService } from '../../preferencias/services/preferencias.service';
+import { FavoritosService } from '../../favoritos/services/favoritos.service';
 import { Buffet } from '../models/buffet.model';
 import {
   CategoriaProducto,
@@ -33,7 +33,7 @@ const filtrosPorDefecto: FiltrosBuffet = {
 export class BuffetPresenter {
   private readonly alumnosService = inject(AlumnosService);
   private readonly buffetService = inject(BuffetService);
-  private readonly preferenciasService = inject(PreferenciasService);
+  private readonly favoritosService = inject(FavoritosService);
   private readonly carritoService = inject(CarritoService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly usuarioService = inject(UsuarioService);
@@ -136,7 +136,7 @@ export class BuffetPresenter {
     });
 
     // Carga de favoritos del alumno
-    this.preferenciasService.getFavoritos(alumnoId).subscribe({
+    this.favoritosService.getFavoritos(alumnoId).subscribe({
       next: (favs) => {
         const ids = new Set(favs.map((f) => f.id));
         this.favoritosState.set(ids);
@@ -197,14 +197,14 @@ export class BuffetPresenter {
     if (ids.has(producto.id)) {
       ids.delete(producto.id);
       this.favoritosState.set(ids);
-      this.preferenciasService.removerFavorito(alumno.id, producto.id).subscribe({
+      this.favoritosService.removerFavorito(alumno.id, producto.id).subscribe({
         next: () => this.toastService.mostrar(`Se quitó "${producto.nombre}" de tus favoritos`, 'success'),
         error: (err) => console.error('Error removing favorite:', err)
       });
     } else {
       ids.add(producto.id);
       this.favoritosState.set(ids);
-      this.preferenciasService.agregarFavorito(alumno.id, producto).subscribe({
+      this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({
         next: () => this.toastService.mostrar(`Se agregó "${producto.nombre}" a tus favoritos`, 'success'),
         error: (err) => console.error('Error adding favorite:', err)
       });
