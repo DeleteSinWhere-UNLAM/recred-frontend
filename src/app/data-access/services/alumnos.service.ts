@@ -47,6 +47,9 @@ export class AlumnosService {
     if (!perfil) {
       return Promise.resolve([]);
     }
+    if (perfil.rol === 'ALUMNO') {
+      return Promise.resolve(this.getAlumnos());
+    }
     this.cargaInFlight = this.cargarHijosDelTutor().finally(() => {
       this.cargaInFlight = null;
     });

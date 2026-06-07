@@ -103,11 +103,11 @@ export class HomeAlumnoPresenter {
     {
       id: 'pedidos',
       label: 'Mis pedidos',
-      descripcion: 'Tus comidas pendientes',
+      descripcion: 'Tu historial de compras y consumos',
       icono: 'fa-receipt',
       emoji: '🛍️',
       color: 'mandarina',
-      ruta: '/compra',
+      ruta: '/movimientos',
     },
     {
       id: 'preferencias',
@@ -145,7 +145,7 @@ export class HomeAlumnoPresenter {
     if (!accion.ruta) return;
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
-    if (accion.id === 'buffet') {
+    if (accion.id === 'buffet' || accion.id === 'pedidos') {
       this.router.navigate([accion.ruta, alumnoId]);
       return;
     }

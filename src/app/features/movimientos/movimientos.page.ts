@@ -9,6 +9,7 @@ import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
+import { PerfilService } from '../../data-access/services/perfil.service';
 
 @Component({
   selector: 'app-movimientos-page',
@@ -22,6 +23,9 @@ export class MovimientosPage implements OnInit {
   private readonly movimientosService = inject(MovimientosService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
+
+  readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   readonly nombreNavbar = this.usuarioService.nombreNavbar;
   readonly alumnos = this.alumnosService.alumnos;
@@ -83,7 +87,10 @@ export class MovimientosPage implements OnInit {
     void this.alumnosService.asegurarCargados().then(() => {
       this.route.paramMap.subscribe((params) => {
         const alumnoId = params.get('alumnoId');
-        if (alumnoId) {
+        if (this.esVistaAlumno()) {
+          const currentAlumnoId = this.perfilService.obtenerAlumnoId() ?? this.usuarioService.getAlumnoActual().id;
+          this.selectedAlumnoId.set(currentAlumnoId);
+        } else if (alumnoId) {
           this.selectedAlumnoId.set(alumnoId);
         } else {
           this.selectedAlumnoId.set('todos');
@@ -173,6 +180,10 @@ export class MovimientosPage implements OnInit {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/tutor');
+    if (this.esVistaAlumno()) {
+      this.router.navigateByUrl('/alumno');
+    } else {
+      this.router.navigateByUrl('/tutor');
+    }
   }
 }

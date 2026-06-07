@@ -9,6 +9,7 @@ import { MovimientosPage } from './movimientos.page';
 import { MovimientosService } from './services/movimientos.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
 import { Movimiento } from './models/movimiento.model';
 import { Alumno } from '../../data-access/models/alumno.model';
 
@@ -19,6 +20,7 @@ describe('MovimientosPage', () => {
 
   let movimientosServiceSpy: jasmine.SpyObj<MovimientosService>;
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
+  let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
 
   let paramMapSubject: BehaviorSubject<any>;
 
@@ -84,6 +86,9 @@ describe('MovimientosPage', () => {
       'asegurarCargados',
       'getAlumnoById',
     ]);
+    perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', [
+      'obtenerAlumnoId',
+    ]);
 
     // Configurar Mocks
     alumnosServiceSpy.asegurarCargados.and.resolveTo([mockAlumno1, mockAlumno2]);
@@ -98,6 +103,8 @@ describe('MovimientosPage', () => {
       return undefined;
     });
 
+    perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-1');
+
     movimientosServiceSpy.getHistorialTutor.and.returnValue(of(mockMovimientosList));
     movimientosServiceSpy.getHistorialAlumno.and.returnValue(of([mockMovimiento1, mockMovimiento3]));
 
@@ -111,6 +118,7 @@ describe('MovimientosPage', () => {
         provideRouter([]),
         { provide: MovimientosService, useValue: movimientosServiceSpy },
         { provide: AlumnosService, useValue: alumnosServiceSpy },
+        { provide: PerfilService, useValue: perfilServiceSpy },
         UsuarioService, // Usar UsuarioService real para resolver señales y métodos de manera correcta en el Navbar
         {
           provide: ActivatedRoute,
@@ -281,5 +289,36 @@ describe('MovimientosPage', () => {
       component.volver();
       expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
     });
+  });
+
+  describe('Vista Alumno', () => {
+    let usuarioService: UsuarioService;
+
+    beforeEach(() => {
+      usuarioService = TestBed.inject(UsuarioService);
+      usuarioService.setHomeUrl('/alumno');
+    });
+
+    afterEach(() => {
+      usuarioService.setHomeUrl('/tutor');
+    });
+
+    it('debería forzar el id del alumno logueado al inicializar', fakeAsync(() => {
+      paramMapSubject.next(convertToParamMap({}));
+      fixture.detectChanges();
+      tick();
+
+      expect(component.selectedAlumnoId()).toBe('alumno-1');
+      expect(movimientosServiceSpy.getHistorialAlumno).toHaveBeenCalledWith('alumno-1');
+    }));
+
+    it('debería navegar a la home de alumno al presionar volver', fakeAsync(() => {
+      paramMapSubject.next(convertToParamMap({}));
+      fixture.detectChanges();
+      tick();
+
+      component.volver();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/alumno');
+    }));
   });
 });

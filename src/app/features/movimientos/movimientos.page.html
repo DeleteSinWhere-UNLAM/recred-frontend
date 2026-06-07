@@ -14,7 +14,9 @@
         </div>
         <div>
           <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
-          <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
+          @if (!esVistaAlumno()) {
+            <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
+          }
         </div>
       </div>
     </header>
@@ -22,23 +24,25 @@
     <!-- Panel de Controles y Filtros -->
     <section class="movimientos__panel" aria-label="Filtros de búsqueda">
       <!-- Selector de Alumno (Hijo) -->
-      <div class="movimientos__control-alumno">
-        <label for="select-alumno" class="movimientos__label">Seleccionar Hijo</label>
-        <div class="movimientos__select-wrapper">
-          <select
-            id="select-alumno"
-            [value]="selectedAlumnoId()"
-            (change)="onAlumnoChange($event)"
-            class="movimientos__select movimientos__select--alumno"
-          >
-            <option value="todos">Todos los hijos</option>
-            @for (alumno of alumnos(); track alumno.id) {
-              <option [value]="alumno.id">{{ alumno.nombre }} {{ alumno.apellido }}</option>
-            }
-          </select>
-          <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
+      @if (!esVistaAlumno()) {
+        <div class="movimientos__control-alumno">
+          <label for="select-alumno" class="movimientos__label">Seleccionar Hijo</label>
+          <div class="movimientos__select-wrapper">
+            <select
+              id="select-alumno"
+              [value]="selectedAlumnoId()"
+              (change)="onAlumnoChange($event)"
+              class="movimientos__select movimientos__select--alumno"
+            >
+              <option value="todos">Todos los hijos</option>
+              @for (alumno of alumnos(); track alumno.id) {
+                <option [value]="alumno.id">{{ alumno.nombre }} {{ alumno.apellido }}</option>
+              }
+            </select>
+            <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
+          </div>
         </div>
-      </div>
+      }
 
       <!-- Filtros Secundarios -->
       <div class="movimientos__filtros">
@@ -154,7 +158,13 @@
             <i class="fa-solid fa-receipt vacio-icon" aria-hidden="true"></i>
           </div>
           <p class="vacio-titulo">No se encontraron movimientos</p>
-          <p class="vacio-subtitulo">Intentá cambiando los filtros o seleccionando otro alumno.</p>
+          <p class="vacio-subtitulo">
+            @if (esVistaAlumno()) {
+              Intentá cambiando los filtros de búsqueda.
+            } @else {
+              Intentá cambiando los filtros o seleccionando otro alumno.
+            }
+          </p>
         </div>
       } @else {
         <!-- Listado -->

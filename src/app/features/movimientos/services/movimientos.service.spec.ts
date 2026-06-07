@@ -47,17 +47,30 @@ describe('MovimientosService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getHistorialAlumno debería llamar a /purchases/alumno/:id', (done) => {
-    service.getHistorialAlumno('alumno-123').subscribe({
+  it('getHistorialAlumno debería llamar a /purchases/alumno/:id cuando el id es un UUID', (done) => {
+    const uuid = '550e8400-e29b-41d4-a716-446655440000';
+    service.getHistorialAlumno(uuid).subscribe({
       next: (movimientos) => {
         expect(movimientos).toEqual(mockMovimientos);
         done();
       }
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/purchases/alumno/alumno-123`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/purchases/alumno/${uuid}`);
     expect(req.request.method).toBe('GET');
     req.flush(mockMovimientos);
+  });
+
+  it('getHistorialAlumno debería retornar mock de movimientos cuando el id no es un UUID', (done) => {
+    service.getHistorialAlumno('julian-garcia').subscribe({
+      next: (movimientos) => {
+        expect(movimientos.length).toBeGreaterThan(0);
+        expect(movimientos[0].studentId).toBe('julian-garcia');
+        done();
+      }
+    });
+
+    // No debe disparar llamadas HTTP, por lo que httpMock.verify() al final de beforeEach/afterEach no encontrará llamadas pendientes.
   });
 
   it('getHistorialTutor debería llamar a /purchases/tutor/me', (done) => {
