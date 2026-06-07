@@ -24,7 +24,7 @@ export class PreferenciasPage {
   preferencias: Preferencia[] = [];
 
   constructor() {
-    this.usuarioService.setHomeUrl('/alumno');
+    this.usuarioService.setHomeUrl('/tutor');
 
     // Cargar sugerencias de la IA
     this.preferenciasService.getPreferencias().subscribe((data) => {
@@ -33,6 +33,6 @@ export class PreferenciasPage {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/alumno');
+    this.router.navigateByUrl('/tutor');
   }
 }
