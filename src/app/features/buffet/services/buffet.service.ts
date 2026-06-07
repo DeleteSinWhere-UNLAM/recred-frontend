@@ -8,6 +8,15 @@ import {
   ClasificacionSalud,
   Producto,
 } from '../models/producto.model';
+interface ProductDTO {
+  id: string;
+  nombre: string;
+  descripcion?: string | null;
+  precio: number;
+  stockActual?: number;
+  categoria?: { id: string; descripcion: string } | null;
+  clasificacionesSalud?: { id: string; descripcion: string }[] | null;
+}
 
 const CAT_COMIDAS: CategoriaProducto = { id: 'comidas', descripcion: 'Comidas' };
 const CAT_BEBIDAS: CategoriaProducto = { id: 'bebidas', descripcion: 'Bebidas' };
@@ -172,7 +181,7 @@ export class BuffetService {
       return of(this.productosPorBuffet[buffetId] ?? this.productosPorBuffet['buffet-san-jose']);
     }
 
-    return this.http.get<any[]>(`${environment.apiUrl}/products`, { params: { buffetId } }).pipe(
+    return this.http.get<ProductDTO[]>(`${environment.apiUrl}/products`, { params: { buffetId } }).pipe(
       map(dtos => dtos.map(dto => this.mapDtoToProducto(dto))),
       catchError((error) => {
         console.warn('Error fetching products from backend, falling back to mock:', error);
@@ -205,14 +214,14 @@ export class BuffetService {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   }
 
-  private mapDtoToProducto(dto: any): Producto {
+  private mapDtoToProducto(dto: ProductDTO): Producto {
     return {
       id: dto.id,
       nombre: dto.nombre,
       descripcion: dto.descripcion ?? '',
       precio: dto.precio,
       categoria: dto.categoria ?? { id: 'comidas', descripcion: 'Comidas' },
-      clasificacionesSalud: dto.clasificacionesSalud ? Array.from(dto.clasificacionesSalud) as any[] : [],
+      clasificacionesSalud: dto.clasificacionesSalud ?? [],
       imagen: this.obtenerImagenProducto(dto.nombre),
       estadoStock: (dto.stockActual !== undefined ? dto.stockActual : 1) > 0 ? 'DISPONIBLE' : 'SIN_STOCK'
     };

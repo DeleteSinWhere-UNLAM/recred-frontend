@@ -6,6 +6,16 @@ import { environment } from '../../../../environments/environment';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { Producto } from '../../buffet/models/producto.model';
 
+interface ProductDTO {
+  id: string;
+  nombre: string;
+  descripcion?: string | null;
+  precio: number;
+  stockActual?: number;
+  categoria?: { id: string; descripcion: string } | null;
+  clasificacionesSalud?: { id: string; descripcion: string }[] | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PreferenciasService {
   private readonly http = inject(HttpClient);
@@ -25,7 +35,7 @@ export class PreferenciasService {
       return of(this.getFavoritosFromLocalStorage(alumnoId));
     }
 
-    return this.http.get<any[]>(`${environment.apiUrl}/alumnos/${alumnoId}/preferencias/favoritos`).pipe(
+    return this.http.get<ProductDTO[]>(`${environment.apiUrl}/alumnos/${alumnoId}/preferencias/favoritos`).pipe(
       map(dtos => dtos.map(dto => this.mapDtoToProducto(dto))),
       catchError((error) => {
         console.warn('Error fetching favorites from backend, falling back to localStorage:', error);
@@ -90,14 +100,14 @@ export class PreferenciasService {
     localStorage.setItem(key, JSON.stringify(updated));
   }
 
-  private mapDtoToProducto(dto: any): Producto {
+  private mapDtoToProducto(dto: ProductDTO): Producto {
     return {
       id: dto.id,
       nombre: dto.nombre,
       descripcion: dto.descripcion ?? '',
       precio: dto.precio,
       categoria: dto.categoria ?? { id: 'comidas', descripcion: 'Comidas' },
-      clasificacionesSalud: dto.clasificacionesSalud ? Array.from(dto.clasificacionesSalud) as any[] : [],
+      clasificacionesSalud: dto.clasificacionesSalud ?? [],
       imagen: this.obtenerImagenProducto(dto.nombre),
       estadoStock: (dto.stockActual !== undefined ? dto.stockActual : 1) > 0 ? 'DISPONIBLE' : 'SIN_STOCK'
     };
