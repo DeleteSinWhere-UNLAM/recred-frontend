@@ -1,15 +1,21 @@
-import { Injectable, Signal, computed, inject, signal } from '@angular/core';
+import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Alumno } from '../../../../data-access/models/alumno.model';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { ItemCarrito } from '../../models/carrito.model';
+import { SugerenciaCarrito } from '../../models/sugerencia-carrito.model';
 import {
   OrdenAlumno,
   Recreo,
 } from '../../models/orden-compra.model';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
+import { BuffetService } from '../../../buffet/services/buffet.service';
+import { SugerenciasCarritoService } from '../../services/sugerencias-carrito.service';
 import { CarritoService } from '../../services/carrito.service';
 import { CompraService } from '../../services/compra.service';
+import { Producto } from '../../../buffet/models/producto.model';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 export interface GrupoCarrito {
   alumno: Alumno;
@@ -20,17 +26,30 @@ export interface GrupoCarrito {
   recreo: Recreo;
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 @Injectable()
 export class CarritoPresenter {
   private readonly carritoService = inject(CarritoService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly compraService = inject(CompraService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
+  private readonly buffetService = inject(BuffetService);
+  private readonly sugerenciasCarritoService = inject(SugerenciasCarritoService);
+  private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
   private readonly seleccionState = signal<Record<string, boolean>>({});
   private readonly fechasState = signal<Record<string, string>>({});
   private readonly recreosState = signal<Record<string, Recreo>>({});
+
+  private readonly sugerenciasState = signal<SugerenciaCarrito[]>([]);
+  private readonly cargandoSugerenciasState = signal(false);
+
+  readonly sugerencias: Signal<SugerenciaCarrito[]> = this.sugerenciasState.asReadonly();
+  readonly cargandoSugerencias: Signal<boolean> = this.cargandoSugerenciasState.asReadonly();
+  readonly mostrarSugerencias = computed(() => this.usuarioService.esVistaAlumno());
 
   readonly fechaMinima = this.calcularFechaMinima();
 
@@ -90,6 +109,74 @@ export class CarritoPresenter {
     }
     return `Hay ${conDeuda.length} alumnos con saldo insuficiente.`;
   });
+
+  constructor() {
+    effect(() => {
+      if (!this.mostrarSugerencias()) {
+        this.sugerenciasState.set([]);
+        return;
+      }
+      this.refrescarSugerencias();
+    });
+  }
+
+  private refrescarSugerencias(): void {
+    const studentId = this.perfilService.obtenerAlumnoId();
+    const grupo = this.grupos()[0];
+    if (!studentId || !UUID_REGEX.test(studentId) || !grupo) {
+      this.sugerenciasState.set([]);
+      return;
+    }
+    const buffet = this.buffetService.getBuffetDelAlumno(grupo.alumno.colegioId);
+    if (!buffet || !UUID_REGEX.test(buffet.id)) {
+      this.sugerenciasState.set([]);
+      return;
+    }
+
+    const itemsRequest = grupo.items.map((i) => ({
+      productId: i.producto.id,
+      quantity: i.cantidad,
+    }));
+
+    this.cargandoSugerenciasState.set(true);
+    this.sugerenciasCarritoService
+      .obtenerSugerencias({
+        studentId,
+        buffetId: buffet.id,
+        items: itemsRequest,
+        limit: 3,
+      })
+      .subscribe({
+        next: (resultado) => {
+          this.sugerenciasState.set(resultado);
+          this.cargandoSugerenciasState.set(false);
+        },
+        error: (err) => {
+          console.error('Error al obtener sugerencias de carrito:', err);
+          this.sugerenciasState.set([]);
+          this.cargandoSugerenciasState.set(false);
+        },
+      });
+  }
+
+  agregarSugerencia(sugerencia: SugerenciaCarrito): void {
+    const grupo = this.grupos()[0];
+    if (!grupo) return;
+    const producto: Producto = {
+      id: sugerencia.productId,
+      nombre: sugerencia.productName,
+      descripcion: '',
+      precio: sugerencia.price,
+      categoria: { id: 'comidas', descripcion: 'Comidas' },
+      clasificacionesSalud: [],
+      imagen: '',
+      estadoStock: sugerencia.stockActual > 0 ? 'DISPONIBLE' : 'SIN_STOCK',
+    };
+    this.carritoService.agregar(producto, grupo.alumno.id, 1);
+    this.toastService.mostrar(
+      `Se agregó "${producto.nombre}" al carrito`,
+    );
+  }
 
   toggleSeleccion(alumnoId: string): void {
     this.seleccionState.update((actual) => ({
