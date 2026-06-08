@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { AsistenteVirtualComponent } from '../asistente-virtual/asistente-virtual.component';
 import { AccionesGridComponent } from './components/acciones-grid/acciones-grid.component';
 import { PedidoRecreoCardComponent } from './components/pedido-recreo-card/pedido-recreo-card.component';
 import { PerfilHeaderComponent } from './components/perfil-header/perfil-header.component';
@@ -16,7 +15,6 @@ import { HomeAlumnoPresenter } from './presenter/home-alumno.presenter';
     PerfilHeaderComponent,
     AccionesGridComponent,
     PedidoRecreoCardComponent,
-    AsistenteVirtualComponent,
   ],
   providers: [HomeAlumnoPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -7,7 +7,6 @@ import {
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { AsistenteVirtualComponent } from '../asistente-virtual/asistente-virtual.component';
 import { AccionesGridComponent } from './components/acciones-grid/acciones-grid.component';
 import { PerfilKiosqueroHeaderComponent } from './components/perfil-kiosquero-header/perfil-kiosquero-header.component';
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
@@ -20,7 +19,6 @@ import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
     NavbarComponent,
     PerfilKiosqueroHeaderComponent,
     AccionesGridComponent,
-    AsistenteVirtualComponent,
   ],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
