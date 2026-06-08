@@ -20,13 +20,19 @@ export class SugerenciasChipsComponent {
   @Output() elegir = new EventEmitter<string>();
 
   protected get hint(): string {
-    return this.tieneCompraPendiente ? 'Compra pendiente' : 'Opciones rapidas';
+    if (this.tieneCompraPendiente) return 'Compra pendiente';
+    if (this.tieneSugerenciasBackend) return 'Siguiente paso';
+    return 'Opciones rapidas';
   }
 
   protected get tieneCompraPendiente(): boolean {
     return this.sugerencias.some(
       (s) => s.tipo === 'confirmacion' || s.tipo === 'cancelacion',
     );
+  }
+
+  private get tieneSugerenciasBackend(): boolean {
+    return this.sugerencias.some((s) => s.tipo === 'backend');
   }
 
   protected onClick(sugerencia: SugerenciaCapacidad): void {

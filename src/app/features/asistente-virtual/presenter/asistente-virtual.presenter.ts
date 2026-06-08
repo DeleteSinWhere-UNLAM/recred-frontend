@@ -2,14 +2,17 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import {
-  CapacidadAsistente,
   SUGERENCIAS_ASISTENTE_POR_ROL,
   SUGERENCIAS_COMPRA_PENDIENTE,
   SugerenciaCapacidad,
 } from '../models/capacidad-asistente.model';
 import { MensajeAsistente } from '../models/mensaje-asistente.model';
 import {
-  MetadataMensajeAsistente,
+  AccionAsistente,
+  RespuestaAsistente,
+  SugerenciaRespuestaAsistente,
+} from '../models/respuesta-asistente.model';
+import {
   MensajeAsistenteResponse,
   SesionAsistenteResponse,
 } from '../models/sesion-asistente.model';
@@ -19,18 +22,18 @@ import {
 } from '../services/asistente-virtual.service';
 
 const MENSAJES_BIENVENIDA: Record<RolUsuario, string> = {
-  ALUMNO: '¡Hola! Soy Cred. Puedo ayudarte con tu saldo y tus compras.',
+  ALUMNO: 'Hola. Soy Cred. Puedo ayudarte con saldo, compras, menu y pedidos.',
   PADRE:
-    '¡Hola! Soy Cred. Puedo ayudarte con tus hijos, presupuestos, compras y restricciones.',
+    'Hola. Soy Cred. Puedo ayudarte con hijos, presupuestos, restricciones y eventos.',
   VENDEDOR:
-    '¡Hola! Soy Cred. Puedo ayudarte con stock, ventas, pedidos y eventos escolares.',
+    'Hola. Soy Cred. Puedo ayudarte con stock, ventas, productos y pedidos del buffet.',
 };
 
-const MENSAJE_BIENVENIDA_DEFAULT =
-  '¡Hola! Soy Cred. ¿En qué te puedo ayudar?';
+const MENSAJE_BIENVENIDA_DEFAULT = 'Hola. Soy Cred. En que te puedo ayudar?';
 const MENSAJE_ERROR =
-  'No pude responder en este momento. Probá de nuevo en unos minutos.';
-const TIPO_COMPRA_RAPIDA = 'COMPRA_RAPIDA';
+  'No pude responder en este momento. Proba de nuevo en unos minutos.';
+const ESTADO_ESPERANDO_RECREO = 'ESPERANDO_RECREO';
+const ESTADO_ESPERANDO_CONFIRMACION = 'ESPERANDO_CONFIRMACION';
 
 @Injectable()
 export class AsistenteVirtualPresenter {
@@ -46,8 +49,10 @@ export class AsistenteVirtualPresenter {
   private readonly historialVisibleState = signal(false);
   private readonly sesionIdState = signal<string | null>(null);
   private readonly sesionHistorialState = signal<string | null>(null);
-  private readonly capacidadesState = signal<readonly CapacidadAsistente[]>([]);
-  private readonly compraPendienteState = signal(false);
+  private readonly accionState = signal<AccionAsistente | null>(null);
+  private readonly sugerenciasBackendState = signal<
+    readonly SugerenciaCapacidad[]
+  >([]);
 
   readonly abierto: Signal<boolean> = this.abiertoState.asReadonly();
   readonly mensajes: Signal<readonly MensajeAsistente[]> =
@@ -60,28 +65,31 @@ export class AsistenteVirtualPresenter {
     () =>
       this.historialDisponibleState() &&
       !this.historialVisibleState() &&
-      !this.compraPendienteState(),
+      !this.tieneAccionInteractiva(),
   );
+  readonly opcionesDisponibles: Signal<readonly SugerenciaCapacidad[]> =
+    computed(() => {
+      const rol = this.perfilService.rol();
+      return rol ? SUGERENCIAS_ASISTENTE_POR_ROL[rol] : [];
+    });
 
   readonly sugerencias: Signal<readonly SugerenciaCapacidad[]> = computed(() => {
-    if (this.compraPendienteState()) {
+    const accion = this.accionState();
+    const sugerenciasBackend = this.sugerenciasBackendState();
+
+    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
       return SUGERENCIAS_COMPRA_PENDIENTE;
     }
 
-    const rol = this.perfilService.rol();
-    if (!rol) return [];
+    if (accion?.estado === ESTADO_ESPERANDO_RECREO) {
+      return sugerenciasBackend;
+    }
 
-    const base = SUGERENCIAS_ASISTENTE_POR_ROL[rol];
-    if (rol === 'ALUMNO') return base;
+    if (sugerenciasBackend.length > 0) {
+      return sugerenciasBackend;
+    }
 
-    const capacidades = this.capacidadesState();
-    if (capacidades.length === 0) return base;
-
-    const permitidas = new Set(capacidades);
-    const filtradas = base.filter(
-      (s) => !!s.capacidad && permitidas.has(s.capacidad),
-    );
-    return filtradas.length > 0 ? filtradas : base;
+    return [];
   });
 
   abrir(): void {
@@ -133,26 +141,16 @@ export class AsistenteVirtualPresenter {
         this.sesionIdState.set(sesionIdRespuesta);
       }
 
-      this.capacidadesState.set(respuesta.capacidades ?? []);
-      if (this.esMensajeResolucionAccion(limpio)) {
-        this.compraPendienteState.set(false);
-      }
-
+      this.aplicarEstadoRespuesta(respuesta);
       this.mensajesState.update((lista) => [
         ...lista,
         this.crearMensajeCred(
           respuesta.respuesta,
-          respuesta.generadoPorIa,
+          respuesta.generadoPorIa ?? false,
           respuesta.fechaHora,
+          respuesta.accion ?? null,
         ),
       ]);
-
-      if (sesionIdRespuesta) {
-        await this.actualizarCompraPendienteDesdeHistorial(
-          contexto,
-          sesionIdRespuesta,
-        );
-      }
     } catch (err) {
       console.error('Error enviando mensaje al asistente:', err);
       this.mensajesState.update((lista) => [
@@ -175,8 +173,7 @@ export class AsistenteVirtualPresenter {
     const sesionId = this.sesionIdState();
 
     this.sesionIdState.set(null);
-    this.capacidadesState.set([]);
-    this.compraPendienteState.set(false);
+    this.limpiarAccionInteractiva();
     this.historialVisibleState.set(false);
     this.historialDisponibleState.set(this.sesionHistorialState() !== null);
     this.mensajesState.set([this.crearMensajeCred(this.mensajeBienvenida(), false)]);
@@ -212,7 +209,7 @@ export class AsistenteVirtualPresenter {
       this.sesionIdState.set(sesionId);
       this.historialVisibleState.set(true);
       this.historialDisponibleState.set(false);
-      this.actualizarCompraPendienteDesdeMensajes(mensajes);
+      this.limpiarAccionInteractiva();
       this.mensajesState.set([this.crearSeparadorHistorial(), ...mapeados]);
     } catch (err) {
       console.warn('No se pudo cargar el historial del asistente:', err);
@@ -240,7 +237,6 @@ export class AsistenteVirtualPresenter {
       const sesiones = await this.asistenteService.listarSesiones(contexto);
       const ultima = this.obtenerUltimaSesion(sesiones);
       if (!ultima) {
-        this.compraPendienteState.set(false);
         this.historialDisponibleState.set(false);
         return;
       }
@@ -255,20 +251,6 @@ export class AsistenteVirtualPresenter {
 
       this.sesionHistorialState.set(ultima.sesionId);
       this.historialDisponibleState.set(mensajes.length > 0);
-
-      if (this.tieneCompraRapidaPendiente(mensajes)) {
-        this.sesionIdState.set(ultima.sesionId);
-        this.compraPendienteState.set(true);
-        this.historialDisponibleState.set(false);
-        this.mensajesState.set([
-          this.crearMensajeCred(this.mensajeBienvenida(), false),
-          ...this.obtenerContextoCompraPendiente(mensajes).map((m) =>
-            this.mapearMensajeBackend(m),
-          ),
-        ]);
-      } else {
-        this.compraPendienteState.set(false);
-      }
     } catch (err) {
       console.warn('No se pudo revisar la ultima sesion del asistente:', err);
     } finally {
@@ -313,85 +295,50 @@ export class AsistenteVirtualPresenter {
     return rol ? MENSAJES_BIENVENIDA[rol] : MENSAJE_BIENVENIDA_DEFAULT;
   }
 
-  private async actualizarCompraPendienteDesdeHistorial(
-    contexto: ContextoAsistente,
-    sesionId: string,
-  ): Promise<void> {
-    try {
-      const mensajes = await this.asistenteService.obtenerMensajes(
-        contexto,
-        sesionId,
-      );
-      this.actualizarCompraPendienteDesdeMensajes(mensajes);
-    } catch (err) {
-      console.warn(
-        'No se pudo actualizar el estado de la accion pendiente:',
-        err,
-      );
-    }
-  }
-
-  private actualizarCompraPendienteDesdeMensajes(
-    mensajes: readonly MensajeAsistenteResponse[],
-  ): void {
-    const ultimoAsistente = [...mensajes]
-      .reverse()
-      .find((m) => m.rol === 'ASISTENTE_IA');
-
-    this.compraPendienteState.set(
-      this.esCompraRapidaPendiente(ultimoAsistente?.metadata),
+  private aplicarEstadoRespuesta(respuesta: RespuestaAsistente): void {
+    const accion = respuesta.accion ?? null;
+    const sugerenciasBackend = this.mapearSugerenciasBackend(
+      respuesta.sugerencias,
     );
+
+    this.accionState.set(accion);
+
+    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
+      this.sugerenciasBackendState.set([]);
+      return;
+    }
+
+    this.sugerenciasBackendState.set(sugerenciasBackend);
   }
 
-  private esCompraRapidaPendiente(
-    metadata?: MetadataMensajeAsistente | null,
-  ): boolean {
+  private mapearSugerenciasBackend(
+    sugerencias: readonly SugerenciaRespuestaAsistente[] | undefined,
+  ): readonly SugerenciaCapacidad[] {
+    if (!sugerencias || sugerencias.length === 0) return [];
+
+    return sugerencias
+      .filter((s) => s.label.trim().length > 0 && s.mensaje.trim().length > 0)
+      .map((s, index) => ({
+        id: `backend-${index}-${this.normalizarId(s.mensaje)}`,
+        label: s.label.trim(),
+        emoji: '',
+        prompt: s.mensaje.trim(),
+        tipo: 'backend',
+        tipoAccion: s.tipoAccion ?? null,
+      }));
+  }
+
+  private tieneAccionInteractiva(): boolean {
+    const estado = this.accionState()?.estado;
     return (
-      metadata?.estadoAccionChatbot === 'PENDIENTE' &&
-      metadata.accionPendienteChatbot?.tipo === TIPO_COMPRA_RAPIDA
+      estado === ESTADO_ESPERANDO_RECREO ||
+      estado === ESTADO_ESPERANDO_CONFIRMACION
     );
   }
 
-  private esMensajeResolucionAccion(texto: string): boolean {
-    const normalizado = texto.trim().toLowerCase();
-    return normalizado === 'confirmar' || normalizado === 'cancelar';
-  }
-
-  private tieneCompraRapidaPendiente(
-    mensajes: readonly MensajeAsistenteResponse[],
-  ): boolean {
-    const ultimoAsistente = this.obtenerUltimoMensajeAsistente(mensajes);
-    return this.esCompraRapidaPendiente(ultimoAsistente?.metadata);
-  }
-
-  private obtenerContextoCompraPendiente(
-    mensajes: readonly MensajeAsistenteResponse[],
-  ): readonly MensajeAsistenteResponse[] {
-    const indicePendiente = this.obtenerIndiceUltimoMensajeAsistente(mensajes);
-    if (indicePendiente < 0) return [];
-
-    const pendiente = mensajes[indicePendiente];
-    const usuarioPrevio = [...mensajes.slice(0, indicePendiente)]
-      .reverse()
-      .find((m) => m.rol === 'USUARIO');
-
-    return usuarioPrevio ? [usuarioPrevio, pendiente] : [pendiente];
-  }
-
-  private obtenerUltimoMensajeAsistente(
-    mensajes: readonly MensajeAsistenteResponse[],
-  ): MensajeAsistenteResponse | undefined {
-    const indice = this.obtenerIndiceUltimoMensajeAsistente(mensajes);
-    return indice >= 0 ? mensajes[indice] : undefined;
-  }
-
-  private obtenerIndiceUltimoMensajeAsistente(
-    mensajes: readonly MensajeAsistenteResponse[],
-  ): number {
-    for (let i = mensajes.length - 1; i >= 0; i--) {
-      if (mensajes[i].rol === 'ASISTENTE_IA') return i;
-    }
-    return -1;
+  private limpiarAccionInteractiva(): void {
+    this.accionState.set(null);
+    this.sugerenciasBackendState.set([]);
   }
 
   private mensajesSoloBienvenida(): boolean {
@@ -408,6 +355,7 @@ export class AsistenteVirtualPresenter {
       texto: mensaje.contenido,
       fechaHora: this.fechaDesdeBackend(mensaje.fechaHora),
       generadoPorIa: mensaje.rol === 'ASISTENTE_IA',
+      accion: mensaje.accion ?? null,
     };
   }
 
@@ -424,13 +372,15 @@ export class AsistenteVirtualPresenter {
     texto: string,
     generadoPorIa: boolean,
     fechaHora?: string,
+    accion?: AccionAsistente | null,
   ): MensajeAsistente {
     return {
       id: this.crearId(),
       rol: 'cred',
       texto,
-      fechaHora: fechaHora ? this.fechaDesdeBackend(fechaHora) : new Date(),
+      fechaHora: this.fechaDesdeBackend(fechaHora),
       generadoPorIa,
+      accion,
     };
   }
 
@@ -443,9 +393,19 @@ export class AsistenteVirtualPresenter {
     };
   }
 
-  private fechaDesdeBackend(valor: string): Date {
+  private fechaDesdeBackend(valor?: string | null): Date {
+    if (!valor) return new Date();
+
     const fecha = new Date(valor);
     return Number.isNaN(fecha.getTime()) ? new Date() : fecha;
+  }
+
+  private normalizarId(valor: string): string {
+    const normalizado = valor
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    return normalizado || this.crearId();
   }
 
   private crearId(): string {

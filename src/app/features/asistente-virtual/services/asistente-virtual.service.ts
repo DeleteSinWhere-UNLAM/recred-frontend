@@ -22,7 +22,7 @@ export interface ContextoAsistente {
 @Injectable({ providedIn: 'root' })
 export class AsistenteVirtualService {
   private readonly http = inject(HttpClient);
-  private readonly iaBase = environment.apiUrl.replace(/\/api\/v\d+\/?$/, '') + '/ia';
+  private readonly iaBase = `${environment.apiUrl.replace(/\/$/, '')}/ia`;
 
   enviarMensaje(
     contexto: ContextoAsistente,

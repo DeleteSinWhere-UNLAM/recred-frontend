@@ -12,7 +12,7 @@ export interface ClasificacionSaludBackend {
 @Injectable({ providedIn: 'root' })
 export class RestriccionesNutricionalesService {
   private readonly http = inject(HttpClient);
-  private readonly base = environment.apiUrl.replace(/\/v\d+\/?$/, '');
+  private readonly base = environment.apiUrl;
 
   getCatalogo(): Promise<ClasificacionSaludBackend[]> {
     return firstValueFrom(

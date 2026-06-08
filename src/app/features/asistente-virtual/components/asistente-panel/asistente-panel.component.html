@@ -74,8 +74,44 @@
     (elegir)="onSugerencia($event)"
   />
 
+  @if (accionesAbiertas_() && gruposOpciones().length > 0) {
+    <section
+      id="asistente-panel-acciones"
+      class="asistente-panel__acciones"
+      aria-label="Opciones del asistente"
+    >
+      <div class="asistente-panel__acciones-scroll">
+        @for (grupo of gruposOpciones(); track trackByGrupo($index, grupo)) {
+          <div class="asistente-panel__acciones-grupo">
+            <h3 class="asistente-panel__acciones-titulo">{{ grupo.label }}</h3>
+            <div class="asistente-panel__acciones-grid">
+              @for (opcion of grupo.opciones; track trackByOpcion($index, opcion)) {
+                <button
+                  type="button"
+                  class="asistente-panel__opcion"
+                  [disabled]="deshabilitado_()"
+                  (click)="onOpcion(opcion)"
+                >
+                  @if (opcion.emoji) {
+                    <span class="asistente-panel__opcion-icono" aria-hidden="true">
+                      {{ opcion.emoji }}
+                    </span>
+                  }
+                  <span class="asistente-panel__opcion-label">{{ opcion.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
   <app-input-mensaje
     [deshabilitado]="deshabilitado_()"
+    [mostrarAcciones]="opciones_().length > 0"
+    [accionesAbiertas]="accionesAbiertas_()"
+    (alternarAcciones)="onToggleAcciones()"
     (enviar)="onEnviar($event)"
   />
 </section>

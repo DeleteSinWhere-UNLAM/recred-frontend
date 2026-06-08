@@ -1,0 +1,10 @@
+
+> recreopago@0.0.0 start
+> node set-env.js --development && ng serve --host 127.0.0.1 --port 4200
+
+◇ injected env (15) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+Generando archivos de entorno (DEV) en C:\Users\patri\Desktop\Mate\tpi\recred-frontend\src\environments: environment.ts, environment.development.ts
+✅ Archivo environment.ts generado correctamente.
+✅ Archivo environment.development.ts generado correctamente.
+ [1mPort 4200 is already in use.
+Would you like to use a different port?[22m [2m(Y/n)[22m[47G

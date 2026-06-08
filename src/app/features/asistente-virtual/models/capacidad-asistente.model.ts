@@ -5,17 +5,22 @@ export type CapacidadAsistente =
   | 'PAGOS'
   | 'COMPRAS'
   | 'EVENTOS'
+  | 'MENU'
+  | 'PRODUCTOS'
   | 'HIJOS'
   | 'PRESUPUESTOS'
   | 'RESTRICCIONES'
   | 'STOCK'
   | 'VENTAS'
-  | 'PEDIDOS';
+  | 'PEDIDOS'
+  | 'PEDIDOS_PENDIENTES'
+  | 'CODIGO_RETIRO';
 
 export type TipoSugerenciaAsistente =
   | 'consulta'
   | 'confirmacion'
-  | 'cancelacion';
+  | 'cancelacion'
+  | 'backend';
 
 export interface SugerenciaCapacidad {
   readonly id: string;
@@ -24,6 +29,7 @@ export interface SugerenciaCapacidad {
   readonly emoji: string;
   readonly prompt: string;
   readonly tipo?: TipoSugerenciaAsistente;
+  readonly tipoAccion?: string | null;
 }
 
 export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
@@ -35,36 +41,64 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       id: 'saldo',
       capacidad: 'SALDO',
       label: 'Saldo',
-      emoji: '💰',
+      emoji: '$',
       prompt: 'saldo',
     },
     {
       id: 'ultimas-compras',
       capacidad: 'COMPRAS',
-      label: 'Últimas compras',
-      emoji: '🛒',
+      label: 'Ultimas compras',
+      emoji: 'C',
       prompt: 'mostrame mis ultimas compras',
     },
     {
       id: 'compras-frecuentes',
       capacidad: 'COMPRAS',
       label: 'Compras frecuentes',
-      emoji: '🧾',
+      emoji: 'F',
       prompt: 'mostrame mis compras frecuentes',
+    },
+    {
+      id: 'compra-habitual',
+      capacidad: 'COMPRAS',
+      label: 'Compra habitual',
+      emoji: '*',
+      prompt: 'comprame lo de siempre',
     },
     {
       id: 'repetir-ultima-compra',
       capacidad: 'COMPRAS',
-      label: 'Repetir última compra',
-      emoji: '🔁',
+      label: 'Repetir ultima compra',
+      emoji: 'R',
       prompt: 'repeti mi ultima compra',
     },
     {
-      id: 'comprar-habitual',
-      capacidad: 'COMPRAS',
-      label: 'Comprar lo habitual',
-      emoji: '⭐',
-      prompt: 'comprame lo de siempre',
+      id: 'eventos',
+      capacidad: 'EVENTOS',
+      label: 'Eventos',
+      emoji: 'E',
+      prompt: 'eventos',
+    },
+    {
+      id: 'menu-productos',
+      capacidad: 'PRODUCTOS',
+      label: 'Menu/productos',
+      emoji: 'M',
+      prompt: 'mostrame el menu',
+    },
+    {
+      id: 'pedidos-pendientes',
+      capacidad: 'PEDIDOS_PENDIENTES',
+      label: 'Pedidos pendientes',
+      emoji: 'P',
+      prompt: 'mostrame mis pedidos pendientes',
+    },
+    {
+      id: 'codigo-retiro',
+      capacidad: 'CODIGO_RETIRO',
+      label: 'Codigo de retiro',
+      emoji: '#',
+      prompt: 'codigo de retiro',
     },
   ],
   PADRE: [
@@ -72,29 +106,29 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       id: 'hijos',
       capacidad: 'HIJOS',
       label: 'Mis hijos',
-      emoji: '👨‍👩‍👧',
-      prompt: 'Resumime el estado de mis hijos.',
+      emoji: 'H',
+      prompt: 'resumime el estado de mis hijos',
     },
     {
       id: 'presupuestos',
       capacidad: 'PRESUPUESTOS',
       label: 'Presupuestos',
-      emoji: '💳',
-      prompt: '¿Cómo vienen los presupuestos de mis hijos?',
+      emoji: '$',
+      prompt: 'como vienen los presupuestos de mis hijos',
     },
     {
       id: 'restricciones',
       capacidad: 'RESTRICCIONES',
       label: 'Restricciones',
-      emoji: '🛡️',
-      prompt: '¿Qué restricciones están activas?',
+      emoji: '!',
+      prompt: 'que restricciones estan activas',
     },
     {
-      id: 'compras-hijos',
-      capacidad: 'COMPRAS',
-      label: 'Compras',
-      emoji: '🧺',
-      prompt: 'Mostrame las compras recientes de mis hijos.',
+      id: 'eventos-tutor',
+      capacidad: 'EVENTOS',
+      label: 'Eventos',
+      emoji: 'E',
+      prompt: 'eventos',
     },
   ],
   VENDEDOR: [
@@ -102,29 +136,36 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       id: 'stock',
       capacidad: 'STOCK',
       label: 'Stock',
-      emoji: '📦',
-      prompt: '¿Qué productos necesitan reposición?',
+      emoji: 'S',
+      prompt: 'stock',
+    },
+    {
+      id: 'pedidos-pendientes-kiosco',
+      capacidad: 'PEDIDOS_PENDIENTES',
+      label: 'Pedidos pendientes',
+      emoji: 'P',
+      prompt: 'pedidos pendientes',
     },
     {
       id: 'ventas',
       capacidad: 'VENTAS',
       label: 'Ventas',
-      emoji: '📈',
-      prompt: 'Resumime las ventas de hoy.',
+      emoji: 'V',
+      prompt: 'ventas',
     },
     {
-      id: 'pedidos',
+      id: 'productos-buffet',
+      capacidad: 'PRODUCTOS',
+      label: 'Productos',
+      emoji: 'M',
+      prompt: 'productos del buffet',
+    },
+    {
+      id: 'pedidos-buffet',
       capacidad: 'PEDIDOS',
-      label: 'Pedidos',
-      emoji: '🧾',
-      prompt: '¿Qué pedidos tengo pendientes?',
-    },
-    {
-      id: 'eventos-kiosco',
-      capacidad: 'EVENTOS',
-      label: 'Eventos',
-      emoji: '📅',
-      prompt: '¿Hay eventos escolares que afecten al buffet?',
+      label: 'Pedidos buffet',
+      emoji: 'B',
+      prompt: 'pedidos del buffet',
     },
   ],
 };

@@ -22,4 +22,6 @@ export interface Perfil {
   readonly alumnoEntity?: ReferenciaPerfil | null;
   readonly studentId?: string | null;
   readonly student?: ReferenciaPerfil | null;
+  readonly phone?: string | null;
+  readonly documentNumber?: string | null;
 }

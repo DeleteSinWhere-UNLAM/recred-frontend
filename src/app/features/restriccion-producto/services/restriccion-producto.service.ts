@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class RestriccionProductoService {
   private readonly http = inject(HttpClient);
-  private readonly base = environment.apiUrl.replace(/\/v\d+\/?$/, '');
+  private readonly base = environment.apiUrl;
 
   bloquearProducto(alumnoId: string, productoId: string): Observable<void> {
     return this.http.post<void>(

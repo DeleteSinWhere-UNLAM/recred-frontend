@@ -1,4 +1,5 @@
 import { MensajeAsistente } from './mensaje-asistente.model';
+import { AccionAsistente } from './respuesta-asistente.model';
 
 export interface SesionAsistente {
   readonly id: string | null;
@@ -36,5 +37,6 @@ export interface MensajeAsistenteResponse {
   readonly rol: 'USUARIO' | 'ASISTENTE_IA';
   readonly contenido: string;
   readonly metadata?: MetadataMensajeAsistente | null;
+  readonly accion?: AccionAsistente | null;
   readonly fechaHora: string;
 }

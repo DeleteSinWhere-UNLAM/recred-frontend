@@ -12,7 +12,7 @@ import { PresupuestoService } from './presupuesto.service';
 
 describe('PresupuestoService', () => {
   const apiBase = environment.apiUrl;
-  const iaBase = apiBase.replace(/\/api\/v\d+\/?$/, '') + '/ia';
+  const iaBase = `${apiBase}/ia`;
 
   const perfilMock: Perfil = {
     id: 'tutor-1',

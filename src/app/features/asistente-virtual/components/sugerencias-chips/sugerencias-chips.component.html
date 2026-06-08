@@ -12,7 +12,9 @@
           [disabled]="deshabilitado"
           (click)="onClick(s)"
         >
-          <span class="sugerencias-chips__emoji" aria-hidden="true">{{ s.emoji }}</span>
+          @if (s.emoji) {
+            <span class="sugerencias-chips__emoji" aria-hidden="true">{{ s.emoji }}</span>
+          }
           <span class="sugerencias-chips__label">{{ s.label }}</span>
         </button>
       }
