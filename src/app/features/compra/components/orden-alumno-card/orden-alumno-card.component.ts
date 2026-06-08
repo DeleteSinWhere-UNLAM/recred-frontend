@@ -43,6 +43,7 @@ export class OrdenAlumnoCardComponent {
   @Input() fecha = '';
   @Input() recreo: Recreo = 'PRIMER_RECREO';
   @Input() fechaMinima = '';
+  @Input() errorPresupuesto: string | null = null;
 
   @Output() toggleSeleccion = new EventEmitter<void>();
   @Output() fechaCambia = new EventEmitter<string>();

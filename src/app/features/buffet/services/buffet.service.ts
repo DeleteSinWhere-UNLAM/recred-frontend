@@ -268,7 +268,8 @@ export class BuffetService {
       clasificacionesSalud: [],
       imagen: this.obtenerImagenProducto(dto.nombre),
       estadoStock: dto.bloqueado ? 'SIN_STOCK' : 'DISPONIBLE',
-      bloqueado: esBloqueoManual
+      bloqueado: esBloqueoManual,
+      motivoBloqueo: dto.motivoBloqueo ?? undefined
     };
   }
 

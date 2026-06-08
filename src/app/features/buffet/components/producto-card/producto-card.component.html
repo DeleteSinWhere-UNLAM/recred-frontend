@@ -80,7 +80,7 @@
           (click)="onAgregar()"
         >
           <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
-          <span>Agregar</span>
+          <span>Agregar a carrito</span>
         </button>
 
         @if (estaEnCarrito()) {
@@ -98,6 +98,9 @@
           @if (producto.bloqueado) {
             <i class="fa-solid fa-lock" aria-hidden="true"></i>
             <span>Bloqueado</span>
+          } @else if (producto.motivoBloqueo) {
+            <i class="fa-solid fa-ban" aria-hidden="true"></i>
+            <span>{{ producto.motivoBloqueo }}</span>
           } @else {
             <i class="fa-solid fa-ban" aria-hidden="true"></i>
             <span>Sin stock</span>

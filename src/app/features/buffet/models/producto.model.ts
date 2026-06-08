@@ -20,6 +20,7 @@ export interface Producto {
   imagen: string;
   estadoStock: EstadoStock;
   bloqueado?: boolean;
+  motivoBloqueo?: string;
 }
 
 export function tieneClasificacion(producto: Producto, descripcion: string): boolean {

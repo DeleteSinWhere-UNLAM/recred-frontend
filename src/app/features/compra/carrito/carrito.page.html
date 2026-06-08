@@ -43,6 +43,7 @@
               [fecha]="grupo.fecha"
               [recreo]="grupo.recreo"
               [fechaMinima]="presenter.fechaMinima"
+              [errorPresupuesto]="presenter.erroresPresupuestoPorAlumno()[grupo.alumno.id] ?? null"
               (toggleSeleccion)="presenter.toggleSeleccion(grupo.alumno.id)"
               (fechaCambia)="presenter.setFecha(grupo.alumno.id, $event)"
               (recreoCambia)="presenter.setRecreo(grupo.alumno.id, $event)"

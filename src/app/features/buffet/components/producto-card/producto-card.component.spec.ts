@@ -106,6 +106,15 @@ describe('ProductoCardComponent', () => {
       expect(ctaBtn.nativeElement.textContent).toContain('Bloqueado');
     });
 
+    it('debería mostrar el motivo de bloqueo y deshabilitado si está restringido por otra regla', () => {
+      fixture.componentRef.setInput('producto', { ...mockProducto, bloqueado: false, estadoStock: 'SIN_STOCK', motivoBloqueo: 'Contiene TACC' });
+      fixture.detectChanges();
+
+      const ctaBtn = fixture.debugElement.query(By.css('.producto-card__cta'));
+      expect(ctaBtn.nativeElement.disabled).toBeTrue();
+      expect(ctaBtn.nativeElement.textContent).toContain('Contiene TACC');
+    });
+
     it('debería desplazar el badge de salud si mostrarCandado es true', () => {
       fixture.componentRef.setInput('mostrarCandado', true);
       fixture.detectChanges();

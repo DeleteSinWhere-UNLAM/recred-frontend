@@ -44,6 +44,13 @@
       </p>
     }
 
+    @if (errorPresupuesto) {
+      <p class="orden-alumno__alerta" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        {{ errorPresupuesto }}
+      </p>
+    }
+
     <div class="orden-alumno__items">
       @for (item of itemsActuales(); track item.id) {
         <app-carrito-item
