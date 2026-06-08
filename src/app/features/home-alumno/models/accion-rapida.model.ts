@@ -1,6 +1,6 @@
 export type AccionColor = 'menta' | 'pizarra' | 'dorado' | 'melocoton' | 'mandarina';
 
-export type AccionId = 'buffet' | 'pedidos' | 'preferencias' | 'favoritos';
+export type AccionId = 'buffet' | 'pedidos' | 'favoritos';
 
 export interface AccionRapida {
   id: AccionId;
