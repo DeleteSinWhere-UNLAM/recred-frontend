@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { signal, Signal, WritableSignal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CarritoPresenter } from './carrito.presenter';
 import { CarritoService } from '../../services/carrito.service';
@@ -60,7 +60,7 @@ describe('CarritoPresenter', () => {
     cantidad: 1,
   };
 
-  let itemsSignal: any;
+  let itemsSignal: WritableSignal<ItemCarrito[]>;
 
   beforeEach(() => {
     carritoServiceSpy = jasmine.createSpyObj('CarritoService', ['cambiarCantidad', 'quitar', 'limpiarAlumno', 'itemsPorAlumno']);
@@ -71,7 +71,7 @@ describe('CarritoPresenter', () => {
     presupuestoServiceSpy = jasmine.createSpyObj('PresupuestoService', ['getPresupuesto', 'cargarPrediccion']);
 
     itemsSignal = signal<ItemCarrito[]>([]);
-    (carritoServiceSpy as any).items = itemsSignal;
+    (carritoServiceSpy as unknown as { items: Signal<ItemCarrito[]> }).items = itemsSignal;
     carritoServiceSpy.itemsPorAlumno.and.returnValue(new Map());
 
     alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);

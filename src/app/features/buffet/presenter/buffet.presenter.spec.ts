@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { signal, Signal } from '@angular/core';
+import { ItemCarrito } from '../../compra/models/carrito.model';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
@@ -269,8 +270,8 @@ describe('BuffetPresenter', () => {
       buffetServiceSpy.getProductosDelBuffet.and.returnValue(of([p1, p2]));
 
       // Mock CarritoService.items signal property
-      const cartItemsSignal = signal<any[]>([]);
-      (carritoServiceSpy as any).items = cartItemsSignal;
+      const cartItemsSignal = signal<ItemCarrito[]>([]);
+      (carritoServiceSpy as unknown as { items: Signal<ItemCarrito[]> }).items = cartItemsSignal;
 
       // Initialize presenter
       presenter.init('alumno-1');
