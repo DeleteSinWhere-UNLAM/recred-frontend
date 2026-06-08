@@ -147,6 +147,22 @@
   color: var(--color-melocoton);
 }
 
+.perfil-kiosquero-header__stat--link {
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition-ui);
+}
+
+.perfil-kiosquero-header__stat--link:hover {
+  transform: translateY(-2px);
+}
+
+.perfil-kiosquero-header__stat--link:hover .perfil-kiosquero-header__stat-icono {
+  background-color: var(--color-pizarra);
+  color: white;
+  border-color: var(--color-pizarra);
+}
+
 @media (max-width: 900px) {
   .perfil-kiosquero-header {
     flex-direction: column;

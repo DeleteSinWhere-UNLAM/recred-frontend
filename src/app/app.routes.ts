@@ -103,6 +103,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'kiosquero/pedidos-tracking',
+        loadComponent: () =>
+          import('./features/tracking-pedidos/tracking-pedidos.page').then(
+            (m) => m.TrackingPedidosPage,
+          ),
+      },
+      {
         path: 'cargar-producto-ia',
         loadChildren: () =>
           import('./features/ai-product-upload/ai-product-upload.routes').then(

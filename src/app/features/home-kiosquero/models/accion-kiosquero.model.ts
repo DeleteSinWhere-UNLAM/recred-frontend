@@ -1,4 +1,5 @@
 export type AccionKiosqueroId =
+  | 'tracking-pedidos'
   | 'cargar-productos'
   | 'dashboard'
   | 'stock'

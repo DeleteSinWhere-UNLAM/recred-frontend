@@ -1,0 +1,111 @@
+<div class="modal-backdrop" (click)="onClose()" role="dialog" aria-modal="true">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="modal-header__title-section">
+        <span class="modal-header__badge" [class]="'modal-header__badge--' + order.status.toLowerCase()">
+          {{ order.statusLabel }}
+        </span>
+        <h2 class="modal-header__title">Detalle del Pedido</h2>
+      </div>
+      <button class="modal-header__close-btn" (click)="onClose()" aria-label="Cerrar modal" [disabled]="isUpdating">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Info del retiro -->
+      <section class="modal-section modal-section--client" aria-labelledby="client-info-title">
+        <h3 id="client-info-title" class="modal-section__title">Información de Retiro</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-item__label">Alumno</span>
+            <strong class="info-item__value">{{ order.studentName }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Fecha Programada</span>
+            <strong class="info-item__value">{{ order.pickupDate | date: 'dd/MM/yyyy' }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Franja Horaria</span>
+            <strong class="info-item__value">{{ order.pickupSlotDescription || 'Por definir' }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-item__label">Método de Pago</span>
+            <strong class="info-item__value">{{ order.paymentMethod }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Código de verificación -->
+      <section class="modal-section modal-section--keyword" aria-labelledby="keyword-title">
+        <h3 id="keyword-title" class="modal-section__title">Clave de Retiro</h3>
+        <div class="keyword-badge">
+          <i class="fa-solid fa-key keyword-badge__icon"></i>
+          <span class="keyword-badge__code">{{ order.withdrawalCode || 'SIN CLAVE' }}</span>
+        </div>
+      </section>
+
+      <!-- Detalle de productos -->
+      <section class="modal-section" aria-labelledby="products-title">
+        <h3 id="products-title" class="modal-section__title">Productos Pedidos</h3>
+        <div class="items-list">
+          @for (item of order.items; track item.productId) {
+            <div class="item-row">
+              <div class="item-row__info">
+                <span class="item-row__name">{{ item.productName }}</span>
+                <span class="item-row__qty">x{{ item.quantity }}</span>
+              </div>
+              <span class="item-row__price">
+                {{ (item.unitPrice * item.quantity) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <div class="total-row">
+          <span class="total-row__label">Total del Pedido</span>
+          <strong class="total-row__value">{{ order.totalAmount | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</strong>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer / Acciones -->
+    <footer class="modal-footer">
+      @if (canCancel()) {
+        <button 
+          class="modal-btn modal-btn--danger" 
+          (click)="onCancel()" 
+          [disabled]="isUpdating"
+        >
+          <i class="fa-solid fa-ban"></i> Cancelar Pedido
+        </button>
+      }
+      
+      <div class="modal-footer__right">
+        <button 
+          class="modal-btn modal-btn--secondary" 
+          (click)="onClose()" 
+          [disabled]="isUpdating"
+        >
+          Cerrar
+        </button>
+        
+        @if (canAdvance()) {
+          <button 
+            class="modal-btn modal-btn--primary" 
+            (click)="onAdvance()" 
+            [disabled]="isUpdating"
+          >
+            @if (isUpdating) {
+              <i class="fa-solid fa-spinner fa-spin"></i> Procesando...
+            } @else {
+              <i class="fa-solid fa-circle-arrow-right"></i> {{ nextStatusText() }}
+            }
+          </button>
+        }
+      </div>
+    </footer>
+  </div>
+</div>
