@@ -1,5 +1,6 @@
 import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { of, tap } from 'rxjs';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { ItemCarrito } from '../../models/carrito.model';
@@ -14,6 +15,7 @@ import { BuffetService } from '../../../buffet/services/buffet.service';
 import { SugerenciasCarritoService } from '../../services/sugerencias-carrito.service';
 import { CarritoService } from '../../services/carrito.service';
 import { CompraService } from '../../services/compra.service';
+import { Buffet } from '../../../buffet/models/buffet.model';
 import { Producto } from '../../../buffet/models/producto.model';
 import { ToastService } from '../../../../shared/services/toast.service';
 
@@ -25,8 +27,6 @@ export interface GrupoCarrito {
   fecha: string;
   recreo: Recreo;
 }
-
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class CarritoPresenter {
@@ -46,10 +46,14 @@ export class CarritoPresenter {
 
   private readonly sugerenciasState = signal<SugerenciaCarrito[]>([]);
   private readonly cargandoSugerenciasState = signal(false);
+  private readonly buffetCache = new Map<string, Buffet>();
 
   readonly sugerencias: Signal<SugerenciaCarrito[]> = this.sugerenciasState.asReadonly();
   readonly cargandoSugerencias: Signal<boolean> = this.cargandoSugerenciasState.asReadonly();
-  readonly mostrarSugerencias = computed(() => this.usuarioService.esVistaAlumno());
+  readonly mostrarSugerencias = computed(
+    () =>
+      this.perfilService.rol() === 'ALUMNO' || this.usuarioService.esVistaAlumno(),
+  );
 
   readonly fechaMinima = this.calcularFechaMinima();
 
@@ -121,14 +125,13 @@ export class CarritoPresenter {
   }
 
   private refrescarSugerencias(): void {
-    const studentId = this.perfilService.obtenerAlumnoId();
     const grupo = this.grupos()[0];
-    if (!studentId || !UUID_REGEX.test(studentId) || !grupo) {
+    if (!grupo) {
       this.sugerenciasState.set([]);
       return;
     }
-    const buffet = this.buffetService.getBuffetDelAlumno(grupo.alumno.colegioId);
-    if (!buffet || !UUID_REGEX.test(buffet.id)) {
+    const studentId = this.perfilService.obtenerAlumnoId() ?? grupo.alumno.id;
+    if (!studentId) {
       this.sugerenciasState.set([]);
       return;
     }
@@ -138,25 +141,44 @@ export class CarritoPresenter {
       quantity: i.cantidad,
     }));
 
-    this.cargandoSugerenciasState.set(true);
-    this.sugerenciasCarritoService
-      .obtenerSugerencias({
-        studentId,
-        buffetId: buffet.id,
-        items: itemsRequest,
-        limit: 3,
-      })
-      .subscribe({
-        next: (resultado) => {
-          this.sugerenciasState.set(resultado);
-          this.cargandoSugerenciasState.set(false);
-        },
-        error: (err) => {
-          console.error('Error al obtener sugerencias de carrito:', err);
-          this.sugerenciasState.set([]);
-          this.cargandoSugerenciasState.set(false);
-        },
-      });
+    this.resolverBuffet(studentId).subscribe({
+      next: (buffet) => {
+        this.cargandoSugerenciasState.set(true);
+        this.sugerenciasCarritoService
+          .obtenerSugerencias({
+            studentId,
+            buffetId: buffet.id,
+            items: itemsRequest,
+            limit: 3,
+          })
+          .subscribe({
+            next: (resultado) => {
+              this.sugerenciasState.set(resultado);
+              this.cargandoSugerenciasState.set(false);
+            },
+            error: (err) => {
+              console.error('Error al obtener sugerencias de carrito:', err);
+              this.sugerenciasState.set([]);
+              this.cargandoSugerenciasState.set(false);
+            },
+          });
+      },
+      error: (err) => {
+        console.error('Error al resolver buffet del alumno:', err);
+        this.sugerenciasState.set([]);
+        this.cargandoSugerenciasState.set(false);
+      },
+    });
+  }
+
+  private resolverBuffet(alumnoId: string) {
+    const cacheado = this.buffetCache.get(alumnoId);
+    if (cacheado) {
+      return of(cacheado);
+    }
+    return this.buffetService.obtenerBuffetDelAlumno(alumnoId).pipe(
+      tap((buffet) => this.buffetCache.set(alumnoId, buffet)),
+    );
   }
 
   agregarSugerencia(sugerencia: SugerenciaCarrito): void {

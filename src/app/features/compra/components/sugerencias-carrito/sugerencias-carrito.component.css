@@ -34,10 +34,12 @@
   color: var(--color-texto-claro);
 }
 
-.sugerencias-carrito__cargando {
+.sugerencias-carrito__cargando,
+.sugerencias-carrito__vacio {
   font-size: 13px;
   color: var(--color-texto-claro);
   font-style: italic;
+  margin: 0;
 }
 
 .sugerencias-carrito__lista {

@@ -30,7 +30,7 @@ const ETIQUETAS_POR_SOURCE: Record<OrigenSugerenciaCarrito, { label: string; ico
   FAVORITE: { label: 'Favorito', icono: 'fa-heart', color: 'melocoton' },
   DETECTED_PREFERENCE: { label: 'Preferencia', icono: 'fa-wand-magic-sparkles', color: 'melocoton' },
   PURCHASE_HISTORY: { label: 'Frecuente', icono: 'fa-arrows-rotate', color: 'pizarra' },
-  DAY_PATTERN: { label: 'Hoy suele comprarlo', icono: 'fa-calendar-day', color: 'pizarra' },
+  DAY_PATTERN: { label: 'Te puede gustar hoy', icono: 'fa-calendar-day', color: 'pizarra' },
   STUDENT_CART_AFFINITY: { label: 'Suele acompañar tu carrito', icono: 'fa-link', color: 'menta' },
   BUFFET_CART_AFFINITY: { label: 'Combo frecuente', icono: 'fa-people-group', color: 'menta' },
 };
