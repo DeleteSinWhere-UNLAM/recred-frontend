@@ -56,6 +56,11 @@ export class NavbarComponent {
     if (this.menuNotifAbierto()) this.menuAbierto.set(false);
   }
 
+  protected irAPerfil(): void {
+    this.menuAbierto.set(false);
+    this.router.navigateByUrl('/perfil');
+  }
+
   protected async cerrarSesion(): Promise<void> {
     this.menuAbierto.set(false);
     try {

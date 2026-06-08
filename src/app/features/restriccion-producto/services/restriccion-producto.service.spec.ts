@@ -11,7 +11,7 @@ describe('RestriccionProductoService', () => {
   let service: RestriccionProductoService;
   let httpMock: HttpTestingController;
 
-  const baseSinVersion = environment.apiUrl.replace(/\/v\d+\/?$/, '');
+  const apiBase = environment.apiUrl;
   const alumnoId = 'alumno-123';
   const productoId = 'producto-456';
 
@@ -43,7 +43,7 @@ describe('RestriccionProductoService', () => {
     });
 
     const req = httpMock.expectOne(
-      `${baseSinVersion}/control-parental/alumnos/${alumnoId}/productos-bloqueados/${productoId}`
+      `${apiBase}/control-parental/alumnos/${alumnoId}/productos-bloqueados/${productoId}`
     );
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({});
@@ -58,7 +58,7 @@ describe('RestriccionProductoService', () => {
     });
 
     const req = httpMock.expectOne(
-      `${baseSinVersion}/control-parental/alumnos/${alumnoId}/productos-bloqueados/${productoId}`
+      `${apiBase}/control-parental/alumnos/${alumnoId}/productos-bloqueados/${productoId}`
     );
     expect(req.request.method).toBe('DELETE');
     req.flush(null);

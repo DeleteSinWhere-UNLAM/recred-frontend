@@ -1,0 +1,146 @@
+<app-navbar [userName]="nombreNavbar()" />
+
+<main class="perfil-usuario">
+  <div class="perfil-usuario__container">
+    <button type="button" class="perfil-usuario__volver" (click)="volver()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
+    <header class="perfil-usuario__header">
+      <div class="perfil-usuario__avatar" aria-hidden="true">
+        {{ iniciales() }}
+      </div>
+      <div class="perfil-usuario__heading">
+        <p class="perfil-usuario__eyebrow">Cuenta RECRED</p>
+        <h1 class="perfil-usuario__titulo">{{ nombreCompleto() }}</h1>
+        <p class="perfil-usuario__subtitulo">
+          Administrá tus datos de contacto y documentación.
+        </p>
+      </div>
+    </header>
+
+    @if (cargando()) {
+      <section class="perfil-usuario__estado" aria-live="polite">
+        <span class="perfil-usuario__loader" aria-hidden="true"></span>
+        <p>Cargando perfil...</p>
+      </section>
+    } @else if (error()) {
+      <section class="perfil-usuario__estado perfil-usuario__estado--error">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <p>{{ error() }}</p>
+        <button type="button" (click)="cargarPerfil()">Reintentar</button>
+      </section>
+    } @else {
+      <section class="perfil-usuario__grid" aria-label="Datos del usuario">
+        <article class="perfil-usuario__panel">
+          <h2 class="perfil-usuario__panel-titulo">Usuario logueado</h2>
+
+          <dl class="perfil-usuario__datos">
+            <div>
+              <dt>Email</dt>
+              <dd>{{ usuario()?.email || perfil()?.email || '-' }}</dd>
+            </div>
+            <div>
+              <dt>Rol</dt>
+              <dd>{{ rolLabel(usuario()?.role || perfil()?.role) }}</dd>
+            </div>
+            <div>
+              <dt>ID</dt>
+              <dd>{{ usuario()?.id || perfil()?.id || '-' }}</dd>
+            </div>
+          </dl>
+        </article>
+
+        <form
+          class="perfil-usuario__panel perfil-usuario__form"
+          [formGroup]="form"
+          (ngSubmit)="guardar()"
+        >
+          <div class="perfil-usuario__form-header">
+            <h2 class="perfil-usuario__panel-titulo">Perfil completo</h2>
+            @if (form.dirty) {
+              <span class="perfil-usuario__cambios">Cambios sin guardar</span>
+            }
+          </div>
+
+          <label class="perfil-usuario__campo">
+            <span>Nombre</span>
+            <input
+              type="text"
+              formControlName="firstName"
+              autocomplete="given-name"
+              [class.perfil-usuario__input--error]="campoInvalido('firstName')"
+            />
+            @if (campoInvalido('firstName')) {
+              <small>Ingresá un nombre válido.</small>
+            }
+          </label>
+
+          <label class="perfil-usuario__campo">
+            <span>Apellido</span>
+            <input
+              type="text"
+              formControlName="lastName"
+              autocomplete="family-name"
+              [class.perfil-usuario__input--error]="campoInvalido('lastName')"
+            />
+            @if (campoInvalido('lastName')) {
+              <small>Ingresá un apellido válido.</small>
+            }
+          </label>
+
+          <label class="perfil-usuario__campo">
+            <span>Teléfono</span>
+            <input
+              type="tel"
+              formControlName="phone"
+              autocomplete="tel"
+              placeholder="1122334455"
+              [class.perfil-usuario__input--error]="campoInvalido('phone')"
+            />
+            @if (campoInvalido('phone')) {
+              <small>El teléfono es demasiado largo.</small>
+            }
+          </label>
+
+          <label class="perfil-usuario__campo">
+            <span>DNI / documento</span>
+            <input
+              type="text"
+              formControlName="documentNumber"
+              autocomplete="off"
+              placeholder="40111222"
+              [class.perfil-usuario__input--error]="campoInvalido('documentNumber')"
+            />
+            @if (campoInvalido('documentNumber')) {
+              <small>El documento es demasiado largo.</small>
+            }
+          </label>
+
+          <div class="perfil-usuario__acciones">
+            <button
+              type="button"
+              class="perfil-usuario__boton perfil-usuario__boton--secundario"
+              [disabled]="guardando() || !form.dirty"
+              (click)="descartarCambios()"
+            >
+              Descartar
+            </button>
+            <button
+              type="submit"
+              class="perfil-usuario__boton perfil-usuario__boton--primario"
+              [disabled]="guardando() || form.invalid"
+            >
+              @if (guardando()) {
+                Guardando...
+              } @else {
+                Guardar cambios
+              }
+            </button>
+          </div>
+        </form>
+      </section>
+    }
+  </div>
+</main>

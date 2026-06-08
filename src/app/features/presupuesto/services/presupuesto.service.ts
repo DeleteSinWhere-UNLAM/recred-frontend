@@ -82,7 +82,7 @@ export class PresupuestoService {
   private readonly http = inject(HttpClient);
   private readonly perfilService = inject(PerfilService);
   private readonly apiBase = environment.apiUrl;
-  private readonly iaBase = environment.apiUrl.replace(/\/api\/v\d+\/?$/, '') + '/ia';
+  private readonly iaBase = `${environment.apiUrl}/ia`;
 
   async getPresupuesto(alumnoId: string): Promise<Presupuesto | undefined> {
     const backend = await firstValueFrom(

@@ -5,10 +5,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import {
-  CapacidadAsistente,
-  SugerenciaCapacidad,
-} from '../../models/capacidad-asistente.model';
+import { SugerenciaCapacidad } from '../../models/capacidad-asistente.model';
 
 @Component({
   selector: 'app-sugerencias-chips',
@@ -20,14 +17,33 @@ export class SugerenciasChipsComponent {
   @Input() sugerencias: readonly SugerenciaCapacidad[] = [];
   @Input() deshabilitado = false;
 
-  @Output() elegir = new EventEmitter<CapacidadAsistente>();
+  @Output() elegir = new EventEmitter<string>();
 
-  protected onClick(capacidad: CapacidadAsistente): void {
-    if (this.deshabilitado) return;
-    this.elegir.emit(capacidad);
+  protected get hint(): string {
+    if (this.tieneCompraPendiente) return 'Compra pendiente';
+    if (this.tieneSugerenciasBackend) return 'Siguiente paso';
+    return 'Opciones rapidas';
   }
 
-  protected trackByCapacidad(_index: number, sugerencia: SugerenciaCapacidad): string {
-    return sugerencia.capacidad;
+  protected get tieneCompraPendiente(): boolean {
+    return this.sugerencias.some(
+      (s) => s.tipo === 'confirmacion' || s.tipo === 'cancelacion',
+    );
+  }
+
+  private get tieneSugerenciasBackend(): boolean {
+    return this.sugerencias.some((s) => s.tipo === 'backend');
+  }
+
+  protected onClick(sugerencia: SugerenciaCapacidad): void {
+    if (this.deshabilitado) return;
+    this.elegir.emit(sugerencia.prompt);
+  }
+
+  protected trackBySugerencia(
+    _index: number,
+    sugerencia: SugerenciaCapacidad,
+  ): string {
+    return sugerencia.id;
   }
 }

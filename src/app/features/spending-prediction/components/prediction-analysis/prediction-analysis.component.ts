@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IaAnalysis } from '../../models/ia-analysis.interface';
+import { CategoriaMasConsumida } from '../../models/spending-prediction.interface';
 
 @Component({
   selector: 'app-prediction-analysis',
@@ -11,5 +12,5 @@ import { IaAnalysis } from '../../models/ia-analysis.interface';
 })
 export class PredictionAnalysisComponent {
   @Input() analisisIa: IaAnalysis | null = null;
-  @Input() categoriasMasConsumidas: string[] = [];
+  @Input() categoriasMasConsumidas: CategoriaMasConsumida[] = [];
 }
