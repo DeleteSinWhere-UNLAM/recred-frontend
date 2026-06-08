@@ -11,7 +11,7 @@ import {
 } from './restricciones-nutricionales.service';
 
 describe('RestriccionesNutricionalesService', () => {
-  const baseSinVersion = environment.apiUrl.replace(/\/v\d+\/?$/, '');
+  const apiBase = environment.apiUrl;
   let service: RestriccionesNutricionalesService;
   let httpMock: HttpTestingController;
 
@@ -29,14 +29,14 @@ describe('RestriccionesNutricionalesService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('getCatalogo pega a /clasificaciones-salud sin /v1', async () => {
+  it('getCatalogo pega a /clasificaciones-salud', async () => {
     const catalogoEsperado: ClasificacionSaludBackend[] = [
       { id: 'uuid-1', descripcion: 'Sin TACC', activo: true },
       { id: 'uuid-2', descripcion: 'Sin azúcar', activo: true },
     ];
 
     const promesa = service.getCatalogo();
-    const req = httpMock.expectOne(`${baseSinVersion}/clasificaciones-salud`);
+    const req = httpMock.expectOne(`${apiBase}/clasificaciones-salud`);
     expect(req.request.method).toBe('GET');
     req.flush(catalogoEsperado);
 
@@ -51,7 +51,7 @@ describe('RestriccionesNutricionalesService', () => {
 
     const promesa = service.getRestriccionesAlumno(alumnoId);
     const req = httpMock.expectOne(
-      `${baseSinVersion}/control-parental/alumnos/${alumnoId}/obtener-restricciones-salud`,
+      `${apiBase}/control-parental/alumnos/${alumnoId}/obtener-restricciones-salud`,
     );
     expect(req.request.method).toBe('GET');
     req.flush(activas);
@@ -65,7 +65,7 @@ describe('RestriccionesNutricionalesService', () => {
 
     const promesa = service.actualizarRestricciones(alumnoId, ids);
     const req = httpMock.expectOne(
-      `${baseSinVersion}/control-parental/alumnos/${alumnoId}/actualizar-restricciones-salud`,
+      `${apiBase}/control-parental/alumnos/${alumnoId}/actualizar-restricciones-salud`,
     );
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual({ clasificacionesIds: ids });
@@ -76,7 +76,7 @@ describe('RestriccionesNutricionalesService', () => {
 
   it('rechaza la promesa cuando el back devuelve error', async () => {
     const promesa = service.getCatalogo();
-    const req = httpMock.expectOne(`${baseSinVersion}/clasificaciones-salud`);
+    const req = httpMock.expectOne(`${apiBase}/clasificaciones-salud`);
     req.flush('boom', { status: 500, statusText: 'Server Error' });
 
     await expectAsync(promesa).toBeRejected();

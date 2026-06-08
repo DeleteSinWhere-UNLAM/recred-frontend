@@ -1,16 +1,20 @@
 @if (sugerencias.length > 0) {
   <div class="sugerencias-chips" role="list">
-    <span class="sugerencias-chips__hint">Preguntame sobre:</span>
+    <span class="sugerencias-chips__hint">{{ hint }}</span>
     <div class="sugerencias-chips__scroll">
-      @for (s of sugerencias; track trackByCapacidad($index, s)) {
+      @for (s of sugerencias; track trackBySugerencia($index, s)) {
         <button
           type="button"
           class="sugerencias-chips__chip"
+          [class.sugerencias-chips__chip--confirmar]="s.tipo === 'confirmacion'"
+          [class.sugerencias-chips__chip--cancelar]="s.tipo === 'cancelacion'"
           role="listitem"
           [disabled]="deshabilitado"
-          (click)="onClick(s.capacidad)"
+          (click)="onClick(s)"
         >
-          <span class="sugerencias-chips__emoji" aria-hidden="true">{{ s.emoji }}</span>
+          @if (s.emoji) {
+            <span class="sugerencias-chips__emoji" aria-hidden="true">{{ s.emoji }}</span>
+          }
           <span class="sugerencias-chips__label">{{ s.label }}</span>
         </button>
       }

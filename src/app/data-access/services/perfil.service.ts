@@ -22,6 +22,15 @@ interface SyncPerfilRequest {
   readonly apellido?: string;
 }
 
+interface DatosUsuarioActualizados {
+  readonly email?: string;
+  readonly firstName?: string;
+  readonly lastName?: string;
+  readonly role?: RolUsuario;
+  readonly phone?: string | null;
+  readonly documentNumber?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PerfilService {
   private readonly http = inject(HttpClient);
@@ -65,6 +74,24 @@ export class PerfilService {
 
   getPerfil(): Perfil | null {
     return this.perfilState();
+  }
+
+  actualizarDatosUsuario(datos: DatosUsuarioActualizados): void {
+    const perfil = this.perfilState();
+    if (!perfil) return;
+
+    const actualizado: Perfil = {
+      ...perfil,
+      email: datos.email ?? perfil.email,
+      nombre: datos.firstName ?? perfil.nombre,
+      apellido: datos.lastName ?? perfil.apellido,
+      rol: datos.role ?? perfil.rol,
+      phone: datos.phone ?? perfil.phone,
+      documentNumber: datos.documentNumber ?? perfil.documentNumber,
+    };
+
+    this.perfilState.set(actualizado);
+    this.guardarEnStorage(actualizado);
   }
 
   obtenerBuffetId(): string | null {

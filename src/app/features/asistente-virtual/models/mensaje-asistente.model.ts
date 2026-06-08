@@ -1,4 +1,6 @@
-export type RolMensaje = 'usuario' | 'cred';
+import { AccionAsistente } from './respuesta-asistente.model';
+
+export type RolMensaje = 'usuario' | 'cred' | 'separador';
 
 export interface MensajeAsistente {
   readonly id: string;
@@ -6,4 +8,5 @@ export interface MensajeAsistente {
   readonly texto: string;
   readonly fechaHora: Date;
   readonly generadoPorIa?: boolean;
+  readonly accion?: AccionAsistente | null;
 }
