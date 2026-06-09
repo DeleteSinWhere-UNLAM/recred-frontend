@@ -34,6 +34,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'restricciones-horarias/:alumnoId',
+        loadComponent: () =>
+          import('./features/restricciones-horarias/restricciones-horarias.page').then(
+            (m) => m.RestriccionesHorariasPage,
+          ),
+      },
+      {
         path: 'restricciones-nutricionales/:alumnoId',
         loadComponent: () =>
           import('./features/restricciones-nutricionales/restricciones-nutricionales.page').then(

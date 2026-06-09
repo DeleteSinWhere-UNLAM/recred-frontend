@@ -69,8 +69,11 @@ function esUrlDeApiPropia(url: string): boolean {
     const requestUrl = new URL(url, window.location.origin);
     const apiUrl = new URL(environment.apiUrl, window.location.origin);
 
-    return requestUrl.origin === apiUrl.origin;
+    const esDominioApi = requestUrl.origin === apiUrl.origin;
+    const esDominioInventario = requestUrl.origin === 'https://18-119-187-167.sslip.io';
+
+    return esDominioApi || esDominioInventario;
   } catch {
-    return url.startsWith(environment.apiUrl);
+    return url.startsWith(environment.apiUrl) || url.startsWith('https://18-119-187-167.sslip.io');
   }
 }

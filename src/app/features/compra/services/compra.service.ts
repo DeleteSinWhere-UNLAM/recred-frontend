@@ -41,7 +41,7 @@ export class CompraService {
 
   procesarPago(): Observable<OrdenCompra> {
     const enCurso = this.ordenEnCursoState();
-    if (!enCurso) {
+    if (!enCurso || enCurso.ordenes.length === 0) {
       return of({ id: '', ordenes: [], total: 0, codigos: {} });
     }
 

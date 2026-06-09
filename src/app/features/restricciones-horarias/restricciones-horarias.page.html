@@ -1,0 +1,97 @@
+<app-navbar [userName]="presenter.alumno()?.nombre ?? ''" />
+
+<main class="restricciones">
+  <div class="restricciones__container">
+    <header class="restricciones__header">
+      <button class="restricciones__back" (click)="volver()">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div class="restricciones__titulo-wrap">
+        <h1 class="restricciones__titulo">Límites y Horarios</h1>
+        <p class="restricciones__subtitulo">
+          Configurá qué puede comprar <strong>{{ presenter.alumno()?.nombre }}</strong> en cada recreo.
+        </p>
+      </div>
+    </header>
+
+    @if (presenter.cargando()) {
+      <div class="restricciones__loading">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Cargando configuración...</span>
+      </div>
+    } @else {
+      <div class="restricciones__lista">
+        @for (item of presenter.franjasConRestricciones(); track item.franja.id) {
+          <article class="franja-card">
+            <header class="franja-card__header">
+              <div class="franja-card__info">
+                <h2 class="franja-card__nombre">{{ item.franja.descripcion }}</h2>
+                <p class="franja-card__horario">
+                  <i class="fa-regular fa-clock"></i>
+                  {{ item.franja.horaInicio }} - {{ item.franja.horaFin }}
+                </p>
+              </div>
+              <span class="franja-card__badge" [class.franja-card__badge--activo]="item.restricciones.length > 0">
+                {{ item.restricciones.length }} {{ item.restricciones.length === 1 ? 'restricción' : 'restricciones' }}
+              </span>
+            </header>
+
+            <div class="franja-card__contenido">
+              @if (item.restricciones.length > 0) {
+                <ul class="restricciones-list">
+                  @for (res of item.restricciones; track res.id) {
+                    <li class="restriccion-item">
+                      <div class="restriccion-item__info">
+                        <i class="fa-solid" [class.fa-tag]="res.categoryId" [class.fa-hand-dots]="res.classificationId"></i>
+                        <span>
+                          {{ res.categoria ? res.categoria.descripcion : (res.clasificacionSalud ? res.clasificacionSalud.descripcion : 'Restricción') }}
+                        </span>
+                      </div>
+                      <button class="restriccion-item__btn-quitar" (click)="presenter.quitarRestriccion(res.id)" title="Quitar restricción">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="franja-card__vacio">Sin restricciones configuradas. Compra libre.</p>
+              }
+
+              <div class="franja-card__acciones">
+                <div class="add-restriction">
+                  <label class="add-restriction__label" [for]="'selectTipo-' + item.franja.id">Bloquear compra de:</label>
+                  <div class="add-restriction__controles">
+                    <select #selectTipo class="add-restriction__select" [id]="'selectTipo-' + item.franja.id">
+                      <optgroup label="Categorías">
+                        @for (cat of item.categoriasDisponibles; track cat.id) {
+                          <option [value]="'CAT:' + cat.id">{{ cat.descripcion }}</option>
+                        }
+                      </optgroup>
+                      <optgroup label="Salud">
+                        @for (salud of item.saludDisponible; track salud.id) {
+                          <option [value]="'SAL:' + salud.id">{{ salud.descripcion }}</option>
+                        }
+                      </optgroup>
+                    </select>
+                    <button 
+                      class="add-restriction__btn" 
+                      (click)="agregar(item.franja.id, selectTipo.value)"
+                    >
+                      <i class="fa-solid fa-plus"></i>
+                      <span>Agregar</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        } @empty {
+          <div class="restricciones__vacio">
+            <i class="fa-solid fa-calendar-xmark"></i>
+            <p>No se encontraron recreos configurados para este colegio.</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</main>
