@@ -191,6 +191,11 @@
   color: var(--color-dorado-dark);
 }
 
+.alumno-card__accion--azul .alumno-card__accion-icono {
+  background-color: color-mix(in srgb, #4a6fa5 14%, var(--color-fondo));
+  color: #4a6fa5;
+}
+
 .alumno-card__config {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
