@@ -6,13 +6,19 @@ import {
   ResumenLinea,
   ResumenOrdenCardComponent,
 } from '../components/resumen-orden-card/resumen-orden-card.component';
+import { SugerenciasCarritoComponent } from '../components/sugerencias-carrito/sugerencias-carrito.component';
 import { CarritoPresenter } from './presenter/carrito.presenter';
 
 @Component({
   selector: 'app-carrito-page',
   templateUrl: './carrito.page.html',
   styleUrl: './carrito.page.css',
-  imports: [NavbarComponent, OrdenAlumnoCardComponent, ResumenOrdenCardComponent],
+  imports: [
+    NavbarComponent,
+    OrdenAlumnoCardComponent,
+    ResumenOrdenCardComponent,
+    SugerenciasCarritoComponent,
+  ],
   providers: [CarritoPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
