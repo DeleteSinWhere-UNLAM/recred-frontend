@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
@@ -11,6 +12,7 @@ export class AcreditarMercadoPagoPresenter {
   private readonly mercadoPagoService = inject(AcreditarMercadoPagoService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly document = inject(DOCUMENT);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly cargandoState = signal(false);
@@ -66,7 +68,7 @@ export class AcreditarMercadoPagoPresenter {
     try {
       const paymentUrl = await this.mercadoPagoService.generarLinkPago(alumno.id, monto);
       if (paymentUrl) {
-        window.location.href = paymentUrl;
+        this.document.location.href = paymentUrl;
       } else {
         throw new Error('No se recibió la URL de pago.');
       }
