@@ -222,8 +222,12 @@ export class BuffetPresenter {
     if (!alumno) return;
 
     const actualBloqueado = !!producto.bloqueado;
-    producto.bloqueado = !actualBloqueado;
-    this.productosState.set([...this.productosState()]);
+    const nuevoEstado = !actualBloqueado;
+
+    producto.bloqueado = nuevoEstado;
+    this.productosState.set(
+      this.productosState().map(p => p.id === producto.id ? { ...p, bloqueado: nuevoEstado } : p)
+    );
 
     if (actualBloqueado) {
       this.restriccionProductoService.desbloquearProducto(alumno.id, producto.id).subscribe({
@@ -233,7 +237,9 @@ export class BuffetPresenter {
         error: (err) => {
           console.error('Error unlocking product:', err);
           producto.bloqueado = true;
-          this.productosState.set([...this.productosState()]);
+          this.productosState.set(
+            this.productosState().map(p => p.id === producto.id ? { ...p, bloqueado: true } : p)
+          );
           this.toastService.mostrar('Error al desbloquear el producto', 'error');
         }
       });
@@ -245,7 +251,9 @@ export class BuffetPresenter {
         error: (err) => {
           console.error('Error blocking product:', err);
           producto.bloqueado = false;
-          this.productosState.set([...this.productosState()]);
+          this.productosState.set(
+            this.productosState().map(p => p.id === producto.id ? { ...p, bloqueado: false } : p)
+          );
           this.toastService.mostrar('Error al bloquear el producto', 'error');
         }
       });
