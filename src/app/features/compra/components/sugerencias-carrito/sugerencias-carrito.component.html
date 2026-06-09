@@ -1,0 +1,47 @@
+<section class="sugerencias-carrito" aria-label="Sugerencias para tu carrito">
+  <header class="sugerencias-carrito__cabecera">
+    <span class="sugerencias-carrito__titulo">
+      <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+      Te puede gustar
+    </span>
+    <span class="sugerencias-carrito__subtitulo">
+      Sumá productos que combinan con tu carrito.
+    </span>
+  </header>
+
+  @if (estaCargando()) {
+    <p class="sugerencias-carrito__cargando" role="status">
+      Buscando sugerencias...
+    </p>
+  } @else if (hayResultados()) {
+    <ul class="sugerencias-carrito__lista">
+      @for (vista of vistas(); track vista.sugerencia.productId) {
+        <li class="sugerencias-carrito__item">
+          <div class="sugerencias-carrito__info">
+            <span class="sugerencias-carrito__chip" [class]="vista.colorClass">
+              <i class="fa-solid" [class]="vista.icono" aria-hidden="true"></i>
+              {{ vista.etiqueta }}
+            </span>
+            <span class="sugerencias-carrito__nombre">{{ vista.sugerencia.productName }}</span>
+            <span class="sugerencias-carrito__razon">{{ vista.sugerencia.reason }}</span>
+          </div>
+          <div class="sugerencias-carrito__acciones">
+            <span class="sugerencias-carrito__precio">{{ vista.precioFormateado }}</span>
+            <button
+              type="button"
+              class="sugerencias-carrito__cta"
+              (click)="onAgregar(vista.sugerencia)"
+            >
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Agregar
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="sugerencias-carrito__vacio" role="status">
+      Sin sugerencias por ahora. Sumá productos al carrito para ver opciones.
+    </p>
+  }
+</section>
