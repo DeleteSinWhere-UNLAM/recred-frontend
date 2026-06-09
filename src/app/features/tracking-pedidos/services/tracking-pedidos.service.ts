@@ -9,7 +9,7 @@ import { ScheduledPickup, EstadoCompra } from '../models/tracking-pedidos.model'
 })
 export class TrackingPedidosService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/v1`;
+  private readonly baseUrl = environment.apiUrl;
 
   getScheduledPickups(filters?: {
     fecha?: string;

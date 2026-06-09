@@ -373,3 +373,32 @@
 .producto-card--bloqueado .producto-card__precio {
   opacity: 0.55;
 }
+
+/* ── Supera presupuesto ─────────────────────────────────────── */
+.producto-card--supera-presupuesto {
+  border-color: rgba(217, 119, 6, 0.28);
+}
+
+.producto-card--supera-presupuesto .producto-card__imagen {
+  filter: grayscale(0.45) sepia(0.15);
+  opacity: 0.72;
+}
+
+.producto-card--supera-presupuesto .producto-card__nombre,
+.producto-card--supera-presupuesto .producto-card__precio {
+  opacity: 0.6;
+}
+
+.producto-card__cta--presupuesto {
+  margin-top: auto;
+  background: rgba(217, 119, 6, 0.08);
+  color: #b45309;
+  border: 1px solid rgba(217, 119, 6, 0.28);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.producto-card__cta--presupuesto:hover {
+  filter: none;
+  box-shadow: none;
+}

@@ -73,7 +73,12 @@ export class ProductoCardComponent {
 
   readonly disponible = computed(() => {
     const p = this.productoState();
-    return p ? (disponible(p) && !p.bloqueado) : false;
+    return p ? (disponible(p) && !p.bloqueado && !p.superaPresupuesto) : false;
+  });
+
+  readonly superaPresupuesto = computed(() => {
+    const p = this.productoState();
+    return p ? !!p.superaPresupuesto : false;
   });
 
   readonly precioFormateado = computed(() => {

@@ -2,8 +2,9 @@
 @if (producto) {
   <article
     class="producto-card"
-    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado"
+    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado && !superaPresupuesto()"
     [class.producto-card--bloqueado]="producto.bloqueado"
+    [class.producto-card--supera-presupuesto]="superaPresupuesto()"
   >
     <div class="producto-card__media">
       <button
@@ -90,19 +91,30 @@
           </p>
         }
       } @else {
-        <button
-          type="button"
-          class="producto-card__cta producto-card__cta--bloqueado"
-          disabled
-        >
-          @if (producto.bloqueado) {
-            <i class="fa-solid fa-lock" aria-hidden="true"></i>
-            <span>Bloqueado</span>
-          } @else {
-            <i class="fa-solid fa-ban" aria-hidden="true"></i>
-            <span>Sin stock</span>
-          }
-        </button>
+        @if (superaPresupuesto()) {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--presupuesto"
+            disabled
+          >
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Supera presupuesto</span>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--bloqueado"
+            disabled
+          >
+            @if (producto.bloqueado) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              <span>Bloqueado</span>
+            } @else {
+              <i class="fa-solid fa-ban" aria-hidden="true"></i>
+              <span>Sin stock</span>
+            }
+          </button>
+        }
       }
     </div>
   </article>

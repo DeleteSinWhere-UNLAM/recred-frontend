@@ -37,7 +37,7 @@ export class ConfirmarPresenter {
   confirmar(): void {
     if (this.cargandoState() || this.vacia()) return;
     this.cargandoState.set(true);
-    this.compraService.simularPago().subscribe({
+    this.compraService.procesarPago().subscribe({
       next: (orden) => {
         for (const o of orden.ordenes) {
           this.carritoService.limpiarAlumno(o.alumno.id);

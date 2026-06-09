@@ -258,7 +258,12 @@ export class BuffetService {
       categoria = { id: 'snacks', descripcion: 'Snacks' };
     }
 
+    const MOTIVOS_PRESUPUESTO = [
+      'Supera el límite de gasto',
+      'Supera límite de su categoría',
+    ];
     const esBloqueoManual = !!dto.bloqueado && dto.motivoBloqueo === 'Bloqueado por el tutor';
+    const esBloqueoPorPresupuesto = !!dto.bloqueado && !!dto.motivoBloqueo && MOTIVOS_PRESUPUESTO.includes(dto.motivoBloqueo);
     return {
       id: dto.id,
       nombre: dto.nombre,
@@ -267,8 +272,9 @@ export class BuffetService {
       categoria: categoria,
       clasificacionesSalud: [],
       imagen: this.obtenerImagenProducto(dto.nombre),
-      estadoStock: dto.bloqueado ? 'SIN_STOCK' : 'DISPONIBLE',
-      bloqueado: esBloqueoManual
+      estadoStock: (esBloqueoManual && !esBloqueoPorPresupuesto) ? 'SIN_STOCK' : 'DISPONIBLE',
+      bloqueado: esBloqueoManual,
+      superaPresupuesto: esBloqueoPorPresupuesto,
     };
   }
 
