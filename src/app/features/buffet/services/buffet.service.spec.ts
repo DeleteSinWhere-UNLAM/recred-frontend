@@ -69,7 +69,8 @@ describe('BuffetService', () => {
       service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].bloqueado).toBeFalse();
-          expect(productos[0].estadoStock).toBe('SIN_STOCK');
+          expect(productos[0].superaPresupuesto).toBeTrue();
+          expect(productos[0].estadoStock).toBe('DISPONIBLE');
           done();
         }
       });
