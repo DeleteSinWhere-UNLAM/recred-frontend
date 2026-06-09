@@ -46,6 +46,13 @@ export const routes: Routes = [
           import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
       },
       {
+        path: 'acreditar-mercado-pago/:alumnoId',
+        loadComponent: () =>
+          import('./features/acreditar-mercado-pago/acreditar-mercado-pago.page').then(
+            (m) => m.AcreditarMercadoPagoPage,
+          ),
+      },
+      {
         path: 'presupuesto/:alumnoId',
         loadComponent: () =>
           import('./features/presupuesto/presupuesto.page').then(

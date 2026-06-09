@@ -25,12 +25,12 @@
   </header>
 
   <div class="alumno-card__acciones" role="group" aria-label="Acciones rápidas">
-    <button type="button" class="alumno-card__accion alumno-card__accion--menta">
+    <a class="alumno-card__accion alumno-card__accion--menta" [routerLink]="['/acreditar-mercado-pago', alumno.id]">
       <span class="alumno-card__accion-icono" aria-hidden="true">
         <i class="fa-solid fa-plus"></i>
       </span>
       <span class="alumno-card__accion-label">Acreditar</span>
-    </button>
+    </a>
     <a class="alumno-card__accion alumno-card__accion--melocoton" [routerLink]="['/restricciones-nutricionales', alumno.id]">
       <span class="alumno-card__accion-icono" aria-hidden="true">
         <i class="fa-solid fa-shield-halved"></i>
