@@ -4,6 +4,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
 import { Category } from '../models/category.interface';
+import {
+  InventoryOverviewItem,
+  QuickStockActionRequest,
+} from '../models/inventory.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +15,7 @@ import { Category } from '../models/category.interface';
 export class ProductService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/products`;
+  private readonly inventoryUrl = `${environment.apiUrl}/inventory`;
 
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl);
@@ -22,6 +27,23 @@ export class ProductService {
 
   getAllByBuffetId(buffetId: string): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl, { params: { buffetId } });
+  }
+
+  getInventoryOverview(buffetId: string): Observable<InventoryOverviewItem[]> {
+    return this.http.get<InventoryOverviewItem[]>(
+      `${this.inventoryUrl}/${buffetId}/overview`,
+    );
+  }
+
+  quickStockAction(
+    buffetId: string,
+    productId: string,
+    payload: QuickStockActionRequest,
+  ): Observable<unknown> {
+    return this.http.patch(
+      `${this.inventoryUrl}/${buffetId}/products/${productId}/quick-action`,
+      payload,
+    );
   }
 
   getById(id: string): Observable<Product> {

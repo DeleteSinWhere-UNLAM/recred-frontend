@@ -1,7 +1,7 @@
 .product-table {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: 20px;
+  border-radius: 18px;
   box-shadow: var(--shadow-card);
   padding: 18px 20px;
   display: flex;
@@ -23,10 +23,11 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
+  min-height: 220px;
   padding: 40px 20px;
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: 20px;
+  border-radius: 18px;
   box-shadow: var(--shadow-card);
   font-family: var(--font-body);
   font-size: 14px;
@@ -44,13 +45,15 @@
 }
 
 @keyframes product-table-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .product-table__estado-icono {
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: 14px;
   background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-fondo));
   color: var(--color-pizarra);
   display: flex;
@@ -75,34 +78,33 @@
 }
 
 .product-table__wrapper {
-  background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: 14px;
-  box-shadow: none;
   overflow-x: auto;
 }
 
 .product-table__tabla {
   width: 100%;
+  min-width: 860px;
   border-collapse: collapse;
   font-family: var(--font-body);
 }
 
 .product-table__tabla thead th {
-  padding: 12px 16px;
+  padding: 12px 14px;
   text-align: left;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
   color: var(--color-texto-claro);
   border-bottom: 1px solid color-mix(in srgb, var(--color-pizarra) 12%, transparent);
-  background-color: transparent;
+  background-color: color-mix(in srgb, var(--color-fondo) 72%, var(--color-superficie));
 }
 
 .product-table__tabla tbody td {
-  padding: 12px 16px;
+  padding: 13px 14px;
   vertical-align: middle;
   border-bottom: 1px solid color-mix(in srgb, var(--color-pizarra) 8%, transparent);
   font-size: 13px;
@@ -119,30 +121,63 @@
   font-weight: 700;
   color: var(--color-pizarra);
   font-size: 14px;
+  line-height: 1.25;
 }
 
-.product-table__desc {
+.product-table__desc,
+.product-table__dato-secundario {
   display: block;
+  margin-top: 3px;
   font-size: 12px;
+  line-height: 1.25;
   color: var(--color-texto-claro);
-  margin-top: 2px;
-  max-width: 260px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.product-table__categoria {
-  display: inline-block;
-  padding: 4px 12px;
-  background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-fondo));
+.product-table__modo,
+.product-table__estado-badge,
+.product-table__stock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.product-table__modo {
+  padding: 0 11px;
+  background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-fondo));
   color: var(--color-pizarra);
+}
+
+.product-table__estado-badge {
+  padding: 0 12px;
+  background-color: color-mix(in srgb, var(--color-texto-claro) 16%, var(--color-fondo));
+  color: var(--color-texto-claro);
+}
+
+.product-table__estado-badge--disponible {
+  background-color: color-mix(in srgb, var(--color-menta) 20%, var(--color-fondo));
+  color: var(--color-menta);
+}
+
+.product-table__estado-badge--bajo {
+  background-color: color-mix(in srgb, var(--color-dorado) 24%, var(--color-fondo));
+  color: var(--color-texto-oscuro);
+}
+
+.product-table__estado-badge--agotado {
+  background-color: color-mix(in srgb, var(--color-melocoton) 18%, var(--color-fondo));
+  color: var(--color-melocoton);
+}
+
+.product-table__estado-badge--pausado {
+  background-color: color-mix(in srgb, var(--color-texto-claro) 18%, var(--color-fondo));
+  color: var(--color-texto-claro);
 }
 
 .product-table__col-number {
@@ -153,31 +188,29 @@
 
 .product-table__col-actions {
   text-align: center;
-  width: 200px;
+  width: 280px;
 }
 
 .product-table__stock {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 36px;
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 700;
+  min-width: 44px;
+  padding: 0 12px;
   background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
   color: var(--color-menta);
 }
 
 .product-table__stock--low {
-  background-color: color-mix(in srgb, var(--color-melocoton) 18%, var(--color-fondo));
+  background-color: color-mix(in srgb, var(--color-dorado) 24%, var(--color-fondo));
+  color: var(--color-texto-oscuro);
+}
+
+.product-table__stock--empty {
+  background-color: color-mix(in srgb, var(--color-melocoton) 16%, var(--color-fondo));
   color: var(--color-melocoton);
 }
 
 .product-table__acciones {
   display: flex;
-  gap: 8px;
+  gap: 7px;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -185,14 +218,16 @@
 .product-table__btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 7px 14px;
-  border-radius: 12px;
+  min-height: 32px;
+  padding: 7px 11px;
+  border-radius: 10px;
   font-family: var(--font-display);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  transition: transform 0.1s ease, background-color 0.15s ease;
   border: none;
 }
 
@@ -200,22 +235,24 @@
   transform: translateY(1px);
 }
 
-.product-table__btn--edit {
+.product-table__btn--primary {
+  background-color: color-mix(in srgb, var(--color-menta) 20%, var(--color-fondo));
+  color: var(--color-menta);
+}
+
+.product-table__btn--neutral {
   background-color: color-mix(in srgb, var(--color-pizarra) 12%, var(--color-fondo));
   color: var(--color-pizarra);
 }
 
-.product-table__btn--edit:hover {
-  background-color: color-mix(in srgb, var(--color-pizarra) 18%, var(--color-fondo));
+.product-table__btn--warning {
+  background-color: color-mix(in srgb, var(--color-dorado) 24%, var(--color-fondo));
+  color: var(--color-texto-oscuro);
 }
 
-.product-table__btn--delete {
-  background-color: color-mix(in srgb, var(--color-melocoton) 14%, var(--color-fondo));
+.product-table__btn--danger {
+  background-color: color-mix(in srgb, var(--color-melocoton) 16%, var(--color-fondo));
   color: var(--color-melocoton);
-}
-
-.product-table__btn--delete:hover {
-  background-color: color-mix(in srgb, var(--color-melocoton) 22%, var(--color-fondo));
 }
 
 .product-table__cards {
@@ -237,71 +274,75 @@
     background-color: var(--color-superficie);
     border: 1px solid var(--color-borde);
     border-radius: 14px;
-    box-shadow: none;
     padding: 14px 16px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
 
   .product-table__card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
 
   .product-table__card-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     flex: 1;
     min-width: 0;
   }
 
-  .product-table__card-desc {
-    margin: 0;
+  .product-table__card-precio {
     font-size: 12px;
     color: var(--color-texto-claro);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-weight: 700;
+  }
+
+  .product-table__card-metrics {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--color-texto-claro);
+  }
+
+  .product-table__card-metrics strong {
+    font-family: var(--font-display);
+    color: var(--color-pizarra);
+    font-size: 16px;
+    text-align: right;
   }
 
   .product-table__card-footer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
-  .product-table__card-precio {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--color-pizarra);
+  .product-table__acciones {
+    justify-content: flex-start;
   }
 }
 
 @media (max-width: 640px) {
   .product-table {
     padding: 16px;
-    border-radius: 18px;
+    border-radius: 16px;
   }
 
   .product-table__estado {
+    min-height: 200px;
     padding: 32px 16px;
-    border-radius: 18px;
+    border-radius: 16px;
   }
 }
 
 @media (max-width: 480px) {
   .product-table {
     padding: 14px;
-    border-radius: 16px;
     gap: 10px;
   }
 
@@ -309,11 +350,16 @@
     font-size: 15px;
   }
 
+  .product-table__btn {
+    min-width: 40px;
+    padding: 8px 10px;
+  }
+
   .product-table__btn span {
     display: none;
   }
 
-  .product-table__btn {
-    padding: 8px 10px;
+  .product-table__card {
+    padding: 13px 14px;
   }
 }

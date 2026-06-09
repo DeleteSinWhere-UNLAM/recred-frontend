@@ -17,25 +17,73 @@
       </div>
       <div class="inventario__identidad">
         <h2 class="inventario__titulo">Inventario</h2>
-        <p class="inventario__subtitulo">
-          Gestiona el stock de tu kiosco
-        </p>
+        <p class="inventario__subtitulo">Control de stock del kiosco</p>
       </div>
-      <button
-        type="button"
-        class="inventario__nuevo"
-        (click)="openCreateForm()"
-      >
-        <i class="fa-solid fa-plus" aria-hidden="true"></i>
-        <span>Nuevo producto</span>
-      </button>
+      <div class="inventario__acciones-header">
+        <span
+          class="inventario__realtime"
+          [class.inventario__realtime--connected]="realtimeStatus === 'connected'"
+          [class.inventario__realtime--connecting]="realtimeStatus === 'connecting'"
+        >
+          <i class="fa-solid fa-circle" aria-hidden="true"></i>
+          Tiempo real
+        </span>
+        <button
+          type="button"
+          class="inventario__nuevo"
+          (click)="openCreateForm()"
+        >
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          <span>Nuevo producto</span>
+        </button>
+      </div>
     </header>
 
+    <section class="inventario__resumen" aria-label="Resumen del inventario">
+      <div class="inventario__stat">
+        <span class="inventario__stat-label">Disponibles</span>
+        <strong class="inventario__stat-value">{{ disponiblesCount }}</strong>
+      </div>
+      <div class="inventario__stat">
+        <span class="inventario__stat-label">Reservados</span>
+        <strong class="inventario__stat-value">{{ reservadosCount }}</strong>
+      </div>
+      <div class="inventario__stat inventario__stat--warning">
+        <span class="inventario__stat-label">Bajo stock</span>
+        <strong class="inventario__stat-value">{{ bajoStockCount }}</strong>
+      </div>
+      <div class="inventario__stat inventario__stat--danger">
+        <span class="inventario__stat-label">Agotados</span>
+        <strong class="inventario__stat-value">{{ agotadosCount }}</strong>
+      </div>
+    </section>
+
+    <section class="inventario__toolbar" aria-label="Filtros de inventario">
+      <div class="inventario__filtros">
+        @for (filter of filterOptions; track filter.id) {
+          <button
+            type="button"
+            class="inventario__filtro"
+            [class.inventario__filtro--activo]="activeFilter === filter.id"
+            (click)="setFilter(filter.id)"
+          >
+            {{ filter.label }}
+          </button>
+        }
+      </div>
+
+      @if (isRefreshing) {
+        <span class="inventario__refresh">
+          <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+          Actualizando
+        </span>
+      }
+    </section>
+
     <app-product-table
-      [products]="products"
+      [products]="filteredProducts"
       [isLoading]="isLoading"
-      (edit)="openEditForm($event)"
-      (remove)="requestDelete($event)">
+      (quickAction)="openQuickAction($event)">
     </app-product-table>
 
     @if (isFormVisible) {
@@ -48,11 +96,120 @@
       </app-product-form>
     }
 
-    <app-confirm-delete-modal
-      [isOpen]="deleteTarget !== null"
-      [productName]="deleteTarget?.nombre ?? ''"
-      (confirmed)="confirmDelete()"
-      (cancelled)="cancelDelete()">
-    </app-confirm-delete-modal>
+    @if (quickActionTarget; as target) {
+      <div
+        class="quick-action-modal__backdrop"
+        tabindex="0"
+        role="button"
+        (click)="closeQuickAction()"
+        (keydown.enter)="closeQuickAction()"
+        (keydown.space)="closeQuickAction()"
+      >
+        <form
+          class="quick-action-modal"
+          [formGroup]="quickActionForm"
+          tabindex="-1"
+          (ngSubmit)="submitQuickAction()"
+          (click)="$event.stopPropagation()"
+          (keydown.enter)="$event.stopPropagation()"
+          (keydown.space)="$event.stopPropagation()"
+        >
+          <header class="quick-action-modal__header">
+            <div class="quick-action-modal__icono" aria-hidden="true">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div>
+              <h3 class="quick-action-modal__titulo">{{ getQuickActionTitle(target.action) }}</h3>
+              <p class="quick-action-modal__producto">{{ target.product.nombre }}</p>
+            </div>
+            <button
+              type="button"
+              class="quick-action-modal__close"
+              (click)="closeQuickAction()"
+              aria-label="Cerrar"
+            >
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </header>
+
+          <div class="quick-action-modal__body">
+            @if (requiresQuantity(target.action)) {
+              <div
+                class="quick-action-modal__group"
+                [class.quick-action-modal__group--error]="hasQuickActionError('quantity')"
+              >
+                <label for="quick-action-quantity" class="quick-action-modal__label">
+                  {{ getQuantityLabel(target.action) }}
+                </label>
+                <input
+                  id="quick-action-quantity"
+                  class="quick-action-modal__input"
+                  formControlName="quantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                >
+                @if (hasQuickActionError('quantity')) {
+                  <span class="quick-action-modal__error">Ingresa una cantidad valida</span>
+                }
+              </div>
+            }
+
+            @if (isSetStockAction(target.action)) {
+              <div
+                class="quick-action-modal__group"
+                [class.quick-action-modal__group--error]="hasQuickActionError('stockMinimo')"
+              >
+                <label for="quick-action-stock-minimo" class="quick-action-modal__label">
+                  Stock minimo
+                </label>
+                <input
+                  id="quick-action-stock-minimo"
+                  class="quick-action-modal__input"
+                  formControlName="stockMinimo"
+                  type="number"
+                  min="0"
+                  step="1"
+                >
+                @if (hasQuickActionError('stockMinimo')) {
+                  <span class="quick-action-modal__error">Ingresa un minimo valido</span>
+                }
+              </div>
+            }
+
+            <div class="quick-action-modal__group">
+              <label for="quick-action-motivo" class="quick-action-modal__label">Motivo</label>
+              <textarea
+                id="quick-action-motivo"
+                class="quick-action-modal__textarea"
+                formControlName="motivo"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <footer class="quick-action-modal__footer">
+            <button
+              type="button"
+              class="quick-action-modal__btn quick-action-modal__btn--cancel"
+              (click)="closeQuickAction()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="quick-action-modal__btn quick-action-modal__btn--submit"
+              [disabled]="isSaving"
+            >
+              @if (isSaving) {
+                Guardando...
+              } @else {
+                Aplicar
+              }
+            </button>
+          </footer>
+        </form>
+      </div>
+    }
   </div>
 </main>

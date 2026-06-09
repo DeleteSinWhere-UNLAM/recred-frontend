@@ -1,29 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductTableComponent } from './product-table.component';
-import { Product } from '../../models/product.interface';
+import { InventoryOverviewItem } from '../../models/inventory.interface';
 
 describe('ProductTableComponent', () => {
   let component: ProductTableComponent;
   let fixture: ComponentFixture<ProductTableComponent>;
 
-  const mockProduct: Product = {
-    id: '1',
+  const mockProduct: InventoryOverviewItem = {
+    productId: '1',
     nombre: 'Product 1',
-    descripcion: 'Desc 1',
     precio: 100,
-    peso: 1,
-    requierePreparacion: false,
+    tipoManejoInventario: 'STOCK_EXACTO',
+    estadoInventario: 'DISPONIBLE',
     stockActual: 10,
-    categoriaId: 'c1',
-    categoriaNombre: 'Category 1'
+    stockReservado: 2,
+    stockDisponible: 8,
+    stockMinimo: 3,
+    cupoMaximoDiario: null,
+    cupoDisponibleDia: null,
+    disponible: true,
+    bajoStock: false,
+    agotado: false,
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProductTableComponent]
-    })
-    .compileComponents();
-    
+      imports: [ProductTableComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(ProductTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -33,21 +37,25 @@ describe('ProductTableComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería emitir el evento edit al disparar la acción de editar con un producto', () => {
-    spyOn(component.edit, 'emit');
-    
-    // Simulate user action or method call
-    component.edit.emit(mockProduct);
-    
-    expect(component.edit.emit).toHaveBeenCalledWith(mockProduct);
+  it('deberia emitir quickAction con producto y accion', () => {
+    spyOn(component.quickAction, 'emit');
+
+    component.emitAction(mockProduct, 'ADD_STOCK');
+
+    expect(component.quickAction.emit).toHaveBeenCalledWith({
+      product: mockProduct,
+      action: 'ADD_STOCK',
+    });
   });
 
-  it('debería emitir el evento remove al disparar la acción de eliminar con un producto', () => {
-    spyOn(component.remove, 'emit');
-    
-    // Simulate user action or method call
-    component.remove.emit(mockProduct);
-    
-    expect(component.remove.emit).toHaveBeenCalledWith(mockProduct);
+  it('deberia mostrar acciones de stock exacto', () => {
+    const actions = component.getActions(mockProduct);
+
+    expect(actions.map((action) => action.action)).toEqual([
+      'ADD_STOCK',
+      'SUBTRACT_STOCK',
+      'SET_STOCK',
+      'MARK_SOLD_OUT',
+    ]);
   });
 });
