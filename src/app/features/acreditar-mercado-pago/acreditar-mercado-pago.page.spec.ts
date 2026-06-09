@@ -16,11 +16,13 @@ describe('AcreditarMercadoPagoPage', () => {
     mockPresenter.init.and.returnValue(Promise.resolve(undefined));
     mockPresenter.acreditar.and.returnValue(Promise.resolve(undefined));
 
-    (mockPresenter as any).cargando = signal(false);
-    (mockPresenter as any).alumno = signal(undefined);
-    (mockPresenter as any).nombreCompleto = signal('');
-    (mockPresenter as any).grado = signal('');
-    (mockPresenter as any).iniciales = signal('');
+    Object.assign(mockPresenter, {
+      cargando: signal(false),
+      alumno: signal(undefined),
+      nombreCompleto: signal(''),
+      grado: signal(''),
+      iniciales: signal('')
+    });
 
     await TestBed.configureTestingModule({
       imports: [AcreditarMercadoPagoPage],
@@ -94,7 +96,7 @@ describe('AcreditarMercadoPagoPage', () => {
 
   it('Dado que cambia el monto en el input, debería actualizar la variable montoIngresado', () => {
     const event = { target: { value: '500' } } as unknown as Event;
-    (component as any).onMontoChange(event);
+    component['onMontoChange'](event);
     expect(component.montoIngresado).toBe(500);
   });
 
@@ -102,7 +104,7 @@ describe('AcreditarMercadoPagoPage', () => {
     const event = new Event('submit');
     spyOn(event, 'preventDefault');
     component.montoIngresado = 1000;
-    (component as any).onSubmit(event);
+    component['onSubmit'](event);
     expect(event.preventDefault).toHaveBeenCalled();
     expect(mockPresenter.acreditar).toHaveBeenCalledWith(1000);
   });

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { AcreditarMercadoPagoPresenter } from './acreditar-mercado-pago.presenter';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
+import { Alumno } from '../../../data-access/models/alumno.model';
 import { ToastService } from '../../../shared/services/toast.service';
 import { AcreditarMercadoPagoService } from '../services/acreditar-mercado-pago.service';
 import { DOCUMENT } from '@angular/common';
@@ -45,12 +46,12 @@ describe('AcreditarMercadoPagoPresenter', () => {
   describe('init', () => {
     it('Dado que init es llamado y encuentra al alumno, debería setear el alumno en el estado', async () => {
       mockAlumnosService.asegurarCargados.and.returnValue(Promise.resolve([]));
-      mockAlumnosService.getAlumnoById.and.returnValue({ id: '1', nombre: 'Juan', apellido: 'Perez', grado: '3A' } as any);
+      mockAlumnosService.getAlumnoById.and.returnValue({ id: '1', nombre: 'Juan', apellido: 'Perez', grado: '3A' } as unknown as Alumno);
 
       await presenter.init('1');
 
       expect(mockAlumnosService.asegurarCargados).toHaveBeenCalled();
-      expect(presenter.alumno()).toEqual({ id: '1', nombre: 'Juan', apellido: 'Perez', grado: '3A' } as any);
+      expect(presenter.alumno()).toEqual({ id: '1', nombre: 'Juan', apellido: 'Perez', grado: '3A' } as unknown as Alumno);
       expect(presenter.nombreCompleto()).toBe('Juan Perez');
       expect(presenter.grado()).toBe('3A');
       expect(presenter.iniciales()).toBe('JP');
@@ -59,7 +60,7 @@ describe('AcreditarMercadoPagoPresenter', () => {
 
     it('Dado que init es llamado pero iniciales maneja undefined en nombre y apellido, debería devolver vacío', async () => {
       mockAlumnosService.asegurarCargados.and.returnValue(Promise.resolve([]));
-      mockAlumnosService.getAlumnoById.and.returnValue({ id: '1', nombre: '', apellido: '', grado: undefined } as any);
+      mockAlumnosService.getAlumnoById.and.returnValue({ id: '1', nombre: '', apellido: '', grado: undefined } as unknown as Alumno);
 
       await presenter.init('1');
 
@@ -91,7 +92,7 @@ describe('AcreditarMercadoPagoPresenter', () => {
   describe('acreditar', () => {
     it('Dado que el estado es cargando, no debería hacer nada al intentar acreditar', async () => {
       // Forzar estado cargando
-      (presenter as any).cargandoState.set(true);
+      presenter['cargandoState'].set(true);
       await presenter.acreditar(100);
       expect(mockMercadoPagoService.generarLinkPago).not.toHaveBeenCalled();
     });
@@ -102,7 +103,7 @@ describe('AcreditarMercadoPagoPresenter', () => {
     });
 
     it('Dado que el monto es menor o igual a 0, debería mostrar un error', async () => {
-      (presenter as any).alumnoState.set({ id: '1' } as any);
+      presenter['alumnoState'].set({ id: '1' } as unknown as Alumno);
       await presenter.acreditar(0);
       expect(mockToastService.mostrar).toHaveBeenCalledWith('El monto debe ser mayor a 0.', 'error');
       expect(mockMercadoPagoService.generarLinkPago).not.toHaveBeenCalled();
@@ -112,18 +113,18 @@ describe('AcreditarMercadoPagoPresenter', () => {
     });
 
     it('Dado que el monto es válido y el link de pago se genera, debería redirigir a la URL', async () => {
-      (presenter as any).alumnoState.set({ id: '1' } as any);
+      presenter['alumnoState'].set({ id: '1' } as unknown as Alumno);
       mockMercadoPagoService.generarLinkPago.and.returnValue(Promise.resolve('https://mercadopago.com/pagar'));
 
       await presenter.acreditar(500);
 
       expect(mockMercadoPagoService.generarLinkPago).toHaveBeenCalledWith('1', 500);
-      expect((presenter as any).document.location.href).toBe('https://mercadopago.com/pagar');
+      expect(presenter['document'].location.href).toBe('https://mercadopago.com/pagar');
       expect(presenter.cargando()).toBeFalse();
     });
 
     it('Dado que no se recibe URL de pago, debería capturar el error y mostrar toast de error', async () => {
-      (presenter as any).alumnoState.set({ id: '1' } as any);
+      presenter['alumnoState'].set({ id: '1' } as unknown as Alumno);
       mockMercadoPagoService.generarLinkPago.and.returnValue(Promise.resolve(''));
 
       await presenter.acreditar(500);
@@ -133,7 +134,7 @@ describe('AcreditarMercadoPagoPresenter', () => {
     });
 
     it('Dado que la API de Mercado Pago lanza un error, debería capturar el error y mostrar toast', async () => {
-      (presenter as any).alumnoState.set({ id: '1' } as any);
+      presenter['alumnoState'].set({ id: '1' } as unknown as Alumno);
       mockMercadoPagoService.generarLinkPago.and.returnValue(Promise.reject(new Error('MP error')));
 
       await presenter.acreditar(500);
