@@ -52,7 +52,7 @@ export class CompraService {
         ]
       };
       
-      return this.http.post<any>(`${environment.apiUrl}/purchases/advance`, payload).pipe(
+      return this.http.post<{ codes: Record<string, string> }>(`${environment.apiUrl}/purchases/advance`, payload).pipe(
         map(response => ({
           studentId: orden.alumno.id,
           codigo: response.codes[orden.alumno.id]

@@ -1,11 +1,11 @@
-import { Injectable, Signal, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { RestriccionesHorariasService } from '../services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../services/franjas-horarias.service';
 import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { ProductService } from '../../updated-inventory/services/product.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
-import { RestriccionHoraria, TimeSlot, TimeRestrictionCommand } from '../models/restriccion-horaria.model';
+import { RestriccionHoraria, TimeSlot } from '../models/restriccion-horaria.model';
 import { CategoriaProducto } from '../../buffet/models/producto.model';
 import { ClasificacionSaludBackend } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { firstValueFrom } from 'rxjs';
@@ -49,13 +49,12 @@ export class RestriccionesHorariasPresenter {
     const restricciones = this.restriccionesState();
 
     // El backend usa 'activa' y objetos anidados
-    const activas = restricciones.filter(r => (r as any).activa !== false);
+    const activas = restricciones.filter(r => r.activa !== false);
 
     return franjas.map(franja => {
       const deEstaFranja = activas.filter(r => {
-        const rAny = r as any;
         // Según el backend, el ID está en r.franjaHoraria.id
-        const idRecreo = rAny.franjaHoraria?.id || rAny.timeSlotId;
+        const idRecreo = r.franjaHoraria?.id || r.timeSlotId;
         return idRecreo === franja.id;
       });
 
@@ -123,7 +122,8 @@ export class RestriccionesHorariasPresenter {
 
       const actualizadas = await this.restriccionesService.getRestriccionesPorAlumno(alumno.id);
       this.restriccionesState.set(actualizadas);
-    } catch (error: any) {
+    } catch (err) {
+      const error = err as import('@angular/common/http').HttpErrorResponse;
       if (error.status === 409) {
         console.error('Conflicto detectado en el backend:', error.error);
         const mensajeBack = error.error?.mensaje || 'Una de las restricciones ya existe o hay un problema de integridad.';
