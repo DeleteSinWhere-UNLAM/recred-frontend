@@ -1,15 +1,23 @@
-import { Injectable, Signal, computed, inject, signal } from '@angular/core';
+import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { of, tap } from 'rxjs';
 import { Alumno } from '../../../../data-access/models/alumno.model';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { ItemCarrito } from '../../models/carrito.model';
+import { SugerenciaCarrito } from '../../models/sugerencia-carrito.model';
 import {
   OrdenAlumno,
   Recreo,
 } from '../../models/orden-compra.model';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
+import { BuffetService } from '../../../buffet/services/buffet.service';
+import { SugerenciasCarritoService } from '../../services/sugerencias-carrito.service';
 import { CarritoService } from '../../services/carrito.service';
 import { CompraService } from '../../services/compra.service';
+import { Buffet } from '../../../buffet/models/buffet.model';
+import { Producto } from '../../../buffet/models/producto.model';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 export interface GrupoCarrito {
   alumno: Alumno;
@@ -26,11 +34,26 @@ export class CarritoPresenter {
   private readonly alumnosService = inject(AlumnosService);
   private readonly compraService = inject(CompraService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
+  private readonly buffetService = inject(BuffetService);
+  private readonly sugerenciasCarritoService = inject(SugerenciasCarritoService);
+  private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
   private readonly seleccionState = signal<Record<string, boolean>>({});
   private readonly fechasState = signal<Record<string, string>>({});
   private readonly recreosState = signal<Record<string, Recreo>>({});
+
+  private readonly sugerenciasState = signal<SugerenciaCarrito[]>([]);
+  private readonly cargandoSugerenciasState = signal(false);
+  private readonly buffetCache = new Map<string, Buffet>();
+
+  readonly sugerencias: Signal<SugerenciaCarrito[]> = this.sugerenciasState.asReadonly();
+  readonly cargandoSugerencias: Signal<boolean> = this.cargandoSugerenciasState.asReadonly();
+  readonly mostrarSugerencias = computed(
+    () =>
+      this.perfilService.rol() === 'ALUMNO' || this.usuarioService.esVistaAlumno(),
+  );
 
   readonly fechaMinima = this.calcularFechaMinima();
 
@@ -90,6 +113,92 @@ export class CarritoPresenter {
     }
     return `Hay ${conDeuda.length} alumnos con saldo insuficiente.`;
   });
+
+  constructor() {
+    effect(() => {
+      if (!this.mostrarSugerencias()) {
+        this.sugerenciasState.set([]);
+        return;
+      }
+      this.refrescarSugerencias();
+    });
+  }
+
+  private refrescarSugerencias(): void {
+    const grupo = this.grupos()[0];
+    if (!grupo) {
+      this.sugerenciasState.set([]);
+      return;
+    }
+    const studentId = this.perfilService.obtenerAlumnoId() ?? grupo.alumno.id;
+    if (!studentId) {
+      this.sugerenciasState.set([]);
+      return;
+    }
+
+    const itemsRequest = grupo.items.map((i) => ({
+      productId: i.producto.id,
+      quantity: i.cantidad,
+    }));
+
+    this.resolverBuffet(studentId).subscribe({
+      next: (buffet) => {
+        this.cargandoSugerenciasState.set(true);
+        this.sugerenciasCarritoService
+          .obtenerSugerencias({
+            studentId,
+            buffetId: buffet.id,
+            items: itemsRequest,
+            limit: 3,
+          })
+          .subscribe({
+            next: (resultado) => {
+              this.sugerenciasState.set(resultado);
+              this.cargandoSugerenciasState.set(false);
+            },
+            error: (err) => {
+              console.error('Error al obtener sugerencias de carrito:', err);
+              this.sugerenciasState.set([]);
+              this.cargandoSugerenciasState.set(false);
+            },
+          });
+      },
+      error: (err) => {
+        console.error('Error al resolver buffet del alumno:', err);
+        this.sugerenciasState.set([]);
+        this.cargandoSugerenciasState.set(false);
+      },
+    });
+  }
+
+  private resolverBuffet(alumnoId: string) {
+    const cacheado = this.buffetCache.get(alumnoId);
+    if (cacheado) {
+      return of(cacheado);
+    }
+    return this.buffetService.obtenerBuffetDelAlumno(alumnoId).pipe(
+      tap((buffet) => this.buffetCache.set(alumnoId, buffet)),
+    );
+  }
+
+  agregarSugerencia(sugerencia: SugerenciaCarrito): void {
+    const grupo = this.grupos()[0];
+    if (!grupo) return;
+    const producto: Producto = {
+      id: sugerencia.productId,
+      nombre: sugerencia.productName,
+      descripcion: '',
+      precio: sugerencia.price,
+      categoria: { id: 'comidas', descripcion: 'Comidas' },
+      clasificacionesSalud: [],
+      imagen: '',
+      estadoStock: sugerencia.stockActual > 0 ? 'DISPONIBLE' : 'SIN_STOCK',
+    };
+    this.carritoService.agregar(producto, grupo.alumno.id, 1);
+    this.toastService.mostrar(
+      `Se agregó "${producto.nombre}" al carrito`,
+    );
+  }
 
   toggleSeleccion(alumnoId: string): void {
     this.seleccionState.update((actual) => ({

@@ -19,8 +19,11 @@ import { FormsModule } from '@angular/forms';
 })
 export class InputMensajeComponent {
   @Input() deshabilitado = false;
+  @Input() mostrarAcciones = false;
+  @Input() accionesAbiertas = false;
 
   @Output() enviar = new EventEmitter<string>();
+  @Output() alternarAcciones = new EventEmitter<void>();
 
   @ViewChild('inputEl') private readonly inputEl?: ElementRef<HTMLInputElement>;
 
@@ -35,6 +38,10 @@ export class InputMensajeComponent {
     if (!this.puedeEnviar) return;
     this.enviar.emit(this.texto().trim());
     this.texto.set('');
+  }
+
+  protected onAlternarAcciones(): void {
+    this.alternarAcciones.emit();
   }
 
   enfocar(): void {

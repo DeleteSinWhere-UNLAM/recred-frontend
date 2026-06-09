@@ -6,8 +6,11 @@
 
     @if (categoriasMasConsumidas && categoriasMasConsumidas.length > 0) {
       <div class="prediction-analysis__tags">
-        @for (cat of categoriasMasConsumidas; track cat) {
-          <span class="prediction-analysis__tag">{{ cat }}</span>
+        @for (cat of categoriasMasConsumidas; track cat.descripcion) {
+          <span class="prediction-analysis__tag">
+            <span>{{ cat.descripcion }}</span>
+            <strong>{{ cat.montoTotal | number:'1.2-2' }} $</strong>
+          </span>
         }
       </div>
     } @else {

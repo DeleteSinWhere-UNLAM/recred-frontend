@@ -32,6 +32,7 @@
 .prediction-analysis__tag {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   padding: 6px 14px;
   background-color: color-mix(in srgb, var(--color-pizarra) 12%, var(--color-fondo));
   color: var(--color-pizarra);
@@ -39,6 +40,11 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 600;
+}
+
+.prediction-analysis__tag strong {
+  color: var(--color-dorado-dark);
+  font-weight: 700;
 }
 
 .prediction-analysis__ia-header {

@@ -67,6 +67,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/perfil-usuario/perfil-usuario.page').then(
+            (m) => m.PerfilUsuarioPage,
+          ),
+      },
+      {
         path: 'favoritos',
         loadComponent: () =>
           import('./features/favoritos/favoritos.page').then(
@@ -156,6 +163,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/notificaciones-precio/notificaciones-precio.page').then(
             (m) => m.NotificacionesPrecioPage,
+          ),
+      },
+      {
+        path: 'resumen-semanal',
+        loadComponent: () =>
+          import('./features/resumen-semanal/resumen-semanal.page').then(
+            (m) => m.ResumenSemanalPage,
           ),
       },
     ],

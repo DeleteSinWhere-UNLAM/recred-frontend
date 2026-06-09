@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 import { AiProductResponse } from '../../models/ai-product-response.interface';
 import { SaveProductRequest } from '../../models/save-product-request.interface';
 
@@ -9,8 +10,9 @@ import { SaveProductRequest } from '../../models/save-product-request.interface'
 })
 export class AiVisionService {
   private readonly http = inject(HttpClient);
-  private readonly uploadUrl = 'https://18-119-187-167.sslip.io/api/load-stock/upload-image';
-  private readonly saveUrl = 'https://18-119-187-167.sslip.io/api/load-stock/save-product';
+  private readonly apiBase = environment.apiUrl;
+  private readonly uploadUrl = `${this.apiBase}/load-stock/upload-image`;
+  private readonly saveUrl = `${this.apiBase}/load-stock/save-product`;
 
   analyzeImage(file: File): Observable<AiProductResponse> {
     const formData = new FormData();

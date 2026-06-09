@@ -7,10 +7,14 @@
   <app-asistente-panel
     [mensajes]="presenter.mensajes()"
     [sugerencias]="presenter.sugerencias()"
-    [enviando]="presenter.procesando()"
+    [opciones]="presenter.opcionesDisponibles()"
+    [enviando]="presenter.enviando()"
+    [deshabilitado]="presenter.procesando()"
+    [mostrarHistorial]="presenter.puedeVerHistorial()"
     (cerrar)="presenter.cerrar()"
     (enviar)="presenter.enviar($event)"
     (sugerencia)="presenter.enviarSugerencia($event)"
     (nuevaConversacion)="presenter.nuevaConversacion()"
+    (verHistorial)="presenter.verMensajesAnteriores()"
   />
 }

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
 import { Category } from '../models/category.interface';
 
@@ -9,14 +10,14 @@ import { Category } from '../models/category.interface';
 })
 export class ProductService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'https://18-119-187-167.sslip.io/api/v1/products';
+  private readonly baseUrl = `${environment.apiUrl}/products`;
 
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl);
   }
 
   getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>('https://18-119-187-167.sslip.io/api/v1/categories');
+    return this.http.get<Category[]>(`${environment.apiUrl}/categories`);
   }
 
   getAllByBuffetId(buffetId: string): Observable<Product[]> {
