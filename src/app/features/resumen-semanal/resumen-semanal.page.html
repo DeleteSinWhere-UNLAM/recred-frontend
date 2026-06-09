@@ -1,0 +1,53 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="resumen">
+  @if (resumen && resumenProcesado && hijoActual) {
+    <h1 class="resumen__titulo">Resumen semanal</h1>
+
+    <p class="resumen__fechas">
+      {{ resumen.fechaDesde }} - {{ resumen.fechaHasta }}
+    </p>
+
+    <section class="resumen__cards">
+      <article class="card">
+        <h3>Gasto total semanal</h3>
+        <p>${{ hijoActual.totalGastado }}</p>
+      </article>
+
+      <article class="card">
+        <h3>Producto más consumido</h3>
+        <p>{{ hijoActual.productoMasConsumido.nombre }}</p>
+      </article>
+
+      <article class="card">
+        <h3>Cantidad semanal</h3>
+        <p>{{ hijoActual.productoMasConsumido.cantidad }}</p>
+      </article>
+    </section>
+
+    <section class="categorias">
+      <h2>Distribución por categoría</h2>
+
+      @for (categoria of categorias; track categoria[0]) {
+        <div class="categoria">
+          <div class="categoria__header">
+            <span>{{ categoria[0] }}</span>
+            <span>{{ categoria[1] }}%</span>
+          </div>
+
+          <div class="barra">
+            <div class="barra__valor" [style.width.%]="categoria[1]"></div>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="ia">
+      <h2>Análisis semanal</h2>
+
+      <p>
+        {{ resumenProcesado.mensaje }}
+      </p>
+    </section>
+  }
+</main>

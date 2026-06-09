@@ -158,6 +158,13 @@ export const routes: Routes = [
             (m) => m.NotificacionesPrecioPage,
           ),
       },
+      {
+        path: 'resumen-semanal',
+        loadComponent: () =>
+          import('./features/resumen-semanal/resumen-semanal.page').then(
+            (m) => m.ResumenSemanalPage,
+          ),
+      },
     ],
   },
 ];
