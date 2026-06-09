@@ -39,13 +39,13 @@ export class TrackingPedidosService {
     });
   }
 
-  advanceOrderStatus(orderId: string, nextStatus: EstadoCompra): Observable<any> {
-    return this.http.patch<any>(`${this.baseUrl}/purchases/${orderId}/status`, {
+  advanceOrderStatus(orderId: string, nextStatus: EstadoCompra): Observable<unknown> {
+    return this.http.patch<unknown>(`${this.baseUrl}/purchases/${orderId}/status`, {
       status: nextStatus,
     });
   }
 
-  cancelOrder(orderId: string): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/purchases/${orderId}/cancel`, {});
+  cancelOrder(orderId: string): Observable<unknown> {
+    return this.http.put<unknown>(`${this.baseUrl}/purchases/${orderId}/cancel`, {});
   }
 }

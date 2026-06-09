@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { TrackingPedidosService } from './services/tracking-pedidos.service';
-import { ScheduledPickup, EstadoCompra, EstadoRetiro, TimeSlotFilter } from './models/tracking-pedidos.model';
+import { ScheduledPickup, EstadoCompra, TimeSlotFilter } from './models/tracking-pedidos.model';
 import { OrderDetailsModalComponent } from './components/order-details-modal/order-details-modal.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ToastService } from '../../shared/services/toast.service';

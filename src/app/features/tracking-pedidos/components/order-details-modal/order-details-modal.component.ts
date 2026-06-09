@@ -14,7 +14,7 @@ export class OrderDetailsModalComponent {
   @Input({ required: true }) order!: ScheduledPickup;
   @Input() isUpdating = false;
 
-  @Output() close = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
   @Output() advanceStatus = new EventEmitter<{ orderId: string; nextStatus: EstadoCompra }>();
   @Output() cancelOrder = new EventEmitter<string>();
 
@@ -41,7 +41,13 @@ export class OrderDetailsModalComponent {
 
   protected onClose(): void {
     if (!this.isUpdating) {
-      this.close.emit();
+      this.closeModal.emit();
+    }
+  }
+
+  protected onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.onClose();
     }
   }
 

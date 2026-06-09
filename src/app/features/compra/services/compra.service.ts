@@ -8,6 +8,12 @@ import {
   OrdenCompra,
 } from '../models/orden-compra.model';
 
+interface AdvancePurchaseResponse {
+  orderId?: string;
+  codes?: Record<string, string>;
+  total?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CompraService {
   private readonly http = inject(HttpClient);
@@ -72,7 +78,7 @@ export class CompraService {
       orders: ordersPayload
     };
 
-    return this.http.post<any>(`${environment.apiUrl}/purchases/advance`, requestPayload).pipe(
+    return this.http.post<AdvancePurchaseResponse>(`${environment.apiUrl}/purchases/advance`, requestPayload).pipe(
       map((response) => {
         const pagada: OrdenCompra = {
           ...enCurso,
