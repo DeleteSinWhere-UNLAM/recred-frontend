@@ -108,7 +108,7 @@
             disabled
           >
             <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-            <span>No apto</span>
+            <span>{{ mensajeRestriccion() }}</span>
           </button>
         } @else {
           <button
@@ -118,7 +118,7 @@
           >
             @if (producto.bloqueado) {
               <i class="fa-solid fa-lock" aria-hidden="true"></i>
-              <span>Bloqueado</span>
+              <span>Bloqueado por el tutor</span>
             } @else {
               <i class="fa-solid fa-ban" aria-hidden="true"></i>
               <span>Sin stock</span>
