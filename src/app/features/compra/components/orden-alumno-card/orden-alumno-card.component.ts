@@ -11,6 +11,7 @@ import { Alumno } from '../../../../data-access/models/alumno.model';
 import { ItemCarrito } from '../../models/carrito.model';
 import { Recreo } from '../../models/orden-compra.model';
 import { CarritoItemComponent } from '../carrito-item/carrito-item.component';
+import { RecreoOpcion } from '../../carrito/presenter/carrito.presenter';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -42,6 +43,7 @@ export class OrdenAlumnoCardComponent {
   @Input() seleccionado = false;
   @Input() fecha = '';
   @Input() recreo: Recreo = 'PRIMER_RECREO';
+  @Input() recreosDisponibles: RecreoOpcion[] = [];
   @Input() fechaMinima = '';
 
   @Output() toggleSeleccion = new EventEmitter<void>();

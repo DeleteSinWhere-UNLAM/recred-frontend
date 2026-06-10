@@ -7,8 +7,6 @@ import { TimeSlot } from '../models/restriccion-horaria.model';
 @Injectable({ providedIn: 'root' })
 export class FranjasHorariasService {
   private readonly http = inject(HttpClient);
-  // Eliminamos la versión para los endpoints de configuración de colegio si es necesario, 
-  // pero según las instrucciones, este parece ser un endpoint v1.
   private readonly base = environment.apiUrl;
 
   getFranjasHorarias(colegioId: string): Promise<TimeSlot[]> {
