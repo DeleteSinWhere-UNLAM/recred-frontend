@@ -1,0 +1,20 @@
+.preferencias-detectadas {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.preferencias-detectadas__titulo {
+  margin-bottom: 1.5rem;
+}
+
+.preferencias-detectadas__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.preferencias-detectadas__vacio {
+  text-align: center;
+  opacity: 0.7;
+}
