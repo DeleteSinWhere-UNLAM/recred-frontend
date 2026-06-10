@@ -12,10 +12,8 @@ export class NotificationService {
   private notificacionSaldoBajoService = inject(NotificacionSaldoBajoService);
 
   requestNotificationPermission() {
-    console.log('Solicitando permisos para notificaciones push...');
     Notification.requestPermission().then((permission) => {
       if (permission === 'granted') {
-        console.log('Permiso concedido. Procesando token FCM...');
         this.handleTokenRegistration();
       } else {
         console.log('Permiso denegado por el usuario.');

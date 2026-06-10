@@ -35,8 +35,4 @@ describe('NotificationService', () => {
     expect(service).toBeTruthy();
   });
 
-  // Nota: testear a fondo métodos como requestNotificationPermission o listenToForegroundMessages
-  // que usan métodos exportados directamente (getToken, onMessage) de @angular/fire/messaging
-  // requiere configuración de mocks a nivel de módulo (esbuild/jest), por lo que acá verificamos
-  // principalmente la inyección de dependencias y que el servicio levante correctamente.
 });
