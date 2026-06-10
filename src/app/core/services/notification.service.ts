@@ -1,4 +1,4 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext, signal } from '@angular/core';
 import { Messaging, getToken, onMessage } from '@angular/fire/messaging';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -8,6 +8,9 @@ export class NotificationService {
   private messaging = inject(Messaging);
   private http = inject(HttpClient);
   private injector = inject(Injector);
+
+  private readonly notificationsState = signal<any[]>([]);
+  readonly notifications = this.notificationsState.asReadonly();
 
   requestNotificationPermission() {
     console.log('Solicitando permisos para notificaciones push...');
@@ -54,10 +57,30 @@ export class NotificationService {
         const body = payload.notification?.body || 'Por algun componente personalizado';
 
         alert(`🔴 ${title}\n${body}`);
+
+        const newNotif = {
+          titulo: title,
+          mensaje: body,
+          fecha: new Date().toISOString()
+        };
+        this.notificationsState.update(list => [newNotif, ...list]);
       });
     });
   }
 
+
+  getNotifications() {
+    this.http.get<any[]>(`${environment.apiUrl}/notifications/me`)
+      .subscribe({
+        next: (notifications) => {
+          console.log('List of notifications:', notifications);
+          this.notificationsState.set(notifications);
+        },
+        error: (err) => {
+          console.error('Error fetching notifications:', err);
+        }
+      });
+  }
 
   private sendTokenToBackend(fcmToken: string) {
     this.http.post(`${environment.apiUrl}/dispositivos`, { fcmToken })

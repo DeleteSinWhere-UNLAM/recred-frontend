@@ -6,11 +6,12 @@ import {
   Input,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
-import { NotificacionesService } from '../../../data-access/services/notificaciones.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 @Component({
@@ -25,7 +26,7 @@ export class NavbarComponent {
   private readonly authService = inject(AuthService);
   private readonly carritoService = inject(CarritoService);
   private readonly usuarioService = inject(UsuarioService);
-  private readonly notificacionesService = inject(NotificacionesService);
+  private readonly notificationService = inject(NotificationService);
   private readonly host = inject(ElementRef<HTMLElement>);
 
   @Input() userName = '';
@@ -33,7 +34,8 @@ export class NavbarComponent {
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   protected readonly esVistaKiosquero = this.usuarioService.esVistaKiosquero;
-  protected readonly notifCount = this.notificacionesService.cantidad;
+  protected readonly notifications = this.notificationService.notifications;
+  protected readonly notifCount = computed(() => this.notifications().length);
   protected readonly menuAbierto = signal(false);
   protected readonly menuNotifAbierto = signal(false);
 
@@ -53,7 +55,10 @@ export class NavbarComponent {
 
   protected toggleNotificaciones(): void {
     this.menuNotifAbierto.update((abierto) => !abierto);
-    if (this.menuNotifAbierto()) this.menuAbierto.set(false);
+    if (this.menuNotifAbierto()) {
+      this.menuAbierto.set(false);
+      this.notificationService.getNotifications();
+    }
   }
 
   protected irAPerfil(): void {

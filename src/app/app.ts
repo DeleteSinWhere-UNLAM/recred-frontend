@@ -42,6 +42,7 @@ export class App implements OnInit {
     this.autenticado.set(isAutenticado);
     if (isAutenticado) {
       this.notificationService.requestNotificationPermission();
+      this.notificationService.getNotifications();
     }
   }
 

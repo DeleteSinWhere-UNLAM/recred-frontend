@@ -15,7 +15,7 @@ describe('App', () => {
     mockAuthService = jasmine.createSpyObj('AuthService', ['isAutenticado']);
     mockAuthService.isAutenticado.and.returnValue(Promise.resolve(false));
 
-    mockNotificationService = jasmine.createSpyObj('NotificationService', ['requestNotificationPermission']);
+    mockNotificationService = jasmine.createSpyObj('NotificationService', ['requestNotificationPermission', 'getNotifications']);
     mockPerfilService = {
       rol: signal(null).asReadonly(),
     };
