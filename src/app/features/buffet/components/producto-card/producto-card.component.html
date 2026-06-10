@@ -2,8 +2,9 @@
 @if (producto) {
   <article
     class="producto-card"
-    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado && !superaPresupuesto()"
+    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado && !bloqueadoPorRestriccion() && !superaPresupuesto()"
     [class.producto-card--bloqueado]="producto.bloqueado"
+    [class.producto-card--restringido]="bloqueadoPorRestriccion()"
     [class.producto-card--supera-presupuesto]="superaPresupuesto()"
   >
     <div class="producto-card__media">
@@ -99,6 +100,15 @@
           >
             <i class="fa-solid fa-wallet" aria-hidden="true"></i>
             <span>Supera presupuesto</span>
+          </button>
+        } @else if (bloqueadoPorRestriccion()) {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--restringido"
+            disabled
+          >
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+            <span>No apto</span>
           </button>
         } @else {
           <button

@@ -73,7 +73,12 @@ export class ProductoCardComponent {
 
   readonly disponible = computed(() => {
     const p = this.productoState();
-    return p ? (disponible(p) && !p.bloqueado && !p.superaPresupuesto) : false;
+    // No disponible si: sin stock, bloqueado por tutor, por restricción nutricional/horaria, o supera presupuesto
+    return p ? (disponible(p) && !p.bloqueado && !p.bloqueadoPorRestriccion && !p.superaPresupuesto) : false;
+  });
+
+  readonly bloqueadoPorRestriccion = computed(() => {
+    return !!this.productoState()?.bloqueadoPorRestriccion;
   });
 
   readonly superaPresupuesto = computed(() => {

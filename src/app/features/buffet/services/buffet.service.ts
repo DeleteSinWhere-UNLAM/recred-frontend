@@ -262,18 +262,32 @@ export class BuffetService {
       'Supera el límite de gasto',
       'Supera límite de su categoría',
     ];
-    const esBloqueoManual = !!dto.bloqueado && dto.motivoBloqueo === 'Bloqueado por el tutor';
     const esBloqueoPorPresupuesto = !!dto.bloqueado && !!dto.motivoBloqueo && MOTIVOS_PRESUPUESTO.includes(dto.motivoBloqueo);
+    // Bloqueo manual del tutor con el candado
+    const esBloqueadoPorTutor = !!dto.bloqueado && dto.motivoBloqueo === 'Bloqueado por el tutor';
+    // Cualquier otro bloqueo (restricción nutricional, horaria, etc.)
+    const esBloqueadoPorRestriccion = !!dto.bloqueado && !esBloqueoPorPresupuesto && !esBloqueadoPorTutor;
+
+    // Buscar en el mock local para recuperar las clasificaciones y la imagen premium
+    const prodMock = this.productosPorBuffet['buffet-san-jose']?.find(
+      (p) => p.id === dto.id || p.nombre.toLowerCase() === dto.nombre.toLowerCase()
+    );
+    const clasificacionesSalud = prodMock ? prodMock.clasificacionesSalud : [];
+    const imagen = prodMock ? prodMock.imagen : this.obtenerImagenProducto(dto.nombre);
+
     return {
       id: dto.id,
       nombre: dto.nombre,
       descripcion: dto.descripcion ?? '',
       precio: dto.precio,
       categoria: categoria,
-      clasificacionesSalud: [],
-      imagen: this.obtenerImagenProducto(dto.nombre),
-      estadoStock: (esBloqueoManual && !esBloqueoPorPresupuesto) ? 'SIN_STOCK' : 'DISPONIBLE',
-      bloqueado: esBloqueoManual,
+      clasificacionesSalud: clasificacionesSalud,
+      imagen: imagen,
+      // Sin stock solo si hay algún tipo de bloqueo real (no presupuesto)
+      estadoStock: (esBloqueadoPorTutor || esBloqueadoPorRestriccion) ? 'SIN_STOCK' : 'DISPONIBLE',
+      bloqueado: esBloqueadoPorTutor,
+      bloqueadoPorRestriccion: esBloqueadoPorRestriccion,
+      motivoBloqueo: dto.motivoBloqueo ?? undefined,
       superaPresupuesto: esBloqueoPorPresupuesto,
     };
   }

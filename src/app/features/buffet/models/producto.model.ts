@@ -19,7 +19,12 @@ export interface Producto {
   clasificacionesSalud: ClasificacionSalud[];
   imagen: string;
   estadoStock: EstadoStock;
+  /** Bloqueado manualmente por el tutor con el candado. Se oculta al alumno. */
   bloqueado?: boolean;
+  /** Bloqueado por restricción nutricional u horaria. Se muestra al alumno pero deshabilitado. */
+  bloqueadoPorRestriccion?: boolean;
+  /** Motivo de bloqueo devuelto por el backend (visible para el tutor). */
+  motivoBloqueo?: string;
   superaPresupuesto?: boolean;
 }
 

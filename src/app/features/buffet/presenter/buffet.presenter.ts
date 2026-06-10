@@ -91,6 +91,7 @@ export class BuffetPresenter {
     const esAlumno = this.usuarioService.esVistaAlumno();
 
     return this.productosState().filter((producto) => {
+      // Solo ocultar al alumno si fue bloqueado manualmente por el tutor
       if (esAlumno && producto.bloqueado) {
         return false;
       }

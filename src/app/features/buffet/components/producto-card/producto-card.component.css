@@ -402,3 +402,32 @@
   filter: none;
   box-shadow: none;
 }
+
+/* ── Bloqueado por restricción nutricional / horaria ─────────── */
+.producto-card--restringido {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.producto-card--restringido .producto-card__imagen {
+  filter: grayscale(0.6) sepia(0.2);
+  opacity: 0.65;
+}
+
+.producto-card--restringido .producto-card__nombre,
+.producto-card--restringido .producto-card__precio {
+  opacity: 0.55;
+}
+
+.producto-card__cta--restringido {
+  margin-top: auto;
+  background: rgba(245, 158, 11, 0.08);
+  color: #92400e;
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.producto-card__cta--restringido:hover {
+  filter: none;
+  box-shadow: none;
+}

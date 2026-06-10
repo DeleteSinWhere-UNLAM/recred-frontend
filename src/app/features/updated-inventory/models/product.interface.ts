@@ -12,6 +12,10 @@ export interface Product {
   };
   categoriaId?: string | null;
   categoriaNombre?: string;
+  clasificacionesSalud?: {
+    id: string;
+    descripcion: string;
+  }[];
 }
 
 export interface CreateProductRequest {
