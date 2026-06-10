@@ -2,12 +2,14 @@ import { Injectable, inject, Injector, runInInjectionContext } from '@angular/co
 import { Messaging, getToken, onMessage } from '@angular/fire/messaging';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { NotificacionSaldoBajoService } from '../../shared/components/notifications/notificacion-saldo-bajo/notificacion-saldo-bajo.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private messaging = inject(Messaging);
   private http = inject(HttpClient);
   private injector = inject(Injector);
+  private notificacionSaldoBajoService = inject(NotificacionSaldoBajoService);
 
   requestNotificationPermission() {
     console.log('Solicitando permisos para notificaciones push...');
@@ -50,14 +52,16 @@ export class NotificationService {
       onMessage(this.messaging, (payload) => {
         console.log('Mensaje recibido en primer plano:', payload);
 
-        const title = payload.notification?.title || 'Cambiar este formato';
-        const body = payload.notification?.body || 'Por algun componente personalizado';
+        if (payload.data && payload.data['type'] === 'LOW_BALANCE_ALERT' && payload.data['rol'] === 'PADRE') {
+          this.notificacionSaldoBajoService.mostrar(
+            Number(payload.data['balance'] || 0),
+            payload.data['alumnoId']
+          );
+        }
 
-        alert(`🔴 ${title}\n${body}`);
       });
     });
   }
-
 
   private sendTokenToBackend(fcmToken: string) {
     this.http.post(`${environment.apiUrl}/dispositivos`, { fcmToken })
