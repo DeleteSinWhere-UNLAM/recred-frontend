@@ -8,7 +8,7 @@ import { RestriccionHoraria, TimeRestrictionCommand } from '../models/restriccio
 export class RestriccionesHorariasService {
   private readonly http = inject(HttpClient);
   // Revertimos: el 404 confirmó que NO está en /v1. Está en /api/time-restrictions
-  private readonly base = environment.apiUrl.replace(/\/v\d+\/?$/, '') + '/time-restrictions';
+  private readonly base = environment.apiUrl + '/time-restrictions';
 
   getRestriccionesPorAlumno(alumnoId: string): Promise<RestriccionHoraria[]> {
     const url = `${this.base}/student/${alumnoId}`;
