@@ -1,0 +1,363 @@
+<app-navbar />
+
+<main class="daily-close">
+  <button type="button" class="daily-close__back" (click)="volver()">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
+
+  <div class="daily-close__container">
+    <header class="daily-close__header">
+      <div class="daily-close__header-icon" aria-hidden="true">
+        <i class="fa-solid fa-clipboard-check"></i>
+      </div>
+      <div class="daily-close__heading">
+        <h1 class="daily-close__title">Cierre diario</h1>
+        <p class="daily-close__subtitle">Revisa el dia, cierra operaciones y consulta el reporte.</p>
+      </div>
+      <div
+        class="daily-close__status"
+        [class.daily-close__status--closed]="isClosedConfirmed()"
+      >
+        <span>{{ statusLabel() }}</span>
+        <small>{{ statusDetail() }}</small>
+      </div>
+    </header>
+
+    <section class="daily-close__controls" aria-label="Fecha del cierre">
+      <label class="daily-close__date-field">
+        <span>Fecha</span>
+        <input
+          type="date"
+          [value]="selectedDate()"
+          (change)="onDateChange($event)"
+        >
+      </label>
+
+      @if (refreshingAfterClose()) {
+        <span class="daily-close__refresh">
+          <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+          Actualizando datos operativos
+        </span>
+      }
+    </section>
+
+    <section class="daily-close__action-panel" aria-label="Accion principal de cierre">
+      <div class="daily-close__action-copy">
+        <span class="daily-close__eyebrow">Operacion de cierre por fecha</span>
+        <h2>Cerrar dia</h2>
+        <p>
+          El cierre vence compras anticipadas activas, libera reservas, devuelve creditos si corresponde
+          y genera el reporte diario.
+        </p>
+        <div class="daily-close__affected-states" aria-label="Estados afectados">
+          <span>PENDIENTE</span>
+          <span>EN PREPARACION</span>
+          <span>LISTO</span>
+        </div>
+      </div>
+
+      <div class="daily-close__action-buttons">
+        <button
+          type="button"
+          class="daily-close__primary"
+          [disabled]="closingDay() || isClosedConfirmed() || !buffetId()"
+          (click)="openConfirmModal()"
+        >
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          @if (closingDay()) {
+            Cerrando...
+          } @else if (isClosedConfirmed()) {
+            Dia cerrado
+          } @else {
+            Cerrar dia
+          }
+        </button>
+      </div>
+    </section>
+
+    @if (closeResult(); as result) {
+      <section
+        class="daily-close__close-result"
+        [class.daily-close__close-result--already]="result.alreadyClosed"
+        aria-live="polite"
+      >
+        @if (result.alreadyClosed) {
+          <div class="daily-close__result-message">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <div>
+              <h2>El dia ya estaba cerrado</h2>
+              <p>No se volvieron a vencer pedidos ni liberar reservas.</p>
+            </div>
+          </div>
+        } @else {
+          <div class="daily-close__result-message">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            <div>
+              <h2>Cierre realizado</h2>
+              <p>Resumen operativo generado para {{ formatDate(result.report.date) }}.</p>
+            </div>
+          </div>
+          <div class="daily-close__result-grid">
+            <div>
+              <span>Pedidos vencidos</span>
+              <strong>{{ formatNumber(result.expiredPurchases) }}</strong>
+            </div>
+            <div>
+              <span>Reservas liberadas</span>
+              <strong>{{ formatNumber(result.releasedReservations) }}</strong>
+            </div>
+            <div>
+              <span>Creditos devueltos</span>
+              <strong>{{ formatMoney(result.refundedCredits) }}</strong>
+            </div>
+            <div>
+              <span>Total vendido</span>
+              <strong>{{ formatMoney(result.report.deliveredTotal) }}</strong>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    @if (loadingReport()) {
+      <section class="daily-close__state" aria-live="polite">
+        <span class="daily-close__loader" aria-hidden="true"></span>
+        <p>Cargando reporte diario...</p>
+      </section>
+    } @else if (errorMessage()) {
+      <section class="daily-close__state daily-close__state--error">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <p>{{ errorMessage() }}</p>
+        @if (buffetId()) {
+          <button type="button" (click)="loadReport()">Reintentar</button>
+        }
+      </section>
+    } @else if (report(); as report) {
+      <section class="daily-close__section" aria-labelledby="daily-summary-title">
+        <div class="daily-close__section-header">
+          <h2 id="daily-summary-title">Resumen del dia</h2>
+          <span>{{ formatDate(report.date) }}</span>
+        </div>
+        <div class="daily-close__summary-grid">
+          @for (metric of summaryMetrics(); track metric.label) {
+            <article
+              class="daily-close__metric"
+              [class.daily-close__metric--success]="metric.tone === 'success'"
+              [class.daily-close__metric--warning]="metric.tone === 'warning'"
+              [class.daily-close__metric--danger]="metric.tone === 'danger'"
+            >
+              <span>{{ metric.label }}</span>
+              <strong>{{ metric.value }}</strong>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section class="daily-close__section" aria-labelledby="daily-order-status-title">
+        <div class="daily-close__section-header">
+          <h2 id="daily-order-status-title">Estados de pedidos</h2>
+        </div>
+        <div class="daily-close__status-grid">
+          @for (item of orderStatusMetrics(); track item.label) {
+            <article class="daily-close__order-status">
+              <i class="fa-solid" [ngClass]="item.icon" aria-hidden="true"></i>
+              <span>{{ item.label }}</span>
+              <strong>{{ formatNumber(item.value) }}</strong>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section class="daily-close__section" aria-labelledby="daily-products-title">
+        <div class="daily-close__section-header">
+          <h2 id="daily-products-title">Productos vendidos</h2>
+        </div>
+        @if (report.products.length > 0) {
+          <div class="daily-close__ranking">
+            @for (product of report.products; track product.productId) {
+              <article
+                class="daily-close__ranking-item"
+                [class.daily-close__product-row--sold-out]="isSoldProductSoldOut(product)"
+                [class.daily-close__product-row--low-stock]="isSoldProductLowStock(product)"
+              >
+                <div>
+                  <strong>{{ product.productName }}</strong>
+                  <span>{{ formatNumber(product.quantity) }} unidades</span>
+                </div>
+                <strong>{{ formatMoney(product.total) }}</strong>
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="daily-close__empty">No hay productos vendidos para esta fecha.</p>
+        }
+      </section>
+
+      <section class="daily-close__section" aria-labelledby="daily-inventory-title">
+        <div class="daily-close__section-header">
+          <h2 id="daily-inventory-title">Inventario al cierre</h2>
+        </div>
+        @if (report.inventory.length > 0) {
+          <div class="daily-close__inventory-list">
+            @for (item of report.inventory; track item.productId) {
+              <article
+                class="daily-close__inventory-item"
+                [class.daily-close__product-row--sold-out]="isInventorySoldOut(item)"
+                [class.daily-close__product-row--low-stock]="isInventoryLowStock(item)"
+              >
+                <div class="daily-close__inventory-main">
+                  <strong>{{ item.productName }}</strong>
+                  <span>{{ formatInventoryMode(item.tipoManejoInventario) }}</span>
+                </div>
+                <div class="daily-close__inventory-numbers">
+                  <span>Actual <strong>{{ formatNumber(item.stockActual) }}</strong></span>
+                  <span>Reservado <strong>{{ formatNumber(item.stockReservado) }}</strong></span>
+                  <span>Disponible <strong>{{ formatNumber(item.stockDisponible) }}</strong></span>
+                  <span>Minimo <strong>{{ formatOptionalNumber(item.stockMinimo) }}</strong></span>
+                </div>
+                <span
+                  class="daily-close__inventory-badge"
+                  [class.daily-close__inventory-badge--sold-out]="isInventorySoldOut(item)"
+                  [class.daily-close__inventory-badge--low-stock]="isInventoryLowStock(item)"
+                >
+                  {{ formatInventoryStatus(item.estadoInventario) }}
+                </span>
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="daily-close__empty">No hay snapshot de inventario para esta fecha.</p>
+        }
+      </section>
+
+      <section class="daily-close__section" aria-labelledby="daily-soldout-title">
+        <div class="daily-close__section-header">
+          <h2 id="daily-soldout-title">Productos agotados</h2>
+        </div>
+        @if (report.soldOutProducts.length > 0) {
+          <div class="daily-close__alert-list">
+            @for (product of report.soldOutProducts; track $index) {
+              <article class="daily-close__alert-item daily-close__product-row--sold-out">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                <span>{{ soldOutProductName(product) }}</span>
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="daily-close__empty">No hay productos agotados registrados.</p>
+        }
+      </section>
+
+      <section class="daily-close__split-sections">
+        <section class="daily-close__section" aria-labelledby="daily-payments-title">
+          <div class="daily-close__section-header">
+            <h2 id="daily-payments-title">Ventas por medio de pago</h2>
+          </div>
+          @if (report.salesByPaymentMethod.length > 0) {
+            <div class="daily-close__compact-grid">
+              @for (payment of report.salesByPaymentMethod; track payment.paymentMethod) {
+                <article class="daily-close__compact-card">
+                  <span>{{ formatPaymentMethod(payment.paymentMethod) }}</span>
+                  <strong>{{ formatMoney(payment.total) }}</strong>
+                  <small>{{ formatNumber(payment.orders) }} pedidos</small>
+                </article>
+              }
+            </div>
+          } @else {
+            <p class="daily-close__empty">No hay medios de pago para mostrar.</p>
+          }
+        </section>
+
+        <section class="daily-close__section" aria-labelledby="daily-movements-title">
+          <div class="daily-close__section-header">
+            <h2 id="daily-movements-title">Movimientos de stock</h2>
+          </div>
+          @if (report.stockMovements.length > 0) {
+            <div class="daily-close__compact-grid">
+              @for (movement of report.stockMovements; track movement.movementType) {
+                <article class="daily-close__compact-card">
+                  <span>{{ formatMovementType(movement.movementType) }}</span>
+                  <strong>{{ formatNumber(movement.quantity) }}</strong>
+                  <small>unidades</small>
+                </article>
+              }
+            </div>
+          } @else {
+            <p class="daily-close__empty">No hay movimientos de stock agrupados.</p>
+          }
+        </section>
+      </section>
+    }
+  </div>
+</main>
+
+@if (confirmModalOpen()) {
+  <div
+    class="daily-close-modal__backdrop"
+    tabindex="0"
+    role="button"
+    (click)="closeConfirmModal()"
+    (keydown.enter)="closeConfirmModal()"
+    (keydown.space)="closeConfirmModal()"
+  >
+    <section
+      class="daily-close-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="daily-close-modal-title"
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+      (keydown.enter)="$event.stopPropagation()"
+      (keydown.space)="$event.stopPropagation()"
+    >
+      <header class="daily-close-modal__header">
+        <div class="daily-close-modal__icon" aria-hidden="true">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div>
+          <h2 id="daily-close-modal-title">Confirmar cierre diario</h2>
+          <p>{{ formatDate(selectedDate()) }}</p>
+        </div>
+      </header>
+
+      <div class="daily-close-modal__body">
+        <p>Esta accion realiza el cierre operativo de la fecha seleccionada.</p>
+        <ul>
+          <li>Vence compras anticipadas activas del dia.</li>
+          <li>Libera reservas de stock.</li>
+          <li>Devuelve creditos si corresponde.</li>
+          <li>Genera el reporte diario.</li>
+        </ul>
+        <div class="daily-close-modal__states">
+          <span>PENDIENTE</span>
+          <span>EN PREPARACION</span>
+          <span>LISTO</span>
+        </div>
+      </div>
+
+      <footer class="daily-close-modal__footer">
+        <button
+          type="button"
+          class="daily-close-modal__button daily-close-modal__button--secondary"
+          [disabled]="closingDay()"
+          (click)="closeConfirmModal()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="daily-close-modal__button daily-close-modal__button--primary"
+          [disabled]="closingDay()"
+          (click)="confirmDailyClose()"
+        >
+          @if (closingDay()) {
+            Cerrando...
+          } @else {
+            Confirmar cierre
+          }
+        </button>
+      </footer>
+    </section>
+  </div>
+}

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
@@ -178,20 +178,37 @@ describe('UpdatedInventoryPageComponent', () => {
     expect(component.filteredProducts).toEqual([mockInventory[1]]);
   });
 
-  it('deberia filtrar productos con stock reservado', () => {
+  it('deberia filtrar productos por busqueda de nombre', () => {
+    component.products = mockInventory;
+    component.searchQuery = 'alfa';
+
+    expect(component.filteredProducts).toEqual([mockInventory[0]]);
+  });
+
+  it('deberia combinar busqueda de nombre con filtro de estado', () => {
+    component.products = mockInventory;
+    component.searchQuery = 'sand';
+    component.setFilter('BAJO_STOCK');
+
+    expect(component.filteredProducts).toEqual([mockInventory[1]]);
+  });
+
+  it('deberia filtrar productos con alta reserva', () => {
+    const highReservationProduct: InventoryOverviewItem = {
+      ...mockInventory[0],
+      productId: 'alta-reserva',
+      stockDisponible: 3,
+      stockReservado: 4,
+    };
     const products: InventoryOverviewItem[] = [
       mockInventory[0],
-      {
-        ...mockInventory[1],
-        productId: 'sin-reserva',
-        stockReservado: 0,
-      },
+      highReservationProduct,
     ];
     component.products = products;
 
-    component.setFilter('RESERVADO');
+    component.setFilter('ALTA_RESERVA');
 
-    expect(component.filteredProducts).toEqual([mockInventory[0]]);
+    expect(component.filteredProducts).toEqual([highReservationProduct]);
   });
 
   it('deberia calcular disponibles y reservados', () => {
@@ -199,7 +216,33 @@ describe('UpdatedInventoryPageComponent', () => {
 
     expect(component.disponiblesCount).toBe(2);
     expect(component.reservadosCount).toBe(4);
+    expect(component.altaReservaCount).toBe(0);
   });
+
+  it('deberia resaltar temporalmente el producto actualizado por SSE', fakeAsync(() => {
+    fixture.detectChanges();
+    const handlers = realtimeServiceMock.connect.calls.mostRecent().args[1] as {
+      onRefresh: (event: {
+        buffetId: string;
+        type: string;
+        productId?: string;
+        occurredAt: string;
+      }) => void;
+    };
+
+    handlers.onRefresh({
+      buffetId: mockBuffetId,
+      type: 'STOCK_CHANGED',
+      productId: mockInventory[0].productId,
+      occurredAt: new Date().toISOString(),
+    });
+
+    expect(component.highlightedProductIds.has(mockInventory[0].productId)).toBeTrue();
+
+    tick(3000);
+
+    expect(component.highlightedProductIds.has(mockInventory[0].productId)).toBeFalse();
+  }));
 
   it('deberia inicializar selectedProduct a null y mostrar el formulario de alta', () => {
     component.openCreateForm();

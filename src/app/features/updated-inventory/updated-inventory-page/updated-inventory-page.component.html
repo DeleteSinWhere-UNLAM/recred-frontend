@@ -20,14 +20,6 @@
         <p class="inventario__subtitulo">Control de stock del kiosco</p>
       </div>
       <div class="inventario__acciones-header">
-        <span
-          class="inventario__realtime"
-          [class.inventario__realtime--connected]="realtimeStatus === 'connected'"
-          [class.inventario__realtime--connecting]="realtimeStatus === 'connecting'"
-        >
-          <i class="fa-solid fa-circle" aria-hidden="true"></i>
-          Tiempo real
-        </span>
         <button
           type="button"
           class="inventario__nuevo"
@@ -45,8 +37,8 @@
         <strong class="inventario__stat-value">{{ disponiblesCount }}</strong>
       </div>
       <div class="inventario__stat">
-        <span class="inventario__stat-label">Reservados</span>
-        <strong class="inventario__stat-value">{{ reservadosCount }}</strong>
+        <span class="inventario__stat-label">Alta reserva</span>
+        <strong class="inventario__stat-value">{{ altaReservaCount }}</strong>
       </div>
       <div class="inventario__stat inventario__stat--warning">
         <span class="inventario__stat-label">Bajo stock</span>
@@ -59,17 +51,41 @@
     </section>
 
     <section class="inventario__toolbar" aria-label="Filtros de inventario">
-      <div class="inventario__filtros">
-        @for (filter of filterOptions; track filter.id) {
-          <button
-            type="button"
-            class="inventario__filtro"
-            [class.inventario__filtro--activo]="activeFilter === filter.id"
-            (click)="setFilter(filter.id)"
+      <div class="inventario__toolbar-main">
+        <label class="inventario__busqueda">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input
+            type="search"
+            class="inventario__busqueda-input"
+            placeholder="Buscar producto"
+            [value]="searchQuery"
+            (input)="setSearchQuery($event)"
+            aria-label="Buscar producto por nombre"
           >
-            {{ filter.label }}
-          </button>
-        }
+          @if (searchQuery) {
+            <button
+              type="button"
+              class="inventario__busqueda-clear"
+              (click)="clearSearchQuery()"
+              aria-label="Limpiar busqueda"
+            >
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          }
+        </label>
+
+        <div class="inventario__filtros">
+          @for (filter of filterOptions; track filter.id) {
+            <button
+              type="button"
+              class="inventario__filtro"
+              [class.inventario__filtro--activo]="activeFilter === filter.id"
+              (click)="setFilter(filter.id)"
+            >
+              {{ filter.label }}
+            </button>
+          }
+        </div>
       </div>
 
       @if (isRefreshing) {
@@ -83,6 +99,7 @@
     <app-product-table
       [products]="filteredProducts"
       [isLoading]="isLoading"
+      [highlightedProductIds]="highlightedProductIds"
       (quickAction)="openQuickAction($event)">
     </app-product-table>
 

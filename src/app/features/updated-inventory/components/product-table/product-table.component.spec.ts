@@ -55,6 +55,7 @@ describe('ProductTableComponent', () => {
       'ADD_STOCK',
       'SUBTRACT_STOCK',
       'SET_STOCK',
+      'SET_DAILY_CAPACITY',
       'MARK_SOLD_OUT',
     ]);
   });

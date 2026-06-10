@@ -34,7 +34,7 @@
     } @else {
       <section class="perfil-usuario__grid" aria-label="Datos del usuario">
         <article class="perfil-usuario__panel">
-          <h2 class="perfil-usuario__panel-titulo">Usuario logueado</h2>
+          <h2 class="perfil-usuario__panel-titulo">Usuario</h2>
 
           <dl class="perfil-usuario__datos">
             <div>
@@ -44,10 +44,6 @@
             <div>
               <dt>Rol</dt>
               <dd>{{ rolLabel(usuario()?.role || perfil()?.role) }}</dd>
-            </div>
-            <div>
-              <dt>ID</dt>
-              <dd>{{ usuario()?.id || perfil()?.id || '-' }}</dd>
             </div>
           </dl>
         </article>

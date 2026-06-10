@@ -5,6 +5,13 @@ import {
   QuickStockAction,
   TipoManejoInventario,
 } from '../../models/inventory.interface';
+import {
+  getAvailabilityRatio,
+  getOperationalStockStatus,
+  getReservationRatio,
+  isHighReservation,
+  OperationalStockStatus,
+} from '../../models/inventory-visual-state';
 
 export interface QuickStockActionSelection {
   product: InventoryOverviewItem;
@@ -28,6 +35,7 @@ interface QuickActionButton {
 export class ProductTableComponent {
   @Input() products: InventoryOverviewItem[] = [];
   @Input() isLoading = false;
+  @Input() highlightedProductIds: ReadonlySet<string> = new Set<string>();
   @Output() quickAction = new EventEmitter<QuickStockActionSelection>();
 
   getModeLabel(mode: TipoManejoInventario): string {
@@ -41,14 +49,31 @@ export class ProductTableComponent {
   }
 
   getStatusLabel(product: InventoryOverviewItem): string {
-    const labels = {
-      DISPONIBLE: 'Disponible',
+    const labels: Record<OperationalStockStatus, string> = {
+      AGOTADO: 'Agotado',
       BAJO_STOCK: 'Bajo stock',
-      SIN_STOCK: 'Agotado',
-      DESACTIVADO: 'Pausado',
+      ALTA_RESERVA: 'Alta reserva',
+      PAUSADO: 'Pausado',
+      OK: 'OK',
     };
 
-    return labels[product.estadoInventario];
+    return labels[this.getOperationalStatus(product)];
+  }
+
+  getOperationalStatus(product: InventoryOverviewItem): OperationalStockStatus {
+    return getOperationalStockStatus(product);
+  }
+
+  getStatusIcon(product: InventoryOverviewItem): string {
+    const icons: Record<OperationalStockStatus, string> = {
+      AGOTADO: 'fa-ban',
+      BAJO_STOCK: 'fa-triangle-exclamation',
+      ALTA_RESERVA: 'fa-clock',
+      PAUSADO: 'fa-pause',
+      OK: 'fa-check',
+    };
+
+    return icons[this.getOperationalStatus(product)];
   }
 
   getStockValue(product: InventoryOverviewItem): string {
@@ -61,6 +86,34 @@ export class ProductTableComponent {
     }
 
     return this.formatNullable(product.stockDisponible);
+  }
+
+  getAvailabilityPercent(product: InventoryOverviewItem): number {
+    return Math.round(getAvailabilityRatio(product) * 100);
+  }
+
+  getReservationPercent(product: InventoryOverviewItem): number {
+    return Math.round(getReservationRatio(product) * 100);
+  }
+
+  getAvailabilityBase(product: InventoryOverviewItem): string {
+    if (product.stockDisponible === null && product.stockReservado === null) {
+      return '-';
+    }
+
+    const total =
+      this.getNumericStock(product.stockDisponible) +
+      this.getNumericStock(product.stockReservado);
+
+    return total.toString();
+  }
+
+  isHighReservation(product: InventoryOverviewItem): boolean {
+    return isHighReservation(product);
+  }
+
+  isHighlighted(product: InventoryOverviewItem): boolean {
+    return this.highlightedProductIds.has(product.productId);
   }
 
   getActions(product: InventoryOverviewItem): QuickActionButton[] {
@@ -110,13 +163,13 @@ export class ProductTableComponent {
     return [
       {
         action: 'ADD_STOCK',
-        label: '+ Stock',
+        label: 'Stock',
         icon: 'fa-plus',
         tone: 'primary',
       },
       {
         action: 'SUBTRACT_STOCK',
-        label: '- Stock',
+        label: 'Stock',
         icon: 'fa-minus',
         tone: 'neutral',
       },
@@ -125,6 +178,12 @@ export class ProductTableComponent {
         label: 'Definir',
         icon: 'fa-pen-to-square',
         tone: 'warning',
+      },
+      {
+        action: 'SET_DAILY_CAPACITY',
+        label: 'Cupo diario',
+        icon: 'fa-calendar-day',
+        tone: 'neutral',
       },
       {
         action: 'MARK_SOLD_OUT',
@@ -141,5 +200,11 @@ export class ProductTableComponent {
 
   formatNullable(value: number | null): string {
     return value === null ? '-' : value.toString();
+  }
+
+  private getNumericStock(value: number | null | undefined): number {
+    return value !== null && value !== undefined && Number.isFinite(value) && value > 0
+      ? value
+      : 0;
   }
 }

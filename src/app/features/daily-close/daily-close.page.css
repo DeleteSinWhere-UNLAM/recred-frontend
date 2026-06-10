@@ -1,0 +1,504 @@
+.daily-close {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  padding: 24px 0 32px;
+  background: var(--color-fondo);
+}
+
+.daily-close__container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.daily-close__back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 1;
+}
+
+.daily-close__back,
+.daily-close__primary,
+.daily-close__secondary,
+.daily-close-modal__button,
+.daily-close__state button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.daily-close__back,
+.daily-close__secondary,
+.daily-close-modal__button--secondary,
+.daily-close__state button {
+  border: 1px solid var(--color-borde);
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra);
+}
+
+.daily-close__header,
+.daily-close__controls,
+.daily-close__action-panel,
+.daily-close__close-result,
+.daily-close__state,
+.daily-close__section {
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background-color: var(--color-superficie);
+}
+
+.daily-close__header,
+.daily-close__controls,
+.daily-close__action-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.daily-close__header {
+  gap: 14px;
+}
+
+.daily-close__header-icon,
+.daily-close__result-message i,
+.daily-close__order-status i,
+.daily-close-modal__icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
+  color: var(--color-menta);
+}
+
+.daily-close__header-icon {
+  width: 52px;
+  height: 52px;
+  flex-basis: 52px;
+  font-size: 22px;
+}
+
+.daily-close__heading,
+.daily-close__action-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.daily-close__title,
+.daily-close h2 {
+  margin: 0;
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.daily-close__title {
+  font-size: 22px;
+}
+
+.daily-close p,
+.daily-close-modal p {
+  margin: 4px 0 0;
+  color: var(--color-texto-claro);
+  font-size: 13px;
+}
+
+.daily-close__status {
+  min-width: 190px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--color-dorado) 20%, var(--color-fondo));
+  color: var(--color-texto-oscuro);
+}
+
+.daily-close__status--closed {
+  background-color: color-mix(in srgb, var(--color-menta) 20%, var(--color-fondo));
+  color: var(--color-menta);
+}
+
+.daily-close__status small {
+  display: block;
+  margin-top: 3px;
+  color: var(--color-texto-claro);
+  font-size: 11px;
+}
+
+.daily-close__date-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.daily-close__date-field input {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  color: var(--color-texto-oscuro);
+  font: inherit;
+}
+
+.daily-close__refresh {
+  color: var(--color-texto-claro);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.daily-close__affected-states,
+.daily-close-modal__states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.daily-close__affected-states span,
+.daily-close-modal__states span,
+.daily-close__inventory-badge {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-fondo));
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.daily-close__action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.daily-close__primary,
+.daily-close-modal__button--primary {
+  background-color: var(--color-dorado);
+  color: var(--color-texto-oscuro);
+}
+
+.daily-close__primary:disabled,
+.daily-close__secondary:disabled,
+.daily-close-modal__button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.daily-close__close-result,
+.daily-close__section {
+  padding: 16px;
+}
+
+.daily-close__close-result {
+  border-color: color-mix(in srgb, var(--color-menta) 32%, var(--color-borde));
+}
+
+.daily-close__close-result--already {
+  border-color: color-mix(in srgb, var(--color-dorado) 34%, var(--color-borde));
+}
+
+.daily-close__close-result--already .daily-close__result-message i,
+.daily-close-modal__icon {
+  background-color: color-mix(in srgb, var(--color-dorado) 24%, var(--color-fondo));
+  color: var(--color-texto-oscuro);
+}
+
+.daily-close__result-message,
+.daily-close__ranking-item,
+.daily-close__inventory-item,
+.daily-close__alert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.daily-close__result-message {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.daily-close__result-grid,
+.daily-close__summary-grid,
+.daily-close__status-grid,
+.daily-close__compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.daily-close__result-grid {
+  margin-top: 14px;
+}
+
+.daily-close__result-grid div,
+.daily-close__metric,
+.daily-close__order-status,
+.daily-close__compact-card,
+.daily-close__ranking-item,
+.daily-close__inventory-item,
+.daily-close__alert-item {
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-pizarra) 8%, transparent);
+  border-radius: 8px;
+}
+
+.daily-close span,
+.daily-close small {
+  display: block;
+  color: var(--color-texto-claro);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.daily-close strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.daily-close__state {
+  min-height: 180px;
+  padding: 36px 20px;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--color-texto-claro);
+  text-align: center;
+}
+
+.daily-close__state,
+.daily-close__section-header,
+.daily-close__order-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.daily-close__section-header {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.daily-close__section-header h2 {
+  font-size: 17px;
+}
+
+.daily-close__section-header span {
+  color: var(--color-texto-claro);
+}
+
+.daily-close__order-status strong {
+  margin: 0 0 0 auto;
+}
+
+.daily-close__ranking,
+.daily-close__inventory-list,
+.daily-close__alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.daily-close__inventory-main {
+  min-width: 180px;
+  flex: 1;
+}
+
+.daily-close__inventory-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
+.daily-close__inventory-numbers strong {
+  color: var(--color-pizarra);
+}
+
+.daily-close__product-row--sold-out {
+  border-color: color-mix(in srgb, var(--color-melocoton) 28%, var(--color-borde));
+  box-shadow: inset 4px 0 0 var(--color-melocoton);
+}
+
+.daily-close__product-row--low-stock {
+  border-color: color-mix(in srgb, var(--color-dorado) 34%, var(--color-borde));
+  box-shadow: inset 4px 0 0 var(--color-dorado);
+}
+
+.daily-close__product-row--sold-out strong {
+  color: var(--color-melocoton);
+}
+
+.daily-close__product-row--low-stock strong {
+  color: var(--color-texto-oscuro);
+}
+
+.daily-close__inventory-badge {
+  background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
+  color: var(--color-menta);
+}
+
+.daily-close__inventory-badge--sold-out {
+  background-color: color-mix(in srgb, var(--color-melocoton) 16%, var(--color-fondo));
+  color: var(--color-melocoton);
+}
+
+.daily-close__inventory-badge--low-stock {
+  background-color: color-mix(in srgb, var(--color-dorado) 24%, var(--color-fondo));
+  color: var(--color-texto-oscuro);
+}
+
+.daily-close__alert-item {
+  justify-content: flex-start;
+  color: var(--color-melocoton);
+}
+
+.daily-close__split-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.daily-close__empty {
+  margin: 0;
+  padding: 18px;
+  border-radius: 8px;
+  color: var(--color-texto-claro);
+  font-weight: 700;
+  text-align: center;
+}
+
+.daily-close-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: rgba(27, 31, 35, 0.42);
+}
+
+.daily-close-modal {
+  width: min(480px, 100%);
+  max-height: min(640px, calc(100vh - 40px));
+  overflow: auto;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background-color: var(--color-superficie);
+}
+
+.daily-close-modal__header,
+.daily-close-modal__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.daily-close-modal__header {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-pizarra) 8%, transparent);
+}
+
+.daily-close-modal__body {
+  padding: 16px 18px;
+}
+
+.daily-close-modal__body ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: var(--color-texto-oscuro);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.daily-close-modal__footer {
+  justify-content: flex-end;
+  border-top: 1px solid color-mix(in srgb, var(--color-pizarra) 8%, transparent);
+}
+
+@media (max-width: 1080px) {
+  .daily-close {
+    padding-top: 80px;
+  }
+
+  .daily-close__back {
+    top: 18px;
+    left: 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .daily-close__container {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .daily-close__header,
+  .daily-close__controls,
+  .daily-close__action-panel,
+  .daily-close__inventory-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .daily-close__status,
+  .daily-close__action-buttons,
+  .daily-close__primary,
+  .daily-close__secondary {
+    width: 100%;
+  }
+
+  .daily-close__split-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-close {
+    padding: 64px 0 20px;
+  }
+
+  .daily-close__container {
+    padding: 0 12px;
+  }
+
+  .daily-close__back span {
+    display: none;
+  }
+
+  .daily-close__result-grid,
+  .daily-close__summary-grid,
+  .daily-close__status-grid,
+  .daily-close__compact-grid {
+    grid-template-columns: 1fr;
+  }
+}

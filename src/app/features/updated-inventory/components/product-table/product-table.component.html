@@ -12,119 +12,91 @@
     <p class="product-table__estado-subtitulo">No hay productos que coincidan con el filtro actual.</p>
   </div>
 } @else {
-  <section class="product-table" aria-labelledby="tabla-productos-titulo">
-    <h3 id="tabla-productos-titulo" class="product-table__titulo">
-      Control de stock
-    </h3>
+  <section class="product-table" aria-labelledby="productos-stock-titulo">
+    <header class="product-table__header">
+      <h3 id="productos-stock-titulo" class="product-table__titulo">
+        Stock operativo
+      </h3>
+      <span class="product-table__count">{{ products.length }} productos</span>
+    </header>
 
-    <div class="product-table__wrapper">
-      <table class="product-table__tabla">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Modo</th>
-            <th>Estado</th>
-            <th class="product-table__col-number">Disponible</th>
-            <th class="product-table__col-number">Reservado</th>
-            <th class="product-table__col-actions">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (product of products; track product.productId) {
-            <tr>
-              <td>
-                <span class="product-table__nombre">{{ product.nombre }}</span>
-                <span class="product-table__desc">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
-              </td>
-              <td>
-                <span class="product-table__modo">{{ getModeLabel(product.tipoManejoInventario) }}</span>
-              </td>
-              <td>
-                <span
-                  class="product-table__estado-badge"
-                  [class.product-table__estado-badge--disponible]="product.estadoInventario === 'DISPONIBLE'"
-                  [class.product-table__estado-badge--bajo]="product.estadoInventario === 'BAJO_STOCK'"
-                  [class.product-table__estado-badge--agotado]="product.estadoInventario === 'SIN_STOCK'"
-                  [class.product-table__estado-badge--pausado]="product.estadoInventario === 'DESACTIVADO'"
-                >
-                  {{ getStatusLabel(product) }}
-                </span>
-              </td>
-              <td class="product-table__col-number">
-                <span
-                  class="product-table__stock"
-                  [class.product-table__stock--low]="product.bajoStock"
-                  [class.product-table__stock--empty]="product.agotado"
-                >
-                  {{ getStockValue(product) }}
-                  @if (product.tipoManejoInventario === 'CUPO_DIARIO') {
-                    / {{ formatNullable(product.cupoMaximoDiario) }}
-                  }
-                </span>
-                @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
-                  <span class="product-table__dato-secundario">
-                    Actual {{ formatNullable(product.stockActual) }}
-                  </span>
-                }
-              </td>
-              <td class="product-table__col-number">
-                {{ formatNullable(product.stockReservado) }}
-              </td>
-              <td class="product-table__col-actions">
-                <div class="product-table__acciones">
-                  @for (action of getActions(product); track action.action) {
-                    <button
-                      type="button"
-                      class="product-table__btn"
-                      [class.product-table__btn--primary]="action.tone === 'primary'"
-                      [class.product-table__btn--neutral]="action.tone === 'neutral'"
-                      [class.product-table__btn--warning]="action.tone === 'warning'"
-                      [class.product-table__btn--danger]="action.tone === 'danger'"
-                      (click)="emitAction(product, action.action)"
-                    >
-                      <i class="fa-solid" [ngClass]="action.icon" aria-hidden="true"></i>
-                      <span>{{ action.label }}</span>
-                    </button>
-                  }
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="product-table__cards">
+    <div class="product-table__grid">
       @for (product of products; track product.productId) {
-        <article class="product-table__card">
-          <header class="product-table__card-header">
-            <div class="product-table__card-info">
-              <span class="product-table__nombre">{{ product.nombre }}</span>
-              <span class="product-table__card-precio">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
+        <article
+          class="product-card"
+          [class.product-card--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+          [class.product-card--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+          [class.product-card--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
+          [class.product-card--pausado]="getOperationalStatus(product) === 'PAUSADO'"
+          [class.product-card--ok]="getOperationalStatus(product) === 'OK'"
+          [class.product-card--updated]="isHighlighted(product)"
+        >
+          <header class="product-card__header">
+            <div class="product-card__title-group">
+              <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
+              <h4 class="product-card__name">{{ product.nombre }}</h4>
+              <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
             </div>
+
             <span
-              class="product-table__estado-badge"
-              [class.product-table__estado-badge--disponible]="product.estadoInventario === 'DISPONIBLE'"
-              [class.product-table__estado-badge--bajo]="product.estadoInventario === 'BAJO_STOCK'"
-              [class.product-table__estado-badge--agotado]="product.estadoInventario === 'SIN_STOCK'"
-              [class.product-table__estado-badge--pausado]="product.estadoInventario === 'DESACTIVADO'"
+              class="product-card__status"
+              [class.product-card__status--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+              [class.product-card__status--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+              [class.product-card__status--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
+              [class.product-card__status--pausado]="getOperationalStatus(product) === 'PAUSADO'"
+              [class.product-card__status--ok]="getOperationalStatus(product) === 'OK'"
             >
+              <i class="fa-solid" [ngClass]="getStatusIcon(product)" aria-hidden="true"></i>
               {{ getStatusLabel(product) }}
             </span>
           </header>
 
-          <div class="product-table__card-metrics">
-            <span>{{ getModeLabel(product.tipoManejoInventario) }}</span>
-            <strong>
-              {{ getStockValue(product) }}
-              @if (product.tipoManejoInventario === 'CUPO_DIARIO') {
-                / {{ formatNullable(product.cupoMaximoDiario) }}
-              }
-            </strong>
-            <span>Reservado {{ formatNullable(product.stockReservado) }}</span>
-          </div>
+          <section class="product-card__availability" aria-label="Disponibilidad">
+            <div class="product-card__availability-row">
+              <span>Disponible</span>
+              <strong>
+                {{ getStockValue(product) }}
+                @if (product.tipoManejoInventario === 'CUPO_DIARIO') {
+                  / {{ formatNullable(product.cupoMaximoDiario) }}
+                }
+              </strong>
+            </div>
 
-          <footer class="product-table__card-footer">
+            <div
+              class="product-card__bar"
+              [attr.aria-label]="'Disponibilidad ' + getAvailabilityPercent(product) + '%'"
+            >
+              <span
+                class="product-card__bar-fill"
+                [class.product-card__bar-fill--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+                [class.product-card__bar-fill--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+                [class.product-card__bar-fill--alta-reserva]="isHighReservation(product)"
+                [style.width.%]="getAvailabilityPercent(product)"
+              ></span>
+            </div>
+
+            <div class="product-card__split">
+              <span>Reservado {{ formatNullable(product.stockReservado) }}</span>
+              <span>Total {{ getAvailabilityBase(product) }}</span>
+            </div>
+          </section>
+
+          <dl class="product-card__metrics">
+            <div class="product-card__metric">
+              <dt>Actual</dt>
+              <dd>{{ formatNullable(product.stockActual) }}</dd>
+            </div>
+            <div class="product-card__metric">
+              <dt>Minimo</dt>
+              <dd>{{ formatNullable(product.stockMinimo) }}</dd>
+            </div>
+            <div class="product-card__metric">
+              <dt>Reserva</dt>
+              <dd>{{ getReservationPercent(product) }}%</dd>
+            </div>
+          </dl>
+
+          <footer class="product-card__footer">
             <div class="product-table__acciones">
               @for (action of getActions(product); track action.action) {
                 <button

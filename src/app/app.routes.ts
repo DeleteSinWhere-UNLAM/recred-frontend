@@ -103,6 +103,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'cierre-diario',
+        loadComponent: () =>
+          import('./features/daily-close/daily-close.page').then(
+            (m) => m.DailyClosePage,
+          ),
+      },
+      {
         path: 'cargar-producto-ia',
         loadChildren: () =>
           import('./features/ai-product-upload/ai-product-upload.routes').then(

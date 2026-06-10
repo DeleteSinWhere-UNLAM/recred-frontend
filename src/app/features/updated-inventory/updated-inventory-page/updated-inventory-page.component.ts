@@ -18,6 +18,10 @@ import {
   QuickStockActionRequest,
   RealtimeInventoryEvent,
 } from '../models/inventory.interface';
+import {
+  compareByOperationalStatus,
+  isHighReservation,
+} from '../models/inventory-visual-state';
 
 const HEALTH_CLASSIFICATION_IDS = ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'];
 
@@ -30,8 +34,10 @@ const INVENTORY_ERROR_MESSAGES: Record<string, string> = {
   BAD_REQUEST: 'Revisa los datos ingresados.',
 };
 
-type InventoryFilter = 'TODOS' | 'DISPONIBLE' | 'RESERVADO' | 'BAJO_STOCK' | 'AGOTADO';
+type InventoryFilter = 'TODOS' | 'DISPONIBLE' | 'BAJO_STOCK' | 'ALTA_RESERVA' | 'AGOTADO';
 type RealtimeStatus = 'connecting' | 'connected' | 'disconnected';
+
+const PRODUCT_HIGHLIGHT_DURATION_MS = 3000;
 
 interface FilterOption {
   id: InventoryFilter;
@@ -79,14 +85,16 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   isFormVisible = false;
   selectedProduct: Product | null = null;
   activeFilter: InventoryFilter = 'TODOS';
+  searchQuery = '';
   realtimeStatus: RealtimeStatus = 'disconnected';
   quickActionTarget: QuickActionTarget | null = null;
+  highlightedProductIds: ReadonlySet<string> = new Set<string>();
 
   readonly filterOptions: FilterOption[] = [
     { id: 'TODOS', label: 'Todos' },
     { id: 'DISPONIBLE', label: 'Disponibles' },
-    { id: 'RESERVADO', label: 'Reservados' },
     { id: 'BAJO_STOCK', label: 'Bajo stock' },
+    { id: 'ALTA_RESERVA', label: 'Alta reserva' },
     { id: 'AGOTADO', label: 'Agotados' },
   ];
 
@@ -99,6 +107,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   private buffetId: string | null = null;
   private realtimeAbortController: AbortController | null = null;
   private refreshTimeoutId: number | null = null;
+  private readonly highlightTimeoutIds = new Map<string, number>();
 
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
@@ -120,6 +129,9 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     if (this.refreshTimeoutId !== null) {
       window.clearTimeout(this.refreshTimeoutId);
     }
+
+    this.highlightTimeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    this.highlightTimeoutIds.clear();
   }
 
   volver(): void {
@@ -127,23 +139,24 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   }
 
   get filteredProducts(): InventoryOverviewItem[] {
+    const normalizedSearchQuery = this.normalizeSearchText(this.searchQuery);
+    let products = normalizedSearchQuery
+      ? this.products.filter((product) =>
+          this.normalizeSearchText(product.nombre).includes(normalizedSearchQuery),
+        )
+      : this.products;
+
     if (this.activeFilter === 'DISPONIBLE') {
-      return this.products.filter((product) => product.disponible && !product.agotado);
+      products = this.products.filter((product) => product.disponible && !product.agotado);
+    } else if (this.activeFilter === 'BAJO_STOCK') {
+      products = this.products.filter((product) => product.bajoStock);
+    } else if (this.activeFilter === 'ALTA_RESERVA') {
+      products = this.products.filter((product) => isHighReservation(product));
+    } else if (this.activeFilter === 'AGOTADO') {
+      products = this.products.filter((product) => product.agotado);
     }
 
-    if (this.activeFilter === 'BAJO_STOCK') {
-      return this.products.filter((product) => product.bajoStock);
-    }
-
-    if (this.activeFilter === 'RESERVADO') {
-      return this.products.filter((product) => (product.stockReservado ?? 0) > 0);
-    }
-
-    if (this.activeFilter === 'AGOTADO') {
-      return this.products.filter((product) => product.agotado);
-    }
-
-    return this.products;
+    return [...products].sort(compareByOperationalStatus);
   }
 
   get disponiblesCount(): number {
@@ -158,6 +171,10 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     return this.products.filter((product) => product.agotado).length;
   }
 
+  get altaReservaCount(): number {
+    return this.products.filter((product) => isHighReservation(product)).length;
+  }
+
   get reservadosCount(): number {
     return this.products.reduce(
       (total, product) => total + (product.stockReservado ?? 0),
@@ -167,6 +184,15 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
 
   setFilter(filter: InventoryFilter): void {
     this.activeFilter = filter;
+  }
+
+  setSearchQuery(event: Event): void {
+    const target = event.target as HTMLInputElement | null;
+    this.searchQuery = target?.value ?? '';
+  }
+
+  clearSearchQuery(): void {
+    this.searchQuery = '';
   }
 
   loadCategories(): void {
@@ -447,8 +473,11 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
           this.realtimeStatus = 'disconnected';
         });
       },
-      onRefresh: () => {
-        this.zone.run(() => this.scheduleInventoryRefresh());
+      onRefresh: (event) => {
+        this.zone.run(() => {
+          this.highlightProduct(event.productId);
+          this.scheduleInventoryRefresh();
+        });
       },
       onPurchaseCreated: (event) => {
         this.zone.run(() => this.showPurchaseCreatedToast(event));
@@ -492,6 +521,40 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       this.refreshTimeoutId = null;
       this.loadProducts(false);
     }, 250);
+  }
+
+  private highlightProduct(productId: string | undefined): void {
+    const normalizedProductId = productId?.trim();
+    if (!normalizedProductId) {
+      return;
+    }
+
+    const previousTimeoutId = this.highlightTimeoutIds.get(normalizedProductId);
+    if (previousTimeoutId !== undefined) {
+      window.clearTimeout(previousTimeoutId);
+    }
+
+    this.highlightedProductIds = new Set([
+      ...this.highlightedProductIds,
+      normalizedProductId,
+    ]);
+
+    const timeoutId = window.setTimeout(() => {
+      const nextHighlightedProductIds = new Set(this.highlightedProductIds);
+      nextHighlightedProductIds.delete(normalizedProductId);
+      this.highlightedProductIds = nextHighlightedProductIds;
+      this.highlightTimeoutIds.delete(normalizedProductId);
+    }, PRODUCT_HIGHLIGHT_DURATION_MS);
+
+    this.highlightTimeoutIds.set(normalizedProductId, timeoutId);
+  }
+
+  private normalizeSearchText(value: string): string {
+    return value
+      .trim()
+      .toLocaleLowerCase('es-AR')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 
   private obtenerBuffetIdActual(): string | null {

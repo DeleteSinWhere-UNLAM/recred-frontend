@@ -1,6 +1,6 @@
 export type AccionKiosqueroId =
   | 'cargar-productos'
-  | 'dashboard'
+  | 'cierre-diario'
   | 'stock'
   | 'sugerencias'
   | 'recomendaciones';

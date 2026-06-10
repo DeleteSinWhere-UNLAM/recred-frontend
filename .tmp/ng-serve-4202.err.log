@@ -1,0 +1,95 @@
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './daily-close.page.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:30:15:
+[37m      30 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './daily-close.page.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:30:15:
+[37m      30 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './daily-close.page.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:30:15:
+[37m      30 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './daily-close.page.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:30:15:
+[37m      30 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './daily-close.page.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:30:15:
+[37m      30 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './daily-close.page.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:30:15:
+[37m      30 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: NgClass is not used within the template of DailyClosePage[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:33:29:
+[37m      33 │   imports: [NavbarComponent, [32mNgClass[37m],
+         ╵                              [32m~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2322: Type 'Signal<({ id: "cargar-productos"; titulo: string; descripcion: string; icono: string; ruta: string; color?: undefined; } | { id: "dashboard"; titulo: string; descripcion: string; icono: string; ruta: string; color: "pizarra"; } | { ...; } | { ...; } | { ...; })[]>' is not assignable to type 'Signal<AccionKiosquero[]>'.
+  Type 'Signal<({ id: "cargar-productos"; titulo: string; descripcion: string; icono: string; ruta: string; color?: undefined; } | { id: "dashboard"; titulo: string; descripcion: string; icono: string; ruta: string; color: "pizarra"; } | { ...; } | { ...; } | { ...; })[]>' is not assignable to type '() => AccionKiosquero[]'.
+    Type '({ id: "cargar-productos"; titulo: string; descripcion: string; icono: string; ruta: string; color?: undefined; } | { id: "dashboard"; titulo: string; descripcion: string; icono: string; ruta: string; color: "pizarra"; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type 'AccionKiosquero[]'.
+      Type '{ id: "cargar-productos"; titulo: string; descripcion: string; icono: string; ruta: string; color?: undefined; } | { id: "dashboard"; titulo: string; descripcion: string; icono: string; ruta: string; color: "pizarra"; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'AccionKiosquero'.
+        Type '{ id: "dashboard"; titulo: string; descripcion: string; icono: string; ruta: string; color: "pizarra"; }' is not assignable to type 'AccionKiosquero'.
+          Types of property 'id' are incompatible.
+            Type '"dashboard"' is not assignable to type 'AccionKiosqueroId'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/home-kiosquero/presenter/home-kiosquero.presenter.ts:52:11:
+[37m      52 │   readonly [32macciones[37m: Signal<AccionKiosquero[]> = computed(() => [
+         ╵            [32m~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: All imports are unused[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.ts:34:2:
+[37m      34 │   [32mimports[37m: [NavbarComponent, NgClass],
+         ╵   [32m~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing tag "span". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.html:22:36:
+[37m      22 │         <span><b>{{ statusLabel() }}[32m</span>[37m
+         ╵                                     [32m~~~~~~~[0m
+
+  Error occurs in the template of component DailyClosePage.
+
+    src/app/features/daily-close/daily-close.page.ts:32:15:
+[37m      32 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'csvUrl' does not exist on type 'DailyClosePage'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/daily-close/daily-close.page.html:79:18:
+[37m      79 │           [href]="[32mcsvUrl[37m()"
+         ╵                   [32m~~~~~~[0m
+
+  Error occurs in the template of component DailyClosePage.
+
+    src/app/features/daily-close/daily-close.page.ts:32:15:
+[37m      32 │   templateUrl: [32m'./daily-close.page.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

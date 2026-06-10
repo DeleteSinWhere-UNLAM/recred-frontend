@@ -58,11 +58,11 @@ export class HomeKiosqueroPresenter {
       ruta: '/cargar-producto-ia',
     },
     {
-      id: 'dashboard',
-      titulo: 'Dashboard',
-      descripcion: 'Métricas y reportes',
-      icono: 'fa-chart-line',
-      ruta: '/dashboard',
+      id: 'cierre-diario',
+      titulo: 'Cierre diario',
+      descripcion: 'Cerrar dia y revisar reporte',
+      icono: 'fa-clipboard-check',
+      ruta: '/cierre-diario',
       color: 'pizarra',
     },
     {
