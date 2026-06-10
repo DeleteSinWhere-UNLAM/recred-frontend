@@ -172,6 +172,13 @@ export const routes: Routes = [
             (m) => m.ResumenSemanalPage,
           ),
       },
+      {
+        path: 'preferencias-detectadas',
+        loadComponent: () =>
+          import('./features/preferencias-detectadas/preferencias-detectadas.page').then(
+            (m) => m.PreferenciasDetectadasPage,
+          ),
+      },
     ],
   },
 ];
