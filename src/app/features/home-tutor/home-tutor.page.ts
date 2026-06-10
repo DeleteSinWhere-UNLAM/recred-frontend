@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
@@ -28,6 +29,7 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
     NavbarComponent,
     ColegioSectionComponent,
     TutorHeaderComponent,
+    RouterLink,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

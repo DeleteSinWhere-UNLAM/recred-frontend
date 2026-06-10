@@ -16,6 +16,15 @@ interface StudentDTO {
   readonly saldo?: number | string | null;
 }
 
+export interface CrearHijoRequest {
+  readonly username: string;
+  readonly nombre: string;
+  readonly apellido: string;
+  readonly email: string;
+  readonly dni: string;
+  readonly gradoId?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AlumnosService {
   private readonly http = inject(HttpClient);
@@ -25,6 +34,26 @@ export class AlumnosService {
   private readonly alumnosState = signal<Alumno[]>([]);
   readonly alumnos: Signal<Alumno[]> = this.alumnosState.asReadonly();
   private cargaInFlight: Promise<Alumno[]> | null = null;
+
+  async crearHijo(req: CrearHijoRequest): Promise<Alumno> {
+    const payload: CrearHijoRequest = {
+      username: req.username.trim(),
+      nombre: req.nombre.trim(),
+      apellido: req.apellido.trim(),
+      email: req.email.trim(),
+      dni: req.dni.trim(),
+      gradoId: req.gradoId?.trim() ? req.gradoId.trim() : null,
+    };
+    const dto = await firstValueFrom(
+      this.http.post<StudentDTO>(
+        `${environment.apiUrl}/tutores/me/hijos`,
+        payload,
+      ),
+    );
+    const alumno = this.fromDto(dto);
+    this.alumnosState.update((actuales) => [...actuales, alumno]);
+    return alumno;
+  }
 
   async cargarHijosDelTutor(): Promise<Alumno[]> {
     const url = `${environment.apiUrl.replace(/\/$/, '')}/tutores/me/hijos`;
