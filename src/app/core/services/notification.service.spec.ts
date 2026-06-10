@@ -18,12 +18,11 @@ describe('NotificationService', () => {
         NotificationService,
         provideHttpClient(),
         provideHttpClientTesting(),
-        // Mock the Messaging token required by AngularFire
         { provide: Messaging, useValue: {} },
         { provide: NotificacionSaldoBajoService, useValue: notificacionServiceSpy }
       ]
     });
-    
+
     service = TestBed.inject(NotificationService);
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -32,7 +31,7 @@ describe('NotificationService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
+  it('dado que se inicializa el servicio, debe crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 

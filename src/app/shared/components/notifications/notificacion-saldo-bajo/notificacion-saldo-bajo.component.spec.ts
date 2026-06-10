@@ -28,16 +28,16 @@ describe('NotificacionSaldoBajoComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('dado que se inicializa el componente, debe crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should call cerrar on service when cerrar is clicked', () => {
+  it('dado que se hace clic en cerrar, debe llamar al método cerrar del servicio', () => {
     component.cerrar();
     expect(notificacionServiceSpy.cerrar).toHaveBeenCalled();
   });
 
-  it('should navigate to acreditar-mercado-pago when comprarSaldo is clicked', () => {
+  it('dado que se hace clic en comprarSaldo, debe cerrar la notificación y navegar a acreditar-mercado-pago', () => {
     component.comprarSaldo();
     expect(notificacionServiceSpy.cerrar).toHaveBeenCalled();
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/acreditar-mercado-pago', 'test-alumno-id']);
