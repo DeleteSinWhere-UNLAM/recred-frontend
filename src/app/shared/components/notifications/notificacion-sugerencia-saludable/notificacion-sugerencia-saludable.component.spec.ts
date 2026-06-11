@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NotificacionSugerenciaSaludableComponent } from './notificacion-sugerencia-saludable.component';
 import { NotificacionSugerenciaSaludableService } from './notificacion-sugerencia-saludable.service';
-import { CarritoService } from '../../../compra/services/carrito.service';
+import { CarritoService } from '../../../../features/compra/services/carrito.service';
 import { Router } from '@angular/router';
+import { Producto } from '../../../../features/buffet/models/producto.model';
 
 describe('NotificacionSugerenciaSaludableComponent', () => {
   let component: NotificacionSugerenciaSaludableComponent;
@@ -11,7 +12,7 @@ describe('NotificacionSugerenciaSaludableComponent', () => {
   let carritoSpy: jasmine.SpyObj<CarritoService>;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  const mockProducto = { id: 'prod-1', nombre: 'Manzana Roja', precio: 150.00 } as any;
+  const mockProducto = { id: 'prod-1', nombre: 'Manzana Roja', precio: 150.00 } as unknown as Producto;
 
   beforeEach(async () => {
     notificacionServiceSpy = jasmine.createSpyObj('NotificacionSugerenciaSaludableService', ['cerrar'], {
