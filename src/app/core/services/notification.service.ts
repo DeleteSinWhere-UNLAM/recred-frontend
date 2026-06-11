@@ -3,6 +3,7 @@ import { Messaging, getToken, onMessage } from '@angular/fire/messaging';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { NotificacionSaldoBajoService } from '../../shared/components/notifications/notificacion-saldo-bajo/notificacion-saldo-bajo.service';
+import { NotificacionSugerenciaSaludableService } from '../../shared/components/notifications/notificacion-sugerencia-saludable/notificacion-sugerencia-saludable.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -10,6 +11,7 @@ export class NotificationService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
   private notificacionSaldoBajoService = inject(NotificacionSaldoBajoService);
+  private notificacionSugerenciaSaludableService = inject(NotificacionSugerenciaSaludableService);
 
   requestNotificationPermission() {
     Notification.requestPermission().then((permission) => {
@@ -56,6 +58,29 @@ export class NotificationService {
             payload.data['alumnoId']
           );
         }
+
+        if (payload.data && payload.data['type'] === 'PURCHASE_SUGGESTION' && payload.data['rol'] === 'ALUMNO') {
+          let producto = null;
+          try {
+            producto = typeof payload.data['producto'] === 'string' 
+              ? JSON.parse(payload.data['producto']) 
+              : payload.data['producto'];
+          } catch (e) {
+            console.error('Error parseando el producto sugerido', e);
+          }
+
+          if (producto) {
+            this.notificacionSugerenciaSaludableService.mostrar(
+              payload.data['sugerenciaId'],
+              payload.data['titulo'],
+              payload.data['mensaje'],
+              producto,
+              payload.data['alumnoId']
+            );
+          }
+        }
+
+
 
       });
     });
