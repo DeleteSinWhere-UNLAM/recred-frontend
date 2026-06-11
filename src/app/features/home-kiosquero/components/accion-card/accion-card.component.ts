@@ -16,7 +16,6 @@ import { AccionKiosquero } from '../../models/accion-kiosquero.model';
 })
 export class AccionCardComponent {
   @Input({ required: true }) accion!: AccionKiosquero;
-  @Input() destacada = false;
   @Output() seleccionar = new EventEmitter<AccionKiosquero>();
 
   protected onClick(): void {

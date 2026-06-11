@@ -1,50 +1,37 @@
-<header class="perfil-kiosquero-header">
-  <div class="perfil-kiosquero-header__identidad">
-    <div class="perfil-kiosquero-header__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreKiosquero">
-      <div class="perfil-kiosquero-header__avatar">
-        <span>{{ iniciales }}</span>
-      </div>
+<section class="perfil-kiosquero-header" [attr.aria-label]="'Perfil de ' + nombreKiosquero">
+  <div class="perfil-kiosquero-header__avatar-wrap">
+    <div class="perfil-kiosquero-header__avatar">
+      <span>{{ iniciales }}</span>
     </div>
+  </div>
 
-    <div class="perfil-kiosquero-header__texto">
-      <p class="perfil-kiosquero-header__saludo">{{ saludo }}</p>
-      <h1 class="perfil-kiosquero-header__nombre">{{ nombreKiosquero }}</h1>
-      <p class="perfil-kiosquero-header__rol">Panel del kiosquero</p>
-    </div>
+  <div class="perfil-kiosquero-header__info">
+    <p class="perfil-kiosquero-header__saludo">
+      <span class="perfil-kiosquero-header__saludo-mano" aria-hidden="true">👋</span>
+      ¡Hola,
+    </p>
+    <h1 class="perfil-kiosquero-header__nombre">{{ nombreKiosquero }}!</h1>
+    <p class="perfil-kiosquero-header__subtitulo">
+      <i class="fa-solid fa-store" aria-hidden="true"></i>
+      <span>Panel del kiosquero</span>
+    </p>
   </div>
 
   <div class="perfil-kiosquero-header__stats" role="group" aria-label="Resumen del día">
     <div class="perfil-kiosquero-header__stat">
-      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
-        <i class="fa-solid fa-dollar-sign"></i>
+      <span class="perfil-kiosquero-header__stat-label">
+        <i class="fa-solid fa-dollar-sign" aria-hidden="true"></i>
+        Ganancias hoy
       </span>
-      <div class="perfil-kiosquero-header__stat-texto">
-        <span class="perfil-kiosquero-header__stat-label">Ganancias hoy</span>
-        <strong class="perfil-kiosquero-header__stat-valor">{{ gananciasFormateadas }}</strong>
-      </div>
+      <span class="perfil-kiosquero-header__stat-valor">{{ gananciasFormateadas }}</span>
     </div>
 
     <div class="perfil-kiosquero-header__stat">
-      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
-        <i class="fa-solid fa-cart-shopping"></i>
+      <span class="perfil-kiosquero-header__stat-label">
+        <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+        Ventas
       </span>
-      <div class="perfil-kiosquero-header__stat-texto">
-        <span class="perfil-kiosquero-header__stat-label">Ventas</span>
-        <strong class="perfil-kiosquero-header__stat-valor">{{ ventasHoy }}</strong>
-      </div>
+      <span class="perfil-kiosquero-header__stat-valor">{{ ventasHoy }}</span>
     </div>
-    <!--
-    <div
-      class="perfil-kiosquero-header__stat"
-      [class.perfil-kiosquero-header__stat--alerta]="productosSinStock > 0"
-    >
-      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
-        <i class="fa-solid fa-box-open"></i>
-      </span>
-      <div class="perfil-kiosquero-header__stat-texto">
-        <span class="perfil-kiosquero-header__stat-label">Sin stock</span>
-        <strong class="perfil-kiosquero-header__stat-valor">{{ productosSinStock }}</strong>
-      </div>
-    </div>-->
   </div>
-</header>
+</section>
