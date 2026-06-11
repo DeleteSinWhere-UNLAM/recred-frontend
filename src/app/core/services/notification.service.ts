@@ -3,13 +3,23 @@ import { Messaging, getToken, onMessage } from '@angular/fire/messaging';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
+export interface AppNotification {
+  id?: string;
+  titulo?: string;
+  title?: string;
+  mensaje?: string;
+  body?: string;
+  message?: string;
+  fecha?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private messaging = inject(Messaging);
   private http = inject(HttpClient);
   private injector = inject(Injector);
 
-  private readonly notificationsState = signal<any[]>([]);
+  private readonly notificationsState = signal<AppNotification[]>([]);
   readonly notifications = this.notificationsState.asReadonly();
 
   requestNotificationPermission() {
@@ -70,7 +80,7 @@ export class NotificationService {
 
 
   getNotifications() {
-    this.http.get<any[]>(`${environment.apiUrl}/notifications/me`)
+    this.http.get<AppNotification[]>(`${environment.apiUrl}/notifications/me`)
       .subscribe({
         next: (notifications) => {
           console.log('List of notifications:', notifications);
