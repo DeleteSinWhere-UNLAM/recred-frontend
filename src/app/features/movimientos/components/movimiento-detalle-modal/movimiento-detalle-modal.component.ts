@@ -47,6 +47,18 @@ export class MovimientoDetalleModalComponent {
     }).format(date);
   }
 
+  formatearFechaProgramada(fechaStr?: string): string {
+    if (!fechaStr) return '';
+    const parts = fechaStr.split('-');
+    if (parts.length === 3) {
+      const year = parts[0];
+      const month = parts[1];
+      const day = parts[2];
+      return `${day}/${month}/${year}`;
+    }
+    return fechaStr;
+  }
+
   mostrarFecha(mov: Movimiento): string {
     if (mov.tipo === 'ANTICIPADA' && mov.pickupDate) {
       const parts = mov.pickupDate.split('-');
