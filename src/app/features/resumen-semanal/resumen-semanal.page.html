@@ -1,111 +1,122 @@
 <app-navbar [userName]="nombreUsuario" />
 
-<main class="resumen">
-  @if (resumen && resumenProcesado) {
-    <h1 class="resumen__titulo">Resumen semanal</h1>
+@if (resumen && resumenProcesado) {
+  <main class="dashboard">
+    <!-- HEADER -->
+    <header class="dashboard__header">
+      <h1>Resumen semanal</h1>
+      <p>{{ resumen.fechaDesde }} - {{ resumen.fechaHasta }}</p>
+    </header>
 
-    <p class="resumen__fechas">
-      {{ resumen.fechaDesde }} - {{ resumen.fechaHasta }}
-    </p>
-
-    <section class="resumen-general">
-      <h2>Resumen familiar</h2>
-
-      <div class="card resumen-total">
-        <h3>Gasto total semanal</h3>
-
-        <p>${{ totalFamiliar }}</p>
+    <!-- 1. KPI ROW -->
+    <section class="kpi-grid">
+      <div class="stat-card highlight">
+        <div class="stat-card__icon">💰</div>
+        <div>
+          <span>Gasto total</span>
+          <h3>${{ totalFamiliar }}</h3>
+        </div>
       </div>
 
-      <div class="grafico-general">
-        @for (hijo of hijosResumen; track hijo.nombre) {
-          <div
-            class="grafico-general__segmento"
-            [style.width.%]="hijo.porcentaje"
-            [style.background]="hijo.color"
-          ></div>
-        }
+      <div class="stat-card">
+        <div class="stat-card__icon">🏆</div>
+        <div>
+          <span>Mayor consumo</span>
+          <h3>{{ hijosResumen[0]?.nombre ?? "-" }}</h3>
+        </div>
       </div>
 
-      <h3>Distribución del gasto familiar</h3>
-
-      <div class="leyenda">
-        @for (hijo of hijosResumen; track hijo.nombre) {
-          <div class="leyenda__item">
-            <span class="leyenda__color" [style.background]="hijo.color"></span>
-
-            <span>
-              {{ hijo.nombre }}
-              - ${{ hijo.gasto }} ({{ hijo.porcentaje.toFixed(1) }}%)
-            </span>
-          </div>
-        }
+      <div class="stat-card">
+        <div class="stat-card__icon">👨‍👩‍👧‍👦</div>
+        <div>
+          <span>Integrantes</span>
+          <h3>{{ hijos.length }}</h3>
+        </div>
       </div>
     </section>
 
-    @for (hijo of hijos; track hijo.nombre) {
-      <section class="hijo">
-        <h2 class="hijo__nombre">
-          {{ hijo.nombre }}
-        </h2>
+    <!-- 2. MAIN ANALYSIS -->
+    <section class="analysis-grid">
+      <!-- CHART -->
+      <section class="chart-card">
+        <h2>Distribución familiar</h2>
 
-        <section class="resumen__cards">
-          <article class="card">
-            <h3>Gasto total semanal</h3>
-
-            <p>${{ hijo.datos.totalGastado }}</p>
-          </article>
-
-          <article class="card">
-            <h3>Producto más consumido</h3>
-
-            <p>
-              {{ hijo.datos.productoMasConsumido?.nombre ?? "Sin consumos" }}
-            </p>
-          </article>
-
-          <article class="card">
-            <h3>Cantidad semanal</h3>
-
-            <p>
-              {{ hijo.datos.productoMasConsumido?.cantidad ?? 0 }}
-            </p>
-          </article>
-        </section>
-
-        <section class="categorias">
-          <h2>Distribución por categoría</h2>
-
-          @if (getCategorias(hijo.datos).length > 0) {
-            @for (categoria of getCategorias(hijo.datos); track categoria[0]) {
-              <div class="categoria">
-                <div class="categoria__header">
-                  <span>{{ categoria[0] }}</span>
-
-                  <span>{{ categoria[1] }}%</span>
-                </div>
-
-                <div class="barra">
-                  <div
-                    class="barra__valor"
-                    [style.width.%]="categoria[1]"
-                  ></div>
-                </div>
+        <div class="chart-bars">
+          @for (item of hijosResumen; track item.nombre) {
+            <div class="bar-item">
+              <div class="bar-wrapper">
+                <div
+                  class="bar"
+                  [style.height.%]="item.porcentaje"
+                  [style.background]="item.color"
+                ></div>
               </div>
-            }
-          } @else {
-            <p>No hubo consumos durante esta semana.</p>
+              <span>{{ item.nombre }}</span>
+            </div>
           }
-        </section>
+        </div>
       </section>
-    }
 
-    <section class="ia">
-      <h2>Análisis semanal</h2>
-
-      <p>
-        {{ resumenProcesado.mensaje }}
-      </p>
+      <!-- INSIGHT -->
+      <section class="insight-card">
+        <h2>🧠 Análisis IA</h2>
+        <p>{{ resumenProcesado.mensaje }}</p>
+      </section>
     </section>
-  }
-</main>
+
+    <!-- 3. DETAIL -->
+    <section class="children-section">
+      <h2>Detalle por hijo</h2>
+
+      <div class="children-grid">
+        @for (hijo of hijos; track hijo.nombre) {
+          <article class="child-card">
+            <header class="child-card__header">
+              <h3>{{ hijo.nombre }}</h3>
+              <span>${{ hijo.datos.totalGastado }}</span>
+            </header>
+
+            <div class="child-card__content">
+              <div class="metric">
+                <label>Producto favorito</label>
+                <strong>
+                  {{
+                    hijo.datos.productoMasConsumido?.nombre ?? "Sin consumos"
+                  }}
+                </strong>
+              </div>
+
+              <div class="metric">
+                <label>Cantidad</label>
+                <strong>
+                  {{ hijo.datos.productoMasConsumido?.cantidad ?? 0 }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="categories">
+              @for (
+                categoria of getCategorias(hijo.datos);
+                track categoria[0]
+              ) {
+                <div class="category">
+                  <div class="category__header">
+                    <span>{{ categoria[0] }}</span>
+                    <span>{{ categoria[1] }}%</span>
+                  </div>
+
+                  <div class="progress">
+                    <div
+                      class="progress__value"
+                      [style.width.%]="categoria[1]"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  </main>
+}
