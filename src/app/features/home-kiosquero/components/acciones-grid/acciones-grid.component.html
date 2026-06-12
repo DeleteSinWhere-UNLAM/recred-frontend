@@ -1,11 +1,16 @@
 <section class="acciones-grid" aria-label="Acciones rápidas">
-  @for (accion of acciones; track accion.id; let first = $first) {
-    <app-accion-card
-      class="acciones-grid__item"
-      [class.acciones-grid__item--full]="first"
-      [accion]="accion"
-      [destacada]="first"
-      (seleccionar)="onSeleccionar($event)"
-    />
-  }
+  <h2 class="acciones-grid__titulo">
+    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+    Tus herramientas
+  </h2>
+
+  <div class="acciones-grid__items">
+    @for (accion of acciones; track accion.id) {
+      <app-accion-card
+        class="acciones-grid__item"
+        [accion]="accion"
+        (seleccionar)="onSeleccionar($event)"
+      />
+    }
+  </div>
 </section>
