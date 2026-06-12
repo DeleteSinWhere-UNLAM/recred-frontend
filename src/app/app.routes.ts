@@ -110,6 +110,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'kiosquero/venta-espontanea',
+        loadChildren: () =>
+          import('./features/venta-espontanea/venta-espontanea.routes').then(
+            (m) => m.ventaEspontaneaRoutes,
+          ),
+      },
+      {
         path: 'kiosquero/pedidos-tracking',
         loadComponent: () =>
           import('./features/tracking-pedidos/tracking-pedidos.page').then(
