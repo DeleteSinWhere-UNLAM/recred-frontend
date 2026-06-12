@@ -180,6 +180,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'promociones',
+        loadComponent: () =>
+          import('./features/promociones/promociones.page').then(
+            (m) => m.PromocionesPageComponent,
+          ),
+      },
+      {
         path: 'preferencias-detectadas',
         loadComponent: () =>
           import('./features/preferencias-detectadas/preferencias-detectadas.page').then(
