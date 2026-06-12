@@ -70,6 +70,7 @@
             type="button"
             class="producto-card__cantidad-btn"
             (click)="sumar()"
+            [disabled]="deshabilitarSumar()"
             aria-label="Sumar uno"
           >
             <i class="fa-solid fa-plus" aria-hidden="true"></i>
@@ -78,11 +79,17 @@
 
         <button
           type="button"
-          class="producto-card__cta"
+          [class]="superaPresupuesto() ? 'producto-card__cta producto-card__cta--presupuesto' : 'producto-card__cta'"
+          [disabled]="superaPresupuesto()"
           (click)="onAgregar()"
         >
-          <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
-          <span>Agregar</span>
+          @if (superaPresupuesto()) {
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Supera presupuesto</span>
+          } @else {
+            <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+            <span>Agregar</span>
+          }
         </button>
 
         @if (estaEnCarrito()) {

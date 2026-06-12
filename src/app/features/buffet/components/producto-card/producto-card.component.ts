@@ -73,8 +73,8 @@ export class ProductoCardComponent {
 
   readonly disponible = computed(() => {
     const p = this.productoState();
-    // No disponible si: sin stock, bloqueado por tutor, por restricción nutricional/horaria, o supera presupuesto
-    return p ? (disponible(p) && !p.bloqueado && !p.bloqueadoPorRestriccion && !p.superaPresupuesto) : false;
+    // No disponible si: sin stock, bloqueado por tutor, por restricción nutricional/horaria, o supera presupuesto unitario
+    return p ? (disponible(p) && !p.bloqueado && !p.bloqueadoPorRestriccion && !this.superaPresupuestoUnitario()) : false;
   });
 
   readonly bloqueadoPorRestriccion = computed(() => {
@@ -105,9 +105,25 @@ export class ProductoCardComponent {
     return 'No apto: ' + etiquetas.join(' · ');
   });
 
+  readonly superaPresupuestoUnitario = computed(() => {
+    const p = this.productoState();
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return false;
+    return !this.carritoService.puedeAgregar(p, alumnoId, 1);
+  });
+
   readonly superaPresupuesto = computed(() => {
     const p = this.productoState();
-    return p ? !!p.superaPresupuesto : false;
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return false;
+    return !this.carritoService.puedeAgregar(p, alumnoId, this.cantidad());
+  });
+
+  readonly deshabilitarSumar = computed(() => {
+    const p = this.productoState();
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return true;
+    return !this.carritoService.puedeAgregar(p, alumnoId, this.cantidad() + 1);
   });
 
   readonly precioFormateado = computed(() => {

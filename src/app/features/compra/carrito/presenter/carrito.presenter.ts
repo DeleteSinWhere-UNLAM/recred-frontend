@@ -12,6 +12,8 @@ import { CarritoService } from '../../services/carrito.service';
 import { CompraService } from '../../services/compra.service';
 import { RestriccionesHorariasService } from '../../../restricciones-horarias/services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../../../restricciones-horarias/services/franjas-horarias.service';
+import { BuffetService } from '../../../buffet/services/buffet.service';
+import { firstValueFrom } from 'rxjs';
 
 export interface GrupoCarrito {
   alumno: Alumno;
@@ -37,6 +39,7 @@ export class CarritoPresenter {
   private readonly router = inject(Router);
   private readonly restriccionesService = inject(RestriccionesHorariasService);
   private readonly franjasService = inject(FranjasHorariasService);
+  private readonly buffetService = inject(BuffetService);
 
   private readonly seleccionState = signal<Record<string, boolean>>({});
   private readonly fechasState = signal<Record<string, string>>({});
@@ -195,6 +198,19 @@ export class CarritoPresenter {
       studentIds.map(async (alumnoId) => {
         const alumno = this.alumnosService.getAlumnoById(alumnoId);
         if (!alumno) return;
+
+        try {
+          const buffet = this.buffetService.getBuffetDelAlumno(alumno.colegioId);
+          if (buffet) {
+            const products = await firstValueFrom(
+              this.buffetService.getProductosDelBuffet(buffet.id, alumnoId)
+            );
+            this.carritoService.setCatalog(products);
+          }
+          await this.carritoService.cargarPresupuestoYConsumo(alumnoId);
+        } catch (error) {
+          console.error(`Error loading catalog/budget for student ${alumnoId}:`, error);
+        }
         
         try {
           const [restricciones, franjas] = await Promise.all([

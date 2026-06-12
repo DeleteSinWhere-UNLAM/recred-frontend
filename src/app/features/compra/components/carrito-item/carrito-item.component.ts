@@ -6,8 +6,10 @@ import {
   Output,
   computed,
   signal,
+  inject,
 } from '@angular/core';
 import { ItemCarrito } from '../../models/carrito.model';
+import { CarritoService } from '../../services/carrito.service';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -22,6 +24,8 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarritoItemComponent {
+  private readonly carritoService = inject(CarritoService);
+
   private readonly itemState = signal<ItemCarrito | undefined>(undefined);
 
   @Input({ required: true })
@@ -34,6 +38,12 @@ export class CarritoItemComponent {
   @Output() eliminar = new EventEmitter<string>();
 
   readonly itemActual = computed(() => this.itemState());
+
+  readonly deshabilitarSumar = computed(() => {
+    const i = this.itemState();
+    if (!i) return true;
+    return !this.carritoService.puedeAgregar(i.producto, i.alumnoId, 1);
+  });
 
   readonly precioFormateado = computed(() => {
     const i = this.itemState();

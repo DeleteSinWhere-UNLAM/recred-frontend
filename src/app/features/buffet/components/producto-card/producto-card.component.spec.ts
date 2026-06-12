@@ -21,8 +21,9 @@ describe('ProductoCardComponent', () => {
   };
 
   beforeEach(async () => {
-    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', ['cantidadDe']);
+    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', ['cantidadDe', 'puedeAgregar']);
     carritoServiceSpy.cantidadDe.and.returnValue(0);
+    carritoServiceSpy.puedeAgregar.and.callFake((prod) => !prod.superaPresupuesto);
 
     await TestBed.configureTestingModule({
       imports: [ProductoCardComponent],

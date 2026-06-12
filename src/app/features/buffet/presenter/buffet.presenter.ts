@@ -136,6 +136,8 @@ export class BuffetPresenter {
         this.productosState.set(productos);
         this.categoriasState.set(this.extractUniqueCategories(productos));
         this.clasificacionesState.set(this.extractUniqueClassifications(productos));
+        this.carritoService.setCatalog(productos);
+        this.carritoService.cargarPresupuestoYConsumo(alumnoId);
       },
       error: (err) => {
         console.error('Error loading products for buffet:', err);

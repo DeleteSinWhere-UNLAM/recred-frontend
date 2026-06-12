@@ -25,6 +25,7 @@ interface MenuProductoDTO {
   precio: number;
   bloqueado?: boolean;
   motivoBloqueo?: string | null;
+  categoria?: { id: string; descripcion: string } | null;
 }
 
 const CAT_COMIDAS: CategoriaProducto = { id: 'comidas', descripcion: 'Comidas' };
@@ -250,13 +251,7 @@ export class BuffetService {
   }
 
   private mapMenuProductDtoToProducto(dto: MenuProductoDTO): Producto {
-    const nombre = dto.nombre.toLowerCase();
-    let categoria = { id: 'comidas', descripcion: 'Comidas' };
-    if (nombre.includes('coca') || nombre.includes('sprite') || nombre.includes('fanta') || nombre.includes('agua') || nombre.includes('jugo') || nombre.includes('gatorade') || nombre.includes('powerade') || nombre.includes('cafe') || nombre.includes('te') || nombre.includes('cindor') || nombre.includes('bebida') || nombre.includes('levite') || nombre.includes('aquarius')) {
-      categoria = { id: 'bebidas', descripcion: 'Bebidas' };
-    } else if (nombre.includes('papa') || nombre.includes('cheeto') || nombre.includes('dorito') || nombre.includes('palito') || nombre.includes('alfajor') || nombre.includes('oreo') || nombre.includes('pepito') || nombre.includes('chocolate') || nombre.includes('cookie') || nombre.includes('turron') || nombre.includes('cereal') || nombre.includes('caramelo') || nombre.includes('chicle') || nombre.includes('pochoclo') || nombre.includes('snack')) {
-      categoria = { id: 'snacks', descripcion: 'Snacks' };
-    }
+    const categoria = dto.categoria ?? { id: 'sin-categoria', descripcion: 'Sin Categoría' };
 
     const MOTIVOS_PRESUPUESTO = [
       'Supera el límite de gasto',

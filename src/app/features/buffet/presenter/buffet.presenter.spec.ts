@@ -91,7 +91,7 @@ describe('BuffetPresenter', () => {
       'getBuffetDelAlumno', 'getProductosDelBuffet',
     ]);
     favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos']);
-    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', ['agregar']);
+    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', ['agregar', 'setCatalog', 'cargarPresupuestoYConsumo']);
     colegiosServiceSpy = jasmine.createSpyObj<ColegiosService>('ColegiosService', ['getColegios']);
     usuarioServiceSpy = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl', 'esVistaAlumno']);
     toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
