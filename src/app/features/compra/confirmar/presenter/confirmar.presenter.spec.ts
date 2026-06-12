@@ -8,6 +8,10 @@ import { SugerenciasService } from '../../../sugerencias/services/sugerencias.se
 import { ToastService } from '../../../../shared/services/toast.service';
 import { signal } from '@angular/core';
 
+import { OrdenCompra } from '../../models/orden-compra.model';
+
+import { Alumno } from '../../../../data-access/models/alumno.model';
+
 describe('ConfirmarPresenter', () => {
   let presenter: ConfirmarPresenter;
   let compraServiceSpy: jasmine.SpyObj<CompraService>;
@@ -16,17 +20,17 @@ describe('ConfirmarPresenter', () => {
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  const mockOrdenBase = {
+  const mockOrdenBase: OrdenCompra = {
     id: '',
     total: 100,
     ordenes: [
-      { alumno: { id: 'alumno-1', nombre: 'Juan' }, subtotal: 100 }
+      { alumno: { id: 'alumno-1', nombre: 'Juan' } as unknown as Alumno, subtotal: 100, items: [], fecha: '', recreo: 'PRIMER_RECREO' }
     ],
     codigos: {}
-  } as any;
+  };
 
   // Usamos un signal real para que la reactividad funcione en el presenter
-  const ordenEnCursoSignal = signal<any>(mockOrdenBase);
+  const ordenEnCursoSignal = signal<OrdenCompra | null>(mockOrdenBase);
 
   beforeEach(() => {
     compraServiceSpy = jasmine.createSpyObj('CompraService', ['simularPago', 'cancelarOrden'], {

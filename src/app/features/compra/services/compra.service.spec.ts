@@ -2,12 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { CompraService } from './compra.service';
 import { OrdenAlumno } from '../models/orden-compra.model';
 
+import { Alumno } from '../../../data-access/models/alumno.model';
+
 describe('CompraService', () => {
   let service: CompraService;
 
   const mockOrdenes: OrdenAlumno[] = [
     {
-      alumno: { id: 'alumno-1', nombre: 'Juan', apellido: 'Perez', saldo: 100 } as any,
+      alumno: { id: 'alumno-1', nombre: 'Juan', apellido: 'Perez', saldo: 100 } as unknown as Alumno,
       items: [],
       fecha: '2026-06-11',
       recreo: 'PRIMER_RECREO',
