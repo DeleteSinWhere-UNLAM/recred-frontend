@@ -2,7 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { environment } from '../../../../environments/environment';
 import { ProductService } from './product.service';
-import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+import { Product } from '../models/product.interface';
+import { CreateProductRequest } from '../models/requests/create-product-request.interface';
+import { UpdateProductRequest } from '../models/requests/update-product-request.interface';
 import { Category } from '../models/category.interface';
 
 describe('ProductService', () => {
@@ -31,7 +33,7 @@ describe('ProductService', () => {
   });
 
   afterEach(() => {
-    httpMock.verify(); // Ensures no outstanding requests
+    httpMock.verify();
   });
 
   it('debería retornar un arreglo de productos al llamar a getAll', () => {
@@ -70,7 +72,7 @@ describe('ProductService', () => {
 
   it('debería enviar el parámetro buffetId y retornar los productos al llamar a getAllByBuffetId', () => {
     const buffetId = 'test-buffet-123';
-    
+
     service.getAllByBuffetId(buffetId).subscribe(products => {
       expect(products).toEqual(mockProducts);
     });
@@ -82,7 +84,7 @@ describe('ProductService', () => {
 
   it('debería obtener un solo producto por su id al llamar a getById', () => {
     const productId = '1';
-    
+
     service.getById(productId).subscribe(product => {
       expect(product).toEqual(mockProducts[0]);
     });
@@ -120,7 +122,7 @@ describe('ProductService', () => {
   });
 
   it('debería manejar el error de validación si create falla', () => {
-    const payload = {} as CreateProductRequest; // Invalid payload to simulate sad path
+    const payload = {} as CreateProductRequest;
 
     service.create(payload).subscribe({
       next: () => fail('should have failed with the 400 error'),

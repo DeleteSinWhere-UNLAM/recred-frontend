@@ -1,0 +1,276 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-bottom: 1px solid #dee2e6;
+  position: relative;
+}
+
+.modal-header-icon {
+  background-color: #ffd700;
+  color: #333;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.25rem;
+  margin-right: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.modal-header-text {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.promotion-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #212529;
+}
+
+.discount-badge {
+  background-color: #e03131;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 800;
+  font-size: 0.875rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #adb5bd;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0.25rem;
+}
+
+.close-btn:hover {
+  color: #495057;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  background-color: #fafbfc;
+}
+
+.promotion-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #eaecef;
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.date-item i {
+  color: #339af0;
+}
+
+.products-title {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #fff;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #eaecef;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.error-item {
+  border-left: 4px solid #f03e3e;
+}
+
+.error-item i {
+  color: #f03e3e;
+  font-size: 1.25rem;
+}
+
+.product-image-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-image-placeholder {
+  color: #adb5bd;
+}
+
+.product-name {
+  font-weight: 500;
+  color: #343a40;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.product-prices {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.original-price {
+  font-size: 0.85rem;
+  color: #adb5bd;
+  text-decoration: line-through;
+}
+
+.discounted-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e03131;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  background-color: #fff;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.btn-secondary {
+  background-color: #f1f3f5;
+  color: #495057;
+  border-color: #e9ecef;
+}
+
+.btn-secondary:hover {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+.btn-primary {
+  background-color: #e7f5ff;
+  color: #1971c2;
+  border-color: #d0ebff;
+}
+
+.btn-primary:hover {
+  background-color: #d0ebff;
+  color: #1864ab;
+}
+
+.btn-success {
+  background-color: #2b8a3e;
+  color: white;
+  box-shadow: 0 4px 6px rgba(43, 138, 62, 0.2);
+}
+
+.btn-success:hover {
+  background-color: #237032;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px rgba(43, 138, 62, 0.3);
+}
+
+@media (max-width: 576px) {
+  .modal-footer {
+    flex-direction: column;
+  }
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

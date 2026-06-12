@@ -4,7 +4,7 @@
   <button
     type="button"
     class="seasonal-page__volver"
-    (click)="volver()"
+    (click)="presenter.volver()"
   >
     <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
     <span>Volver</span>
@@ -23,30 +23,41 @@
       </div>
     </header>
 
-    @if (isLoading) {
+    @if (presenter.isLoading()) {
       <div class="seasonal-page__estado">
         <div class="seasonal-page__spinner"></div>
         <p>Analizando el clima de tu zona y generando recomendaciones...</p>
       </div>
-    } @else if (error) {
+    } @else if (presenter.error()) {
       <div class="seasonal-page__estado seasonal-page__estado--error">
         <div class="seasonal-page__error-icono">
           <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
         </div>
-        <p>{{ error }}</p>
+        <p>{{ presenter.error() }}</p>
         <button
           type="button"
           class="seasonal-page__reintentar"
-          (click)="loadRecommendations()"
+          (click)="presenter.loadRecommendations()"
         >
           Reintentar
         </button>
       </div>
     } @else {
       <app-seasonal-list
-        [sugerencias]="sugerencias"
-        [tipPromocional]="tipPromocional">
+        [sugerencias]="presenter.sugerencias()"
+        [tipPromocional]="presenter.tipPromocional()">
       </app-seasonal-list>
     }
   </div>
 </main>
+
+@if (presenter.shouldShowPromotionModal()) {
+  <app-ia-promotion-approval-modal
+    [promotion]="presenter.promotion()!"
+    [resolvedProducts]="presenter.resolvedProducts()"
+    (approve)="presenter.approvePromotion($event)"
+    (edit)="presenter.editPromotion($event)"
+    (discard)="presenter.discardPromotion($event)"
+    (closeModal)="presenter.closeModal()">
+  </app-ia-promotion-approval-modal>
+}

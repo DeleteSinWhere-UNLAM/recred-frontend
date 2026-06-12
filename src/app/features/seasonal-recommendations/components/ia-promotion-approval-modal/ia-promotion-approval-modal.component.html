@@ -1,0 +1,61 @@
+<div class="modal-overlay" (click)="onClose()" aria-hidden="true">
+  <div class="modal-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <div class="modal-header-icon">
+        <i class="fa-solid fa-sparkles"></i>
+      </div>
+      <div class="modal-header-text">
+        <h2 id="modal-title" class="promotion-name">{{ promotion.name }}</h2>
+        <span class="discount-badge">-{{ promotion.discountPercentage }}%</span>
+      </div>
+      <button class="close-btn" (click)="onClose()" aria-label="Cerrar modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="promotion-dates">
+        <div class="date-item">
+          <i class="fa-regular fa-calendar"></i>
+          <span>Inicia: <strong>{{ promotion.startDate | date:'medium' }}</strong></span>
+        </div>
+        <div class="date-item">
+          <i class="fa-regular fa-calendar-check"></i>
+          <span>Finaliza: <strong>{{ promotion.endDate | date:'medium' }}</strong></span>
+        </div>
+      </div>
+
+      <h3 class="products-title">Productos incluidos:</h3>
+      <div class="products-list">
+        @for (product of resolvedProducts; track product.id) {
+          <div class="product-item">
+            <div class="product-info">
+              <span class="product-name">{{ product.nombre }}</span>
+              <div class="product-prices">
+                <span class="original-price">{{ product.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="discounted-price">{{ getDiscountedPrice(product.precio) | currency:'ARS':'symbol':'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="product-item error-item">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="product-name">Producto no disponible</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-success" (click)="onApprove()">
+        <i class="fa-solid fa-check"></i> Aprobar
+      </button>
+      <button class="btn btn-primary" (click)="onEdit()">
+        <i class="fa-solid fa-pen"></i> Editar
+      </button>
+      <button class="btn btn-secondary" (click)="onDiscard()">
+        <i class="fa-solid fa-trash"></i> Descartar
+      </button>
+    </div>
+  </div>
+</div>

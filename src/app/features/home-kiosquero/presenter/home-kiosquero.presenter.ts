@@ -90,6 +90,14 @@ export class HomeKiosqueroPresenter {
       ruta: '/recomendaciones-estacionales',
       color: 'menta',
     },
+    {
+      id: 'promociones',
+      titulo: 'Promociones',
+      descripcion: 'Crear y editar descuentos',
+      icono: 'fa-tags',
+      ruta: '/promociones',
+      color: 'violeta',
+    },
   ]);
 
   init(): void {
