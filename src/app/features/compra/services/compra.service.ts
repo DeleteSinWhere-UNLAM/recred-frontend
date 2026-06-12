@@ -103,4 +103,10 @@ export class CompraService {
       })
     );
   }
+
+  deliver(purchaseId: string, code: string) {
+    const url = `${environment.apiUrl}/purchases/${purchaseId}/deliver`;
+    return this.http.post<void>(url, { withdrawalCode: code });
+  }
 }
+

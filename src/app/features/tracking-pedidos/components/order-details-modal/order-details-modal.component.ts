@@ -1,16 +1,21 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
+import { CompraService } from '../../../compra/services/compra.service';
 import { ScheduledPickup, EstadoCompra } from '../../models/tracking-pedidos.model';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-order-details-modal',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, DatePipe],
+  imports: [CommonModule, CurrencyPipe, DatePipe, FormsModule],
   templateUrl: './order-details-modal.component.html',
   styleUrl: './order-details-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderDetailsModalComponent {
+  private readonly compraService = inject(CompraService);
+  showVerificationModal: boolean = false;
+  verificationCode: string = '';
   @Input({ required: true }) order!: ScheduledPickup;
   @Input() isUpdating = false;
 
@@ -60,7 +65,9 @@ export class OrderDetailsModalComponent {
     } else if (this.order.status === 'EN_PREPARACION') {
       nextStatus = 'LISTO';
     } else if (this.order.status === 'LISTO') {
-      nextStatus = 'ENTREGADO';
+      // Open verification modal instead of directly advancing
+      this.showVerificationModal = true;
+      return;
     }
 
     if (nextStatus) {
@@ -68,7 +75,21 @@ export class OrderDetailsModalComponent {
     }
   }
 
-  protected onCancel(): void {
+  protected confirmDelivery(): void {
+    if (!this.verificationCode) return;
+    this.compraService.deliver(this.order.id, this.verificationCode).subscribe({
+      next: () => {
+        this.advanceStatus.emit({ orderId: this.order.id, nextStatus: 'ENTREGADO' });
+        this.showVerificationModal = false;
+        this.verificationCode = '';
+      },
+      error: (err) => {
+        alert('Código incorrecto. Intente nuevamente.');
+      }
+    });
+  }
+
+protected onCancel(): void {
     if (this.isUpdating) return;
     if (confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.')) {
       this.cancelOrder.emit(this.order.id);

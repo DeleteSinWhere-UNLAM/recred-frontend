@@ -144,10 +144,12 @@
               </div>
 
               <div class="order-card__details">
-                <div class="order-card__keyword">
-                  <span class="order-card__keyword-label">Clave de Retiro</span>
-                  <span class="order-card__keyword-value">{{ order.withdrawalCode }}</span>
-                </div>
+                @if (order.status === 'ENTREGADO') {
+                  <div class="order-card__keyword">
+                    <span class="order-card__keyword-label">Clave de Retiro</span>
+                    <span class="order-card__keyword-value">{{ order.withdrawalCode }}</span>
+                  </div>
+                }
                 <div class="order-card__total">
                   <span class="order-card__total-label">Total</span>
                   <strong class="order-card__total-value">

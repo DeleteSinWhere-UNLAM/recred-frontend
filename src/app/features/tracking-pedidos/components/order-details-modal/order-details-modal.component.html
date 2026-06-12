@@ -39,13 +39,29 @@
       </section>
 
       <!-- Código de verificación -->
-      <section class="modal-section modal-section--keyword" aria-labelledby="keyword-title">
-        <h3 id="keyword-title" class="modal-section__title">Clave de Retiro</h3>
-        <div class="keyword-badge">
-          <i class="fa-solid fa-key keyword-badge__icon"></i>
-          <span class="keyword-badge__code">{{ order.withdrawalCode || 'SIN CLAVE' }}</span>
-        </div>
-      </section>
+        <!-- Clave de retiro ocultada por seguridad -->
+        @if (order.status === 'ENTREGADO') {
+          <section class="modal-section modal-section--keyword" aria-labelledby="keyword-title">
+            <h3 id="keyword-title" class="modal-section__title">Clave de Retiro</h3>
+            <div class="keyword-badge">
+              <i class="fa-solid fa-key keyword-badge__icon"></i>
+              <span class="keyword-badge__code">{{ order.withdrawalCode || 'SIN CLAVE' }}</span>
+            </div>
+          </section>
+        }
+        <!-- Modal de verificación al entregar pedido -->
+        @if (order.status === 'LISTO' && showVerificationModal) {
+          <section class="modal-section" aria-labelledby="verification-title">
+            <h3 id="verification-title" class="modal-section__title">Confirmar entrega</h3>
+            <div class="input-group">
+              <label for="code-input" class="input-label">Código de retiro</label>
+              <input id="code-input" type="text" [(ngModel)]="verificationCode" class="input-field" placeholder="Ingrese la clave" />
+            </div>
+            <button class="modal-btn modal-btn--primary" (click)="confirmDelivery()" [disabled]="!verificationCode || isUpdating">
+              <i class="fa-solid fa-circle-check"></i> Confirmar entrega
+            </button>
+          </section>
+        }
 
       <!-- Detalle de productos -->
       <section class="modal-section" aria-labelledby="products-title">
