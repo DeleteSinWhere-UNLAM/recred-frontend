@@ -180,13 +180,18 @@
               <div class="movimientos__card-body">
                 <div class="movimientos__card-row">
                   <h3 class="movimientos__card-nombre">{{ getNombreAlumno(mov.studentId) }}</h3>
-                  <span class="movimientos__card-fecha">{{ formatearFecha(mov.date) }}</span>
+                  <span class="movimientos__card-fecha">{{ mostrarFecha(mov) }}</span>
                 </div>
                 <p class="movimientos__card-resumen">
                   @for (item of mov.items; track item.productId; let last = $last) {
                     <span class="movimientos__card-item">{{ item.quantity }}x {{ item.productName }}</span>{{ !last ? ', ' : '' }}
                   }
                 </p>
+                @if (mov.tipo === 'ANTICIPADA' && mov.withdrawalCode) {
+                  <p class="movimientos__card-clave" style="margin-top: 4px; font-size: 0.85rem; color: #7f8c8d;">
+                    Clave de retiro: <strong style="color: #e67e22;">{{ mov.withdrawalCode }}</strong>
+                  </p>
+                }
               </div>
 
               <div class="movimientos__card-right">
@@ -214,6 +219,7 @@
   <app-movimiento-detalle-modal
     [movimiento]="mov"
     [nombreAlumno]="getNombreAlumno(mov.studentId)"
+    [esVistaAlumno]="esVistaAlumno()"
     (cerrar)="cerrarDetalle()"
   />
 }

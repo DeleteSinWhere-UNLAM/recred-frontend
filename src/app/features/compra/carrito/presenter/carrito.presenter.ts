@@ -494,7 +494,7 @@ export class CarritoPresenter {
       }
     }
     
-    let candidate = new Date(now);
+    const candidate = new Date(now);
     if (startFromTomorrow) {
       candidate.setDate(candidate.getDate() + 1);
     }

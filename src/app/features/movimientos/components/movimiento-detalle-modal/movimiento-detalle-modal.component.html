@@ -18,23 +18,33 @@
       <div class="mov-modal__section mov-modal__section--info">
         <div class="mov-modal__info-grid">
           <div>
-            <span class="mov-modal__label">Fecha y Hora</span>
-            <span class="mov-modal__value">{{ formatearFecha(movimiento.date) }}</span>
+            <span class="mov-modal__label">{{ movimiento.tipo === 'ANTICIPADA' ? 'Fecha de Retiro' : 'Fecha y Hora' }}</span>
+            <span class="mov-modal__value">{{ mostrarFecha(movimiento) }}</span>
           </div>
           <div>
             <span class="mov-modal__label">Alumno</span>
             <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
           </div>
-          <div>
-            <span class="mov-modal__label">Medio de Pago</span>
-            <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
-          </div>
+          @if (esVistaAlumno) {
+            <div>
+              <span class="mov-modal__label">Medio de Pago</span>
+              <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
+            </div>
+          }
           <div>
             <span class="mov-modal__label">Estado</span>
             <span class="mov-modal__badge" [attr.data-status]="movimiento.status">
               {{ movimiento.statusLabel || movimiento.status }}
             </span>
           </div>
+          @if (movimiento.tipo === 'ANTICIPADA' && movimiento.withdrawalCode) {
+            <div>
+              <span class="mov-modal__label">Clave de Retiro</span>
+              <span class="mov-modal__value" style="font-weight: bold; color: #e67e22;">
+                {{ movimiento.withdrawalCode }}
+              </span>
+            </div>
+          }
         </div>
       </div>
 

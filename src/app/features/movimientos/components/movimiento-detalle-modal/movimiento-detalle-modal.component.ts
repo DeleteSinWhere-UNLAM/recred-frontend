@@ -10,6 +10,7 @@ import { Movimiento } from '../../models/movimiento.model';
 export class MovimientoDetalleModalComponent {
   @Input({ required: true }) movimiento!: Movimiento;
   @Input() nombreAlumno = '';
+  @Input() esVistaAlumno = false;
   @Output() cerrar = new EventEmitter<void>();
 
   onCerrar(): void {
@@ -44,5 +45,22 @@ export class MovimientoDetalleModalComponent {
       dateStyle: 'medium',
       timeStyle: 'short',
     }).format(date);
+  }
+
+  mostrarFecha(mov: Movimiento): string {
+    if (mov.tipo === 'ANTICIPADA' && mov.pickupDate) {
+      const parts = mov.pickupDate.split('-');
+      let dateStr = mov.pickupDate;
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const d = new Date(year, month, day);
+        dateStr = new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium' }).format(d);
+      }
+      const slot = mov.pickupSlotDescription ? ` - ${mov.pickupSlotDescription}` : '';
+      return `${dateStr}${slot}`;
+    }
+    return this.formatearFecha(mov.date);
   }
 }
