@@ -14,6 +14,7 @@ import { RestriccionesHorariasService } from '../../../restricciones-horarias/se
 import { FranjasHorariasService } from '../../../restricciones-horarias/services/franjas-horarias.service';
 import { BuffetService } from '../../../buffet/services/buffet.service';
 import { firstValueFrom } from 'rxjs';
+import { RestriccionHoraria, TimeSlot } from '../../../restricciones-horarias/models/restriccion-horaria.model';
 
 export interface GrupoCarrito {
   alumno: Alumno;
@@ -28,6 +29,7 @@ export interface RecreoOpcion {
   recreo: Recreo;
   descripcion: string;
   bloqueado: boolean;
+  motivo?: 'tutor' | 'tiempo';
 }
 
 @Injectable()
@@ -44,11 +46,106 @@ export class CarritoPresenter {
   private readonly seleccionState = signal<Record<string, boolean>>({});
   private readonly fechasState = signal<Record<string, string>>({});
   private readonly recreosState = signal<Record<string, Recreo>>({});
-  private readonly blockedRecreosState = signal<Record<string, Recreo[]>>({});
-  private readonly recreosDisponiblesState = signal<Record<string, RecreoOpcion[]>>({});
+  private readonly franjasMap = signal<Record<string, TimeSlot[]>>({});
+  private readonly restriccionesMap = signal<Record<string, RestriccionHoraria[]>>({});
 
-  readonly blockedRecreos = this.blockedRecreosState.asReadonly();
-  readonly recreosDisponiblesMap = this.recreosDisponiblesState.asReadonly();
+  readonly recreosDisponiblesMap = computed(() => {
+    const dates = this.fechasState();
+    const franjas = this.franjasMap();
+    const restricciones = this.restriccionesMap();
+    const result: Record<string, RecreoOpcion[]> = {};
+
+    const itemsPorAlumno = this.carritoService.itemsPorAlumno();
+    for (const alumnoId of itemsPorAlumno.keys()) {
+      const slots = franjas[alumnoId] || [];
+      const studentRestrictions = restricciones[alumnoId] || [];
+      const selectedDateStr = dates[alumnoId] || this.fechaMinima;
+
+      const generalRestrictions = studentRestrictions.filter(
+        (r) =>
+          r.activa !== false &&
+          !r.categoryId &&
+          !r.classificationId &&
+          !r.categoria &&
+          !r.clasificacionSalud,
+      );
+
+      const sortedSlots = [...slots].sort((a, b) =>
+        (a.horaInicio || '').localeCompare(b.horaInicio || ''),
+      );
+      const options: RecreoOpcion[] = [];
+      const recreosPosibles: Recreo[] = [
+        'PRIMER_RECREO',
+        'SEGUNDO_RECREO',
+        'MEDIODIA',
+        'FUERA_HORA',
+      ];
+
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+
+      for (const slot of sortedSlots) {
+        let matchedRecreo: Recreo | undefined;
+        for (const rec of recreosPosibles) {
+          if (this.matchesDescription(slot.descripcion, rec)) {
+            matchedRecreo = rec;
+            break;
+          }
+        }
+
+        if (!matchedRecreo) {
+          const idx = sortedSlots.indexOf(slot);
+          if (idx >= 0 && idx < recreosPosibles.length) {
+            matchedRecreo = recreosPosibles[idx];
+          }
+        }
+
+        if (matchedRecreo) {
+          let isBlocked = generalRestrictions.some(
+            (r) => r.franjaHoraria?.id === slot.id || r.timeSlotId === slot.id,
+          );
+          let motivo: 'tutor' | 'tiempo' = 'tutor';
+
+          if (selectedDateStr === todayStr && slot.horaInicio) {
+            const [hours, minutes] = slot.horaInicio.split(':').map(Number);
+            const slotTime = new Date(now);
+            slotTime.setHours(hours, minutes, 0, 0);
+
+            const diffMs = slotTime.getTime() - now.getTime();
+            if (diffMs <= 3600000) {
+              isBlocked = true;
+              motivo = 'tiempo';
+            }
+          }
+
+          if (!options.some((o) => o.recreo === matchedRecreo)) {
+            options.push({
+              recreo: matchedRecreo,
+              descripcion: slot.descripcion,
+              bloqueado: isBlocked,
+              motivo: isBlocked ? motivo : undefined,
+            });
+          }
+        }
+      }
+      result[alumnoId] = options;
+    }
+    return result;
+  });
+
+  readonly blockedRecreos = computed(() => {
+    const disponiblesMap = this.recreosDisponiblesMap();
+    const result: Record<string, Recreo[]> = {};
+    for (const [alumnoId, options] of Object.entries(disponiblesMap)) {
+      result[alumnoId] = options
+        .filter((o) => o.bloqueado)
+        .map((o) => o.recreo);
+    }
+    return result;
+  });
 
   readonly fechaMinima = this.calcularFechaMinima();
 
@@ -103,11 +200,34 @@ export class CarritoPresenter {
     });
   });
 
-  readonly avanzarPosible = computed(
-    () => this.haySeleccion() && !this.hayFechaFaltante() && !this.hayRecreoBloqueadoSeleccionado(),
-  );
+  readonly avanzarPosible = computed(() => {
+    if (
+      !this.haySeleccion() ||
+      this.hayFechaFaltante() ||
+      this.hayRecreoBloqueadoSeleccionado()
+    ) {
+      return false;
+    }
+    const hoyStr = this.fechaMinima;
+    for (const g of this.grupos()) {
+      if (g.seleccionado && g.fecha < hoyStr) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   readonly advertencia = computed<string | null>(() => {
+    const conFechaPasada = this.grupos().filter(
+      (g) => g.seleccionado && g.fecha && g.fecha < this.fechaMinima,
+    );
+    if (conFechaPasada.length > 0) {
+      if (conFechaPasada.length === 1) {
+        return `La fecha seleccionada para ${conFechaPasada[0].alumno.nombre} es anterior a la fecha actual.`;
+      }
+      return `Hay alumnos con fechas seleccionadas anteriores a la fecha actual.`;
+    }
+
     const conDeuda = this.grupos().filter(
       (g) => g.seleccionado && g.alumno.saldo < g.subtotal,
     );
@@ -119,9 +239,24 @@ export class CarritoPresenter {
     }
 
     const conRecreoBloqueado = this.grupos().filter(
-      g => g.seleccionado && (this.blockedRecreos()[g.alumno.id] || []).includes(g.recreo)
+      (g) =>
+        g.seleccionado &&
+        (this.blockedRecreos()[g.alumno.id] || []).includes(g.recreo),
     );
     if (conRecreoBloqueado.length > 0) {
+      const alumnoId = conRecreoBloqueado[0].alumno.id;
+      const options = this.recreosDisponiblesMap()[alumnoId] || [];
+      const selectedOption = options.find(
+        (o) => o.recreo === conRecreoBloqueado[0].recreo,
+      );
+
+      if (selectedOption?.motivo === 'tiempo') {
+        if (conRecreoBloqueado.length === 1) {
+          return `Falta una hora o menos para el recreo seleccionado de ${conRecreoBloqueado[0].alumno.nombre}.`;
+        }
+        return `Hay recreos seleccionados para los cuales falta una hora o menos.`;
+      }
+
       if (conRecreoBloqueado.length === 1) {
         return `${conRecreoBloqueado[0].alumno.nombre} tiene bloqueadas todas las compras en el recreo seleccionado.`;
       }
@@ -140,6 +275,12 @@ export class CarritoPresenter {
 
   setFecha(alumnoId: string, fecha: string): void {
     this.fechasState.update((actual) => ({ ...actual, [alumnoId]: fecha }));
+    setTimeout(() => {
+      this.ajustarRecreosSeleccionados(
+        this.blockedRecreos(),
+        this.recreosDisponiblesMap(),
+      );
+    });
   }
 
   setRecreo(alumnoId: string, recreo: Recreo): void {
@@ -191,89 +332,56 @@ export class CarritoPresenter {
     const mapa = this.carritoService.itemsPorAlumno();
     const studentIds = Array.from(mapa.keys());
     
-    const disponiblesMap: Record<string, RecreoOpcion[]> = {};
-    const blockedMap: Record<string, Recreo[]> = {};
-    
+    const franjasRecord: Record<string, TimeSlot[]> = {};
+    const restriccionesRecord: Record<string, RestriccionHoraria[]> = {};
+
     await Promise.all(
       studentIds.map(async (alumnoId) => {
         const alumno = this.alumnosService.getAlumnoById(alumnoId);
         if (!alumno) return;
 
         try {
-          const buffet = this.buffetService.getBuffetDelAlumno(alumno.colegioId);
+          const buffet = this.buffetService.getBuffetDelAlumno(
+            alumno.colegioId,
+          );
           if (buffet) {
             const products = await firstValueFrom(
-              this.buffetService.getProductosDelBuffet(buffet.id, alumnoId)
+              this.buffetService.getProductosDelBuffet(buffet.id, alumnoId),
             );
             this.carritoService.setCatalog(products);
           }
           await this.carritoService.cargarPresupuestoYConsumo(alumnoId);
         } catch (error) {
-          console.error(`Error loading catalog/budget for student ${alumnoId}:`, error);
+          console.error(
+            `Error loading catalog/budget for student ${alumnoId}:`,
+            error,
+          );
         }
-        
+
         try {
           const [restricciones, franjas] = await Promise.all([
             this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
-            this.franjasService.getFranjasHorarias(alumno.colegioId)
+            this.franjasService.getFranjasHorarias(alumno.colegioId),
           ]);
-          
-          const generalRestrictions = restricciones.filter(
-            r => r.activa !== false && !r.categoryId && !r.classificationId && !r.categoria && !r.clasificacionSalud
-          );
-          
-          const sortedSlots = [...franjas].sort((a, b) => (a.horaInicio || '').localeCompare(b.horaInicio || ''));
-          
-          const options: RecreoOpcion[] = [];
-          const blockedList: Recreo[] = [];
-          const recreosPosibles: Recreo[] = ['PRIMER_RECREO', 'SEGUNDO_RECREO', 'MEDIODIA', 'FUERA_HORA'];
-          
-          for (const slot of sortedSlots) {
-            let matchedRecreo: Recreo | undefined;
-            for (const rec of recreosPosibles) {
-              if (this.matchesDescription(slot.descripcion, rec)) {
-                matchedRecreo = rec;
-                break;
-              }
-            }
-            
-            if (!matchedRecreo) {
-              const idx = sortedSlots.indexOf(slot);
-              if (idx >= 0 && idx < recreosPosibles.length) {
-                matchedRecreo = recreosPosibles[idx];
-              }
-            }
-            
-            if (matchedRecreo) {
-              const isBlocked = generalRestrictions.some(r => 
-                r.franjaHoraria?.id === slot.id || r.timeSlotId === slot.id
-              );
-              
-              if (isBlocked) {
-                blockedList.push(matchedRecreo);
-              }
-              
-              if (!options.some(o => o.recreo === matchedRecreo)) {
-                options.push({
-                  recreo: matchedRecreo,
-                  descripcion: slot.descripcion,
-                  bloqueado: isBlocked
-                });
-              }
-            }
-          }
-          
-          disponiblesMap[alumnoId] = options;
-          blockedMap[alumnoId] = blockedList;
+
+          franjasRecord[alumnoId] = franjas;
+          restriccionesRecord[alumnoId] = restricciones;
         } catch (error) {
-          console.error(`Error al cargar recreos para el alumno ${alumnoId}:`, error);
+          console.error(
+            `Error al cargar recreos para el alumno ${alumnoId}:`,
+            error,
+          );
         }
-      })
+      }),
     );
-    
-    this.recreosDisponiblesState.set(disponiblesMap);
-    this.blockedRecreosState.set(blockedMap);
-    this.ajustarRecreosSeleccionados(blockedMap, disponiblesMap);
+
+    this.franjasMap.set(franjasRecord);
+    this.restriccionesMap.set(restriccionesRecord);
+
+    this.ajustarRecreosSeleccionados(
+      this.blockedRecreos(),
+      this.recreosDisponiblesMap(),
+    );
   }
 
   private matchesDescription(slotDescripcion: string, recreo: Recreo): boolean {

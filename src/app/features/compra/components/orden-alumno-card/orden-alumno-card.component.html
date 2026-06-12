@@ -76,7 +76,7 @@
         >
           @for (opc of recreosDisponibles; track opc.recreo) {
             <option [value]="opc.recreo" [disabled]="opc.bloqueado">
-              {{ opc.descripcion }}{{ opc.bloqueado ? ' (Bloqueado)' : '' }}
+              {{ opc.descripcion }}{{ opc.bloqueado ? (opc.motivo === 'tiempo' ? ' (No disponible - Falta menos de 1 hora)' : ' (Bloqueado)') : '' }}
             </option>
           }
         </select>
