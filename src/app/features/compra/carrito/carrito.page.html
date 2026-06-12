@@ -42,6 +42,7 @@
               [seleccionado]="grupo.seleccionado"
               [fecha]="grupo.fecha"
               [recreo]="grupo.recreo"
+              [recreosDisponibles]="presenter.recreosDisponiblesMap()[grupo.alumno.id] || []"
               [fechaMinima]="presenter.fechaMinima"
               (toggleSeleccion)="presenter.toggleSeleccion(grupo.alumno.id)"
               (fechaCambia)="presenter.setFecha(grupo.alumno.id, $event)"

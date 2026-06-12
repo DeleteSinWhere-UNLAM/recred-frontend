@@ -32,6 +32,11 @@ export class RestriccionesHorariasPage implements OnInit {
   agregar(franjaId: string, seleccion: string): void {
     if (!seleccion) return;
     
+    if (seleccion === 'ALL:all') {
+      this.presenter.agregarRestriccion(franjaId, 'TOTAL');
+      return;
+    }
+
     const [tipoPrefix, valorId] = seleccion.split(':');
     const tipo = tipoPrefix === 'CAT' ? 'CATEGORIA' : 'SALUD';
     

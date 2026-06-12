@@ -74,10 +74,11 @@
           [value]="recreo"
           (change)="onRecreoCambia($event)"
         >
-          <option value="PRIMER_RECREO">1er Recreo</option>
-          <option value="SEGUNDO_RECREO">2do Recreo</option>
-          <option value="MEDIODIA">Mediodía</option>
-          <option value="FUERA_HORA">Fuera de hora</option>
+          @for (opc of recreosDisponibles; track opc.recreo) {
+            <option [value]="opc.recreo" [disabled]="opc.bloqueado">
+              {{ opc.descripcion }}{{ opc.bloqueado ? ' (Bloqueado)' : '' }}
+            </option>
+          }
         </select>
       </label>
     </div>

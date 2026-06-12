@@ -15,6 +15,7 @@ export interface FranjaConRestricciones {
   restricciones: RestriccionHoraria[];
   categoriasDisponibles: CategoriaProducto[];
   saludDisponible: ClasificacionSaludBackend[];
+  tieneBloqueoTotal: boolean;
 }
 
 @Injectable()
@@ -68,11 +69,16 @@ export class RestriccionesHorariasPresenter {
         !deEstaFranja.some(r => r.clasificacionSalud?.id === salud.id || r.classificationId === salud.id)
       );
 
+      const tieneBloqueoTotal = deEstaFranja.some(r => 
+        !r.categoryId && !r.classificationId && !r.categoria && !r.clasificacionSalud
+      );
+
       return {
         franja,
         restricciones: deEstaFranja,
         categoriasDisponibles,
-        saludDisponible
+        saludDisponible,
+        tieneBloqueoTotal
       };
     });
   });
@@ -107,7 +113,7 @@ export class RestriccionesHorariasPresenter {
     }
   }
 
-  async agregarRestriccion(franjaId: string, tipo: 'CATEGORIA' | 'SALUD', valorId: string): Promise<void> {
+  async agregarRestriccion(franjaId: string, tipo: 'CATEGORIA' | 'SALUD' | 'TOTAL', valorId?: string | null): Promise<void> {
     const alumno = this.alumnoState();
     if (!alumno) return;
 
@@ -116,8 +122,8 @@ export class RestriccionesHorariasPresenter {
       await this.restriccionesService.crearRestriccion({
         studentId: alumno.id,
         timeSlotId: franjaId,
-        categoryId: tipo === 'CATEGORIA' ? valorId : null,
-        classificationId: tipo === 'SALUD' ? valorId : null
+        categoryId: tipo === 'CATEGORIA' ? (valorId || null) : null,
+        classificationId: tipo === 'SALUD' ? (valorId || null) : null
       });
 
       const actualizadas = await this.restriccionesService.getRestriccionesPorAlumno(alumno.id);
