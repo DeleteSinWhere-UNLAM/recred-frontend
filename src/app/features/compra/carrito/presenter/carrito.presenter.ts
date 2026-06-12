@@ -52,7 +52,6 @@ export class CarritoPresenter {
   private readonly router = inject(Router);
   private readonly restriccionesService = inject(RestriccionesHorariasService);
   private readonly franjasService = inject(FranjasHorariasService);
-  private readonly buffetService = inject(BuffetService);
 
   private readonly seleccionState = signal<Record<string, boolean>>({});
   private readonly fechasState = signal<Record<string, string>>({});

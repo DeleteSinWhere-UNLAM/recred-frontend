@@ -1,11 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { CompraService } from './compra.service';
 import { OrdenAlumno } from '../models/orden-compra.model';
-
 import { Alumno } from '../../../data-access/models/alumno.model';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 
 describe('CompraService', () => {
   let service: CompraService;
+  let httpMock: HttpTestingController;
+  let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
 
   const mockOrdenes: OrdenAlumno[] = [
     {
@@ -18,8 +25,26 @@ describe('CompraService', () => {
   ];
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    const perfilSpy = jasmine.createSpyObj<PerfilService>('PerfilService', [
+      'getPerfil',
+    ]);
+
+    TestBed.configureTestingModule({
+      providers: [
+        CompraService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: PerfilService, useValue: perfilSpy },
+      ]
+    });
+
     service = TestBed.inject(CompraService);
+    httpMock = TestBed.inject(HttpTestingController);
+    perfilServiceSpy = TestBed.inject(PerfilService) as jasmine.SpyObj<PerfilService>;
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   it('should be created', () => {
