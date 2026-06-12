@@ -101,7 +101,7 @@ export class CrearHijoPage implements OnInit {
       username,
       email,
       dni,
-      gradoId: null,
+      gradoId: 'd65d48fc-95e8-46b0-868c-c593a95e14e3',
     });
   }
 
