@@ -149,6 +149,18 @@ export class CarritoPresenter {
 
   readonly fechaMinima = this.calcularFechaMinima();
 
+  readonly fechaMinimaMap = computed(() => {
+    const franjas = this.franjasMap();
+    const result: Record<string, string> = {};
+    const itemsPorAlumno = this.carritoService.itemsPorAlumno();
+
+    for (const alumnoId of itemsPorAlumno.keys()) {
+      const slots = franjas[alumnoId] || [];
+      result[alumnoId] = this.calcularFechaMinimaParaAlumno(slots);
+    }
+    return result;
+  });
+
   readonly grupos: Signal<GrupoCarrito[]> = computed(() => {
     const mapa = this.carritoService.itemsPorAlumno();
     const seleccion = this.seleccionState();
@@ -168,7 +180,7 @@ export class CarritoPresenter {
         items,
         subtotal,
         seleccionado: seleccion[alumnoId] ?? true,
-        fecha: fechas[alumnoId] ?? this.fechaMinima,
+        fecha: fechas[alumnoId] ?? (this.fechaMinimaMap()[alumnoId] || this.fechaMinima),
         recreo: recreos[alumnoId] ?? 'PRIMER_RECREO',
       });
     }
@@ -208,24 +220,34 @@ export class CarritoPresenter {
     ) {
       return false;
     }
-    const hoyStr = this.fechaMinima;
     for (const g of this.grupos()) {
-      if (g.seleccionado && g.fecha < hoyStr) {
-        return false;
+      if (g.seleccionado) {
+        const studentMin = this.fechaMinimaMap()[g.alumno.id] || this.fechaMinima;
+        if (g.fecha < studentMin || this.esFinDeSemana(g.fecha)) {
+          return false;
+        }
       }
     }
     return true;
   });
 
   readonly advertencia = computed<string | null>(() => {
-    const conFechaPasada = this.grupos().filter(
-      (g) => g.seleccionado && g.fecha && g.fecha < this.fechaMinima,
-    );
-    if (conFechaPasada.length > 0) {
-      if (conFechaPasada.length === 1) {
-        return `La fecha seleccionada para ${conFechaPasada[0].alumno.nombre} es anterior a la fecha actual.`;
+    const conFechaInvalida = this.grupos().filter((g) => {
+      if (!g.seleccionado || !g.fecha) return false;
+      const studentMin = this.fechaMinimaMap()[g.alumno.id] || this.fechaMinima;
+      return g.fecha < studentMin || this.esFinDeSemana(g.fecha);
+    });
+
+    if (conFechaInvalida.length > 0) {
+      const g = conFechaInvalida[0];
+      const isWeekend = this.esFinDeSemana(g.fecha);
+      if (conFechaInvalida.length === 1) {
+        if (isWeekend) {
+          return `La fecha seleccionada para ${g.alumno.nombre} corresponde a un fin de semana.`;
+        }
+        return `La fecha seleccionada para ${g.alumno.nombre} no está permitida o es anterior a la fecha actual.`;
       }
-      return `Hay alumnos con fechas seleccionadas anteriores a la fecha actual.`;
+      return `Hay alumnos con fechas seleccionadas inválidas (anteriores a la actual o fin de semana).`;
     }
 
     const conDeuda = this.grupos().filter(
@@ -274,7 +296,15 @@ export class CarritoPresenter {
   }
 
   setFecha(alumnoId: string, fecha: string): void {
-    this.fechasState.update((actual) => ({ ...actual, [alumnoId]: fecha }));
+    const minDate = this.fechaMinimaMap()[alumnoId] || this.fechaMinima;
+    let adjustedFecha = fecha;
+    if (fecha < minDate) {
+      adjustedFecha = minDate;
+    }
+    if (this.esFinDeSemana(adjustedFecha)) {
+      adjustedFecha = this.siguienteDiaHabilDesdeString(adjustedFecha);
+    }
+    this.fechasState.update((actual) => ({ ...actual, [alumnoId]: adjustedFecha }));
     setTimeout(() => {
       this.ajustarRecreosSeleccionados(
         this.blockedRecreos(),
@@ -319,11 +349,18 @@ export class CarritoPresenter {
   }
 
   private calcularFechaMinima(): string {
-    // TODO: validar feriados/fines de semana cuando exista endpoint
-    const hoy = new Date();
-    const yyyy = hoy.getFullYear();
-    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
-    const dd = String(hoy.getDate()).padStart(2, '0');
+    const candidate = new Date();
+    while (true) {
+      const day = candidate.getDay();
+      if (day === 0 || day === 6) {
+        candidate.setDate(candidate.getDate() + 1);
+      } else {
+        break;
+      }
+    }
+    const yyyy = candidate.getFullYear();
+    const mm = String(candidate.getMonth() + 1).padStart(2, '0');
+    const dd = String(candidate.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   }
 
@@ -378,6 +415,7 @@ export class CarritoPresenter {
     this.franjasMap.set(franjasRecord);
     this.restriccionesMap.set(restriccionesRecord);
 
+    this.ajustarFechasIniciales();
     this.ajustarRecreosSeleccionados(
       this.blockedRecreos(),
       this.recreosDisponiblesMap(),
@@ -428,5 +466,85 @@ export class CarritoPresenter {
     if (changed) {
       this.recreosState.set(actualRecreos);
     }
+  }
+
+  private calcularFechaMinimaParaAlumno(slots: TimeSlot[]): string {
+    const now = new Date();
+    let startFromTomorrow = false;
+    
+    if (slots.length > 0) {
+      const sortedSlots = [...slots].sort((a, b) =>
+        (a.horaFin || '').localeCompare(b.horaFin || '')
+      );
+      const lastSlot = sortedSlots[sortedSlots.length - 1];
+      if (lastSlot && lastSlot.horaFin) {
+        const [hours, minutes] = lastSlot.horaFin.split(':').map(Number);
+        const slotEndTime = new Date(now);
+        slotEndTime.setHours(hours, minutes, 0, 0);
+        
+        if (now.getTime() >= slotEndTime.getTime()) {
+          startFromTomorrow = true;
+        }
+      }
+    }
+    
+    let candidate = new Date(now);
+    if (startFromTomorrow) {
+      candidate.setDate(candidate.getDate() + 1);
+    }
+    
+    while (true) {
+      const day = candidate.getDay();
+      if (day === 0 || day === 6) {
+        candidate.setDate(candidate.getDate() + 1);
+      } else {
+        break;
+      }
+    }
+    
+    const yyyy = candidate.getFullYear();
+    const mm = String(candidate.getMonth() + 1).padStart(2, '0');
+    const dd = String(candidate.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private ajustarFechasIniciales(): void {
+    const actualFechas = { ...this.fechasState() };
+    const minMap = this.fechaMinimaMap();
+    let changed = false;
+
+    for (const [alumnoId, minDate] of Object.entries(minMap)) {
+      const current = actualFechas[alumnoId];
+      if (!current || current < minDate || this.esFinDeSemana(current)) {
+        actualFechas[alumnoId] = minDate;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      this.fechasState.set(actualFechas);
+    }
+  }
+
+  private esFinDeSemana(fechaStr: string): boolean {
+    if (!fechaStr) return false;
+    const dateObj = new Date(fechaStr + 'T00:00:00');
+    const day = dateObj.getDay();
+    return day === 0 || day === 6;
+  }
+
+  private siguienteDiaHabilDesdeString(fechaStr: string): string {
+    const dateObj = new Date(fechaStr + 'T00:00:00');
+    while (true) {
+      dateObj.setDate(dateObj.getDate() + 1);
+      const day = dateObj.getDay();
+      if (day !== 0 && day !== 6) {
+        break;
+      }
+    }
+    const yyyy = dateObj.getFullYear();
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 }
