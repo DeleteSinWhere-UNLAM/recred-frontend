@@ -9,6 +9,7 @@ import {
 import { SugerenciasCarritoComponent } from '../components/sugerencias-carrito/sugerencias-carrito.component';
 import { CarritoPresenter } from './presenter/carrito.presenter';
 import { GuardarFavoritoModalComponent } from '../components/guardar-favorito-modal/guardar-favorito-modal.component';
+import { ItemCarrito } from '../models/carrito.model';
 
 @Component({
   selector: 'app-carrito-page',
@@ -47,7 +48,7 @@ export class CarritoPage implements OnInit {
     })),
   );
 
-  abrirModalFavorito(alumnoId: string, items: any[]): void {
+  abrirModalFavorito(alumnoId: string, items: ItemCarrito[]): void {
     this.favoritoModalAlumnoId = alumnoId;
     this.favoritoModalItems = items.map((i) => ({
       productId: i.producto.id,

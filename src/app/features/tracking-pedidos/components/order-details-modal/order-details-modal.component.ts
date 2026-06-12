@@ -14,8 +14,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class OrderDetailsModalComponent {
   private readonly compraService = inject(CompraService);
-  showVerificationModal: boolean = false;
-  verificationCode: string = '';
+  showVerificationModal = false;
+  verificationCode = '';
   @Input({ required: true }) order!: ScheduledPickup;
   @Input() isUpdating = false;
 
@@ -83,7 +83,7 @@ export class OrderDetailsModalComponent {
         this.showVerificationModal = false;
         this.verificationCode = '';
       },
-      error: (err) => {
+      error: () => {
         alert('Código incorrecto. Intente nuevamente.');
       }
     });
