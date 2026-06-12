@@ -1,7 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from '../services/product.service';
-import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+import { Product } from '../models/product.interface';
+import { CreateProductRequest } from '../models/requests/create-product-request.interface';
+import { UpdateProductRequest } from '../models/requests/update-product-request.interface';
 import { Category } from '../models/category.interface';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
