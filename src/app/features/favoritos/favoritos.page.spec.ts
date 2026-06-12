@@ -38,7 +38,6 @@ describe('FavoritosPage', () => {
     perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerAlumnoId']);
     toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
 
-    // Mocks por defecto
     perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-123');
     favoritosServiceSpy.getFavoritos.and.returnValue(of([mockProducto]));
 

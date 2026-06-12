@@ -70,7 +70,6 @@ describe('MovimientosService', () => {
       }
     });
 
-    // No debe disparar llamadas HTTP, por lo que httpMock.verify() al final de beforeEach/afterEach no encontrará llamadas pendientes.
   });
 
   it('getHistorialTutor debería llamar a /purchases/tutor/me', (done) => {

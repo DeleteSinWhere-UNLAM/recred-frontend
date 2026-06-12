@@ -91,7 +91,6 @@ describe('AcreditarMercadoPagoPresenter', () => {
 
   describe('acreditar', () => {
     it('Dado que el estado es cargando, no debería hacer nada al intentar acreditar', async () => {
-      // Forzar estado cargando
       presenter['cargandoState'].set(true);
       await presenter.acreditar(100);
       expect(mockMercadoPagoService.generarLinkPago).not.toHaveBeenCalled();

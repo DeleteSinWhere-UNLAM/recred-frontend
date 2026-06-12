@@ -90,7 +90,6 @@ describe('MovimientosPage', () => {
       'obtenerAlumnoId',
     ]);
 
-    // Configurar Mocks
     alumnosServiceSpy.asegurarCargados.and.resolveTo([mockAlumno1, mockAlumno2]);
     Object.defineProperty(alumnosServiceSpy, 'alumnos', {
       value: signal([mockAlumno1, mockAlumno2]),
@@ -151,8 +150,6 @@ describe('MovimientosPage', () => {
       expect(component.selectedAlumnoId()).toBe('todos');
       expect(movimientosServiceSpy.getHistorialTutor).toHaveBeenCalled();
       expect(component.cargando()).toBeFalse();
-      // Debería ordenar los movimientos descendentemente por fecha
-      // Fechas: mov-2 (07-06), mov-3 (06-06), mov-1 (05-06)
       expect(component.rawMovimientos()[0].id).toBe('mov-2');
       expect(component.rawMovimientos()[1].id).toBe('mov-3');
       expect(component.rawMovimientos()[2].id).toBe('mov-1');
@@ -167,7 +164,6 @@ describe('MovimientosPage', () => {
       expect(movimientosServiceSpy.getHistorialAlumno).toHaveBeenCalledWith('alumno-1');
       expect(component.cargando()).toBeFalse();
       expect(component.rawMovimientos().length).toBe(2);
-      // Ordenamiento descendente: mov-3 (06-06) antes que mov-1 (05-06)
       expect(component.rawMovimientos()[0].id).toBe('mov-3');
     }));
 
@@ -202,10 +198,7 @@ describe('MovimientosPage', () => {
     });
 
     it('debería filtrar por fecha desde/hasta', () => {
-      // Movimientos fechas:
-      // mov-1: 2026-06-05
-      // mov-2: 2026-06-07
-      // mov-3: 2026-06-06
+
 
       component.filtroFechaDesde.set('2026-06-06');
       expect(component.movimientosFiltrados().length).toBe(2); // mov-2 y mov-3
@@ -215,16 +208,13 @@ describe('MovimientosPage', () => {
     });
 
     it('debería filtrar por rango de precios', () => {
-      // Precios:
-      // mov-1: 1500
-      // mov-2: 800
-      // mov-3: 2500
+
 
       component.filtroPrecioMin.set(1000);
       expect(component.movimientosFiltrados().length).toBe(2); // mov-1 y mov-3
 
       component.filtroPrecioMax.set(2000);
-      expect(component.movimientosFiltrados().length).toBe(1); // solo mov-1 (1500)
+      expect(component.movimientosFiltrados().length).toBe(1);
     });
 
     it('debería limpiar filtros correctamente', () => {

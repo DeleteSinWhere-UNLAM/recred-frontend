@@ -86,7 +86,6 @@ describe('BuffetPresenter', () => {
       ['bloquearProducto', 'desbloquearProducto']
     );
 
-    // Default setups
     alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
     buffetServiceSpy.getBuffetDelAlumno.and.returnValue(mockBuffet);
     buffetServiceSpy.getProductosDelBuffet.and.returnValue(of(mockProductos));
