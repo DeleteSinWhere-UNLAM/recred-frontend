@@ -220,10 +220,16 @@ export class CarritoPresenter {
     ) {
       return false;
     }
+    const disponiblesMap = this.recreosDisponiblesMap();
     for (const g of this.grupos()) {
       if (g.seleccionado) {
         const studentMin = this.fechaMinimaMap()[g.alumno.id] || this.fechaMinima;
         if (g.fecha < studentMin || this.esFinDeSemana(g.fecha)) {
+          return false;
+        }
+        const options = disponiblesMap[g.alumno.id] || [];
+        const selectedOption = options.find((o) => o.recreo === g.recreo);
+        if (!selectedOption || selectedOption.bloqueado) {
           return false;
         }
       }
