@@ -12,7 +12,6 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 describe('CompraService', () => {
   let service: CompraService;
   let httpMock: HttpTestingController;
-  let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
 
   const mockOrdenes: OrdenAlumno[] = [
     {
@@ -40,7 +39,6 @@ describe('CompraService', () => {
 
     service = TestBed.inject(CompraService);
     httpMock = TestBed.inject(HttpTestingController);
-    perfilServiceSpy = TestBed.inject(PerfilService) as jasmine.SpyObj<PerfilService>;
   });
 
   afterEach(() => {
