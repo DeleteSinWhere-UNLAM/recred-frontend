@@ -453,3 +453,24 @@
   background-color: var(--color-fondo);
 }
 
+.mov-modal__btn--danger {
+  padding: 10px 18px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 750;
+  border-radius: var(--radius-button);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-ui);
+  background-color: transparent;
+  color: var(--color-melocoton);
+  border: 1px solid rgba(231, 111, 81, 0.4);
+  cursor: pointer;
+}
+
+.mov-modal__btn--danger:hover {
+  background-color: rgba(231, 111, 81, 0.08);
+  border-color: var(--color-melocoton);
+}
+

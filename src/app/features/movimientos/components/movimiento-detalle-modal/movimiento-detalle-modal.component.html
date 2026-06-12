@@ -140,6 +140,11 @@
 
     @if (movimiento.tipo === 'ANTICIPADA') {
       <footer class="mov-modal__footer--pedido">
+        @if (puedoCancelar()) {
+          <button type="button" class="mov-modal__btn--danger" (click)="onCancelar()">
+            <i class="fa-solid fa-ban"></i> Cancelar Pedido
+          </button>
+        }
         <button type="button" class="mov-modal__btn--secondary" (click)="onCerrar()">
           Cerrar
         </button>

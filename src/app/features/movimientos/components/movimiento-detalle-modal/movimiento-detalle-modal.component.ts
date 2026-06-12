@@ -12,9 +12,20 @@ export class MovimientoDetalleModalComponent {
   @Input() nombreAlumno = '';
   @Input() esVistaAlumno = false;
   @Output() cerrar = new EventEmitter<void>();
+  @Output() cancelar = new EventEmitter<string>();
 
   onCerrar(): void {
     this.cerrar.emit();
+  }
+
+  puedoCancelar(): boolean {
+    return !this.esVistaAlumno &&
+           this.movimiento.tipo === 'ANTICIPADA' &&
+           (this.movimiento.status === 'PENDIENTE' || this.movimiento.status === 'EN_PREPARACION');
+  }
+
+  onCancelar(): void {
+    this.cancelar.emit(this.movimiento.id);
   }
 
   onOverlayClick(event: MouseEvent): void {
