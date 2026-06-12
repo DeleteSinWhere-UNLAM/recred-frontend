@@ -1,13 +1,24 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { VentaEspontanea } from './venta-espontanea';
+import { VentaEspontaneaService } from './venta-espontanea';
+import { BuffetService } from '../../buffet/services/buffet.service';
 
-describe('VentaEspontanea', () => {
-  let service: VentaEspontanea;
+describe('VentaEspontaneaService', () => {
+  let service: VentaEspontaneaService;
+  let buffetServiceMock: jasmine.SpyObj<BuffetService>;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(VentaEspontanea);
+    buffetServiceMock = jasmine.createSpyObj('BuffetService', ['getProductosDelBuffet']);
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: BuffetService, useValue: buffetServiceMock }
+      ]
+    });
+    service = TestBed.inject(VentaEspontaneaService);
   });
 
   it('should be created', () => {
