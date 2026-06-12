@@ -124,7 +124,6 @@ describe('AlumnosService', () => {
         done();
       });
 
-      // No se debe disparar ningún request HTTP
       httpMock.expectNone(`${environment.apiUrl}/tutores/me/hijos`);
     });
 

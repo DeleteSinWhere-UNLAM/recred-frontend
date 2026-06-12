@@ -129,8 +129,7 @@ export class BuffetPresenter {
 
     this.alumnoState.set(alumno);
     this.buffetState.set(buffet);
-    
-    // Carga dinámica de productos
+
     this.buffetService.getProductosDelBuffet(buffet.id, alumnoId).subscribe({
       next: (productos) => {
         this.productosState.set(productos);
@@ -144,7 +143,6 @@ export class BuffetPresenter {
       }
     });
 
-    // Carga de favoritos del alumno
     this.favoritosService.getFavoritos(alumnoId).subscribe({
       next: (favs) => {
         const ids = new Set(favs.map((f) => f.id));

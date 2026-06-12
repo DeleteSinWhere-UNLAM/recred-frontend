@@ -4,7 +4,18 @@ export interface Sugerencia {
   motivo: string;
 }
 
+export interface PromocionCreada {
+  id: string;
+  name: string;
+  discountPercentage: number;
+  productIds: string[];
+  startDate: string;
+  endDate: string;
+  status: string;
+}
+
 export interface RecomendacionesResponse {
   sugerencias: Sugerencia[];
   tip_promocional?: string;
+  promocion_creada?: PromocionCreada;
 }

@@ -26,7 +26,6 @@ export class PreferenciasPage {
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
 
-    // Cargar sugerencias de la IA
     this.preferenciasService.getPreferencias().subscribe((data) => {
       this.preferencias = data;
     });

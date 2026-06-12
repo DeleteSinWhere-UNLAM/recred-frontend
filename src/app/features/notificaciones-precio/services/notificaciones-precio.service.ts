@@ -13,7 +13,7 @@ export class NotificacionesPrecioService {
 
   getNotificaciones(usuarioId: string): Observable<NotificacionPrecio[]> {
     return this.http.get<NotificacionPrecio[]>(
-      `${this.baseUrl}/usuarios/${usuarioId}/preferencias?tipo=ALERTA_PRECIO&ultima=true`,
+      `${this.baseUrl}/usuarios/${usuarioId}/preferencias?tipo=ALERTA_PRECIO`,
     );
   }
 }

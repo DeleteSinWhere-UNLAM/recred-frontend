@@ -53,6 +53,13 @@ export const routes: Routes = [
           import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
       },
       {
+        path: 'acreditar-mercado-pago/:alumnoId',
+        loadComponent: () =>
+          import('./features/acreditar-mercado-pago/acreditar-mercado-pago.page').then(
+            (m) => m.AcreditarMercadoPagoPage,
+          ),
+      },
+      {
         path: 'presupuesto/:alumnoId',
         loadComponent: () =>
           import('./features/presupuesto/presupuesto.page').then(
@@ -170,6 +177,27 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/notificaciones-precio/notificaciones-precio.page').then(
             (m) => m.NotificacionesPrecioPage,
+          ),
+      },
+      {
+        path: 'resumen-semanal',
+        loadComponent: () =>
+          import('./features/resumen-semanal/resumen-semanal.page').then(
+            (m) => m.ResumenSemanalPage,
+          ),
+      },
+      {
+        path: 'promociones',
+        loadComponent: () =>
+          import('./features/promociones/promociones.page').then(
+            (m) => m.PromocionesPageComponent,
+          ),
+      },
+      {
+        path: 'preferencias-detectadas',
+        loadComponent: () =>
+          import('./features/preferencias-detectadas/preferencias-detectadas.page').then(
+            (m) => m.PreferenciasDetectadasPage,
           ),
       },
     ],

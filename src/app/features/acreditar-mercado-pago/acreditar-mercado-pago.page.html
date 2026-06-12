@@ -1,0 +1,70 @@
+<div class="acreditar-page">
+  <app-navbar title="Acreditar Saldo"></app-navbar>
+
+  <main class="acreditar-page__content">
+    @if (presenter.cargando() && !presenter.alumno()) {
+      <div class="acreditar-page__loading">
+        <i class="fa-solid fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
+        <p>Cargando información...</p>
+      </div>
+    } @else {
+      <header class="acreditar-page__alumno">
+        <div class="acreditar-page__avatar">
+          <span>{{ presenter.iniciales() }}</span>
+        </div>
+        <div class="acreditar-page__alumno-info">
+          <h2>{{ presenter.nombreCompleto() }}</h2>
+          <p>
+            <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+            {{ presenter.grado() }}
+          </p>
+        </div>
+      </header>
+
+      <section class="acreditar-page__form-section">
+        <h3>¿Cuánto querés acreditar?</h3>
+        <p class="acreditar-page__description">
+          Ingresá el monto y te redirigiremos a Mercado Pago para completar la operación.
+        </p>
+
+        <form class="acreditar-page__form" (submit)="onSubmit($event)">
+          <div class="acreditar-page__input-group">
+            <label for="monto">Monto a cargar ($)</label>
+            <input 
+              type="number" 
+              id="monto" 
+              name="monto" 
+              min="1" 
+              step="100"
+              placeholder="Ej: 5000"
+              (input)="onMontoChange($event)"
+              required
+            />
+          </div>
+
+          <div class="acreditar-page__actions">
+            <button 
+              type="button" 
+              class="acreditar-page__btn acreditar-page__btn--secondary"
+              (click)="presenter.volver()"
+              [disabled]="presenter.cargando()"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="acreditar-page__btn acreditar-page__btn--primary"
+              [disabled]="presenter.cargando()"
+            >
+              @if (presenter.cargando()) {
+                <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Procesando...
+              } @else {
+                Continuar a Mercado Pago
+              }
+            </button>
+          </div>
+        </form>
+      </section>
+    }
+  </main>
+</div>

@@ -21,18 +21,29 @@ export class CompraService {
 
   private readonly ordenEnCursoState = signal<OrdenCompra | null>(null);
   private readonly ultimaOrdenState = signal<OrdenCompra | null>(null);
+  private readonly sugerenciaPendienteState = signal<string | null>(null);
 
   readonly ordenEnCurso = this.ordenEnCursoState.asReadonly();
   readonly ultimaOrden = this.ultimaOrdenState.asReadonly();
 
-  iniciarOrden(ordenes: OrdenAlumno[]): void {
+  setSugerenciaPendiente(id: string): void {
+    this.sugerenciaPendienteState.set(id);
+  }
+
+  iniciarOrden(ordenes: OrdenAlumno[], sugerenciaId?: string): void {
     const total = ordenes.reduce((acc, o) => acc + o.subtotal, 0);
+
+    const finalSugerenciaId = sugerenciaId || this.sugerenciaPendienteState();
+
     this.ordenEnCursoState.set({
       id: '',
       ordenes,
       total,
       codigos: {},
+      sugerenciaId: finalSugerenciaId ?? undefined,
     });
+
+    this.sugerenciaPendienteState.set(null);
   }
 
   cancelarOrden(): void {

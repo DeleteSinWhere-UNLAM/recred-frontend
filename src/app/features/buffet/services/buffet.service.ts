@@ -186,6 +186,12 @@ export class BuffetService {
     return this.buffetsPorColegio[colegioId] ?? Object.values(this.buffetsPorColegio)[0];
   }
 
+  obtenerBuffetDelAlumno(alumnoId: string): Observable<Buffet> {
+    return this.http.get<Buffet>(
+      `${environment.apiUrl}/alumnos/${alumnoId}/buffet`,
+    );
+  }
+
   getProductosDelBuffet(buffetId: string, alumnoId?: string): Observable<Producto[]> {
     if (alumnoId && this.isUuid(alumnoId)) {
       return this.http.get<MenuProductoDTO[]>(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).pipe(

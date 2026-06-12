@@ -1,0 +1,100 @@
+import { Component, inject } from '@angular/core';
+
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+
+import { UsuarioService } from '../../data-access/services/usuario.service';
+
+import {
+  HijoResumen,
+  ResumenProcesado,
+  ResumenSemanal,
+} from './models/resumen-semanal.model';
+
+import { ResumenSemanalService } from './services/resumen-semanal.service';
+
+@Component({
+  selector: 'app-resumen-semanal-page',
+  standalone: true,
+  templateUrl: './resumen-semanal.page.html',
+  styleUrl: './resumen-semanal.page.css',
+  imports: [NavbarComponent],
+})
+export class ResumenSemanalPage {
+  private readonly usuarioService = inject(UsuarioService);
+
+  private readonly resumenService = inject(ResumenSemanalService);
+
+  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+
+  resumen?: ResumenSemanal;
+
+  resumenProcesado?: ResumenProcesado;
+
+  hijos: { nombre: string; datos: HijoResumen }[] = [];
+
+  readonly colores = [
+    '#4f46e5',
+    '#22c55e',
+    '#f59e0b',
+    '#ef4444',
+    '#06b6d4',
+    '#8b5cf6',
+    '#84cc16',
+    '#f97316',
+    '#ec4899',
+    '#14b8a6',
+  ];
+
+  constructor() {
+    const perfilRaw = localStorage.getItem('recred.perfil');
+
+    const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
+
+    if (usuarioId) {
+      this.resumenService.getResumen(usuarioId).subscribe((data) => {
+        this.resumen = data;
+
+        const resumenInterno = JSON.parse(data.resumen);
+
+        const mensajeIA = JSON.parse(resumenInterno.mensaje);
+
+        this.resumenProcesado = {
+          hijos: resumenInterno.hijos,
+          mensaje: mensajeIA.comparativa ?? mensajeIA.mensaje ?? '',
+        };
+
+        this.hijos = Object.entries(resumenInterno.hijos).map(
+          ([nombre, datos]) => ({
+            nombre,
+            datos: datos as HijoResumen,
+          }),
+        );
+      });
+    }
+  }
+
+  getCategorias(hijo: HijoResumen) {
+    return Object.entries(hijo.porCategoria ?? {});
+  }
+
+  get totalFamiliar(): number {
+    return this.hijos.reduce(
+      (total, hijo) => total + (hijo.datos.totalGastado ?? 0),
+      0,
+    );
+  }
+
+  get hijosResumen() {
+    return this.hijos
+      .map((hijo, index) => ({
+        nombre: hijo.nombre,
+        gasto: hijo.datos.totalGastado ?? 0,
+        porcentaje:
+          this.totalFamiliar > 0
+            ? ((hijo.datos.totalGastado ?? 0) / this.totalFamiliar) * 100
+            : 0,
+        color: this.colores[index % this.colores.length],
+      }))
+      .sort((a, b) => b.gasto - a.gasto);
+  }
+}

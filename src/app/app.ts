@@ -6,12 +6,14 @@ import { AuthService } from './core/auth/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
 import { PerfilService } from './data-access/services/perfil.service';
 import { AsistenteVirtualComponent } from './features/asistente-virtual/asistente-virtual.component';
+import { NotificacionSaldoBajoComponent } from "./shared/components/notifications/notificacion-saldo-bajo/notificacion-saldo-bajo.component";
+import { NotificacionSugerenciaSaludableComponent } from "./shared/components/notifications/notificacion-sugerencia-saludable/notificacion-sugerencia-saludable.component";
 
 const RUTAS_SIN_ASISTENTE = new Set(['/', '/seleccion-tipo-cuenta']);
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastHostComponent, AsistenteVirtualComponent],
+  imports: [RouterOutlet, ToastHostComponent, AsistenteVirtualComponent, NotificacionSaldoBajoComponent, NotificacionSugerenciaSaludableComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

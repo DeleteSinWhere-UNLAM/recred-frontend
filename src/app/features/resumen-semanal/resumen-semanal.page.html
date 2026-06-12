@@ -1,0 +1,111 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="resumen">
+  @if (resumen && resumenProcesado) {
+    <h1 class="resumen__titulo">Resumen semanal</h1>
+
+    <p class="resumen__fechas">
+      {{ resumen.fechaDesde }} - {{ resumen.fechaHasta }}
+    </p>
+
+    <section class="resumen-general">
+      <h2>Resumen familiar</h2>
+
+      <div class="card resumen-total">
+        <h3>Gasto total semanal</h3>
+
+        <p>${{ totalFamiliar }}</p>
+      </div>
+
+      <div class="grafico-general">
+        @for (hijo of hijosResumen; track hijo.nombre) {
+          <div
+            class="grafico-general__segmento"
+            [style.width.%]="hijo.porcentaje"
+            [style.background]="hijo.color"
+          ></div>
+        }
+      </div>
+
+      <h3>Distribución del gasto familiar</h3>
+
+      <div class="leyenda">
+        @for (hijo of hijosResumen; track hijo.nombre) {
+          <div class="leyenda__item">
+            <span class="leyenda__color" [style.background]="hijo.color"></span>
+
+            <span>
+              {{ hijo.nombre }}
+              - ${{ hijo.gasto }} ({{ hijo.porcentaje.toFixed(1) }}%)
+            </span>
+          </div>
+        }
+      </div>
+    </section>
+
+    @for (hijo of hijos; track hijo.nombre) {
+      <section class="hijo">
+        <h2 class="hijo__nombre">
+          {{ hijo.nombre }}
+        </h2>
+
+        <section class="resumen__cards">
+          <article class="card">
+            <h3>Gasto total semanal</h3>
+
+            <p>${{ hijo.datos.totalGastado }}</p>
+          </article>
+
+          <article class="card">
+            <h3>Producto más consumido</h3>
+
+            <p>
+              {{ hijo.datos.productoMasConsumido?.nombre ?? "Sin consumos" }}
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Cantidad semanal</h3>
+
+            <p>
+              {{ hijo.datos.productoMasConsumido?.cantidad ?? 0 }}
+            </p>
+          </article>
+        </section>
+
+        <section class="categorias">
+          <h2>Distribución por categoría</h2>
+
+          @if (getCategorias(hijo.datos).length > 0) {
+            @for (categoria of getCategorias(hijo.datos); track categoria[0]) {
+              <div class="categoria">
+                <div class="categoria__header">
+                  <span>{{ categoria[0] }}</span>
+
+                  <span>{{ categoria[1] }}%</span>
+                </div>
+
+                <div class="barra">
+                  <div
+                    class="barra__valor"
+                    [style.width.%]="categoria[1]"
+                  ></div>
+                </div>
+              </div>
+            }
+          } @else {
+            <p>No hubo consumos durante esta semana.</p>
+          }
+        </section>
+      </section>
+    }
+
+    <section class="ia">
+      <h2>Análisis semanal</h2>
+
+      <p>
+        {{ resumenProcesado.mensaje }}
+      </p>
+    </section>
+  }
+</main>

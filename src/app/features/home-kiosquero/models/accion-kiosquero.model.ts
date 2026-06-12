@@ -4,9 +4,15 @@ export type AccionKiosqueroId =
   | 'dashboard'
   | 'stock'
   | 'sugerencias'
-  | 'recomendaciones';
+  | 'recomendaciones'
+  | 'promociones';
 
-export type AccionKiosqueroColor = 'pizarra' | 'menta' | 'dorado' | 'melocoton';
+export type AccionKiosqueroColor =
+  | 'pizarra'
+  | 'menta'
+  | 'dorado'
+  | 'melocoton'
+  | 'violeta';
 
 export interface AccionKiosquero {
   id: AccionKiosqueroId;

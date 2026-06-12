@@ -52,6 +52,14 @@
               (eliminarItem)="presenter.eliminarItem($event)"
             />
           }
+
+          @if (presenter.mostrarSugerencias()) {
+            <app-sugerencias-carrito
+              [sugerencias]="presenter.sugerencias()"
+              [cargando]="presenter.cargandoSugerencias()"
+              (agregar)="presenter.agregarSugerencia($event)"
+            />
+          }
         </section>
 
         <app-resumen-orden-card

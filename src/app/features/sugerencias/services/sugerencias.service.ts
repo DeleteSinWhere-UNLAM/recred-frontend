@@ -17,4 +17,10 @@ export class SugerenciasService {
       )
       .pipe(map((response) => [response]));
   }
+
+  comprarSugerencia(sugerenciaId: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/sugerencias-consumo/comprar`, {
+      sugerenciaId,
+    });
+  }
 }

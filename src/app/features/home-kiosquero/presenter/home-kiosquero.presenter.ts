@@ -67,14 +67,7 @@ export class HomeKiosqueroPresenter {
       descripcion: 'Subí una foto y lo detectamos',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
-    },
-    {
-      id: 'dashboard',
-      titulo: 'Dashboard',
-      descripcion: 'Métricas y reportes',
-      icono: 'fa-chart-line',
-      ruta: '/dashboard',
-      color: 'pizarra',
+      color: 'dorado',
     },
     {
       id: 'stock',
@@ -82,7 +75,15 @@ export class HomeKiosqueroPresenter {
       descripcion: 'Inventario y reposición',
       icono: 'fa-boxes-stacked',
       ruta: '/admin-productos',
-      color: 'menta',
+      color: 'violeta',
+    },
+    {
+      id: 'dashboard',
+      titulo: 'Panel de control',
+      descripcion: 'Métricas y reportes',
+      icono: 'fa-chart-line',
+      ruta: '/dashboard',
+      color: 'pizarra',
     },
     {
       id: 'sugerencias',
@@ -90,7 +91,7 @@ export class HomeKiosqueroPresenter {
       descripcion: 'Recomendaciones inteligentes',
       icono: 'fa-robot',
       ruta: '/sugerencias',
-      color: 'dorado',
+      color: 'melocoton',
     },
     {
       id: 'recomendaciones',
@@ -98,7 +99,15 @@ export class HomeKiosqueroPresenter {
       descripcion: 'Qué stockear según la temporada',
       icono: 'fa-leaf',
       ruta: '/recomendaciones-estacionales',
-      color: 'melocoton',
+      color: 'menta',
+    },
+    {
+      id: 'promociones',
+      titulo: 'Promociones',
+      descripcion: 'Crear y editar descuentos',
+      icono: 'fa-tags',
+      ruta: '/promociones',
+      color: 'violeta',
     },
   ]);
 

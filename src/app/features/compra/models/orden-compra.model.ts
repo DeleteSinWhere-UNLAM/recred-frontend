@@ -20,6 +20,7 @@ export interface OrdenCompra {
   ordenes: OrdenAlumno[];
   total: number;
   codigos: Record<string, string>;
+  sugerenciaId?: string;
 }
 
 export const RECREO_LABELS: Record<Recreo, string> = {
