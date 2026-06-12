@@ -24,6 +24,18 @@ export class MovimientoDetalleModalComponent {
            (this.movimiento.status === 'PENDIENTE' || this.movimiento.status === 'EN_PREPARACION');
   }
 
+  esFechaLimiteSuperada(): boolean {
+    if (!this.movimiento.pickupDate || !this.movimiento.pickupSlotStartTime) {
+      return false;
+    }
+    const targetStr = `${this.movimiento.pickupDate}T${this.movimiento.pickupSlotStartTime}:00-03:00`;
+    const targetTime = new Date(targetStr).getTime();
+    const now = new Date().getTime();
+    const diffMs = targetTime - now;
+    const oneHourMs = 60 * 60 * 1000;
+    return diffMs <= oneHourMs;
+  }
+
   onCancelar(): void {
     this.cancelar.emit(this.movimiento.id);
   }

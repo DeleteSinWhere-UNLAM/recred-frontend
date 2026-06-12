@@ -474,3 +474,11 @@
   border-color: var(--color-melocoton);
 }
 
+.mov-modal__btn--danger:disabled {
+  color: var(--color-texto-claro) !important;
+  border-color: var(--color-borde) !important;
+  background-color: var(--color-superficie-alt) !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+

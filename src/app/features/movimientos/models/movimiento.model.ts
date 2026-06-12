@@ -18,4 +18,5 @@ export interface Movimiento {
   withdrawalCode?: string;
   pickupSlotDescription?: string;
   pickupDate?: string;
+  pickupSlotStartTime?: string;
 }
