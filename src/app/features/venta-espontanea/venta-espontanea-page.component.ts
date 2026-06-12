@@ -29,24 +29,28 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
         </div>
 
         <!-- Error modal básico -->
-        <div *ngIf="mensajeError()" class="venta__error">
+        @if (mensajeError()) {
+        <div class="venta__error">
           <p class="venta__error-titulo"><i class="fa-solid fa-triangle-exclamation"></i> No se pudo procesar</p>
           <p class="venta__error-texto">{{ mensajeError() }}</p>
           <button class="venta__error-cerrar" (click)="mensajeError.set('')">Cerrar</button>
         </div>
+        }
 
         <!-- Paso 1: Seleccionar Alumno -->
-        <div *ngIf="!alumnoSeleccionado()" class="venta__paso">
+        @if (!alumnoSeleccionado()) {
+        <div class="venta__paso">
           <h2 class="venta__paso-titulo">
             <span class="venta__paso-numero">1</span>
             Identificar Alumno
           </h2>
           
           <div class="venta__buscador">
-            <label>Buscar por DNI o Nombre</label>
+            <label for="busqueda-alumno">Buscar por DNI o Nombre</label>
             <div class="venta__input-group">
               <i class="fa-solid fa-magnifying-glass"></i>
               <input 
+                id="busqueda-alumno"
                 type="text" 
                 placeholder="Ej: 12345678 o Juan"
                 [(ngModel)]="busquedaAlumno"
@@ -55,10 +59,14 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
             </div>
           </div>
           
-          <div *ngIf="alumnosFiltrados().length > 0" class="venta__resultados">
-            <div *ngFor="let alumno of alumnosFiltrados()" 
-                 class="venta__resultado-item"
-                 (click)="seleccionarAlumno(alumno)">
+          @if (alumnosFiltrados().length > 0) {
+          <div class="venta__resultados">
+            @for (alumno of alumnosFiltrados(); track alumno.id) {
+            <div class="venta__resultado-item"
+                 (click)="seleccionarAlumno(alumno)"
+                 (keydown.enter)="seleccionarAlumno(alumno)"
+                 (keydown.space)="seleccionarAlumno(alumno)"
+                 tabindex="0">
               <div>
                 <p class="venta__resultado-nombre">{{ alumno.nombre }} {{ alumno.apellido }}</p>
                 <p class="venta__resultado-dni">DNI: {{ alumno.dni || 'N/A' }}</p>
@@ -67,7 +75,9 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
                 <i class="fa-solid fa-chevron-right"></i>
               </div>
             </div>
+            }
           </div>
+          }
 
           <div class="venta__separador">
             <span>O</span>
@@ -81,16 +91,20 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
             {{ escaneando() ? 'Cancelar Escaneo' : 'Escanear QR' }}
           </button>
 
-          <div *ngIf="escaneando()" class="venta__escaner">
+          @if (escaneando()) {
+          <div class="venta__escaner">
             <zxing-scanner 
               (scanSuccess)="onCodeResult($event)"
               [formats]="formats">
             </zxing-scanner>
           </div>
+          }
         </div>
+        }
 
         <!-- Paso 2: Productos -->
-        <div *ngIf="alumnoSeleccionado()">
+        @if (alumnoSeleccionado()) {
+        <div>
           <!-- Info Alumno Seleccionado -->
           <div class="venta__comprador">
             <div class="venta__comprador-info">
@@ -114,8 +128,8 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 
           <!-- Grid de Productos -->
           <div class="venta__grid">
-            <div *ngFor="let producto of service.productos()" 
-                 class="producto-card"
+            @for (producto of service.productos(); track producto.id) {
+            <div class="producto-card"
                  [class.producto-card--bloqueado]="isBloqueado(producto)"
                  [class.producto-card--sin-stock]="producto.estadoStock === 'SIN_STOCK'">
               
@@ -124,14 +138,18 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
                 <img [src]="producto.imagen || 'assets/placeholder.png'" alt="Producto" class="producto-card__imagen">
                 
                 <!-- Clasificaciones -->
-                <div *ngIf="producto.clasificacionesSalud?.length" class="producto-card__badge">
+                @if (producto.clasificacionesSalud?.length) {
+                <div class="producto-card__badge">
                   {{ producto.clasificacionesSalud[0].descripcion }}
                 </div>
+                }
 
                 <!-- Candado -->
-                <div *ngIf="isBloqueado(producto)" class="producto-card__lock-btn producto-card__lock-btn--bloqueado">
+                @if (isBloqueado(producto)) {
+                <div class="producto-card__lock-btn producto-card__lock-btn--bloqueado">
                   <i class="fa-solid fa-lock"></i>
                 </div>
+                }
               </div>
 
               <!-- Contenido -->
@@ -145,46 +163,50 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 
                 <!-- Controles Agregar -->
                 <div class="producto-card__acciones">
-                  <ng-container *ngIf="isBloqueado(producto)">
+                  @if (isBloqueado(producto)) {
                     <div class="producto-card__cta producto-card__cta--bloqueado">
                       {{ getMotivoBloqueo(producto) }}
                     </div>
-                  </ng-container>
-
-                  <ng-container *ngIf="!isBloqueado(producto)">
-                    <ng-container *ngIf="getCantidad(producto) === 0; else enCarrito">
+                  } @else {
+                    @if (getCantidad(producto) === 0) {
                       <button class="producto-card__cta" (click)="sumar(producto)">
                         <i class="fa-solid fa-cart-plus"></i> Agregar
                       </button>
-                    </ng-container>
-                    <ng-template #enCarrito>
+                    } @else {
                       <div class="producto-card__cantidad">
                         <button class="producto-card__cantidad-btn" (click)="restar(producto)"><i class="fa-solid fa-minus"></i></button>
                         <span class="producto-card__cantidad-valor">{{ getCantidad(producto) }}</span>
                         <button class="producto-card__cantidad-btn" (click)="sumar(producto)"><i class="fa-solid fa-plus"></i></button>
                       </div>
-                    </ng-template>
-                  </ng-container>
+                    }
+                  }
                 </div>
               </div>
             </div>
+            }
           </div>
         </div>
+        }
       </div>
 
       <!-- Footer Cart -->
-      <div *ngIf="alumnoSeleccionado() && getTotal() > 0" class="venta__footer">
+      @if (alumnoSeleccionado() && getTotal() > 0) {
+      <div class="venta__footer">
         <div class="venta__footer-container">
           <div class="venta__total">
             <span class="venta__total-label">Total a Cobrar</span>
             <span class="venta__total-valor">\${{ getTotal() }}</span>
           </div>
           <button class="venta__btn-cobrar" [disabled]="procesando()" (click)="confirmarVenta()">
-            <span *ngIf="procesando()"><i class="fa-solid fa-circle-notch fa-spin"></i> Procesando</span>
-            <span *ngIf="!procesando()">Confirmar Venta <i class="fa-solid fa-arrow-right"></i></span>
+            @if (procesando()) {
+            <span><i class="fa-solid fa-circle-notch fa-spin"></i> Procesando</span>
+            } @else {
+            <span>Confirmar Venta <i class="fa-solid fa-arrow-right"></i></span>
+            }
           </button>
         </div>
       </div>
+      }
     </main>
   `
 })
@@ -259,7 +281,9 @@ export class VentaEspontaneaPageComponent implements OnInit {
       if (parsed.alumnoId) {
         idABuscar = parsed.alumnoId;
       }
-    } catch(e) {}
+    } catch {
+      // ignore
+    }
 
     const alumno = this.service.alumnos().find(a => a.id === idABuscar);
     if (alumno) {
@@ -319,7 +343,7 @@ export class VentaEspontaneaPageComponent implements OnInit {
     this.mensajeError.set('');
 
     this.service.procesarVenta(alumno.id, items).subscribe({
-      next: (res) => {
+      next: () => {
         this.procesando.set(false);
         alert('¡Venta realizada con éxito!');
         this.router.navigate(['/kiosquero']);
