@@ -30,12 +30,10 @@ export class MovimientosPage implements OnInit {
   readonly nombreNavbar = this.usuarioService.nombreNavbar;
   readonly alumnos = this.alumnosService.alumnos;
 
-  // Estados de datos
   readonly rawMovimientos = signal<Movimiento[]>([]);
   readonly cargando = signal(true);
   readonly errorMsg = signal<string | null>(null);
 
-  // Estados de filtros
   readonly selectedAlumnoId = signal<string>('todos');
   readonly filtroEstado = signal<string>('TODOS');
   readonly filtroFechaDesde = signal<string>('');
@@ -43,7 +41,6 @@ export class MovimientosPage implements OnInit {
   readonly filtroPrecioMin = signal<number | null>(null);
   readonly filtroPrecioMax = signal<number | null>(null);
 
-  // Estado del modal de detalle
   readonly modalMovimiento = signal<Movimiento | null>(null);
 
   readonly movimientosFiltrados = computed<Movimiento[]>(() => {
@@ -55,12 +52,10 @@ export class MovimientosPage implements OnInit {
     const maxPrice = this.filtroPrecioMax();
 
     return list.filter((m) => {
-      // Filtrar por estado
       if (estado !== 'TODOS' && m.status !== estado) {
         return false;
       }
 
-      // Filtrar por rango de fechas
       if (desde) {
         const dateLimit = new Date(`${desde}T00:00:00`);
         if (new Date(m.date) < dateLimit) return false;
@@ -70,7 +65,6 @@ export class MovimientosPage implements OnInit {
         if (new Date(m.date) > dateLimit) return false;
       }
 
-      // Filtrar por rango de precios
       if (minPrice !== null && minPrice !== undefined && m.totalAmount < minPrice) {
         return false;
       }
@@ -83,7 +77,6 @@ export class MovimientosPage implements OnInit {
   });
 
   ngOnInit(): void {
-    // Asegurar que los alumnos estén cargados en el servicio
     void this.alumnosService.asegurarCargados().then(() => {
       this.route.paramMap.subscribe((params) => {
         const alumnoId = params.get('alumnoId');
@@ -111,7 +104,6 @@ export class MovimientosPage implements OnInit {
 
     request$.subscribe({
       next: (data) => {
-        // Ordenar por fecha decreciente (más recientes primero)
         this.rawMovimientos.set(
           [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         );
