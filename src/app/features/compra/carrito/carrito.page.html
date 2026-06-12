@@ -50,6 +50,7 @@
               (sumarItem)="presenter.sumarItem($event)"
               (restarItem)="presenter.restarItem($event)"
               (eliminarItem)="presenter.eliminarItem($event)"
+              (guardarFavorito)="abrirModalFavorito(grupo.alumno.id, grupo.items)"
             />
           }
 
@@ -74,3 +75,11 @@
     }
   </div>
 </main>
+
+@if (mostrarModalFavorito) {
+  <app-guardar-favorito-modal
+    [initialAlumnoId]="favoritoModalAlumnoId"
+    [items]="favoritoModalItems"
+    (closeModal)="cerrarModalFavorito()"
+  />
+}

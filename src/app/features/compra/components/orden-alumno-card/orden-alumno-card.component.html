@@ -84,8 +84,18 @@
     </div>
 
     <footer class="orden-alumno__pie">
-      <span class="orden-alumno__pie-label">Subtotal</span>
-      <span class="orden-alumno__pie-valor">{{ subtotalFormateado() }}</span>
+      <button
+        type="button"
+        class="orden-alumno__favorito-btn"
+        (click)="guardarFavorito.emit()"
+      >
+        <i class="fa-regular fa-heart" aria-hidden="true"></i>
+        <span>Guardar como Favorito</span>
+      </button>
+      <div class="orden-alumno__pie-resumen">
+        <span class="orden-alumno__pie-label">Subtotal</span>
+        <span class="orden-alumno__pie-valor">{{ subtotalFormateado() }}</span>
+      </div>
     </footer>
   </article>
 }

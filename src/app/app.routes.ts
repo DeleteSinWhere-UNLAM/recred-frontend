@@ -88,6 +88,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'carritos-favoritos',
+        loadComponent: () =>
+          import('./features/carritos-favoritos/carritos-favoritos.page').then(
+            (m) => m.CarritosFavoritosPage,
+          ),
+      },
+      {
         path: 'sugerencias',
         loadComponent: () =>
           import('./features/sugerencias/sugerencias.page').then(

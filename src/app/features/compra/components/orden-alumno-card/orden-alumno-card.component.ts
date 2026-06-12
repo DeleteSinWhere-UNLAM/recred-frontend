@@ -52,6 +52,7 @@ export class OrdenAlumnoCardComponent {
   @Output() sumarItem = new EventEmitter<string>();
   @Output() restarItem = new EventEmitter<string>();
   @Output() eliminarItem = new EventEmitter<string>();
+  @Output() guardarFavorito = new EventEmitter<void>();
 
   readonly alumnoActual = computed(() => this.alumnoState());
   readonly itemsActuales = computed(() => this.itemsState());
