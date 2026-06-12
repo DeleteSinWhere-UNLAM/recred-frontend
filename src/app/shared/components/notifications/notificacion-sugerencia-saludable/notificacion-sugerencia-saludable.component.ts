@@ -50,11 +50,9 @@ export class NotificacionSugerenciaSaludableComponent {
 
       if (alumno.saldo >= producto.precio) {
         this.carritoService.agregar(producto, alumnoId, 1);
-        
-        // Guardamos el ID de la sugerencia para usarlo al confirmar la compra final
+
         this.compraService.setSugerenciaPendiente(state.sugerenciaId);
-        
-        // Redirigimos al carrito para que elija fecha y recreo
+
         this.router.navigate(['/compra']);
         this.cerrar();
       } else {

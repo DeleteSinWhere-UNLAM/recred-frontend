@@ -26,8 +26,7 @@ export class CompraService {
 
   iniciarOrden(ordenes: OrdenAlumno[], sugerenciaId?: string): void {
     const total = ordenes.reduce((acc, o) => acc + o.subtotal, 0);
-    
-    // Si no viene sugerenciaId por parámetro, buscamos si hay una pendiente
+
     const finalSugerenciaId = sugerenciaId || this.sugerenciaPendienteState();
 
     this.ordenEnCursoState.set({
@@ -38,7 +37,6 @@ export class CompraService {
       sugerenciaId: finalSugerenciaId ?? undefined,
     });
 
-    // Una vez asignada a una orden, limpiamos la sugerencia pendiente
     this.sugerenciaPendienteState.set(null);
   }
 
