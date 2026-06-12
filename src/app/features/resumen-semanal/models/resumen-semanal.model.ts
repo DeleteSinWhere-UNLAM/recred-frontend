@@ -11,9 +11,10 @@ export interface ResumenProcesado {
 }
 
 export interface HijoResumen {
-  totalGastado: number;
-  productoMasConsumido: ProductoConsumido;
+  nombre: string;
   porCategoria: Record<string, number>;
+  totalGastado: number;
+  productoMasConsumido?: ProductoConsumido;
 }
 
 export interface ProductoConsumido {
