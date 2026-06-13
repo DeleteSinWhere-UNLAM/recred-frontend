@@ -27,13 +27,26 @@ export class AlumnosService {
   private cargaInFlight: Promise<Alumno[]> | null = null;
 
   async cargarHijosDelTutor(): Promise<Alumno[]> {
-    const dtos = await firstValueFrom(
-      this.http.get<StudentDTO[]>(`${environment.apiUrl}/tutores/me/hijos`),
-    );
-    const alumnos = dtos.map((dto) => this.fromDto(dto));
-    this.alumnosState.set(alumnos);
-    console.log('Alumnos cargados:', alumnos);
-    return alumnos;
+    const url = `${environment.apiUrl.replace(/\/$/, '')}/tutores/me/hijos`;
+    console.log('Cargando hijos desde:', url);
+
+    try {
+      const dtos = await firstValueFrom(this.http.get<StudentDTO[]>(url));
+      console.log('Respuesta raw del back:', dtos);
+
+      if (!dtos || !Array.isArray(dtos)) {
+        console.warn('La respuesta del back no es un array válido:', dtos);
+        return [];
+      }
+
+      const alumnos = dtos.map((dto) => this.fromDto(dto));
+      this.alumnosState.set(alumnos);
+      console.log('Alumnos procesados y guardados en el estado:', alumnos);
+      return alumnos;
+    } catch (error) {
+      console.error('Error al cargar hijos del tutor:', error);
+      throw error;
+    }
   }
 
   asegurarCargados(): Promise<Alumno[]> {

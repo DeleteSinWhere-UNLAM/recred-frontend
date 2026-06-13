@@ -33,5 +33,31 @@
       </span>
       <span class="perfil-kiosquero-header__stat-valor">{{ ventasHoy }}</span>
     </div>
+    <a
+      routerLink="/kiosquero/pedidos-tracking"
+      class="perfil-kiosquero-header__stat perfil-kiosquero-header__stat--link"
+      [class.perfil-kiosquero-header__stat--alerta]="pedidosPendientes > 0"
+    >
+      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
+        <i class="fa-solid fa-clipboard-list"></i>
+      </span>
+      <div class="perfil-kiosquero-header__stat-texto">
+        <span class="perfil-kiosquero-header__stat-label">Pedidos pendientes</span>
+        <strong class="perfil-kiosquero-header__stat-valor">{{ pedidosPendientes }}</strong>
+      </div>
+    </a>
+
+    <div
+      class="perfil-kiosquero-header__stat"
+      [class.perfil-kiosquero-header__stat--alerta]="productosSinStock > 0"
+    >
+      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
+        <i class="fa-solid fa-box-open"></i>
+      </span>
+      <div class="perfil-kiosquero-header__stat-texto">
+        <span class="perfil-kiosquero-header__stat-label">Sin stock</span>
+        <strong class="perfil-kiosquero-header__stat-valor">{{ productosSinStock }}</strong>
+      </div>
+    </div>
   </div>
 </section>

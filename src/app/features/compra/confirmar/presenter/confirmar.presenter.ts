@@ -40,13 +40,12 @@ export class ConfirmarPresenter {
   confirmar(): void {
     if (this.cargandoState() || this.vacia()) return;
     this.cargandoState.set(true);
-
     const ordenActual = this.orden();
     const obs$ = (ordenActual?.sugerenciaId)
       ? this.sugerenciasService.comprarSugerencia(ordenActual.sugerenciaId).pipe(
-          switchMap(() => this.compraService.simularPago())
+          switchMap(() => this.compraService.procesarPago())
         )
-      : this.compraService.simularPago();
+      : this.compraService.procesarPago();
 
     obs$.subscribe({
       next: (orden) => {
