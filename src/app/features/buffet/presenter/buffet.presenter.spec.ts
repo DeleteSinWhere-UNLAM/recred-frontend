@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
@@ -92,6 +93,14 @@ describe('BuffetPresenter', () => {
     ]);
     favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos']);
     carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', ['agregar', 'setCatalog', 'cargarPresupuestoYConsumo']);
+    const mockCarrito = carritoServiceSpy as unknown as {
+      items: unknown;
+      budgets: unknown;
+      purchases: unknown;
+    };
+    mockCarrito.items = signal([]);
+    mockCarrito.budgets = signal(new Map());
+    mockCarrito.purchases = signal(new Map());
     colegiosServiceSpy = jasmine.createSpyObj<ColegiosService>('ColegiosService', ['getColegios']);
     usuarioServiceSpy = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl', 'esVistaAlumno']);
     toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);

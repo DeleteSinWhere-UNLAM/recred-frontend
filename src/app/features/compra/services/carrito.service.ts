@@ -19,6 +19,8 @@ export class CarritoService {
   private catalog: Producto[] = [];
 
   readonly items = this.itemsState.asReadonly();
+  readonly budgets = this.budgetsState.asReadonly();
+  readonly purchases = this.purchasesState.asReadonly();
 
   readonly cantidadTotal = computed(() =>
     this.itemsState().reduce((acc, item) => acc + item.cantidad, 0),
