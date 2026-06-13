@@ -1,7 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from '../services/product.service';
-import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+import { Product } from '../models/product.interface';
+import { CreateProductRequest } from '../models/requests/create-product-request.interface';
+import { UpdateProductRequest } from '../models/requests/update-product-request.interface';
 import { Category } from '../models/category.interface';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
@@ -11,7 +13,24 @@ import { ProductTableComponent } from '../components/product-table/product-table
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 
-const HEALTH_CLASSIFICATION_IDS = ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'];
+// IDs de clasificaciones de salud en la base de datos
+const CLASIFICACION_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
+const CLASIFICACION_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
+const CLASIFICACION_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+
+/**
+ * Construye el array de IDs de clasificaciones de salud según el formulario.
+ * - contiene_tacc = false  → agrega "Sin TACC" (apto para celíacos)
+ * - contiene_azucar = false → agrega "Sin Azúcar"
+ * - contiene_lactosa = true → agrega "Contiene Lácteos"
+ */
+function buildHealthClassificationIds(data: ProductFormData): string[] {
+  const ids: string[] = [];
+  if (!data.contiene_tacc) ids.push(CLASIFICACION_SIN_TACC);
+  if (!data.contiene_azucar) ids.push(CLASIFICACION_SIN_AZUCAR);
+  if (data.contiene_lactosa) ids.push(CLASIFICACION_CONTIENE_LACTEOS);
+  return ids;
+}
 
 @Component({
   selector: 'app-updated-inventory-page',
@@ -154,7 +173,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
       nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : "",
       buffetId,
       stockActual: data.stockActual,
-      clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
+      clasificacionesSaludIds: buildHealthClassificationIds(data),
       tiposIds: null,
     };
 
@@ -183,7 +202,7 @@ export class UpdatedInventoryPageComponent implements OnInit {
       stockActual: data.stockActual,
       buffetId,
       categoriaId: isNewCategory ? "" : (data.categoriaId || ''), // Update might not support creating categories on the fly, but we adapt it
-      clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
+      clasificacionesSaludIds: buildHealthClassificationIds(data),
     };
 
     this.productService.update(id, payload).subscribe({

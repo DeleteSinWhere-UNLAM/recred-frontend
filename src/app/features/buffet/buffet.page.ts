@@ -80,4 +80,12 @@ export class BuffetPage implements OnInit {
       maximumFractionDigits: 0,
     }).format(this.presenter.saldo());
   }
+
+  protected formatARS(monto: number): string {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      maximumFractionDigits: 0,
+    }).format(monto);
+  }
 }

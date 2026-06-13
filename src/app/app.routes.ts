@@ -34,6 +34,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'restricciones-horarias/:alumnoId',
+        loadComponent: () =>
+          import('./features/restricciones-horarias/restricciones-horarias.page').then(
+            (m) => m.RestriccionesHorariasPage,
+          ),
+      },
+      {
         path: 'restricciones-nutricionales/:alumnoId',
         loadComponent: () =>
           import('./features/restricciones-nutricionales/restricciones-nutricionales.page').then(
@@ -81,6 +88,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'carritos-favoritos',
+        loadComponent: () =>
+          import('./features/carritos-favoritos/carritos-favoritos.page').then(
+            (m) => m.CarritosFavoritosPage,
+          ),
+      },
+      {
         path: 'sugerencias',
         loadComponent: () =>
           import('./features/sugerencias/sugerencias.page').then(
@@ -107,6 +121,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/home-kiosquero/home-kiosquero.page').then(
             (m) => m.HomeKiosqueroPage,
+          ),
+      },
+      {
+        path: 'kiosquero/venta-espontanea',
+        loadChildren: () =>
+          import('./features/venta-espontanea/venta-espontanea.routes').then(
+            (m) => m.ventaEspontaneaRoutes,
+          ),
+      },
+      {
+        path: 'kiosquero/pedidos-tracking',
+        loadComponent: () =>
+          import('./features/tracking-pedidos/tracking-pedidos.page').then(
+            (m) => m.TrackingPedidosPage,
           ),
       },
       {
@@ -170,6 +198,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/resumen-semanal/resumen-semanal.page').then(
             (m) => m.ResumenSemanalPage,
+          ),
+      },
+      {
+        path: 'promociones',
+        loadComponent: () =>
+          import('./features/promociones/promociones.page').then(
+            (m) => m.PromocionesPageComponent,
           ),
       },
       {

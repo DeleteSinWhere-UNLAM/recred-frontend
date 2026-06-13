@@ -1,14 +1,17 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { switchMap } from 'rxjs';
 import { RECREO_LABELS } from '../../models/orden-compra.model';
 import { CarritoService } from '../../services/carrito.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CompraService } from '../../services/compra.service';
+import { SugerenciasService } from '../../../sugerencias/services/sugerencias.service';
 
 @Injectable()
 export class ConfirmarPresenter {
   private readonly compraService = inject(CompraService);
   private readonly carritoService = inject(CarritoService);
+  private readonly sugerenciasService = inject(SugerenciasService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -37,7 +40,14 @@ export class ConfirmarPresenter {
   confirmar(): void {
     if (this.cargandoState() || this.vacia()) return;
     this.cargandoState.set(true);
-    this.compraService.simularPago().subscribe({
+    const ordenActual = this.orden();
+    const obs$ = (ordenActual?.sugerenciaId)
+      ? this.sugerenciasService.comprarSugerencia(ordenActual.sugerenciaId).pipe(
+          switchMap(() => this.compraService.procesarPago())
+        )
+      : this.compraService.procesarPago();
+
+    obs$.subscribe({
       next: (orden) => {
         for (const o of orden.ordenes) {
           this.carritoService.limpiarAlumno(o.alumno.id);

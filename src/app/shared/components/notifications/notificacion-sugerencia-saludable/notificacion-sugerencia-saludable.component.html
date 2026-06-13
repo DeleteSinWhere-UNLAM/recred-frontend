@@ -1,0 +1,35 @@
+@if (notificacionService.state$().show) {
+  <div class="notificacion-panel">
+    <div class="notificacion-header">
+      <div class="notificacion-title-wrap">
+        <div class="notificacion-icon-bg">
+          <i class="fa-solid fa-apple-whole"></i>
+        </div>
+        <h3 class="notificacion-title">{{ notificacionService.state$().titulo }}</h3>
+      </div>
+      <button (click)="cerrar()" class="notificacion-close" aria-label="Cerrar notificación">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    
+    <p class="notificacion-body">
+      {{ notificacionService.state$().mensaje }}
+    </p>
+    
+    @if (notificacionService.state$().producto) {
+      <p class="notificacion-body">
+        <strong>{{ notificacionService.state$().producto?.nombre }}</strong> - ${{ notificacionService.state$().producto?.precio | number:'1.2-2' }}
+      </p>
+    }
+
+    <div class="notificacion-actions">
+      <button (click)="cerrar()" class="btn-later">
+        Más tarde
+      </button>
+      <button (click)="comprarProducto()" class="btn-buy">
+        <i class="fa-solid fa-cart-shopping"></i>
+        Comprar
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,84 @@
+<app-navbar></app-navbar>
+
+<main class="promociones-page">
+  <button type="button" class="btn-volver" (click)="presenter.volver()">
+    <i class="fa-solid fa-arrow-left"></i> Volver al panel
+  </button>
+
+  <header class="page-header">
+    <div class="header-content">
+      <h1><i class="fa-solid fa-tags header-icon"></i> Promociones Activas</h1>
+      <p>Visualiza y gestiona las promociones creadas en tu kiosco.</p>
+    </div>
+    <div class="header-actions">
+      <!-- TODO: Modal de nueva promoción -->
+      <button class="btn btn-primary" disabled>
+        <i class="fa-solid fa-plus"></i> Nueva Promoción
+      </button>
+    </div>
+  </header>
+
+  @if (presenter.isLoading()) {
+    <div class="loading-state">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Cargando promociones...</p>
+    </div>
+  } @else if (presenter.error()) {
+    <div class="error-state">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <h2>Vaya, hubo un problema</h2>
+      <p>{{ presenter.error() }}</p>
+      <button class="btn btn-secondary" (click)="presenter.loadPromotions()">Reintentar</button>
+    </div>
+  } @else if (!presenter.hasPromotions()) {
+    <div class="empty-state">
+      <i class="fa-solid fa-box-open"></i>
+      <h2>Aún no hay promociones</h2>
+      <p>Cuando crees nuevas promociones desde el motor de IA, aparecerán aquí.</p>
+    </div>
+  } @else {
+    <div class="promotions-grid">
+      @for (promo of presenter.promotions(); track promo.id) {
+        <div class="promotion-card" [class.draft]="promo.status === 'DRAFT'" [class.active]="promo.status === 'ACTIVE'">
+          <div class="promo-header">
+            <span class="status-badge" [ngClass]="promo.status | lowercase">{{ promo.status }}</span>
+            <button class="delete-btn" (click)="presenter.deletePromotion(promo.id)" title="Descartar promoción">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+          
+          <div class="promo-body">
+            <div class="discount-circle">
+              <span>-{{ promo.discountPercentage }}%</span>
+            </div>
+            <h3 class="promo-title">{{ promo.name }}</h3>
+            
+            <div class="promo-dates">
+              <div class="date-row">
+                <i class="fa-regular fa-calendar"></i>
+                <div class="date-col">
+                  <span class="date-label">Inicia</span>
+                  <span class="date-value">{{ promo.startDate | date:'medium' }}</span>
+                </div>
+              </div>
+              <div class="date-row">
+                <i class="fa-regular fa-calendar-check"></i>
+                <div class="date-col">
+                  <span class="date-label">Finaliza</span>
+                  <span class="date-value">{{ promo.endDate | date:'medium' }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="promo-stats">
+              <div class="stat">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>{{ promo.productIds.length }} productos incluidos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</main>

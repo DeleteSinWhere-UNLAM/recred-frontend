@@ -10,6 +10,7 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-movimientos-page',
@@ -24,18 +25,17 @@ export class MovimientosPage implements OnInit {
   private readonly alumnosService = inject(AlumnosService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
+  private readonly toastService = inject(ToastService);
 
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   readonly nombreNavbar = this.usuarioService.nombreNavbar;
   readonly alumnos = this.alumnosService.alumnos;
 
-  // Estados de datos
   readonly rawMovimientos = signal<Movimiento[]>([]);
   readonly cargando = signal(true);
   readonly errorMsg = signal<string | null>(null);
 
-  // Estados de filtros
   readonly selectedAlumnoId = signal<string>('todos');
   readonly filtroEstado = signal<string>('TODOS');
   readonly filtroFechaDesde = signal<string>('');
@@ -43,7 +43,6 @@ export class MovimientosPage implements OnInit {
   readonly filtroPrecioMin = signal<number | null>(null);
   readonly filtroPrecioMax = signal<number | null>(null);
 
-  // Estado del modal de detalle
   readonly modalMovimiento = signal<Movimiento | null>(null);
 
   readonly movimientosFiltrados = computed<Movimiento[]>(() => {
@@ -55,12 +54,10 @@ export class MovimientosPage implements OnInit {
     const maxPrice = this.filtroPrecioMax();
 
     return list.filter((m) => {
-      // Filtrar por estado
       if (estado !== 'TODOS' && m.status !== estado) {
         return false;
       }
 
-      // Filtrar por rango de fechas
       if (desde) {
         const dateLimit = new Date(`${desde}T00:00:00`);
         if (new Date(m.date) < dateLimit) return false;
@@ -70,7 +67,6 @@ export class MovimientosPage implements OnInit {
         if (new Date(m.date) > dateLimit) return false;
       }
 
-      // Filtrar por rango de precios
       if (minPrice !== null && minPrice !== undefined && m.totalAmount < minPrice) {
         return false;
       }
@@ -83,7 +79,6 @@ export class MovimientosPage implements OnInit {
   });
 
   ngOnInit(): void {
-    // Asegurar que los alumnos estén cargados en el servicio
     void this.alumnosService.asegurarCargados().then(() => {
       this.route.paramMap.subscribe((params) => {
         const alumnoId = params.get('alumnoId');
@@ -111,7 +106,6 @@ export class MovimientosPage implements OnInit {
 
     request$.subscribe({
       next: (data) => {
-        // Ordenar por fecha decreciente (más recientes primero)
         this.rawMovimientos.set(
           [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         );
@@ -179,11 +173,59 @@ export class MovimientosPage implements OnInit {
     }).format(date);
   }
 
+  mostrarFecha(mov: Movimiento): string {
+    if (mov.tipo === 'ANTICIPADA' && mov.pickupDate) {
+      const parts = mov.pickupDate.split('-');
+      let dateStr = mov.pickupDate;
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const d = new Date(year, month, day);
+        dateStr = new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium' }).format(d);
+      }
+      const slot = mov.pickupSlotDescription ? ` - ${mov.pickupSlotDescription}` : '';
+      return `${dateStr}${slot}`;
+    }
+    return this.formatearFecha(mov.date);
+  }
+
   volver(): void {
     if (this.esVistaAlumno()) {
       this.router.navigateByUrl('/alumno');
     } else {
       this.router.navigateByUrl('/tutor');
+    }
+  }
+
+  cancelarPedido(id: string): void {
+    if (confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.')) {
+      this.movimientosService.cancelarCompra(id).subscribe({
+        next: () => {
+          this.toastService.mostrar('Pedido cancelado y saldo reembolsado', 'success');
+          
+          this.rawMovimientos.update((list) =>
+            list.map((m) =>
+              m.id === id
+                ? { ...m, status: 'CANCELADO', statusLabel: 'Cancelado' }
+                : m
+            )
+          );
+          
+          const openModal = this.modalMovimiento();
+          if (openModal && openModal.id === id) {
+            this.modalMovimiento.set({
+              ...openModal,
+              status: 'CANCELADO',
+              statusLabel: 'Cancelado'
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error al cancelar el pedido:', err);
+          this.toastService.mostrar('Error al cancelar el pedido', 'error');
+        }
+      });
     }
   }
 }

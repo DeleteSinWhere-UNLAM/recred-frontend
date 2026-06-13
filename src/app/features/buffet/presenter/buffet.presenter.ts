@@ -15,6 +15,27 @@ import {
   Producto,
 } from '../models/producto.model';
 import { RestriccionProductoService } from '../../restriccion-producto/services/restriccion-producto.service';
+import { getPeriodRange, getProductCategory, isSameCategory } from '../../compra/utils/budget-helpers';
+import { PERIODO_LABELS } from '../../presupuesto/models/presupuesto.model';
+
+export interface PresupuestoDisponibleCategoria {
+  categoriaId: string;
+  descripcionCategoria: string;
+  montoLimite: number;
+  montoConsumido: number;
+  montoDisponible: number;
+  porcentajeConsumido: number;
+}
+
+export interface PresupuestoDisponible {
+  activo: boolean;
+  periodo: string;
+  montoLimiteGeneral: number;
+  montoConsumidoGeneral: number;
+  montoDisponibleGeneral: number;
+  porcentajeConsumidoGeneral: number;
+  reglasCategorias: PresupuestoDisponibleCategoria[];
+}
 
 export interface FiltrosBuffet {
   busqueda: string;
@@ -74,6 +95,111 @@ export class BuffetPresenter {
 
   readonly saldo = computed(() => this.alumnoState()?.saldo ?? 0);
 
+  readonly presupuestoDisponible = computed<PresupuestoDisponible | null>(() => {
+    const alumno = this.alumnoState();
+    if (!alumno) return null;
+
+    const budget = this.carritoService.budgets().get(alumno.id);
+    if (!budget || !budget.activo) {
+      return null;
+    }
+
+    const { start, end } = getPeriodRange(budget.periodo);
+    const pastPurchases = this.carritoService.purchases().get(alumno.id) ?? [];
+    const approvedPastPurchases = pastPurchases.filter((m) => {
+      if (m.status !== 'APPROVED') return false;
+      const purchaseDate = new Date(m.date);
+      return purchaseDate >= start && purchaseDate <= end;
+    });
+
+    // Calculate spent past general
+    let spentPastGeneral = 0;
+    for (const m of approvedPastPurchases) {
+      spentPastGeneral += m.totalAmount;
+    }
+
+    // Calculate spent cart general
+    let spentCartGeneral = 0;
+    const cartItems = this.carritoService.items().filter((i) => i.alumnoId === alumno.id);
+    for (const item of cartItems) {
+      spentCartGeneral += item.producto.precio * item.cantidad;
+    }
+
+    const montoConsumidoGeneral = spentPastGeneral + spentCartGeneral;
+    const montoDisponibleGeneral = Math.max(0, budget.montoLimiteGeneral - montoConsumidoGeneral);
+    const porcentajeConsumidoGeneral = budget.montoLimiteGeneral > 0
+      ? Math.round((montoConsumidoGeneral / budget.montoLimiteGeneral) * 100)
+      : 0;
+
+    // Rules
+    const reglasCategorias: PresupuestoDisponibleCategoria[] = [];
+    for (const rule of budget.reglasCategoria) {
+      if (!rule.activo) continue;
+
+      // Spent past for this category
+      let spentPastCategory = 0;
+      for (const m of approvedPastPurchases) {
+        for (const item of m.items) {
+          const itemCatId = getProductCategory(item.productId, item.productName, this.productosState());
+          const catalogProd = this.productosState().find((p) => p.id === item.productId);
+          const itemCatDesc = catalogProd?.categoria?.descripcion ?? item.productName;
+          if (
+            isSameCategory(
+              itemCatId,
+              itemCatDesc,
+              rule.categoriaId,
+              rule.descripcionCategoria
+            )
+          ) {
+            spentPastCategory += item.unitPrice * item.quantity;
+          }
+        }
+      }
+
+      // Spent cart for this category
+      let spentCartCategory = 0;
+      for (const item of cartItems) {
+        if (
+          isSameCategory(
+            item.producto.categoria.id,
+            item.producto.categoria.descripcion,
+            rule.categoriaId,
+            rule.descripcionCategoria
+          )
+        ) {
+          spentCartCategory += item.producto.precio * item.cantidad;
+        }
+      }
+
+      const montoConsumido = spentPastCategory + spentCartCategory;
+      const montoDisponible = Math.max(0, rule.montoLimiteCalculado - montoConsumido);
+      const porcentajeConsumido = rule.montoLimiteCalculado > 0
+        ? Math.round((montoConsumido / rule.montoLimiteCalculado) * 100)
+        : 0;
+
+      reglasCategorias.push({
+        categoriaId: rule.categoriaId,
+        descripcionCategoria: rule.descripcionCategoria,
+        montoLimite: rule.montoLimiteCalculado,
+        montoConsumido,
+        montoDisponible,
+        porcentajeConsumido,
+      });
+    }
+
+    const periodoLabel = PERIODO_LABELS[budget.periodo] || budget.periodo;
+
+    return {
+      activo: true,
+      periodo: periodoLabel,
+      montoLimiteGeneral: budget.montoLimiteGeneral,
+      montoConsumidoGeneral,
+      montoDisponibleGeneral,
+      porcentajeConsumidoGeneral,
+      reglasCategorias,
+    };
+  });
+
   readonly nombreColegio = computed(() => {
     const alumno = this.alumnoState();
     if (!alumno) return '';
@@ -91,6 +217,7 @@ export class BuffetPresenter {
     const esAlumno = this.usuarioService.esVistaAlumno();
 
     return this.productosState().filter((producto) => {
+      // Solo ocultar al alumno si fue bloqueado manualmente por el tutor
       if (esAlumno && producto.bloqueado) {
         return false;
       }
@@ -128,20 +255,20 @@ export class BuffetPresenter {
 
     this.alumnoState.set(alumno);
     this.buffetState.set(buffet);
-    
-    // Carga dinámica de productos
+
     this.buffetService.getProductosDelBuffet(buffet.id, alumnoId).subscribe({
       next: (productos) => {
         this.productosState.set(productos);
         this.categoriasState.set(this.extractUniqueCategories(productos));
         this.clasificacionesState.set(this.extractUniqueClassifications(productos));
+        this.carritoService.setCatalog(productos);
+        this.carritoService.cargarPresupuestoYConsumo(alumnoId);
       },
       error: (err) => {
         console.error('Error loading products for buffet:', err);
       }
     });
 
-    // Carga de favoritos del alumno
     this.favoritosService.getFavoritos(alumnoId).subscribe({
       next: (favs) => {
         const ids = new Set(favs.map((f) => f.id));
@@ -222,8 +349,12 @@ export class BuffetPresenter {
     if (!alumno) return;
 
     const actualBloqueado = !!producto.bloqueado;
-    producto.bloqueado = !actualBloqueado;
-    this.productosState.set([...this.productosState()]);
+    const nuevoEstado = !actualBloqueado;
+
+    producto.bloqueado = nuevoEstado;
+    this.productosState.set(
+      this.productosState().map(p => p.id === producto.id ? { ...p, bloqueado: nuevoEstado } : p)
+    );
 
     if (actualBloqueado) {
       this.restriccionProductoService.desbloquearProducto(alumno.id, producto.id).subscribe({
@@ -233,7 +364,9 @@ export class BuffetPresenter {
         error: (err) => {
           console.error('Error unlocking product:', err);
           producto.bloqueado = true;
-          this.productosState.set([...this.productosState()]);
+          this.productosState.set(
+            this.productosState().map(p => p.id === producto.id ? { ...p, bloqueado: true } : p)
+          );
           this.toastService.mostrar('Error al desbloquear el producto', 'error');
         }
       });
@@ -245,7 +378,9 @@ export class BuffetPresenter {
         error: (err) => {
           console.error('Error blocking product:', err);
           producto.bloqueado = false;
-          this.productosState.set([...this.productosState()]);
+          this.productosState.set(
+            this.productosState().map(p => p.id === producto.id ? { ...p, bloqueado: false } : p)
+          );
           this.toastService.mostrar('Error al bloquear el producto', 'error');
         }
       });

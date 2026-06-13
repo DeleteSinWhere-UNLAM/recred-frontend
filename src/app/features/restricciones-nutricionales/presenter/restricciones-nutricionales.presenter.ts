@@ -14,11 +14,22 @@ import {
   normalizarDescripcion,
   restriccionesPorDefecto,
 } from '../models/restricciones-nutricionales.model';
+import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
+import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
+
+export interface HorarioCompraState {
+  franjaId: string;
+  descripcion: string;
+  bloqueado: boolean;
+  restriccionId?: string;
+}
 
 @Injectable()
 export class RestriccionesNutricionalesPresenter {
   private readonly alumnosService = inject(AlumnosService);
   private readonly restriccionesService = inject(RestriccionesNutricionalesService);
+  private readonly restriccionesHorariasService = inject(RestriccionesHorariasService);
+  private readonly franjasHorariasService = inject(FranjasHorariasService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -26,6 +37,7 @@ export class RestriccionesNutricionalesPresenter {
   private readonly restriccionesState = signal<RestriccionesNutricionales>(
     restriccionesPorDefecto(),
   );
+  private readonly horariosCompraState = signal<HorarioCompraState[]>([]);
   private readonly cargandoState = signal(false);
   private readonly guardandoState = signal(false);
 
@@ -36,6 +48,7 @@ export class RestriccionesNutricionalesPresenter {
   readonly alumno: Signal<Alumno | undefined> = this.alumnoState.asReadonly();
   readonly restricciones: Signal<RestriccionesNutricionales> =
     this.restriccionesState.asReadonly();
+  readonly horariosCompra = this.horariosCompraState.asReadonly();
   readonly cargando = this.cargandoState.asReadonly();
   readonly guardando = this.guardandoState.asReadonly();
 
@@ -63,18 +76,44 @@ export class RestriccionesNutricionalesPresenter {
       }
       this.alumnoId = alumnoId;
       this.alumnoState.set(alumno);
-      const [catalogo, activas] = await Promise.all([
+      const [catalogo, activas, restriccionesHorarias, franjas] = await Promise.all([
         this.restriccionesService.getCatalogo(),
         this.restriccionesService.getRestriccionesAlumno(alumnoId),
+        this.restriccionesHorariasService.getRestriccionesPorAlumno(alumnoId),
+        this.franjasHorariasService.getFranjasHorarias(alumno.colegioId)
       ]);
       this.idPorClave = this.construirMapeo(catalogo);
       this.restriccionesState.set(this.proyectarActivas(activas));
+
+      const mappedHorarios: HorarioCompraState[] = franjas.map(slot => {
+        const restriction = restriccionesHorarias.find(r => 
+          r.activa !== false &&
+          (r.franjaHoraria?.id === slot.id || r.timeSlotId === slot.id) &&
+          !r.categoryId && !r.classificationId && !r.categoria && !r.clasificacionSalud
+        );
+
+        return {
+          franjaId: slot.id,
+          descripcion: slot.descripcion,
+          bloqueado: !!restriction,
+          restriccionId: restriction?.id
+        };
+      });
+
+      this.horariosCompraState.set(mappedHorarios);
+
     } catch (error) {
       console.error('[RestriccionesNutricionales] error cargando', error);
       this.toastService.mostrar('No pudimos cargar las restricciones del alumno.', 'error');
     } finally {
       this.cargandoState.set(false);
     }
+  }
+
+  alternarHorario(franjaId: string): void {
+    this.horariosCompraState.update(actual => 
+      actual.map(h => h.franjaId === franjaId ? { ...h, bloqueado: !h.bloqueado } : h)
+    );
   }
 
   alternar(clave: ClaveRestriccion): void {
@@ -87,7 +126,28 @@ export class RestriccionesNutricionalesPresenter {
     const ids = this.idsSeleccionados();
     this.guardandoState.set(true);
     try {
+      // 1. Guardar restricciones nutricionales
       await this.restriccionesService.actualizarRestricciones(this.alumnoId, ids);
+
+      // 2. Guardar restricciones horarias
+      const horarios = this.horariosCompraState();
+      await Promise.all(
+        horarios.map(async (h) => {
+          if (!h.bloqueado && h.restriccionId) {
+            // Pasó de bloqueado a permitido: deshabilitar restricción
+            await this.restriccionesHorariasService.deshabilitarRestriccion(h.restriccionId);
+          } else if (h.bloqueado && !h.restriccionId) {
+            // Pasó de permitido a bloqueado: crear restricción
+            await this.restriccionesHorariasService.crearRestriccion({
+              studentId: this.alumnoId,
+              timeSlotId: h.franjaId,
+              categoryId: null,
+              classificationId: null
+            });
+          }
+        })
+      );
+
       this.toastService.mostrar('Restricciones actualizadas.', 'success');
       this.router.navigateByUrl('/tutor');
     } catch (error) {

@@ -61,7 +61,7 @@ describe('AiProductUploadPageComponent', () => {
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
     component.handlePhoto(file);
 
-    expect(component.isLoading).toBeFalse(); // After subscribe it becomes false
+    expect(component.isLoading).toBeFalse();
     expect(aiVisionServiceMock.analyzeImage).toHaveBeenCalledWith(file);
     expect(component.scannedProductData?.nombre).toBe('Galletas de arroz integral');
   });
