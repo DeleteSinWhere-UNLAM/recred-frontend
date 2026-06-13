@@ -1,0 +1,117 @@
+<app-navbar [userName]="nombreUsuario()" />
+
+<main class="carritos-page">
+  <div class="carritos-page__container">
+    <header class="carritos-page__cabecera">
+      <button
+        type="button"
+        class="carritos-page__volver"
+        (click)="volver()"
+      >
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Volver</span>
+      </button>
+      <div class="carritos-page__titulo-bloque">
+        <h2 class="carritos-page__titulo">Carritos Favoritos</h2>
+        <p class="carritos-page__subtitulo">
+          Tus combinaciones de productos guardadas para compras rápidas.
+        </p>
+      </div>
+    </header>
+
+    @if (isLoading) {
+      <div class="carritos-page__loading" role="status">
+        <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+        <span>Cargando carritos favoritos...</span>
+      </div>
+    } @else if (gruposHijos.length === 0) {
+      <section class="carritos-page__vacio" role="status">
+        <i class="fa-solid fa-heart-crack" aria-hidden="true"></i>
+        <h3>No tenés carritos favoritos guardados</h3>
+        <p>Podés guardar un carrito como favorito al armar tu pedido en la pantalla del carrito.</p>
+        <button
+          type="button"
+          class="carritos-page__vacio-cta"
+          (click)="volver()"
+        >
+          Ir al inicio
+        </button>
+      </section>
+    } @else {
+      <div class="carritos-page__grid">
+        @for (grupo of gruposHijos; track grupo.alumnoId) {
+          <section class="grupo-hijo" [attr.aria-label]="'Carritos para ' + grupo.alumnoNombre">
+            <h3 class="grupo-hijo__titulo">
+              <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
+              <span>{{ grupo.alumnoNombre }} {{ grupo.alumnoApellido }}</span>
+            </h3>
+
+            <div class="grupo-hijo__carritos">
+              @for (cart of grupo.carritos; track cart.id) {
+                <article class="carrito-card">
+                  <header class="carrito-card__header">
+                    <h4 class="carrito-card__nombre">{{ cart.nombre }}</h4>
+                    <div class="carrito-card__acciones-top">
+                      <button
+                        type="button"
+                        class="carrito-card__btn-icon"
+                        (click)="abrirEditarModal(cart)"
+                        title="Editar nombre o hijo asignado"
+                      >
+                        <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="carrito-card__btn-icon carrito-card__btn-icon--danger"
+                        (click)="eliminarCarrito(cart.id)"
+                        title="Eliminar"
+                      >
+                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </header>
+
+                  <div class="carrito-card__body">
+                    <ul class="carrito-card__items">
+                      @for (item of cart.items; track item.productId) {
+                        <li class="carrito-card__item">
+                          <span class="carrito-card__item-qty">{{ item.quantity }}x</span>
+                          <span class="carrito-card__item-name">{{ item.productName }}</span>
+                          <span class="carrito-card__item-price">
+                            {{ formatearPrecio(item.unitPrice * item.quantity) }}
+                          </span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+
+                  <footer class="carrito-card__footer">
+                    <button
+                      type="button"
+                      class="carrito-card__btn-cargar"
+                      (click)="cargarAlCarrito(cart)"
+                    >
+                      <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+                      Cargar al Carrito
+                    </button>
+                  </footer>
+                </article>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+  </div>
+</main>
+
+@if (mostrarModalEditar) {
+  <app-guardar-favorito-modal
+    [cartId]="editarCartId"
+    [initialNombre]="editarInitialNombre"
+    [initialAlumnoId]="editarInitialAlumnoId"
+    [items]="editarItems"
+    (closeModal)="cerrarEditarModal()"
+    (saveSuccess)="cargarCarritosFavoritos()"
+  />
+}

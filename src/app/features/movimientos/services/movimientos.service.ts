@@ -19,6 +19,10 @@ export class MovimientosService {
     return this.http.get<Movimiento[]>(`${environment.apiUrl}/purchases/tutor/me`);
   }
 
+  cancelarCompra(id: string): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/purchases/${id}/cancel`, {});
+  }
+
   private isUuid(id: string): boolean {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   }

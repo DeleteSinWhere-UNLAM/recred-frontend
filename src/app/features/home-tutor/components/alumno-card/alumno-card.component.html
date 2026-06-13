@@ -37,6 +37,12 @@
       </span>
       <span class="alumno-card__accion-label">Restricciones</span>
     </a>
+    <a class="alumno-card__accion alumno-card__accion--azul" [routerLink]="['/restricciones-horarias', alumno.id]">
+      <span class="alumno-card__accion-icono" aria-hidden="true">
+        <i class="fa-solid fa-clock"></i>
+      </span>
+      <span class="alumno-card__accion-label">Horarios</span>
+    </a>
     <a class="alumno-card__accion alumno-card__accion--dorado" [routerLink]="['/presupuesto', alumno.id]">
       <span class="alumno-card__accion-icono" aria-hidden="true">
         <i class="fa-solid fa-piggy-bank"></i>

@@ -1,4 +1,6 @@
 export type AccionKiosqueroId =
+  | 'venta-espontanea'
+  | 'tracking-pedidos'
   | 'cargar-productos'
   | 'dashboard'
   | 'stock'
@@ -20,4 +22,5 @@ export interface AccionKiosquero {
   icono: string;
   ruta: string;
   color?: AccionKiosqueroColor;
+  destacada?: boolean;
 }

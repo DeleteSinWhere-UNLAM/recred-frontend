@@ -56,6 +56,67 @@
       }
     </header>
 
+    @if (!esVistaAlumno() && presenter.presupuestoDisponible(); as presupuesto) {
+      <section class="buffet__presupuesto-seccion" aria-labelledby="presupuesto-disponible-titulo">
+        <div class="buffet__presupuesto-general">
+          <div class="buffet__presupuesto-info">
+            <h3 id="presupuesto-disponible-titulo" class="buffet__presupuesto-titulo">
+              <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+              Saldo Disponible
+            </h3>
+            <p class="buffet__presupuesto-periodo">
+              Período: <strong>{{ presupuesto.periodo }}</strong> (Límite total: {{ formatARS(presupuesto.montoLimiteGeneral) }})
+            </p>
+          </div>
+          <div class="buffet__presupuesto-valores">
+            <div class="buffet__presupuesto-disponible-total">
+              <span class="buffet__presupuesto-valor-label">Disponible general</span>
+              <span class="buffet__presupuesto-valor" [class.buffet__presupuesto-valor--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85">
+                {{ formatARS(presupuesto.montoDisponibleGeneral) }}
+              </span>
+            </div>
+            <div class="buffet__presupuesto-progreso-wrapper">
+              <div class="buffet__presupuesto-progreso-barra">
+                <div class="buffet__presupuesto-progreso-fill" 
+                     [style.width.%]="presupuesto.porcentajeConsumidoGeneral"
+                     [class.buffet__presupuesto-progreso-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"></div>
+              </div>
+              <span class="buffet__presupuesto-progreso-texto">Consumido: {{ formatARS(presupuesto.montoConsumidoGeneral) }} ({{ presupuesto.porcentajeConsumidoGeneral }}%)</span>
+            </div>
+          </div>
+        </div>
+
+        @if (presupuesto.reglasCategorias.length > 0) {
+          <div class="buffet__presupuesto-categorias">
+            <h4 class="buffet__presupuesto-subtitulo">Saldos por Categoría</h4>
+            <div class="buffet__presupuesto-categorias-grid">
+              @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
+                <div class="buffet__categoria-card">
+                  <div class="buffet__categoria-info">
+                    <span class="buffet__categoria-nombre">{{ regla.descripcionCategoria }}</span>
+                    <span class="buffet__categoria-limite">Límite: {{ formatARS(regla.montoLimite) }}</span>
+                  </div>
+                  <div class="buffet__categoria-valores">
+                    <span class="buffet__categoria-disponible" [class.buffet__categoria-disponible--alerta]="regla.porcentajeConsumido >= 85">
+                      {{ formatARS(regla.montoDisponible) }}
+                    </span>
+                    <span class="buffet__categoria-disponible-label">disponible</span>
+                  </div>
+                  <div class="buffet__categoria-progreso">
+                    <div class="buffet__categoria-progreso-barra">
+                      <div class="buffet__categoria-progreso-fill" 
+                           [style.width.%]="regla.porcentajeConsumido"
+                           [class.buffet__categoria-progreso-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
+
     <section class="buffet__filtros" aria-label="Filtros del menú">
       <div class="buffet__filtro buffet__filtro--busqueda">
         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>

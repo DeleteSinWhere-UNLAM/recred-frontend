@@ -7,72 +7,158 @@
   aria-label="Cerrar modal"
 >
   <div class="mov-modal" role="dialog" aria-labelledby="modal-titulo">
-    <header class="mov-modal__header">
-      <h3 id="modal-titulo" class="mov-modal__titulo">Detalles del Movimiento</h3>
+    <header class="mov-modal__header" [class.mov-modal__header--pedido]="movimiento.tipo === 'ANTICIPADA'">
+      @if (movimiento.tipo === 'ANTICIPADA') {
+        <div class="mov-modal__title-section">
+          <span class="mov-modal__header-badge" [attr.data-status]="movimiento.status">
+            {{ movimiento.statusLabel || movimiento.status }}
+          </span>
+          <h3 id="modal-titulo" class="mov-modal__titulo">Detalle del Pedido</h3>
+        </div>
+      } @else {
+        <h3 id="modal-titulo" class="mov-modal__titulo">Detalles del Movimiento</h3>
+      }
       <button type="button" class="mov-modal__close-btn" (click)="onCerrar()" aria-label="Cerrar modal">
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </header>
 
     <div class="mov-modal__body">
-      <div class="mov-modal__section mov-modal__section--info">
-        <div class="mov-modal__info-grid">
-          <div>
-            <span class="mov-modal__label">Fecha y Hora</span>
-            <span class="mov-modal__value">{{ formatearFecha(movimiento.date) }}</span>
+      @if (movimiento.tipo === 'ANTICIPADA') {
+        <!-- Info del retiro -->
+        <section class="mov-modal__section" aria-labelledby="client-info-title">
+          <h4 id="client-info-title" class="mov-modal__section-titulo-pedido">Información de Retiro</h4>
+          <div class="mov-modal__info-grid">
+            <div>
+              <span class="mov-modal__label">Alumno</span>
+              <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Fecha Programada</span>
+              <span class="mov-modal__value">{{ formatearFechaProgramada(movimiento.pickupDate) }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Franja Horaria</span>
+              <span class="mov-modal__value">{{ movimiento.pickupSlotDescription || 'Por definir' }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Método de Pago</span>
+              <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
+            </div>
           </div>
-          <div>
-            <span class="mov-modal__label">Alumno</span>
-            <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
-          </div>
-          <div>
-            <span class="mov-modal__label">Medio de Pago</span>
-            <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
-          </div>
-          <div>
-            <span class="mov-modal__label">Estado</span>
-            <span class="mov-modal__badge" [attr.data-status]="movimiento.status">
-              {{ movimiento.statusLabel || movimiento.status }}
-            </span>
-          </div>
-        </div>
-      </div>
+        </section>
 
-      <div class="mov-modal__section">
-        <h4 class="mov-modal__section-titulo">Productos Consumidos</h4>
-        <div class="mov-modal__table-container">
-          <table class="mov-modal__table">
-            <thead>
-              <tr>
-                <th>Producto</th>
-                <th class="txt-center">Cant.</th>
-                <th class="txt-right">Unitario</th>
-                <th class="txt-right">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of movimiento.items; track item.productId) {
-                <tr>
-                  <td>{{ item.productName }}</td>
-                  <td class="txt-center">{{ item.quantity }}</td>
-                  <td class="txt-right">{{ formatearPrecio(item.unitPrice) }}</td>
-                  <td class="txt-right">{{ formatearPrecio(item.unitPrice * item.quantity) }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        <!-- Código de verificación -->
+        @if (movimiento.withdrawalCode) {
+          <section class="mov-modal__section mov-modal__section--keyword" aria-labelledby="keyword-title">
+            <h4 id="keyword-title" class="mov-modal__section-titulo" style="margin: 0; text-align: center;">Clave de Retiro</h4>
+            <div class="keyword-badge">
+              <i class="fa-solid fa-key keyword-badge__icon"></i>
+              <span class="keyword-badge__code">{{ movimiento.withdrawalCode }}</span>
+            </div>
+          </section>
+        }
+
+        <!-- Detalle de productos -->
+        <section class="mov-modal__section" aria-labelledby="products-title">
+          <h4 id="products-title" class="mov-modal__section-titulo-pedido">Productos Pedidos</h4>
+          <div class="items-list">
+            @for (item of movimiento.items; track item.productId) {
+              <div class="item-row">
+                <div class="item-row__info">
+                  <span class="item-row__name">{{ item.productName }}</span>
+                  <span class="item-row__qty">x{{ item.quantity }}</span>
+                </div>
+                <span class="item-row__price">
+                  {{ formatearPrecio(item.unitPrice * item.quantity) }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <div class="total-row">
+            <span class="total-row__label">Total del Pedido</span>
+            <strong class="total-row__value">{{ formatearPrecio(movimiento.totalAmount) }}</strong>
+          </div>
+        </section>
+      } @else {
+        <!-- Presencial purchase -->
+        <div class="mov-modal__section mov-modal__section--info">
+          <div class="mov-modal__info-grid">
+            <div>
+              <span class="mov-modal__label">Fecha y Hora</span>
+              <span class="mov-modal__value">{{ formatearFecha(movimiento.date) }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Alumno</span>
+              <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
+            </div>
+            @if (esVistaAlumno) {
+              <div>
+                <span class="mov-modal__label">Medio de Pago</span>
+                <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
+              </div>
+            }
+            <div>
+              <span class="mov-modal__label">Estado</span>
+              <div>
+                <span class="mov-modal__badge" [attr.data-status]="movimiento.status">
+                  {{ movimiento.statusLabel || movimiento.status }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <div class="mov-modal__section">
+          <h4 class="mov-modal__section-titulo">Productos Consumidos</h4>
+          <div class="mov-modal__table-container">
+            <table class="mov-modal__table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th class="txt-center">Cant.</th>
+                  <th class="txt-right">Unitario</th>
+                  <th class="txt-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of movimiento.items; track item.productId) {
+                  <tr>
+                    <td>{{ item.productName }}</td>
+                    <td class="txt-center">{{ item.quantity }}</td>
+                    <td class="txt-right">{{ formatearPrecio(item.unitPrice) }}</td>
+                    <td class="txt-right">{{ formatearPrecio(item.unitPrice * item.quantity) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
     </div>
 
-    <footer class="mov-modal__footer">
-      <div class="mov-modal__total">
-        <span>Total de la Compra</span>
-        <strong>{{ formatearPrecio(movimiento.totalAmount) }}</strong>
-      </div>
-      <button type="button" class="mov-modal__action-btn" (click)="onCerrar()">
-        Listo
-      </button>
-    </footer>
+    @if (movimiento.tipo === 'ANTICIPADA') {
+      <footer class="mov-modal__footer--pedido">
+        @if (puedoCancelar()) {
+          <button type="button" class="mov-modal__btn--danger" [disabled]="esFechaLimiteSuperada()" (click)="onCancelar()">
+            <i class="fa-solid fa-ban"></i> Cancelar Pedido
+          </button>
+        }
+        <button type="button" class="mov-modal__btn--secondary" (click)="onCerrar()">
+          Cerrar
+        </button>
+      </footer>
+    } @else {
+      <footer class="mov-modal__footer">
+        <div class="mov-modal__total">
+          <span>Total de la Compra</span>
+          <strong>{{ formatearPrecio(movimiento.totalAmount) }}</strong>
+        </div>
+        <button type="button" class="mov-modal__action-btn" (click)="onCerrar()">
+          Listo
+        </button>
+      </footer>
+    }
   </div>
 </div>

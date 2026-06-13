@@ -1,0 +1,98 @@
+<div class="modal-backdrop" (click)="onClose()" (keyup.escape)="onClose()" tabindex="-1">
+  <div class="modal-container" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="modal-header__title-section">
+        <h2 class="modal-header__title">
+          {{ cartId ? 'Editar Carrito Favorito' : 'Guardar como Favorito' }}
+        </h2>
+      </div>
+      <button class="modal-header__close-btn" (click)="onClose()" aria-label="Cerrar modal" [disabled]="isSaving">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </header>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Input de Nombre -->
+      <div class="form-group">
+        <label for="cart-name" class="form-label">Nombre del Carrito</label>
+        <input
+          id="cart-name"
+          type="text"
+          [(ngModel)]="nombre"
+          class="form-input"
+          placeholder="Ej: Desayuno saludable, Almuerzo de los Viernes"
+          [disabled]="isSaving"
+        />
+      </div>
+
+      <!-- Select de Hijo -->
+      <div class="form-group">
+        <label for="student-select" class="form-label">¿Para qué hijo es?</label>
+        <select
+          id="student-select"
+          [(ngModel)]="alumnoId"
+          class="form-select"
+          [disabled]="isSaving"
+        >
+          <option value="" disabled selected>Seleccioná un hijo</option>
+          @for (hijo of hijos(); track hijo.id) {
+            <option [value]="hijo.id">
+              {{ hijo.nombre }} {{ hijo.apellido }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- Detalle de productos -->
+      <section class="modal-section" aria-labelledby="products-title">
+        <h3 id="products-title" class="modal-section__title">Productos agregados</h3>
+        <div class="items-list">
+          @if (items.length === 0) {
+            <p class="empty-items">No hay productos en este carrito.</p>
+          } @else {
+            @for (item of items; track item.productId) {
+              <div class="item-row">
+                <div class="item-row__info">
+                  <span class="item-row__name">{{ item.productName }}</span>
+                  <span class="item-row__qty">x{{ item.quantity }}</span>
+                </div>
+                <span class="item-row__price">
+                  {{ (item.price * item.quantity) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+                </span>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="total-row">
+          <span class="total-row__label">Total del Carrito</span>
+          <strong class="total-row__value">{{ total | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</strong>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer / Acciones -->
+    <footer class="modal-footer">
+      <button
+        class="modal-btn modal-btn--secondary"
+        (click)="onClose()"
+        [disabled]="isSaving"
+      >
+        Cancelar
+      </button>
+      <button
+        class="modal-btn modal-btn--primary"
+        (click)="onSave()"
+        [disabled]="isSaving || !nombre.trim() || !alumnoId"
+      >
+        @if (isSaving) {
+          <i class="fa-solid fa-spinner fa-spin"></i> Guardando...
+        } @else {
+          <i class="fa-solid fa-floppy-disk"></i> Guardar
+        }
+      </button>
+    </footer>
+  </div>
+</div>

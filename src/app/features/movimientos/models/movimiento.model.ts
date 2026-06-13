@@ -14,4 +14,9 @@ export interface Movimiento {
   paymentMethod: string;
   date: string;
   items: ItemMovimiento[];
+  tipo?: 'ANTICIPADA' | 'PRESENCIAL';
+  withdrawalCode?: string;
+  pickupSlotDescription?: string;
+  pickupDate?: string;
+  pickupSlotStartTime?: string;
 }

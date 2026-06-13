@@ -10,6 +10,7 @@ import { MovimientosService } from './services/movimientos.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { Movimiento } from './models/movimiento.model';
 import { Alumno } from '../../data-access/models/alumno.model';
 
@@ -21,6 +22,7 @@ describe('MovimientosPage', () => {
   let movimientosServiceSpy: jasmine.SpyObj<MovimientosService>;
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   let paramMapSubject: BehaviorSubject<ParamMap>;
 
@@ -81,6 +83,7 @@ describe('MovimientosPage', () => {
     movimientosServiceSpy = jasmine.createSpyObj<MovimientosService>('MovimientosService', [
       'getHistorialAlumno',
       'getHistorialTutor',
+      'cancelarCompra',
     ]);
     alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>('AlumnosService', [
       'asegurarCargados',
@@ -88,6 +91,9 @@ describe('MovimientosPage', () => {
     ]);
     perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', [
       'obtenerAlumnoId',
+    ]);
+    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', [
+      'mostrar',
     ]);
 
     alumnosServiceSpy.asegurarCargados.and.resolveTo([mockAlumno1, mockAlumno2]);
@@ -106,6 +112,7 @@ describe('MovimientosPage', () => {
 
     movimientosServiceSpy.getHistorialTutor.and.returnValue(of(mockMovimientosList));
     movimientosServiceSpy.getHistorialAlumno.and.returnValue(of([mockMovimiento1, mockMovimiento3]));
+    movimientosServiceSpy.cancelarCompra.and.returnValue(of(undefined));
 
     paramMapSubject = new BehaviorSubject(convertToParamMap({}));
 
@@ -118,6 +125,7 @@ describe('MovimientosPage', () => {
         { provide: MovimientosService, useValue: movimientosServiceSpy },
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: PerfilService, useValue: perfilServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
         UsuarioService, // Usar UsuarioService real para resolver señales y métodos de manera correcta en el Navbar
         {
           provide: ActivatedRoute,
@@ -240,6 +248,17 @@ describe('MovimientosPage', () => {
 
       component.cerrarDetalle();
       expect(component.modalMovimiento()).toBeNull();
+    });
+
+    it('debería cancelar el pedido y actualizar el estado a CANCELADO', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      component.modalMovimiento.set(mockMovimiento2);
+      
+      component.cancelarPedido('mov-2');
+      
+      expect(movimientosServiceSpy.cancelarCompra).toHaveBeenCalledWith('mov-2');
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Pedido cancelado y saldo reembolsado', 'success');
+      expect(component.modalMovimiento()?.status).toBe('CANCELADO');
     });
   });
 

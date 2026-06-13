@@ -49,7 +49,27 @@ export class HomeKiosqueroPresenter {
     () => this.resumenState()?.productosSinStock ?? 0,
   );
 
+  readonly pedidosPendientes = computed(
+    () => this.resumenState()?.pedidosPendientes ?? 0,
+  );
+
   readonly acciones: Signal<AccionKiosquero[]> = computed(() => [
+    {
+      id: 'venta-espontanea',
+      titulo: 'Venta espontánea',
+      descripcion: 'Registra una venta presencial a un alumno',
+      icono: 'fa-cash-register',
+      ruta: '/kiosquero/venta-espontanea',
+      destacada: true,
+    },
+    {
+      id: 'tracking-pedidos',
+      titulo: 'Seguimiento de pedidos',
+      descripcion: 'Monitorea y entrega los pedidos recibidos',
+      icono: 'fa-clipboard-list',
+      ruta: '/kiosquero/pedidos-tracking',
+      destacada: true,
+    },
     {
       id: 'cargar-productos',
       titulo: 'Carga de producto',

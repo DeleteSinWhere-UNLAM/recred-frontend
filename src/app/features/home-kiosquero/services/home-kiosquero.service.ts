@@ -9,6 +9,7 @@ export class HomeKiosqueroService {
       gananciasHoy: 12450,
       ventasHoy: 34,
       productosSinStock: 5,
+      pedidosPendientes: 8,
     };
   }
 
