@@ -126,6 +126,29 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
             Catálogo Disponible
           </h2>
 
+          
+          <h2 class="venta__paso-titulo" style="margin-top: 32px;">
+            <span class="venta__paso-numero">3</span>
+            Método de Pago
+          </h2>
+          <div style="display: flex; gap: 16px; margin-bottom: 32px;">
+            <button 
+              type="button"
+              (click)="metodoPago.set('CREDITOS')"
+              [style.border]="metodoPago() === 'CREDITOS' ? '2px solid #007bff' : '1px solid #ddd'"
+              style="flex: 1; padding: 16px; border-radius: 8px; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-wallet" style="font-size: 24px;"></i>
+              <span>Créditos Recreo</span>
+            </button>
+            <button 
+              type="button"
+              (click)="metodoPago.set('MERCADO_PAGO')"
+              [style.border]="metodoPago() === 'MERCADO_PAGO' ? '2px solid #007bff' : '1px solid #ddd'"
+              style="flex: 1; padding: 16px; border-radius: 8px; background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-credit-card" style="font-size: 24px;"></i>
+              <span>Mercado Pago</span>
+            </button>
+          </div>
           <!-- Grid de Productos -->
           <div class="venta__grid">
             @for (producto of service.productos(); track producto.id) {
@@ -224,6 +247,7 @@ export class VentaEspontaneaPageComponent implements OnInit {
   carrito = signal<Map<string, number>>(new Map());
   procesando = signal(false);
   mensajeError = signal('');
+  metodoPago = signal('CREDITOS');
 
   ngOnInit() {
     this.service.cargarAlumnos().subscribe();
@@ -342,8 +366,12 @@ export class VentaEspontaneaPageComponent implements OnInit {
     this.procesando.set(true);
     this.mensajeError.set('');
 
-    this.service.procesarVenta(alumno.id, items).subscribe({
-      next: () => {
+    this.service.procesarVenta(alumno.id, items, this.metodoPago()).subscribe({
+      next: (res: any) => {
+        if (res.paymentUrl) {
+          window.location.href = res.paymentUrl;
+          return;
+        }
         this.procesando.set(false);
         alert('¡Venta realizada con éxito!');
         this.router.navigate(['/kiosquero']);
