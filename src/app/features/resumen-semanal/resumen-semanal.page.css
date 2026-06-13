@@ -231,7 +231,12 @@
   font-size: 0.85rem;
   color: #8d99aa;
 }
-
+.metric__label {
+  display: block;
+  font-size: 0.85rem;
+  color: #7b8794;
+  margin-bottom: 4px;
+}
 /* =========================
    CATEGORIES
 ========================= */

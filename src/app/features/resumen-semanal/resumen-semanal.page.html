@@ -78,7 +78,8 @@
 
             <div class="child-card__content">
               <div class="metric">
-                <label>Producto favorito</label>
+                <span class="metric__label">Producto favorito</span>
+
                 <strong>
                   {{
                     hijo.datos.productoMasConsumido?.nombre ?? "Sin consumos"
@@ -87,7 +88,8 @@
               </div>
 
               <div class="metric">
-                <label>Cantidad</label>
+                <span class="metric__label">Cantidad</span>
+
                 <strong>
                   {{ hijo.datos.productoMasConsumido?.cantidad ?? 0 }}
                 </strong>
