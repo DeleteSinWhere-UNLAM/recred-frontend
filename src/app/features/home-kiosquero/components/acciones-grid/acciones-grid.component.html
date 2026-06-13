@@ -8,7 +8,9 @@
     @for (accion of acciones; track accion.id) {
       <app-accion-card
         class="acciones-grid__item"
+        [class.acciones-grid__item--full]="accion.destacada"
         [accion]="accion"
+        [destacada]="accion.destacada ?? false"
         (seleccionar)="onSeleccionar($event)"
       />
     }
