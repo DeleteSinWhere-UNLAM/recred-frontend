@@ -12,7 +12,7 @@ import { PresupuestoService } from '../../../presupuesto/services/presupuesto.se
 import { RestriccionesHorariasService } from '../../../restricciones-horarias/services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../../../restricciones-horarias/services/franjas-horarias.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { of } from 'rxjs';
+
 import { signal } from '@angular/core';
 
 describe('CarritoPresenter', () => {
@@ -95,6 +95,7 @@ describe('CarritoPresenter', () => {
 
   describe('validaciones de avance', () => {
     it('debería calcular grupos correctamente y permitir avanzar si todo está OK', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mapa = new Map<string, any[]>();
       mapa.set('alumno-1', [
         {
@@ -120,6 +121,7 @@ describe('CarritoPresenter', () => {
     });
 
     it('no debería permitir avanzar si el saldo es insuficiente', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mapa = new Map<string, any[]>();
       mapa.set('alumno-1', [
         {
@@ -144,6 +146,7 @@ describe('CarritoPresenter', () => {
 
   describe('acciones', () => {
     it('debería llamar a iniciarOrden y navegar al avanzar', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mapa = new Map<string, any[]>();
       mapa.set('alumno-1', [
         {
