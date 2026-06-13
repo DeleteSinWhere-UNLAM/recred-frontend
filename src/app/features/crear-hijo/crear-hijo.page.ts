@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormControl,
@@ -20,6 +27,8 @@ type CrearHijoForm = FormGroup<{
   username: FormControl<string>;
   email: FormControl<string>;
   dni: FormControl<string>;
+  colegioId: FormControl<string>;
+  gradoId: FormControl<string>;
 }>;
 
 function usernameSinFormatoEmail(
@@ -44,6 +53,7 @@ export class CrearHijoPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly form: CrearHijoForm = new FormGroup({
     nombre: new FormControl('', {
@@ -73,6 +83,14 @@ export class CrearHijoPage implements OnInit {
         Validators.pattern(/^\d{7,9}$/),
       ],
     }),
+    colegioId: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    gradoId: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
 
   protected readonly nombreUsuario =
@@ -86,6 +104,14 @@ export class CrearHijoPage implements OnInit {
 
   ngOnInit(): void {
     void this.alumnosService.asegurarCargados();
+    void this.presenter.cargarColegios();
+
+    this.form.controls.colegioId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((colegioId) => {
+        this.form.controls.gradoId.setValue('');
+        void this.presenter.cargarGrados(colegioId);
+      });
   }
 
   protected async onSubmit(event: Event): Promise<void> {
@@ -94,14 +120,15 @@ export class CrearHijoPage implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    const { nombre, apellido, username, email, dni } = this.form.getRawValue();
+    const { nombre, apellido, username, email, dni, gradoId } =
+      this.form.getRawValue();
     await this.presenter.crear({
       nombre,
       apellido,
       username,
       email,
       dni,
-      gradoId: 'd65d48fc-95e8-46b0-868c-c593a95e14e3',
+      gradoId,
     });
   }
 

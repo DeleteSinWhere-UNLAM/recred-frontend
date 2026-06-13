@@ -5,19 +5,61 @@ import {
   AlumnosService,
   CrearHijoRequest,
 } from '../../../data-access/services/alumnos.service';
+import { ColegiosService } from '../../../data-access/services/colegios.service';
+import { Colegio } from '../../../data-access/models/colegio.model';
+import { Grado } from '../../../data-access/models/grado.model';
 import { ToastService } from '../../../shared/services/toast.service';
 
 @Injectable()
 export class CrearHijoPresenter {
   private readonly alumnosService = inject(AlumnosService);
+  private readonly colegiosService = inject(ColegiosService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
   private readonly guardandoState = signal(false);
   private readonly errorState = signal<string | null>(null);
+  private readonly colegiosState = signal<Colegio[]>([]);
+  private readonly gradosState = signal<Grado[]>([]);
+  private readonly cargandoColegiosState = signal(false);
+  private readonly cargandoGradosState = signal(false);
 
   readonly guardando: Signal<boolean> = this.guardandoState.asReadonly();
   readonly error: Signal<string | null> = this.errorState.asReadonly();
+  readonly colegios: Signal<Colegio[]> = this.colegiosState.asReadonly();
+  readonly grados: Signal<Grado[]> = this.gradosState.asReadonly();
+  readonly cargandoColegios: Signal<boolean> =
+    this.cargandoColegiosState.asReadonly();
+  readonly cargandoGrados: Signal<boolean> =
+    this.cargandoGradosState.asReadonly();
+
+  async cargarColegios(): Promise<void> {
+    if (this.cargandoColegiosState() || this.colegiosState().length > 0) return;
+    this.cargandoColegiosState.set(true);
+    try {
+      const lista = await this.colegiosService.obtenerColegios();
+      this.colegiosState.set(lista);
+    } catch {
+      this.toastService.mostrar('No se pudieron cargar los colegios.', 'error');
+    } finally {
+      this.cargandoColegiosState.set(false);
+    }
+  }
+
+  async cargarGrados(colegioId: string): Promise<void> {
+    this.gradosState.set([]);
+    if (!colegioId) return;
+    this.cargandoGradosState.set(true);
+    try {
+      const lista =
+        await this.colegiosService.obtenerGradosPorColegio(colegioId);
+      this.gradosState.set(lista);
+    } catch {
+      this.toastService.mostrar('No se pudieron cargar los grados.', 'error');
+    } finally {
+      this.cargandoGradosState.set(false);
+    }
+  }
 
   async crear(req: CrearHijoRequest): Promise<boolean> {
     if (this.guardandoState()) return false;
