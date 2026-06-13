@@ -755,3 +755,106 @@
 .producto-card--bloqueado .producto-card__precio {
   opacity: 0.55;
 }
+
+/* =========================================================
+   BLOQUEO DE FIN DE SEMANA / FERIADOS
+   ========================================================= */
+.venta__cabecera-acciones {
+  justify-self: end;
+}
+
+.venta__toggle-dias {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: var(--color-superficie);
+  padding: 8px 16px;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--color-borde);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  transition: all var(--transition-ui);
+}
+
+.venta__toggle-dias:hover {
+  background: rgba(74, 111, 165, 0.05);
+  border-color: var(--color-pizarra);
+}
+
+.venta__bloqueo-dia {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-card);
+  padding: 48px 24px;
+  max-width: 600px;
+  margin: 0 auto 32px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.venta__bloqueo-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+}
+
+.venta__bloqueo-icono {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(231, 111, 81, 0.1);
+  color: var(--color-melocoton);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+.venta__bloqueo-titulo {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  margin-bottom: 12px;
+}
+
+.venta__bloqueo-texto {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-pizarra);
+  margin-bottom: 8px;
+}
+
+.venta__bloqueo-subtexto {
+  font-size: 14px;
+  color: var(--color-texto-claro);
+  margin-bottom: 32px;
+}
+
+.venta__btn-desbloquear {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: linear-gradient(180deg, var(--color-pizarra), var(--color-pizarra-dark));
+  color: white;
+  border-radius: var(--radius-button);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(74, 111, 165, 0.2);
+  transition: all var(--transition-ui);
+}
+
+.venta__btn-desbloquear:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(74, 111, 165, 0.3);
+}

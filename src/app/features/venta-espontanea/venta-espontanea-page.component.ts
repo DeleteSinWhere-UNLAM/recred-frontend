@@ -6,6 +6,7 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
 import { VentaEspontaneaService, AlumnoResumen, ProductoVenta } from './services/venta-espontanea';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { FeriadosService } from '../../shared/services/feriados.service';
 
 @Component({
   selector: 'app-venta-espontanea-page',
@@ -25,7 +26,12 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
             <h1 class="venta__titulo">Venta Espontánea</h1>
             <p class="venta__subtitulo">Buffet Instituto San José</p>
           </div>
-          <div></div>
+          <div class="venta__cabecera-acciones">
+             <label class="venta__toggle-dias" title="Permite realizar ventas espontáneas durante fines de semana y feriados">
+               <input type="checkbox" [checked]="ventasDiasNoLaborablesHabilitadas()" (change)="toggleDiasNoLaborables($event)">
+               <span>Habilitar Fines de Semana / Feriados</span>
+             </label>
+          </div>
         </div>
 
         <!-- Error modal básico -->
@@ -37,6 +43,24 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
         </div>
         }
 
+        <!-- Bloqueo de Fin de Semana / Feriado -->
+        @if (bloqueadoPorDiaNoLaborable()) {
+        <div class="venta__bloqueo-dia">
+          <div class="venta__bloqueo-contenido">
+            <div class="venta__bloqueo-icono">
+              <i class="fa-solid fa-store-slash"></i>
+            </div>
+            <h2 class="venta__bloqueo-titulo">Día No Laborable</h2>
+            <p class="venta__bloqueo-texto">{{ mensajeBloqueoDia() }}</p>
+            <p class="venta__bloqueo-subtexto">
+              La venta espontánea está inhabilitada por defecto en días no laborables.
+            </p>
+            <button class="venta__btn-desbloquear" (click)="habilitarDiasNoLaborables()">
+              <i class="fa-solid fa-unlock"></i> Desbloquear Ventas Hoy
+            </button>
+          </div>
+        </div>
+        } @else {
         <!-- Paso 1: Seleccionar Alumno -->
         @if (!alumnoSeleccionado()) {
         <div class="venta__paso">
@@ -187,6 +211,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
           </div>
         </div>
         }
+        }
       </div>
 
       <!-- Footer Cart -->
@@ -213,6 +238,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 export class VentaEspontaneaPageComponent implements OnInit {
   service = inject(VentaEspontaneaService);
   router = inject(Router);
+  feriadosService = inject(FeriadosService);
 
   formats = [BarcodeFormat.QR_CODE];
 
@@ -225,8 +251,56 @@ export class VentaEspontaneaPageComponent implements OnInit {
   procesando = signal(false);
   mensajeError = signal('');
 
+  ventasDiasNoLaborablesHabilitadas = signal(false);
+  esDiaNoLaborable = signal(false);
+  mensajeBloqueoDia = signal('');
+
+  bloqueadoPorDiaNoLaborable = signal(false);
+
   ngOnInit() {
     this.service.cargarAlumnos().subscribe();
+    this.verificarDiaLaborable();
+  }
+
+  verificarDiaLaborable() {
+    const habilitadoStorage = localStorage.getItem('recred_habilitar_fines_semana');
+    if (habilitadoStorage === 'true') {
+      this.ventasDiasNoLaborablesHabilitadas.set(true);
+    }
+
+    const hoy = new Date();
+    const diaSemana = hoy.getDay();
+    if (diaSemana === 0 || diaSemana === 6) {
+      this.esDiaNoLaborable.set(true);
+      this.mensajeBloqueoDia.set('Hoy es fin de semana.');
+      this.actualizarEstadoBloqueo();
+      return;
+    }
+
+    this.feriadosService.esFeriadoHoy().subscribe((res) => {
+      if (res.esFeriado) {
+        this.esDiaNoLaborable.set(true);
+        this.mensajeBloqueoDia.set(`Hoy es feriado: ${res.motivo}.`);
+        this.actualizarEstadoBloqueo();
+      }
+    });
+  }
+
+  actualizarEstadoBloqueo() {
+    this.bloqueadoPorDiaNoLaborable.set(this.esDiaNoLaborable() && !this.ventasDiasNoLaborablesHabilitadas());
+  }
+
+  habilitarDiasNoLaborables() {
+    this.ventasDiasNoLaborablesHabilitadas.set(true);
+    localStorage.setItem('recred_habilitar_fines_semana', 'true');
+    this.actualizarEstadoBloqueo();
+  }
+
+  toggleDiasNoLaborables(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.ventasDiasNoLaborablesHabilitadas.set(checked);
+    localStorage.setItem('recred_habilitar_fines_semana', checked ? 'true' : 'false');
+    this.actualizarEstadoBloqueo();
   }
 
   isBloqueado(producto: ProductoVenta): boolean {
