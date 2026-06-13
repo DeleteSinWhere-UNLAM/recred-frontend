@@ -52,7 +52,9 @@ describe('CarritoPresenter', () => {
     restriccionesSpy.getRestriccionesPorAlumno.and.resolveTo([]);
     
     const franjasSpy = jasmine.createSpyObj('FranjasHorariasService', ['getFranjasHorarias']);
-    franjasSpy.getFranjasHorarias.and.resolveTo([]);
+    franjasSpy.getFranjasHorarias.and.resolveTo([
+      { id: '1', descripcion: 'Primer recreo', horaInicio: '10:00', horaFin: '10:30' }
+    ]);
     
     const presupuestoSpy = jasmine.createSpyObj('PresupuestoService', ['checkBudgetDates']);
     presupuestoSpy.checkBudgetDates.and.resolveTo([]);
@@ -94,7 +96,7 @@ describe('CarritoPresenter', () => {
   });
 
   describe('validaciones de avance', () => {
-    it('debería calcular grupos correctamente y permitir avanzar si todo está OK', () => {
+    it('debería calcular grupos correctamente y permitir avanzar si todo está OK', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mapa = new Map<string, any[]>();
       mapa.set('alumno-1', [
@@ -114,13 +116,15 @@ describe('CarritoPresenter', () => {
       carritoServiceSpy.seleccionRetiro.and.returnValue({
         'alumno-1': { fecha: '2050-01-03', recreo: 'PRIMER_RECREO' } // 2050-01-03 es lunes
       });
+      
+      await presenter.init();
 
       expect(presenter.grupos().length).toBe(1);
       expect(presenter.totalSeleccionado()).toBe(1000);
       expect(presenter.avanzarPosible()).toBeTrue();
     });
 
-    it('no debería permitir avanzar si el saldo es insuficiente', () => {
+    it('no debería permitir avanzar si el saldo es insuficiente', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mapa = new Map<string, any[]>();
       mapa.set('alumno-1', [
@@ -139,13 +143,15 @@ describe('CarritoPresenter', () => {
       carritoServiceSpy.seleccionRetiro.and.returnValue({
         'alumno-1': { fecha: '2050-01-03', recreo: 'PRIMER_RECREO' }
       });
+      
+      await presenter.init();
 
       expect(presenter.advertencia()).toContain('saldo de Test no alcanza');
     });
   });
 
   describe('acciones', () => {
-    it('debería llamar a iniciarOrden y navegar al avanzar', () => {
+    it('debería llamar a iniciarOrden y navegar al avanzar', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mapa = new Map<string, any[]>();
       mapa.set('alumno-1', [
@@ -165,6 +171,7 @@ describe('CarritoPresenter', () => {
         'alumno-1': { fecha: '2050-01-03', recreo: 'PRIMER_RECREO' }
       });
 
+      await presenter.init();
       presenter.avanzar();
       
       expect(compraServiceSpy.iniciarOrden).toHaveBeenCalled();
