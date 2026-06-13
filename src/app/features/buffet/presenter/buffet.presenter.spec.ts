@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -10,6 +10,9 @@ import { ColegiosService } from '../../../data-access/services/colegios.service'
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { RestriccionProductoService } from '../../restriccion-producto/services/restriccion-producto.service';
+import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
+import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
+import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
 import { BuffetPresenter } from './buffet.presenter';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { Buffet } from '../models/buffet.model';
@@ -26,6 +29,9 @@ describe('BuffetPresenter', () => {
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let restriccionProductoServiceSpy: jasmine.SpyObj<RestriccionProductoService>;
+  let franjasHorariasServiceSpy: jasmine.SpyObj<FranjasHorariasService>;
+  let restriccionesHorariasServiceSpy: jasmine.SpyObj<RestriccionesHorariasService>;
+  let presupuestoServiceSpy: jasmine.SpyObj<PresupuestoService>;
 
   const mockAlumno: Alumno = {
     id: 'alumno-1',
@@ -92,7 +98,9 @@ describe('BuffetPresenter', () => {
       'getBuffetDelAlumno', 'getProductosDelBuffet',
     ]);
     favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos']);
-    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', ['agregar', 'setCatalog', 'cargarPresupuestoYConsumo']);
+    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', [
+      'agregar', 'setCatalog', 'cargarPresupuestoYConsumo', 'getSeleccionRetiro', 'setSeleccionRetiro'
+    ]);
     const mockCarrito = carritoServiceSpy as unknown as {
       items: unknown;
       budgets: unknown;
@@ -108,6 +116,9 @@ describe('BuffetPresenter', () => {
     restriccionProductoServiceSpy = jasmine.createSpyObj<RestriccionProductoService>(
       'RestriccionProductoService', ['bloquearProducto', 'desbloquearProducto']
     );
+    franjasHorariasServiceSpy = jasmine.createSpyObj<FranjasHorariasService>('FranjasHorariasService', ['getFranjasHorarias']);
+    restriccionesHorariasServiceSpy = jasmine.createSpyObj<RestriccionesHorariasService>('RestriccionesHorariasService', ['getRestriccionesPorAlumno']);
+    presupuestoServiceSpy = jasmine.createSpyObj<PresupuestoService>('PresupuestoService', ['checkBudgetDates', 'getPresupuesto']);
 
     alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
     buffetServiceSpy.getBuffetDelAlumno.and.returnValue(mockBuffet);
@@ -116,6 +127,9 @@ describe('BuffetPresenter', () => {
     colegiosServiceSpy.getColegios.and.returnValue([{ id: 'colegio-1', nombre: 'Fernando Fader' }]);
     usuarioServiceSpy.homeUrl.and.returnValue('/tutor');
     usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
+    franjasHorariasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([]));
+    restriccionesHorariasServiceSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([]));
+    presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.resolve([]));
 
     TestBed.configureTestingModule({
       providers: [
@@ -129,6 +143,9 @@ describe('BuffetPresenter', () => {
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: RestriccionProductoService, useValue: restriccionProductoServiceSpy },
+        { provide: FranjasHorariasService, useValue: franjasHorariasServiceSpy },
+        { provide: RestriccionesHorariasService, useValue: restriccionesHorariasServiceSpy },
+        { provide: PresupuestoService, useValue: presupuestoServiceSpy },
       ],
     });
 
@@ -142,13 +159,14 @@ describe('BuffetPresenter', () => {
   // ── Separación de tipos de bloqueo en productosFiltrados ──────────────────
 
   describe('productosFiltrados — separación bloqueo tutor vs restricción', () => {
-    it('en vista tutor: debe mostrar todos los productos (disponibles, bloqueados por tutor y por restricción)', () => {
+    it('en vista tutor: debe mostrar todos los productos (disponibles, bloqueados por tutor y por restricción)', fakeAsync(() => {
       usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
       presenter.init('alumno-1');
+      tick();
 
       const filtrados = presenter.productosFiltrados();
       expect(filtrados.length).toBe(3);
-    });
+    }));
 
     it('en vista alumno: debe ocultar solo los productos bloqueados por el tutor', () => {
       usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
