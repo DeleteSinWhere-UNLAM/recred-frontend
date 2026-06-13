@@ -173,8 +173,8 @@ export class CarritoService {
     }
   }
 
-  puedeAgregar(producto: Producto, alumnoId: string, cantidadAdicional: number): boolean {
-    console.log('[DEBUG puedeAgregar]', {
+  validarAgregar(producto: Producto, alumnoId: string, cantidadAdicional: number): { permitido: boolean, razon?: 'saldo' | 'presupuesto' | 'categoria' } {
+    console.log('[DEBUG validarAgregar]', {
       productoId: producto.id,
       productoNombre: producto.nombre,
       productoPrecio: producto.precio,
@@ -184,14 +184,14 @@ export class CarritoService {
     });
 
     if (producto.superaPresupuesto) {
-      console.log('[DEBUG puedeAgregar] producto.superaPresupuesto is true');
-      return false;
+      console.log('[DEBUG validarAgregar] producto.superaPresupuesto is true');
+      return { permitido: false, razon: 'presupuesto' };
     }
 
     const budget = this.budgetsState().get(alumnoId);
-    console.log('[DEBUG puedeAgregar] Loaded budget:', budget);
+    console.log('[DEBUG validarAgregar] Loaded budget:', budget);
     if (!budget || !budget.activo) {
-      console.log('[DEBUG puedeAgregar] No budget found or inactive');
+      console.log('[DEBUG validarAgregar] No budget found or inactive');
       const alumno = this.alumnosService.getAlumnoById(alumnoId);
       if (alumno) {
         let spentCartGeneral = 0;
@@ -200,11 +200,11 @@ export class CarritoService {
           spentCartGeneral += item.producto.precio * item.cantidad;
         }
         if (spentCartGeneral + producto.precio * cantidadAdicional > alumno.saldo) {
-          console.log('[DEBUG puedeAgregar] Exceeds student credit balance (no budget case)!');
-          return false;
+          console.log('[DEBUG validarAgregar] Exceeds student credit balance (no budget case)!');
+          return { permitido: false, razon: 'saldo' };
         }
       }
-      return true;
+      return { permitido: true };
     }
 
     const seleccion = this.seleccionRetiroState()[alumnoId];
@@ -266,10 +266,19 @@ export class CarritoService {
 
     // Check general budget limit capped by student wallet balance (credits)
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
-    const limiteEfectivo = Math.min(budget.montoLimiteGeneral, (alumno?.saldo ?? Infinity) + spentPastGeneral);
-
+    
+    // Check wallet balance specifically
+    const limiteSaldo = (alumno?.saldo ?? Infinity) + spentPastGeneral;
     const totalGeneral = spentPastGeneral + spentCartGeneral + additionalCost;
-    console.log('[DEBUG puedeAgregar] General cost check:', {
+    
+    if (totalGeneral > limiteSaldo) {
+      console.log('[DEBUG validarAgregar] Exceeds student credit balance!');
+      return { permitido: false, razon: 'saldo' };
+    }
+
+    const limiteEfectivo = Math.min(budget.montoLimiteGeneral, limiteSaldo);
+
+    console.log('[DEBUG validarAgregar] General cost check:', {
       spentPastGeneral,
       spentCartGeneral,
       additionalCost,
@@ -278,9 +287,10 @@ export class CarritoService {
       saldo: alumno?.saldo,
       limiteEfectivo
     });
+    
     if (totalGeneral > limiteEfectivo) {
-      console.log('[DEBUG puedeAgregar] Exceeds general budget or credit balance!');
-      return false;
+      console.log('[DEBUG validarAgregar] Exceeds general budget!');
+      return { permitido: false, razon: 'presupuesto' };
     }
 
     // Check category budget limit (if applicable)
@@ -293,10 +303,10 @@ export class CarritoService {
         r.descripcionCategoria
       )
     );
-    console.log('[DEBUG puedeAgregar] Matched rule for category:', producto.categoria.id, rule);
+    console.log('[DEBUG validarAgregar] Matched rule for category:', producto.categoria.id, rule);
     if (rule) {
       const totalCategory = spentPastCategory + spentCartCategory + additionalCost;
-      console.log('[DEBUG puedeAgregar] Category cost check:', {
+      console.log('[DEBUG validarAgregar] Category cost check:', {
         spentPastCategory,
         spentCartCategory,
         additionalCost,
@@ -304,11 +314,15 @@ export class CarritoService {
         limit: rule.montoLimiteCalculado
       });
       if (totalCategory > rule.montoLimiteCalculado) {
-        console.log('[DEBUG puedeAgregar] Exceeds category budget!');
-        return false;
+        console.log('[DEBUG validarAgregar] Exceeds category budget!');
+        return { permitido: false, razon: 'categoria' };
       }
     }
 
-    return true;
+    return { permitido: true };
+  }
+
+  puedeAgregar(producto: Producto, alumnoId: string, cantidadAdicional: number): boolean {
+    return this.validarAgregar(producto, alumnoId, cantidadAdicional).permitido;
   }
 }

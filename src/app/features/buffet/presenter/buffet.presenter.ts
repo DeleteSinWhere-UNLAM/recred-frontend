@@ -379,8 +379,15 @@ export class BuffetPresenter {
     const esAlumno = this.usuarioService.esVistaAlumno();
 
     return this.productosState().filter((producto) => {
-      if (esAlumno && producto.bloqueado) {
-        return false;
+      if (esAlumno) {
+        // Ocultar productos bloqueados manualmente por el tutor
+        if (producto.bloqueado) {
+          return false;
+        }
+        // Ocultar productos bloqueados por restricciones nutricionales
+        if (producto.bloqueadoPorRestriccion && producto.motivoBloqueo?.toLowerCase().includes('contiene')) {
+          return false;
+        }
       }
       if (soloFavoritos && !favs.has(producto.id)) {
         return false;
@@ -435,51 +442,38 @@ export class BuffetPresenter {
       .then(res => this.restriccionesNutricionalesState.set(res))
       .catch(err => console.error('Error loading nutritional restrictions:', err));
 
-    if (this.usuarioService.esVistaAlumno()) {
-      // Alumno profile: fetch products immediately without date query param
+    // Load franjas and restrictions, then set initial date/recreo, then load products with date query param
+    Promise.all([
+      this.franjasService.getFranjasHorarias(alumno.colegioId),
+      this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
+    ]).then(([franjas, restricciones]) => {
+      this.franjasState.set(franjas);
+      this.restriccionesState.set(restricciones);
+
+      // Determine initial fecha and recreo
+      const minDate = this.fechaMinima();
+      const initialFecha = savedSelection?.fecha && savedSelection.fecha >= minDate
+        ? savedSelection.fecha
+        : minDate;
+      const initialRecreo = savedSelection?.recreo ?? this.firstAvailableRecreo();
+
+      this.fechaSeleccionadaState.set(initialFecha);
+      this.recreoSeleccionadoState.set(initialRecreo);
+      this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
+
+      // Fetch products for view with date-time query param
+      const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
+      this.cargarProductos(buffet.id, alumnoId, fechaHora);
+
+      // Initial budget check for the initial date
+      this.consultarPresupuestoPorFecha(alumnoId, initialFecha);
+    }).catch((err) => {
+      console.error('Error loading franjas/restricciones:', err);
+      // Fallback: still set a default date and load products
+      const minDate = this.calcularFechaMinima([]);
+      this.fechaSeleccionadaState.set(minDate);
       this.cargarProductos(buffet.id, alumnoId);
-      // Fetch restrictions and franjas for information section
-      Promise.all([
-        this.franjasService.getFranjasHorarias(alumno.colegioId),
-        this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
-      ]).then(([franjas, restricciones]) => {
-        this.franjasState.set(franjas);
-        this.restriccionesState.set(restricciones);
-      }).catch(err => console.error('Error loading franjas/restricciones:', err));
-    } else {
-      // Tutor profile: first load franjas and restrictions, then set initial date/recreo, then load products with date query param
-      Promise.all([
-        this.franjasService.getFranjasHorarias(alumno.colegioId),
-        this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
-      ]).then(([franjas, restricciones]) => {
-        this.franjasState.set(franjas);
-        this.restriccionesState.set(restricciones);
-
-        // Determine initial fecha and recreo
-        const minDate = this.fechaMinima();
-        const initialFecha = savedSelection?.fecha && savedSelection.fecha >= minDate
-          ? savedSelection.fecha
-          : minDate;
-        const initialRecreo = savedSelection?.recreo ?? this.firstAvailableRecreo();
-
-        this.fechaSeleccionadaState.set(initialFecha);
-        this.recreoSeleccionadoState.set(initialRecreo);
-        this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
-
-        // Fetch products for tutor view with date-time query param
-        const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
-        this.cargarProductos(buffet.id, alumnoId, fechaHora);
-
-        // Initial budget check for the initial date
-        this.consultarPresupuestoPorFecha(alumnoId, initialFecha);
-      }).catch((err) => {
-        console.error('Error loading franjas/restricciones:', err);
-        // Fallback: still set a default date and load products
-        const minDate = this.calcularFechaMinima([]);
-        this.fechaSeleccionadaState.set(minDate);
-        this.cargarProductos(buffet.id, alumnoId);
-      });
-    }
+    });
 
     this.filtrosState.set({ ...filtrosPorDefecto });
   }

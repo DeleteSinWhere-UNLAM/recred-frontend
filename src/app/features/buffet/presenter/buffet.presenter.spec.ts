@@ -173,33 +173,28 @@ describe('BuffetPresenter', () => {
       expect(filtrados.length).toBe(3);
     }));
 
-    it('en vista alumno: debe ocultar solo los productos bloqueados por el tutor', () => {
+    it('en vista alumno: debe ocultar los productos bloqueados por el tutor y los restringidos por nutrición', fakeAsync(() => {
       usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
       presenter.init('alumno-1');
+      tick();
 
       const filtrados = presenter.productosFiltrados();
-      // El bloqueado por tutor (Alfajor) queda fuera; el de restricción (Oreo) debe aparecer
-      expect(filtrados.length).toBe(2);
+      // El bloqueado por tutor (Alfajor) y el bloqueado por restricción nutricional (Oreo) quedan fuera;
+      // solo el libre (Agua Mineral) debe aparecer.
+      expect(filtrados.length).toBe(1);
+      expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
       expect(filtrados.some(p => p.id === 'prod-tutor')).toBeFalse();
-    });
+      expect(filtrados.some(p => p.id === 'prod-restriccion')).toBeFalse();
+    }));
 
-    it('en vista alumno: los productos con restricción nutricional deben aparecer (no ocultarse)', () => {
+    it('en vista alumno: los productos disponibles deben aparecer', fakeAsync(() => {
       usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
       presenter.init('alumno-1');
-
-      const filtrados = presenter.productosFiltrados();
-      const oreo = filtrados.find(p => p.id === 'prod-restriccion');
-      expect(oreo).toBeDefined();
-      expect(oreo?.bloqueadoPorRestriccion).toBeTrue();
-    });
-
-    it('en vista alumno: los productos disponibles deben aparecer', () => {
-      usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
-      presenter.init('alumno-1');
+      tick();
 
       const filtrados = presenter.productosFiltrados();
       expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
-    });
+    }));
   });
 
   // ── toggleLock ─────────────────────────────────────────────────────────────

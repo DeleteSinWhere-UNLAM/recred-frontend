@@ -114,7 +114,7 @@ describe('AlumnosService', () => {
       });
     });
 
-    it('debería resolver inmediatamente con getAlumnos si el perfil tiene rol ALUMNO', (done) => {
+    it('debería disparar el request HTTP a /alumnos/me si el rol es ALUMNO', (done) => {
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
       perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
 
@@ -124,7 +124,9 @@ describe('AlumnosService', () => {
         done();
       });
 
-      httpMock.expectNone(`${environment.apiUrl}/tutores/me/hijos`);
+      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/me`);
+      expect(req.request.method).toBe('GET');
+      req.flush({ id: 'julian-garcia', nombre: 'Julián', apellido: 'García', grado: '4to Año A', colegioId: 'instituto-san-jose', saldo: 2580 });
     });
 
     it('debería disparar el request HTTP si el rol es PADRE', (done) => {

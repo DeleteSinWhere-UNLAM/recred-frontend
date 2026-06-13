@@ -64,8 +64,8 @@ export class CarritoPresenter {
 
   readonly budgetBlockReasons = this.budgetBlockReasonsState.asReadonly();
 
-  /** En perfil Tutor/Padre la fecha y recreo se seleccionan en el buffet, no en el carrito. */
-  readonly esModoSoloLectura = computed(() => !this.usuarioService.esVistaAlumno());
+  /** Tanto en perfil Tutor como en perfil Alumno, la fecha y recreo se seleccionan en el buffet. */
+  readonly esModoSoloLectura = computed(() => true);
 
   readonly recreosDisponiblesMap = computed(() => {
     const dates = this.fechasState();

@@ -14,7 +14,7 @@ export class UsuarioService {
     nombre: 'Julián',
     apellido: 'García',
     grado: '4to Año A',
-    colegioId: 'instituto-san-jose',
+    colegioId: '5fd5acd3-ab97-4d95-aa33-a349bf47d0c8',
     saldo: 2580,
   };
 

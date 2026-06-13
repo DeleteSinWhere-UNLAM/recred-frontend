@@ -2,10 +2,10 @@
 @if (producto) {
   <article
     class="producto-card"
-    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado && !bloqueadoPorRestriccion() && !superaPresupuesto()"
+    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado && !bloqueadoPorRestriccion() && !superaPresupuesto() && !superaSaldo()"
     [class.producto-card--bloqueado]="producto.bloqueado"
     [class.producto-card--restringido]="bloqueadoPorRestriccion()"
-    [class.producto-card--supera-presupuesto]="superaPresupuesto()"
+    [class.producto-card--supera-presupuesto]="superaPresupuesto() || superaSaldo()"
   >
     <div class="producto-card__media">
       <button
@@ -79,11 +79,14 @@
 
         <button
           type="button"
-          [class]="superaPresupuesto() ? 'producto-card__cta producto-card__cta--presupuesto' : 'producto-card__cta'"
-          [disabled]="superaPresupuesto()"
+          [class]="(superaPresupuesto() || superaSaldo()) ? 'producto-card__cta producto-card__cta--presupuesto' : 'producto-card__cta'"
+          [disabled]="superaPresupuesto() || superaSaldo()"
           (click)="onAgregar()"
         >
-          @if (superaPresupuesto()) {
+          @if (superaSaldo()) {
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Saldo insuficiente</span>
+          } @else if (superaPresupuesto()) {
             <i class="fa-solid fa-wallet" aria-hidden="true"></i>
             <span>Supera presupuesto</span>
           } @else {
@@ -99,7 +102,16 @@
           </p>
         }
       } @else {
-        @if (superaPresupuesto()) {
+        @if (superaSaldo()) {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--presupuesto"
+            disabled
+          >
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Saldo insuficiente</span>
+          </button>
+        } @else if (superaPresupuesto()) {
           <button
             type="button"
             class="producto-card__cta producto-card__cta--presupuesto"

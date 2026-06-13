@@ -56,7 +56,7 @@
       }
     </header>
 
-    @if (!esVistaAlumno() && presenter.alumno()) {
+    @if (presenter.alumno()) {
       <section class="buffet__presupuesto-seccion" aria-labelledby="presupuesto-disponible-titulo">
         @if (presenter.presupuestoDisponible(); as presupuesto) {
           <div class="buffet__presupuesto-general">
@@ -202,46 +202,48 @@
         </div>
 
         <!-- Nuevo sector informativo: Restricciones Configuradas (Alimenticias y Horarias) -->
-        <div class="buffet__restricciones-informativas">
-          <h4 class="buffet__restricciones-informativas-titulo">
-            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-            Restricciones del Alumno
-          </h4>
-          <div class="buffet__restricciones-informativas-contenido">
-            <!-- Restricciones alimenticias -->
-            <div class="buffet__restricciones-grupo">
-              <span class="buffet__restricciones-grupo-label">Restricciones Alimenticias</span>
-              <div class="buffet__restricciones-tags">
-                @if (presenter.restriccionesNutricionales().length > 0) {
-                  @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
-                    <span class="buffet__tag-restriccion buffet__tag-restriccion--activa">
-                      <i class="fa-solid fa-ban" aria-hidden="true"></i>
-                      {{ rest.descripcion }}
+        @if (!esVistaAlumno()) {
+          <div class="buffet__restricciones-informativas">
+            <h4 class="buffet__restricciones-informativas-titulo">
+              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+              Restricciones del Alumno
+            </h4>
+            <div class="buffet__restricciones-informativas-contenido">
+              <!-- Restricciones alimenticias -->
+              <div class="buffet__restricciones-grupo">
+                <span class="buffet__restricciones-grupo-label">Restricciones Alimenticias</span>
+                <div class="buffet__restricciones-tags">
+                  @if (presenter.restriccionesNutricionales().length > 0) {
+                    @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
+                      <span class="buffet__tag-restriccion buffet__tag-restriccion--activa">
+                        <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                        {{ rest.descripcion }}
+                      </span>
+                    }
+                  } @else {
+                    <span class="buffet__tag-restriccion buffet__tag-restriccion--libre">
+                      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                      Sin restricciones alimenticias
                     </span>
                   }
-                } @else {
-                  <span class="buffet__tag-restriccion buffet__tag-restriccion--libre">
-                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                    Sin restricciones alimenticias
-                  </span>
-                }
+                </div>
               </div>
-            </div>
 
-            <!-- Horarios de compra -->
-            <div class="buffet__restricciones-grupo">
-              <span class="buffet__restricciones-grupo-label">Horarios de Compra Permitidos</span>
-              <div class="buffet__restricciones-horarios-capsulas">
-                @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
-                  <div class="buffet__horario-capsula" [class.buffet__horario-capsula--bloqueado]="horario.bloqueado">
-                    <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado" [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
-                    <span>{{ horario.descripcion }}</span>
-                  </div>
-                }
+              <!-- Horarios de compra -->
+              <div class="buffet__restricciones-grupo">
+                <span class="buffet__restricciones-grupo-label">Horarios de Compra Permitidos</span>
+                <div class="buffet__restricciones-horarios-capsulas">
+                  @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
+                    <div class="buffet__horario-capsula" [class.buffet__horario-capsula--bloqueado]="horario.bloqueado">
+                      <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado" [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
+                      <span>{{ horario.descripcion }}</span>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
       </section>
     }
 
