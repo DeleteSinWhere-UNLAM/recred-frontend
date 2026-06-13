@@ -383,7 +383,7 @@ export class CarritoPresenter {
               return next;
             });
           })
-          .catch((err: any) => {
+          .catch((err: unknown) => {
             console.error('Error checking budget dates:', err);
           });
       });
