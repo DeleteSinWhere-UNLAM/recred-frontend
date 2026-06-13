@@ -46,7 +46,7 @@ export class VentaEspontaneaService {
     );
   }
 
-  procesarVenta(alumnoId: string, items: ProductoVenta[]): Observable<any> {
+  procesarVenta(alumnoId: string, items: ProductoVenta[]): Observable<unknown> {
     const payload = {
       studentId: alumnoId,
       items: items.map(i => ({ productId: i.id, quantity: i.cantidad })),
