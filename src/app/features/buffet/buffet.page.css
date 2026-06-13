@@ -718,6 +718,27 @@
   color: var(--color-texto-claro);
 }
 
+.buffet__presupuesto-detalles-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-top: 24px;
+  align-items: stretch;
+}
+
+.buffet__presupuesto-detalles-fila .buffet__presupuesto-categorias {
+  flex: 1 1 480px;
+  min-width: 0;
+}
+
+.buffet__presupuesto-detalles-fila .buffet__retiro-contenedor {
+  flex: 1 1 360px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .buffet__presupuesto-categorias {
   display: flex;
   flex-direction: column;
@@ -1005,4 +1026,111 @@
   border-top: 1px solid var(--color-borde);
   margin: 12px 0 6px 0;
   opacity: 0.8;
+}
+
+/* === Nuevo sector informativo: Restricciones Configuradas === */
+.buffet__restricciones-informativas {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--color-borde);
+}
+
+.buffet__restricciones-informativas-titulo {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.buffet__restricciones-informativas-titulo i {
+  color: var(--color-pizarra-dark);
+}
+
+.buffet__restricciones-informativas-contenido {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.buffet__restricciones-grupo {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.buffet__restricciones-grupo-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-texto-claro);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.buffet__restricciones-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.buffet__tag-restriccion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: transform var(--transition-ui);
+}
+
+.buffet__tag-restriccion--activa {
+  background-color: rgba(230, 57, 70, 0.08);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  color: #e63946;
+}
+
+.buffet__tag-restriccion--libre {
+  background-color: rgba(129, 178, 154, 0.1);
+  border: 1px solid rgba(129, 178, 154, 0.25);
+  color: #2d7a5a;
+}
+
+.buffet__restricciones-horarios-capsulas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.buffet__horario-capsula {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: rgba(129, 178, 154, 0.1);
+  border: 1px solid rgba(129, 178, 154, 0.25);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d7a5a;
+}
+
+.buffet__horario-capsula i {
+  color: #2d7a5a;
+  font-size: 14px;
+}
+
+.buffet__horario-capsula--bloqueado {
+  background-color: #f8f9fa;
+  border: 1px solid var(--color-borde);
+  color: var(--color-texto-claro);
+  opacity: 0.7;
+}
+
+.buffet__horario-capsula--bloqueado i {
+  color: var(--color-texto-claro);
 }

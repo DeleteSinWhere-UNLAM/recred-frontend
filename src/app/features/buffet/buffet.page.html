@@ -86,115 +86,161 @@
               </div>
             </div>
           </div>
+        }
 
-          @if (presupuesto.reglasCategorias.length > 0) {
-            <div class="buffet__presupuesto-categorias">
-              <h4 class="buffet__presupuesto-subtitulo">Saldos por Categoría</h4>
-              <div class="buffet__presupuesto-categorias-grid">
-                @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
-                  <div class="buffet__categoria-card">
-                    <div class="buffet__categoria-info">
-                      <span class="buffet__categoria-nombre">{{ regla.descripcionCategoria }}</span>
-                      <span class="buffet__categoria-limite">Límite: {{ formatARS(regla.montoLimite) }}</span>
-                    </div>
-                    <div class="buffet__categoria-valores">
-                      <span class="buffet__categoria-disponible" [class.buffet__categoria-disponible--alerta]="regla.porcentajeConsumido >= 85">
-                        {{ formatARS(regla.montoDisponible) }}
-                      </span>
-                      <span class="buffet__categoria-disponible-label">disponible</span>
-                    </div>
-                    <div class="buffet__categoria-progreso">
-                      <div class="buffet__categoria-progreso-barra">
-                        <div class="buffet__categoria-progreso-fill" 
-                             [style.width.%]="regla.porcentajeConsumido"
-                             [class.buffet__categoria-progreso-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
+        <!-- Contenedor secundario para alinear categorías y selector de retiro -->
+        <div class="buffet__presupuesto-detalles-fila">
+          <!-- Sección de selección de retiro -->
+          <div class="buffet__retiro-contenedor">
+            <div class="buffet__retiro-header">
+              <h3 id="retiro-titulo" class="buffet__retiro-titulo">
+                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                Fecha y Horario de Retiro
+              </h3>
+              <p class="buffet__retiro-subtitulo">Elegí cuándo retirará el pedido el alumno.</p>
+            </div>
+
+            <div class="buffet__retiro-campos">
+              <label class="buffet__retiro-campo">
+                <span class="buffet__retiro-campo-label">
+                  <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                  Día de retiro
+                </span>
+                <input
+                  id="buffet-fecha-retiro"
+                  type="date"
+                  class="buffet__retiro-input"
+                  [value]="presenter.fechaSeleccionada()"
+                  [min]="presenter.fechaMinima()"
+                  (change)="onFechaCambia($event)"
+                  aria-label="Día de retiro"
+                />
+              </label>
+
+              <label class="buffet__retiro-campo">
+                <span class="buffet__retiro-campo-label">
+                  <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                  Franja horaria
+                </span>
+                <select
+                  id="buffet-recreo-retiro"
+                  class="buffet__retiro-select"
+                  [value]="presenter.recreoSeleccionado()"
+                  (change)="onRecreoCambia($event)"
+                  aria-label="Franja horaria de retiro"
+                >
+                  @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
+                    <option
+                      [value]="opc.recreo"
+                      [disabled]="opc.bloqueado"
+                      [selected]="opc.recreo === presenter.recreoSeleccionado()"
+                    >
+                      {{ opc.descripcion }}{{ opc.bloqueado ? (opc.motivo === 'tiempo' ? ' (No disponible — menos de 1h)' : ' (Bloqueado)') : '' }}
+                    </option>
+                  }
+                </select>
+              </label>
+            </div>
+
+            <!-- Resultado del check de presupuesto por fecha -->
+            @if (presenter.cargandoPresupuestoPorFecha()) {
+              <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--cargando">
+                <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+                <span>Verificando presupuesto para esta fecha…</span>
+              </div>
+            } @else if (presenter.presupuestoPorFecha(); as budgetFecha) {
+              @if (budgetFecha.bloqueado) {
+                <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--bloqueado" role="alert">
+                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                  <div>
+                    <strong>Presupuesto insuficiente para esta fecha</strong>
+                    @if (budgetFecha.razon) {
+                      <p class="buffet__retiro-budget-razon">{{ budgetFecha.razon }}</p>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--ok">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>Presupuesto disponible para la fecha seleccionada</span>
+                </div>
+              }
+            }
+          </div>
+
+          <!-- Categorías -->
+          @if (presenter.presupuestoDisponible(); as presupuesto) {
+            @if (presupuesto.reglasCategorias.length > 0) {
+              <div class="buffet__presupuesto-categorias">
+                <h4 class="buffet__presupuesto-subtitulo">Saldos por Categoría</h4>
+                <div class="buffet__presupuesto-categorias-grid">
+                  @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
+                    <div class="buffet__categoria-card">
+                      <div class="buffet__categoria-info">
+                        <span class="buffet__categoria-nombre">{{ regla.descripcionCategoria }}</span>
+                        <span class="buffet__categoria-limite">Límite: {{ formatARS(regla.montoLimite) }}</span>
+                      </div>
+                      <div class="buffet__categoria-valores">
+                        <span class="buffet__categoria-disponible" [class.buffet__categoria-disponible--alerta]="regla.porcentajeConsumido >= 85">
+                          {{ formatARS(regla.montoDisponible) }}
+                        </span>
+                        <span class="buffet__categoria-disponible-label">disponible</span>
+                      </div>
+                      <div class="buffet__categoria-progreso">
+                        <div class="buffet__categoria-progreso-barra">
+                          <div class="buffet__categoria-progreso-fill" 
+                               [style.width.%]="regla.porcentajeConsumido"
+                               [class.buffet__categoria-progreso-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
+                        </div>
                       </div>
                     </div>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Nuevo sector informativo: Restricciones Configuradas (Alimenticias y Horarias) -->
+        <div class="buffet__restricciones-informativas">
+          <h4 class="buffet__restricciones-informativas-titulo">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+            Restricciones del Alumno
+          </h4>
+          <div class="buffet__restricciones-informativas-contenido">
+            <!-- Restricciones alimenticias -->
+            <div class="buffet__restricciones-grupo">
+              <span class="buffet__restricciones-grupo-label">Restricciones Alimenticias</span>
+              <div class="buffet__restricciones-tags">
+                @if (presenter.restriccionesNutricionales().length > 0) {
+                  @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
+                    <span class="buffet__tag-restriccion buffet__tag-restriccion--activa">
+                      <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                      {{ rest.descripcion }}
+                    </span>
+                  }
+                } @else {
+                  <span class="buffet__tag-restriccion buffet__tag-restriccion--libre">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    Sin restricciones alimenticias
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Horarios de compra -->
+            <div class="buffet__restricciones-grupo">
+              <span class="buffet__restricciones-grupo-label">Horarios de Compra Permitidos</span>
+              <div class="buffet__restricciones-horarios-capsulas">
+                @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
+                  <div class="buffet__horario-capsula" [class.buffet__horario-capsula--bloqueado]="horario.bloqueado">
+                    <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado" [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
+                    <span>{{ horario.descripcion }}</span>
                   </div>
                 }
               </div>
             </div>
-          }
-
-          <div class="buffet__presupuesto-divider"></div>
-        }
-
-        <!-- Sección de selección de retiro -->
-        <div class="buffet__retiro-contenedor">
-          <div class="buffet__retiro-header">
-            <h3 id="retiro-titulo" class="buffet__retiro-titulo">
-              <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
-              Fecha y Horario de Retiro
-            </h3>
-            <p class="buffet__retiro-subtitulo">Elegí cuándo retirará el pedido el alumno.</p>
           </div>
-
-          <div class="buffet__retiro-campos">
-            <label class="buffet__retiro-campo">
-              <span class="buffet__retiro-campo-label">
-                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                Día de retiro
-              </span>
-              <input
-                id="buffet-fecha-retiro"
-                type="date"
-                class="buffet__retiro-input"
-                [value]="presenter.fechaSeleccionada()"
-                [min]="presenter.fechaMinima()"
-                (change)="onFechaCambia($event)"
-                aria-label="Día de retiro"
-              />
-            </label>
-
-            <label class="buffet__retiro-campo">
-              <span class="buffet__retiro-campo-label">
-                <i class="fa-regular fa-clock" aria-hidden="true"></i>
-                Franja horaria
-              </span>
-              <select
-                id="buffet-recreo-retiro"
-                class="buffet__retiro-select"
-                [value]="presenter.recreoSeleccionado()"
-                (change)="onRecreoCambia($event)"
-                aria-label="Franja horaria de retiro"
-              >
-                @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
-                  <option
-                    [value]="opc.recreo"
-                    [disabled]="opc.bloqueado"
-                    [selected]="opc.recreo === presenter.recreoSeleccionado()"
-                  >
-                    {{ opc.descripcion }}{{ opc.bloqueado ? (opc.motivo === 'tiempo' ? ' (No disponible — menos de 1h)' : ' (Bloqueado)') : '' }}
-                  </option>
-                }
-              </select>
-            </label>
-          </div>
-
-          <!-- Resultado del check de presupuesto por fecha -->
-          @if (presenter.cargandoPresupuestoPorFecha()) {
-            <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--cargando">
-              <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
-              <span>Verificando presupuesto para esta fecha…</span>
-            </div>
-          } @else if (presenter.presupuestoPorFecha(); as budgetFecha) {
-            @if (budgetFecha.bloqueado) {
-              <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--bloqueado" role="alert">
-                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                <div>
-                  <strong>Presupuesto insuficiente para esta fecha</strong>
-                  @if (budgetFecha.razon) {
-                    <p class="buffet__retiro-budget-razon">{{ budgetFecha.razon }}</p>
-                  }
-                </div>
-              </div>
-            } @else {
-              <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--ok">
-                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                <span>Presupuesto disponible para la fecha seleccionada</span>
-              </div>
-            }
-          }
         </div>
       </section>
     }

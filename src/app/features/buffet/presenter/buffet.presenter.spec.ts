@@ -13,6 +13,7 @@ import { RestriccionProductoService } from '../../restriccion-producto/services/
 import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
 import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
+import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { BuffetPresenter } from './buffet.presenter';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { Buffet } from '../models/buffet.model';
@@ -32,6 +33,7 @@ describe('BuffetPresenter', () => {
   let franjasHorariasServiceSpy: jasmine.SpyObj<FranjasHorariasService>;
   let restriccionesHorariasServiceSpy: jasmine.SpyObj<RestriccionesHorariasService>;
   let presupuestoServiceSpy: jasmine.SpyObj<PresupuestoService>;
+  let restriccionesNutricionalesServiceSpy: jasmine.SpyObj<RestriccionesNutricionalesService>;
 
   const mockAlumno: Alumno = {
     id: 'alumno-1',
@@ -119,6 +121,7 @@ describe('BuffetPresenter', () => {
     franjasHorariasServiceSpy = jasmine.createSpyObj<FranjasHorariasService>('FranjasHorariasService', ['getFranjasHorarias']);
     restriccionesHorariasServiceSpy = jasmine.createSpyObj<RestriccionesHorariasService>('RestriccionesHorariasService', ['getRestriccionesPorAlumno']);
     presupuestoServiceSpy = jasmine.createSpyObj<PresupuestoService>('PresupuestoService', ['checkBudgetDates', 'getPresupuesto']);
+    restriccionesNutricionalesServiceSpy = jasmine.createSpyObj<RestriccionesNutricionalesService>('RestriccionesNutricionalesService', ['getRestriccionesAlumno']);
 
     alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
     buffetServiceSpy.getBuffetDelAlumno.and.returnValue(mockBuffet);
@@ -130,7 +133,8 @@ describe('BuffetPresenter', () => {
     franjasHorariasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([]));
     restriccionesHorariasServiceSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([]));
     presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.resolve([]));
-
+    restriccionesNutricionalesServiceSpy.getRestriccionesAlumno.and.returnValue(Promise.resolve([]));
+ 
     TestBed.configureTestingModule({
       providers: [
         BuffetPresenter,
@@ -146,6 +150,7 @@ describe('BuffetPresenter', () => {
         { provide: FranjasHorariasService, useValue: franjasHorariasServiceSpy },
         { provide: RestriccionesHorariasService, useValue: restriccionesHorariasServiceSpy },
         { provide: PresupuestoService, useValue: presupuestoServiceSpy },
+        { provide: RestriccionesNutricionalesService, useValue: restriccionesNutricionalesServiceSpy },
       ],
     });
 

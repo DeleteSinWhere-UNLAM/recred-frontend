@@ -20,6 +20,7 @@ import { PERIODO_LABELS } from '../../presupuesto/models/presupuesto.model';
 import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
 import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
 import { PresupuestoService, DateBudgetStatus } from '../../presupuesto/services/presupuesto.service';
+import { RestriccionesNutricionalesService, ClasificacionSaludBackend } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { TimeSlot, RestriccionHoraria } from '../../restricciones-horarias/models/restriccion-horaria.model';
 import { Recreo, RECREO_LABELS } from '../../compra/models/orden-compra.model';
 
@@ -82,6 +83,7 @@ export class BuffetPresenter {
   private readonly franjasService = inject(FranjasHorariasService);
   private readonly restriccionesService = inject(RestriccionesHorariasService);
   private readonly presupuestoService = inject(PresupuestoService);
+  private readonly restriccionesNutricionalesService = inject(RestriccionesNutricionalesService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly buffetState = signal<Buffet | undefined>(undefined);
@@ -90,6 +92,7 @@ export class BuffetPresenter {
   private readonly categoriasState = signal<CategoriaProducto[]>([]);
   private readonly clasificacionesState = signal<ClasificacionSalud[]>([]);
   private readonly filtrosState = signal<FiltrosBuffet>({ ...filtrosPorDefecto });
+  private readonly restriccionesNutricionalesState = signal<ClasificacionSaludBackend[]>([]);
 
   // Fecha/Recreo selection
   private readonly franjasState = signal<TimeSlot[]>([]);
@@ -114,6 +117,34 @@ export class BuffetPresenter {
   readonly recreoSeleccionado: Signal<Recreo> = this.recreoSeleccionadoState.asReadonly();
   readonly presupuestoPorFecha: Signal<PresupuestoPorFecha | null> = this.presupuestoPorFechaState.asReadonly();
   readonly cargandoPresupuestoPorFecha: Signal<boolean> = this.cargandoPresupuestoPorFechaState.asReadonly();
+  readonly restriccionesNutricionales = this.restriccionesNutricionalesState.asReadonly();
+
+  readonly restriccionesHorariasInformativas = computed(() => {
+    const slots = this.franjasState();
+    const restricciones = this.restriccionesState();
+    const generalRestrictions = restricciones.filter(
+      (r) =>
+        r.activa !== false &&
+        !r.categoryId &&
+        !r.classificationId &&
+        !r.categoria &&
+        !r.clasificacionSalud,
+    );
+
+    const sortedSlots = [...slots].sort((a, b) =>
+      (a.horaInicio || '').localeCompare(b.horaInicio || ''),
+    );
+
+    return sortedSlots.map(slot => {
+      const isBlocked = generalRestrictions.some(
+        (r) => r.franjaHoraria?.id === slot.id || r.timeSlotId === slot.id,
+      );
+      return {
+        descripcion: slot.descripcion,
+        bloqueado: isBlocked
+      };
+    });
+  });
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
@@ -253,10 +284,15 @@ export class BuffetPresenter {
       spentCartGeneral += item.producto.precio * item.cantidad;
     }
 
-    const montoConsumidoGeneral = spentPastGeneral + spentCartGeneral;
-    const montoDisponibleGeneral = Math.max(0, budget.montoLimiteGeneral - montoConsumidoGeneral);
-    const porcentajeConsumidoGeneral = budget.montoLimiteGeneral > 0
-      ? Math.round((montoConsumidoGeneral / budget.montoLimiteGeneral) * 100)
+    const limiteTeorico = alumno.saldo + spentPastGeneral;
+    const montoLimiteGeneral = Math.min(budget.montoLimiteGeneral, limiteTeorico);
+    const montoDisponibleGeneral = Math.max(
+      0,
+      Math.min(alumno.saldo - spentCartGeneral, budget.montoLimiteGeneral - spentPastGeneral - spentCartGeneral)
+    );
+    const montoConsumidoGeneral = montoLimiteGeneral - montoDisponibleGeneral;
+    const porcentajeConsumidoGeneral = montoLimiteGeneral > 0
+      ? Math.round((montoConsumidoGeneral / montoLimiteGeneral) * 100)
       : 0;
 
     const reglasCategorias: PresupuestoDisponibleCategoria[] = [];
@@ -296,16 +332,17 @@ export class BuffetPresenter {
         }
       }
 
+      const categoryLimit = Math.min(rule.montoLimiteCalculado, montoLimiteGeneral);
       const montoConsumido = spentPastCategory + spentCartCategory;
-      const montoDisponible = Math.max(0, rule.montoLimiteCalculado - montoConsumido);
-      const porcentajeConsumido = rule.montoLimiteCalculado > 0
-        ? Math.round((montoConsumido / rule.montoLimiteCalculado) * 100)
+      const montoDisponible = Math.max(0, Math.min(montoDisponibleGeneral, categoryLimit - montoConsumido));
+      const porcentajeConsumido = categoryLimit > 0
+        ? Math.round((montoConsumido / categoryLimit) * 100)
         : 0;
 
       reglasCategorias.push({
         categoriaId: rule.categoriaId,
         descripcionCategoria: rule.descripcionCategoria,
-        montoLimite: rule.montoLimiteCalculado,
+        montoLimite: categoryLimit,
         montoConsumido,
         montoDisponible,
         porcentajeConsumido,
@@ -317,7 +354,7 @@ export class BuffetPresenter {
     return {
       activo: true,
       periodo: periodoLabel,
-      montoLimiteGeneral: budget.montoLimiteGeneral,
+      montoLimiteGeneral,
       montoConsumidoGeneral,
       montoDisponibleGeneral,
       porcentajeConsumidoGeneral,
@@ -393,9 +430,22 @@ export class BuffetPresenter {
       }
     });
 
+    // Fetch nutritional restrictions
+    this.restriccionesNutricionalesService.getRestriccionesAlumno(alumnoId)
+      .then(res => this.restriccionesNutricionalesState.set(res))
+      .catch(err => console.error('Error loading nutritional restrictions:', err));
+
     if (this.usuarioService.esVistaAlumno()) {
       // Alumno profile: fetch products immediately without date query param
       this.cargarProductos(buffet.id, alumnoId);
+      // Fetch restrictions and franjas for information section
+      Promise.all([
+        this.franjasService.getFranjasHorarias(alumno.colegioId),
+        this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
+      ]).then(([franjas, restricciones]) => {
+        this.franjasState.set(franjas);
+        this.restriccionesState.set(restricciones);
+      }).catch(err => console.error('Error loading franjas/restricciones:', err));
     } else {
       // Tutor profile: first load franjas and restrictions, then set initial date/recreo, then load products with date query param
       Promise.all([

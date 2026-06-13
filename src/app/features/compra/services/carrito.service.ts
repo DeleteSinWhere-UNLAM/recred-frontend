@@ -8,6 +8,7 @@ import { Movimiento } from '../../movimientos/models/movimiento.model';
 import { getPeriodRange, getProductCategory, isSameCategory } from '../utils/budget-helpers';
 import { firstValueFrom } from 'rxjs';
 import { Recreo } from '../models/orden-compra.model';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
 
 export interface SeleccionRetiro {
   fecha: string;
@@ -18,6 +19,7 @@ export interface SeleccionRetiro {
 export class CarritoService {
   private readonly presupuestoService = inject(PresupuestoService);
   private readonly movimientosService = inject(MovimientosService);
+  private readonly alumnosService = inject(AlumnosService);
 
   private readonly itemsState = signal<ItemCarrito[]>([]);
   private readonly budgetsState = signal<Map<string, Presupuesto>>(new Map());
@@ -190,6 +192,18 @@ export class CarritoService {
     console.log('[DEBUG puedeAgregar] Loaded budget:', budget);
     if (!budget || !budget.activo) {
       console.log('[DEBUG puedeAgregar] No budget found or inactive');
+      const alumno = this.alumnosService.getAlumnoById(alumnoId);
+      if (alumno) {
+        let spentCartGeneral = 0;
+        const cartItems = this.itemsState().filter((i) => i.alumnoId === alumnoId);
+        for (const item of cartItems) {
+          spentCartGeneral += item.producto.precio * item.cantidad;
+        }
+        if (spentCartGeneral + producto.precio * cantidadAdicional > alumno.saldo) {
+          console.log('[DEBUG puedeAgregar] Exceeds student credit balance (no budget case)!');
+          return false;
+        }
+      }
       return true;
     }
 
@@ -250,17 +264,22 @@ export class CarritoService {
 
     const additionalCost = producto.precio * cantidadAdicional;
 
-    // Check general budget limit
+    // Check general budget limit capped by student wallet balance (credits)
+    const alumno = this.alumnosService.getAlumnoById(alumnoId);
+    const limiteEfectivo = Math.min(budget.montoLimiteGeneral, (alumno?.saldo ?? Infinity) + spentPastGeneral);
+
     const totalGeneral = spentPastGeneral + spentCartGeneral + additionalCost;
     console.log('[DEBUG puedeAgregar] General cost check:', {
       spentPastGeneral,
       spentCartGeneral,
       additionalCost,
       totalGeneral,
-      limit: budget.montoLimiteGeneral
+      limit: budget.montoLimiteGeneral,
+      saldo: alumno?.saldo,
+      limiteEfectivo
     });
-    if (totalGeneral > budget.montoLimiteGeneral) {
-      console.log('[DEBUG puedeAgregar] Exceeds general budget!');
+    if (totalGeneral > limiteEfectivo) {
+      console.log('[DEBUG puedeAgregar] Exceeds general budget or credit balance!');
       return false;
     }
 
