@@ -10,8 +10,6 @@ import {
 import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
 import { RestriccionesNutricionalesPresenter } from './restricciones-nutricionales.presenter';
-import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
-import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
 import { RestriccionHoraria } from '../../restricciones-horarias/models/restriccion-horaria.model';
 
 describe('RestriccionesNutricionalesPresenter', () => {
