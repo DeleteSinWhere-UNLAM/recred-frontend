@@ -46,11 +46,11 @@ export class VentaEspontaneaService {
     );
   }
 
-  procesarVenta(alumnoId: string, items: ProductoVenta[], paymentMethod: string = 'CREDITOS'): Observable<any> {
+  procesarVenta(alumnoId: string, items: ProductoVenta[]): Observable<any> {
     const payload = {
       studentId: alumnoId,
       items: items.map(i => ({ productId: i.id, quantity: i.cantidad })),
-      paymentMethod
+      paymentMethod: 'CREDITOS'
     };
     return this.http.post(environment.apiUrl + '/purchases/presential', payload);
   }
