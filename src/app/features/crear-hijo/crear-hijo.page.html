@@ -117,6 +117,59 @@
             <span class="crear-hijo__error">Ingresá un email válido.</span>
           }
         </label>
+
+        <label class="crear-hijo__field crear-hijo__field--full">
+          <span class="crear-hijo__label">Colegio</span>
+          <select formControlName="colegioId">
+            <option value="" disabled>
+              @if (presenter.cargandoColegios()) {
+                Cargando colegios...
+              } @else {
+                Elegí un colegio
+              }
+            </option>
+            @for (colegio of presenter.colegios(); track colegio.id) {
+              <option [value]="colegio.id">{{ colegio.nombre }}</option>
+            }
+          </select>
+          @if (
+            form.controls.colegioId.touched && form.controls.colegioId.invalid
+          ) {
+            <span class="crear-hijo__error">Elegí un colegio.</span>
+          }
+        </label>
+
+        <label class="crear-hijo__field crear-hijo__field--full">
+          <span class="crear-hijo__label">Grado</span>
+          <select
+            formControlName="gradoId"
+            [attr.disabled]="
+              !form.controls.colegioId.value ||
+              presenter.cargandoGrados() ||
+              presenter.grados().length === 0
+                ? true
+                : null
+            "
+          >
+            <option value="" disabled>
+              @if (!form.controls.colegioId.value) {
+                Elegí primero un colegio
+              } @else if (presenter.cargandoGrados()) {
+                Cargando grados...
+              } @else if (presenter.grados().length === 0) {
+                Sin grados disponibles
+              } @else {
+                Elegí un grado
+              }
+            </option>
+            @for (grado of presenter.grados(); track grado.id) {
+              <option [value]="grado.id">{{ grado.nombre }}</option>
+            }
+          </select>
+          @if (form.controls.gradoId.touched && form.controls.gradoId.invalid) {
+            <span class="crear-hijo__error">Elegí un grado.</span>
+          }
+        </label>
       </div>
 
       @if (presenter.error()) {
