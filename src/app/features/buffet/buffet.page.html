@@ -56,64 +56,146 @@
       }
     </header>
 
-    @if (!esVistaAlumno() && presenter.presupuestoDisponible(); as presupuesto) {
+    @if (!esVistaAlumno() && presenter.alumno()) {
       <section class="buffet__presupuesto-seccion" aria-labelledby="presupuesto-disponible-titulo">
-        <div class="buffet__presupuesto-general">
-          <div class="buffet__presupuesto-info">
-            <h3 id="presupuesto-disponible-titulo" class="buffet__presupuesto-titulo">
-              <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-              Saldo Disponible
-            </h3>
-            <p class="buffet__presupuesto-periodo">
-              Período: <strong>{{ presupuesto.periodo }}</strong> (Límite total: {{ formatARS(presupuesto.montoLimiteGeneral) }})
-            </p>
-          </div>
-          <div class="buffet__presupuesto-valores">
-            <div class="buffet__presupuesto-disponible-total">
-              <span class="buffet__presupuesto-valor-label">Disponible general</span>
-              <span class="buffet__presupuesto-valor" [class.buffet__presupuesto-valor--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85">
-                {{ formatARS(presupuesto.montoDisponibleGeneral) }}
-              </span>
+        @if (presenter.presupuestoDisponible(); as presupuesto) {
+          <div class="buffet__presupuesto-general">
+            <div class="buffet__presupuesto-info">
+              <h3 id="presupuesto-disponible-titulo" class="buffet__presupuesto-titulo">
+                <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+                Saldo Disponible
+              </h3>
+              <p class="buffet__presupuesto-periodo">
+                Período: <strong>{{ presupuesto.periodo }}</strong> (Límite total: {{ formatARS(presupuesto.montoLimiteGeneral) }})
+              </p>
             </div>
-            <div class="buffet__presupuesto-progreso-wrapper">
-              <div class="buffet__presupuesto-progreso-barra">
-                <div class="buffet__presupuesto-progreso-fill" 
-                     [style.width.%]="presupuesto.porcentajeConsumidoGeneral"
-                     [class.buffet__presupuesto-progreso-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"></div>
+            <div class="buffet__presupuesto-valores">
+              <div class="buffet__presupuesto-disponible-total">
+                <span class="buffet__presupuesto-valor-label">Disponible general</span>
+                <span class="buffet__presupuesto-valor" [class.buffet__presupuesto-valor--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85">
+                  {{ formatARS(presupuesto.montoDisponibleGeneral) }}
+                </span>
               </div>
-              <span class="buffet__presupuesto-progreso-texto">Consumido: {{ formatARS(presupuesto.montoConsumidoGeneral) }} ({{ presupuesto.porcentajeConsumidoGeneral }}%)</span>
+              <div class="buffet__presupuesto-progreso-wrapper">
+                <div class="buffet__presupuesto-progreso-barra">
+                  <div class="buffet__presupuesto-progreso-fill" 
+                       [style.width.%]="presupuesto.porcentajeConsumidoGeneral"
+                       [class.buffet__presupuesto-progreso-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"></div>
+                </div>
+                <span class="buffet__presupuesto-progreso-texto">Consumido: {{ formatARS(presupuesto.montoConsumidoGeneral) }} ({{ presupuesto.porcentajeConsumidoGeneral }}%)</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        @if (presupuesto.reglasCategorias.length > 0) {
-          <div class="buffet__presupuesto-categorias">
-            <h4 class="buffet__presupuesto-subtitulo">Saldos por Categoría</h4>
-            <div class="buffet__presupuesto-categorias-grid">
-              @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
-                <div class="buffet__categoria-card">
-                  <div class="buffet__categoria-info">
-                    <span class="buffet__categoria-nombre">{{ regla.descripcionCategoria }}</span>
-                    <span class="buffet__categoria-limite">Límite: {{ formatARS(regla.montoLimite) }}</span>
-                  </div>
-                  <div class="buffet__categoria-valores">
-                    <span class="buffet__categoria-disponible" [class.buffet__categoria-disponible--alerta]="regla.porcentajeConsumido >= 85">
-                      {{ formatARS(regla.montoDisponible) }}
-                    </span>
-                    <span class="buffet__categoria-disponible-label">disponible</span>
-                  </div>
-                  <div class="buffet__categoria-progreso">
-                    <div class="buffet__categoria-progreso-barra">
-                      <div class="buffet__categoria-progreso-fill" 
-                           [style.width.%]="regla.porcentajeConsumido"
-                           [class.buffet__categoria-progreso-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
+          @if (presupuesto.reglasCategorias.length > 0) {
+            <div class="buffet__presupuesto-categorias">
+              <h4 class="buffet__presupuesto-subtitulo">Saldos por Categoría</h4>
+              <div class="buffet__presupuesto-categorias-grid">
+                @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
+                  <div class="buffet__categoria-card">
+                    <div class="buffet__categoria-info">
+                      <span class="buffet__categoria-nombre">{{ regla.descripcionCategoria }}</span>
+                      <span class="buffet__categoria-limite">Límite: {{ formatARS(regla.montoLimite) }}</span>
+                    </div>
+                    <div class="buffet__categoria-valores">
+                      <span class="buffet__categoria-disponible" [class.buffet__categoria-disponible--alerta]="regla.porcentajeConsumido >= 85">
+                        {{ formatARS(regla.montoDisponible) }}
+                      </span>
+                      <span class="buffet__categoria-disponible-label">disponible</span>
+                    </div>
+                    <div class="buffet__categoria-progreso">
+                      <div class="buffet__categoria-progreso-barra">
+                        <div class="buffet__categoria-progreso-fill" 
+                             [style.width.%]="regla.porcentajeConsumido"
+                             [class.buffet__categoria-progreso-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              }
+                }
+              </div>
             </div>
-          </div>
+          }
+
+          <div class="buffet__presupuesto-divider"></div>
         }
+
+        <!-- Sección de selección de retiro -->
+        <div class="buffet__retiro-contenedor">
+          <div class="buffet__retiro-header">
+            <h3 id="retiro-titulo" class="buffet__retiro-titulo">
+              <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+              Fecha y Horario de Retiro
+            </h3>
+            <p class="buffet__retiro-subtitulo">Elegí cuándo retirará el pedido el alumno.</p>
+          </div>
+
+          <div class="buffet__retiro-campos">
+            <label class="buffet__retiro-campo">
+              <span class="buffet__retiro-campo-label">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                Día de retiro
+              </span>
+              <input
+                id="buffet-fecha-retiro"
+                type="date"
+                class="buffet__retiro-input"
+                [value]="presenter.fechaSeleccionada()"
+                [min]="presenter.fechaMinima()"
+                (change)="onFechaCambia($event)"
+                aria-label="Día de retiro"
+              />
+            </label>
+
+            <label class="buffet__retiro-campo">
+              <span class="buffet__retiro-campo-label">
+                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                Franja horaria
+              </span>
+              <select
+                id="buffet-recreo-retiro"
+                class="buffet__retiro-select"
+                [value]="presenter.recreoSeleccionado()"
+                (change)="onRecreoCambia($event)"
+                aria-label="Franja horaria de retiro"
+              >
+                @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
+                  <option
+                    [value]="opc.recreo"
+                    [disabled]="opc.bloqueado"
+                    [selected]="opc.recreo === presenter.recreoSeleccionado()"
+                  >
+                    {{ opc.descripcion }}{{ opc.bloqueado ? (opc.motivo === 'tiempo' ? ' (No disponible — menos de 1h)' : ' (Bloqueado)') : '' }}
+                  </option>
+                }
+              </select>
+            </label>
+          </div>
+
+          <!-- Resultado del check de presupuesto por fecha -->
+          @if (presenter.cargandoPresupuestoPorFecha()) {
+            <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--cargando">
+              <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+              <span>Verificando presupuesto para esta fecha…</span>
+            </div>
+          } @else if (presenter.presupuestoPorFecha(); as budgetFecha) {
+            @if (budgetFecha.bloqueado) {
+              <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--bloqueado" role="alert">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                <div>
+                  <strong>Presupuesto insuficiente para esta fecha</strong>
+                  @if (budgetFecha.razon) {
+                    <p class="buffet__retiro-budget-razon">{{ budgetFecha.razon }}</p>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--ok">
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                <span>Presupuesto disponible para la fecha seleccionada</span>
+              </div>
+            }
+          }
+        </div>
       </section>
     }
 

@@ -13,6 +13,7 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ProductoCardComponent } from './components/producto-card/producto-card.component';
 import { SeleccionarAlumnoModalComponent } from './components/seleccionar-alumno-modal/seleccionar-alumno-modal.component';
 import { BuffetPresenter } from './presenter/buffet.presenter';
+import { Recreo } from '../compra/models/orden-compra.model';
 
 @Component({
   selector: 'app-buffet-page',
@@ -73,6 +74,16 @@ export class BuffetPage implements OnInit {
     this.presenter.cambiarAlumno(alumnoId);
   }
 
+  protected onFechaCambia(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.presenter.setFecha(target.value);
+  }
+
+  protected onRecreoCambia(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.presenter.setRecreo(target.value as Recreo);
+  }
+
   protected get saldoFormateado(): string {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -88,4 +99,11 @@ export class BuffetPage implements OnInit {
       maximumFractionDigits: 0,
     }).format(monto);
   }
+
+  protected formatFecha(fechaStr: string): string {
+    if (!fechaStr) return '';
+    const [year, month, day] = fechaStr.split('-');
+    return `${day}/${month}/${year}`;
+  }
 }
+

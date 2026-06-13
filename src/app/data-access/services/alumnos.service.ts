@@ -49,8 +49,8 @@ export class AlumnosService {
     }
   }
 
-  asegurarCargados(): Promise<Alumno[]> {
-    if (this.alumnosState().length > 0) {
+  asegurarCargados(force = false): Promise<Alumno[]> {
+    if (!force && this.alumnosState().length > 0) {
       return Promise.resolve(this.alumnosState());
     }
     if (this.cargaInFlight) {

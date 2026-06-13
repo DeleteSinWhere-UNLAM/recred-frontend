@@ -837,3 +837,172 @@
     align-items: flex-start;
   }
 }
+
+/* === Sección de selección de retiro (Tutor) === */
+.buffet__retiro-seccion {
+  margin-bottom: 28px;
+  padding: 20px 24px;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: slideInTop 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.buffet__retiro-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.buffet__retiro-titulo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.buffet__retiro-titulo i {
+  color: var(--color-pizarra);
+}
+
+.buffet__retiro-subtitulo {
+  font-size: 13px;
+  color: var(--color-texto-claro);
+}
+
+.buffet__retiro-campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.buffet__retiro-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.buffet__retiro-campo-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-texto-claro);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.buffet__retiro-campo-label i {
+  color: var(--color-pizarra);
+  font-size: 12px;
+}
+
+.buffet__retiro-input,
+.buffet__retiro-select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px;
+  background-color: var(--color-superficie);
+  color: var(--color-texto-oscuro);
+  border: 1px solid rgba(74, 111, 165, 0.2);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition:
+    border-color var(--transition-ui),
+    box-shadow var(--transition-ui);
+}
+
+.buffet__retiro-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234A6FA5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.buffet__retiro-input:focus,
+.buffet__retiro-select:focus {
+  border-color: var(--color-pizarra);
+  box-shadow: 0 0 0 4px var(--color-foco);
+  background-color: #fff;
+}
+
+/* Budget status feedback */
+.buffet__retiro-budget-estado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.buffet__retiro-budget-estado--ok {
+  background-color: rgba(129, 178, 154, 0.12);
+  border: 1px solid rgba(129, 178, 154, 0.32);
+  color: #2d7a5a;
+}
+
+.buffet__retiro-budget-estado--ok i {
+  color: #2d7a5a;
+  font-size: 18px;
+}
+
+.buffet__retiro-budget-estado--bloqueado {
+  background-color: rgba(230, 57, 70, 0.08);
+  border: 1px solid rgba(230, 57, 70, 0.24);
+  color: #c0392b;
+}
+
+.buffet__retiro-budget-estado--bloqueado i {
+  color: #e63946;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.buffet__retiro-budget-razon {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.buffet__retiro-budget-estado--cargando {
+  background-color: rgba(74, 111, 165, 0.06);
+  border: 1px solid rgba(74, 111, 165, 0.15);
+  color: var(--color-texto-claro);
+}
+
+.buffet__retiro-budget-estado--cargando i {
+  color: var(--color-pizarra);
+}
+
+@media (max-width: 560px) {
+  .buffet__retiro-seccion {
+    padding: 16px;
+  }
+
+  .buffet__retiro-campos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.buffet__presupuesto-divider {
+  border-top: 1px solid var(--color-borde);
+  margin: 12px 0 6px 0;
+  opacity: 0.8;
+}

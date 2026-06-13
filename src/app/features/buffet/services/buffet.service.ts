@@ -192,9 +192,13 @@ export class BuffetService {
     );
   }
 
-  getProductosDelBuffet(buffetId: string, alumnoId?: string): Observable<Producto[]> {
+  getProductosDelBuffet(buffetId: string, alumnoId?: string, fechaHoraConsulta?: string): Observable<Producto[]> {
     if (alumnoId && this.isUuid(alumnoId)) {
-      return this.http.get<MenuProductoDTO[]>(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).pipe(
+      const params: Record<string, string> = {};
+      if (fechaHoraConsulta) {
+        params['fechaHoraConsulta'] = fechaHoraConsulta;
+      }
+      return this.http.get<MenuProductoDTO[]>(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`, { params }).pipe(
         map(dtos => dtos.map(dto => this.mapMenuProductDtoToProducto(dto))),
         catchError((error) => {
           console.warn('Error fetching menu buffet from backend, falling back to products query:', error);

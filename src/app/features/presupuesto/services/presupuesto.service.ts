@@ -13,6 +13,16 @@ import {
   recalcularMontosReglas,
 } from '../models/presupuesto.model';
 
+export interface DateBudgetStatus {
+  readonly date: string;
+  readonly blocked: boolean;
+  readonly reason: string | null;
+}
+
+export interface CheckBudgetDatesResponse {
+  readonly validationResults: readonly DateBudgetStatus[];
+}
+
 interface CategoriaBackend {
   readonly id: string;
   readonly descripcion: string;
@@ -122,6 +132,20 @@ export class PresupuestoService {
     return categorias
       .filter((c) => c.activo !== false)
       .map((c) => ({ id: c.id, descripcion: c.descripcion }));
+  }
+
+  async checkBudgetDates(
+    alumnoId: string,
+    dates: readonly string[],
+    items: readonly { productId: string; quantity: number }[]
+  ): Promise<readonly DateBudgetStatus[]> {
+    const response = await firstValueFrom(
+      this.http.post<CheckBudgetDatesResponse>(
+        `${this.apiBase}/budgets/student/${encodeURIComponent(alumnoId)}/check-dates`,
+        { dates, items }
+      )
+    );
+    return response?.validationResults ?? [];
   }
 
   async guardar(presupuesto: Presupuesto): Promise<Presupuesto> {

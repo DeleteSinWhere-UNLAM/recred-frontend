@@ -76,7 +76,7 @@ export class HomeTutorPage implements OnInit {
   }
 
   ngOnInit(): void {
-    void this.alumnosService.asegurarCargados();
+    void this.alumnosService.asegurarCargados(true);
   }
 
   private armarNombreCompleto(): string {

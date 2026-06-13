@@ -237,3 +237,77 @@
   font-size: 14px;
   color: var(--color-melocoton);
 }
+
+/* Read-only retiro display */
+.orden-alumno__retiro-lectura {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.orden-alumno__retiro-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 14px;
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid rgba(74, 111, 165, 0.12);
+  border-radius: var(--radius-button);
+}
+
+.orden-alumno__retiro-dato-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__retiro-dato-label i {
+  color: var(--color-pizarra);
+  font-size: 11px;
+}
+
+.orden-alumno__retiro-dato-valor {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+.orden-alumno__retiro-editar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 16px;
+  background-color: rgba(74, 111, 165, 0.07);
+  border: 1px solid rgba(74, 111, 165, 0.2);
+  border-radius: var(--radius-button);
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  grid-column: 1 / -1;
+  transition: background-color var(--transition-ui), border-color var(--transition-ui);
+}
+
+.orden-alumno__retiro-editar:hover {
+  background-color: rgba(74, 111, 165, 0.12);
+  border-color: var(--color-pizarra);
+}
+
+.orden-alumno__retiro-editar i {
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .orden-alumno__retiro-lectura {
+    grid-template-columns: 1fr;
+  }
+}

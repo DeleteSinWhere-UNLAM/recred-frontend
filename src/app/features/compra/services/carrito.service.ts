@@ -7,6 +7,12 @@ import { MovimientosService } from '../../movimientos/services/movimientos.servi
 import { Movimiento } from '../../movimientos/models/movimiento.model';
 import { getPeriodRange, getProductCategory, isSameCategory } from '../utils/budget-helpers';
 import { firstValueFrom } from 'rxjs';
+import { Recreo } from '../models/orden-compra.model';
+
+export interface SeleccionRetiro {
+  fecha: string;
+  recreo: Recreo;
+}
 
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
@@ -16,11 +22,32 @@ export class CarritoService {
   private readonly itemsState = signal<ItemCarrito[]>([]);
   private readonly budgetsState = signal<Map<string, Presupuesto>>(new Map());
   private readonly purchasesState = signal<Map<string, Movimiento[]>>(new Map());
+  private readonly seleccionRetiroState = signal<Record<string, SeleccionRetiro>>({});
   private catalog: Producto[] = [];
 
   readonly items = this.itemsState.asReadonly();
   readonly budgets = this.budgetsState.asReadonly();
   readonly purchases = this.purchasesState.asReadonly();
+  readonly seleccionRetiro = this.seleccionRetiroState.asReadonly();
+
+  setSeleccionRetiro(alumnoId: string, fecha: string, recreo: Recreo): void {
+    this.seleccionRetiroState.update((current) => ({
+      ...current,
+      [alumnoId]: { fecha, recreo },
+    }));
+  }
+
+  getSeleccionRetiro(alumnoId: string): SeleccionRetiro | undefined {
+    return this.seleccionRetiroState()[alumnoId];
+  }
+
+  clearSeleccionRetiro(alumnoId: string): void {
+    this.seleccionRetiroState.update((current) => {
+      const next = { ...current };
+      delete next[alumnoId];
+      return next;
+    });
+  }
 
   readonly cantidadTotal = computed(() =>
     this.itemsState().reduce((acc, item) => acc + item.cantidad, 0),
@@ -166,13 +193,16 @@ export class CarritoService {
       return true;
     }
 
-    const { start, end } = getPeriodRange(budget.periodo);
+    const seleccion = this.seleccionRetiroState()[alumnoId];
+    const referenceDate = seleccion?.fecha ? new Date(seleccion.fecha + 'T12:00:00') : new Date();
+    const { start, end } = getPeriodRange(budget.periodo, referenceDate);
 
     // Sum past approved purchases in the current range
     const pastPurchases = this.purchasesState().get(alumnoId) ?? [];
+    const activeStatuses = ['APPROVED', 'PENDING', 'PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'];
     const approvedPastPurchases = pastPurchases.filter((m) => {
-      if (m.status !== 'APPROVED') return false;
-      const purchaseDate = new Date(m.date);
+      if (!activeStatuses.includes(m.status)) return false;
+      const purchaseDate = m.pickupDate ? new Date(m.pickupDate + 'T12:00:00') : new Date(m.date);
       return purchaseDate >= start && purchaseDate <= end;
     });
 

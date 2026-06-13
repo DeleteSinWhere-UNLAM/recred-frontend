@@ -138,7 +138,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
                 <img [src]="producto.imagen || 'assets/placeholder.png'" alt="Producto" class="producto-card__imagen">
                 
                 <!-- Clasificaciones -->
-                @if (producto.clasificacionesSalud?.length) {
+                @if (producto.clasificacionesSalud.length) {
                 <div class="producto-card__badge">
                   {{ producto.clasificacionesSalud[0].descripcion }}
                 </div>
