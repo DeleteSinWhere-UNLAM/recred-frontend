@@ -1,0 +1,187 @@
+<div class="tutor-dashboard">
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando panel global...</p>
+    </div>
+  } @else if (globalSummary) {
+    <!-- Global Header -->
+    <div class="global-header card">
+      <div class="global-balance-info">
+        <h3>Saldo Total Consolidado</h3>
+        <div class="balance-display">
+          <span class="currency">$</span>
+          <span class="amount">{{ globalSummary.totalBalance | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="global-actions">
+        <button class="primary-btn" (click)="openTransferModal()">
+          <i class="fa-solid fa-money-bill-transfer"></i> Transferir Saldo
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs for Children -->
+    <div class="children-tabs">
+      @for (child of globalSummary.children; track child.studentId) {
+        <button 
+          class="tab-btn" 
+          [class.active]="selectedChild?.studentId === child.studentId"
+          (click)="selectChild(child)">
+          <i class="fa-solid fa-child"></i> {{ child.studentName }}
+        </button>
+      }
+    </div>
+
+    <!-- Selected Child View -->
+    @if (selectedChild) {
+      <div class="dashboard-grid">
+        
+        <!-- Smart Action Widget -->
+        @if (selectedChild.smartAction) {
+          <section class="card smart-action-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Sugerencia Inteligente</h3>
+            </div>
+            <div class="smart-action-content">
+              <h4>{{ selectedChild.smartAction.title }}</h4>
+              <p>{{ selectedChild.smartAction.description }}</p>
+              <button class="action-btn" (click)="openSmartActionModal()">Revisar y Aplicar</button>
+            </div>
+          </section>
+        }
+
+        <!-- Financial Widget -->
+        <section class="card finance-card">
+          <div class="card-header">
+            <h3>Finanzas: {{ selectedChild.studentName }}</h3>
+            @if (isLowBalance) {
+              <span class="badge alert-badge">Saldo Bajo</span>
+            }
+          </div>
+          <div class="balance-display">
+            <span class="currency">$</span>
+            <span class="amount">{{ selectedChild.balance | number:'1.2-2' }}</span>
+          </div>
+          <p class="prediction-text"><i class="fa-solid fa-chart-line"></i> {{ selectedChild.spendingPredictionMessage }}</p>
+          
+          @if (selectedChild.budget) {
+            <div class="budget-section mt-4">
+              <div class="budget-info">
+                <span>Presupuesto {{ selectedChild.budget.period }}</span>
+                <span class="limit">${{ selectedChild.budget.limit | number:'1.0-0' }}</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar" [ngClass]="budgetColorClass" [style.width.%]="budgetPercentage"></div>
+              </div>
+              <small class="spent-text">Gastado: ${{ selectedChild.budget.spent | number:'1.0-0' }}</small>
+            </div>
+          }
+        </section>
+
+        <!-- Health & Gamification Widget -->
+        <section class="card health-card">
+          <div class="card-header">
+            <h3>Salud y Hábitos</h3>
+          </div>
+          <div class="reward-info">
+            <div class="level-badge">
+              <i class="fa-solid fa-medal"></i> {{ selectedChild.health.rewardLevel }}
+            </div>
+            <div class="points-info">
+              <strong>{{ selectedChild.health.rewardPoints }} pts</strong>
+              <small>Faltan {{ selectedChild.health.pointsToNextLevel }} para próximo nivel</small>
+            </div>
+          </div>
+          <div class="ai-summary">
+            <p>"{{ selectedChild.health.weeklyHealthSummary }}"</p>
+          </div>
+        </section>
+
+        <!-- Logistics Widget -->
+        <section class="card logistics-card">
+          <div class="card-header">
+            <h3>Logística del Día</h3>
+          </div>
+          @if (selectedChild.todayPickups.length > 0) {
+            <ul class="pickup-list">
+              @for (pickup of selectedChild.todayPickups; track pickup.id) {
+                <li class="pickup-item">
+                  <i class="fa-solid fa-box-open"></i>
+                  <span>{{ pickup.menuName }}</span>
+                  <span class="pickup-time">{{ pickup.pickupTime }}</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="empty-state">No hay retiros programados para hoy.</p>
+          }
+        </section>
+
+        <!-- Recent Transactions -->
+        <section class="card transactions-card">
+          <div class="card-header">
+            <h3>Últimos Movimientos</h3>
+          </div>
+          <ul class="transaction-list">
+            @for (tx of selectedChild.recentTransactions; track tx.id) {
+              <li class="transaction-item">
+                <div class="tx-icon">{{ tx.icon }}</div>
+                <div class="tx-details">
+                  <span class="tx-name">{{ tx.name }}</span>
+                  <span class="tx-date">{{ tx.date | date:'dd MMM, HH:mm' }}</span>
+                </div>
+                <div class="tx-amount negative">{{ tx.amount | number:'1.2-2' }}</div>
+              </li>
+            }
+          </ul>
+        </section>
+      </div>
+    }
+  }
+
+  <!-- Transfer Modal -->
+  @if (showTransferModal) {
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Transferir Saldo</h3>
+          <button class="close-btn" (click)="closeTransferModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+          <p>Seleccione desde quién y hacia quién desea transferir fondos.</p>
+          <!-- Form mock for transfer -->
+          <div class="form-group">
+            <label for="transferAmount">Monto:</label>
+            <input id="transferAmount" type="number" class="form-control" placeholder="$ 0.00">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="secondary-btn" (click)="closeTransferModal()">Cancelar</button>
+          <button class="primary-btn" (click)="closeTransferModal()">Confirmar Transferencia</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Smart Action Modal -->
+  @if (showSmartActionModal && selectedChild?.smartAction) {
+    <div class="modal-overlay">
+      <div class="modal-content smart-modal">
+        <div class="modal-header">
+          <h3>Aplicar Sugerencia</h3>
+          <button class="close-btn" (click)="closeSmartActionModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="smart-icon"><i class="fa-solid fa-lightbulb"></i></div>
+          <p class="smart-text">{{ selectedChild!.smartAction?.description }}</p>
+          <p class="warning-text">Esto actualizará las reglas de consumo del alumno.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="secondary-btn" (click)="closeSmartActionModal()">Descartar</button>
+          <button class="action-btn" (click)="applySmartAction()">Aceptar e Implementar</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

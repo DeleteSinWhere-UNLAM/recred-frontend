@@ -27,6 +27,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'tutor-dashboard',
+        loadComponent: () =>
+          import('./features/tutor-dashboard/tutor-dashboard.component').then(
+            (m) => m.TutorDashboardComponent,
+          ),
+      },
+      {
         path: 'crear-hijo',
         loadComponent: () =>
           import('./features/crear-hijo/crear-hijo.page').then(

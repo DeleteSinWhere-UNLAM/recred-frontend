@@ -1,363 +1,403 @@
 <app-navbar [userName]="nombreUsuario()" />
 
-<main class="buffet">
+<main class="buffet" [class.buffet--sidebar-closed]="panelLateralCerrado()">
   <div class="buffet__container">
-    <header class="buffet__cabecera">
-      <button
-        type="button"
-        class="buffet__volver"
-        (click)="presenter.volver()"
-      >
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        <span>Volver</span>
-      </button>
+    <div class="buffet__layout-wrapper">
 
-      <div class="buffet__titulo-bloque">
-        <h2 class="buffet__titulo">Menú del Buffet</h2>
-        <div class="buffet__titulo-meta">
-          @if (presenter.buffet(); as buffet) {
-            <p class="buffet__buffet-nombre">{{ buffet.nombre }}</p>
-          }
-          <span class="buffet__productos-count">
-            {{ presenter.productosFiltrados().length }} productos
-          </span>
-        </div>
-      </div>
+      <!-- Main Content Area -->
+      <div class="buffet__main-content">
+        <!-- Cabecera -->
+        <header class="buffet__cabecera">
+          <button type="button" class="buffet__volver" (click)="presenter.volver()">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            <span>Volver</span>
+          </button>
 
-      @if (presenter.alumno(); as alumno) {
-        <div class="buffet__alumno">
-          <div class="buffet__avatar" aria-hidden="true">
-            <span>{{ presenter.iniciales() }}</span>
+          <div class="buffet__titulo-bloque">
+            <h2 class="buffet__titulo">Menú del Buffet</h2>
+            <div class="buffet__titulo-meta">
+              @if (presenter.buffet(); as buffet) {
+              <p class="buffet__buffet-nombre">{{ buffet.nombre }}</p>
+              }
+              <span class="buffet__productos-count">
+                {{ presenter.productosFiltrados().length }} productos
+              </span>
+            </div>
           </div>
-          <div class="buffet__alumno-textos">
-            <div class="buffet__alumno-linea">
-              <p class="buffet__alumno-nombre">{{ presenter.nombreCompleto() }}</p>
-              @if (!esVistaAlumno()) {
-                <button
-                  type="button"
-                  class="buffet__alumno-editar"
-                  (click)="abrirSelector()"
-                  aria-label="Cambiar alumno"
-                  title="Cambiar alumno"
-                >
+
+          @if (presenter.alumno(); as alumno) {
+          <div class="buffet__alumno">
+            <div class="buffet__avatar" aria-hidden="true">
+              <span>{{ presenter.iniciales() }}</span>
+            </div>
+            <div class="buffet__alumno-textos">
+              <div class="buffet__alumno-linea">
+                <p class="buffet__alumno-nombre">{{ presenter.nombreCompleto() }}</p>
+                @if (!esVistaAlumno()) {
+                <button type="button" class="buffet__alumno-editar" (click)="abrirSelector()"
+                  aria-label="Cambiar alumno" title="Cambiar alumno">
                   <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
                 </button>
-              }
-            </div>
-            <p class="buffet__alumno-colegio">
-              en <strong>{{ presenter.nombreColegio() }}</strong>
-            </p>
-          </div>
-          <div class="buffet__saldo">
-            <span class="buffet__saldo-label">SALDO</span>
-            <span class="buffet__saldo-valor">{{ saldoFormateado }}</span>
-          </div>
-        </div>
-      }
-    </header>
-
-    @if (presenter.alumno()) {
-      <section class="buffet__presupuesto-seccion" aria-labelledby="presupuesto-disponible-titulo">
-        @if (presenter.presupuestoDisponible(); as presupuesto) {
-          <div class="buffet__presupuesto-general">
-            <div class="buffet__presupuesto-info">
-              <h3 id="presupuesto-disponible-titulo" class="buffet__presupuesto-titulo">
-                <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-                Saldo Disponible
-              </h3>
-              <p class="buffet__presupuesto-periodo">
-                Período: <strong>{{ presupuesto.periodo }}</strong> (Límite total: {{ formatARS(presupuesto.montoLimiteGeneral) }})
+                }
+              </div>
+              <p class="buffet__alumno-colegio">
+                en <strong>{{ presenter.nombreColegio() }}</strong>
               </p>
             </div>
-            <div class="buffet__presupuesto-valores">
-              <div class="buffet__presupuesto-disponible-total">
-                <span class="buffet__presupuesto-valor-label">Disponible general</span>
-                <span class="buffet__presupuesto-valor" [class.buffet__presupuesto-valor--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85">
-                  {{ formatARS(presupuesto.montoDisponibleGeneral) }}
-                </span>
-              </div>
-              <div class="buffet__presupuesto-progreso-wrapper">
-                <div class="buffet__presupuesto-progreso-barra">
-                  <div class="buffet__presupuesto-progreso-fill" 
-                       [style.width.%]="presupuesto.porcentajeConsumidoGeneral"
-                       [class.buffet__presupuesto-progreso-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"></div>
-                </div>
-                <span class="buffet__presupuesto-progreso-texto">Consumido: {{ formatARS(presupuesto.montoConsumidoGeneral) }} ({{ presupuesto.porcentajeConsumidoGeneral }}%)</span>
-              </div>
+            <div class="buffet__saldo">
+              <span class="buffet__saldo-label">SALDO</span>
+              <span class="buffet__saldo-valor">{{ saldoFormateado }}</span>
             </div>
           </div>
+          }
+        </header>
+
+        <!-- Filtros Condensados -->
+        <section class="buffet__filtros-container" aria-label="Filtros del menú">
+          <div class="buffet__filtros-row">
+            <!-- Search field -->
+            <div class="buffet__filtro-item buffet__filtro-item--search">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <input type="search" class="buffet__search-input" placeholder="Buscar por nombre..."
+                [value]="presenter.filtros().busqueda" (input)="onBusqueda($event)" aria-label="Buscar productos" />
+            </div>
+
+            <!-- Price Inputs (Min / Max) -->
+            <div class="buffet__filtro-item buffet__filtro-item--price">
+              <span class="price-prefix">$</span>
+              <input type="number" class="buffet__price-input" placeholder="Mín"
+                [value]="presenter.filtros().precioMin ?? ''" (input)="onPrecioMinCambia($event)"
+                aria-label="Precio mínimo" />
+            </div>
+
+            <span class="price-separator">-</span>
+
+            <div class="buffet__filtro-item buffet__filtro-item--price">
+              <span class="price-prefix">$</span>
+              <input type="number" class="buffet__price-input" placeholder="Máx"
+                [value]="presenter.filtros().precioMax ?? ''" (input)="onPrecioMaxCambia($event)"
+                aria-label="Precio máximo" />
+            </div>
+
+            <!-- Category select -->
+            <div class="buffet__filtro-item buffet__filtro-item--select">
+              <select class="buffet__select" [value]="presenter.filtros().categoriaId" (change)="onCategoria($event)"
+                aria-label="Filtrar por categoría">
+                <option value="todas">Categorías</option>
+                @for (cat of presenter.categorias(); track cat.id) {
+                <option [value]="cat.id">{{ cat.descripcion }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Favoritos toggle -->
+            <button type="button" class="buffet__favoritos-toggle" [class.active]="presenter.filtros().soloFavoritos"
+              (click)="onToggleSoloFavoritos()" aria-label="Filtrar solo favoritos">
+              <i class="fa-solid fa-heart" aria-hidden="true"></i>
+              <span>FAVORITOS</span>
+            </button>
+
+            <!-- Limpiar button inside the same row -->
+            <button type="button" class="buffet__limpiar-btn-inline" (click)="presenter.limpiarFiltros()"
+              aria-label="Limpiar filtros">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+              <span>LIMPIAR</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Product Grid -->
+        @if (presenter.productosFiltrados().length > 0) {
+        <section class="buffet__grid" aria-label="Productos del buffet">
+          @for (producto of presenter.productosFiltrados(); track producto.id) {
+          <app-producto-card [producto]="producto" [alumnoId]="presenter.alumno()?.id ?? ''"
+            [esFavorito]="presenter.favoritos().has(producto.id)" [mostrarCandado]="!esVistaAlumno()"
+            (agregar)="presenter.agregarAlCarrito($event.producto, $event.cantidad)"
+            (toggleFavorito)="presenter.toggleFavorito($event)" (toggleLock)="presenter.toggleLock($event)" />
+          }
+        </section>
+        } @else {
+        <div class="buffet__vacio" role="status">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <p>No hay productos que coincidan con los filtros.</p>
+          <button type="button" class="buffet__vacio-cta" (click)="presenter.limpiarFiltros()">
+            Limpiar filtros
+          </button>
+        </div>
         }
+      </div>
 
-        <!-- Contenedor secundario para alinear categorías y selector de retiro -->
-        <div class="buffet__presupuesto-detalles-fila">
-          <!-- Sección de selección de retiro -->
-          <div class="buffet__retiro-contenedor">
-            <div class="buffet__retiro-header">
-              <h3 id="retiro-titulo" class="buffet__retiro-titulo">
-                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
-                Fecha y Horario de Retiro
-              </h3>
-              <p class="buffet__retiro-subtitulo">Elegí cuándo retirará el pedido el alumno.</p>
-            </div>
+      <!-- Right Sidebar Panel -->
+      @if (presenter.alumno(); as alumno) {
+      <aside class="buffet__sidebar" [class.closed]="panelLateralCerrado()">
+        <button type="button" class="buffet__sidebar-toggle-header" (click)="panelLateralCerrado.set(!panelLateralCerrado())">
+          <div class="buffet__sidebar-toggle-title">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <span>Ocultar</span>
+          </div>
+          <i class="fa-solid" [class.fa-chevron-right]="!panelLateralCerrado()"
+            [class.fa-chevron-left]="panelLateralCerrado()" aria-hidden="true"></i>
+        </button>
 
-            <div class="buffet__retiro-campos">
-              <label class="buffet__retiro-campo">
-                <span class="buffet__retiro-campo-label">
-                  <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                  Día de retiro
-                </span>
-                <input
-                  id="buffet-fecha-retiro"
-                  type="date"
-                  class="buffet__retiro-input"
-                  [value]="presenter.fechaSeleccionada()"
-                  [min]="presenter.fechaMinima()"
-                  (change)="onFechaCambia($event)"
-                  aria-label="Día de retiro"
-                />
-              </label>
+        <div class="buffet__sidebar-content">
+          <!-- Saldo Disponible Section -->
+          @if (presenter.presupuestoDisponible(); as presupuesto) {
+          <div class="buffet__sidebar-section">
+            <h3 class="buffet__sidebar-section-title">
+              <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+              Saldo Disponible
+            </h3>
+            <p class="buffet__sidebar-section-subtitle">
+              Período: <strong>{{ presupuesto.periodo }}</strong> (Límite total: {{
+              formatARS(presupuesto.montoLimiteGeneral) }})
+            </p>
 
-              <label class="buffet__retiro-campo">
-                <span class="buffet__retiro-campo-label">
-                  <i class="fa-regular fa-clock" aria-hidden="true"></i>
-                  Franja horaria
-                </span>
-                <select
-                  id="buffet-recreo-retiro"
-                  class="buffet__retiro-select"
-                  [value]="presenter.recreoSeleccionado()"
-                  (change)="onRecreoCambia($event)"
-                  aria-label="Franja horaria de retiro"
-                >
-                  @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
-                    <option
-                      [value]="opc.recreo"
-                      [disabled]="opc.bloqueado"
-                      [selected]="opc.recreo === presenter.recreoSeleccionado()"
-                    >
-                      {{ opc.descripcion }}{{ opc.bloqueado ? (opc.motivo === 'tiempo' ? ' (No disponible — menos de 1h)' : ' (Bloqueado)') : '' }}
-                    </option>
-                  }
-                </select>
-              </label>
-            </div>
-
-            <!-- Resultado del check de presupuesto por fecha -->
-            @if (presenter.cargandoPresupuestoPorFecha()) {
-              <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--cargando">
-                <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
-                <span>Verificando presupuesto para esta fecha…</span>
+            <div class="buffet__sidebar-saldo-gauge-row">
+              <div class="buffet__sidebar-circle-gauge">
+                <svg class="circle-gauge-svg" viewBox="0 0 100 100">
+                  <circle class="circle-gauge-bg" cx="50" cy="50" r="42" stroke-width="8"></circle>
+                  <circle class="circle-gauge-fill" cx="50" cy="50" r="42" stroke-width="8"
+                    [style.strokeDashoffset]="263.89 - (263.89 * (presupuesto.porcentajeConsumidoGeneral || 0)) / 100"
+                    stroke-dasharray="263.89"
+                    [class.circle-gauge-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"
+                    transform="rotate(-90 50 50)"></circle>
+                </svg>
+                <div class="circle-gauge-text">
+                  <span class="circle-gauge-label">SALDO</span>
+                  <span class="circle-gauge-amount">{{ presenter.saldo() }}</span>
+                </div>
               </div>
-            } @else if (presenter.presupuestoPorFecha(); as budgetFecha) {
-              @if (budgetFecha.bloqueado) {
-                <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--bloqueado" role="alert">
-                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                  <div>
-                    <strong>Presupuesto insuficiente para esta fecha</strong>
-                    @if (budgetFecha.razon) {
-                      <p class="buffet__retiro-budget-razon">{{ budgetFecha.razon }}</p>
-                    }
+
+              <div class="buffet__sidebar-saldo-detalles">
+                <div class="saldo-detalle-item">
+                  <span class="saldo-detalle-label">DISPONIBLE GENERAL</span>
+                  <span class="saldo-detalle-value"
+                    [class.saldo-detalle-value--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85">
+                    {{ formatARS(presupuesto.montoDisponibleGeneral) }}
+                  </span>
+                </div>
+                <div class="saldo-mini-bar-container">
+                  <div class="saldo-mini-bar">
+                    <div class="saldo-mini-bar-fill" [style.width.%]="presupuesto.porcentajeConsumidoGeneral"
+                      [class.saldo-mini-bar-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"></div>
+                  </div>
+                  <span class="saldo-mini-bar-text">
+                    Consumido: {{ formatARS(presupuesto.montoConsumidoGeneral) }} ({{
+                    presupuesto.porcentajeConsumidoGeneral }}%)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            @if (presupuesto.reglasCategorias.length > 0) {
+            <div class="buffet__sidebar-categorias-list">
+              <span class="buffet__sidebar-sublabel">Límites por Categoría</span>
+              <div class="buffet__sidebar-categoria-items">
+                @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
+                <div class="buffet__sidebar-categoria-item">
+                  <div class="categoria-item-header">
+                    <span class="categoria-item-name">{{ regla.descripcionCategoria }}</span>
+                    <span class="categoria-item-disponible"
+                      [class.categoria-item-disponible--alerta]="regla.porcentajeConsumido >= 85">
+                      {{ formatARS(regla.montoDisponible) }} disp.
+                    </span>
+                  </div>
+                  <div class="categoria-item-bar">
+                    <div class="categoria-item-bar-fill" [style.width.%]="regla.porcentajeConsumido"
+                      [class.categoria-item-bar-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
+                  </div>
+                  <div class="categoria-item-footer">
+                    <span>Límite: {{ formatARS(regla.montoLimite) }}</span>
+                    <span>Consumido: {{ regla.porcentajeConsumido }}%</span>
                   </div>
                 </div>
-              } @else {
-                <div class="buffet__retiro-budget-estado buffet__retiro-budget-estado--ok">
-                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                  <span>Presupuesto disponible para la fecha seleccionada</span>
+                }
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="buffet__sidebar-section">
+            <h3 class="buffet__sidebar-section-title">
+              <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+              Saldo Disponible
+            </h3>
+            <p class="buffet__sidebar-section-subtitle">Saldo general de la cuenta del alumno</p>
+
+            <div class="buffet__sidebar-saldo-gauge-row">
+              <div class="buffet__sidebar-circle-gauge">
+                <svg class="circle-gauge-svg" viewBox="0 0 100 100">
+                  <circle class="circle-gauge-bg" cx="50" cy="50" r="42" stroke-width="8"></circle>
+                  <circle class="circle-gauge-fill" cx="50" cy="50" r="42" stroke-width="8" stroke-dashoffset="0"
+                    stroke-dasharray="263.89" transform="rotate(-90 50 50)"></circle>
+                </svg>
+                <div class="circle-gauge-text">
+                  <span class="circle-gauge-label">SALDO</span>
+                  <span class="circle-gauge-amount">{{ formatARS(presenter.saldo()) }}</span>
                 </div>
-              }
+              </div>
+
+              <div class="buffet__sidebar-saldo-detalles">
+                <div class="saldo-detalle-item">
+                  <span class="saldo-detalle-label">DISPONIBLE GENERAL</span>
+                  <span class="saldo-detalle-value">{{ formatARS(presenter.saldo()) }}</span>
+                </div>
+                <div class="saldo-mini-bar-container">
+                  <div class="saldo-mini-bar">
+                    <div class="saldo-mini-bar-fill" style="width: 0%"></div>
+                  </div>
+                  <span class="saldo-mini-bar-text">Sin límites de presupuesto diarios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+
+          <!-- Fecha y Horario de Retiro Section -->
+          <div class="buffet__sidebar-section">
+            <h3 class="buffet__sidebar-section-title">
+              <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+              Fecha y Horario de Retiro
+            </h3>
+            <p class="buffet__sidebar-section-subtitle">Elegí cuándo retirará el pedido el alumno.</p>
+
+            <div class="buffet__sidebar-retiro-layout">
+              <!-- Left: Custom Calendar Widget -->
+              <div class="buffet__calendar-widget">
+                <div class="calendar-widget-header">
+                  <span class="calendar-current-month">{{ nombreMesCalendario() }}</span>
+                </div>
+
+                <div class="calendar-grid">
+                  <span class="calendar-grid-header">L</span>
+                  <span class="calendar-grid-header">M</span>
+                  <span class="calendar-grid-header">M</span>
+                  <span class="calendar-grid-header">J</span>
+                  <span class="calendar-grid-header">V</span>
+                  <span class="calendar-grid-header">S</span>
+                  <span class="calendar-grid-header">D</span>
+
+                  @for (cell of diasCalendario(); track cell.fechaStr) {
+                  <button type="button" class="calendar-day-btn" [class.calendar-day-btn--selected]="cell.seleccionada"
+                    [class.calendar-day-btn--disabled]="cell.bloqueado"
+                    [class.calendar-day-btn--outside]="cell.fueraDeMes" [disabled]="cell.bloqueado"
+                    (click)="seleccionarDiaCalendario(cell)">
+                    {{ cell.nroDia }}
+                  </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Right: Franja Horaria Stack -->
+              <div class="buffet__sidebar-recreos">
+                <span class="recreo-section-label">FRANJA HORARIA</span>
+                <div class="recreos-btn-stack">
+                  @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
+                  <button type="button" class="recreo-option-btn"
+                    [class.active]="opc.recreo === presenter.recreoSeleccionado()" [disabled]="opc.bloqueado"
+                    (click)="presenter.setRecreo(opc.recreo)"
+                    [title]="opc.bloqueado ? (opc.motivo === 'tiempo' ? 'No disponible — menos de 1h' : 'Bloqueado por el tutor') : ''">
+                    <span class="recreo-option-name">{{ opc.descripcion }}</span>
+                    @if (obtenerRangoHorario(opc.recreo); as rango) {
+                    <span class="recreo-option-time">{{ rango }}</span>
+                    }
+                  </button>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Budget status banner under calendar -->
+            @if (presenter.cargandoPresupuestoPorFecha()) {
+            <div class="buffet__sidebar-budget-status budget-status--cargando">
+              <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+              <span>Verificando presupuesto…</span>
+            </div>
+            } @else if (presenter.presupuestoPorFecha(); as budgetFecha) {
+            @if (budgetFecha.bloqueado) {
+            <div class="buffet__sidebar-budget-status budget-status--bloqueado" role="alert">
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              <div>
+                <strong>Presupuesto insuficiente</strong>
+                @if (budgetFecha.razon) {
+                <p class="budget-status-reason">{{ budgetFecha.razon }}</p>
+                }
+              </div>
+            </div>
+            } @else {
+            <div class="buffet__sidebar-budget-status budget-status--ok">
+              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+              <span>Presupuesto disponible para la fecha seleccionada</span>
+            </div>
+            }
             }
           </div>
 
-          <!-- Categorías -->
-          @if (presenter.presupuestoDisponible(); as presupuesto) {
-            @if (presupuesto.reglasCategorias.length > 0) {
-              <div class="buffet__presupuesto-categorias">
-                <h4 class="buffet__presupuesto-subtitulo">Saldos por Categoría</h4>
-                <div class="buffet__presupuesto-categorias-grid">
-                  @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
-                    <div class="buffet__categoria-card">
-                      <div class="buffet__categoria-info">
-                        <span class="buffet__categoria-nombre">{{ regla.descripcionCategoria }}</span>
-                        <span class="buffet__categoria-limite">Límite: {{ formatARS(regla.montoLimite) }}</span>
-                      </div>
-                      <div class="buffet__categoria-valores">
-                        <span class="buffet__categoria-disponible" [class.buffet__categoria-disponible--alerta]="regla.porcentajeConsumido >= 85">
-                          {{ formatARS(regla.montoDisponible) }}
-                        </span>
-                        <span class="buffet__categoria-disponible-label">disponible</span>
-                      </div>
-                      <div class="buffet__categoria-progreso">
-                        <div class="buffet__categoria-progreso-barra">
-                          <div class="buffet__categoria-progreso-fill" 
-                               [style.width.%]="regla.porcentajeConsumido"
-                               [class.buffet__categoria-progreso-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-          }
-        </div>
-
-        <!-- Nuevo sector informativo: Restricciones Configuradas (Alimenticias y Horarias) -->
-        @if (!esVistaAlumno()) {
-          <div class="buffet__restricciones-informativas">
-            <h4 class="buffet__restricciones-informativas-titulo">
+          <!-- Alumno / Restricciones Section -->
+          @if (!esVistaAlumno()) {
+          <div class="buffet__sidebar-section">
+            <h3 class="buffet__sidebar-section-title">
               <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
               Restricciones del Alumno
-            </h4>
-            <div class="buffet__restricciones-informativas-contenido">
-              <!-- Restricciones alimenticias -->
-              <div class="buffet__restricciones-grupo">
-                <span class="buffet__restricciones-grupo-label">Restricciones Alimenticias</span>
-                <div class="buffet__restricciones-tags">
+            </h3>
+
+            <div class="buffet__sidebar-restricciones-content">
+              <!-- Dietary restrictions -->
+              <div class="restricciones-sidebar-group">
+                <span class="restricciones-group-label">Restricciones Alimenticias</span>
+                <div class="restricciones-pills-container">
                   @if (presenter.restriccionesNutricionales().length > 0) {
-                    @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
-                      <span class="buffet__tag-restriccion buffet__tag-restriccion--activa">
-                        <i class="fa-solid fa-ban" aria-hidden="true"></i>
-                        {{ rest.descripcion }}
-                      </span>
-                    }
+                  @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
+                  <span class="restriccion-pill-card restriccion-pill-card--danger">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    {{ rest.descripcion }}
+                  </span>
+                  }
                   } @else {
-                    <span class="buffet__tag-restriccion buffet__tag-restriccion--libre">
-                      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                      Sin restricciones alimenticias
-                    </span>
+                  <span class="restriccion-pill-card restriccion-pill-card--success">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    Sin restricciones alimenticias
+                  </span>
                   }
                 </div>
               </div>
 
-              <!-- Horarios de compra -->
-              <div class="buffet__restricciones-grupo">
-                <span class="buffet__restricciones-grupo-label">Horarios de Compra Permitidos</span>
-                <div class="buffet__restricciones-horarios-capsulas">
+              <!-- Time restrictions -->
+              <div class="restricciones-sidebar-group">
+                <span class="restricciones-group-label">Horarios Permitidos</span>
+                <div class="restricciones-pills-container">
                   @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
-                    <div class="buffet__horario-capsula" [class.buffet__horario-capsula--bloqueado]="horario.bloqueado">
-                      <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado" [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
-                      <span>{{ horario.descripcion }}</span>
-                    </div>
+                  <span class="restriccion-pill-card" [class.restriccion-pill-card--success]="!horario.bloqueado"
+                    [class.restriccion-pill-card--muted]="horario.bloqueado">
+                    <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado"
+                      [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
+                    {{ horario.descripcion }}
+                  </span>
                   }
                 </div>
               </div>
             </div>
           </div>
-        }
-      </section>
-    }
-
-    <section class="buffet__filtros" aria-label="Filtros del menú">
-      <div class="buffet__filtro buffet__filtro--busqueda">
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        <input
-          type="search"
-          class="buffet__busqueda"
-          placeholder="Buscar por nombre..."
-          [value]="presenter.filtros().busqueda"
-          (input)="onBusqueda($event)"
-          aria-label="Buscar productos"
-        />
-      </div>
-
-      <div class="buffet__filtro buffet__filtro--slider" aria-hidden="true">
-        <div class="buffet__slider-rotulos">
-          <span>MIN</span>
-          <span>MAX</span>
-        </div>
-        <div class="buffet__slider-track">
-          <div class="buffet__slider-fill"></div>
-          <span class="buffet__slider-thumb buffet__slider-thumb--izq"></span>
-          <span class="buffet__slider-thumb buffet__slider-thumb--der"></span>
-        </div>
-        <p class="buffet__slider-nota">Rango de precio</p>
-      </div>
-
-      <div class="buffet__filtro buffet__filtro--select">
-        <select
-          class="buffet__select"
-          [value]="presenter.filtros().categoriaId"
-          (change)="onCategoria($event)"
-          aria-label="Filtrar por categoría"
-        >
-          <option value="todas">Categorías</option>
-          @for (cat of presenter.categorias(); track cat.id) {
-            <option [value]="cat.id">{{ cat.descripcion }}</option>
           }
-        </select>
-      </div>
+        </div>
+      </aside>
+      }
 
-      <div class="buffet__filtro buffet__filtro--select">
-        <select
-          class="buffet__select"
-          [value]="presenter.filtros().clasificacionId"
-          (change)="onClasificacion($event)"
-          aria-label="Filtrar por restricción"
-        >
-          <option value="todas">Restricciones</option>
-          @for (cla of presenter.clasificaciones(); track cla.id) {
-            <option [value]="cla.id">{{ cla.descripcion }}</option>
-          }
-        </select>
-      </div>
-
-      <button
-        type="button"
-        class="buffet__filtro-favoritos"
-        [class.buffet__filtro-favoritos--activo]="presenter.filtros().soloFavoritos"
-        (click)="onToggleSoloFavoritos()"
-        aria-label="Filtrar solo favoritos"
-      >
-        <i class="fa-solid fa-heart" aria-hidden="true"></i>
-        <span>Favoritos</span>
-      </button>
-
-      <button
-        type="button"
-        class="buffet__limpiar"
-        (click)="presenter.limpiarFiltros()"
-      >
-        <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
-        <span>Limpiar</span>
-      </button>
-    </section>
-
-    @if (presenter.productosFiltrados().length > 0) {
-      <section class="buffet__grid" aria-label="Productos del buffet">
-        @for (producto of presenter.productosFiltrados(); track producto.id) {
-          <app-producto-card
-            [producto]="producto"
-            [alumnoId]="presenter.alumno()?.id ?? ''"
-            [esFavorito]="presenter.favoritos().has(producto.id)"
-            [mostrarCandado]="!esVistaAlumno()"
-            (agregar)="presenter.agregarAlCarrito($event.producto, $event.cantidad)"
-            (toggleFavorito)="presenter.toggleFavorito($event)"
-            (toggleLock)="presenter.toggleLock($event)"
-          />
-        }
-      </section>
-    } @else {
-      <div class="buffet__vacio" role="status">
-        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        <p>No hay productos que coincidan con los filtros.</p>
-        <button
-          type="button"
-          class="buffet__vacio-cta"
-          (click)="presenter.limpiarFiltros()"
-        >
-          Limpiar filtros
-        </button>
-      </div>
-    }
+    </div>
   </div>
 </main>
 
 @if (mostrarSelector()) {
-  <app-seleccionar-alumno-modal
-    [alumnos]="todosLosAlumnos"
-    [colegios]="todosLosColegios"
-    [alumnoActualId]="presenter.alumno()?.id ?? ''"
-    (seleccionar)="onAlumnoSeleccionado($event)"
-    (cerrar)="cerrarSelector()"
-  />
+<app-seleccionar-alumno-modal [alumnos]="todosLosAlumnos" [colegios]="todosLosColegios"
+  [alumnoActualId]="presenter.alumno()?.id ?? ''" (seleccionar)="onAlumnoSeleccionado($event)"
+  (cerrar)="cerrarSelector()" />
+}
+
+<!-- Sidebar Float Button when Closed -->
+@if (panelLateralCerrado() && presenter.alumno()) {
+<button type="button" class="buffet__sidebar-open-btn" (click)="panelLateralCerrado.set(false)"
+  aria-label="Abrir panel de información">
+  <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+  <span>Ver Saldo y Retiro</span>
+</button>
 }

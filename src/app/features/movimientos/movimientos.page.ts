@@ -36,6 +36,10 @@ export class MovimientosPage implements OnInit {
   readonly cargando = signal(true);
   readonly errorMsg = signal<string | null>(null);
 
+  readonly filtroBusqueda = signal<string>('');
+  readonly filtroFecha = signal<string>('');
+  readonly mostrarFiltrosAvanzados = signal<boolean>(false);
+
   readonly selectedAlumnoId = signal<string>('todos');
   readonly filtroEstado = signal<string>('TODOS');
   readonly filtroFechaDesde = signal<string>('');
@@ -52,8 +56,24 @@ export class MovimientosPage implements OnInit {
     const hasta = this.filtroFechaHasta();
     const minPrice = this.filtroPrecioMin();
     const maxPrice = this.filtroPrecioMax();
+    const query = this.filtroBusqueda().toLowerCase().trim();
+    const selectedDate = this.filtroFecha();
 
-    return list.filter((m) => {
+    let filtered = list;
+
+    if (query) {
+      filtered = filtered.filter((m) => {
+        return m.items.some((item) => item.productName.toLowerCase().includes(query));
+      });
+    }
+
+    if (selectedDate) {
+      filtered = filtered.filter((m) => {
+        return m.date.startsWith(selectedDate);
+      });
+    }
+
+    return filtered.filter((m) => {
       if (estado !== 'TODOS' && m.status !== estado) {
         return false;
       }
@@ -76,6 +96,32 @@ export class MovimientosPage implements OnInit {
 
       return true;
     });
+  });
+
+  readonly movimientosAgrupadosPorDia = computed<{ fechaStr: string; movimientos: Movimiento[] }[]>(() => {
+    const list = this.movimientosFiltrados();
+    const groupsMap = new Map<string, Movimiento[]>();
+    const orderedKeys: string[] = [];
+
+    for (const m of list) {
+      const d = new Date(m.date);
+      const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const dia = d.getDate();
+      const mes = meses[d.getMonth()];
+      const anio = d.getFullYear();
+      const dateStr = `${dia} ${mes} ${anio}`;
+
+      if (!groupsMap.has(dateStr)) {
+        groupsMap.set(dateStr, []);
+        orderedKeys.push(dateStr);
+      }
+      groupsMap.get(dateStr)!.push(m);
+    }
+
+    return orderedKeys.map((key) => ({
+      fechaStr: key,
+      movimientos: groupsMap.get(key)!,
+    }));
   });
 
   ngOnInit(): void {
@@ -130,11 +176,68 @@ export class MovimientosPage implements OnInit {
   }
 
   limpiarFiltros(): void {
+    this.filtroBusqueda.set('');
+    this.filtroFecha.set('');
     this.filtroEstado.set('TODOS');
     this.filtroFechaDesde.set('');
     this.filtroFechaHasta.set('');
     this.filtroPrecioMin.set(null);
     this.filtroPrecioMax.set(null);
+  }
+
+  get activeChips(): { id: string; label: string }[] {
+    const chips = [];
+
+    if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
+      const alumno = this.alumnosService.getAlumnoById(this.selectedAlumnoId());
+      if (alumno) {
+        chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre} ${alumno.apellido}` });
+      }
+    }
+
+    if (this.filtroEstado() !== 'TODOS') {
+      const label = this.filtroEstado() === 'PENDIENTE' ? 'A Preparar' : 'Entregado';
+      chips.push({ id: 'estado', label: `Estado: ${label}` });
+    }
+
+    if (this.filtroPrecioMin() !== null || this.filtroPrecioMax() !== null) {
+      const min = this.filtroPrecioMin() ?? 0;
+      const max = this.filtroPrecioMax() ? `$${this.filtroPrecioMax()}` : 'Max';
+      chips.push({ id: 'rango', label: `Rango: $${min} - ${max}` });
+    }
+
+    if (this.filtroFechaDesde() || this.filtroFechaHasta()) {
+      const desde = this.filtroFechaDesde() ? this.filtroFechaDesde() : 'Inicio';
+      const hasta = this.filtroFechaHasta() ? this.filtroFechaHasta() : 'Fin';
+      chips.push({ id: 'fecha', label: `Fechas: ${desde} a ${hasta}` });
+    }
+
+    return chips;
+  }
+
+  removeChip(id: string): void {
+    if (id === 'alumno') {
+      this.selectedAlumnoId.set('todos');
+      void this.router.navigate(['/movimientos']);
+    } else if (id === 'estado') {
+      this.filtroEstado.set('TODOS');
+    } else if (id === 'rango') {
+      this.filtroPrecioMin.set(null);
+      this.filtroPrecioMax.set(null);
+    } else if (id === 'fecha') {
+      this.filtroFechaDesde.set('');
+      this.filtroFechaHasta.set('');
+    }
+  }
+
+  mostrarHoraOMediodia(mov: Movimiento): string {
+    if (mov.tipo === 'ANTICIPADA' && mov.pickupSlotDescription) {
+      return mov.pickupSlotDescription;
+    }
+    const date = new Date(mov.date);
+    const hora = String(date.getHours()).padStart(2, '0');
+    const mins = String(date.getMinutes()).padStart(2, '0');
+    return `${hora}:${mins} hs`;
   }
 
   abrirDetalle(movimiento: Movimiento): void {
