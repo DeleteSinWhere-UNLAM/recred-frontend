@@ -60,6 +60,8 @@ export interface FiltrosBuffet {
   categoriaId: string | 'todas';
   clasificacionId: string | 'todas';
   soloFavoritos: boolean;
+  precioMin: number | null;
+  precioMax: number | null;
 }
 
 const filtrosPorDefecto: FiltrosBuffet = {
@@ -67,6 +69,8 @@ const filtrosPorDefecto: FiltrosBuffet = {
   categoriaId: 'todas',
   clasificacionId: 'todas',
   soloFavoritos: false,
+  precioMin: null,
+  precioMax: null,
 };
 
 @Injectable()
@@ -373,7 +377,7 @@ export class BuffetPresenter {
   });
 
   readonly productosFiltrados = computed<Producto[]>(() => {
-    const { busqueda, categoriaId, clasificacionId, soloFavoritos } = this.filtrosState();
+    const { busqueda, categoriaId, clasificacionId, soloFavoritos, precioMin, precioMax } = this.filtrosState();
     const texto = busqueda.trim().toLowerCase();
     const favs = this.favoritosState();
     const esAlumno = this.usuarioService.esVistaAlumno();
@@ -402,6 +406,12 @@ export class BuffetPresenter {
         clasificacionId !== 'todas' &&
         !producto.clasificacionesSalud.some((c) => c.id === clasificacionId)
       ) {
+        return false;
+      }
+      if (precioMin !== null && precioMin !== undefined && producto.precio < precioMin) {
+        return false;
+      }
+      if (precioMax !== null && precioMax !== undefined && producto.precio > precioMax) {
         return false;
       }
       return true;
@@ -595,6 +605,14 @@ export class BuffetPresenter {
 
   toggleSoloFavoritos(): void {
     this.filtrosState.update((actual) => ({ ...actual, soloFavoritos: !actual.soloFavoritos }));
+  }
+
+  setPrecioMin(monto: number | null): void {
+    this.filtrosState.update((actual) => ({ ...actual, precioMin: monto }));
+  }
+
+  setPrecioMax(monto: number | null): void {
+    this.filtrosState.update((actual) => ({ ...actual, precioMax: monto }));
   }
 
   limpiarFiltros(): void {
