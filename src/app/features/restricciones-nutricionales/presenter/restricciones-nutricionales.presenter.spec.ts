@@ -129,7 +129,8 @@ describe('RestriccionesNutricionalesPresenter', () => {
     });
 
     it('muestra un toast de error si falla la carga', async () => {
-      restriccionesService.getCatalogo.and.rejectWith(new Error('boom'));
+      spyOn(console, 'error');
+      restriccionesService.getCatalogo.and.callFake(async () => { throw new Error('boom'); });
 
       await presenter.init('alumno-42');
 
@@ -192,9 +193,8 @@ describe('RestriccionesNutricionalesPresenter', () => {
     });
 
     it('muestra un toast de error si falla el guardado', async () => {
-      restriccionesService.actualizarRestricciones.and.rejectWith(
-        new Error('boom'),
-      );
+      spyOn(console, 'error');
+      restriccionesService.actualizarRestricciones.and.callFake(async () => { throw new Error('boom'); });
       await presenter.init('alumno-42');
 
       await presenter.guardar();

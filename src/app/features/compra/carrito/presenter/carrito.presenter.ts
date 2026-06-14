@@ -15,6 +15,7 @@ import { BuffetService } from '../../../buffet/services/buffet.service';
 import { SugerenciasCarritoService } from '../../services/sugerencias-carrito.service';
 import { CarritoService } from '../../services/carrito.service';
 import { CompraService } from '../../services/compra.service';
+import { PresupuestoService, DateBudgetStatus } from '../../../presupuesto/services/presupuesto.service';
 import { RestriccionesHorariasService } from '../../../restricciones-horarias/services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../../../restricciones-horarias/services/franjas-horarias.service';
 import { firstValueFrom } from 'rxjs';
@@ -52,12 +53,19 @@ export class CarritoPresenter {
   private readonly router = inject(Router);
   private readonly restriccionesService = inject(RestriccionesHorariasService);
   private readonly franjasService = inject(FranjasHorariasService);
+  private readonly presupuestoService = inject(PresupuestoService);
 
   private readonly seleccionState = signal<Record<string, boolean>>({});
   private readonly fechasState = signal<Record<string, string>>({});
   private readonly recreosState = signal<Record<string, Recreo>>({});
   private readonly franjasMap = signal<Record<string, TimeSlot[]>>({});
   private readonly restriccionesMap = signal<Record<string, RestriccionHoraria[]>>({});
+  private readonly budgetBlockReasonsState = signal<Record<string, string>>({});
+
+  readonly budgetBlockReasons = this.budgetBlockReasonsState.asReadonly();
+
+  /** Tanto en perfil Tutor como en perfil Alumno, la fecha y recreo se seleccionan en el buffet. */
+  readonly esModoSoloLectura = computed(() => true);
 
   readonly recreosDisponiblesMap = computed(() => {
     const dates = this.fechasState();
@@ -187,6 +195,8 @@ export class CarritoPresenter {
     const seleccion = this.seleccionState();
     const fechas = this.fechasState();
     const recreos = this.recreosState();
+    const soloLectura = this.esModoSoloLectura();
+    const seleccionRetiro = this.carritoService.seleccionRetiro();
 
     const lista: GrupoCarrito[] = [];
     for (const [alumnoId, items] of mapa) {
@@ -196,13 +206,16 @@ export class CarritoPresenter {
         (acc, i) => acc + i.producto.precio * i.cantidad,
         0,
       );
+
+      // In tutor mode, take fecha/recreo from CarritoService (set in buffet)
+      const retiro = soloLectura ? seleccionRetiro[alumnoId] : undefined;
       lista.push({
         alumno,
         items,
         subtotal,
         seleccionado: seleccion[alumnoId] ?? true,
-        fecha: fechas[alumnoId] ?? (this.fechaMinimaMap()[alumnoId] || this.fechaMinima),
-        recreo: recreos[alumnoId] ?? 'PRIMER_RECREO',
+        fecha: retiro?.fecha ?? fechas[alumnoId] ?? (this.fechaMinimaMap()[alumnoId] || this.fechaMinima),
+        recreo: retiro?.recreo ?? recreos[alumnoId] ?? 'PRIMER_RECREO',
       });
     }
     return lista;
@@ -237,7 +250,8 @@ export class CarritoPresenter {
     if (
       !this.haySeleccion() ||
       this.hayFechaFaltante() ||
-      this.hayRecreoBloqueadoSeleccionado()
+      this.hayRecreoBloqueadoSeleccionado() ||
+      Object.keys(this.budgetBlockReasons()).length > 0
     ) {
       return false;
     }
@@ -287,6 +301,17 @@ export class CarritoPresenter {
       return `Hay ${conDeuda.length} alumnos con saldo insuficiente.`;
     }
 
+    const blockReasons = this.budgetBlockReasons();
+    const conPresupuestoExcedido = this.grupos().filter(
+      (g) => g.seleccionado && blockReasons[g.alumno.id]
+    );
+    if (conPresupuestoExcedido.length > 0) {
+      if (conPresupuestoExcedido.length === 1) {
+        return blockReasons[conPresupuestoExcedido[0].alumno.id];
+      }
+      return `Hay ${conPresupuestoExcedido.length} alumnos con presupuesto excedido.`;
+    }
+
     const conRecreoBloqueado = this.grupos().filter(
       (g) =>
         g.seleccionado &&
@@ -322,6 +347,46 @@ export class CarritoPresenter {
         return;
       }
       this.refrescarSugerencias();
+    });
+
+    effect(() => {
+      const groupsToVerify = this.grupos()
+        .filter((g) => g.seleccionado && g.fecha && g.items.length > 0)
+        .map((g) => ({
+          studentId: g.alumno.id,
+          fecha: g.fecha,
+          items: g.items.map((i) => ({
+            productId: i.producto.id,
+            quantity: i.cantidad,
+          })),
+        }));
+
+      if (groupsToVerify.length === 0) {
+        if (Object.keys(this.budgetBlockReasonsState()).length > 0) {
+          this.budgetBlockReasonsState.set({});
+        }
+        return;
+      }
+
+      groupsToVerify.forEach((group) => {
+        this.presupuestoService
+          .checkBudgetDates(group.studentId, [group.fecha], group.items)
+          .then((results: readonly DateBudgetStatus[]) => {
+            const match = results.find((r: DateBudgetStatus) => r.date === group.fecha);
+            this.budgetBlockReasonsState.update((prev) => {
+              const next = { ...prev };
+              if (match?.blocked && match?.reason) {
+                next[group.studentId] = match.reason;
+              } else {
+                delete next[group.studentId];
+              }
+              return next;
+            });
+          })
+          .catch((err: unknown) => {
+            console.error('Error checking budget dates:', err);
+          });
+      });
     });
   }
 
@@ -459,6 +524,10 @@ export class CarritoPresenter {
 
   volverAlBuffet(): void {
     this.router.navigateByUrl(this.usuarioService.homeUrl());
+  }
+
+  irAEditarRetiro(alumnoId: string): void {
+    this.router.navigate(['/buffet', alumnoId]);
   }
 
   private calcularFechaMinima(): string {

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { HomeAlumnoService } from '../services/home-alumno.service';
 import { AccionRapida } from '../models/accion-rapida.model';
@@ -20,6 +21,7 @@ export class HomeAlumnoPresenter {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly colegiosService = inject(ColegiosService);
+  private readonly alumnosService = inject(AlumnosService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
   private readonly router = inject(Router);
 
@@ -121,15 +123,18 @@ export class HomeAlumnoPresenter {
   ]);
 
   init(): void {
-    const alumnoMock = this.usuarioService.getAlumnoActual();
-    const perfil = this.perfilService.getPerfil();
-    const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;
-    const alumno: Alumno = perfil
-      ? { ...alumnoMock, id: alumnoId, nombre: perfil.nombre, apellido: perfil.apellido }
-      : alumnoMock;
-    this.alumnoState.set(alumno);
-    this.pedidoState.set(this.homeAlumnoService.getPedidoEnCurso(alumnoId));
-    this.recreoState.set(this.homeAlumnoService.getProximoRecreo(alumnoId));
+    void this.alumnosService.asegurarCargados(true).then((alumnos) => {
+      const alumnoMock = this.usuarioService.getAlumnoActual();
+      const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;
+      
+      const alumno = alumnos.find(a => a.id === alumnoId) || alumnos[0];
+      
+      if (alumno) {
+        this.alumnoState.set(alumno);
+        this.pedidoState.set(this.homeAlumnoService.getPedidoEnCurso(alumno.id));
+        this.recreoState.set(this.homeAlumnoService.getProximoRecreo(alumno.id));
+      }
+    });
   }
 
   ejecutarAccion(accion: AccionRapida): void {

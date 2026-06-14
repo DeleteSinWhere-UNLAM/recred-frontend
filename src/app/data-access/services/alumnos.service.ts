@@ -49,27 +49,28 @@ export class AlumnosService {
     }
   }
 
-  asegurarCargados(): Promise<Alumno[]> {
-    if (this.alumnosState().length > 0) {
-      return Promise.resolve(this.alumnosState());
+  async cargarPerfilAlumno(): Promise<Alumno[]> {
+    const url = `${environment.apiUrl.replace(/\/$/, '')}/alumnos/me`;
+    console.log('Cargando perfil alumno desde:', url);
+
+    try {
+      const dto = await firstValueFrom(this.http.get<StudentDTO>(url));
+      console.log('Respuesta raw del back (alumno):', dto);
+
+      if (!dto) {
+        return this.getMockAlumno();
+      }
+
+      const alumno = this.fromDto(dto);
+      this.alumnosState.set([alumno]);
+      return [alumno];
+    } catch (error) {
+      console.error('Error al cargar perfil del alumno:', error);
+      return this.getMockAlumno();
     }
-    if (this.cargaInFlight) {
-      return this.cargaInFlight;
-    }
-    const perfil = this.perfilService.getPerfil();
-    if (!perfil) {
-      return Promise.resolve([]);
-    }
-    if (perfil.rol === 'ALUMNO') {
-      return Promise.resolve(this.getAlumnos());
-    }
-    this.cargaInFlight = this.cargarHijosDelTutor().finally(() => {
-      this.cargaInFlight = null;
-    });
-    return this.cargaInFlight;
   }
 
-  getAlumnos(): Alumno[] {
+  private getMockAlumno(): Alumno[] {
     const list = this.alumnosState();
     if (list.length > 0) return list;
 
@@ -85,6 +86,35 @@ export class AlumnosService {
       }];
     }
     return [];
+  }
+
+  asegurarCargados(force = false): Promise<Alumno[]> {
+    if (!force && this.alumnosState().length > 0) {
+      return Promise.resolve(this.alumnosState());
+    }
+    if (this.cargaInFlight) {
+      return this.cargaInFlight;
+    }
+    const perfil = this.perfilService.getPerfil();
+    if (!perfil) {
+      return Promise.resolve([]);
+    }
+    if (perfil.rol === 'ALUMNO') {
+      this.cargaInFlight = this.cargarPerfilAlumno().finally(() => {
+        this.cargaInFlight = null;
+      });
+      return this.cargaInFlight;
+    }
+    this.cargaInFlight = this.cargarHijosDelTutor().finally(() => {
+      this.cargaInFlight = null;
+    });
+    return this.cargaInFlight;
+  }
+
+  getAlumnos(): Alumno[] {
+    const list = this.alumnosState();
+    if (list.length > 0) return list;
+    return this.getMockAlumno();
   }
 
   getAlumnoById(id: string): Alumno | undefined {

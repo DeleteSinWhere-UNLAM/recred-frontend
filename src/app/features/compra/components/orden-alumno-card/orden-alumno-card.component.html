@@ -44,6 +44,13 @@
       </p>
     }
 
+    @if (motivoBloqueoPresupuesto) {
+      <p class="orden-alumno__alerta" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        {{ motivoBloqueoPresupuesto }}
+      </p>
+    }
+
     <div class="orden-alumno__items">
       @for (item of itemsActuales(); track item.id) {
         <app-carrito-item
@@ -56,31 +63,61 @@
     </div>
 
     <div class="orden-alumno__opciones">
-      <label class="orden-alumno__campo">
-        <span class="orden-alumno__campo-label">Día de retiro</span>
-        <input
-          type="date"
-          class="orden-alumno__input"
-          [value]="fecha"
-          [min]="fechaMinima"
-          (change)="onFechaCambia($event)"
-        />
-      </label>
-
-      <label class="orden-alumno__campo">
-        <span class="orden-alumno__campo-label">Recreo</span>
-        <select
-          class="orden-alumno__input"
-          [value]="recreo"
-          (change)="onRecreoCambia($event)"
+      @if (modoSoloLectura) {
+        <!-- Modo solo lectura: muestra los valores seleccionados -->
+        <div class="orden-alumno__retiro-lectura">
+          <div class="orden-alumno__retiro-dato">
+            <span class="orden-alumno__retiro-dato-label">
+              <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+              Día de retiro
+            </span>
+            <span class="orden-alumno__retiro-dato-valor">{{ fechaFormateada() }}</span>
+          </div>
+          <div class="orden-alumno__retiro-dato">
+            <span class="orden-alumno__retiro-dato-label">
+              <i class="fa-regular fa-clock" aria-hidden="true"></i>
+              Franja horaria
+            </span>
+            <span class="orden-alumno__retiro-dato-valor">{{ recreoLabel() }}</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="orden-alumno__retiro-editar"
+          (click)="editarRetiro.emit()"
+          aria-label="Editar fecha y horario de retiro"
         >
-          @for (opc of recreosDisponibles; track opc.recreo) {
-            <option [value]="opc.recreo" [disabled]="opc.bloqueado" [selected]="opc.recreo === recreo">
-              {{ opc.descripcion }}{{ opc.bloqueado ? (opc.motivo === 'tiempo' ? ' (No disponible - Falta menos de 1 hora)' : ' (Bloqueado)') : '' }}
-            </option>
-          }
-        </select>
-      </label>
+          <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+          <span>Editar retiro</span>
+        </button>
+      } @else {
+        <!-- Modo edición: inputs de fecha y recreo -->
+        <label class="orden-alumno__campo">
+          <span class="orden-alumno__campo-label">Día de retiro</span>
+          <input
+            type="date"
+            class="orden-alumno__input"
+            [value]="fecha"
+            [min]="fechaMinima"
+            (change)="onFechaCambia($event)"
+          />
+        </label>
+
+        <label class="orden-alumno__campo">
+          <span class="orden-alumno__campo-label">Recreo</span>
+          <select
+            class="orden-alumno__input"
+            [value]="recreo"
+            (change)="onRecreoCambia($event)"
+          >
+            @for (opc of recreosDisponibles; track opc.recreo) {
+              <option [value]="opc.recreo" [disabled]="opc.bloqueado" [selected]="opc.recreo === recreo">
+                {{ opc.descripcion }}{{ opc.bloqueado ? (opc.motivo === 'tiempo' ? ' (No disponible - Falta menos de 1 hora)' : ' (Bloqueado)') : '' }}
+              </option>
+            }
+          </select>
+        </label>
+      }
     </div>
 
     <footer class="orden-alumno__pie">

@@ -7,20 +7,49 @@ import { MovimientosService } from '../../movimientos/services/movimientos.servi
 import { Movimiento } from '../../movimientos/models/movimiento.model';
 import { getPeriodRange, getProductCategory, isSameCategory } from '../utils/budget-helpers';
 import { firstValueFrom } from 'rxjs';
+import { Recreo } from '../models/orden-compra.model';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
+
+export interface SeleccionRetiro {
+  fecha: string;
+  recreo: Recreo;
+}
 
 @Injectable({ providedIn: 'root' })
 export class CarritoService {
   private readonly presupuestoService = inject(PresupuestoService);
   private readonly movimientosService = inject(MovimientosService);
+  private readonly alumnosService = inject(AlumnosService);
 
   private readonly itemsState = signal<ItemCarrito[]>([]);
   private readonly budgetsState = signal<Map<string, Presupuesto>>(new Map());
   private readonly purchasesState = signal<Map<string, Movimiento[]>>(new Map());
+  private readonly seleccionRetiroState = signal<Record<string, SeleccionRetiro>>({});
   private catalog: Producto[] = [];
 
   readonly items = this.itemsState.asReadonly();
   readonly budgets = this.budgetsState.asReadonly();
   readonly purchases = this.purchasesState.asReadonly();
+  readonly seleccionRetiro = this.seleccionRetiroState.asReadonly();
+
+  setSeleccionRetiro(alumnoId: string, fecha: string, recreo: Recreo): void {
+    this.seleccionRetiroState.update((current) => ({
+      ...current,
+      [alumnoId]: { fecha, recreo },
+    }));
+  }
+
+  getSeleccionRetiro(alumnoId: string): SeleccionRetiro | undefined {
+    return this.seleccionRetiroState()[alumnoId];
+  }
+
+  clearSeleccionRetiro(alumnoId: string): void {
+    this.seleccionRetiroState.update((current) => {
+      const next = { ...current };
+      delete next[alumnoId];
+      return next;
+    });
+  }
 
   readonly cantidadTotal = computed(() =>
     this.itemsState().reduce((acc, item) => acc + item.cantidad, 0),
@@ -144,8 +173,8 @@ export class CarritoService {
     }
   }
 
-  puedeAgregar(producto: Producto, alumnoId: string, cantidadAdicional: number): boolean {
-    console.log('[DEBUG puedeAgregar]', {
+  validarAgregar(producto: Producto, alumnoId: string, cantidadAdicional: number): { permitido: boolean, razon?: 'saldo' | 'presupuesto' | 'categoria' } {
+    console.log('[DEBUG validarAgregar]', {
       productoId: producto.id,
       productoNombre: producto.nombre,
       productoPrecio: producto.precio,
@@ -155,24 +184,39 @@ export class CarritoService {
     });
 
     if (producto.superaPresupuesto) {
-      console.log('[DEBUG puedeAgregar] producto.superaPresupuesto is true');
-      return false;
+      console.log('[DEBUG validarAgregar] producto.superaPresupuesto is true');
+      return { permitido: false, razon: 'presupuesto' };
     }
 
     const budget = this.budgetsState().get(alumnoId);
-    console.log('[DEBUG puedeAgregar] Loaded budget:', budget);
+    console.log('[DEBUG validarAgregar] Loaded budget:', budget);
     if (!budget || !budget.activo) {
-      console.log('[DEBUG puedeAgregar] No budget found or inactive');
-      return true;
+      console.log('[DEBUG validarAgregar] No budget found or inactive');
+      const alumno = this.alumnosService.getAlumnoById(alumnoId);
+      if (alumno) {
+        let spentCartGeneral = 0;
+        const cartItems = this.itemsState().filter((i) => i.alumnoId === alumnoId);
+        for (const item of cartItems) {
+          spentCartGeneral += item.producto.precio * item.cantidad;
+        }
+        if (spentCartGeneral + producto.precio * cantidadAdicional > alumno.saldo) {
+          console.log('[DEBUG validarAgregar] Exceeds student credit balance (no budget case)!');
+          return { permitido: false, razon: 'saldo' };
+        }
+      }
+      return { permitido: true };
     }
 
-    const { start, end } = getPeriodRange(budget.periodo);
+    const seleccion = this.seleccionRetiroState()[alumnoId];
+    const referenceDate = seleccion?.fecha ? new Date(seleccion.fecha + 'T12:00:00') : new Date();
+    const { start, end } = getPeriodRange(budget.periodo, referenceDate);
 
     // Sum past approved purchases in the current range
     const pastPurchases = this.purchasesState().get(alumnoId) ?? [];
+    const activeStatuses = ['APPROVED', 'PENDING', 'PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'];
     const approvedPastPurchases = pastPurchases.filter((m) => {
-      if (m.status !== 'APPROVED') return false;
-      const purchaseDate = new Date(m.date);
+      if (!activeStatuses.includes(m.status)) return false;
+      const purchaseDate = m.pickupDate ? new Date(m.pickupDate + 'T12:00:00') : new Date(m.date);
       return purchaseDate >= start && purchaseDate <= end;
     });
 
@@ -220,18 +264,33 @@ export class CarritoService {
 
     const additionalCost = producto.precio * cantidadAdicional;
 
-    // Check general budget limit
+    // Check general budget limit capped by student wallet balance (credits)
+    const alumno = this.alumnosService.getAlumnoById(alumnoId);
+    
+    // Check wallet balance specifically
+    const limiteSaldo = (alumno?.saldo ?? Infinity) + spentPastGeneral;
     const totalGeneral = spentPastGeneral + spentCartGeneral + additionalCost;
-    console.log('[DEBUG puedeAgregar] General cost check:', {
+    
+    if (totalGeneral > limiteSaldo) {
+      console.log('[DEBUG validarAgregar] Exceeds student credit balance!');
+      return { permitido: false, razon: 'saldo' };
+    }
+
+    const limiteEfectivo = Math.min(budget.montoLimiteGeneral, limiteSaldo);
+
+    console.log('[DEBUG validarAgregar] General cost check:', {
       spentPastGeneral,
       spentCartGeneral,
       additionalCost,
       totalGeneral,
-      limit: budget.montoLimiteGeneral
+      limit: budget.montoLimiteGeneral,
+      saldo: alumno?.saldo,
+      limiteEfectivo
     });
-    if (totalGeneral > budget.montoLimiteGeneral) {
-      console.log('[DEBUG puedeAgregar] Exceeds general budget!');
-      return false;
+    
+    if (totalGeneral > limiteEfectivo) {
+      console.log('[DEBUG validarAgregar] Exceeds general budget!');
+      return { permitido: false, razon: 'presupuesto' };
     }
 
     // Check category budget limit (if applicable)
@@ -244,10 +303,10 @@ export class CarritoService {
         r.descripcionCategoria
       )
     );
-    console.log('[DEBUG puedeAgregar] Matched rule for category:', producto.categoria.id, rule);
+    console.log('[DEBUG validarAgregar] Matched rule for category:', producto.categoria.id, rule);
     if (rule) {
       const totalCategory = spentPastCategory + spentCartCategory + additionalCost;
-      console.log('[DEBUG puedeAgregar] Category cost check:', {
+      console.log('[DEBUG validarAgregar] Category cost check:', {
         spentPastCategory,
         spentCartCategory,
         additionalCost,
@@ -255,11 +314,15 @@ export class CarritoService {
         limit: rule.montoLimiteCalculado
       });
       if (totalCategory > rule.montoLimiteCalculado) {
-        console.log('[DEBUG puedeAgregar] Exceeds category budget!');
-        return false;
+        console.log('[DEBUG validarAgregar] Exceeds category budget!');
+        return { permitido: false, razon: 'categoria' };
       }
     }
 
-    return true;
+    return { permitido: true };
+  }
+
+  puedeAgregar(producto: Producto, alumnoId: string, cantidadAdicional: number): boolean {
+    return this.validarAgregar(producto, alumnoId, cantidadAdicional).permitido;
   }
 }

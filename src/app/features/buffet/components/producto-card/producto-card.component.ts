@@ -105,6 +105,14 @@ export class ProductoCardComponent {
     return 'No apto: ' + etiquetas.join(' · ');
   });
 
+  readonly razonRechazo = computed(() => {
+    const p = this.productoState();
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return null;
+    const validation = this.carritoService.validarAgregar(p, alumnoId, this.cantidad());
+    return validation.permitido ? null : validation.razon;
+  });
+
   readonly superaPresupuestoUnitario = computed(() => {
     const p = this.productoState();
     const alumnoId = this.alumnoIdState();
@@ -113,10 +121,11 @@ export class ProductoCardComponent {
   });
 
   readonly superaPresupuesto = computed(() => {
-    const p = this.productoState();
-    const alumnoId = this.alumnoIdState();
-    if (!p || !alumnoId) return false;
-    return !this.carritoService.puedeAgregar(p, alumnoId, this.cantidad());
+    return this.razonRechazo() === 'presupuesto' || this.razonRechazo() === 'categoria';
+  });
+
+  readonly superaSaldo = computed(() => {
+    return this.razonRechazo() === 'saldo';
   });
 
   readonly deshabilitarSumar = computed(() => {

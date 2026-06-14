@@ -21,7 +21,7 @@ export interface ProductoVenta extends Producto {
 export class VentaEspontaneaService {
   private http = inject(HttpClient);
   private buffetService = inject(BuffetService);
-  
+
   private alumnosState = signal<AlumnoResumen[]>([]);
   readonly alumnos = this.alumnosState.asReadonly();
 
@@ -29,13 +29,12 @@ export class VentaEspontaneaService {
   readonly productos = this.productosState.asReadonly();
 
   cargarAlumnos(): Observable<AlumnoResumen[]> {
-    return this.http.get<AlumnoResumen[]>(`${environment.apiUrl}/alumnos`).pipe(
+    return this.http.get<AlumnoResumen[]>(environment.apiUrl + '/alumnos').pipe(
       tap((data) => this.alumnosState.set(data))
     );
   }
 
   cargarProductosDelAlumno(alumnoId: string): Observable<Producto[]> {
-    // Usar BuffetService para obtener los productos con todas las propiedades de UI (imagen, categoria, etc)
     return this.buffetService.getProductosDelBuffet('buffet-san-jose', alumnoId).pipe(
       tap((productos: Producto[]) => {
         const prodsVenta = productos.map(p => ({
@@ -50,8 +49,9 @@ export class VentaEspontaneaService {
   procesarVenta(alumnoId: string, items: ProductoVenta[]): Observable<unknown> {
     const payload = {
       studentId: alumnoId,
-      items: items.map(i => ({ productId: i.id, quantity: i.cantidad }))
+      items: items.map(i => ({ productId: i.id, quantity: i.cantidad })),
+      paymentMethod: 'CREDITOS'
     };
-    return this.http.post(`${environment.apiUrl}/purchases/presential`, payload);
+    return this.http.post(environment.apiUrl + '/purchases/presential', payload);
   }
 }

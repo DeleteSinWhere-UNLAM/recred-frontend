@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { ItemCarrito } from '../../models/carrito.model';
-import { Recreo } from '../../models/orden-compra.model';
+import { Recreo, RECREO_LABELS } from '../../models/orden-compra.model';
 import { CarritoItemComponent } from '../carrito-item/carrito-item.component';
 import { RecreoOpcion } from '../../carrito/presenter/carrito.presenter';
 
@@ -45,6 +45,9 @@ export class OrdenAlumnoCardComponent {
   @Input() recreo: Recreo = 'PRIMER_RECREO';
   @Input() recreosDisponibles: RecreoOpcion[] = [];
   @Input() fechaMinima = '';
+  @Input() motivoBloqueoPresupuesto?: string;
+  /** En modo solo lectura, los campos de fecha y recreo no son editables. */
+  @Input() modoSoloLectura = false;
 
   @Output() toggleSeleccion = new EventEmitter<void>();
   @Output() fechaCambia = new EventEmitter<string>();
@@ -53,6 +56,7 @@ export class OrdenAlumnoCardComponent {
   @Output() restarItem = new EventEmitter<string>();
   @Output() eliminarItem = new EventEmitter<string>();
   @Output() guardarFavorito = new EventEmitter<void>();
+  @Output() editarRetiro = new EventEmitter<void>();
 
   readonly alumnoActual = computed(() => this.alumnoState());
   readonly itemsActuales = computed(() => this.itemsState());
@@ -74,6 +78,14 @@ export class OrdenAlumnoCardComponent {
       0,
     ),
   );
+
+  readonly fechaFormateada = computed(() => {
+    if (!this.fecha) return '—';
+    const [year, month, day] = this.fecha.split('-');
+    return `${day}/${month}/${year}`;
+  });
+
+  readonly recreoLabel = computed(() => RECREO_LABELS[this.recreo] ?? this.recreo);
 
   readonly subtotalFormateado = computed(() =>
     formateadorPrecio.format(this.subtotal()),
