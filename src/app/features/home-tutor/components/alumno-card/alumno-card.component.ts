@@ -6,6 +6,7 @@ import { MovimientosService } from '../../../movimientos/services/movimientos.se
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 

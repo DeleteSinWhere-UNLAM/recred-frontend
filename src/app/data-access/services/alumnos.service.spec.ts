@@ -124,6 +124,7 @@ describe('AlumnosService', () => {
         done();
       });
 
+      httpMock.expectNone(`${environment.apiUrl}/tutores/me/hijos`);
       const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/me`);
       expect(req.request.method).toBe('GET');
       req.flush({ id: 'julian-garcia', nombre: 'Julián', apellido: 'García', grado: '4to Año A', colegioId: 'instituto-san-jose', saldo: 2580 });

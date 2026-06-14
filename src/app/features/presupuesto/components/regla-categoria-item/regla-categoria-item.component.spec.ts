@@ -82,7 +82,7 @@ describe('ReglaCategoriaItemComponent', () => {
     expect(emitido).toBe('r-1');
   });
 
-  it('formatear devuelve el monto en ARS sin decimales', () => {
+  it('formatear devuelve el monto con signo peso sin decimales', () => {
     const resultado = component.formatear(1234);
     expect(resultado).toContain('1.234');
     expect(resultado).toContain('$');

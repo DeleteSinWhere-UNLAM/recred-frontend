@@ -7,19 +7,13 @@ import {
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { AccionesGridComponent } from './components/acciones-grid/acciones-grid.component';
-import { PerfilKiosqueroHeaderComponent } from './components/perfil-kiosquero-header/perfil-kiosquero-header.component';
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
 
 @Component({
   selector: 'app-home-kiosquero-page',
   templateUrl: './home-kiosquero.page.html',
   styleUrl: './home-kiosquero.page.css',
-  imports: [
-    NavbarComponent,
-    PerfilKiosqueroHeaderComponent,
-    AccionesGridComponent,
-  ],
+  imports: [NavbarComponent],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +24,5 @@ export class HomeKiosqueroPage implements OnInit {
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
     this.presenter.init();
-    this.usuarioService.setNombreNavbar(this.presenter.nombreKiosquero());
   }
 }

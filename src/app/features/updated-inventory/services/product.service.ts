@@ -6,6 +6,12 @@ import { Product } from '../models/product.interface';
 import { CreateProductRequest } from '../models/requests/create-product-request.interface';
 import { UpdateProductRequest } from '../models/requests/update-product-request.interface';
 import { Category } from '../models/category.interface';
+import {
+  InventoryStockMovement,
+  InventoryStockUpdateRequest,
+  InventoryOverviewItem,
+  QuickStockActionRequest,
+} from '../models/inventory.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +19,7 @@ import { Category } from '../models/category.interface';
 export class ProductService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/products`;
+  private readonly inventoryUrl = `${environment.apiUrl}/inventory`;
 
   getAll(): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl);
@@ -24,6 +31,43 @@ export class ProductService {
 
   getAllByBuffetId(buffetId: string): Observable<Product[]> {
     return this.http.get<Product[]>(this.baseUrl, { params: { buffetId } });
+  }
+
+  getInventoryOverview(buffetId: string): Observable<InventoryOverviewItem[]> {
+    return this.http.get<InventoryOverviewItem[]>(
+      `${this.inventoryUrl}/${buffetId}/overview`,
+    );
+  }
+
+  quickStockAction(
+    buffetId: string,
+    productId: string,
+    payload: QuickStockActionRequest,
+  ): Observable<unknown> {
+    return this.http.patch(
+      `${this.inventoryUrl}/${buffetId}/products/${productId}/quick-action`,
+      payload,
+    );
+  }
+
+  updateInventoryStock(
+    buffetId: string,
+    productId: string,
+    payload: InventoryStockUpdateRequest,
+  ): Observable<unknown> {
+    return this.http.patch(
+      `${this.inventoryUrl}/${buffetId}/products/${productId}/stock`,
+      payload,
+    );
+  }
+
+  getProductStockMovements(
+    buffetId: string,
+    productId: string,
+  ): Observable<InventoryStockMovement[]> {
+    return this.http.get<InventoryStockMovement[]>(
+      `${this.inventoryUrl}/${buffetId}/products/${productId}/movements`,
+    );
   }
 
   getById(id: string): Observable<Product> {

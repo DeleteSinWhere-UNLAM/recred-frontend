@@ -18,6 +18,7 @@ interface GrupoColegio {
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 

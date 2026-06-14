@@ -134,7 +134,7 @@ describe('BuffetPresenter', () => {
     restriccionesHorariasServiceSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([]));
     presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.resolve([]));
     restriccionesNutricionalesServiceSpy.getRestriccionesAlumno.and.returnValue(Promise.resolve([]));
- 
+
     TestBed.configureTestingModule({
       providers: [
         BuffetPresenter,
