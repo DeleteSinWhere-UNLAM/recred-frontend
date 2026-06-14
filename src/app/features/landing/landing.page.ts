@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Hub } from 'aws-amplify/utils';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { RolUsuario } from '../../data-access/models/perfil.model';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
 import {
   PerfilService,
   UsuarioSinPerfilError,
@@ -28,6 +29,7 @@ export class LandingPage implements OnInit, OnDestroy {
   protected readonly presenter = inject(LandingPresenter);
   private readonly authService = inject(AuthService);
   private readonly perfilService = inject(PerfilService);
+  private readonly alumnosService = inject(AlumnosService);
   private readonly router = inject(Router);
 
   protected readonly cargando = signal<boolean>(true);
@@ -62,7 +64,8 @@ export class LandingPage implements OnInit, OnDestroy {
   private async redirigirSegunPerfil(): Promise<void> {
     try {
       const perfil = await this.perfilService.cargarPerfil();
-      this.router.navigateByUrl(ROL_A_RUTA[perfil.rol]);
+      const destino = await this.resolverDestino(perfil.rol);
+      this.router.navigateByUrl(destino);
     } catch (err) {
       if (err instanceof UsuarioSinPerfilError) {
         this.router.navigateByUrl('/seleccion-tipo-cuenta');
@@ -72,6 +75,19 @@ export class LandingPage implements OnInit, OnDestroy {
       this.redirigiendo = false;
 
       this.cargando.set(false);
+    }
+  }
+
+  private async resolverDestino(rol: RolUsuario): Promise<string> {
+    if (rol !== 'PADRE') {
+      return ROL_A_RUTA[rol];
+    }
+    try {
+      const hijos = await this.alumnosService.cargarHijosDelTutor();
+      return hijos.length === 0 ? '/crear-hijo' : '/tutor';
+    } catch (err) {
+      console.error('Error verificando hijos del tutor', err);
+      return '/tutor';
     }
   }
 
