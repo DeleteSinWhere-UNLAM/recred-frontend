@@ -6,6 +6,7 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 
 import {
   HijoResumen,
+  MensajeHijo,
   ResumenProcesado,
   ResumenSemanal,
 } from './models/resumen-semanal.model';
@@ -56,11 +57,13 @@ export class ResumenSemanalPage {
 
         const resumenInterno = JSON.parse(data.resumen);
 
-        const mensajeIA = JSON.parse(resumenInterno.mensaje);
+        const mensajes: MensajeHijo[] = JSON.parse(
+          resumenInterno.mensaje ?? '[]',
+        );
 
         this.resumenProcesado = {
           hijos: resumenInterno.hijos,
-          mensaje: mensajeIA.comparativa ?? mensajeIA.mensaje ?? '',
+          mensajes,
         };
 
         this.hijos = Object.entries(resumenInterno.hijos).map(
