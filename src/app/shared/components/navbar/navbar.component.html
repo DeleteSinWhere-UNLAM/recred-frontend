@@ -1,8 +1,13 @@
-<header class="navbar">
+<header class="navbar" [class.navbar--kiosquero]="esVistaKiosquero()">
   <div class="navbar__inner">
     <div class="navbar__brand">
-      <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
-        <img src="logoHeader.png" alt="" class="navbar__logo-img">
+      <a
+        class="navbar__logo"
+        href="/"
+        (click)="irAInicio($event)"
+        aria-label="RECRED — Inicio"
+      >
+        <img src="logoHeader.png" alt="" class="navbar__logo-img" />
         <span class="navbar__logo-text">RECRED</span>
       </a>
     </div>
@@ -19,12 +24,16 @@
         <button
           type="button"
           class="navbar__notif"
+          [class.navbar__notif--wide]="esVistaKiosquero()"
           [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'"
           [attr.aria-expanded]="menuNotifAbierto()"
           aria-haspopup="menu"
           (click)="toggleNotificaciones()"
         >
           <i class="fa-solid fa-bell" aria-hidden="true"></i>
+          @if (esVistaKiosquero()) {
+            <span>Notificaciones</span>
+          }
           @if (notifCount() > 0) {
             <span class="navbar__notif-badge">{{ notifCount() }}</span>
           }
@@ -35,11 +44,24 @@
             @if (notifCount() === 0) {
               <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
             } @else {
-              <p class="navbar__menu-vacio">Tenés {{ notifCount() }} notificaciones pendientes.</p>
+              <p class="navbar__menu-vacio">
+                Tenés {{ notifCount() }} notificaciones pendientes.
+              </p>
             }
           </div>
         }
       </div>
+
+      @if (esVistaKiosquero()) {
+        <a
+          class="navbar__scan"
+          [routerLink]="['/cierre-diario']"
+          [queryParams]="{ seccion: 'pedidos' }"
+        >
+          <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
+          <span>Escanear código QR</span>
+        </a>
+      }
 
       @if (!esVistaKiosquero()) {
         <button

@@ -86,7 +86,6 @@ describe('BuffetPresenter', () => {
       ['bloquearProducto', 'desbloquearProducto']
     );
 
-    // Default setups
     alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
     buffetServiceSpy.getBuffetDelAlumno.and.returnValue(mockBuffet);
     buffetServiceSpy.getProductosDelBuffet.and.returnValue(of(mockProductos));
@@ -139,7 +138,7 @@ describe('BuffetPresenter', () => {
 
     it('toggleLock debería bloquear un producto de forma optimista y llamar al servicio', () => {
       presenter.init('alumno-1');
-      const producto = { ...mockProductos[0], bloqueado: false }; // Coca Cola
+      const producto = { ...mockProductos[0], bloqueado: false };
       restriccionProductoServiceSpy.bloquearProducto.and.returnValue(of(undefined));
 
       presenter.toggleLock(producto);

@@ -5,6 +5,8 @@ import { environment } from '../../../../environments/environment';
 import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
 import { Category } from '../models/category.interface';
 import {
+  InventoryStockMovement,
+  InventoryStockUpdateRequest,
   InventoryOverviewItem,
   QuickStockActionRequest,
 } from '../models/inventory.interface';
@@ -43,6 +45,26 @@ export class ProductService {
     return this.http.patch(
       `${this.inventoryUrl}/${buffetId}/products/${productId}/quick-action`,
       payload,
+    );
+  }
+
+  updateInventoryStock(
+    buffetId: string,
+    productId: string,
+    payload: InventoryStockUpdateRequest,
+  ): Observable<unknown> {
+    return this.http.patch(
+      `${this.inventoryUrl}/${buffetId}/products/${productId}/stock`,
+      payload,
+    );
+  }
+
+  getProductStockMovements(
+    buffetId: string,
+    productId: string,
+  ): Observable<InventoryStockMovement[]> {
+    return this.http.get<InventoryStockMovement[]>(
+      `${this.inventoryUrl}/${buffetId}/products/${productId}/movements`,
     );
   }
 

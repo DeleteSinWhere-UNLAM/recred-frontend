@@ -87,6 +87,52 @@ describe('DailyCloseService', () => {
     req.flush(report);
   });
 
+  it('deberia obtener el estado del cierre diario por fecha', () => {
+    const response = {
+      buffetId,
+      date,
+      closed: true,
+      expiredPurchases: 2,
+      releasedReservations: 4,
+      refundedCredits: 0,
+    };
+
+    service.getDailyCloseStatus(buffetId, date).subscribe((result) => {
+      expect(result).toEqual(response);
+    });
+
+    const req = httpMock.expectOne(
+      `${kiosquerosUrl}/${buffetId}/daily-close/status?date=${date}`,
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(response);
+  });
+
+  it('deberia listar cierres diarios con filtros opcionales', () => {
+    const response = [
+      {
+        id: 'close-1',
+        buffetId,
+        date,
+        expiredPurchases: 2,
+        releasedReservations: 4,
+        refundedCredits: 0,
+      },
+    ];
+
+    service
+      .getDailyCloses(buffetId, { from: '2026-06-01', to: '2026-06-30' })
+      .subscribe((result) => {
+        expect(result).toEqual(response);
+      });
+
+    const req = httpMock.expectOne(
+      `${kiosquerosUrl}/${buffetId}/daily-closes?from=2026-06-01&to=2026-06-30`,
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(response);
+  });
+
   it('deberia refrescar endpoints operativos despues del cierre y devolver reporte', () => {
     service.refreshAfterClose(buffetId, date).subscribe((result) => {
       expect(result).toEqual(report);

@@ -62,6 +62,7 @@ export class ReglaCategoriaItemComponent {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
+      currencyDisplay: 'narrowSymbol',
       maximumFractionDigits: 0,
     }).format(monto);
   }

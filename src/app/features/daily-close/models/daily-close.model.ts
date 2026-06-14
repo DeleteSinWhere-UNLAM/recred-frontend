@@ -6,6 +6,29 @@ export interface DailyCloseResult {
   report: DailyReport;
 }
 
+export interface DailyCloseStatus {
+  buffetId: string;
+  date: string;
+  closed: boolean;
+  expiredPurchases: number;
+  releasedReservations: number;
+  refundedCredits: number;
+}
+
+export interface DailyCloseRecord {
+  id: string;
+  buffetId: string;
+  date: string;
+  expiredPurchases: number;
+  releasedReservations: number;
+  refundedCredits: number;
+}
+
+export interface DailyCloseHistoryFilters {
+  from?: string;
+  to?: string;
+}
+
 export interface DailyReport {
   buffetId: string;
   date: string;

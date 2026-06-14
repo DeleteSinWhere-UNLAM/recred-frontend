@@ -1,106 +1,153 @@
 <app-navbar />
 
 <main class="inventario">
-  <button
-    type="button"
-    class="inventario__volver"
-    (click)="volver()"
-  >
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    <span>Volver</span>
-  </button>
-
   <div class="inventario__container">
-    <header class="inventario__cabecera">
-      <div class="inventario__icono" aria-hidden="true">
-        <i class="fa-solid fa-boxes-stacked"></i>
-      </div>
-      <div class="inventario__identidad">
-        <h2 class="inventario__titulo">Inventario</h2>
-        <p class="inventario__subtitulo">Control de stock del kiosco</p>
-      </div>
-      <div class="inventario__acciones-header">
-        <button
-          type="button"
-          class="inventario__nuevo"
-          (click)="openCreateForm()"
-        >
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          <span>Nuevo producto</span>
-        </button>
-      </div>
-    </header>
+    <button
+      type="button"
+      class="inventario__volver"
+      (click)="volver()"
+    >
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
 
-    <section class="inventario__resumen" aria-label="Resumen del inventario">
-      <div class="inventario__stat">
+    <section class="inventario__panel">
+  <header class="inventario__cabecera">
+    <div class="inventario__icono" aria-hidden="true">
+      <i class="fa-solid fa-boxes-stacked"></i>
+    </div>
+
+    <div class="inventario__identidad">
+      <h2 class="inventario__titulo">Inventario</h2>
+    </div>
+
+    <div class="inventario__acciones-header">
+      <button
+        type="button"
+        class="inventario__nuevo"
+        (click)="openCreateForm()"
+      >
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        <span>Nuevo producto</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="inventario__resumen" aria-label="Resumen del inventario">
+    <div class="inventario__stat">
+      <span class="inventario__stat-icon" aria-hidden="true">
+        <i class="fa-solid fa-circle-check"></i>
+      </span>
+      <div>
         <span class="inventario__stat-label">Disponibles</span>
         <strong class="inventario__stat-value">{{ disponiblesCount }}</strong>
       </div>
-      <div class="inventario__stat">
+    </div>
+
+    <div class="inventario__stat">
+      <span class="inventario__stat-icon inventario__stat-icon--warning" aria-hidden="true">
+        <i class="fa-solid fa-bookmark"></i>
+      </span>
+      <div>
         <span class="inventario__stat-label">Alta reserva</span>
         <strong class="inventario__stat-value">{{ altaReservaCount }}</strong>
       </div>
-      <div class="inventario__stat inventario__stat--warning">
+    </div>
+
+    <div class="inventario__stat inventario__stat--warning">
+      <span class="inventario__stat-icon inventario__stat-icon--warning" aria-hidden="true">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </span>
+      <div>
         <span class="inventario__stat-label">Bajo stock</span>
         <strong class="inventario__stat-value">{{ bajoStockCount }}</strong>
       </div>
-      <div class="inventario__stat inventario__stat--danger">
+    </div>
+
+    <div class="inventario__stat inventario__stat--paused">
+      <span class="inventario__stat-icon inventario__stat-icon--paused" aria-hidden="true">
+        <i class="fa-solid fa-minus"></i>
+      </span>
+      <div>
+        <span class="inventario__stat-label">No disponibles</span>
+        <strong class="inventario__stat-value">{{ pausadosCount }}</strong>
+      </div>
+    </div>
+
+    <div class="inventario__stat inventario__stat--danger">
+      <span class="inventario__stat-icon inventario__stat-icon--danger" aria-hidden="true">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </span>
+      <div>
         <span class="inventario__stat-label">Agotados</span>
         <strong class="inventario__stat-value">{{ agotadosCount }}</strong>
       </div>
-    </section>
+    </div>
 
-    <section class="inventario__toolbar" aria-label="Filtros de inventario">
-      <div class="inventario__toolbar-main">
-        <label class="inventario__busqueda">
-          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-          <input
-            type="search"
-            class="inventario__busqueda-input"
-            placeholder="Buscar producto"
-            [value]="searchQuery"
-            (input)="setSearchQuery($event)"
-            aria-label="Buscar producto por nombre"
-          >
-          @if (searchQuery) {
-            <button
-              type="button"
-              class="inventario__busqueda-clear"
-              (click)="clearSearchQuery()"
-              aria-label="Limpiar busqueda"
-            >
-              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-            </button>
-          }
-        </label>
-
-        <div class="inventario__filtros">
-          @for (filter of filterOptions; track filter.id) {
-            <button
-              type="button"
-              class="inventario__filtro"
-              [class.inventario__filtro--activo]="activeFilter === filter.id"
-              (click)="setFilter(filter.id)"
-            >
-              {{ filter.label }}
-            </button>
-          }
-        </div>
+    <div class="inventario__stat">
+      <span class="inventario__stat-icon inventario__stat-icon--info" aria-hidden="true">
+        <i class="fa-solid fa-cube"></i>
+      </span>
+      <div>
+        <span class="inventario__stat-label">Total productos</span>
+        <strong class="inventario__stat-value">{{ products.length }}</strong>
       </div>
+    </div>
+  </section>
 
-      @if (isRefreshing) {
-        <span class="inventario__refresh">
-          <i class="fa-solid fa-rotate" aria-hidden="true"></i>
-          Actualizando
-        </span>
-      }
-    </section>
+  <section class="inventario__toolbar" aria-label="Filtros de inventario">
+    <div class="inventario__toolbar-main">
+      <label class="inventario__busqueda">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input
+          type="search"
+          class="inventario__busqueda-input"
+          placeholder="Buscar producto"
+          [value]="searchQuery"
+          (input)="setSearchQuery($event)"
+          aria-label="Buscar producto por nombre"
+        >
+        @if (searchQuery) {
+          <button
+            type="button"
+            class="inventario__busqueda-clear"
+            (click)="clearSearchQuery()"
+            aria-label="Limpiar busqueda"
+          >
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        }
+      </label>
+
+      <div class="inventario__filtros">
+        @for (filter of filterOptions; track filter.id) {
+          <button
+            type="button"
+            class="inventario__filtro"
+            [class.inventario__filtro--activo]="activeFilter === filter.id"
+            (click)="setFilter(filter.id)"
+          >
+            {{ filter.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (isRefreshing) {
+      <span class="inventario__refresh">
+        <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+        Actualizando
+      </span>
+    }
+  </section>
+</section>
 
     <app-product-table
       [products]="filteredProducts"
       [isLoading]="isLoading"
       [highlightedProductIds]="highlightedProductIds"
-      (quickAction)="openQuickAction($event)">
+      (manageInventory)="openInventoryManagement($event)"
+      (viewHistory)="openStockHistory($event)">
     </app-product-table>
 
     @if (isFormVisible) {
@@ -113,36 +160,36 @@
       </app-product-form>
     }
 
-    @if (quickActionTarget; as target) {
+    @if (inventoryManagementTarget; as target) {
       <div
         class="quick-action-modal__backdrop"
         tabindex="0"
         role="button"
-        (click)="closeQuickAction()"
-        (keydown.enter)="closeQuickAction()"
-        (keydown.space)="closeQuickAction()"
+        (click)="closeInventoryManagement()"
+        (keydown.enter)="closeInventoryManagement()"
+        (keydown.space)="closeInventoryManagement()"
       >
         <form
-          class="quick-action-modal"
-          [formGroup]="quickActionForm"
+          class="quick-action-modal quick-action-modal--inventory"
+          [formGroup]="inventoryManagementForm"
           tabindex="-1"
-          (ngSubmit)="submitQuickAction()"
+          (ngSubmit)="submitInventoryManagement()"
           (click)="$event.stopPropagation()"
           (keydown.enter)="$event.stopPropagation()"
           (keydown.space)="$event.stopPropagation()"
         >
           <header class="quick-action-modal__header">
             <div class="quick-action-modal__icono" aria-hidden="true">
-              <i class="fa-solid fa-bolt"></i>
+              <i class="fa-solid fa-sliders"></i>
             </div>
             <div>
-              <h3 class="quick-action-modal__titulo">{{ getQuickActionTitle(target.action) }}</h3>
-              <p class="quick-action-modal__producto">{{ target.product.nombre }}</p>
+              <h3 class="quick-action-modal__titulo">Gestionar inventario</h3>
+              <p class="quick-action-modal__producto">{{ target.nombre }}</p>
             </div>
             <button
               type="button"
               class="quick-action-modal__close"
-              (click)="closeQuickAction()"
+              (click)="closeInventoryManagement()"
               aria-label="Cerrar"
             >
               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
@@ -150,54 +197,135 @@
           </header>
 
           <div class="quick-action-modal__body">
-            @if (requiresQuantity(target.action)) {
+            <div class="inventory-mode-modal__modes" aria-label="Modo de inventario">
+              @for (mode of inventoryModeOptions; track mode.id) {
+                <label
+                  class="inventory-mode-modal__option"
+                  [class.inventory-mode-modal__option--active]="getInventoryManagementMode() === mode.id"
+                >
+                  <input
+                    class="inventory-mode-modal__radio"
+                    type="radio"
+                    formControlName="tipoManejoInventario"
+                    [value]="mode.id"
+                    (change)="onInventoryModeChange()"
+                  >
+                  <span>{{ mode.label }}</span>
+                </label>
+              }
+            </div>
+
+            <div class="inventory-mode-modal__shortcuts" aria-label="Acciones rápidas">
+              <button
+                type="button"
+                class="inventory-mode-modal__shortcut"
+                (click)="applyInventoryManagementShortcut('MAKE_AVAILABLE')"
+              >
+                <i class="fa-solid fa-play" aria-hidden="true"></i>
+                <span>Disponible</span>
+              </button>
+              <button
+                type="button"
+                class="inventory-mode-modal__shortcut inventory-mode-modal__shortcut--warning"
+                (click)="applyInventoryManagementShortcut('PAUSE')"
+              >
+                <i class="fa-solid fa-pause" aria-hidden="true"></i>
+                <span>Pausar</span>
+              </button>
+              <button
+                type="button"
+                class="inventory-mode-modal__shortcut inventory-mode-modal__shortcut--danger"
+                (click)="applyInventoryManagementShortcut('SOLD_OUT')"
+              >
+                <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                <span>Agotar</span>
+              </button>
+            </div>
+
+            @if (getInventoryManagementMode() === 'STOCK_EXACTO') {
+              <div class="inventory-mode-modal__field-grid">
+                <div
+                  class="quick-action-modal__group"
+                  [class.quick-action-modal__group--error]="hasInventoryManagementError('stockActual')"
+                >
+                  <label for="inventory-stock-actual" class="quick-action-modal__label">
+                    Stock actual
+                  </label>
+                  <input
+                    id="inventory-stock-actual"
+                    class="quick-action-modal__input"
+                    formControlName="stockActual"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Conservar"
+                  >
+                  @if (hasInventoryManagementError('stockActual')) {
+                    <span class="quick-action-modal__error">Ingresa stock actual</span>
+                  }
+                </div>
+
+                <div
+                  class="quick-action-modal__group"
+                  [class.quick-action-modal__group--error]="hasInventoryManagementError('stockMinimo')"
+                >
+                  <label for="inventory-stock-minimo" class="quick-action-modal__label">
+                    Alertarme en cantidad de stock
+                  </label>
+                  <input
+                    id="inventory-stock-minimo"
+                    class="quick-action-modal__input"
+                    formControlName="stockMinimo"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Conservar"
+                  >
+                  @if (hasInventoryManagementError('stockMinimo')) {
+                    <span class="quick-action-modal__error">Ingresa una cantidad</span>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (getInventoryManagementMode() === 'CUPO_DIARIO') {
               <div
                 class="quick-action-modal__group"
-                [class.quick-action-modal__group--error]="hasQuickActionError('quantity')"
+                [class.quick-action-modal__group--error]="hasInventoryManagementError('cupoMaximoDiario')"
               >
-                <label for="quick-action-quantity" class="quick-action-modal__label">
-                  {{ getQuantityLabel(target.action) }}
+                <label for="inventory-cupo-diario" class="quick-action-modal__label">
+                  Cupo máximo diario
                 </label>
                 <input
-                  id="quick-action-quantity"
+                  id="inventory-cupo-diario"
                   class="quick-action-modal__input"
-                  formControlName="quantity"
+                  formControlName="cupoMaximoDiario"
                   type="number"
                   min="0"
                   step="1"
+                  placeholder="Conservar"
                 >
-                @if (hasQuickActionError('quantity')) {
-                  <span class="quick-action-modal__error">Ingresa una cantidad valida</span>
+                @if (hasInventoryManagementError('cupoMaximoDiario')) {
+                  <span class="quick-action-modal__error">Ingresa un cupo válido</span>
                 }
               </div>
             }
 
-            @if (isSetStockAction(target.action)) {
-              <div
-                class="quick-action-modal__group"
-                [class.quick-action-modal__group--error]="hasQuickActionError('stockMinimo')"
-              >
-                <label for="quick-action-stock-minimo" class="quick-action-modal__label">
-                  Stock minimo
-                </label>
+            @if (getInventoryManagementMode() === 'DISPONIBLE_NO_DISPONIBLE') {
+              <label class="inventory-mode-modal__toggle">
                 <input
-                  id="quick-action-stock-minimo"
-                  class="quick-action-modal__input"
-                  formControlName="stockMinimo"
-                  type="number"
-                  min="0"
-                  step="1"
+                  type="checkbox"
+                  formControlName="disponible"
+                  (change)="onInventoryModeChange()"
                 >
-                @if (hasQuickActionError('stockMinimo')) {
-                  <span class="quick-action-modal__error">Ingresa un minimo valido</span>
-                }
-              </div>
+                <strong>Disponible para vender</strong>
+              </label>
             }
 
             <div class="quick-action-modal__group">
-              <label for="quick-action-motivo" class="quick-action-modal__label">Motivo</label>
+              <label for="inventory-management-motivo" class="quick-action-modal__label">Motivo</label>
               <textarea
-                id="quick-action-motivo"
+                id="inventory-management-motivo"
                 class="quick-action-modal__textarea"
                 formControlName="motivo"
                 rows="3"
@@ -209,7 +337,7 @@
             <button
               type="button"
               class="quick-action-modal__btn quick-action-modal__btn--cancel"
-              (click)="closeQuickAction()"
+              (click)="closeInventoryManagement()"
             >
               Cancelar
             </button>
@@ -221,11 +349,124 @@
               @if (isSaving) {
                 Guardando...
               } @else {
-                Aplicar
+                Guardar cambios
               }
             </button>
           </footer>
         </form>
+      </div>
+    }
+
+    @if (stockMovementTarget; as target) {
+      <div
+        class="quick-action-modal__backdrop"
+        tabindex="0"
+        role="button"
+        (click)="closeStockHistory()"
+        (keydown.enter)="closeStockHistory()"
+        (keydown.space)="closeStockHistory()"
+      >
+        <section
+          class="quick-action-modal quick-action-modal--history stock-history-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="stock-history-title"
+          tabindex="-1"
+          (click)="$event.stopPropagation()"
+          (keydown.enter)="$event.stopPropagation()"
+          (keydown.space)="$event.stopPropagation()"
+        >
+          <header class="quick-action-modal__header">
+            <div class="quick-action-modal__icono" aria-hidden="true">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div>
+              <h3 id="stock-history-title" class="quick-action-modal__titulo">
+                Historial de stock
+              </h3>
+              <p class="quick-action-modal__producto">{{ target.nombre }}</p>
+            </div>
+            <button
+              type="button"
+              class="quick-action-modal__close"
+              (click)="closeStockHistory()"
+              aria-label="Cerrar"
+            >
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </header>
+
+          <div class="stock-history-modal__summary" aria-label="Stock actual del producto">
+            <div>
+              <span>Actual</span>
+              <strong>{{ formatStockMovementNumber(target.stockActual) }}</strong>
+            </div>
+            <div>
+              <span>Disponible</span>
+              <strong>{{ formatStockMovementNumber(target.stockDisponible) }}</strong>
+            </div>
+            <div>
+              <span>Reservado</span>
+              <strong>{{ formatStockMovementNumber(target.stockReservado) }}</strong>
+            </div>
+          </div>
+
+          <div class="stock-history-modal__body">
+            @if (isLoadingStockMovements) {
+              <div class="stock-history-modal__state" role="status">
+                <div class="stock-history-modal__spinner" aria-hidden="true"></div>
+                <p>Cargando historial...</p>
+              </div>
+            } @else if (stockMovements.length === 0) {
+              <div class="stock-history-modal__state stock-history-modal__state--empty">
+                <i class="fa-solid fa-box-open" aria-hidden="true"></i>
+                <p>No hay movimientos registrados para este producto.</p>
+              </div>
+            } @else {
+              <div class="stock-history-modal__list">
+                @for (movement of stockMovements; track movement.id) {
+                  <article
+                    class="stock-history-modal__movement"
+                    [class.stock-history-modal__movement--reserva]="movement.tipo === 'RESERVA'"
+                    [class.stock-history-modal__movement--liberacion]="movement.tipo === 'LIBERACION'"
+                    [class.stock-history-modal__movement--consumo]="movement.tipo === 'CONSUMO'"
+                    [class.stock-history-modal__movement--venta]="movement.tipo === 'VENTA'"
+                    [class.stock-history-modal__movement--ajuste]="movement.tipo === 'AJUSTE'"
+                  >
+                    <div class="stock-history-modal__badge" aria-hidden="true">
+                      <i class="fa-solid {{ getStockMovementTypeIcon(movement.tipo) }}"></i>
+                    </div>
+
+                    <div class="stock-history-modal__movement-body">
+                      <header class="stock-history-modal__movement-header">
+                        <div>
+                          <strong>{{ getStockMovementTypeLabel(movement.tipo) }}</strong>
+                          <time [attr.datetime]="movement.creadoEn">
+                            {{ formatStockMovementDate(movement.creadoEn) }}
+                          </time>
+                        </div>
+                        <span class="stock-history-modal__delta">
+                          {{ formatStockMovementDelta(movement) }}
+                        </span>
+                      </header>
+
+                      <div class="stock-history-modal__stock-flow">
+                        <span>Anterior {{ formatStockMovementNumber(movement.cantidadAnterior) }}</span>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        <span>Nuevo {{ formatStockMovementNumber(movement.cantidadNueva) }}</span>
+                        <small>Cantidad {{ formatStockMovementNumber(movement.cantidad) }}</small>
+                      </div>
+
+                      @if (movement.motivo; as motivo) {
+                        <p class="stock-history-modal__reason">{{ motivo }}</p>
+                      }
+                    </div>
+                  </article>
+                }
+              </div>
+            }
+          </div>
+        </section>
       </div>
     }
   </div>

@@ -43,6 +43,37 @@ export interface QuickStockActionRequest {
   usuarioId?: string;
 }
 
+export interface InventoryStockUpdateRequest {
+  stockActual?: number;
+  stockMinimo?: number;
+  estadoInventario?: EstadoInventario;
+  tipoManejoInventario?: TipoManejoInventario;
+  disponible?: boolean;
+  cupoMaximoDiario?: number;
+  motivo?: string;
+  usuarioId?: string;
+}
+
+export type InventoryStockMovementType =
+  | 'RESERVA'
+  | 'LIBERACION'
+  | 'CONSUMO'
+  | 'VENTA'
+  | 'AJUSTE';
+
+export interface InventoryStockMovement {
+  id: string;
+  inventarioId: string;
+  tipo: InventoryStockMovementType;
+  cantidad: number;
+  cantidadAnterior: number;
+  cantidadNueva: number;
+  motivo: string | null;
+  usuarioId: string | null;
+  compraId: string | null;
+  creadoEn: string;
+}
+
 export interface RealtimeInventoryEvent {
   buffetId: string;
   type: string;
@@ -54,8 +85,16 @@ export interface RealtimeInventoryEvent {
   stockActual?: number;
   stockReservado?: number;
   stockDisponible?: number;
+  stockMinimo?: number;
+  cupoMaximoDiario?: number;
+  cupoDisponibleDia?: number;
+  disponible?: boolean;
   estadoInventario?: EstadoInventario;
   tipoManejoInventario?: TipoManejoInventario;
+  movementType?: InventoryStockMovementType | string;
+  changeKind?: string;
+  reason?: string;
+  date?: string;
   occurredAt: string;
   message?: string;
 }

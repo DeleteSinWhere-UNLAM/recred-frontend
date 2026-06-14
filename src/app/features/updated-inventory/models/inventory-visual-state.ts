@@ -17,14 +17,28 @@ const STATUS_PRIORITY: Record<OperationalStockStatus, number> = {
   OK: 4,
 };
 
-// Futura mejora de contrato: categoriaId/categoriaNombre, imagenUrl,
-// actualizadoEn y stockMaximo permitirian agrupar por categoria, mostrar foto,
-// indicar ultima actualizacion y calcular barras contra capacidad real.
 export function getOperationalStockStatus(
   product: InventoryOverviewItem,
 ): OperationalStockStatus {
+  if (product.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE') {
+    return product.disponible &&
+      product.estadoInventario !== 'DESACTIVADO' &&
+      product.estadoInventario !== 'SIN_STOCK' &&
+      !product.agotado
+      ? 'OK'
+      : 'PAUSADO';
+  }
+
+  if (product.estadoInventario === 'DESACTIVADO') {
+    return 'PAUSADO';
+  }
+
   if (product.agotado || product.estadoInventario === 'SIN_STOCK') {
     return 'AGOTADO';
+  }
+
+  if (!product.disponible) {
+    return 'PAUSADO';
   }
 
   if (product.bajoStock || product.estadoInventario === 'BAJO_STOCK') {
@@ -33,10 +47,6 @@ export function getOperationalStockStatus(
 
   if (isHighReservation(product)) {
     return 'ALTA_RESERVA';
-  }
-
-  if (!product.disponible || product.estadoInventario === 'DESACTIVADO') {
-    return 'PAUSADO';
   }
 
   return 'OK';

@@ -2,18 +2,14 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-// Determinar si es producción
 const isProduction = process.env.NODE_ENV === 'production' || process.argv.includes('--production');
 
-// Siempre generamos environment.ts porque es el archivo base que busca el compilador.
-// En desarrollo, también generamos environment.development.ts para cumplir con angular.json
 const targetFiles = isProduction
   ? ['environment.ts']
   : ['environment.ts', 'environment.development.ts'];
 
 const environmentsDir = path.join(__dirname, `./src/environments`);
 
-// Variables obligatorias
 const requiredEnvs = [
   'COGNITO_USER_POOL_ID',
   'COGNITO_CLIENT_ID',
@@ -32,7 +28,6 @@ const requiredEnvs = [
   'FIREBASE_VAPID_KEY'
 ];
 
-// Validar que todas existan
 requiredEnvs.forEach(env => {
   if (!process.env[env]) {
     console.error(`❌ Error: Falta la variable de entorno obligatoria: ${env}`);
@@ -69,7 +64,6 @@ const envConfigFile = `export const environment = {
 
 console.log(`Generando archivos de entorno (${isProduction ? 'PROD' : 'DEV'}) en ${environmentsDir}: ${targetFiles.join(', ')}`);
 
-// Asegurar que el directorio existe
 if (!fs.existsSync(environmentsDir)) {
   fs.mkdirSync(environmentsDir, { recursive: true });
 }

@@ -356,24 +356,14 @@
   transform: translateY(1px);
 }
 
-.product-table__btn--primary {
-  background-color: color-mix(in srgb, var(--color-menta) 20%, var(--color-fondo));
-  color: var(--color-menta);
-}
-
-.product-table__btn--neutral {
-  background-color: color-mix(in srgb, var(--color-pizarra) 12%, var(--color-fondo));
+.product-table__btn--manage {
+  background-color: color-mix(in srgb, var(--color-pizarra) 16%, var(--color-fondo));
   color: var(--color-pizarra);
 }
 
-.product-table__btn--warning {
-  background-color: color-mix(in srgb, var(--color-dorado) 24%, var(--color-fondo));
-  color: var(--color-texto-oscuro);
-}
-
-.product-table__btn--danger {
-  background-color: color-mix(in srgb, var(--color-melocoton) 16%, var(--color-fondo));
-  color: var(--color-melocoton);
+.product-table__btn--history {
+  background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
+  color: #3f7a5d;
 }
 
 @media (max-width: 760px) {
@@ -419,5 +409,269 @@
 
   .product-table__btn span {
     display: none;
+  }
+}
+
+/* =========================================================
+   Rediseño cards stock operativo
+   - Menos rígido, mismo estilo Home / Cierre diario
+   ========================================================= */
+
+.product-table {
+  gap: 18px;
+}
+
+.product-table__header {
+  padding: 0 2px;
+}
+
+.product-table__titulo {
+  color: var(--color-pizarra-dark);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.product-table__titulo::before {
+  content: "";
+  display: inline-flex;
+  width: 8px;
+  height: 8px;
+  margin-right: 9px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra);
+  vertical-align: middle;
+}
+
+.product-table__count {
+  min-height: 34px;
+  padding: 0 13px;
+  background-color: rgba(74, 111, 165, 0.1);
+  color: var(--color-pizarra-dark);
+  font-weight: 900;
+}
+
+.product-table__estado {
+  min-height: 260px;
+  border-radius: 22px;
+  background-color: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-card);
+}
+
+.product-table__estado-icono {
+  border-radius: 18px;
+}
+
+.product-table__estado-titulo {
+  color: var(--color-pizarra-dark);
+  font-size: 17px;
+}
+
+.product-table__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.product-card {
+  min-height: 318px;
+  padding: 18px;
+  gap: 14px;
+  border-radius: 20px;
+  border-color: var(--color-borde);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.9)),
+    var(--color-superficie);
+  box-shadow: var(--shadow-card);
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(74, 111, 165, 0.2);
+  box-shadow: var(--shadow-elevated);
+}
+
+.product-card::before {
+  width: 4px;
+  background-color: var(--color-menta);
+}
+
+.product-card--agotado {
+  border-color: rgba(231, 111, 81, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(231, 111, 81, 0.035)),
+    var(--color-superficie);
+}
+
+.product-card--bajo,
+.product-card--alta-reserva {
+  border-color: rgba(242, 183, 5, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 183, 5, 0.035)),
+    var(--color-superficie);
+}
+
+.product-card--pausado {
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.product-card__header {
+  align-items: flex-start;
+}
+
+.product-card__title-group {
+  gap: 6px;
+}
+
+.product-card__mode {
+  min-height: 26px;
+  padding: 0 11px;
+  background-color: rgba(74, 111, 165, 0.1);
+  color: var(--color-pizarra-dark);
+}
+
+.product-card--bajo .product-card__mode,
+.product-card--alta-reserva .product-card__mode {
+  background-color: rgba(242, 183, 5, 0.15);
+  color: #946600;
+}
+
+.product-card--agotado .product-card__mode {
+  background-color: rgba(231, 111, 81, 0.13);
+  color: #a83b24;
+}
+
+.product-card__name {
+  color: var(--color-pizarra-dark);
+  font-size: 19px;
+  line-height: 1.16;
+}
+
+.product-card__price {
+  color: var(--color-texto-claro);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.product-card__status {
+  min-height: 30px;
+  padding: 0 12px;
+  background-color: rgba(129, 178, 154, 0.16);
+  color: #3f7a5d;
+}
+
+.product-card__status--agotado {
+  background-color: rgba(231, 111, 81, 0.13);
+  color: var(--color-melocoton);
+}
+
+.product-card__status--bajo,
+.product-card__status--alta-reserva {
+  background-color: rgba(242, 183, 5, 0.17);
+  color: #946600;
+}
+
+.product-card__status--pausado {
+  background-color: rgba(148, 163, 184, 0.16);
+  color: var(--color-texto-claro);
+}
+
+.product-card__availability {
+  padding: 15px;
+  border-radius: 16px;
+  border-color: var(--color-borde);
+  background-color: rgba(240, 244, 248, 0.58);
+}
+
+.product-card__availability-row span,
+.product-card__split {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.product-card__availability-row strong {
+  color: var(--color-pizarra-dark);
+  font-size: 25px;
+}
+
+.product-card__bar {
+  height: 9px;
+  background-color: rgba(148, 163, 184, 0.26);
+}
+
+.product-card__bar-fill {
+  background-color: #4f9d73;
+}
+
+.product-card__bar-fill--bajo,
+.product-card__bar-fill--alta-reserva {
+  background-color: var(--color-dorado);
+}
+
+.product-card__bar-fill--agotado {
+  background-color: var(--color-melocoton);
+}
+
+.product-card__metrics {
+  gap: 10px;
+}
+
+.product-card__metric {
+  min-height: 64px;
+  padding: 11px 12px;
+  border-radius: 13px;
+  border-color: var(--color-borde);
+  background-color: rgba(255, 255, 255, 0.82);
+}
+
+.product-card__metric dt {
+  color: var(--color-texto-claro);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.product-card__metric dd {
+  color: var(--color-pizarra-dark);
+  font-size: 18px;
+}
+
+.product-table__btn--manage {
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 12px;
+  background-color: rgba(74, 111, 165, 0.13);
+  color: var(--color-pizarra-dark);
+  font-weight: 900;
+}
+
+.product-table__btn--manage:hover {
+  background-color: rgba(74, 111, 165, 0.18);
+}
+
+.product-table__btn--history {
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 12px;
+  background-color: rgba(129, 178, 154, 0.16);
+  color: #3f7a5d;
+  font-weight: 900;
+}
+
+.product-table__btn--history:hover {
+  background-color: rgba(129, 178, 154, 0.22);
+}
+
+@media (max-width: 1280px) {
+  .product-table__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .product-table__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card {
+    min-height: 0;
+    border-radius: 18px;
   }
 }

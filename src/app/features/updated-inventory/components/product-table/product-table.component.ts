@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CurrencyPipe, NgClass } from '@angular/common';
 import {
   InventoryOverviewItem,
-  QuickStockAction,
   TipoManejoInventario,
 } from '../../models/inventory.interface';
 import {
@@ -12,18 +11,6 @@ import {
   isHighReservation,
   OperationalStockStatus,
 } from '../../models/inventory-visual-state';
-
-export interface QuickStockActionSelection {
-  product: InventoryOverviewItem;
-  action: QuickStockAction;
-}
-
-interface QuickActionButton {
-  action: QuickStockAction;
-  label: string;
-  icon: string;
-  tone: 'primary' | 'neutral' | 'warning' | 'danger';
-}
 
 @Component({
   selector: 'app-product-table',
@@ -36,12 +23,13 @@ export class ProductTableComponent {
   @Input() products: InventoryOverviewItem[] = [];
   @Input() isLoading = false;
   @Input() highlightedProductIds: ReadonlySet<string> = new Set<string>();
-  @Output() quickAction = new EventEmitter<QuickStockActionSelection>();
+  @Output() manageInventory = new EventEmitter<InventoryOverviewItem>();
+  @Output() viewHistory = new EventEmitter<InventoryOverviewItem>();
 
   getModeLabel(mode: TipoManejoInventario): string {
     const labels: Record<TipoManejoInventario, string> = {
       STOCK_EXACTO: 'Stock exacto',
-      DISPONIBLE_NO_DISPONIBLE: 'Disponible',
+      DISPONIBLE_NO_DISPONIBLE: 'Disponible / No disponible',
       CUPO_DIARIO: 'Cupo diario',
     };
 
@@ -53,7 +41,7 @@ export class ProductTableComponent {
       AGOTADO: 'Agotado',
       BAJO_STOCK: 'Bajo stock',
       ALTA_RESERVA: 'Alta reserva',
-      PAUSADO: 'Pausado',
+      PAUSADO: 'No disponible',
       OK: 'OK',
     };
 
@@ -82,10 +70,20 @@ export class ProductTableComponent {
     }
 
     if (product.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE') {
-      return product.disponible && !product.agotado ? 'Disponible' : 'No disponible';
+      return product.disponible &&
+        !product.agotado &&
+        product.estadoInventario !== 'DESACTIVADO'
+        ? 'Disponible'
+        : 'No disponible';
     }
 
     return this.formatNullable(product.stockDisponible);
+  }
+
+  getAvailabilityLabel(product: InventoryOverviewItem): string {
+    return product.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE'
+      ? 'Estado operativo'
+      : 'Disponible';
   }
 
   getAvailabilityPercent(product: InventoryOverviewItem): number {
@@ -116,86 +114,12 @@ export class ProductTableComponent {
     return this.highlightedProductIds.has(product.productId);
   }
 
-  getActions(product: InventoryOverviewItem): QuickActionButton[] {
-    if (product.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE') {
-      return product.disponible
-        ? [
-            {
-              action: 'SET_UNAVAILABLE',
-              label: 'Pausar',
-              icon: 'fa-pause',
-              tone: 'warning',
-            },
-          ]
-        : [
-            {
-              action: 'SET_AVAILABLE',
-              label: 'Activar',
-              icon: 'fa-play',
-              tone: 'primary',
-            },
-          ];
-    }
-
-    if (product.tipoManejoInventario === 'CUPO_DIARIO') {
-      return [
-        {
-          action: 'SET_DAILY_CAPACITY',
-          label: 'Cupo',
-          icon: 'fa-calendar-day',
-          tone: 'primary',
-        },
-        {
-          action: 'ADD_STOCK',
-          label: '+ Cupo',
-          icon: 'fa-plus',
-          tone: 'neutral',
-        },
-        {
-          action: 'MARK_SOLD_OUT',
-          label: 'Agotar',
-          icon: 'fa-ban',
-          tone: 'danger',
-        },
-      ];
-    }
-
-    return [
-      {
-        action: 'ADD_STOCK',
-        label: 'Stock',
-        icon: 'fa-plus',
-        tone: 'primary',
-      },
-      {
-        action: 'SUBTRACT_STOCK',
-        label: 'Stock',
-        icon: 'fa-minus',
-        tone: 'neutral',
-      },
-      {
-        action: 'SET_STOCK',
-        label: 'Definir',
-        icon: 'fa-pen-to-square',
-        tone: 'warning',
-      },
-      {
-        action: 'SET_DAILY_CAPACITY',
-        label: 'Cupo diario',
-        icon: 'fa-calendar-day',
-        tone: 'neutral',
-      },
-      {
-        action: 'MARK_SOLD_OUT',
-        label: 'Agotar',
-        icon: 'fa-ban',
-        tone: 'danger',
-      },
-    ];
+  emitManageInventory(product: InventoryOverviewItem): void {
+    this.manageInventory.emit(product);
   }
 
-  emitAction(product: InventoryOverviewItem, action: QuickStockAction): void {
-    this.quickAction.emit({ product, action });
+  emitViewHistory(product: InventoryOverviewItem): void {
+    this.viewHistory.emit(product);
   }
 
   formatNullable(value: number | null): string {

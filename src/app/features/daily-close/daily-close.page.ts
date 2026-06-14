@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -6,8 +15,12 @@ import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../shared/services/toast.service';
+import { InventoryRealtimeService } from '../updated-inventory/services/inventory-realtime.service';
+import { RealtimeInventoryEvent } from '../updated-inventory/models/inventory.interface';
 import {
+  DailyCloseRecord,
   DailyCloseResult,
+  DailyCloseStatus,
   DailyInventorySnapshot,
   DailyProductSale,
   DailyReport,
@@ -18,7 +31,7 @@ import { DailyCloseService } from './services/daily-close.service';
 interface ReportMetric {
   label: string;
   value: string;
-  tone?: 'success' | 'warning' | 'danger';
+  tone?: 'success' | 'warning';
 }
 
 interface OrderStatusMetric {
@@ -27,6 +40,13 @@ interface OrderStatusMetric {
   icon: string;
 }
 
+const INVENTORY_PAGE_SIZE = 5;
+const SOLD_PRODUCTS_PAGE_SIZE = 5;
+const DAILY_CLOSE_REALTIME_REFRESH_DELAY_MS = 2500;
+const DAILY_CLOSE_REALTIME_REFRESH_TYPES = new Set([
+  'DAILY_REPORT_CHANGED',
+]);
+
 @Component({
   selector: 'app-daily-close-page',
   templateUrl: './daily-close.page.html',
@@ -34,35 +54,67 @@ interface OrderStatusMetric {
   imports: [NavbarComponent, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DailyClosePage implements OnInit {
+export class DailyClosePage implements OnInit, OnDestroy {
   private readonly dailyCloseService = inject(DailyCloseService);
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly toastService = inject(ToastService);
+  private readonly inventoryRealtimeService = inject(InventoryRealtimeService);
   private readonly router = inject(Router);
+  private readonly zone = inject(NgZone);
 
   protected readonly buffetId = signal<string | null>(null);
   protected readonly selectedDate = signal(this.getTodayInputDate());
   protected readonly report = signal<DailyReport | null>(null);
+  protected readonly closeStatus = signal<DailyCloseStatus | null>(null);
   protected readonly closeResult = signal<DailyCloseResult | null>(null);
+  protected readonly dailyCloses = signal<DailyCloseRecord[]>([]);
   protected readonly loadingReport = signal(false);
+  protected readonly loadingCloseStatus = signal(false);
+  protected readonly loadingHistory = signal(false);
   protected readonly closingDay = signal(false);
   protected readonly downloadingCsv = signal(false);
   protected readonly refreshingAfterClose = signal(false);
   protected readonly confirmModalOpen = signal(false);
+  protected readonly historyModalOpen = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly closeStatusErrorMessage = signal<string | null>(null);
+  protected readonly historyErrorMessage = signal<string | null>(null);
+  protected readonly historyFrom = signal('');
+  protected readonly historyTo = signal('');
+  protected readonly inventoryPage = signal(1);
+  protected readonly soldProductsPage = signal(1);
 
-  protected readonly isClosedConfirmed = computed(() => this.closeResult() !== null);
+  private realtimeAbortController: AbortController | null = null;
+  private realtimeRefreshTimeoutId: number | null = null;
+
+  protected readonly isClosedConfirmed = computed(
+    () => this.closeStatus()?.closed === true || this.closeResult() !== null,
+  );
 
   protected readonly statusLabel = computed(() =>
-    this.isClosedConfirmed() ? 'Cerrado' : 'Abierto',
+    this.loadingCloseStatus()
+      ? 'Verificando'
+      : this.isClosedConfirmed()
+        ? 'Día cerrado'
+        : 'Abierto',
   );
 
-  protected readonly statusDetail = computed(() =>
-    this.isClosedConfirmed()
-      ? 'Cierre confirmado para la fecha seleccionada.'
-      : 'Aún no se ha hecho un cierre.',
-  );
+  protected readonly statusDetail = computed(() => {
+    if (this.loadingCloseStatus()) {
+      return 'Consultando estado del cierre.';
+    }
+
+    if (this.closeStatusErrorMessage()) {
+      return this.closeStatusErrorMessage();
+    }
+
+    if (this.isClosedConfirmed()) {
+      return `Cierre confirmado para ${this.formatDate(this.closedSummary()?.date ?? this.selectedDate())}.`;
+    }
+
+    return 'Todavía no se hizo un cierre para esta fecha.';
+  });
 
   protected readonly summaryMetrics = computed<ReportMetric[]>(() => {
     const report = this.report();
@@ -90,7 +142,7 @@ export class DailyClosePage implements OnInit {
         value: this.formatNumber(report.releasedReservations),
       },
       {
-        label: 'Creditos devueltos',
+        label: 'Créditos devueltos',
         value: this.formatMoney(report.refundedCredits),
       },
     ];
@@ -104,7 +156,7 @@ export class DailyClosePage implements OnInit {
       { label: 'Entregados', value: report.deliveredOrders, icon: 'fa-check' },
       { label: 'Pendientes', value: report.pendingOrders, icon: 'fa-hourglass-half' },
       {
-        label: 'En preparacion',
+        label: 'En preparación',
         value: report.inPreparationOrders,
         icon: 'fa-utensils',
       },
@@ -115,6 +167,115 @@ export class DailyClosePage implements OnInit {
     ];
   });
 
+  protected readonly closureMetrics = computed<ReportMetric[]>(() => {
+    const summary = this.closedSummary();
+    if (!summary) return [];
+
+    const metrics: ReportMetric[] = [
+      {
+        label: 'Pedidos vencidos',
+        value: this.formatNumber(summary.expiredPurchases),
+        tone: summary.expiredPurchases > 0 ? 'warning' : undefined,
+      },
+      {
+        label: 'Reservas liberadas',
+        value: this.formatNumber(summary.releasedReservations),
+      },
+      {
+        label: 'Créditos devueltos',
+        value: this.formatMoney(summary.refundedCredits),
+      },
+    ];
+
+    const report = this.report();
+    if (report) {
+      metrics.push({
+        label: 'Total vendido',
+        value: this.formatMoney(report.deliveredTotal),
+        tone: 'success',
+      });
+    }
+
+    return metrics;
+  });
+
+  protected readonly sortedInventory = computed<DailyInventorySnapshot[]>(() => {
+    const inventory = this.report()?.inventory ?? [];
+
+    return [...inventory].sort((first, second) => {
+      const priorityDiff = this.getInventoryPriority(first) - this.getInventoryPriority(second);
+
+      if (priorityDiff !== 0) return priorityDiff;
+
+      return first.productName.localeCompare(second.productName, 'es-AR');
+    });
+  });
+
+  protected readonly sortedProducts = computed<DailyProductSale[]>(() => {
+    const products = this.report()?.products ?? [];
+
+    return [...products].sort((first, second) => {
+      const totalDiff = second.total - first.total;
+
+      if (totalDiff !== 0) return totalDiff;
+
+      const quantityDiff = second.quantity - first.quantity;
+
+      if (quantityDiff !== 0) return quantityDiff;
+
+      return first.productName.localeCompare(second.productName, 'es-AR');
+    });
+  });
+
+  protected readonly paginatedProducts = computed<DailyProductSale[]>(() => {
+    const start = (this.soldProductsPage() - 1) * SOLD_PRODUCTS_PAGE_SIZE;
+
+    return this.sortedProducts().slice(start, start + SOLD_PRODUCTS_PAGE_SIZE);
+  });
+
+  protected readonly soldProductsTotalPages = computed(() =>
+    Math.max(
+      1,
+      Math.ceil(this.sortedProducts().length / SOLD_PRODUCTS_PAGE_SIZE),
+    ),
+  );
+
+  protected readonly soldProductsPageStart = computed(() => {
+    if (this.sortedProducts().length === 0) return 0;
+
+    return (this.soldProductsPage() - 1) * SOLD_PRODUCTS_PAGE_SIZE + 1;
+  });
+
+  protected readonly soldProductsPageEnd = computed(() =>
+    Math.min(
+      this.soldProductsPage() * SOLD_PRODUCTS_PAGE_SIZE,
+      this.sortedProducts().length,
+    ),
+  );
+
+  protected readonly paginatedInventory = computed<DailyInventorySnapshot[]>(() => {
+    const start = (this.inventoryPage() - 1) * INVENTORY_PAGE_SIZE;
+
+    return this.sortedInventory().slice(start, start + INVENTORY_PAGE_SIZE);
+  });
+
+  protected readonly inventoryTotalPages = computed(() =>
+    Math.max(1, Math.ceil(this.sortedInventory().length / INVENTORY_PAGE_SIZE)),
+  );
+
+  protected readonly inventoryPageStart = computed(() => {
+    if (this.sortedInventory().length === 0) return 0;
+
+    return (this.inventoryPage() - 1) * INVENTORY_PAGE_SIZE + 1;
+  });
+
+  protected readonly inventoryPageEnd = computed(() =>
+    Math.min(
+      this.inventoryPage() * INVENTORY_PAGE_SIZE,
+      this.sortedInventory().length,
+    ),
+  );
+
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
 
@@ -122,11 +283,21 @@ export class DailyClosePage implements OnInit {
     this.buffetId.set(buffetId);
 
     if (!buffetId) {
-      this.errorMessage.set('No se encontro un buffet asociado a tu perfil.');
+      this.errorMessage.set('No se encontró un buffet asociado a tu perfil.');
       return;
     }
 
-    this.loadReport();
+    this.loadDailyData();
+    this.loadCloseHistory();
+    this.connectRealtime(buffetId);
+  }
+
+  ngOnDestroy(): void {
+    this.realtimeAbortController?.abort();
+
+    if (this.realtimeRefreshTimeoutId !== null) {
+      window.clearTimeout(this.realtimeRefreshTimeoutId);
+    }
   }
 
   protected volver(): void {
@@ -143,32 +314,141 @@ export class DailyClosePage implements OnInit {
 
     this.selectedDate.set(nextDate);
     this.closeResult.set(null);
-    this.loadReport();
+    this.closeStatus.set(null);
+    this.closeStatusErrorMessage.set(null);
+    this.inventoryPage.set(1);
+    this.soldProductsPage.set(1);
+    this.loadDailyData();
   }
 
-  protected loadReport(): void {
+  protected loadDailyData(showLoading = true): void {
+    this.loadCloseStatus(showLoading);
+    this.loadReport(showLoading);
+  }
+
+  protected loadReport(showLoading = true): void {
     const buffetId = this.buffetId();
     if (!buffetId) return;
 
-    this.loadingReport.set(true);
-    this.errorMessage.set(null);
+    if (showLoading) {
+      this.loadingReport.set(true);
+      this.errorMessage.set(null);
+    }
 
     this.dailyCloseService
       .getDailyReport(buffetId, this.selectedDate())
-      .pipe(finalize(() => this.loadingReport.set(false)))
+      .pipe(finalize(() => {
+        if (showLoading) {
+          this.loadingReport.set(false);
+        }
+      }))
       .subscribe({
         next: (report) => {
           this.report.set(report);
+          this.inventoryPage.set(1);
+          this.soldProductsPage.set(1);
         },
         error: () => {
-          this.report.set(null);
-          this.errorMessage.set('No se pudo cargar el reporte diario.');
+          if (showLoading) {
+            this.report.set(null);
+            this.errorMessage.set('No se pudo cargar el reporte diario.');
+          }
         },
       });
   }
 
+  protected loadCloseStatus(showLoading = true): void {
+    const buffetId = this.buffetId();
+    if (!buffetId) return;
+
+    if (showLoading) {
+      this.loadingCloseStatus.set(true);
+      this.closeStatusErrorMessage.set(null);
+    }
+
+    this.dailyCloseService
+      .getDailyCloseStatus(buffetId, this.selectedDate())
+      .pipe(finalize(() => {
+        if (showLoading) {
+          this.loadingCloseStatus.set(false);
+        }
+      }))
+      .subscribe({
+        next: (status) => {
+          this.closeStatus.set(status);
+        },
+        error: () => {
+          if (showLoading) {
+            this.closeStatus.set(null);
+            this.closeStatusErrorMessage.set(
+              'No se pudo verificar si esta fecha ya fue cerrada.',
+            );
+          }
+        },
+      });
+  }
+
+  protected loadCloseHistory(): void {
+    const buffetId = this.buffetId();
+    if (!buffetId) return;
+
+    this.loadingHistory.set(true);
+    this.historyErrorMessage.set(null);
+
+    this.dailyCloseService
+      .getDailyCloses(buffetId, {
+        from: this.historyFrom() || undefined,
+        to: this.historyTo() || undefined,
+      })
+      .pipe(finalize(() => this.loadingHistory.set(false)))
+      .subscribe({
+        next: (closes) => {
+          this.dailyCloses.set(closes);
+        },
+        error: () => {
+          this.dailyCloses.set([]);
+          this.historyErrorMessage.set('No se pudieron cargar los cierres.');
+        },
+      });
+  }
+
+  protected openHistoryModal(): void {
+    this.historyModalOpen.set(true);
+    this.loadCloseHistory();
+  }
+
+  protected closeHistoryModal(): void {
+    this.historyModalOpen.set(false);
+  }
+
+  protected onHistoryFromChange(event: Event): void {
+    this.historyFrom.set(this.getInputValue(event));
+  }
+
+  protected onHistoryToChange(event: Event): void {
+    this.historyTo.set(this.getInputValue(event));
+  }
+
+  protected selectDailyClose(close: DailyCloseRecord): void {
+    this.selectedDate.set(close.date);
+    this.closeResult.set(null);
+    this.inventoryPage.set(1);
+    this.soldProductsPage.set(1);
+    this.closeStatus.set({
+      buffetId: close.buffetId,
+      date: close.date,
+      closed: true,
+      expiredPurchases: close.expiredPurchases,
+      releasedReservations: close.releasedReservations,
+      refundedCredits: close.refundedCredits,
+    });
+    this.closeStatusErrorMessage.set(null);
+    this.historyModalOpen.set(false);
+    this.loadDailyData();
+  }
+
   protected openConfirmModal(): void {
-    if (this.closingDay() || this.isClosedConfirmed()) {
+    if (this.closingDay() || this.loadingCloseStatus() || this.isClosedConfirmed()) {
       return;
     }
 
@@ -185,7 +465,12 @@ export class DailyClosePage implements OnInit {
 
   protected confirmDailyClose(): void {
     const buffetId = this.buffetId();
-    if (!buffetId || this.closingDay() || this.isClosedConfirmed()) {
+    if (
+      !buffetId ||
+      this.closingDay() ||
+      this.loadingCloseStatus() ||
+      this.isClosedConfirmed()
+    ) {
       return;
     }
 
@@ -199,17 +484,24 @@ export class DailyClosePage implements OnInit {
         next: (result) => {
           this.closeResult.set(result);
           this.report.set(result.report);
+          this.inventoryPage.set(1);
+          this.soldProductsPage.set(1);
+          this.closeStatus.set(this.resultToCloseStatus(result));
           this.confirmModalOpen.set(false);
           this.toastService.mostrar(
             result.alreadyClosed
-              ? 'El dia ya estaba cerrado.'
+              ? 'El día ya estaba cerrado.'
               : 'Cierre diario realizado.',
             result.alreadyClosed ? 'info' : 'success',
           );
+          this.loadCloseHistory();
+          if (result.alreadyClosed) {
+            this.loadCloseStatus();
+          }
           this.refreshAfterClose(buffetId);
         },
         error: () => {
-          this.toastService.mostrar('No se pudo cerrar el dia.', 'error');
+          this.toastService.mostrar('No se pudo cerrar el día.', 'error');
         },
       });
   }
@@ -239,6 +531,7 @@ export class DailyClosePage implements OnInit {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
+      currencyDisplay: 'narrowSymbol',
       maximumFractionDigits: 2,
     }).format(Number(value ?? 0));
   }
@@ -249,7 +542,7 @@ export class DailyClosePage implements OnInit {
 
   protected formatOptionalNumber(value: number | null | undefined): string {
     return value === null || value === undefined
-      ? 'Sin minimo'
+      ? 'Sin mínimo'
       : this.formatNumber(value);
   }
 
@@ -283,12 +576,24 @@ export class DailyClosePage implements OnInit {
     return labels[mode] ?? mode;
   }
 
-  protected formatPaymentMethod(paymentMethod: string): string {
-    return paymentMethod.replace(/_/g, ' ').toLocaleLowerCase('es-AR');
-  }
-
   protected formatMovementType(movementType: string): string {
-    return movementType.replace(/_/g, ' ').toLocaleLowerCase('es-AR');
+    const labels: Record<string, string> = {
+      AJUSTE: 'Ajuste',
+      LIBERACION: 'Liberación',
+      RESERVA: 'Reserva',
+      VENTA: 'Venta',
+      CONSUMO: 'Consumo',
+    };
+
+    if (labels[movementType]) {
+      return labels[movementType];
+    }
+
+    const normalized = movementType
+      .replace(/_/g, ' ')
+      .toLocaleLowerCase('es-AR');
+
+    return normalized.charAt(0).toLocaleUpperCase('es-AR') + normalized.slice(1);
   }
 
   protected soldOutProductName(product: DailySoldOutProduct): string {
@@ -319,6 +624,34 @@ export class DailyClosePage implements OnInit {
     return product.productId;
   }
 
+  protected trackDailyClose(_: number, close: DailyCloseRecord): string {
+    return close.id;
+  }
+
+  protected isSelectedClose(close: DailyCloseRecord): boolean {
+    return close.date === this.selectedDate();
+  }
+
+  protected previousInventoryPage(): void {
+    this.inventoryPage.update((page) => Math.max(1, page - 1));
+  }
+
+  protected nextInventoryPage(): void {
+    this.inventoryPage.update((page) =>
+      Math.min(this.inventoryTotalPages(), page + 1),
+    );
+  }
+
+  protected previousSoldProductsPage(): void {
+    this.soldProductsPage.update((page) => Math.max(1, page - 1));
+  }
+
+  protected nextSoldProductsPage(): void {
+    this.soldProductsPage.update((page) =>
+      Math.min(this.soldProductsTotalPages(), page + 1),
+    );
+  }
+
   private refreshAfterClose(buffetId: string): void {
     this.refreshingAfterClose.set(true);
 
@@ -328,18 +661,96 @@ export class DailyClosePage implements OnInit {
       .subscribe({
         next: (report) => {
           this.report.set(report);
+          this.inventoryPage.set(1);
+          this.soldProductsPage.set(1);
         },
         error: () => {
           this.toastService.mostrar(
-            'El cierre se realizo, pero no se pudo refrescar el reporte.',
+            'El cierre se realizó, pero no se pudo refrescar el reporte.',
             'error',
           );
         },
       });
   }
 
+  private connectRealtime(buffetId: string): void {
+    this.realtimeAbortController?.abort();
+
+    this.realtimeAbortController = this.inventoryRealtimeService.connect(
+      buffetId,
+      {
+        onRefresh: (event) => {
+          this.zone.run(() => this.scheduleRealtimeRefresh(event));
+        },
+        onError: (error) => {
+          console.warn('SSE de cierre diario desconectado o reintentando', error);
+        },
+      },
+    );
+  }
+
+  private scheduleRealtimeRefresh(event: RealtimeInventoryEvent): void {
+    if (
+      !this.shouldRefreshDailyCloseForRealtimeEvent(event) ||
+      this.realtimeRefreshTimeoutId !== null
+    ) {
+      return;
+    }
+
+    this.realtimeRefreshTimeoutId = window.setTimeout(() => {
+      this.realtimeRefreshTimeoutId = null;
+
+      if (!this.shouldRefreshDailyCloseForRealtimeEvent(event)) {
+        return;
+      }
+
+      this.inventoryRealtimeService.recordRefetch('daily-close-report');
+      this.loadDailyData(false);
+
+      if (this.historyModalOpen()) {
+        this.loadCloseHistory();
+      }
+    }, DAILY_CLOSE_REALTIME_REFRESH_DELAY_MS);
+  }
+
   private findInventorySnapshot(productId: string): DailyInventorySnapshot | undefined {
     return this.report()?.inventory.find((item) => item.productId === productId);
+  }
+
+  private getInventoryPriority(product: DailyInventorySnapshot): number {
+    return this.getInventoryStatusPriority(product.estadoInventario);
+  }
+
+  private getInventoryStatusPriority(status: string | undefined): number {
+    const priorities: Record<string, number> = {
+      SIN_STOCK: 0,
+      BAJO_STOCK: 1,
+      DISPONIBLE: 2,
+      DESACTIVADO: 3,
+    };
+
+    return status ? priorities[status] ?? 4 : 4;
+  }
+
+  private closedSummary(): DailyCloseStatus | null {
+    const status = this.closeStatus();
+    if (status?.closed) return status;
+
+    const result = this.closeResult();
+    if (!result) return null;
+
+    return this.resultToCloseStatus(result);
+  }
+
+  private resultToCloseStatus(result: DailyCloseResult): DailyCloseStatus {
+    return {
+      buffetId: result.report.buffetId,
+      date: result.report.date,
+      closed: true,
+      expiredPurchases: result.expiredPurchases,
+      releasedReservations: result.releasedReservations,
+      refundedCredits: result.refundedCredits,
+    };
   }
 
   private saveCsvFile(file: Blob, filename: string): void {
@@ -352,6 +763,35 @@ export class DailyClosePage implements OnInit {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  }
+
+  private getInputValue(event: Event): string {
+    return (event.target as HTMLInputElement | null)?.value ?? '';
+  }
+
+  private isSelectedDateToday(): boolean {
+    return this.selectedDate() === this.getTodayInputDate();
+  }
+
+  private shouldRefreshDailyCloseForRealtimeEvent(
+    event: RealtimeInventoryEvent,
+  ): boolean {
+    return (
+      document.visibilityState === 'visible' &&
+      this.isRealtimeEventForSelectedDate(event) &&
+      !this.isClosedConfirmed() &&
+      DAILY_CLOSE_REALTIME_REFRESH_TYPES.has(event.type)
+    );
+  }
+
+  private isRealtimeEventForSelectedDate(event: RealtimeInventoryEvent): boolean {
+    const eventDate = event.date?.trim();
+
+    if (eventDate) {
+      return eventDate === this.selectedDate();
+    }
+
+    return this.isSelectedDateToday();
   }
 
   private getTodayInputDate(): string {

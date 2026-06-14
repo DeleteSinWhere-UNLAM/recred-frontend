@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { UpdatedInventoryPageComponent } from './updated-inventory-page.component';
 import { ProductService } from '../services/product.service';
@@ -11,7 +11,11 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 import { InventoryRealtimeService } from '../services/inventory-realtime.service';
 import { Category } from '../models/category.interface';
 import { Product } from '../models/product.interface';
-import { InventoryOverviewItem } from '../models/inventory.interface';
+import {
+  InventoryOverviewItem,
+  InventoryStockMovement,
+  RealtimeInventoryEvent,
+} from '../models/inventory.interface';
 import { ProductFormData } from '../components/product-form/product-form.component';
 
 describe('UpdatedInventoryPageComponent', () => {
@@ -21,6 +25,11 @@ describe('UpdatedInventoryPageComponent', () => {
   let toastServiceMock: jasmine.SpyObj<ToastService>;
   let perfilServiceMock: jasmine.SpyObj<PerfilService>;
   let realtimeServiceMock: jasmine.SpyObj<InventoryRealtimeService>;
+  let activatedRouteMock: {
+    snapshot: {
+      queryParamMap: ReturnType<typeof convertToParamMap>;
+    };
+  };
 
   const mockBuffetId = 'buffet-test-123';
 
@@ -75,23 +84,66 @@ describe('UpdatedInventoryPageComponent', () => {
     categoriaId: 'c1',
   };
 
+  const mockStockMovements: InventoryStockMovement[] = [
+    {
+      id: 'movement-old',
+      inventarioId: 'inventory-1',
+      tipo: 'VENTA',
+      cantidad: 2,
+      cantidadAnterior: 10,
+      cantidadNueva: 8,
+      motivo: 'Consumo por venta presencial',
+      usuarioId: 'usuario-1',
+      compraId: 'compra-1',
+      creadoEn: '2026-06-11T10:30:00',
+    },
+    {
+      id: 'movement-new',
+      inventarioId: 'inventory-1',
+      tipo: 'AJUSTE',
+      cantidad: 5,
+      cantidadAnterior: 8,
+      cantidadNueva: 13,
+      motivo: 'Reposición manual',
+      usuarioId: 'usuario-1',
+      compraId: null,
+      creadoEn: '2026-06-11T11:30:00',
+    },
+  ];
+
   beforeEach(async () => {
     productServiceMock = jasmine.createSpyObj('ProductService', [
       'getCategories',
       'getInventoryOverview',
-      'quickStockAction',
+      'updateInventoryStock',
+      'getProductStockMovements',
       'create',
     ]);
     toastServiceMock = jasmine.createSpyObj('ToastService', ['mostrar']);
-    perfilServiceMock = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
-    realtimeServiceMock = jasmine.createSpyObj('InventoryRealtimeService', ['connect']);
+    perfilServiceMock = jasmine.createSpyObj('PerfilService', [
+      'obtenerBuffetId',
+      'getPerfil',
+    ]);
+    realtimeServiceMock = jasmine.createSpyObj('InventoryRealtimeService', [
+      'connect',
+      'recordRefetch',
+    ]);
 
     productServiceMock.getCategories.and.returnValue(of(mockCategories));
     productServiceMock.getInventoryOverview.and.returnValue(of(mockInventory));
-    productServiceMock.quickStockAction.and.returnValue(of({ ok: true }));
+    productServiceMock.updateInventoryStock.and.returnValue(of({ ok: true }));
+    productServiceMock.getProductStockMovements.and.returnValue(
+      of(mockStockMovements),
+    );
     productServiceMock.create.and.returnValue(of(createdProduct));
     perfilServiceMock.obtenerBuffetId.and.returnValue(mockBuffetId);
+    perfilServiceMock.getPerfil.and.returnValue(null);
     realtimeServiceMock.connect.and.returnValue(new AbortController());
+    activatedRouteMock = {
+      snapshot: {
+        queryParamMap: convertToParamMap({}),
+      },
+    };
 
     await TestBed.configureTestingModule({
       imports: [UpdatedInventoryPageComponent],
@@ -101,6 +153,7 @@ describe('UpdatedInventoryPageComponent', () => {
         { provide: PerfilService, useValue: perfilServiceMock },
         { provide: InventoryRealtimeService, useValue: realtimeServiceMock },
         provideRouter([]),
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
@@ -124,6 +177,18 @@ describe('UpdatedInventoryPageComponent', () => {
     expect(component.products).toEqual(mockInventory);
   });
 
+  it('deberia abrir el modal de gestion cuando llega productId por query param', () => {
+    activatedRouteMock.snapshot.queryParamMap = convertToParamMap({
+      productId: mockInventory[1].productId,
+    });
+
+    fixture.detectChanges();
+
+    expect(component.inventoryManagementTarget).toEqual(mockInventory[1]);
+    expect(component.getInventoryManagementMode()).toBe('CUPO_DIARIO');
+    expect(component.highlightedProductIds.has(mockInventory[1].productId)).toBeTrue();
+  });
+
   it('deberia mostrar toast cuando llega una compra nueva por SSE', () => {
     fixture.detectChanges();
     const handlers = realtimeServiceMock.connect.calls.mostRecent().args[1] as {
@@ -138,6 +203,7 @@ describe('UpdatedInventoryPageComponent', () => {
     const formattedTotal = new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
+      currencyDisplay: 'narrowSymbol',
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     }).format(2500);
@@ -211,6 +277,23 @@ describe('UpdatedInventoryPageComponent', () => {
     expect(component.filteredProducts).toEqual([highReservationProduct]);
   });
 
+  it('deberia filtrar productos no disponibles', () => {
+    const pausedProduct: InventoryOverviewItem = {
+      ...mockInventory[0],
+      productId: 'pausado',
+      nombre: 'Producto no disponible',
+      estadoInventario: 'DESACTIVADO',
+      disponible: false,
+      agotado: false,
+    };
+    component.products = [...mockInventory, pausedProduct];
+
+    component.setFilter('PAUSADO');
+
+    expect(component.filteredProducts).toEqual([pausedProduct]);
+    expect(component.pausadosCount).toBe(1);
+  });
+
   it('deberia calcular disponibles y reservados', () => {
     component.products = mockInventory;
 
@@ -222,18 +305,18 @@ describe('UpdatedInventoryPageComponent', () => {
   it('deberia resaltar temporalmente el producto actualizado por SSE', fakeAsync(() => {
     fixture.detectChanges();
     const handlers = realtimeServiceMock.connect.calls.mostRecent().args[1] as {
-      onRefresh: (event: {
-        buffetId: string;
-        type: string;
-        productId?: string;
-        occurredAt: string;
-      }) => void;
+      onRefresh: (event: RealtimeInventoryEvent) => void;
     };
 
     handlers.onRefresh({
       buffetId: mockBuffetId,
       type: 'STOCK_CHANGED',
       productId: mockInventory[0].productId,
+      stockActual: 18,
+      stockReservado: 3,
+      stockDisponible: 15,
+      estadoInventario: 'DISPONIBLE',
+      tipoManejoInventario: 'STOCK_EXACTO',
       occurredAt: new Date().toISOString(),
     });
 
@@ -280,26 +363,88 @@ describe('UpdatedInventoryPageComponent', () => {
     );
   });
 
-  it('deberia abrir y enviar quick action', () => {
+  it('deberia cargar el historial de stock del producto', () => {
     fixture.detectChanges();
-    component.openQuickAction({
-      product: mockInventory[0],
-      action: 'ADD_STOCK',
-    });
-    component.quickActionForm.patchValue({
-      quantity: 10,
-      motivo: 'Reposicion',
-    });
 
-    component.submitQuickAction();
+    component.openStockHistory(mockInventory[0]);
 
-    expect(productServiceMock.quickStockAction).toHaveBeenCalledWith(
+    expect(productServiceMock.getProductStockMovements).toHaveBeenCalledWith(
       mockBuffetId,
       mockInventory[0].productId,
+    );
+    expect(component.stockMovementTarget).toEqual(mockInventory[0]);
+    expect(component.stockMovements.map((movement) => movement.id)).toEqual([
+      'movement-new',
+      'movement-old',
+    ]);
+    expect(component.isLoadingStockMovements).toBeFalse();
+  });
+
+  it('deberia cerrar el historial de stock', () => {
+    fixture.detectChanges();
+    component.openStockHistory(mockInventory[0]);
+
+    component.closeStockHistory();
+
+    expect(component.stockMovementTarget).toBeNull();
+    expect(component.stockMovements).toEqual([]);
+    expect(component.isLoadingStockMovements).toBeFalse();
+  });
+
+  it('deberia mostrar error si falla la carga del historial', () => {
+    productServiceMock.getProductStockMovements.and.returnValue(
+      throwError(() => new Error('API Error')),
+    );
+
+    fixture.detectChanges();
+    component.openStockHistory(mockInventory[0]);
+
+    expect(component.stockMovements).toEqual([]);
+    expect(component.isLoadingStockMovements).toBeFalse();
+    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
+      'No se pudo cargar el historial del producto',
+      'error',
+    );
+  });
+
+  it('deberia gestionar modo stock exacto reutilizando valores existentes', () => {
+    perfilServiceMock.getPerfil.and.returnValue({
+      id: 'usuario-123',
+      email: 'test@example.com',
+      nombre: 'Test',
+      apellido: 'User',
+      rol: 'VENDEDOR',
+    });
+
+    const pausedProduct: InventoryOverviewItem = {
+      ...mockInventory[0],
+      tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+      estadoInventario: 'DESACTIVADO',
+      disponible: false,
+      stockActual: 15,
+      stockMinimo: 5,
+    };
+
+    fixture.detectChanges();
+    component.openInventoryManagement(pausedProduct);
+    component.inventoryManagementForm.patchValue({
+      tipoManejoInventario: 'STOCK_EXACTO',
+      motivo: '',
+    });
+
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
+      mockBuffetId,
+      pausedProduct.productId,
       {
-        action: 'ADD_STOCK',
-        quantity: 10,
-        motivo: 'Reposicion',
+        tipoManejoInventario: 'STOCK_EXACTO',
+        disponible: true,
+        estadoInventario: 'DISPONIBLE',
+        stockActual: 15,
+        stockMinimo: 5,
+        motivo: 'Volver a stock exacto',
+        usuarioId: 'usuario-123',
       },
     );
     expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
@@ -308,7 +453,122 @@ describe('UpdatedInventoryPageComponent', () => {
     );
   });
 
-  it('deberia mapear errores de quick action por code', () => {
+  it('deberia aplicar el atajo de pausar dentro del modal de gestion', () => {
+    fixture.detectChanges();
+    component.openInventoryManagement(mockInventory[0]);
+
+    component.applyInventoryManagementShortcut('PAUSE');
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
+      mockBuffetId,
+      mockInventory[0].productId,
+      {
+        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+        disponible: false,
+        estadoInventario: 'DESACTIVADO',
+        motivo: 'Pausado temporalmente',
+      },
+    );
+  });
+
+  it('deberia cambiar a disponible/no disponible sin pisar stock', () => {
+    fixture.detectChanges();
+    component.openInventoryManagement(mockInventory[0]);
+    component.inventoryManagementForm.patchValue({
+      tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+      disponible: false,
+      motivo: 'Pausado temporalmente',
+    });
+
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
+      mockBuffetId,
+      mockInventory[0].productId,
+      {
+        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+        disponible: false,
+        estadoInventario: 'DESACTIVADO',
+        motivo: 'Pausado temporalmente',
+      },
+    );
+  });
+
+  it('deberia aplicar el atajo disponible con usuarioId', () => {
+    perfilServiceMock.getPerfil.and.returnValue({
+      id: 'usuario-123',
+      email: 'test@example.com',
+      nombre: 'Test',
+      apellido: 'User',
+      rol: 'VENDEDOR',
+    });
+
+    fixture.detectChanges();
+    component.openInventoryManagement({
+      ...mockInventory[0],
+      estadoInventario: 'DESACTIVADO',
+      disponible: false,
+    });
+    component.applyInventoryManagementShortcut('MAKE_AVAILABLE');
+
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
+      mockBuffetId,
+      mockInventory[0].productId,
+      {
+        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+        disponible: true,
+        estadoInventario: 'DISPONIBLE',
+        motivo: 'Producto disponible',
+        usuarioId: 'usuario-123',
+      },
+    );
+  });
+
+  it('deberia aplicar el atajo de agotar stock exacto', () => {
+    fixture.detectChanges();
+    component.openInventoryManagement(mockInventory[0]);
+
+    component.applyInventoryManagementShortcut('SOLD_OUT');
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
+      mockBuffetId,
+      mockInventory[0].productId,
+      {
+        tipoManejoInventario: 'STOCK_EXACTO',
+        disponible: true,
+        estadoInventario: 'SIN_STOCK',
+        stockActual: 0,
+        stockMinimo: 5,
+        motivo: 'Marcar agotado',
+      },
+    );
+  });
+
+  it('deberia aplicar el atajo de agotar cupo diario', () => {
+    fixture.detectChanges();
+    component.openInventoryManagement(mockInventory[1]);
+
+    component.applyInventoryManagementShortcut('SOLD_OUT');
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
+      mockBuffetId,
+      mockInventory[1].productId,
+      {
+        tipoManejoInventario: 'CUPO_DIARIO',
+        disponible: true,
+        estadoInventario: 'SIN_STOCK',
+        cupoMaximoDiario: 0,
+        motivo: 'Marcar agotado',
+      },
+    );
+  });
+
+  it('deberia mapear errores de gestion por code', () => {
     const error = new HttpErrorResponse({
       status: 409,
       error: {
@@ -316,15 +576,12 @@ describe('UpdatedInventoryPageComponent', () => {
         mensaje: 'No hay stock suficiente...',
       },
     });
-    productServiceMock.quickStockAction.and.returnValue(throwError(() => error));
+    productServiceMock.updateInventoryStock.and.returnValue(throwError(() => error));
 
     fixture.detectChanges();
-    component.openQuickAction({
-      product: mockInventory[0],
-      action: 'SUBTRACT_STOCK',
-    });
-    component.quickActionForm.patchValue({ quantity: 30 });
-    component.submitQuickAction();
+    component.openInventoryManagement(mockInventory[0]);
+    component.inventoryManagementForm.patchValue({ stockActual: 0 });
+    component.submitInventoryManagement();
 
     expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
       'No hay stock suficiente.',

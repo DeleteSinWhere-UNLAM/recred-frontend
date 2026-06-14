@@ -33,6 +33,7 @@ export class MovimientoDetalleModalComponent {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
       currency: 'ARS',
+      currencyDisplay: 'narrowSymbol',
       maximumFractionDigits: 0,
     }).format(precio);
   }

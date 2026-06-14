@@ -32,7 +32,6 @@ export class AlumnosService {
     );
     const alumnos = dtos.map((dto) => this.fromDto(dto));
     this.alumnosState.set(alumnos);
-    console.log('Alumnos cargados:', alumnos);
     return alumnos;
   }
 

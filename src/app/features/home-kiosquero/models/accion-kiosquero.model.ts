@@ -1,9 +1,12 @@
 export type AccionKiosqueroId =
+  | 'ver-pedidos'
   | 'cargar-productos'
   | 'cierre-diario'
+  | 'reportes'
   | 'stock'
   | 'sugerencias'
-  | 'recomendaciones';
+  | 'recomendaciones'
+  | 'recomendaciones-estacionales';
 
 export type AccionKiosqueroColor = 'pizarra' | 'menta' | 'dorado' | 'melocoton';
 

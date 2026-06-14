@@ -13,13 +13,6 @@
   </div>
 } @else {
   <section class="product-table" aria-labelledby="productos-stock-titulo">
-    <header class="product-table__header">
-      <h3 id="productos-stock-titulo" class="product-table__titulo">
-        Stock operativo
-      </h3>
-      <span class="product-table__count">{{ products.length }} productos</span>
-    </header>
-
     <div class="product-table__grid">
       @for (product of products; track product.productId) {
         <article
@@ -35,7 +28,7 @@
             <div class="product-card__title-group">
               <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
               <h4 class="product-card__name">{{ product.nombre }}</h4>
-              <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
+              <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
             </div>
 
             <span
@@ -53,7 +46,7 @@
 
           <section class="product-card__availability" aria-label="Disponibilidad">
             <div class="product-card__availability-row">
-              <span>Disponible</span>
+              <span>{{ getAvailabilityLabel(product) }}</span>
               <strong>
                 {{ getStockValue(product) }}
                 @if (product.tipoManejoInventario === 'CUPO_DIARIO') {
@@ -62,56 +55,62 @@
               </strong>
             </div>
 
-            <div
-              class="product-card__bar"
-              [attr.aria-label]="'Disponibilidad ' + getAvailabilityPercent(product) + '%'"
-            >
-              <span
-                class="product-card__bar-fill"
-                [class.product-card__bar-fill--agotado]="getOperationalStatus(product) === 'AGOTADO'"
-                [class.product-card__bar-fill--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
-                [class.product-card__bar-fill--alta-reserva]="isHighReservation(product)"
-                [style.width.%]="getAvailabilityPercent(product)"
-              ></span>
-            </div>
+            @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
+              <div
+                class="product-card__bar"
+                [attr.aria-label]="'Disponibilidad ' + getAvailabilityPercent(product) + '%'"
+              >
+                <span
+                  class="product-card__bar-fill"
+                  [class.product-card__bar-fill--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+                  [class.product-card__bar-fill--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+                  [class.product-card__bar-fill--alta-reserva]="isHighReservation(product)"
+                  [style.width.%]="getAvailabilityPercent(product)"
+                ></span>
+              </div>
 
-            <div class="product-card__split">
-              <span>Reservado {{ formatNullable(product.stockReservado) }}</span>
-              <span>Total {{ getAvailabilityBase(product) }}</span>
-            </div>
+              <div class="product-card__split">
+                <span>Reservado {{ formatNullable(product.stockReservado) }}</span>
+                <span>Total {{ getAvailabilityBase(product) }}</span>
+              </div>
+            }
           </section>
 
-          <dl class="product-card__metrics">
-            <div class="product-card__metric">
-              <dt>Actual</dt>
-              <dd>{{ formatNullable(product.stockActual) }}</dd>
-            </div>
-            <div class="product-card__metric">
-              <dt>Minimo</dt>
-              <dd>{{ formatNullable(product.stockMinimo) }}</dd>
-            </div>
-            <div class="product-card__metric">
-              <dt>Reserva</dt>
-              <dd>{{ getReservationPercent(product) }}%</dd>
-            </div>
-          </dl>
+          @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
+            <dl class="product-card__metrics">
+              <div class="product-card__metric">
+                <dt>Actual</dt>
+                <dd>{{ formatNullable(product.stockActual) }}</dd>
+              </div>
+              <div class="product-card__metric">
+                <dt>Mínimo</dt>
+                <dd>{{ formatNullable(product.stockMinimo) }}</dd>
+              </div>
+              <div class="product-card__metric">
+                <dt>Reserva</dt>
+                <dd>{{ getReservationPercent(product) }}%</dd>
+              </div>
+            </dl>
+          }
 
           <footer class="product-card__footer">
             <div class="product-table__acciones">
-              @for (action of getActions(product); track action.action) {
-                <button
-                  type="button"
-                  class="product-table__btn"
-                  [class.product-table__btn--primary]="action.tone === 'primary'"
-                  [class.product-table__btn--neutral]="action.tone === 'neutral'"
-                  [class.product-table__btn--warning]="action.tone === 'warning'"
-                  [class.product-table__btn--danger]="action.tone === 'danger'"
-                  (click)="emitAction(product, action.action)"
-                >
-                  <i class="fa-solid" [ngClass]="action.icon" aria-hidden="true"></i>
-                  <span>{{ action.label }}</span>
-                </button>
-              }
+              <button
+                type="button"
+                class="product-table__btn product-table__btn--manage"
+                (click)="emitManageInventory(product)"
+              >
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                <span>Gestionar</span>
+              </button>
+              <button
+                type="button"
+                class="product-table__btn product-table__btn--history"
+                (click)="emitViewHistory(product)"
+              >
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                <span>Historial</span>
+              </button>
             </div>
           </footer>
         </article>

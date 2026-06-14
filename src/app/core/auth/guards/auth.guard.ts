@@ -38,7 +38,6 @@ async function resolverAutenticacion(
         : router.createUrlTree(['/seleccion-tipo-cuenta']);
     }
 
-    console.error('Error preparando la sesion autenticada', err);
     return router.createUrlTree(['/']);
   }
 }

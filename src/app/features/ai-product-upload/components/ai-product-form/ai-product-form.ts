@@ -89,7 +89,7 @@ export class AiProductForm implements OnInit, OnChanges {
         nuevaCategoriaNombre: formValue.categoriaId === 'NEW' ? formValue.nuevaCategoriaNombre : '',
         buffetId: this.buffetId,
         stockActual: formValue.stockActual,
-        clasificacionesSaludIds: ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'],//this.buildHealthClassificationIds(formValue),
+        clasificacionesSaludIds: ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'],
         tiposIds: [],
       };
       this.save.emit(request);

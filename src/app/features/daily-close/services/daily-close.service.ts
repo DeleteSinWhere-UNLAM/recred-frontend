@@ -2,7 +2,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { DailyCloseResult, DailyReport } from '../models/daily-close.model';
+import {
+  DailyCloseHistoryFilters,
+  DailyCloseRecord,
+  DailyCloseResult,
+  DailyCloseStatus,
+  DailyReport,
+} from '../models/daily-close.model';
 
 @Injectable({ providedIn: 'root' })
 export class DailyCloseService {
@@ -22,6 +28,36 @@ export class DailyCloseService {
     return this.http.get<DailyReport>(
       `${this.kiosquerosUrl}/${buffetId}/reports/daily`,
       { params: this.buildDateParams(date) },
+    );
+  }
+
+  getDailyCloseStatus(
+    buffetId: string,
+    date?: string,
+  ): Observable<DailyCloseStatus> {
+    return this.http.get<DailyCloseStatus>(
+      `${this.kiosquerosUrl}/${buffetId}/daily-close/status`,
+      { params: this.buildDateParams(date) },
+    );
+  }
+
+  getDailyCloses(
+    buffetId: string,
+    filters: DailyCloseHistoryFilters = {},
+  ): Observable<DailyCloseRecord[]> {
+    let params = new HttpParams();
+
+    if (filters.from) {
+      params = params.set('from', filters.from);
+    }
+
+    if (filters.to) {
+      params = params.set('to', filters.to);
+    }
+
+    return this.http.get<DailyCloseRecord[]>(
+      `${this.kiosquerosUrl}/${buffetId}/daily-closes`,
+      { params },
     );
   }
 
@@ -56,7 +92,9 @@ export class DailyCloseService {
     }).pipe(map(({ report }) => report));
   }
 
-  private buildDateParams(date: string): HttpParams {
-    return new HttpParams().set('date', date);
+  private buildDateParams(date?: string): HttpParams {
+    const params = new HttpParams();
+
+    return date ? params.set('date', date) : params;
   }
 }

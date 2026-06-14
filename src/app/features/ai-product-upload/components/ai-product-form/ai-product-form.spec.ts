@@ -80,7 +80,7 @@ describe('AiProductForm', () => {
     spyOn(component.save, 'emit');
 
     component.productForm.patchValue({
-      nombre: '', // inválido
+      nombre: '',
       descripcion: 'Galletas de chocolate'
     });
 

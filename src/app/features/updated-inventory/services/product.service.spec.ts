@@ -10,6 +10,8 @@ import { Product, CreateProductRequest, UpdateProductRequest } from '../models/p
 import { Category } from '../models/category.interface';
 import {
   InventoryOverviewItem,
+  InventoryStockMovement,
+  InventoryStockUpdateRequest,
   QuickStockActionRequest,
 } from '../models/inventory.interface';
 
@@ -64,6 +66,21 @@ describe('ProductService', () => {
       disponible: true,
       bajoStock: false,
       agotado: false,
+    },
+  ];
+
+  const mockMovements: InventoryStockMovement[] = [
+    {
+      id: 'movement-1',
+      inventarioId: 'inventory-1',
+      tipo: 'VENTA',
+      cantidad: 2,
+      cantidadAnterior: 10,
+      cantidadNueva: 8,
+      motivo: 'Consumo por venta presencial',
+      usuarioId: 'usuario-1',
+      compraId: 'compra-1',
+      creadoEn: '2026-06-11T10:30:00',
     },
   ];
 
@@ -144,6 +161,45 @@ describe('ProductService', () => {
     expect(req.request.method).toBe('PATCH');
     expect(req.request.body).toEqual(payload);
     req.flush({ ok: true });
+  });
+
+  it('deberia actualizar stock con el endpoint general', () => {
+    const buffetId = 'test-buffet-123';
+    const productId = 'product-123';
+    const payload: InventoryStockUpdateRequest = {
+      tipoManejoInventario: 'STOCK_EXACTO',
+      stockActual: 15,
+      stockMinimo: 5,
+      estadoInventario: 'DISPONIBLE',
+      disponible: true,
+      motivo: 'Volver a stock exacto',
+    };
+
+    service.updateInventoryStock(buffetId, productId, payload).subscribe((response) => {
+      expect(response).toEqual({ ok: true });
+    });
+
+    const req = httpMock.expectOne(
+      `${inventoryUrl}/${buffetId}/products/${productId}/stock`,
+    );
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual(payload);
+    req.flush({ ok: true });
+  });
+
+  it('deberia obtener movimientos de stock por producto', () => {
+    const buffetId = 'test-buffet-123';
+    const productId = 'product-123';
+
+    service.getProductStockMovements(buffetId, productId).subscribe((movements) => {
+      expect(movements).toEqual(mockMovements);
+    });
+
+    const req = httpMock.expectOne(
+      `${inventoryUrl}/${buffetId}/products/${productId}/movements`,
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(mockMovements);
   });
 
   it('deberia obtener un producto por id', () => {

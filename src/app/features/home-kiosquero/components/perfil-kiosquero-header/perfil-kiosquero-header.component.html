@@ -1,6 +1,9 @@
 <header class="perfil-kiosquero-header">
   <div class="perfil-kiosquero-header__identidad">
-    <div class="perfil-kiosquero-header__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreKiosquero">
+    <div
+      class="perfil-kiosquero-header__avatar-wrap"
+      [attr.aria-label]="'Avatar de ' + nombreKiosquero"
+    >
       <div class="perfil-kiosquero-header__avatar">
         <span>{{ iniciales }}</span>
       </div>
@@ -9,42 +12,7 @@
     <div class="perfil-kiosquero-header__texto">
       <p class="perfil-kiosquero-header__saludo">{{ saludo }}</p>
       <h1 class="perfil-kiosquero-header__nombre">{{ nombreKiosquero }}</h1>
-      <p class="perfil-kiosquero-header__rol">Panel del kiosquero</p>
+      <p class="perfil-kiosquero-header__rol">Panel operativo del buffet</p>
     </div>
-  </div>
-
-  <div class="perfil-kiosquero-header__stats" role="group" aria-label="Resumen del día">
-    <div class="perfil-kiosquero-header__stat">
-      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
-        <i class="fa-solid fa-dollar-sign"></i>
-      </span>
-      <div class="perfil-kiosquero-header__stat-texto">
-        <span class="perfil-kiosquero-header__stat-label">Ganancias hoy</span>
-        <strong class="perfil-kiosquero-header__stat-valor">{{ gananciasFormateadas }}</strong>
-      </div>
-    </div>
-
-    <div class="perfil-kiosquero-header__stat">
-      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
-        <i class="fa-solid fa-cart-shopping"></i>
-      </span>
-      <div class="perfil-kiosquero-header__stat-texto">
-        <span class="perfil-kiosquero-header__stat-label">Ventas</span>
-        <strong class="perfil-kiosquero-header__stat-valor">{{ ventasHoy }}</strong>
-      </div>
-    </div>
-    <!--
-    <div
-      class="perfil-kiosquero-header__stat"
-      [class.perfil-kiosquero-header__stat--alerta]="productosSinStock > 0"
-    >
-      <span class="perfil-kiosquero-header__stat-icono" aria-hidden="true">
-        <i class="fa-solid fa-box-open"></i>
-      </span>
-      <div class="perfil-kiosquero-header__stat-texto">
-        <span class="perfil-kiosquero-header__stat-label">Sin stock</span>
-        <strong class="perfil-kiosquero-header__stat-valor">{{ productosSinStock }}</strong>
-      </div>
-    </div>-->
   </div>
 </header>
