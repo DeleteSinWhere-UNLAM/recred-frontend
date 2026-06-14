@@ -15,6 +15,14 @@ export class MovimientosService {
     return this.http.get<Movimiento[]>(`${environment.apiUrl}/purchases/alumno/${alumnoId}`);
   }
 
+  getPendientesAlumno(alumnoId: string): Observable<Movimiento[]> {
+    if (!this.isUuid(alumnoId)) {
+      const mock = this.getMockMovimientos(alumnoId);
+      return of(mock.filter(m => m.status === 'PENDING' || m.status === 'EN_PREPARACION' || m.status === 'LISTO'));
+    }
+    return this.http.get<Movimiento[]>(`${environment.apiUrl}/purchases/alumno/${alumnoId}/pendientes`);
+  }
+
   getHistorialTutor(): Observable<Movimiento[]> {
     return this.http.get<Movimiento[]>(`${environment.apiUrl}/purchases/tutor/me`);
   }

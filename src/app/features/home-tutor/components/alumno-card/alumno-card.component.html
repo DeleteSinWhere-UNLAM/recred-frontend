@@ -65,7 +65,7 @@
     </a>
     
     <!-- 6. Pendientes -->
-    <button type="button" class="alumno-card__btn alumno-card__btn--morado">
+    <a class="alumno-card__btn alumno-card__btn--morado" [routerLink]="['/movimientos-pendientes', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-clock-rotate-left"></i>
         @if (cantidadPendientes > 0) {
@@ -73,7 +73,7 @@
         }
       </span>
       <span class="alumno-card__btn-label">Pendientes</span>
-    </button>
+    </a>
     
     <!-- 7. Movimientos -->
     <a class="alumno-card__btn alumno-card__btn--gris" [routerLink]="['/movimientos', alumno.id]">

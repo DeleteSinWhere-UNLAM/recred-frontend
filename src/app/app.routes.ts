@@ -201,6 +201,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'movimientos-pendientes/:alumnoId',
+        loadComponent: () =>
+          import(
+            './features/movimientos-pendientes/movimientos-pendientes.page'
+          ).then((m) => m.MovimientosPendientesPage),
+      },
+      {
         path: 'notificaciones-precio',
         loadComponent: () =>
           import('./features/notificaciones-precio/notificaciones-precio.page').then(
