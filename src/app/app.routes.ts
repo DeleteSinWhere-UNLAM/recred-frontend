@@ -27,6 +27,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'tutor-dashboard',
+        loadComponent: () =>
+          import('./features/tutor-dashboard/tutor-dashboard.component').then(
+            (m) => m.TutorDashboardComponent,
+          ),
+      },
+      {
         path: 'alumno',
         loadComponent: () =>
           import('./features/home-alumno/home-alumno.page').then(
