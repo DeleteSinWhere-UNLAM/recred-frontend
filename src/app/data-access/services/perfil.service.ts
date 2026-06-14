@@ -37,38 +37,38 @@ export class PerfilService {
   private readonly authSessionService = inject(AuthSessionService);
 
   private readonly perfilState = signal<Perfil | null>(this.leerDeStorage());
+  private syncPerfilEnCurso: Promise<Perfil> | null = null;
+  private versionPerfil = 0;
+
   readonly perfil: Signal<Perfil | null> = this.perfilState.asReadonly();
   readonly rol: Signal<RolUsuario | null> = computed(
     () => this.perfilState()?.rol ?? null,
   );
 
   async cargarPerfil(): Promise<Perfil> {
-    try {
-      const syncRequest = await this.armarSyncRequest();
-      const perfil = await firstValueFrom(
-        this.http.post<Perfil>(
-          `${environment.apiUrl}/usuarios/sync`,
-          syncRequest,
-        ),
-      );
-
-      if (!perfil.rol || perfil.rol.toString() === 'PENDIENTE') {
-        throw new UsuarioSinPerfilError();
-      }
-
-      this.perfilState.set(perfil);
-      this.guardarEnStorage(perfil);
-      return perfil;
-    } catch (err) {
-      if (err instanceof UsuarioSinPerfilError) {
-        throw err;
-      }
-      console.error('Error al sincronizar el perfil:', err);
-      throw err;
+    if (this.syncPerfilEnCurso) {
+      return this.syncPerfilEnCurso;
     }
+
+    const versionSolicitud = this.versionPerfil;
+    const syncPromise = this.sincronizarPerfil(versionSolicitud);
+    this.syncPerfilEnCurso = syncPromise;
+
+    syncPromise.then(
+      () => this.limpiarSyncEnCurso(syncPromise),
+      () => this.limpiarSyncEnCurso(syncPromise),
+    );
+
+    return syncPromise;
   }
 
   async asegurarPerfil(): Promise<Perfil> {
+    const perfilActual = this.perfilState();
+
+    if (this.esPerfilActivo(perfilActual)) {
+      return perfilActual;
+    }
+
     return this.cargarPerfil();
   }
 
@@ -138,8 +138,39 @@ export class PerfilService {
   }
 
   limpiar(): void {
+    this.versionPerfil++;
+    this.syncPerfilEnCurso = null;
     this.perfilState.set(null);
     localStorage.removeItem(PERFIL_STORAGE_KEY);
+  }
+
+  private async sincronizarPerfil(versionSolicitud: number): Promise<Perfil> {
+    try {
+      const syncRequest = await this.armarSyncRequest();
+      const perfil = await firstValueFrom(
+        this.http.post<Perfil>(
+          `${environment.apiUrl}/usuarios/sync`,
+          syncRequest,
+        ),
+      );
+
+      if (!perfil.rol || perfil.rol.toString() === 'PENDIENTE') {
+        throw new UsuarioSinPerfilError();
+      }
+
+      if (versionSolicitud === this.versionPerfil) {
+        this.perfilState.set(perfil);
+        this.guardarEnStorage(perfil);
+      }
+
+      return perfil;
+    } catch (err) {
+      if (err instanceof UsuarioSinPerfilError) {
+        throw err;
+      }
+      console.error('Error al sincronizar el perfil:', err);
+      throw err;
+    }
   }
 
   private leerDeStorage(): Perfil | null {
@@ -155,6 +186,16 @@ export class PerfilService {
 
   private guardarEnStorage(perfil: Perfil): void {
     localStorage.setItem(PERFIL_STORAGE_KEY, JSON.stringify(perfil));
+  }
+
+  private esPerfilActivo(perfil: Perfil | null): perfil is Perfil {
+    return !!perfil?.rol && perfil.rol.toString() !== 'PENDIENTE';
+  }
+
+  private limpiarSyncEnCurso(syncPromise: Promise<Perfil>): void {
+    if (this.syncPerfilEnCurso === syncPromise) {
+      this.syncPerfilEnCurso = null;
+    }
   }
 
   private async armarSyncRequest(): Promise<SyncPerfilRequest> {

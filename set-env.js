@@ -2,10 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-
 const isProduction = process.env.NODE_ENV === 'production' || process.argv.includes('--production');
-
-
 const targetFiles = isProduction
   ? ['environment.ts']
   : ['environment.ts', 'environment.development.ts'];

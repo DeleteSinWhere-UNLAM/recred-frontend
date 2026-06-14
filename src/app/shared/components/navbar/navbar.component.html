@@ -1,8 +1,13 @@
-<header class="navbar">
+<header class="navbar" [class.navbar--kiosquero]="esVistaKiosquero()">
   <div class="navbar__inner">
     <div class="navbar__brand">
-      <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
-        <img src="logoHeader.png" alt="" class="navbar__logo-img">
+      <a
+        class="navbar__logo"
+        href="/"
+        (click)="irAInicio($event)"
+        aria-label="RECRED — Inicio"
+      >
+        <img src="logoHeader.png" alt="" class="navbar__logo-img" />
         <span class="navbar__logo-text">RECRED</span>
       </a>
     </div>
@@ -23,16 +28,59 @@
         </a>
       }
 
+      @if (esVistaKiosquero()) {
+        <div class="navbar__kiosk-tools-wrap">
+          <button
+            type="button"
+            class="navbar__kiosk-tools"
+            aria-label="Promos"
+            [attr.aria-expanded]="menuKiosqueroAbierto()"
+            aria-haspopup="menu"
+            (click)="toggleMenuKiosquero()"
+          >
+            <i class="fa-solid fa-tags" aria-hidden="true"></i>
+            <span>Promos</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          @if (menuKiosqueroAbierto()) {
+            <div class="navbar__menu navbar__menu--kiosk-tools" role="menu">
+              <button
+                type="button"
+                class="navbar__menu-item"
+                role="menuitem"
+                (click)="irARecomendacionesEstacionales()"
+              >
+                <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+                <span>Recomendaciones estacionales</span>
+              </button>
+              <button
+                type="button"
+                class="navbar__menu-item"
+                role="menuitem"
+                (click)="irAPromociones()"
+              >
+                <i class="fa-solid fa-tags" aria-hidden="true"></i>
+                <span>Promociones</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
       <div class="navbar__notif-wrap">
         <button
           type="button"
           class="navbar__notif"
+          [class.navbar__notif--wide]="esVistaKiosquero()"
           [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'"
           [attr.aria-expanded]="menuNotifAbierto()"
           aria-haspopup="menu"
           (click)="toggleNotificaciones()"
         >
           <i class="fa-solid fa-bell" aria-hidden="true"></i>
+          @if (esVistaKiosquero()) {
+            <span>Notificaciones</span>
+          }
           @if (notifCount() > 0) {
             <span class="navbar__notif-badge">{{ notifCount() }}</span>
           }
@@ -43,7 +91,9 @@
             @if (notifCount() === 0) {
               <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
             } @else {
-              <p class="navbar__menu-vacio">Tenés {{ notifCount() }} notificaciones pendientes.</p>
+              <p class="navbar__menu-vacio">
+                Tenés {{ notifCount() }} notificaciones pendientes.
+              </p>
             }
           </div>
         }

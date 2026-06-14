@@ -37,6 +37,7 @@ export class MensajeBurbujaComponent {
     return total.toLocaleString('es-AR', {
       style: 'currency',
       currency: 'ARS',
+      currencyDisplay: 'narrowSymbol',
     });
   }
 

@@ -34,12 +34,9 @@ export class SugerenciasPage {
 
     const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
 
-    console.log('ID DESDE LOCALSTORAGE:', usuarioId);
-
     if (usuarioId) {
       this.sugerenciasService.getSugerencias(usuarioId).subscribe((data) => {
         this.sugerencias = data;
-        console.log('SUGERENCIAS:', data);
       });
     }
   }

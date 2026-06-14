@@ -110,15 +110,6 @@ export class AuthSessionService {
       });
       return false;
     }
-
-    console.log('Sesión Cognito OK', {
-      userSub: session.userSub,
-      tokenUse: accessToken.payload['token_use'],
-      clientId: accessToken.payload['client_id'],
-      scope: accessToken.payload['scope'],
-      exp: accessToken.payload['exp'],
-    });
-
     return true;
   }
 

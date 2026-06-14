@@ -1,11 +1,14 @@
 export type AccionKiosqueroId =
+  | 'ver-pedidos'
   | 'venta-espontanea'
   | 'tracking-pedidos'
   | 'cargar-productos'
-  | 'dashboard'
+  | 'cierre-diario'
+  | 'reportes'
   | 'stock'
   | 'sugerencias'
   | 'recomendaciones'
+  | 'recomendaciones-estacionales'
   | 'promociones';
 
 export type AccionKiosqueroColor =

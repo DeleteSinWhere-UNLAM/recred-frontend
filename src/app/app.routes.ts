@@ -131,10 +131,24 @@ export const routes: Routes = [
           import('./features/compra/compra.routes').then((m) => m.compraRoutes),
       },
       {
+        path: 'kiosquero/reportes',
+        loadComponent: () =>
+          import('./features/home-kiosquero/kiosquero-reportes.page').then(
+            (m) => m.KiosqueroReportesPage,
+          ),
+      },
+      {
         path: 'kiosquero',
         loadComponent: () =>
           import('./features/home-kiosquero/home-kiosquero.page').then(
             (m) => m.HomeKiosqueroPage,
+          ),
+      },
+      {
+        path: 'cierre-diario',
+        loadComponent: () =>
+          import('./features/daily-close/daily-close.page').then(
+            (m) => m.DailyClosePage,
           ),
       },
       {

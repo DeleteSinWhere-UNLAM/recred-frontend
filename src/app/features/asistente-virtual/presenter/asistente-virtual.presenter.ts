@@ -22,14 +22,14 @@ import {
 } from '../services/asistente-virtual.service';
 
 const MENSAJES_BIENVENIDA: Record<RolUsuario, string> = {
-  ALUMNO: 'Hola. Soy Cred. Puedo ayudarte con saldo, compras, menu y pedidos.',
+  ALUMNO: 'Hola. Soy Recredito. Puedo ayudarte con saldo, compras, menu y pedidos.',
   PADRE:
-    'Hola. Soy Cred. Puedo ayudarte con hijos, presupuestos, restricciones y eventos.',
+    'Hola. Soy Recredito. Puedo ayudarte con hijos, presupuestos, restricciones y eventos.',
   VENDEDOR:
-    'Hola. Soy Cred. Puedo ayudarte con stock, ventas, productos y pedidos del buffet.',
+    'Hola. Soy Recredito. Puedo ayudarte con stock, ventas, productos y pedidos del buffet.',
 };
 
-const MENSAJE_BIENVENIDA_DEFAULT = 'Hola. Soy Cred. En que te puedo ayudar?';
+const MENSAJE_BIENVENIDA_DEFAULT = 'Hola. Soy Recredito. En que te puedo ayudar?';
 const MENSAJE_ERROR =
   'No pude responder en este momento. Proba de nuevo en unos minutos.';
 const ESTADO_ESPERANDO_RECREO = 'ESPERANDO_RECREO';

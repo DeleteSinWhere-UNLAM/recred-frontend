@@ -29,15 +29,11 @@ export class NotificacionesPrecioPage {
 
     const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
 
-    console.log('ID DESDE LOCALSTORAGE:', usuarioId);
-
     if (usuarioId) {
       this.notificacionesService
         .getNotificaciones(usuarioId)
         .subscribe((data) => {
           this.notificaciones = data;
-
-          console.log('NOTIFICACIONES:', data);
         });
     }
   }

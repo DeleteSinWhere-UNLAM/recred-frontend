@@ -17,6 +17,7 @@ import { ConfirmarPresenter } from './presenter/confirmar.presenter';
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 

@@ -13,6 +13,7 @@ import { Recreo } from '../models/recreo.model';
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 

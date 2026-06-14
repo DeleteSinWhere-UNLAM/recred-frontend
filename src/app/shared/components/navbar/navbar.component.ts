@@ -36,6 +36,7 @@ export class NavbarComponent {
   protected readonly notifCount = this.notificacionesService.cantidad;
   protected readonly menuAbierto = signal(false);
   protected readonly menuNotifAbierto = signal(false);
+  protected readonly menuKiosqueroAbierto = signal(false);
 
   protected irAlCarrito(): void {
     this.router.navigateByUrl('/compra');
@@ -48,12 +49,36 @@ export class NavbarComponent {
 
   protected toggleMenu(): void {
     this.menuAbierto.update((abierto) => !abierto);
-    if (this.menuAbierto()) this.menuNotifAbierto.set(false);
+    if (this.menuAbierto()) {
+      this.menuNotifAbierto.set(false);
+      this.menuKiosqueroAbierto.set(false);
+    }
   }
 
   protected toggleNotificaciones(): void {
     this.menuNotifAbierto.update((abierto) => !abierto);
-    if (this.menuNotifAbierto()) this.menuAbierto.set(false);
+    if (this.menuNotifAbierto()) {
+      this.menuAbierto.set(false);
+      this.menuKiosqueroAbierto.set(false);
+    }
+  }
+
+  protected toggleMenuKiosquero(): void {
+    this.menuKiosqueroAbierto.update((abierto) => !abierto);
+    if (this.menuKiosqueroAbierto()) {
+      this.menuAbierto.set(false);
+      this.menuNotifAbierto.set(false);
+    }
+  }
+
+  protected irARecomendacionesEstacionales(): void {
+    this.menuKiosqueroAbierto.set(false);
+    this.router.navigateByUrl('/recomendaciones-estacionales');
+  }
+
+  protected irAPromociones(): void {
+    this.menuKiosqueroAbierto.set(false);
+    this.router.navigateByUrl('/promociones');
   }
 
   protected irAPerfil(): void {
@@ -73,11 +98,19 @@ export class NavbarComponent {
 
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
-    if (!this.menuAbierto() && !this.menuNotifAbierto()) return;
+    if (
+      !this.menuAbierto() &&
+      !this.menuNotifAbierto() &&
+      !this.menuKiosqueroAbierto()
+    ) {
+      return;
+    }
+
     const target = event.target as Node | null;
     if (target && !this.host.nativeElement.contains(target)) {
       this.menuAbierto.set(false);
       this.menuNotifAbierto.set(false);
+      this.menuKiosqueroAbierto.set(false);
     }
   }
 
@@ -85,5 +118,6 @@ export class NavbarComponent {
   protected onEscape(): void {
     if (this.menuAbierto()) this.menuAbierto.set(false);
     if (this.menuNotifAbierto()) this.menuNotifAbierto.set(false);
+    if (this.menuKiosqueroAbierto()) this.menuKiosqueroAbierto.set(false);
   }
 }
