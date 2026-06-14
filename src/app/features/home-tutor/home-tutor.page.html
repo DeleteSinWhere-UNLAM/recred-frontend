@@ -11,7 +11,12 @@
       [saldoTotalNegativo]="saldoTotalNegativo()"
     />
 
-    <h2 class="home__subtitulo">Mis Hijos</h2>
+    <h2 class="home__subtitulo">
+      <span class="home__subtitulo-icono" aria-hidden="true">
+        <i class="fa-solid fa-user-group"></i>
+      </span>
+      <span>Mis hijos</span>
+    </h2>
 
     <div class="home__sections">
       @for (grupo of grupos(); track grupo.colegio.id) {
