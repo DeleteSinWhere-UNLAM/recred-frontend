@@ -11,12 +11,22 @@
       [saldoTotalNegativo]="saldoTotalNegativo()"
     />
 
-    <h2 class="home__subtitulo">
-      <span class="home__subtitulo-icono" aria-hidden="true">
-        <i class="fa-solid fa-user-group"></i>
-      </span>
-      <span>Mis hijos</span>
-    </h2>
+    <div class="home__subtitulo-row">
+      <h2 class="home__subtitulo">
+        <span class="home__subtitulo-icono" aria-hidden="true">
+          <i class="fa-solid fa-user-group"></i>
+        </span>
+        <span>Mis hijos</span>
+      </h2>
+      <a
+        routerLink="/crear-hijo"
+        class="home__agregar-hijo"
+        aria-label="Agregar un nuevo hijo"
+      >
+        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+        <span>Agregar hijo</span>
+      </a>
+    </div>
 
     <div class="home__sections">
       @for (grupo of grupos(); track grupo.colegio.id) {

@@ -34,6 +34,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'crear-hijo',
+        loadComponent: () =>
+          import('./features/crear-hijo/crear-hijo.page').then(
+            (m) => m.CrearHijoPage,
+          ),
+      },
+      {
         path: 'alumno',
         loadComponent: () =>
           import('./features/home-alumno/home-alumno.page').then(
