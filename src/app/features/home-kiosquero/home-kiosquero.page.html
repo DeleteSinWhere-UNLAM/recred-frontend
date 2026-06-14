@@ -26,7 +26,7 @@
           (click)="presenter.abrirReportes()"
         >
           <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-          <span>Panel de visualización</span>
+          <span>Panel de control</span>
         </button>
       </header>
 
@@ -141,6 +141,7 @@
                   [class.pv__quick-action--menta]="action.color === 'menta'"
                   [class.pv__quick-action--dorado]="action.color === 'dorado'"
                   [class.pv__quick-action--melocoton]="action.color === 'melocoton'"
+                  [class.pv__quick-action--violeta]="action.color === 'violeta'"
                   (click)="presenter.ejecutarAccion(action)"
                 >
                   <span class="pv__quick-icon" aria-hidden="true">
@@ -171,6 +172,8 @@
                   class="pv__featured-card"
                   [class.pv__featured-card--dorado]="action.color === 'dorado'"
                   [class.pv__featured-card--menta]="action.color === 'menta'"
+                  [class.pv__featured-card--pizarra]="action.color === 'pizarra'"
+                  [class.pv__featured-card--melocoton]="action.color === 'melocoton'"
                   (click)="presenter.ejecutarAccion(action)"
                 >
                   <span class="pv__featured-icon" aria-hidden="true">

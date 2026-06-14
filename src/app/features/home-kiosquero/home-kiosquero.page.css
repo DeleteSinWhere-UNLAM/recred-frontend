@@ -514,6 +514,10 @@
   background-color: rgba(231, 111, 81, 0.14);
   color: var(--color-melocoton);
 }
+.pv__quick-action--violeta .pv__quick-icon {
+  background-color: rgba(124, 58, 237, 0.14);
+  color: #6d28d9;
+}
 .pv__quick-action strong,
 .pv__featured-card strong {
   display: block;
@@ -550,6 +554,9 @@
 .pv__quick-action--melocoton .pv__quick-arrow {
   background-color: var(--color-melocoton);
 }
+.pv__quick-action--violeta .pv__quick-arrow {
+  background-color: #7c3aed;
+}
 .pv__featured-actions {
   gap: 14px;
 }
@@ -579,6 +586,12 @@
 .pv__featured-card--menta {
   background: linear-gradient(135deg, rgba(129, 178, 154, 0.22), rgba(255, 255, 255, 0.98));
 }
+.pv__featured-card--pizarra {
+  background: linear-gradient(135deg, rgba(74, 111, 165, 0.18), rgba(255, 255, 255, 0.98));
+}
+.pv__featured-card--melocoton {
+  background: linear-gradient(135deg, rgba(231, 111, 81, 0.16), rgba(255, 255, 255, 0.98));
+}
 .pv__featured-icon {
   width: 48px;
   height: 48px;
@@ -592,6 +605,12 @@
 }
 .pv__featured-card--menta .pv__featured-icon {
   color: #3f7a5d;
+}
+.pv__featured-card--pizarra .pv__featured-icon {
+  color: var(--color-pizarra);
+}
+.pv__featured-card--melocoton .pv__featured-icon {
+  color: var(--color-melocoton);
 }
 .pv__featured-arrow {
   width: 34px;

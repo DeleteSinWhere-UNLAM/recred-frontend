@@ -287,14 +287,22 @@ describe('HomeKiosqueroPresenter', () => {
   it('expone las acciones operativas esperadas', () => {
     expect(presenter.acciones().map((accion) => accion.id)).toEqual([
       'ver-pedidos',
+      'venta-espontanea',
+      'tracking-pedidos',
       'cargar-productos',
+      'stock',
+      'reportes',
+      'sugerencias',
+      'recomendaciones',
+      'promociones',
       'cierre-diario',
     ]);
     expect(presenter.featuredActions().map((accion) => accion.id)).toEqual([
+      'venta-espontanea',
       'cargar-productos',
       'cierre-diario',
     ]);
-    expect(presenter.secondaryActions()).toEqual([]);
+    expect(presenter.secondaryActions().map((accion) => accion.id)).toEqual([]);
   });
 
   it('formatea ventas por categoria con porcentaje de barra y porcentaje real', () => {
@@ -375,6 +383,18 @@ describe('HomeKiosqueroPresenter', () => {
     presenter.abrirReportes();
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/reportes');
+  });
+
+  it('navega a promociones desde la accion fusionada', () => {
+    const promociones = presenter
+      .acciones()
+      .find((accion) => accion.id === 'promociones');
+
+    expect(promociones).toBeDefined();
+
+    presenter.ejecutarAccion(promociones!);
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/promociones');
   });
 
   function countInclusiveDays(from: string, to: string): number {

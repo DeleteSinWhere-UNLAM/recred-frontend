@@ -18,6 +18,11 @@ import {
 } from '../models/inventory.interface';
 import { ProductFormData } from '../components/product-form/product-form.component';
 
+// IDs de clasificaciones tal como están en la BD
+const ID_SIN_TACC       = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
+const ID_SIN_AZUCAR     = '7e113952-93ca-4797-a80d-54f3a31b2165';
+const ID_CONT_LACTEOS   = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+
 describe('UpdatedInventoryPageComponent', () => {
   let component: UpdatedInventoryPageComponent;
   let fixture: ComponentFixture<UpdatedInventoryPageComponent>;
@@ -111,13 +116,53 @@ describe('UpdatedInventoryPageComponent', () => {
     },
   ];
 
+  const mockProducts: Product[] = [
+    {
+      id: '1',
+      nombre: 'Product 1',
+      descripcion: 'Desc 1',
+      precio: 100,
+      peso: 1,
+      requierePreparacion: false,
+      stockActual: 10,
+      categoria: { id: 'c1', descripcion: 'Category 1' },
+    },
+    {
+      id: '2',
+      nombre: 'Product 2',
+      descripcion: 'Desc 2',
+      precio: 200,
+      peso: 2,
+      requierePreparacion: true,
+      stockActual: 20,
+    },
+  ];
+
+  const formDataBase: ProductFormData = {
+    nombre: 'Producto Test',
+    descripcion: 'Descripción test',
+    precio: 100,
+    peso: 1,
+    stockActual: 10,
+    categoriaId: 'c1',
+    nuevaCategoriaNombre: '',
+    requierePreparacion: false,
+    contiene_azucar: false,
+    contiene_mani: false,
+    contiene_lactosa: false,
+    contiene_tacc: false,
+  };
+
   beforeEach(async () => {
     productServiceMock = jasmine.createSpyObj('ProductService', [
       'getCategories',
       'getInventoryOverview',
       'updateInventoryStock',
       'getProductStockMovements',
+      'getById',
       'create',
+      'update',
+      'delete',
     ]);
     toastServiceMock = jasmine.createSpyObj('ToastService', ['mostrar']);
     perfilServiceMock = jasmine.createSpyObj('PerfilService', [
@@ -136,6 +181,9 @@ describe('UpdatedInventoryPageComponent', () => {
       of(mockStockMovements),
     );
     productServiceMock.create.and.returnValue(of(createdProduct));
+    productServiceMock.getById.and.returnValue(of(mockProducts[0]));
+    productServiceMock.update.and.returnValue(of(mockProducts[0]));
+    productServiceMock.delete.and.returnValue(of(void 0));
     perfilServiceMock.obtenerBuffetId.and.returnValue(mockBuffetId);
     perfilServiceMock.getPerfil.and.returnValue(null);
     realtimeServiceMock.connect.and.returnValue(new AbortController());
@@ -332,6 +380,108 @@ describe('UpdatedInventoryPageComponent', () => {
 
     expect(component.selectedProduct).toBeNull();
     expect(component.isFormVisible).toBeTrue();
+  });
+
+  describe('buildHealthClassificationIds — mapeo correcto de clasificaciones de salud', () => {
+    it('un producto sin TACC, sin azúcar y sin lácteos debe tener Solo Sin TACC y Sin Azúcar', () => {
+      const formData: ProductFormData = {
+        ...formDataBase,
+        contiene_tacc: false,
+        contiene_azucar: false,
+        contiene_lactosa: false,
+      };
+
+      component.selectedProduct = null;
+      component.handleFormSubmit(formData);
+
+      const payload = productServiceMock.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_TACC);
+      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_AZUCAR);
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
+    });
+
+    it('un producto con TACC no debe tener la clasificación Sin TACC', () => {
+      const formData: ProductFormData = {
+        ...formDataBase,
+        contiene_tacc: true,
+        contiene_azucar: false,
+        contiene_lactosa: false,
+      };
+
+      component.selectedProduct = null;
+      component.handleFormSubmit(formData);
+
+      const payload = productServiceMock.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
+    });
+
+    it('un producto con azúcar no debe tener la clasificación Sin Azúcar', () => {
+      const formData: ProductFormData = {
+        ...formDataBase,
+        contiene_tacc: false,
+        contiene_azucar: true,
+        contiene_lactosa: false,
+      };
+
+      component.selectedProduct = null;
+      component.handleFormSubmit(formData);
+
+      const payload = productServiceMock.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
+    });
+
+    it('un producto con lácteos debe tener la clasificación Contiene Lácteos', () => {
+      const formData: ProductFormData = {
+        ...formDataBase,
+        contiene_tacc: false,
+        contiene_azucar: false,
+        contiene_lactosa: true,
+      };
+
+      component.selectedProduct = null;
+      component.handleFormSubmit(formData);
+
+      const payload = productServiceMock.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).toContain(ID_CONT_LACTEOS);
+    });
+
+    it('un producto con TACC, azúcar y sin lácteos debe tener array vacío de clasificaciones relevantes', () => {
+      const formData: ProductFormData = {
+        ...formDataBase,
+        contiene_tacc: true,
+        contiene_azucar: true,
+        contiene_lactosa: false,
+      };
+
+      component.selectedProduct = null;
+      component.handleFormSubmit(formData);
+
+      const payload = productServiceMock.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
+    });
+
+    it('las mismas clasificaciones deben enviarse al crear y al actualizar un producto', () => {
+      const formData: ProductFormData = {
+        ...formDataBase,
+        contiene_tacc: false,
+        contiene_azucar: false,
+        contiene_lactosa: true,
+      };
+
+      // Crear
+      component.selectedProduct = null;
+      component.handleFormSubmit(formData);
+      const payloadCreate = productServiceMock.create.calls.mostRecent().args[0];
+
+      // Actualizar
+      component.selectedProduct = mockProducts[0];
+      component.handleFormSubmit(formData);
+      const payloadUpdate = productServiceMock.update.calls.mostRecent().args[1];
+
+      expect(payloadCreate.clasificacionesSaludIds).toEqual(payloadUpdate.clasificacionesSaludIds);
+    });
   });
 
   it('deberia crear producto y refrescar overview', () => {
@@ -587,5 +737,68 @@ describe('UpdatedInventoryPageComponent', () => {
       'No hay stock suficiente.',
       'error',
     );
+  });
+
+  // ── Gestión del formulario ─────────────────────────────────────────────────
+
+  describe('Gestión del formulario', () => {
+    it('debería inicializar selectedProduct a null y mostrar el formulario al llamar openCreateForm', () => {
+      component.openCreateForm();
+      expect(component.selectedProduct).toBeNull();
+      expect(component.isFormVisible).toBeTrue();
+    });
+
+    it('debería asignar selectedProduct y mostrar el formulario al llamar openEditForm', () => {
+      component.openEditForm(mockProducts[0]);
+      expect(component.selectedProduct).toEqual(mockProducts[0]);
+      expect(component.isFormVisible).toBeTrue();
+    });
+
+    it('debería crear el producto y recargar la lista al enviar un formulario nuevo', () => {
+      spyOn(component, 'loadProducts');
+      component.selectedProduct = null;
+      component.handleFormSubmit(formDataBase);
+
+      expect(productServiceMock.create).toHaveBeenCalled();
+      expect(productServiceMock.create.calls.mostRecent().args[0].buffetId).toBe(mockBuffetId);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto creado exitosamente', 'success');
+      expect(component.isFormVisible).toBeFalse();
+      expect(component.loadProducts).toHaveBeenCalled();
+    });
+
+    it('debería mostrar error si la creación falla', () => {
+      productServiceMock.create.and.returnValue(throwError(() => new Error()));
+      component.selectedProduct = null;
+      component.handleFormSubmit(formDataBase);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al crear el producto', 'error');
+    });
+
+    it('debería actualizar el producto al enviar un formulario de edición', () => {
+      spyOn(component, 'loadProducts');
+      component.selectedProduct = mockProducts[0];
+      component.handleFormSubmit(formDataBase);
+
+      expect(productServiceMock.update).toHaveBeenCalled();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto actualizado exitosamente', 'success');
+    });
+
+    it('debería mostrar error si la actualización falla', () => {
+      productServiceMock.update.and.returnValue(throwError(() => new Error()));
+      component.selectedProduct = mockProducts[0];
+      component.handleFormSubmit(formDataBase);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al actualizar el producto', 'error');
+    });
+
+    it('debería eliminar el producto y actualizar la lista al confirmar', () => {
+      productServiceMock.delete.and.returnValue(of(void 0));
+      component.products = [...mockInventory];
+      component.deleteTarget = mockProducts[0];
+
+      component.confirmDelete();
+
+      expect(productServiceMock.delete).toHaveBeenCalledWith(mockProducts[0].id);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto eliminado correctamente', 'success');
+      expect(component.products.length).toBe(1);
+    });
   });
 });

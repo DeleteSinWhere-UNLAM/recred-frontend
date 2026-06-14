@@ -57,6 +57,28 @@
         }
       </ul>
 
+      @if (presenter.horariosCompra().length > 0) {
+        <div class="restricciones__horarios-seccion">
+          <h3 class="restricciones__horarios-titulo">HORARIOS DE COMPRA (SOLO ALUMNO)</h3>
+          
+          <div class="restricciones__horarios-grid">
+            @for (horario of presenter.horariosCompra(); track horario.franjaId) {
+              <button
+                type="button"
+                class="horario-card"
+                [class.horario-card--bloqueado]="horario.bloqueado"
+                (click)="presenter.alternarHorario(horario.franjaId)"
+              >
+                <div class="horario-card__check">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+                <span class="horario-card__nombre">{{ horario.descripcion }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
       <button
         type="button"
         class="restricciones__guardar"

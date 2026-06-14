@@ -27,10 +27,31 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'tutor-dashboard',
+        loadComponent: () =>
+          import('./features/tutor-dashboard/tutor-dashboard.component').then(
+            (m) => m.TutorDashboardComponent,
+          ),
+      },
+      {
+        path: 'crear-hijo',
+        loadComponent: () =>
+          import('./features/crear-hijo/crear-hijo.page').then(
+            (m) => m.CrearHijoPage,
+          ),
+      },
+      {
         path: 'alumno',
         loadComponent: () =>
           import('./features/home-alumno/home-alumno.page').then(
             (m) => m.HomeAlumnoPage,
+          ),
+      },
+      {
+        path: 'restricciones-horarias/:alumnoId',
+        loadComponent: () =>
+          import('./features/restricciones-horarias/restricciones-horarias.page').then(
+            (m) => m.RestriccionesHorariasPage,
           ),
       },
       {
@@ -44,6 +65,13 @@ export const routes: Routes = [
         path: 'buffet/:alumnoId',
         loadComponent: () =>
           import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
+      },
+      {
+        path: 'acreditar-mercado-pago/:alumnoId',
+        loadComponent: () =>
+          import('./features/acreditar-mercado-pago/acreditar-mercado-pago.page').then(
+            (m) => m.AcreditarMercadoPagoPage,
+          ),
       },
       {
         path: 'presupuesto/:alumnoId',
@@ -71,6 +99,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/favoritos/favoritos.page').then(
             (m) => m.FavoritosPage,
+          ),
+      },
+      {
+        path: 'carritos-favoritos',
+        loadComponent: () =>
+          import('./features/carritos-favoritos/carritos-favoritos.page').then(
+            (m) => m.CarritosFavoritosPage,
           ),
       },
       {
@@ -114,6 +149,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/daily-close/daily-close.page').then(
             (m) => m.DailyClosePage,
+          ),
+      },
+      {
+        path: 'kiosquero/venta-espontanea',
+        loadChildren: () =>
+          import('./features/venta-espontanea/venta-espontanea.routes').then(
+            (m) => m.ventaEspontaneaRoutes,
+          ),
+      },
+      {
+        path: 'kiosquero/pedidos-tracking',
+        loadComponent: () =>
+          import('./features/tracking-pedidos/tracking-pedidos.page').then(
+            (m) => m.TrackingPedidosPage,
           ),
       },
       {
@@ -170,6 +219,27 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/notificaciones-precio/notificaciones-precio.page').then(
             (m) => m.NotificacionesPrecioPage,
+          ),
+      },
+      {
+        path: 'resumen-semanal',
+        loadComponent: () =>
+          import('./features/resumen-semanal/resumen-semanal.page').then(
+            (m) => m.ResumenSemanalPage,
+          ),
+      },
+      {
+        path: 'promociones',
+        loadComponent: () =>
+          import('./features/promociones/promociones.page').then(
+            (m) => m.PromocionesPageComponent,
+          ),
+      },
+      {
+        path: 'preferencias-detectadas',
+        loadComponent: () =>
+          import('./features/preferencias-detectadas/preferencias-detectadas.page').then(
+            (m) => m.PreferenciasDetectadasPage,
           ),
       },
     ],

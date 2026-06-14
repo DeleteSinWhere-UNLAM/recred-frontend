@@ -6,7 +6,9 @@ import {
 } from '@angular/common/http/testing';
 import { environment } from '../../../../environments/environment';
 import { ProductService } from './product.service';
-import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+import { Product } from '../models/product.interface';
+import { CreateProductRequest } from '../models/requests/create-product-request.interface';
+import { UpdateProductRequest } from '../models/requests/update-product-request.interface';
 import { Category } from '../models/category.interface';
 import {
   InventoryOverviewItem,
@@ -240,7 +242,21 @@ describe('ProductService', () => {
     req.flush(expectedResponse);
   });
 
-  it('deberia actualizar un producto', () => {
+  it('debería manejar el error de validación si create falla', () => {
+    const payload = {} as CreateProductRequest;
+
+    service.create(payload).subscribe({
+      next: () => fail('should have failed with the 400 error'),
+      error: (error) => {
+        expect(error.status).toEqual(400);
+      }
+    });
+
+    const req = httpMock.expectOne(productsUrl);
+    req.flush('Bad Request', { status: 400, statusText: 'Bad Request' });
+  });
+
+  it('debería enviar un PUT y retornar el producto actualizado al llamar a update', () => {
     const productId = '1';
     const payload: UpdateProductRequest = {
       nombre: 'Updated Name',

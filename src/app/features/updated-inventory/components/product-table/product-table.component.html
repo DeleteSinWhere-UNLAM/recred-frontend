@@ -111,6 +111,22 @@
                 <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
                 <span>Historial</span>
               </button>
+              <button
+                type="button"
+                class="product-table__btn product-table__btn--edit"
+                (click)="emitEditProduct(product)"
+              >
+                <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                <span>Editar</span>
+              </button>
+              <button
+                type="button"
+                class="product-table__btn product-table__btn--delete"
+                (click)="emitDeleteProduct(product)"
+              >
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                <span>Eliminar</span>
+              </button>
             </div>
           </footer>
         </article>

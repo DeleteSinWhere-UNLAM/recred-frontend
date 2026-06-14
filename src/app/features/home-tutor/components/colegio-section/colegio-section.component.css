@@ -1,79 +1,66 @@
 .colegio-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
-.colegio-section__header {
+.colegio-section__layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+/* Sidebar: Colegio Info Card */
+.colegio-section__sidebar {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all 0.2s ease;
+}
+
+.colegio-section__sidebar--colapsado {
+  padding: 16px 20px;
+}
+
+.colegio-section__sidebar-header {
   display: flex;
   align-items: center;
   gap: 16px;
   width: 100%;
-  padding: 12px 20px 12px 12px;
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
-  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
   text-align: left;
-  box-shadow: var(--shadow-card);
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-.colegio-section__header:hover {
-  transform: translateY(-1px);
-  border-color: var(--color-borde-fuerte);
-}
-
-.colegio-section__header:active {
-  transform: scale(0.99);
-  box-shadow: var(--shadow-neu-concave);
-}
-
-.colegio-section__header:focus-visible {
-  outline: 2px solid var(--color-dorado);
-  outline-offset: 2px;
+  cursor: pointer;
+  outline: none;
 }
 
 .colegio-section__icono {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   background-color: rgba(74, 111, 165, 0.08);
   color: var(--color-pizarra);
   font-size: 18px;
-  box-shadow: none;
   flex-shrink: 0;
 }
 
 .colegio-section__nombre {
   flex: 1;
   font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--color-texto-oscuro);
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a3b5c;
   margin: 0;
   min-width: 0;
-}
-
-.colegio-section__contador {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 28px;
-  height: 28px;
-  padding: 0 8px;
-  border-radius: 14px;
-  background-color: color-mix(in srgb, var(--color-menta) 22%, var(--color-fondo));
-  color: var(--color-menta);
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 800;
-  flex-shrink: 0;
 }
 
 .colegio-section__chevron {
@@ -83,30 +70,110 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: rgba(74, 111, 165, 0.06);
-  color: var(--color-texto-claro);
-  font-size: 12px;
-  box-shadow: inset 0 0 0 1px rgba(74, 111, 165, 0.08);
+  background-color: rgba(74, 111, 165, 0.05);
+  color: #64748b;
+  font-size: 13px;
   transition: transform 0.25s ease;
   flex-shrink: 0;
 }
 
-.colegio-section__header--expandido .colegio-section__chevron {
+.colegio-section__chevron--rotado {
   transform: rotate(180deg);
-  color: var(--color-pizarra);
+  color: #1a3b5c;
+}
+
+/* Sidebar Body */
+.colegio-section__sidebar-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 24px;
+  flex: 1;
+  animation: colegio-fade-in 0.25s ease;
+}
+
+.colegio-section__info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.colegio-section__info-row i {
+  font-size: 16px;
+  color: #1a3b5c;
+  width: 20px;
+  text-align: center;
+}
+
+.colegio-section__divider {
+  border: none;
+  height: 1px;
+  background-color: var(--color-borde);
+  margin: 4px 0;
+}
+
+.colegio-section__saldo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.colegio-section__saldo-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.colegio-section__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a3b5c;
+  line-height: 1.1;
+}
+
+/* Illustration building at the bottom */
+.colegio-section__ilustracion {
+  margin: 16px -24px -24px -24px;
+  padding: 16px 24px 0 24px;
+  background: linear-gradient(180deg, rgba(240, 244, 248, 0) 0%, rgba(226, 232, 240, 0.4) 100%);
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  overflow: hidden;
+  margin-top: auto;
+}
+
+.colegio-section__ilustracion svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  display: block;
+}
+
+/* Content Column (Grid) */
+.colegio-section__content {
+  width: 100%;
 }
 
 .colegio-section__grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-  animation: colegio-section-aparecer 0.25s ease;
+  animation: colegio-fade-in 0.25s ease;
 }
 
-@keyframes colegio-section-aparecer {
+@keyframes colegio-fade-in {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -114,32 +181,34 @@
   }
 }
 
-@media (min-width: 1100px) {
+/* Responsive Rules for Desktop */
+@media (min-width: 900px) {
+  .colegio-section__layout {
+    grid-template-columns: 280px 1fr;
+    gap: 30px;
+  }
+  
   .colegio-section__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 640px) {
-  .colegio-section__header {
-    padding: 10px 16px 10px 10px;
-    gap: 12px;
+@media (min-width: 1280px) {
+  .colegio-section__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
 
+@media (max-width: 520px) {
+  .colegio-section__sidebar {
+    padding: 20px;
+  }
+  
   .colegio-section__nombre {
-    font-size: 14px;
-    letter-spacing: 0.8px;
+    font-size: 18px;
   }
 
-  .colegio-section__icono {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-
-  .colegio-section__chevron {
-    width: 28px;
-    height: 28px;
-    font-size: 11px;
+  .colegio-section__saldo-valor {
+    font-size: 24px;
   }
 }

@@ -147,7 +147,9 @@
       [isLoading]="isLoading"
       [highlightedProductIds]="highlightedProductIds"
       (manageInventory)="openInventoryManagement($event)"
-      (viewHistory)="openStockHistory($event)">
+      (viewHistory)="openStockHistory($event)"
+      (editProduct)="openEditFormFromInventory($event)"
+      (deleteProduct)="requestDeleteFromInventory($event)">
     </app-product-table>
 
     @if (isFormVisible) {
@@ -469,5 +471,12 @@
         </section>
       </div>
     }
+
+    <app-confirm-delete-modal
+      [isOpen]="deleteTarget !== null"
+      [productName]="deleteTarget?.nombre ?? ''"
+      (confirmed)="confirmDelete()"
+      (cancelled)="cancelDelete()"
+    />
   </div>
 </main>

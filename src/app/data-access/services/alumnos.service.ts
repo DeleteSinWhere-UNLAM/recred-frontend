@@ -16,6 +16,15 @@ interface StudentDTO {
   readonly saldo?: number | string | null;
 }
 
+export interface CrearHijoRequest {
+  readonly username: string;
+  readonly nombre: string;
+  readonly apellido: string;
+  readonly email: string;
+  readonly dni: string;
+  readonly gradoId?: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AlumnosService {
   private readonly http = inject(HttpClient);
@@ -26,36 +35,71 @@ export class AlumnosService {
   readonly alumnos: Signal<Alumno[]> = this.alumnosState.asReadonly();
   private cargaInFlight: Promise<Alumno[]> | null = null;
 
-  async cargarHijosDelTutor(): Promise<Alumno[]> {
-    const dtos = await firstValueFrom(
-      this.http.get<StudentDTO[]>(`${environment.apiUrl}/tutores/me/hijos`),
+  async crearHijo(req: CrearHijoRequest): Promise<Alumno> {
+    const payload: CrearHijoRequest = {
+      username: req.username.trim(),
+      nombre: req.nombre.trim(),
+      apellido: req.apellido.trim(),
+      email: req.email.trim(),
+      dni: req.dni.trim(),
+      gradoId: req.gradoId?.trim() ? req.gradoId.trim() : null,
+    };
+    const dto = await firstValueFrom(
+      this.http.post<StudentDTO>(
+        `${environment.apiUrl}/tutores/me/hijos`,
+        payload,
+      ),
     );
-    const alumnos = dtos.map((dto) => this.fromDto(dto));
-    this.alumnosState.set(alumnos);
-    return alumnos;
+    const alumno = this.fromDto(dto);
+    this.alumnosState.update((actuales) => [...actuales, alumno]);
+    return alumno;
   }
 
-  asegurarCargados(): Promise<Alumno[]> {
-    if (this.alumnosState().length > 0) {
-      return Promise.resolve(this.alumnosState());
+  async cargarHijosDelTutor(): Promise<Alumno[]> {
+    const url = `${environment.apiUrl.replace(/\/$/, '')}/tutores/me/hijos`;
+    console.log('Cargando hijos desde:', url);
+
+    try {
+      const dtos = await firstValueFrom(this.http.get<StudentDTO[]>(url));
+      console.log('Respuesta raw del back:', dtos);
+
+      if (!dtos || !Array.isArray(dtos)) {
+        console.warn('La respuesta del back no es un array válido:', dtos);
+        return [];
+      }
+
+      const alumnos = dtos.map((dto) => this.fromDto(dto));
+      this.alumnosState.set(alumnos);
+      console.log('Alumnos procesados y guardados en el estado:', alumnos);
+      return alumnos;
+    } catch (error) {
+      console.error('Error al cargar hijos del tutor:', error);
+      throw error;
     }
-    if (this.cargaInFlight) {
-      return this.cargaInFlight;
-    }
-    const perfil = this.perfilService.getPerfil();
-    if (!perfil) {
-      return Promise.resolve([]);
-    }
-    if (perfil.rol === 'ALUMNO') {
-      return Promise.resolve(this.getAlumnos());
-    }
-    this.cargaInFlight = this.cargarHijosDelTutor().finally(() => {
-      this.cargaInFlight = null;
-    });
-    return this.cargaInFlight;
   }
 
-  getAlumnos(): Alumno[] {
+  async cargarPerfilAlumno(): Promise<Alumno[]> {
+    const url = `${environment.apiUrl.replace(/\/$/, '')}/alumnos/me`;
+    console.log('Cargando perfil alumno desde:', url);
+
+    try {
+      const dto = await firstValueFrom(this.http.get<StudentDTO>(url));
+      console.log('Respuesta raw del back (alumno):', dto);
+
+      if (!dto) {
+        return this.getMockAlumno();
+      }
+
+      const alumno = this.fromDto(dto);
+      this.alumnosState.set([alumno]);
+      return [alumno];
+    } catch (error) {
+      console.error('Error al cargar perfil del alumno:', error);
+      return this.getMockAlumno();
+    }
+  }
+
+  private getMockAlumno(): Alumno[] {
     const list = this.alumnosState();
     if (list.length > 0) return list;
 
@@ -71,6 +115,35 @@ export class AlumnosService {
       }];
     }
     return [];
+  }
+
+  asegurarCargados(force = false): Promise<Alumno[]> {
+    if (!force && this.alumnosState().length > 0) {
+      return Promise.resolve(this.alumnosState());
+    }
+    if (this.cargaInFlight) {
+      return this.cargaInFlight;
+    }
+    const perfil = this.perfilService.getPerfil();
+    if (!perfil) {
+      return Promise.resolve([]);
+    }
+    if (perfil.rol === 'ALUMNO') {
+      this.cargaInFlight = this.cargarPerfilAlumno().finally(() => {
+        this.cargaInFlight = null;
+      });
+      return this.cargaInFlight;
+    }
+    this.cargaInFlight = this.cargarHijosDelTutor().finally(() => {
+      this.cargaInFlight = null;
+    });
+    return this.cargaInFlight;
+  }
+
+  getAlumnos(): Alumno[] {
+    const list = this.alumnosState();
+    if (list.length > 0) return list;
+    return this.getMockAlumno();
   }
 
   getAlumnoById(id: string): Alumno | undefined {

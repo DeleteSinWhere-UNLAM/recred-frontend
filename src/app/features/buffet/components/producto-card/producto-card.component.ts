@@ -74,7 +74,66 @@ export class ProductoCardComponent {
 
   readonly disponible = computed(() => {
     const p = this.productoState();
-    return p ? (disponible(p) && !p.bloqueado) : false;
+    // No disponible si: sin stock, bloqueado por tutor, por restricción nutricional/horaria, o supera presupuesto unitario
+    return p ? (disponible(p) && !p.bloqueado && !p.bloqueadoPorRestriccion && !this.superaPresupuestoUnitario()) : false;
+  });
+
+  readonly bloqueadoPorRestriccion = computed(() => {
+    return !!this.productoState()?.bloqueadoPorRestriccion;
+  });
+
+  /**
+   * Convierte el motivoBloqueo del backend en una etiqueta corta para el botón.
+   * El backend devuelve: "Contiene: Gluten (TACC), Azúcar, Lácteos"
+   * Se mapea a: "No apto: Contiene TACC · Contiene Azúcar · Contiene Lácteos"
+   */
+  readonly mensajeRestriccion = computed(() => {
+    const motivo = this.productoState()?.motivoBloqueo ?? '';
+    if (!motivo) return 'No apto';
+
+    const MAPA: Record<string, string> = {
+      'Gluten (TACC)':                   'Contiene TACC',
+      'Azúcar':                          'Contiene Azúcar',
+      'Lácteos':                         'Contiene Lácteos',
+      'Alto Sodio':                      'Contiene Sodio',
+      'Ingredientes de origen animal':   'No Vegano',
+    };
+
+    // El backend prefija con "Contiene: "
+    const contenido = motivo.replace(/^Contiene:\s*/i, '');
+    const partes = contenido.split(',').map(p => p.trim());
+    const etiquetas = partes.map(p => MAPA[p] ?? p);
+    return 'No apto: ' + etiquetas.join(' · ');
+  });
+
+  readonly razonRechazo = computed(() => {
+    const p = this.productoState();
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return null;
+    const validation = this.carritoService.validarAgregar(p, alumnoId, this.cantidad());
+    return validation.permitido ? null : validation.razon;
+  });
+
+  readonly superaPresupuestoUnitario = computed(() => {
+    const p = this.productoState();
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return false;
+    return !this.carritoService.puedeAgregar(p, alumnoId, 1);
+  });
+
+  readonly superaPresupuesto = computed(() => {
+    return this.razonRechazo() === 'presupuesto' || this.razonRechazo() === 'categoria';
+  });
+
+  readonly superaSaldo = computed(() => {
+    return this.razonRechazo() === 'saldo';
+  });
+
+  readonly deshabilitarSumar = computed(() => {
+    const p = this.productoState();
+    const alumnoId = this.alumnoIdState();
+    if (!p || !alumnoId) return true;
+    return !this.carritoService.puedeAgregar(p, alumnoId, this.cantidad() + 1);
   });
 
   readonly precioFormateado = computed(() => {

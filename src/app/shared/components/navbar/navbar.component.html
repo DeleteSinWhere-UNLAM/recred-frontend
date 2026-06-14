@@ -14,10 +14,57 @@
 
     <nav class="navbar__actions" aria-label="Acciones principales">
       @if (!esVistaAlumno() && !esVistaKiosquero()) {
+        <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']">
+          <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
         <a class="navbar__movimientos-link" [routerLink]="['/movimientos']">
           <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
           <span>Ver movimientos</span>
         </a>
+        <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']">
+          <i class="fa-regular fa-heart" aria-hidden="true"></i>
+          <span>Carritos Favoritos</span>
+        </a>
+      }
+
+      @if (esVistaKiosquero()) {
+        <div class="navbar__kiosk-tools-wrap">
+          <button
+            type="button"
+            class="navbar__kiosk-tools"
+            aria-label="Promos"
+            [attr.aria-expanded]="menuKiosqueroAbierto()"
+            aria-haspopup="menu"
+            (click)="toggleMenuKiosquero()"
+          >
+            <i class="fa-solid fa-tags" aria-hidden="true"></i>
+            <span>Promos</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+          @if (menuKiosqueroAbierto()) {
+            <div class="navbar__menu navbar__menu--kiosk-tools" role="menu">
+              <button
+                type="button"
+                class="navbar__menu-item"
+                role="menuitem"
+                (click)="irARecomendacionesEstacionales()"
+              >
+                <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+                <span>Recomendaciones estacionales</span>
+              </button>
+              <button
+                type="button"
+                class="navbar__menu-item"
+                role="menuitem"
+                (click)="irAPromociones()"
+              >
+                <i class="fa-solid fa-tags" aria-hidden="true"></i>
+                <span>Promociones</span>
+              </button>
+            </div>
+          }
+        </div>
       }
 
       <div class="navbar__notif-wrap">
@@ -51,17 +98,6 @@
           </div>
         }
       </div>
-
-      @if (esVistaKiosquero()) {
-        <a
-          class="navbar__scan"
-          [routerLink]="['/cierre-diario']"
-          [queryParams]="{ seccion: 'pedidos' }"
-        >
-          <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
-          <span>Escanear código QR</span>
-        </a>
-      }
 
       @if (!esVistaKiosquero()) {
         <button

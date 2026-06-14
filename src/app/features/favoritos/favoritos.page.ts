@@ -51,7 +51,6 @@ export class FavoritosPage {
     this.usuarioService.setHomeUrl('/alumno');
     this.alumnoId = this.perfilService.obtenerAlumnoId() ?? this.usuarioService.getAlumnoActual().id;
 
-    // Cargar productos favoritos
     this.cargarFavoritos();
   }
 

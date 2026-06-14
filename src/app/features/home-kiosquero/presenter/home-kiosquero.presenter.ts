@@ -861,12 +861,70 @@ export class HomeKiosqueroPresenter {
       color: 'pizarra',
     },
     {
+      id: 'venta-espontanea',
+      titulo: 'Venta espontánea',
+      descripcion: 'Registra una venta presencial a un alumno',
+      icono: 'fa-cash-register',
+      ruta: '/kiosquero/venta-espontanea',
+      color: 'pizarra',
+      destacada: true,
+    },
+    {
+      id: 'tracking-pedidos',
+      titulo: 'Seguimiento de pedidos',
+      descripcion: 'Monitorea y entrega los pedidos recibidos',
+      icono: 'fa-clipboard-list',
+      ruta: '/kiosquero/pedidos-tracking',
+      color: 'menta',
+      destacada: true,
+    },
+    {
       id: 'cargar-productos',
       titulo: 'Cargar producto',
       descripcion: 'Alta asistida por foto',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
+    },
+    {
+      id: 'stock',
+      titulo: 'Stock',
+      descripcion: 'Inventario y reposición',
+      icono: 'fa-boxes-stacked',
+      ruta: '/admin-productos',
+      color: 'violeta',
+    },
+    {
+      id: 'reportes',
+      titulo: 'Panel de control',
+      descripcion: 'Métricas y reportes',
+      icono: 'fa-chart-line',
+      ruta: '/kiosquero/reportes',
+      color: 'pizarra',
+    },
+    {
+      id: 'sugerencias',
+      titulo: 'Sugerencias del día',
+      descripcion: 'Recomendaciones inteligentes',
+      icono: 'fa-robot',
+      ruta: '/sugerencias',
+      color: 'melocoton',
+    },
+    {
+      id: 'recomendaciones',
+      titulo: 'Recomendaciones estacionales',
+      descripcion: 'Qué stockear según la temporada',
+      icono: 'fa-leaf',
+      ruta: '/recomendaciones-estacionales',
+      color: 'menta',
+    },
+    {
+      id: 'promociones',
+      titulo: 'Promociones',
+      descripcion: 'Crear y editar descuentos',
+      icono: 'fa-tags',
+      ruta: '/promociones',
+      color: 'violeta',
     },
     {
       id: 'cierre-diario',
@@ -887,13 +945,24 @@ export class HomeKiosqueroPresenter {
   readonly secondaryActions = computed<AccionKiosquero[]>(() => {
     return this.acciones().filter(
       (accion) =>
-        !['ver-pedidos', 'cargar-productos', 'cierre-diario'].includes(
-          accion.id,
-        ),
+        ![
+          'ver-pedidos',
+          'cargar-productos',
+          'tracking-pedidos',
+          'stock',
+          'reportes',
+          'sugerencias',
+          'recomendaciones',
+          'promociones',
+          'cierre-diario',
+        ].includes(accion.id) && !accion.destacada,
     );
   });
 
   readonly featuredActions: Signal<AccionKiosquero[]> = computed(() => [
+    ...this.acciones().filter(
+      (accion) => accion.destacada && accion.id !== 'tracking-pedidos',
+    ),
     {
       id: 'cargar-productos',
       titulo: 'Cargar producto',

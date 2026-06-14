@@ -1,30 +1,34 @@
 <section class="tutor-header" [attr.aria-label]="'Perfil de ' + nombreCompleto">
-  <div class="tutor-header__avatar-wrap">
-    <div class="tutor-header__avatar">
-      <span>{{ iniciales }}</span>
+  <div class="tutor-header__profile-container">
+    <div class="tutor-header__avatar-wrap">
+      <div class="tutor-header__avatar">
+        <span>{{ iniciales }}</span>
+      </div>
+    </div>
+
+    <div class="tutor-header__info">
+      <p class="tutor-header__saludo">
+        ¡Hola,
+      </p>
+      <h1 class="tutor-header__nombre">{{ nombreCompleto }}!</h1>
+      <p class="tutor-header__subtitulo">
+        <span class="tutor-header__hashtag">#</span>
+        <span>{{ resumenHijos }}</span>
+      </p>
     </div>
   </div>
 
-  <div class="tutor-header__info">
-    <p class="tutor-header__saludo">
-      <span class="tutor-header__saludo-mano" aria-hidden="true">👋</span>
-      ¡Hola,
-    </p>
-    <h1 class="tutor-header__nombre">{{ nombreCompleto }}!</h1>
-    <p class="tutor-header__subtitulo">
-      <i class="fa-solid fa-children" aria-hidden="true"></i>
-      <span>{{ resumenHijos }}</span>
-    </p>
-  </div>
-
-  <div
-    class="tutor-header__saldo"
-    [class.tutor-header__saldo--negativo]="saldoTotalNegativo"
-  >
-    <span class="tutor-header__saldo-label">
-      <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-      Saldo total
-    </span>
-    <span class="tutor-header__saldo-valor">{{ saldoTotalFormateado }}</span>
+  <div class="tutor-header__saldo-card">
+    <div class="tutor-header__saldo-content">
+      <span class="tutor-header__saldo-label">Saldo total</span>
+      <span class="tutor-header__saldo-valor">{{ saldoTotalFormateado }}</span>
+    </div>
+    <div class="tutor-header__saldo-decor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="tutor-header__wallet-icon">
+        <path d="M21 18V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"/>
+        <path d="M3 10h18"/>
+        <path d="M16 14h2v2h-2z"/>
+      </svg>
+    </div>
   </div>
 </section>

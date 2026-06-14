@@ -10,6 +10,7 @@ import { MovimientosService } from './services/movimientos.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
+import { ToastService } from '../../shared/services/toast.service';
 import { Movimiento } from './models/movimiento.model';
 import { Alumno } from '../../data-access/models/alumno.model';
 
@@ -21,6 +22,7 @@ describe('MovimientosPage', () => {
   let movimientosServiceSpy: jasmine.SpyObj<MovimientosService>;
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   let paramMapSubject: BehaviorSubject<ParamMap>;
 
@@ -81,6 +83,7 @@ describe('MovimientosPage', () => {
     movimientosServiceSpy = jasmine.createSpyObj<MovimientosService>('MovimientosService', [
       'getHistorialAlumno',
       'getHistorialTutor',
+      'cancelarCompra',
     ]);
     alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>('AlumnosService', [
       'asegurarCargados',
@@ -89,8 +92,10 @@ describe('MovimientosPage', () => {
     perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', [
       'obtenerAlumnoId',
     ]);
+    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', [
+      'mostrar',
+    ]);
 
-    // Configurar Mocks
     alumnosServiceSpy.asegurarCargados.and.resolveTo([mockAlumno1, mockAlumno2]);
     Object.defineProperty(alumnosServiceSpy, 'alumnos', {
       value: signal([mockAlumno1, mockAlumno2]),
@@ -107,6 +112,7 @@ describe('MovimientosPage', () => {
 
     movimientosServiceSpy.getHistorialTutor.and.returnValue(of(mockMovimientosList));
     movimientosServiceSpy.getHistorialAlumno.and.returnValue(of([mockMovimiento1, mockMovimiento3]));
+    movimientosServiceSpy.cancelarCompra.and.returnValue(of(undefined));
 
     paramMapSubject = new BehaviorSubject(convertToParamMap({}));
 
@@ -119,6 +125,7 @@ describe('MovimientosPage', () => {
         { provide: MovimientosService, useValue: movimientosServiceSpy },
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: PerfilService, useValue: perfilServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
         UsuarioService, // Usar UsuarioService real para resolver señales y métodos de manera correcta en el Navbar
         {
           provide: ActivatedRoute,
@@ -151,8 +158,6 @@ describe('MovimientosPage', () => {
       expect(component.selectedAlumnoId()).toBe('todos');
       expect(movimientosServiceSpy.getHistorialTutor).toHaveBeenCalled();
       expect(component.cargando()).toBeFalse();
-      // Debería ordenar los movimientos descendentemente por fecha
-      // Fechas: mov-2 (07-06), mov-3 (06-06), mov-1 (05-06)
       expect(component.rawMovimientos()[0].id).toBe('mov-2');
       expect(component.rawMovimientos()[1].id).toBe('mov-3');
       expect(component.rawMovimientos()[2].id).toBe('mov-1');
@@ -167,7 +172,6 @@ describe('MovimientosPage', () => {
       expect(movimientosServiceSpy.getHistorialAlumno).toHaveBeenCalledWith('alumno-1');
       expect(component.cargando()).toBeFalse();
       expect(component.rawMovimientos().length).toBe(2);
-      // Ordenamiento descendente: mov-3 (06-06) antes que mov-1 (05-06)
       expect(component.rawMovimientos()[0].id).toBe('mov-3');
     }));
 
@@ -202,10 +206,7 @@ describe('MovimientosPage', () => {
     });
 
     it('debería filtrar por fecha desde/hasta', () => {
-      // Movimientos fechas:
-      // mov-1: 2026-06-05
-      // mov-2: 2026-06-07
-      // mov-3: 2026-06-06
+
 
       component.filtroFechaDesde.set('2026-06-06');
       expect(component.movimientosFiltrados().length).toBe(2); // mov-2 y mov-3
@@ -215,16 +216,13 @@ describe('MovimientosPage', () => {
     });
 
     it('debería filtrar por rango de precios', () => {
-      // Precios:
-      // mov-1: 1500
-      // mov-2: 800
-      // mov-3: 2500
+
 
       component.filtroPrecioMin.set(1000);
       expect(component.movimientosFiltrados().length).toBe(2); // mov-1 y mov-3
 
       component.filtroPrecioMax.set(2000);
-      expect(component.movimientosFiltrados().length).toBe(1); // solo mov-1 (1500)
+      expect(component.movimientosFiltrados().length).toBe(1);
     });
 
     it('debería limpiar filtros correctamente', () => {
@@ -250,6 +248,17 @@ describe('MovimientosPage', () => {
 
       component.cerrarDetalle();
       expect(component.modalMovimiento()).toBeNull();
+    });
+
+    it('debería cancelar el pedido y actualizar el estado a CANCELADO', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      component.modalMovimiento.set(mockMovimiento2);
+      
+      component.cancelarPedido('mov-2');
+      
+      expect(movimientosServiceSpy.cancelarCompra).toHaveBeenCalledWith('mov-2');
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Pedido cancelado y saldo reembolsado', 'success');
+      expect(component.modalMovimiento()?.status).toBe('CANCELADO');
     });
   });
 

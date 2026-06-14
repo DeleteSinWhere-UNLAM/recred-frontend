@@ -29,8 +29,8 @@ describe('ProductFormComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, ProductFormComponent]
     })
-    .compileComponents();
-    
+      .compileComponents();
+
     fixture = TestBed.createComponent(ProductFormComponent);
     component = fixture.componentInstance;
     component.categories = mockCategories;
@@ -85,11 +85,11 @@ describe('ProductFormComponent', () => {
 
   it('debería ser inválido si se violan las restricciones de validación', () => {
     component.productForm.patchValue({
-      nombre: 'a', // minLength 2
-      descripcion: 'ab', // minLength 3
-      precio: 0, // min 0.01
-      peso: 0, // min 0.001
-      stockActual: -1, // min 0
+      nombre: 'a',
+      descripcion: 'ab',
+      precio: 0,
+      peso: 0,
+      stockActual: -1,
       categoriaId: 'c1'
     });
 
@@ -107,7 +107,7 @@ describe('ProductFormComponent', () => {
 
     const nuevaCategoriaCtrl = component.productForm.get('nuevaCategoriaNombre');
     expect(nuevaCategoriaCtrl?.hasError('required')).toBeTrue();
-    
+
     component.productForm.patchValue({ nuevaCategoriaNombre: 'New Category' });
     expect(nuevaCategoriaCtrl?.hasError('required')).toBeFalse();
   });
@@ -150,7 +150,7 @@ describe('ProductFormComponent', () => {
     spyOn(component.formSubmit, 'emit');
     spyOn(component.productForm, 'markAllAsTouched').and.callThrough();
 
-    component.productForm.patchValue({ nombre: '' }); // Invalid
+    component.productForm.patchValue({ nombre: '' });
     component.submitForm();
 
     expect(component.productForm.markAllAsTouched).toHaveBeenCalled();
@@ -159,10 +159,9 @@ describe('ProductFormComponent', () => {
 
   it('debería emitir el evento formCancel al cancelar el formulario', () => {
     spyOn(component.formCancel, 'emit');
-    
-    // Call emit manually or find the button and click it
+
     component.formCancel.emit();
-    
+
     expect(component.formCancel.emit).toHaveBeenCalled();
   });
 });

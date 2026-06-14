@@ -25,6 +25,8 @@ export class ProductTableComponent {
   @Input() highlightedProductIds: ReadonlySet<string> = new Set<string>();
   @Output() manageInventory = new EventEmitter<InventoryOverviewItem>();
   @Output() viewHistory = new EventEmitter<InventoryOverviewItem>();
+  @Output() editProduct = new EventEmitter<InventoryOverviewItem>();
+  @Output() deleteProduct = new EventEmitter<InventoryOverviewItem>();
 
   getModeLabel(mode: TipoManejoInventario): string {
     const labels: Record<TipoManejoInventario, string> = {
@@ -120,6 +122,14 @@ export class ProductTableComponent {
 
   emitViewHistory(product: InventoryOverviewItem): void {
     this.viewHistory.emit(product);
+  }
+
+  emitEditProduct(product: InventoryOverviewItem): void {
+    this.editProduct.emit(product);
+  }
+
+  emitDeleteProduct(product: InventoryOverviewItem): void {
+    this.deleteProduct.emit(product);
   }
 
   formatNullable(value: number | null): string {

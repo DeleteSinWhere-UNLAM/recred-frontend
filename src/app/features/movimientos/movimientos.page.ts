@@ -10,6 +10,7 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-movimientos-page',
@@ -24,18 +25,21 @@ export class MovimientosPage implements OnInit {
   private readonly alumnosService = inject(AlumnosService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
+  private readonly toastService = inject(ToastService);
 
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   readonly nombreNavbar = this.usuarioService.nombreNavbar;
   readonly alumnos = this.alumnosService.alumnos;
 
-  // Estados de datos
   readonly rawMovimientos = signal<Movimiento[]>([]);
   readonly cargando = signal(true);
   readonly errorMsg = signal<string | null>(null);
 
-  // Estados de filtros
+  readonly filtroBusqueda = signal<string>('');
+  readonly filtroFecha = signal<string>('');
+  readonly mostrarFiltrosAvanzados = signal<boolean>(false);
+
   readonly selectedAlumnoId = signal<string>('todos');
   readonly filtroEstado = signal<string>('TODOS');
   readonly filtroFechaDesde = signal<string>('');
@@ -43,7 +47,6 @@ export class MovimientosPage implements OnInit {
   readonly filtroPrecioMin = signal<number | null>(null);
   readonly filtroPrecioMax = signal<number | null>(null);
 
-  // Estado del modal de detalle
   readonly modalMovimiento = signal<Movimiento | null>(null);
 
   readonly movimientosFiltrados = computed<Movimiento[]>(() => {
@@ -53,14 +56,28 @@ export class MovimientosPage implements OnInit {
     const hasta = this.filtroFechaHasta();
     const minPrice = this.filtroPrecioMin();
     const maxPrice = this.filtroPrecioMax();
+    const query = this.filtroBusqueda().toLowerCase().trim();
+    const selectedDate = this.filtroFecha();
 
-    return list.filter((m) => {
-      // Filtrar por estado
+    let filtered = list;
+
+    if (query) {
+      filtered = filtered.filter((m) => {
+        return m.items.some((item) => item.productName.toLowerCase().includes(query));
+      });
+    }
+
+    if (selectedDate) {
+      filtered = filtered.filter((m) => {
+        return m.date.startsWith(selectedDate);
+      });
+    }
+
+    return filtered.filter((m) => {
       if (estado !== 'TODOS' && m.status !== estado) {
         return false;
       }
 
-      // Filtrar por rango de fechas
       if (desde) {
         const dateLimit = new Date(`${desde}T00:00:00`);
         if (new Date(m.date) < dateLimit) return false;
@@ -70,7 +87,6 @@ export class MovimientosPage implements OnInit {
         if (new Date(m.date) > dateLimit) return false;
       }
 
-      // Filtrar por rango de precios
       if (minPrice !== null && minPrice !== undefined && m.totalAmount < minPrice) {
         return false;
       }
@@ -82,8 +98,33 @@ export class MovimientosPage implements OnInit {
     });
   });
 
+  readonly movimientosAgrupadosPorDia = computed<{ fechaStr: string; movimientos: Movimiento[] }[]>(() => {
+    const list = this.movimientosFiltrados();
+    const groupsMap = new Map<string, Movimiento[]>();
+    const orderedKeys: string[] = [];
+
+    for (const m of list) {
+      const d = new Date(m.date);
+      const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const dia = d.getDate();
+      const mes = meses[d.getMonth()];
+      const anio = d.getFullYear();
+      const dateStr = `${dia} ${mes} ${anio}`;
+
+      if (!groupsMap.has(dateStr)) {
+        groupsMap.set(dateStr, []);
+        orderedKeys.push(dateStr);
+      }
+      groupsMap.get(dateStr)!.push(m);
+    }
+
+    return orderedKeys.map((key) => ({
+      fechaStr: key,
+      movimientos: groupsMap.get(key)!,
+    }));
+  });
+
   ngOnInit(): void {
-    // Asegurar que los alumnos estén cargados en el servicio
     void this.alumnosService.asegurarCargados().then(() => {
       this.route.paramMap.subscribe((params) => {
         const alumnoId = params.get('alumnoId');
@@ -111,7 +152,6 @@ export class MovimientosPage implements OnInit {
 
     request$.subscribe({
       next: (data) => {
-        // Ordenar por fecha decreciente (más recientes primero)
         this.rawMovimientos.set(
           [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         );
@@ -136,11 +176,68 @@ export class MovimientosPage implements OnInit {
   }
 
   limpiarFiltros(): void {
+    this.filtroBusqueda.set('');
+    this.filtroFecha.set('');
     this.filtroEstado.set('TODOS');
     this.filtroFechaDesde.set('');
     this.filtroFechaHasta.set('');
     this.filtroPrecioMin.set(null);
     this.filtroPrecioMax.set(null);
+  }
+
+  get activeChips(): { id: string; label: string }[] {
+    const chips = [];
+
+    if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
+      const alumno = this.alumnosService.getAlumnoById(this.selectedAlumnoId());
+      if (alumno) {
+        chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre} ${alumno.apellido}` });
+      }
+    }
+
+    if (this.filtroEstado() !== 'TODOS') {
+      const label = this.filtroEstado() === 'PENDIENTE' ? 'A Preparar' : 'Entregado';
+      chips.push({ id: 'estado', label: `Estado: ${label}` });
+    }
+
+    if (this.filtroPrecioMin() !== null || this.filtroPrecioMax() !== null) {
+      const min = this.filtroPrecioMin() ?? 0;
+      const max = this.filtroPrecioMax() ? `$${this.filtroPrecioMax()}` : 'Max';
+      chips.push({ id: 'rango', label: `Rango: $${min} - ${max}` });
+    }
+
+    if (this.filtroFechaDesde() || this.filtroFechaHasta()) {
+      const desde = this.filtroFechaDesde() ? this.filtroFechaDesde() : 'Inicio';
+      const hasta = this.filtroFechaHasta() ? this.filtroFechaHasta() : 'Fin';
+      chips.push({ id: 'fecha', label: `Fechas: ${desde} a ${hasta}` });
+    }
+
+    return chips;
+  }
+
+  removeChip(id: string): void {
+    if (id === 'alumno') {
+      this.selectedAlumnoId.set('todos');
+      void this.router.navigate(['/movimientos']);
+    } else if (id === 'estado') {
+      this.filtroEstado.set('TODOS');
+    } else if (id === 'rango') {
+      this.filtroPrecioMin.set(null);
+      this.filtroPrecioMax.set(null);
+    } else if (id === 'fecha') {
+      this.filtroFechaDesde.set('');
+      this.filtroFechaHasta.set('');
+    }
+  }
+
+  mostrarHoraOMediodia(mov: Movimiento): string {
+    if (mov.tipo === 'ANTICIPADA' && mov.pickupSlotDescription) {
+      return mov.pickupSlotDescription;
+    }
+    const date = new Date(mov.date);
+    const hora = String(date.getHours()).padStart(2, '0');
+    const mins = String(date.getMinutes()).padStart(2, '0');
+    return `${hora}:${mins} hs`;
   }
 
   abrirDetalle(movimiento: Movimiento): void {
@@ -180,11 +277,59 @@ export class MovimientosPage implements OnInit {
     }).format(date);
   }
 
+  mostrarFecha(mov: Movimiento): string {
+    if (mov.tipo === 'ANTICIPADA' && mov.pickupDate) {
+      const parts = mov.pickupDate.split('-');
+      let dateStr = mov.pickupDate;
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const d = new Date(year, month, day);
+        dateStr = new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium' }).format(d);
+      }
+      const slot = mov.pickupSlotDescription ? ` - ${mov.pickupSlotDescription}` : '';
+      return `${dateStr}${slot}`;
+    }
+    return this.formatearFecha(mov.date);
+  }
+
   volver(): void {
     if (this.esVistaAlumno()) {
       this.router.navigateByUrl('/alumno');
     } else {
       this.router.navigateByUrl('/tutor');
+    }
+  }
+
+  cancelarPedido(id: string): void {
+    if (confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.')) {
+      this.movimientosService.cancelarCompra(id).subscribe({
+        next: () => {
+          this.toastService.mostrar('Pedido cancelado y saldo reembolsado', 'success');
+          
+          this.rawMovimientos.update((list) =>
+            list.map((m) =>
+              m.id === id
+                ? { ...m, status: 'CANCELADO', statusLabel: 'Cancelado' }
+                : m
+            )
+          );
+          
+          const openModal = this.modalMovimiento();
+          if (openModal && openModal.id === id) {
+            this.modalMovimiento.set({
+              ...openModal,
+              status: 'CANCELADO',
+              statusLabel: 'Cancelado'
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error al cancelar el pedido:', err);
+          this.toastService.mostrar('Error al cancelar el pedido', 'error');
+        }
+      });
     }
   }
 }

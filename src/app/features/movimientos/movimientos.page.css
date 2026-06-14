@@ -7,7 +7,7 @@
 }
 
 .movimientos__container {
-  max-width: 960px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -88,33 +88,111 @@
 }
 
 /* Panel de Controles y Filtros */
-.movimientos__panel {
+.movimientos__control-card {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
+  border-radius: 24px;
   padding: 24px;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-/* Control Alumno (Principal) */
-.movimientos__control-alumno {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 320px;
-}
-
-/* Filtros Secundarios Grid */
-.movimientos__filtros {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 16px;
-  align-items: flex-end;
+}
+
+.movimientos__search-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.movimientos__search-input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.movimientos__search-input-wrapper .search-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--color-texto-claro);
+  font-size: 16px;
+}
+
+.movimientos__search-input {
+  width: 100%;
+  padding: 12px 16px 12px 46px;
+  background-color: #f8fafc;
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a3b5c;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.movimientos__search-input:focus {
+  background-color: var(--color-superficie);
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.movimientos__btn-filtros-avanzados {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  color: #1a3b5c;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+  transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.movimientos__btn-filtros-avanzados:hover {
+  background-color: #f8fafc;
+}
+
+.movimientos__btn-filtros-avanzados:active {
+  transform: scale(0.98);
+}
+
+.movimientos__btn-filtros-avanzados.active {
+  border-color: var(--color-dorado);
+  background-color: color-mix(in srgb, var(--color-dorado) 4%, var(--color-superficie));
+}
+
+.movimientos__btn-filtros-avanzados i {
+  color: var(--color-dorado);
+  font-size: 14px;
+}
+
+/* Panel Colapsable de Filtros Avanzados */
+.movimientos__filtros-avanzados-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s ease;
+  padding: 0;
+}
+
+.movimientos__filtros-avanzados-panel.open {
+  max-height: 500px;
   border-top: 1px dashed var(--color-borde-fuerte);
   padding-top: 20px;
+  margin-top: 4px;
+}
+
+.movimientos__filtros-avanzados-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .movimientos__filtro-group {
@@ -123,21 +201,15 @@
   gap: 8px;
 }
 
-/* Forzar que el botón de limpiar no use grid de inputs o se alinee bien */
-.movimientos__filtro-group--btn {
-  justify-self: stretch;
-}
-
 .movimientos__label {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--color-pizarra);
 }
 
-/* Inputs y Selects */
 .movimientos__select-wrapper {
   position: relative;
   width: 100%;
@@ -145,30 +217,22 @@
 
 .movimientos__select {
   width: 100%;
-  padding: 12px 36px 12px 14px;
-  background-color: var(--color-superficie-alt);
-  border: 1px solid transparent;
+  padding: 11px 36px 11px 14px;
+  background-color: #f8fafc;
+  border: 1px solid var(--color-borde);
   border-radius: 10px;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-texto-oscuro);
+  color: #1a3b5c;
   cursor: pointer;
   appearance: none;
-  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
-}
-
-.movimientos__select--alumno {
-  background-color: color-mix(in srgb, var(--color-pizarra) 6%, var(--color-superficie));
-  border: 1px solid var(--color-borde-fuerte);
-  font-size: 15px;
-  font-weight: 600;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
 .movimientos__select:focus {
   background-color: var(--color-superficie);
-  border-color: var(--color-pizarra);
-  box-shadow: 0 0 0 3px var(--color-foco);
+  border-color: #3b82f6;
   outline: none;
 }
 
@@ -184,25 +248,23 @@
 
 .movimientos__input {
   width: 100%;
-  padding: 11px 14px;
-  background-color: var(--color-superficie-alt);
-  border: 1px solid transparent;
+  padding: 10px 14px;
+  background-color: #f8fafc;
+  border: 1px solid var(--color-borde);
   border-radius: 10px;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-texto-oscuro);
-  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  color: #1a3b5c;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
 .movimientos__input:focus {
   background-color: var(--color-superficie);
-  border-color: var(--color-pizarra);
-  box-shadow: 0 0 0 3px var(--color-foco);
+  border-color: #3b82f6;
   outline: none;
 }
 
-/* Input Monto con $ */
 .movimientos__input-monto-wrapper {
   position: relative;
   width: 100%;
@@ -222,14 +284,16 @@
   padding-left: 28px;
 }
 
-/* Botón Limpiar */
+.movimientos__filtros-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .movimientos__limpiar-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  width: 100%;
-  padding: 12px 16px;
+  padding: 10px 16px;
   background-color: transparent;
   border: 1px dashed var(--color-pizarra);
   color: var(--color-pizarra);
@@ -237,7 +301,8 @@
   font-weight: 700;
   font-size: 13px;
   border-radius: 10px;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
 }
 
 .movimientos__limpiar-btn:hover {
@@ -245,46 +310,109 @@
   color: var(--color-pizarra-dark);
 }
 
-.movimientos__limpiar-btn:active {
-  transform: translateY(1px);
+/* Chips de Filtros Activos */
+.movimientos__chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid var(--color-borde);
+  padding-top: 16px;
 }
 
-/* Listado de tarjetas */
+.movimientos__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #f1f5f9;
+  color: #1a3b5c;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.movimientos__chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 50%;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.movimientos__chip-remove:hover {
+  background-color: #e2e8f0;
+  color: #ef4444;
+}
+
+/* Timeline y Agrupamiento por Día */
 .movimientos__list-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
-.movimientos__lista {
+.movimientos__timeline {
   display: flex;
   flex-direction: column;
-  gap: 14px;
 }
 
-.movimientos__card {
+.movimientos__fecha-grupo {
+  display: flex;
+  flex-direction: column;
+}
+
+.movimientos__fecha-titulo {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-texto-claro);
+  margin: 32px 0 12px 4px;
+  text-transform: capitalize;
+  text-align: left;
+}
+
+.movimientos__fecha-card {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
-  padding: 16px 20px;
+  border-radius: 24px;
   box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Fila de Movimiento individual */
+.movimientos__fila {
+  display: grid;
+  grid-template-columns: 1fr 140px 300px 240px;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 24px;
+  transition: background-color 0.2s ease;
+}
+
+.movimientos__fila:hover {
+  background-color: #fafbfc;
+}
+
+.movimientos__fila-left {
   display: flex;
   align-items: center;
   gap: 18px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex: 1;
 }
 
-.movimientos__card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-elevated);
-}
-
-/* Iniciales Círculo */
 .movimientos__iniciales {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: var(--color-pizarra);
+  background-color: #1a3b5c; /* Unified dark slate blue for all avatars */
   color: var(--color-superficie);
   display: flex;
   align-items: center;
@@ -293,136 +421,150 @@
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(74, 111, 165, 0.2);
+  box-shadow: 0 4px 10px rgba(26, 59, 92, 0.12);
+  flex-shrink: 0;
 }
 
-/* Cambiar colores de círculos según ID de alumnos para más variedad */
-.movimientos__iniciales[data-alumno="julian-garcia"] {
-  background-color: #4A6FA5;
-}
-.movimientos__iniciales[data-alumno="mateo-garcia"] {
-  background-color: #E76F51;
-}
-.movimientos__iniciales[data-alumno="sofia-garcia"] {
-  background-color: #81B29A;
-}
-
-/* Cuerpo Tarjeta */
-.movimientos__card-body {
-  flex-grow: 1;
+.movimientos__fila-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
-.movimientos__card-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.movimientos__card-nombre {
+.movimientos__fila-nombre {
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
-  color: var(--color-texto-oscuro);
+  color: #1a3b5c; /* Navy blue */
   margin: 0;
 }
 
-.movimientos__card-fecha {
-  font-size: 12px;
-  color: var(--color-texto-claro);
-  font-weight: 500;
-}
-
-.movimientos__card-resumen {
+.movimientos__fila-resumen {
   font-size: 13px;
-  color: var(--color-texto-claro);
+  color: #64748b;
   margin: 0;
   line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
 }
 
-.movimientos__card-item {
-  color: var(--color-texto-oscuro);
+.movimientos__fila-item {
+  color: #1a3b5c;
   font-weight: 600;
 }
 
-/* Columna Derecha Tarjeta */
-.movimientos__card-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  flex-shrink: 0;
-  min-width: 130px;
+.movimientos__fila-clave {
+  font-size: 12px;
+  color: #64748b;
+  margin: 2px 0 0 0;
 }
 
-.movimientos__card-monto {
+.movimientos__fila-clave strong {
+  color: var(--color-melocoton);
+  font-weight: 700;
+}
+
+/* Columnas de Status y Tiempo */
+.movimientos__fila-status-col {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  min-width: 140px;
+}
+
+.movimientos__status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.movimientos__status-pill[data-status="PENDIENTE"],
+.movimientos__status-pill[data-status="PENDING"] {
+  background-color: #ffedd5; /* Very soft orange */
+  color: #c2410c; /* Saturated orange text */
+}
+
+.movimientos__status-pill[data-status="ENTREGADO"],
+.movimientos__status-pill[data-status="APPROVED"] {
+  background-color: #d1fae5; /* Very soft green */
+  color: #0f766e; /* Saturated green text */
+}
+
+.movimientos__status-pill[data-status="CANCELADO"],
+.movimientos__status-pill[data-status="REJECTED"] {
+  background-color: #fee2e2; /* Very soft red */
+  color: #b91c1c; /* Saturated red text */
+}
+
+.movimientos__fila-time-col {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  min-width: 180px;
+}
+
+.movimientos__fila-time-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Columna Derecha con Monto y Botón dorado */
+.movimientos__fila-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: flex-end;
+  min-width: 240px;
+  flex-shrink: 0;
+}
+
+.movimientos__fila-monto {
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 800;
-  color: var(--color-texto-oscuro);
+  color: #1a3b5c;
+  min-width: 70px;
+  text-align: right;
 }
 
-/* Status Badge */
-.movimientos__status-badge {
+.movimientos__fila-detalles-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.movimientos__status-badge[data-status="PENDIENTE"] {
-  background-color: rgba(231, 111, 81, 0.12);
-  color: var(--color-melocoton);
-}
-
-.movimientos__status-badge[data-status="PENDIENTE"] .status-dot {
-  background-color: var(--color-melocoton);
-}
-
-.movimientos__status-badge[data-status="ENTREGADO"] {
-  background-color: rgba(129, 178, 154, 0.12);
-  color: var(--color-menta);
-}
-
-.movimientos__status-badge[data-status="ENTREGADO"] .status-dot {
-  background-color: var(--color-menta);
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.movimientos__detalles-btn {
+  padding: 10px 18px;
+  background-color: var(--color-dorado);
+  color: #1a3b5c;
   font-family: var(--font-display);
+  font-weight: 800;
   font-size: 12px;
-  font-weight: 700;
-  color: var(--color-pizarra);
-  text-decoration: underline;
-  padding: 2px 4px;
-  transition: color 0.2s;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(242, 183, 5, 0.15);
+  transition: background-color 0.15s, transform 0.1s, box-shadow 0.15s;
 }
 
-.movimientos__detalles-btn:hover {
-  color: var(--color-pizarra-dark);
+.movimientos__fila-detalles-btn:hover {
+  background-color: var(--color-dorado-dark);
+  box-shadow: 0 6px 14px rgba(242, 183, 5, 0.22);
 }
 
-/* Vistas Alternativas: Carga, Vacío, Error */
+.movimientos__fila-detalles-btn:active {
+  transform: scale(0.97);
+}
+
+.movimientos__fila-divider {
+  height: 1px;
+  background-color: #f1f5f9; /* Subtle light gray line */
+  margin: 0 24px;
+}
+
+/* Skeletons y errores */
 .movimientos__loading {
   display: flex;
   flex-direction: column;
@@ -432,8 +574,8 @@
 .movimientos__skeleton-card {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
-  padding: 18px 20px;
+  border-radius: 24px;
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   gap: 18px;
@@ -501,7 +643,7 @@
 .movimientos__error-card {
   background-color: var(--color-superficie);
   border: 1px solid rgba(231, 111, 81, 0.25);
-  border-radius: var(--radius-card);
+  border-radius: 24px;
   padding: 32px 24px;
   text-align: center;
   box-shadow: var(--shadow-card);
@@ -533,6 +675,7 @@
   border-radius: var(--radius-button);
   box-shadow: 0 4px 12px rgba(231, 111, 81, 0.25);
   transition: transform 0.15s, opacity 0.2s;
+  cursor: pointer;
 }
 
 .movimientos__reintentar-btn:hover {
@@ -547,7 +690,7 @@
 .movimientos__vacio-card {
   background-color: var(--color-superficie);
   border: 1px dashed var(--color-borde-fuerte);
-  border-radius: var(--radius-card);
+  border-radius: 24px;
   padding: 48px 24px;
   text-align: center;
   display: flex;
@@ -585,6 +728,33 @@
 }
 
 /* Responsive */
+@media (max-width: 992px) {
+  .movimientos__fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .movimientos__fila-left {
+    min-width: 100%;
+  }
+
+  .movimientos__fila-status-col {
+    justify-content: flex-start;
+    min-width: 100px;
+  }
+
+  .movimientos__fila-time-col {
+    justify-content: flex-start;
+    min-width: 120px;
+  }
+
+  .movimientos__fila-right {
+    min-width: unset;
+    flex: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .movimientos {
     padding-top: 24px;
@@ -595,84 +765,52 @@
     gap: 20px;
   }
 
-  .movimientos__panel {
+  .movimientos__control-card {
     padding: 20px;
     gap: 16px;
   }
 
-  .movimientos__control-alumno {
-    max-width: 100%;
-  }
-
-  .movimientos__filtros {
+  .movimientos__filtros-avanzados-grid {
     grid-template-columns: 1fr 1fr;
-    padding-top: 16px;
   }
 
-  .movimientos__filtro-group--btn {
-    grid-column: span 2;
-    margin-top: 4px;
+  .movimientos__fila {
+    padding: 16px 20px;
   }
 
-  .movimientos__card {
-    padding: 14px 16px;
-    gap: 14px;
-  }
-
-  .movimientos__iniciales {
-    width: 44px;
-    height: 44px;
-    font-size: 14px;
+  .movimientos__fecha-card {
+    border-radius: 18px;
   }
 }
 
 @media (max-width: 600px) {
-  .movimientos__card {
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-
-  .movimientos__card-left {
-    order: 1;
-  }
-
-  .movimientos__card-body {
-    order: 2;
-    width: calc(100% - 60px);
-  }
-
-  .movimientos__card-right {
-    order: 3;
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    border-top: 1px solid var(--color-borde);
-    padding-top: 10px;
-    margin-top: 6px;
-    min-width: unset;
-  }
-
-  .movimientos__card-row {
+  .movimientos__search-row {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
+    align-items: stretch;
   }
 
-  .movimientos__card-fecha {
-    font-size: 11px;
+  .movimientos__btn-filtros-avanzados {
+    justify-content: center;
+  }
+
+  .movimientos__filtros-avanzados-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .movimientos__fila-divider {
+    margin: 0 16px;
+  }
+
+  .movimientos__fila-right {
+    min-width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+    margin-top: 4px;
   }
 }
 
 @media (max-width: 480px) {
-  .movimientos__filtros {
-    grid-template-columns: 1fr;
-  }
-
-  .movimientos__filtro-group--btn {
-    grid-column: span 1;
-  }
-
   .movimientos__titulo {
     font-size: 20px;
   }

@@ -11,6 +11,7 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { CarritoService } from '../compra/services/carrito.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { Producto } from '../buffet/models/producto.model';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
 
 describe('FavoritosPage', () => {
   let component: FavoritosPage;
@@ -38,7 +39,6 @@ describe('FavoritosPage', () => {
     perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerAlumnoId']);
     toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
 
-    // Mocks por defecto
     perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-123');
     favoritosServiceSpy.getFavoritos.and.returnValue(of([mockProducto]));
 
@@ -50,6 +50,7 @@ describe('FavoritosPage', () => {
         provideRouter([]),
         { provide: FavoritosService, useValue: favoritosServiceSpy },
         { provide: PerfilService, useValue: perfilServiceSpy },
+        { provide: AlumnosService, useValue: {} },
         UsuarioService, // Usar UsuarioService real para resolver señales y métodos de manera correcta
         CarritoService, // Usar CarritoService real para evitar que falle Navbar con cartCount
         { provide: ToastService, useValue: toastServiceSpy },

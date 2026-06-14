@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 import { PanelKiosquero } from '../models/panel-kiosquero.model';
+import { ResumenKiosquero } from '../models/resumen-kiosquero.model';
 
 export interface DashboardRangeParams {
   from: string;
@@ -30,6 +31,15 @@ export class HomeKiosqueroService {
       `${this.kiosquerosUrl}/${buffetId}/dashboard`,
       { params: this.buildRangeParams(range) },
     );
+  }
+
+  getResumen(): ResumenKiosquero {
+    return {
+      gananciasHoy: 12450,
+      ventasHoy: 34,
+      productosSinStock: 5,
+      pedidosPendientes: 8,
+    };
   }
 
   getNombreKiosquero(): string {

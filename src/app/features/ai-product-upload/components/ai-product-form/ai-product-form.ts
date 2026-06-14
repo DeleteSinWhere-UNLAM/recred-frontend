@@ -89,7 +89,7 @@ export class AiProductForm implements OnInit, OnChanges {
         nuevaCategoriaNombre: formValue.categoriaId === 'NEW' ? formValue.nuevaCategoriaNombre : '',
         buffetId: this.buffetId,
         stockActual: formValue.stockActual,
-        clasificacionesSaludIds: ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'],
+        clasificacionesSaludIds: this.buildHealthClassificationIds(formValue),
         tiposIds: [],
       };
       this.save.emit(request);
@@ -112,10 +112,12 @@ export class AiProductForm implements OnInit, OnChanges {
 
   private buildHealthClassificationIds(formValue: Record<string, boolean>): string[] {
     const ids: string[] = [];
-    if (formValue['contiene_azucar']) ids.push('AZUCAR');
-    if (formValue['contiene_mani']) ids.push('MANI');
-    if (formValue['contiene_lactosa']) ids.push('LACTOSA');
-    if (formValue['contiene_tacc']) ids.push('TACC');
+    // Si el producto NO contiene TACC → etiqueta "Sin TACC" (apto para celíacos)
+    if (!formValue['contiene_tacc']) ids.push('15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8');
+    // Si el producto NO contiene azúcar → etiqueta "Sin Azúcar"
+    if (!formValue['contiene_azucar']) ids.push('7e113952-93ca-4797-a80d-54f3a31b2165');
+    // Si el producto SÍ contiene lácteos → etiqueta "Contiene Lácteos"
+    if (formValue['contiene_lactosa']) ids.push('a087290b-474e-4a8c-9e5d-ce1c375d4009');
     return ids;
   }
 }

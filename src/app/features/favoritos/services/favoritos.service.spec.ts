@@ -74,7 +74,6 @@ describe('FavoritosService', () => {
       };
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfil);
 
-      // getFavoritos internamente llama a getPath
       service.getFavoritos(uuidAlumno).subscribe();
 
       const req = httpMock.expectOne(`${environment.apiUrl}/usuarios/${uuidAlumno}/preferencias/favoritos`);
@@ -165,7 +164,6 @@ describe('FavoritosService', () => {
 
       service.agregarFavorito(uuidAlumno, mockProducto).subscribe({
         next: () => {
-          // El request se completó con éxito, no debe guardarse en localstorage si el backend responde ok
           const key = `recred.favoritos.${uuidAlumno}`;
           expect(localStorage.getItem(key)).toBeNull();
           done();

@@ -19,4 +19,16 @@ export class ColegioSectionComponent {
   toggle(): void {
     this.expandido.update((v) => !v);
   }
+
+  get totalSaldo(): number {
+    return this.alumnos.reduce((sum, a) => sum + a.saldo, 0);
+  }
+
+  get totalSaldoFormateado(): string {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      maximumFractionDigits: 0,
+    }).format(this.totalSaldo);
+  }
 }

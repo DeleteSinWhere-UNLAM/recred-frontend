@@ -77,10 +77,10 @@ export class ProductFormComponent implements OnInit, OnChanges {
         categoriaId: this.product.categoriaId || 'NEW',
         nuevaCategoriaNombre: this.product.categoriaId ? '' : (this.product.categoriaNombre || ''),
         requierePreparacion: this.product.requierePreparacion,
-        contiene_azucar: false, // Update with actual product health flags if available in Product interface
+        contiene_azucar: this.product.clasificacionesSalud ? !this.product.clasificacionesSalud.some(c => c.descripcion === 'Sin Azúcar') : false,
         contiene_mani: false,
-        contiene_lactosa: false,
-        contiene_tacc: false,
+        contiene_lactosa: this.product.clasificacionesSalud ? this.product.clasificacionesSalud.some(c => c.descripcion === 'Contiene Lácteos') : false,
+        contiene_tacc: this.product.clasificacionesSalud ? !this.product.clasificacionesSalud.some(c => c.descripcion === 'Sin TACC') : false,
       });
     }
 

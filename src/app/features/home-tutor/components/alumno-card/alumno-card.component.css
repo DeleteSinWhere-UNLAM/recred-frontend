@@ -5,8 +5,8 @@
   padding: 24px;
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
 }
 
 .alumno-card__header {
@@ -14,7 +14,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
 }
 
 .alumno-card__identidad {
@@ -33,19 +32,19 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: var(--color-pizarra);
-  color: #fff;
+  background-color: #1a3b5c; /* Deep slate blue */
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 24px;
   letter-spacing: 0.5px;
   box-shadow:
-    0 0 0 3px var(--color-superficie),
-    0 0 0 5px rgba(242, 183, 5, 0.72),
-    0 10px 22px rgba(74, 111, 165, 0.18);
+    0 0 0 3px #ffffff,
+    0 0 0 5px var(--color-dorado),
+    0 8px 16px rgba(74, 111, 165, 0.1);
 }
 
 .alumno-card__texto {
@@ -57,9 +56,9 @@
 
 .alumno-card__nombre {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
-  color: var(--color-pizarra);
+  color: #1a3b5c;
   line-height: 1.2;
   margin: 0;
   word-break: break-word;
@@ -70,44 +69,47 @@
   align-items: center;
   gap: 6px;
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--color-texto-claro);
+  color: #64748b;
 }
 
 .alumno-card__grado i {
-  color: var(--color-menta);
-  font-size: 13px;
+  color: #10b981; /* Green cap */
+  font-size: 14px;
 }
 
+/* Saldo Display Box */
 .alumno-card__saldo {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
-  padding: 10px 16px;
-  background-color: rgba(74, 111, 165, 0.08);
-  border: 1px solid rgba(74, 111, 165, 0.12);
-  border-radius: 14px;
-  color: var(--color-pizarra);
-  box-shadow: var(--shadow-neu-concave);
+  padding: 8px 16px;
+  background-color: rgba(74, 111, 165, 0.05);
+  border: 1px solid rgba(74, 111, 165, 0.08);
+  border-radius: 12px;
+  color: #1a3b5c;
   flex-shrink: 0;
 }
 
 .alumno-card__saldo--negativo {
-  background-color: color-mix(in srgb, var(--color-melocoton) 14%, var(--color-fondo));
+  background-color: #fef2f2;
+  border-color: #fecaca;
   color: var(--color-melocoton);
 }
 
+.alumno-card__saldo--bajo {
+  background-color: #fef2f2;
+  border-color: #ef4444; /* red frame border */
+  color: #ef4444;
+}
+
 .alumno-card__saldo-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-display);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
 }
 
 .alumno-card__saldo-valor {
@@ -117,141 +119,179 @@
   line-height: 1.1;
 }
 
-.alumno-card__acciones {
+/* 3x3 Actions Grid */
+.alumno-card__acciones-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
-.alumno-card__accion {
+.alumno-card__btn {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 14px 10px;
-  background-color: var(--color-superficie);
-  color: var(--color-texto-oscuro);
-  border: 1px solid var(--color-borde);
-  border-radius: 14px;
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
+  gap: 6px;
+  padding: 8px 4px;
+  background-color: #f8fafc;
+  border: 1px solid rgba(74, 111, 165, 0.05);
+  border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(74, 111, 165, 0.06);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.alumno-card__accion:hover {
+.alumno-card__btn:hover {
   transform: translateY(-2px);
-  border-color: var(--color-borde-fuerte);
-  box-shadow: var(--shadow-card);
+  border-color: rgba(74, 111, 165, 0.15);
+  box-shadow: 0 4px 10px rgba(74, 111, 165, 0.04);
 }
 
-.alumno-card__accion:active {
-  transform: scale(0.97);
-  box-shadow: var(--shadow-neu-concave);
-}
-
-.alumno-card__accion-icono {
+.alumno-card__btn-icono {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background-color: rgba(74, 111, 165, 0.06);
-  box-shadow: inset 0 0 0 1px rgba(74, 111, 165, 0.08);
-  font-size: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 13px;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+
+.alumno-card__btn-label {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475569;
+  text-align: center;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+/* Badge count inside the icon circle */
+.alumno-card__btn-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3b82f6; /* Blue badge */
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 850;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  line-height: 1;
+  border: 1px solid #ffffff;
+}
+
+/* Color schemes for the 9 buttons */
+.alumno-card__btn--menta .alumno-card__btn-icono {
+  background-color: #22c55e; /* Green - Acreditar */
+}
+
+.alumno-card__btn--melocoton .alumno-card__btn-icono {
+  background-color: #ef4444; /* Red - Restricciones */
+}
+
+.alumno-card__btn--azul .alumno-card__btn-icono {
+  background-color: #3b82f6; /* Blue - Horarios */
+}
+
+.alumno-card__btn--dorado .alumno-card__btn-icono {
+  background-color: #f59e0b; /* Yellow - Presupuesto */
+}
+
+.alumno-card__btn--pizarra .alumno-card__btn-icono {
+  background-color: #64748b; /* Slate - Estadística */
+}
+
+.alumno-card__btn--morado .alumno-card__btn-icono {
+  background-color: #a855f7; /* Purple - Pendientes */
+}
+
+.alumno-card__btn--gris .alumno-card__btn-icono {
+  background-color: #475569; /* Dark Grey - Movimientos */
+}
+
+.alumno-card__btn--celeste .alumno-card__btn-icono {
+  background-color: #06b6d4; /* Light Blue - Predicción */
+}
+
+.alumno-card__btn--violeta .alumno-card__btn-icono {
+  background-color: #8b5cf6; /* Violet - Preferencias */
+}
+
+/* Budget Row Style */
+.alumno-card__budget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a3b5c;
+}
+
+.alumno-card__budget-label {
+  color: #64748b;
   flex-shrink: 0;
 }
 
-.alumno-card__accion-label {
-  line-height: 1.2;
+.alumno-card__budget-bar {
+  flex: 1;
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
 }
 
-.alumno-card__accion--menta .alumno-card__accion-icono {
-  background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
-  color: var(--color-menta);
+.alumno-card__budget-progress {
+  height: 100%;
+  background-color: #10b981; /* green progress */
+  border-radius: 999px;
 }
 
-.alumno-card__accion--melocoton .alumno-card__accion-icono {
-  background-color: color-mix(in srgb, var(--color-melocoton) 18%, var(--color-fondo));
-  color: var(--color-melocoton);
+.alumno-card__budget-percentage {
+  color: #64748b;
+  font-weight: 800;
+  flex-shrink: 0;
 }
 
-.alumno-card__accion--pizarra .alumno-card__accion-icono {
-  background-color: color-mix(in srgb, var(--color-pizarra) 14%, var(--color-fondo));
-  color: var(--color-pizarra);
-}
-
-.alumno-card__accion--dorado .alumno-card__accion-icono {
-  background-color: color-mix(in srgb, var(--color-dorado) 22%, var(--color-fondo));
-  color: var(--color-dorado-dark);
-}
-
-.alumno-card__config {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  background-color: rgba(74, 111, 165, 0.05);
-  border: 1px solid var(--color-borde);
-  border-radius: 12px;
-  box-shadow: none;
-}
-
-.alumno-card__config-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-body);
+.alumno-card__budget-fraction {
+  color: #1a3b5c;
+  font-weight: 800;
+  flex-shrink: 0;
   font-size: 12px;
-  font-weight: 600;
-  color: var(--color-texto-claro);
-  text-decoration: none;
-  text-align: center;
-  transition: color 0.15s ease;
+  background-color: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
 }
 
-.alumno-card__config-link i {
-  color: var(--color-pizarra);
-  font-size: 13px;
-  opacity: 0.7;
-  transition: opacity 0.15s ease;
-}
-
-.alumno-card__config-link:hover {
-  color: var(--color-pizarra);
-}
-
-.alumno-card__config-link:hover i {
-  opacity: 1;
-}
-
+/* CTA "Ir al Buffet" Button */
 .alumno-card__cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   width: 100%;
-  padding: 14px 16px;
+  padding: 14px;
   background-color: var(--color-dorado);
-  color: var(--color-texto-oscuro);
-  border-radius: 14px;
+  color: #1a3b5c; /* High contrast text */
+  border-radius: 16px;
   font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   letter-spacing: 0.3px;
   text-decoration: none;
-  box-shadow: 0 10px 22px rgba(217, 163, 4, 0.18);
+  box-shadow: 0 8px 20px rgba(242, 183, 5, 0.18);
   transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
@@ -261,53 +301,26 @@
 
 .alumno-card__cta:active {
   transform: scale(0.98);
-  box-shadow:
-    inset 0 0 0 1px rgba(180, 130, 0, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(180, 130, 0, 0.26);
 }
 
-@media (max-width: 520px) {
+@media (max-width: 480px) {
   .alumno-card {
     padding: 20px;
-    gap: 16px;
   }
-
-  .alumno-card__header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .alumno-card__saldo {
-    align-items: center;
-    width: 100%;
-  }
-
-  .alumno-card__avatar {
-    width: 56px;
-    height: 56px;
-    font-size: 19px;
-  }
-
-  .alumno-card__nombre {
-    font-size: 18px;
-  }
-
-  .alumno-card__acciones {
-    gap: 8px;
-  }
-
-  .alumno-card__accion {
-    padding: 12px 6px;
-    font-size: 11px;
-  }
-
-  .alumno-card__accion-icono {
-    width: 34px;
-    height: 34px;
-  }
-
-  .alumno-card__config {
+  
+  .alumno-card__acciones-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .alumno-card__budget {
+    flex-wrap: wrap;
     gap: 8px;
-    padding: 10px 12px;
+  }
+
+  .alumno-card__budget-bar {
+    width: 100%;
+    order: 4;
+    flex: none;
   }
 }

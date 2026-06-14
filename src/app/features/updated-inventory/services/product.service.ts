@@ -2,7 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Product, CreateProductRequest, UpdateProductRequest } from '../models/product.interface';
+import { Product } from '../models/product.interface';
+import { CreateProductRequest } from '../models/requests/create-product-request.interface';
+import { UpdateProductRequest } from '../models/requests/update-product-request.interface';
 import { Category } from '../models/category.interface';
 import {
   InventoryStockMovement,

@@ -38,8 +38,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "10kb",
-                  "maximumError": "25kb"
+                  "maximumWarning": "90kb",
+                  "maximumError": "100kb"
                 }
               ],
               "outputHashing": "all"
@@ -60,6 +60,13 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": [
+              "5cpbvx-ip-179-37-104-36.tunnelmole.net",
+              ".tunnelmole.net",
+              "localhost"
+            ]
+          },
           "configurations": {
             "production": {
               "buildTarget": "recreopago:build:production"

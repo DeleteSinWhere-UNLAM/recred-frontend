@@ -3,7 +3,9 @@ import { Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../services/product.service';
-import { CreateProductRequest, Product } from '../models/product.interface';
+import { Product } from '../models/product.interface';
+import { CreateProductRequest } from '../models/requests/create-product-request.interface';
+import { UpdateProductRequest } from '../models/requests/update-product-request.interface';
 import { Category } from '../models/category.interface';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
@@ -11,6 +13,7 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
+import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 import { InventoryRealtimeService } from '../services/inventory-realtime.service';
 import {
   EstadoInventario,
@@ -25,7 +28,24 @@ import {
   getOperationalStockStatus,
 } from '../models/inventory-visual-state';
 
-const HEALTH_CLASSIFICATION_IDS = ['15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8'];
+// IDs de clasificaciones de salud en la base de datos
+const CLASIFICACION_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
+const CLASIFICACION_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
+const CLASIFICACION_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+
+/**
+ * Construye el array de IDs de clasificaciones de salud según el formulario.
+ * - contiene_tacc = false  → agrega "Sin TACC" (apto para celíacos)
+ * - contiene_azucar = false → agrega "Sin Azúcar"
+ * - contiene_lactosa = true → agrega "Contiene Lácteos"
+ */
+function buildHealthClassificationIds(data: ProductFormData): string[] {
+  const ids: string[] = [];
+  if (!data.contiene_tacc) ids.push(CLASIFICACION_SIN_TACC);
+  if (!data.contiene_azucar) ids.push(CLASIFICACION_SIN_AZUCAR);
+  if (data.contiene_lactosa) ids.push(CLASIFICACION_CONTIENE_LACTEOS);
+  return ids;
+}
 
 const INVENTORY_ERROR_MESSAGES: Record<string, string> = {
   STOCK_INSUFFICIENT: 'No hay stock suficiente.',
@@ -85,6 +105,7 @@ type InventoryManagementShortcut = 'MAKE_AVAILABLE' | 'PAUSE' | 'SOLD_OUT';
     NavbarComponent,
     ProductTableComponent,
     ProductFormComponent,
+    ConfirmDeleteModalComponent,
     ReactiveFormsModule,
   ],
   templateUrl: './updated-inventory-page.component.html',
@@ -125,6 +146,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   isSaving = false;
   isFormVisible = false;
   selectedProduct: Product | null = null;
+  deleteTarget: Product | null = null;
   activeFilter: InventoryFilter = 'TODOS';
   searchQuery = '';
   realtimeStatus: RealtimeStatus = 'disconnected';
@@ -331,6 +353,22 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     this.isFormVisible = true;
   }
 
+  openEditForm(product: Product): void {
+    this.selectedProduct = product;
+    this.isFormVisible = true;
+  }
+
+  openEditFormFromInventory(product: InventoryOverviewItem): void {
+    this.productService.getById(product.productId).subscribe({
+      next: (fullProduct) => {
+        this.openEditForm(this.normalizeEditableProduct(fullProduct));
+      },
+      error: () => {
+        this.toastService.mostrar('Error al cargar el producto', 'error');
+      },
+    });
+  }
+
   closeForm(): void {
     this.isFormVisible = false;
     this.selectedProduct = null;
@@ -345,7 +383,42 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     }
 
     this.isSaving = true;
-    this.createProduct(data, currentBuffetId);
+    if (this.selectedProduct) {
+      this.updateProduct(this.selectedProduct.id, data, currentBuffetId);
+    } else {
+      this.createProduct(data, currentBuffetId);
+    }
+  }
+
+  requestDelete(product: Product): void {
+    this.deleteTarget = product;
+  }
+
+  requestDeleteFromInventory(product: InventoryOverviewItem): void {
+    this.deleteTarget = this.productFromInventoryOverview(product);
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteTarget) {
+      return;
+    }
+
+    const id = this.deleteTarget.id;
+    this.deleteTarget = null;
+
+    this.productService.delete(id).subscribe({
+      next: () => {
+        this.products = this.products.filter((product) => product.productId !== id);
+        this.toastService.mostrar('Producto eliminado correctamente', 'success');
+      },
+      error: () => {
+        this.toastService.mostrar('Error al eliminar el producto', 'error');
+      },
+    });
+  }
+
+  cancelDelete(): void {
+    this.deleteTarget = null;
   }
 
   openInventoryManagement(product: InventoryOverviewItem): void {
@@ -586,7 +659,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : '',
       buffetId,
       stockActual: data.stockActual,
-      clasificacionesSaludIds: HEALTH_CLASSIFICATION_IDS,
+      clasificacionesSaludIds: buildHealthClassificationIds(data),
       tiposIds: null,
     };
 
@@ -600,6 +673,34 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       error: () => {
         this.isSaving = false;
         this.toastService.mostrar('Error al crear el producto', 'error');
+      },
+    });
+  }
+
+  private updateProduct(id: string, data: ProductFormData, buffetId: string): void {
+    const isNewCategory = data.categoriaId === 'NEW';
+    const payload: UpdateProductRequest = {
+      nombre: data.nombre,
+      descripcion: data.descripcion,
+      precio: data.precio,
+      peso: data.peso,
+      requierePreparacion: data.requierePreparacion,
+      stockActual: data.stockActual,
+      buffetId,
+      categoriaId: isNewCategory ? '' : (data.categoriaId || ''),
+      clasificacionesSaludIds: buildHealthClassificationIds(data),
+    };
+
+    this.productService.update(id, payload).subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.closeForm();
+        this.loadProducts(false);
+        this.toastService.mostrar('Producto actualizado exitosamente', 'success');
+      },
+      error: () => {
+        this.isSaving = false;
+        this.toastService.mostrar('Error al actualizar el producto', 'error');
       },
     });
   }
@@ -1102,6 +1203,27 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       .toLocaleLowerCase('es-AR')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  private normalizeEditableProduct(product: Product): Product {
+    return {
+      ...product,
+      categoriaId: product.categoriaId ?? product.categoria?.id ?? null,
+      categoriaNombre:
+        product.categoriaNombre ?? product.categoria?.descripcion ?? '',
+    };
+  }
+
+  private productFromInventoryOverview(product: InventoryOverviewItem): Product {
+    return {
+      id: product.productId,
+      nombre: product.nombre,
+      descripcion: '',
+      precio: product.precio,
+      peso: 0,
+      requierePreparacion: false,
+      stockActual: product.stockActual ?? 0,
+    };
   }
 
   private obtenerBuffetIdActual(): string | null {

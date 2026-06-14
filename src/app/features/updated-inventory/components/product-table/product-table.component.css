@@ -366,6 +366,16 @@
   color: #3f7a5d;
 }
 
+.product-table__btn--edit {
+  background-color: color-mix(in srgb, var(--color-dorado) 22%, var(--color-fondo));
+  color: var(--color-texto-oscuro);
+}
+
+.product-table__btn--delete {
+  background-color: color-mix(in srgb, var(--color-melocoton) 14%, var(--color-fondo));
+  color: var(--color-melocoton);
+}
+
 @media (max-width: 760px) {
   .product-table__grid {
     grid-template-columns: 1fr;
@@ -657,6 +667,32 @@
 
 .product-table__btn--history:hover {
   background-color: rgba(129, 178, 154, 0.22);
+}
+
+.product-table__btn--edit {
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 12px;
+  background-color: rgba(242, 183, 5, 0.18);
+  color: var(--color-texto-oscuro);
+  font-weight: 900;
+}
+
+.product-table__btn--edit:hover {
+  background-color: rgba(242, 183, 5, 0.26);
+}
+
+.product-table__btn--delete {
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 12px;
+  background-color: rgba(224, 122, 95, 0.14);
+  color: var(--color-melocoton);
+  font-weight: 900;
+}
+
+.product-table__btn--delete:hover {
+  background-color: rgba(224, 122, 95, 0.22);
 }
 
 @media (max-width: 1280px) {

@@ -30,13 +30,21 @@ export interface ResumenLinea {
 })
 export class ResumenOrdenCardComponent {
   private readonly lineasState = signal<ResumenLinea[]>([]);
+  private readonly totalState = signal<number>(0);
 
   @Input({ required: true })
   set lineas(valor: ResumenLinea[]) {
     this.lineasState.set(valor);
   }
 
-  @Input() total = 0;
+  @Input()
+  set total(valor: number) {
+    this.totalState.set(valor);
+  }
+  get total(): number {
+    return this.totalState();
+  }
+
   @Input() ctaLabel = 'Avanzar al Pago';
   @Input() ctaDeshabilitado = false;
   @Input() cargando = false;
@@ -47,7 +55,7 @@ export class ResumenOrdenCardComponent {
   readonly lineasActuales = computed(() => this.lineasState());
 
   readonly totalFormateado = computed(() =>
-    formateadorPrecio.format(this.total),
+    formateadorPrecio.format(this.totalState()),
   );
 
   formatear(valor: number): string {

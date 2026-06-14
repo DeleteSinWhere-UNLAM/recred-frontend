@@ -1,0 +1,29 @@
+@if (notificacionService.state$().show) {
+  <div class="notificacion-panel">
+    <div class="notificacion-header">
+      <div class="notificacion-title-wrap">
+        <div class="notificacion-icon-bg">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+        <h3 class="notificacion-title">¡Saldo bajo!</h3>
+      </div>
+      <button (click)="cerrar()" class="notificacion-close" aria-label="Cerrar notificación">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    
+    <p class="notificacion-body">
+      Tu saldo actual es de <span class="notificacion-amount">${{ notificacionService.state$().balance | number:'1.2-2' }}</span>. Te recomendamos acreditar más saldo para seguir operando sin interrupciones.
+    </p>
+    
+    <div class="notificacion-actions">
+      <button (click)="cerrar()" class="btn-later">
+        Más tarde
+      </button>
+      <button (click)="comprarSaldo()" class="btn-buy">
+        <i class="fa-solid fa-cart-shopping"></i>
+        Acreditar Saldo
+      </button>
+    </div>
+  </div>
+}

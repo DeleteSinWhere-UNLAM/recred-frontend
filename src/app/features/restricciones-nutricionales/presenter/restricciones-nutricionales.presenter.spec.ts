@@ -7,7 +7,10 @@ import {
   ClasificacionSaludBackend,
   RestriccionesNutricionalesService,
 } from '../services/restricciones-nutricionales.service';
+import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
+import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
 import { RestriccionesNutricionalesPresenter } from './restricciones-nutricionales.presenter';
+import { RestriccionHoraria } from '../../restricciones-horarias/models/restriccion-horaria.model';
 
 describe('RestriccionesNutricionalesPresenter', () => {
   const alumnoMock: Alumno = {
@@ -31,6 +34,8 @@ describe('RestriccionesNutricionalesPresenter', () => {
   let presenter: RestriccionesNutricionalesPresenter;
   let alumnosService: jasmine.SpyObj<AlumnosService>;
   let restriccionesService: jasmine.SpyObj<RestriccionesNutricionalesService>;
+  let restriccionesHorariasService: jasmine.SpyObj<RestriccionesHorariasService>;
+  let franjasHorariasService: jasmine.SpyObj<FranjasHorariasService>;
   let toastService: jasmine.SpyObj<ToastService>;
   let router: jasmine.SpyObj<Router>;
 
@@ -43,6 +48,14 @@ describe('RestriccionesNutricionalesPresenter', () => {
       'RestriccionesNutricionalesService',
       ['getCatalogo', 'getRestriccionesAlumno', 'actualizarRestricciones'],
     );
+    restriccionesHorariasService = jasmine.createSpyObj<RestriccionesHorariasService>(
+      'RestriccionesHorariasService',
+      ['getRestriccionesPorAlumno', 'crearRestriccion', 'deshabilitarRestriccion'],
+    );
+    franjasHorariasService = jasmine.createSpyObj<FranjasHorariasService>(
+      'FranjasHorariasService',
+      ['getFranjasHorarias'],
+    );
     toastService = jasmine.createSpyObj<ToastService>('ToastService', [
       'mostrar',
     ]);
@@ -53,12 +66,18 @@ describe('RestriccionesNutricionalesPresenter', () => {
     restriccionesService.getCatalogo.and.resolveTo(catalogoMock);
     restriccionesService.getRestriccionesAlumno.and.resolveTo([]);
     restriccionesService.actualizarRestricciones.and.resolveTo();
+    restriccionesHorariasService.getRestriccionesPorAlumno.and.resolveTo([]);
+    restriccionesHorariasService.crearRestriccion.and.resolveTo({} as RestriccionHoraria);
+    restriccionesHorariasService.deshabilitarRestriccion.and.resolveTo();
+    franjasHorariasService.getFranjasHorarias.and.resolveTo([]);
 
     TestBed.configureTestingModule({
       providers: [
         RestriccionesNutricionalesPresenter,
         { provide: AlumnosService, useValue: alumnosService },
         { provide: RestriccionesNutricionalesService, useValue: restriccionesService },
+        { provide: RestriccionesHorariasService, useValue: restriccionesHorariasService },
+        { provide: FranjasHorariasService, useValue: franjasHorariasService },
         { provide: ToastService, useValue: toastService },
         { provide: Router, useValue: router },
       ],
@@ -110,7 +129,8 @@ describe('RestriccionesNutricionalesPresenter', () => {
     });
 
     it('muestra un toast de error si falla la carga', async () => {
-      restriccionesService.getCatalogo.and.rejectWith(new Error('boom'));
+      spyOn(console, 'error');
+      restriccionesService.getCatalogo.and.callFake(async () => { throw new Error('boom'); });
 
       await presenter.init('alumno-42');
 
@@ -173,9 +193,8 @@ describe('RestriccionesNutricionalesPresenter', () => {
     });
 
     it('muestra un toast de error si falla el guardado', async () => {
-      restriccionesService.actualizarRestricciones.and.rejectWith(
-        new Error('boom'),
-      );
+      spyOn(console, 'error');
+      restriccionesService.actualizarRestricciones.and.callFake(async () => { throw new Error('boom'); });
       await presenter.init('alumno-42');
 
       await presenter.guardar();
