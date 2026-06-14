@@ -13,9 +13,14 @@
           <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
         </div>
         <div>
-          <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
-          @if (!esVistaAlumno()) {
-            <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
+          @if (esVistaIndividual() && !esVistaAlumno()) {
+            <h1 id="page-title" class="movimientos__titulo">Movimientos de {{ nombreAlumno() }}</h1>
+            <p class="movimientos__subtitulo">Historial completo de compras y consumos</p>
+          } @else {
+            <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
+            @if (!esVistaAlumno()) {
+              <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
+            }
           }
         </div>
       </div>
@@ -52,7 +57,7 @@
       <div class="movimientos__filtros-avanzados-panel" [class.open]="mostrarFiltrosAvanzados()">
         <div class="movimientos__filtros-avanzados-grid">
           <!-- Selector de Alumno (Hijo) -->
-          @if (!esVistaAlumno()) {
+          @if (!esVistaAlumno() && !esVistaIndividual()) {
             <div class="movimientos__filtro-group">
               <label for="select-alumno" class="movimientos__label">Seleccionar Hijo</label>
               <div class="movimientos__select-wrapper">
@@ -84,7 +89,11 @@
               >
                 <option value="TODOS">Todos los estados</option>
                 <option value="PENDIENTE">A Preparar</option>
+                <option value="EN_PREPARACION">En preparación</option>
+                <option value="LISTO">Listo para retirar</option>
                 <option value="ENTREGADO">Entregado</option>
+                <option value="CANCELADO">Cancelado</option>
+                <option value="NO_RETIRADO">No entregado</option>
               </select>
               <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
             </div>

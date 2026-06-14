@@ -165,6 +165,20 @@ export class BuffetPresenter {
 
   readonly saldo = computed(() => this.alumnoState()?.saldo ?? 0);
 
+  readonly itemsCarrito = computed(() => {
+    const alumno = this.alumnoState();
+    if (!alumno) return [];
+    return this.carritoService.items().filter((item) => item.alumnoId === alumno.id);
+  });
+
+  readonly totalCarrito = computed(() => {
+    return this.itemsCarrito().reduce((acc, item) => acc + item.producto.precio * item.cantidad, 0);
+  });
+
+  readonly cantidadItemsCarrito = computed(() => {
+    return this.itemsCarrito().reduce((acc, item) => acc + item.cantidad, 0);
+  });
+
   readonly fechaMinima = computed<string>(() => {
     const slots = this.franjasState();
     return this.calcularFechaMinima(slots);
@@ -621,6 +635,10 @@ export class BuffetPresenter {
 
   volver(): void {
     this.router.navigateByUrl(this.usuarioService.homeUrl());
+  }
+
+  irAlCarrito(): void {
+    this.router.navigateByUrl('/compra');
   }
 
   cambiarAlumno(nuevoAlumnoId: string): void {

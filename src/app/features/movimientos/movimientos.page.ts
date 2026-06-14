@@ -28,6 +28,8 @@ export class MovimientosPage implements OnInit {
   private readonly toastService = inject(ToastService);
 
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
+  readonly esVistaIndividual = signal<boolean>(false);
+  readonly nombreAlumno = signal<string>('');
 
   readonly nombreNavbar = this.usuarioService.nombreNavbar;
   readonly alumnos = this.alumnosService.alumnos;
@@ -131,10 +133,22 @@ export class MovimientosPage implements OnInit {
         if (this.esVistaAlumno()) {
           const currentAlumnoId = this.perfilService.obtenerAlumnoId() ?? this.usuarioService.getAlumnoActual().id;
           this.selectedAlumnoId.set(currentAlumnoId);
+          this.esVistaIndividual.set(true);
+          const alumno = this.alumnosService.getAlumnoById(currentAlumnoId);
+          if (alumno) {
+            this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
+          }
         } else if (alumnoId) {
           this.selectedAlumnoId.set(alumnoId);
+          this.esVistaIndividual.set(true);
+          const alumno = this.alumnosService.getAlumnoById(alumnoId);
+          if (alumno) {
+            this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
+          }
         } else {
           this.selectedAlumnoId.set('todos');
+          this.esVistaIndividual.set(false);
+          this.nombreAlumno.set('');
         }
         this.cargarHistorial();
       });
@@ -188,7 +202,7 @@ export class MovimientosPage implements OnInit {
   get activeChips(): { id: string; label: string }[] {
     const chips = [];
 
-    if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
+    if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos' && !this.esVistaIndividual()) {
       const alumno = this.alumnosService.getAlumnoById(this.selectedAlumnoId());
       if (alumno) {
         chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre} ${alumno.apellido}` });
@@ -196,7 +210,15 @@ export class MovimientosPage implements OnInit {
     }
 
     if (this.filtroEstado() !== 'TODOS') {
-      const label = this.filtroEstado() === 'PENDIENTE' ? 'A Preparar' : 'Entregado';
+      const map: Record<string, string> = {
+        PENDIENTE: 'A Preparar',
+        EN_PREPARACION: 'En preparación',
+        LISTO: 'Listo para retirar',
+        ENTREGADO: 'Entregado',
+        CANCELADO: 'Cancelado',
+        NO_RETIRADO: 'No entregado',
+      };
+      const label = map[this.filtroEstado()] || this.filtroEstado();
       chips.push({ id: 'estado', label: `Estado: ${label}` });
     }
 

@@ -401,3 +401,27 @@
   <span>Ver Saldo y Retiro</span>
 </button>
 }
+
+<!-- Floating Bottom Cart Bar -->
+@if (presenter.alumno(); as alumno) {
+  @if (presenter.totalCarrito() > 0) {
+    <div class="buffet__footer-cart">
+      <div class="buffet__footer-cart-container">
+        <div class="buffet__footer-cart-info">
+          <div class="buffet__footer-cart-icon">
+            <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+            <span class="buffet__footer-cart-badge">{{ presenter.cantidadItemsCarrito() }}</span>
+          </div>
+          <div class="buffet__footer-cart-text">
+            <span class="buffet__footer-cart-label">Subtotal del carrito</span>
+            <span class="buffet__footer-cart-total">{{ formatARS(presenter.totalCarrito()) }}</span>
+          </div>
+        </div>
+        <button type="button" class="buffet__footer-cart-btn" (click)="presenter.irAlCarrito()">
+          <span>Ver Carrito y Pagar</span>
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+}
