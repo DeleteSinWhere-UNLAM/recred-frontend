@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Alumno } from '../../../../data-access/models/alumno.model';
+import { MovimientosService } from '../../../movimientos/services/movimientos.service';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -16,8 +17,24 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AlumnoCardComponent {
+export class AlumnoCardComponent implements OnInit {
   @Input({ required: true }) alumno!: Alumno;
+
+  private readonly movimientosService = inject(MovimientosService);
+  private readonly _cantidadPendientes = signal<number>(0);
+
+  ngOnInit(): void {
+    if (this.alumno?.id) {
+      this.movimientosService.getPendientesAlumno(this.alumno.id).subscribe({
+        next: (movimientos) => {
+          this._cantidadPendientes.set(movimientos.length);
+        },
+        error: (err) => {
+          console.error('Error fetching pending purchases for student:', err);
+        },
+      });
+    }
+  }
 
   get nombreCompleto(): string {
     return `${this.alumno.nombre} ${this.alumno.apellido}`;
@@ -64,11 +81,6 @@ export class AlumnoCardComponent {
   }
 
   get cantidadPendientes(): number {
-    const nombre = this.alumno.nombre.toLowerCase();
-    if (nombre.includes('eugenio')) return 2;
-    if (nombre.includes('emmanuel')) return 1;
-    if (nombre.includes('adrian')) return 3;
-    if (nombre.includes('rocio')) return 2;
-    return 0;
+    return this._cantidadPendientes();
   }
 }

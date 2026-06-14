@@ -13,15 +13,8 @@
           <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
         </div>
         <div>
-          @if (esVistaIndividual() && !esVistaAlumno()) {
-            <h1 id="page-title" class="movimientos__titulo">Movimientos de {{ nombreAlumno() }}</h1>
-            <p class="movimientos__subtitulo">Historial completo de compras y consumos</p>
-          } @else {
-            <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
-            @if (!esVistaAlumno()) {
-              <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
-            }
-          }
+          <h1 id="page-title" class="movimientos__titulo">Compras Pendientes de {{ nombreAlumno() }}</h1>
+          <p class="movimientos__subtitulo">Seguimiento de las compras a preparar y listas para retirar</p>
         </div>
       </div>
     </header>
@@ -35,7 +28,7 @@
             type="text"
             [ngModel]="filtroBusqueda()"
             (ngModelChange)="filtroBusqueda.set($event)"
-            placeholder="Buscar por alumno, item, código..."
+            placeholder="Buscar por item, código..."
             class="movimientos__search-input"
             id="search-input"
           />
@@ -56,27 +49,6 @@
       <!-- Advanced Filters Collapsible Section -->
       <div class="movimientos__filtros-avanzados-panel" [class.open]="mostrarFiltrosAvanzados()">
         <div class="movimientos__filtros-avanzados-grid">
-          <!-- Selector de Alumno (Hijo) -->
-          @if (!esVistaAlumno() && !esVistaIndividual()) {
-            <div class="movimientos__filtro-group">
-              <label for="select-alumno" class="movimientos__label">Seleccionar Hijo</label>
-              <div class="movimientos__select-wrapper">
-                <select
-                  id="select-alumno"
-                  [value]="selectedAlumnoId()"
-                  (change)="onAlumnoChange($event)"
-                  class="movimientos__select"
-                >
-                  <option value="todos">Todos los hijos</option>
-                  @for (alumno of alumnos(); track alumno.id) {
-                    <option [value]="alumno.id">{{ alumno.nombre }} {{ alumno.apellido }}</option>
-                  }
-                </select>
-                <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
-              </div>
-            </div>
-          }
-
           <!-- Estado -->
           <div class="movimientos__filtro-group">
             <label for="filtro-estado" class="movimientos__label">Estado</label>
@@ -87,13 +59,10 @@
                 (ngModelChange)="filtroEstado.set($event)"
                 class="movimientos__select"
               >
-                <option value="TODOS">Todos los estados</option>
+                <option value="TODOS">Todos los estados pendientes</option>
                 <option value="PENDIENTE">A Preparar</option>
                 <option value="EN_PREPARACION">En preparación</option>
                 <option value="LISTO">Listo para retirar</option>
-                <option value="ENTREGADO">Entregado</option>
-                <option value="CANCELADO">Cancelado</option>
-                <option value="NO_RETIRADO">No entregado</option>
               </select>
               <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
             </div>
@@ -207,13 +176,9 @@
           <div class="vacio-icono-wrapper">
             <i class="fa-solid fa-receipt vacio-icon" aria-hidden="true"></i>
           </div>
-          <p class="vacio-titulo">No se encontraron movimientos</p>
+          <p class="vacio-titulo">No hay compras pendientes</p>
           <p class="vacio-subtitulo">
-            @if (esVistaAlumno()) {
-              Intentá cambiando los filtros de búsqueda.
-            } @else {
-              Intentá cambiando los filtros o seleccionando otro alumno.
-            }
+            Las compras preparadas, entregadas o canceladas no se listan aquí.
           </p>
         </div>
       } @else {
@@ -231,7 +196,7 @@
                         {{ getInicialesAlumno(mov.studentId) }}
                       </div>
                       <div class="movimientos__fila-info">
-                        <h3 class="movimientos__fila-nombre">{{ getNombreAlumno(mov.studentId) }}</h3>
+                        <h3 class="movimientos__fila-nombre">{{ nombreAlumno() }}</h3>
                         @if (mov.tipo === 'ANTICIPADA' && mov.withdrawalCode) {
                           <p class="movimientos__fila-clave">
                             Clave de retiro: <strong>{{ mov.withdrawalCode }}</strong>
@@ -281,8 +246,8 @@
 @if (modalMovimiento(); as mov) {
   <app-movimiento-detalle-modal
     [movimiento]="mov"
-    [nombreAlumno]="getNombreAlumno(mov.studentId)"
-    [esVistaAlumno]="esVistaAlumno()"
+    [nombreAlumno]="nombreAlumno()"
+    [esVistaAlumno]="false"
     (cerrar)="cerrarDetalle()"
     (cancelar)="cancelarPedido($event)"
   />
