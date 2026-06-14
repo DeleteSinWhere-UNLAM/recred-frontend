@@ -39,9 +39,7 @@ export class AlumnoCardComponent {
     return this.alumno.saldo < 500;
   }
 
-  get budgetLimit(): number {
-    return 1000;
-  }
+  readonly budgetLimit = 1000;
 
   get budgetSpent(): number {
     const nombre = this.alumno.nombre.toLowerCase();

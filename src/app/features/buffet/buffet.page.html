@@ -130,14 +130,14 @@
       <!-- Right Sidebar Panel -->
       @if (presenter.alumno(); as alumno) {
       <aside class="buffet__sidebar" [class.closed]="panelLateralCerrado()">
-        <div class="buffet__sidebar-toggle-header" (click)="panelLateralCerrado.set(!panelLateralCerrado())">
+        <button type="button" class="buffet__sidebar-toggle-header" (click)="panelLateralCerrado.set(!panelLateralCerrado())">
           <div class="buffet__sidebar-toggle-title">
             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
             <span>Ocultar</span>
           </div>
           <i class="fa-solid" [class.fa-chevron-right]="!panelLateralCerrado()"
             [class.fa-chevron-left]="panelLateralCerrado()" aria-hidden="true"></i>
-        </div>
+        </button>
 
         <div class="buffet__sidebar-content">
           <!-- Saldo Disponible Section -->

@@ -1198,9 +1198,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   padding: 16px 20px;
   background-color: #f8fafc;
+  border: none;
   border-bottom: 1px solid var(--color-borde);
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   user-select: none;
   transition: background-color 0.15s ease;
