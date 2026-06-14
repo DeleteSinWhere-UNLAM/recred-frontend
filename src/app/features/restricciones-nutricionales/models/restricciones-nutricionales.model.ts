@@ -27,16 +27,16 @@ export interface DescriptorRestriccion {
 export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   {
     clave: 'sinTacc',
-    titulo: 'Sin TACC (Celíaco)',
-    descripcion: 'Bloquea productos con gluten.',
-    icono: 'fa-wheat-awn-circle-exclamation',
+    titulo: 'TACC',
+    descripcion: 'Bloques productos con gluten.',
+    icono: 'fa-wheat-awn',
     colorIcono: 'melocoton',
     palabrasClave: ['tacc', 'gluten', 'celiac'],
   },
   {
     clave: 'sinAzucar',
-    titulo: 'Sin Azúcar Agregada',
-    descripcion: 'Perfil apto para diabéticos.',
+    titulo: 'Azúcar',
+    descripcion: 'Perfil apto para diabético.',
     icono: 'fa-cubes-stacked',
     colorIcono: 'pizarra',
     palabrasClave: ['azucar', 'diabet'],
@@ -44,14 +44,14 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   {
     clave: 'sinSodio',
     titulo: 'Sin Sodio',
-    descripcion: 'Bloquea productos con alto sodio.',
+    descripcion: 'Bloques productos con alto sodio.',
     icono: 'fa-heart-pulse',
     colorIcono: 'dorado',
     palabrasClave: ['sodio', 'sal'],
   },
   {
     clave: 'vegano',
-    titulo: 'Menú Vegano',
+    titulo: 'Vegano',
     descripcion: 'Libre de productos animales.',
     icono: 'fa-leaf',
     colorIcono: 'menta',
@@ -60,7 +60,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   {
     clave: 'contieneLacteos',
     titulo: 'Contiene Lácteos',
-    descripcion: 'Bloquea productos con lácteos.',
+    descripcion: 'Bloques productos con lácteos.',
     icono: 'fa-cow',
     colorIcono: 'melocoton',
     palabrasClave: ['lacteo'],
