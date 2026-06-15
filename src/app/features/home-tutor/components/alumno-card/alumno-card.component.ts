@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } fro
 import { RouterLink } from '@angular/router';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { MovimientosService } from '../../../movimientos/services/movimientos.service';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
+import { MicrocreditosService } from '../../../../data-access/services/microcreditos.service';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -21,6 +23,8 @@ export class AlumnoCardComponent implements OnInit {
   @Input({ required: true }) alumno!: Alumno;
 
   private readonly movimientosService = inject(MovimientosService);
+  private readonly perfilService = inject(PerfilService);
+  private readonly microcreditosService = inject(MicrocreditosService);
   private readonly _cantidadPendientes = signal<number>(0);
 
   ngOnInit(): void {
@@ -82,5 +86,29 @@ export class AlumnoCardComponent implements OnInit {
 
   get cantidadPendientes(): number {
     return this._cantidadPendientes();
+  }
+
+  get esPadre(): boolean {
+    return this.perfilService.perfil()?.rol === 'PADRE';
+  }
+
+  solicitarMicrocredito(): void {
+    const parentId = this.perfilService.perfil()?.id;
+    if (!parentId || !this.alumno?.id) return;
+    
+    this.microcreditosService.enableCredit({ parentId, studentId: this.alumno.id })
+      .subscribe({
+        next: (res) => {
+          alert('Microcrédito habilitado exitosamente por: $' + res.amount);
+        },
+        error: (err) => {
+          console.error('Error HTTP:', err);
+          if (err.status === 409) {
+            alert('El alumno ya tiene un microcrédito activo.');
+          } else {
+            alert('Error al solicitar microcrédito: ' + (err.error || err.message));
+          }
+        }
+      });
   }
 }
