@@ -315,8 +315,13 @@
 }
 
 .navbar__notif-item {
-  padding: 12px 16px;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
   border-bottom: 1px solid var(--color-borde);
+  padding: 12px 16px;
   transition: background-color var(--transition-ui);
 }
 
@@ -333,6 +338,7 @@
 }
 
 .navbar__notif-titulo {
+  display: block;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
@@ -341,6 +347,7 @@
 }
 
 .navbar__notif-mensaje {
+  display: block;
   font-family: var(--font-body);
   font-size: 12px;
   color: var(--color-texto-oscuro);
