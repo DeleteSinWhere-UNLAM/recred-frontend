@@ -101,9 +101,17 @@
 
     <!-- 10. Microcrédito (Sólo PADRE) -->
     @if (esPadre) {
-      <button type="button" class="alumno-card__btn alumno-card__btn--menta" (click)="solicitarMicrocredito()" style="border:none; cursor:pointer;">
+      <button type="button" 
+              class="alumno-card__btn alumno-card__btn--menta" 
+              [class.btn-disabled]="creditoActivo() !== null"
+              [title]="creditoActivo() !== null ? 'El alumno ya tiene un microcredito aún no saldado' : 'Asignar Microcrédito'"
+              (click)="abrirModalMicrocredito()" 
+              style="border:none; cursor:pointer;">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-hand-holding-dollar"></i>
+          @if (creditoActivo()) {
+            <span class="alumno-card__btn-badge alumno-card__btn-badge--info"><i class="fa-solid fa-check"></i></span>
+          }
         </span>
         <span class="alumno-card__btn-label">Microcrédito</span>
       </button>
@@ -120,9 +128,139 @@
     <span class="alumno-card__budget-fraction">{{ budgetSpentFormateado }} / {{ budgetLimitFormateado }}</span>
   </div>
 
-  <!-- CTA Buffet Button -->
   <a class="alumno-card__cta" [routerLink]="['/buffet', alumno.id]">
     <i class="fa-solid fa-utensils" aria-hidden="true"></i>
     Ir al Buffet
   </a>
 </article>
+
+@if (showMicrocreditoModal()) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" (click)="cerrarModalMicrocredito()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <h2 class="modal-title">
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+        Microcrédito para {{ alumno.nombre }}
+      </h2>
+
+      @if (creditoActivo()) {
+        <div class="modal-body">
+          <div class="modal-alert modal-alert--info">
+            <p>
+              <i class="fa-solid fa-circle-info"></i>
+              <strong>{{ alumno.nombre }} ya posee un microcrédito en curso.</strong>
+            </p>
+            <p class="mt-2" style="font-size: 0.9rem;">
+              Monto original: ${{ creditoActivo()?.amount }} <br/>
+              Cuotas asignadas: {{ creditoActivo()?.installments }} <br/>
+              Fecha: {{ creditoActivo()?.createdAt | date:'dd/MM/yyyy' }}
+            </p>
+            <p class="mt-2 text-sm text-gray-600" style="font-size: 0.85rem;">
+              No es posible asignar un nuevo crédito hasta que el actual haya sido saldado.
+            </p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button (click)="cerrarModalMicrocredito()" class="modal-btn-confirmar">
+            Entendido
+          </button>
+        </div>
+      } @else if (calculandoRecarga()) {
+        <div class="modal-loading">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+          <p>Calculando referencia...</p>
+        </div>
+      } @else {
+        <div class="modal-body">
+          
+          <!-- Selector Tipo -->
+          <div class="modal-field">
+            <label class="modal-label">Modalidad</label>
+            <div class="modal-radio-group">
+              <label class="modal-radio">
+                <input type="radio" name="tipoMonto" value="porcentaje" [(ngModel)]="tipoMonto">
+                <span>Porcentaje de Recarga</span>
+              </label>
+              <label class="modal-radio">
+                <input type="radio" name="tipoMonto" value="fijo" [(ngModel)]="tipoMonto">
+                <span>Monto Fijo</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Base Manual si no hay recargas -->
+          @if (tipoMonto() === 'porcentaje' && ultimaRecarga() === 0) {
+            <div class="modal-alert">
+              <p>
+                <i class="fa-solid fa-circle-info"></i>
+                No se encontraron recargas previas. <strong>¿El porcentaje de cuánto?</strong>
+              </p>
+              <div class="modal-input-wrap">
+                <span class="modal-input-prefix">$</span>
+                <input type="number" [(ngModel)]="baseRecargaManual" class="modal-input" min="1">
+              </div>
+            </div>
+          }
+
+          <!-- Contenido Porcentaje -->
+          @if (tipoMonto() === 'porcentaje') {
+            <div class="modal-field">
+              <div class="modal-flex-between">
+                <label class="modal-label">Porcentaje: {{ porcentaje() }}%</label>
+                <span class="modal-monto-resaltado">${{ montoCalculado }}</span>
+              </div>
+              <input type="range" [(ngModel)]="porcentaje" min="1" max="100" class="modal-slider">
+              <p class="modal-hint">Base de referencia: ${{ baseCalculo }}</p>
+            </div>
+          }
+
+          <!-- Contenido Fijo -->
+          @if (tipoMonto() === 'fijo') {
+            <div class="modal-field">
+              <label class="modal-label">Monto ($)</label>
+              <div class="modal-input-wrap">
+                <span class="modal-input-prefix">$</span>
+                <input type="number" [(ngModel)]="montoFijo" class="modal-input" min="1">
+              </div>
+              <div class="modal-quick-buttons">
+                <button (click)="setMontoRapido(25)" class="modal-btn-quick">25%</button>
+                <button (click)="setMontoRapido(50)" class="modal-btn-quick">50%</button>
+                <button (click)="setMontoRapido(75)" class="modal-btn-quick">75%</button>
+              </div>
+            </div>
+          }
+
+          <!-- Cuotas -->
+          <div class="modal-field">
+            <label class="modal-label">Cuotas (Meses)</label>
+            <input type="number" [(ngModel)]="cuotas" class="modal-input mb-2" min="1" max="24" placeholder="Otras...">
+            <div class="modal-quick-buttons">
+              <button (click)="setCuotas(1)" [class.active]="cuotas() === 1" class="modal-btn-quick">1</button>
+              <button (click)="setCuotas(3)" [class.active]="cuotas() === 3" class="modal-btn-quick">3</button>
+              <button (click)="setCuotas(6)" [class.active]="cuotas() === 6" class="modal-btn-quick">6</button>
+            </div>
+            @if (cuotas() > 1) {
+              <div class="modal-info">
+                <i class="fa-solid fa-calendar-check"></i>
+                <p>Las cuotas vencen el día <strong>10 de cada mes</strong>.</p>
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <div class="modal-actions">
+          <button (click)="cerrarModalMicrocredito()" class="modal-btn-cancelar">
+            Cancelar
+          </button>
+          <button (click)="confirmarMicrocredito()" class="modal-btn-confirmar">
+            Habilitar
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}

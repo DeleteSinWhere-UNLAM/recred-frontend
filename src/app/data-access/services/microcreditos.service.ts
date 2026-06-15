@@ -22,9 +22,23 @@ export interface SchoolCredit {
 export class MicrocreditosService {
   private readonly apiUrl = `${environment.apiUrl}/school-credits`;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-  enableCredit(request: EnableSchoolCreditRequest): Observable<SchoolCredit> {
-    return this.http.post<SchoolCredit>(this.apiUrl, request);
+  requestCredit(studentId: string, parentId: string, amount: number, installments: number): Observable<any> {
+    const body = { 
+      studentId: studentId,
+      parentId: parentId,
+      amount: amount,
+      installments: installments
+    };
+    return this.http.post(`${this.apiUrl}`, body);
+  }
+
+  getLastRecharge(studentId: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/alumno/${studentId}/last-recharge`);
+  }
+
+  getActiveCredit(studentId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/alumno/${studentId}/active`);
   }
 }
