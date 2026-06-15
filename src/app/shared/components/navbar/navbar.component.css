@@ -238,6 +238,32 @@
   color: var(--color-melocoton);
 }
 
+.navbar__menu-item-chevron {
+  margin-left: auto;
+  font-size: 11px !important;
+}
+
+.navbar__submenu {
+  margin: 4px 0 4px 8px;
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid var(--color-borde);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar__submenu-item {
+  font-weight: 500;
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+.navbar__submenu-vacio {
+  margin: 6px 12px;
+  font-size: 13px;
+  color: var(--color-texto-claro);
+}
+
 @keyframes navbar-menu-aparecer {
   from {
     opacity: 0;

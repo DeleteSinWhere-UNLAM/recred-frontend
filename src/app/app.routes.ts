@@ -201,6 +201,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'billetera',
+        loadComponent: () =>
+          import('./features/billetera/billetera.page').then(
+            (m) => m.BilleteraPage,
+          ),
+      },
+      {
+        path: 'billetera/:alumnoId',
+        loadComponent: () =>
+          import('./features/billetera/billetera.page').then(
+            (m) => m.BilleteraPage,
+          ),
+      },
+      {
         path: 'movimientos',
         loadComponent: () =>
           import('./features/movimientos/movimientos.page').then(
