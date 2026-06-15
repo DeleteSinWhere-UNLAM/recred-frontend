@@ -1,21 +1,17 @@
+/* =========================================
+   CREAR HIJO – Rediseño Dos Paneles
+   ========================================= */
+
 .crear-hijo {
   min-height: calc(100vh - 64px);
-  padding: 32px 0 48px;
+  padding: 32px 0 56px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(240, 244, 248, 0) 260px),
     linear-gradient(135deg, rgba(74, 111, 165, 0.08), rgba(242, 183, 5, 0.06)),
     var(--color-fondo);
 }
 
-.crear-hijo__container {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-
+/* ── Topbar (botón Volver) ──────────────── */
 .crear-hijo__topbar {
   max-width: 1280px;
   margin: 0 auto 8px;
@@ -54,25 +50,41 @@
   cursor: not-allowed;
 }
 
-.crear-hijo__header {
+/* ── Contenedor principal ───────────────── */
+.crear-hijo__container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  text-align: center;
+  gap: 28px;
 }
 
-.crear-hijo__icono {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: var(--color-dorado);
-  color: var(--color-pizarra);
+/* ── Encabezado de página ───────────────── */
+.crear-hijo__header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.crear-hijo__header-icon {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--color-dorado), #e8a800);
+  color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
-  box-shadow: var(--shadow-card);
+  font-size: 24px;
+  box-shadow: 0 6px 20px rgba(242, 183, 5, 0.35);
+}
+
+.crear-hijo__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .crear-hijo__titulo {
@@ -81,30 +93,123 @@
   font-size: 26px;
   font-weight: 800;
   color: var(--color-pizarra);
+  line-height: 1.2;
 }
 
 .crear-hijo__bajada {
   margin: 0;
   color: var(--color-texto-claro);
-  font-size: 15px;
-  max-width: 480px;
+  font-size: 14px;
+  max-width: 520px;
+  line-height: 1.5;
 }
 
-.crear-hijo__form {
+/* ── Tarjeta grande ─────────────────────── */
+.crear-hijo__card {
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: 28px 24px;
+  border-radius: 20px;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.07),
+    0 8px 32px rgba(74, 111, 165, 0.06);
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 22px;
 }
 
-.crear-hijo__grid {
+/* ── Dos paneles ────────────────────────── */
+/*
+  Subgrid: el contenedor define 4 filas compartidas
+  (1 header + 3 grupos de campos). Cada panel hereda
+  los track sizes vía grid-template-rows: subgrid,
+  garantizando alineación pixel-perfect entre paneles.
+*/
+.crear-hijo__panels {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: auto auto auto auto; /* header + 3 filas de campos */
+  row-gap: 20px;
+}
+
+.crear-hijo__panel {
+  /* Ocupa todas las filas del padre y las hereda como subgrid */
+  grid-row: 1 / -1;
+  display: grid;
+  grid-template-rows: subgrid;
+  padding: 32px 28px;
+  /* gap viene del row-gap del padre vía subgrid */
+}
+
+/* Cabecera de cada panel */
+.crear-hijo__panel-header {
+  display: flex;
+  align-items: flex-start; /* ícono al tope cuando el subtítulo envuelve */
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.crear-hijo__panel-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.crear-hijo__panel-icon--personal {
+  background: rgba(74, 111, 165, 0.12);
+  color: #1a3b5c;
+}
+
+.crear-hijo__panel-icon--escolar {
+  background: rgba(242, 183, 5, 0.15);
+  color: #b38600;
+}
+
+.crear-hijo__panel-titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-pizarra);
+}
+
+.crear-hijo__panel-subtitulo {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-texto-claro);
+  line-height: 1.4;
+}
+
+/* Divisor vertical entre paneles */
+.crear-hijo__divisor {
+  grid-column: 2;
+  grid-row: 1 / -1;   /* abarca todas las filas del grid padre */
+  align-self: stretch;
+  width: 1px;
+  background: var(--color-borde);
+  margin: 32px 0;     /* respeta el padding vertical de los paneles */
+}
+
+/* ── Campos del formulario ──────────────── */
+.crear-hijo__fields {
+  /*
+    display:contents aplana los hijos directamente dentro
+    del subgrid del panel, de modo que cada grupo de campos
+    ocupe su propia fila compartida con el panel opuesto.
+  */
+  display: contents;
+}
+
+.crear-hijo__field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
 .crear-hijo__field {
@@ -113,33 +218,37 @@
   gap: 6px;
 }
 
-.crear-hijo__field--full {
-  grid-column: 1 / -1;
-}
-
 .crear-hijo__label {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--color-pizarra);
+  letter-spacing: 0.01em;
 }
 
-.crear-hijo__field input,
-.crear-hijo__field select {
+.crear-hijo__label i {
+  font-size: 11px;
+  color: var(--color-texto-claro);
+}
+
+.crear-hijo__field input {
   padding: 11px 14px;
   border-radius: 10px;
-  border: 1px solid var(--color-borde);
+  border: 1.5px solid var(--color-borde);
   background: var(--color-fondo);
-  font-size: 15px;
+  font-size: 14.5px;
   font-family: inherit;
   color: var(--color-pizarra);
-  transition: border-color 0.18s, box-shadow 0.18s;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
 }
 
-.crear-hijo__field input:focus,
-.crear-hijo__field select:focus {
+.crear-hijo__field input:focus {
   outline: none;
-  border-color: var(--color-pizarra);
-  box-shadow: 0 0 0 3px var(--color-foco);
+  border-color: #4a6fa5;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.18);
 }
 
 .crear-hijo__field input::placeholder {
@@ -148,40 +257,108 @@
   font-weight: 400;
 }
 
-.crear-hijo__field select[disabled] {
+/* Select con wrapper para el chevron personalizado */
+.crear-hijo__select-wrapper {
+  position: relative;
+}
+
+.crear-hijo__select-wrapper select {
+  width: 100%;
+  appearance: none;
+  padding: 11px 38px 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-borde);
+  background: var(--color-fondo);
+  font-size: 14.5px;
+  font-family: inherit;
+  color: var(--color-pizarra);
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+
+.crear-hijo__select-wrapper select:focus {
+  outline: none;
+  border-color: #4a6fa5;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.18);
+}
+
+.crear-hijo__select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--color-texto-claro);
+  pointer-events: none;
+  transition: transform 0.18s;
+}
+
+.crear-hijo__select-wrapper--disabled {
   opacity: 0.6;
+}
+
+.crear-hijo__select-wrapper--disabled select {
   cursor: not-allowed;
 }
 
+/* Hint y error */
 .crear-hijo__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
   color: var(--color-texto-claro);
+  line-height: 1.4;
+}
+
+.crear-hijo__hint i {
+  font-size: 11px;
+  color: #4a6fa5;
+  flex-shrink: 0;
 }
 
 .crear-hijo__error {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
   color: #c0392b;
+  font-weight: 500;
 }
 
+.crear-hijo__error i {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+/* ── Banner de error general ─────────────── */
 .crear-hijo__error-banner {
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: 10px;
+  margin: 0 28px;
+  padding: 12px 16px;
+  border-radius: 12px;
   background: rgba(192, 57, 43, 0.08);
   border: 1px solid rgba(192, 57, 43, 0.25);
   color: #a83227;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+/* ── Acciones ────────────────────────────── */
 .crear-hijo__actions {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  padding: 20px 28px 28px;
+  border-top: 1px solid var(--color-borde);
+  background: rgba(240, 244, 248, 0.5);
 }
 
 .crear-hijo__btn {
   min-width: 160px;
-  padding: 12px 18px;
+  padding: 12px 20px;
   border-radius: 12px;
   border: none;
   font-size: 15px;
@@ -195,19 +372,24 @@
 }
 
 .crear-hijo__btn--primario {
-  background-color: var(--color-dorado);
+  background: linear-gradient(135deg, var(--color-dorado), #d4a200);
   color: #fff;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 16px rgba(242, 183, 5, 0.4);
 }
 
 .crear-hijo__btn--primario:hover:not(:disabled) {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(242, 183, 5, 0.5);
 }
 
 .crear-hijo__btn--secundario {
   background-color: transparent;
   color: var(--color-pizarra);
-  border: 1px solid var(--color-borde);
+  border: 1.5px solid var(--color-borde);
+}
+
+.crear-hijo__btn--secundario:hover:not(:disabled) {
+  background-color: var(--color-superficie-alt);
 }
 
 .crear-hijo__btn:disabled {
@@ -215,9 +397,17 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
+.crear-hijo__btn:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
   .crear-hijo {
-    padding: 20px 0 32px;
+    padding: 20px 0 40px;
   }
 
   .crear-hijo__topbar {
@@ -226,22 +416,77 @@
 
   .crear-hijo__container {
     padding: 0 16px;
-    gap: 22px;
+    gap: 20px;
   }
 
-  .crear-hijo__form {
-    padding: 22px 18px;
+  .crear-hijo__header {
+    gap: 14px;
   }
 
-  .crear-hijo__grid {
+  .crear-hijo__header-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+    border-radius: 14px;
+  }
+
+  .crear-hijo__titulo {
+    font-size: 20px;
+  }
+
+  .crear-hijo__panels {
+    /* En mobile: columna única, volver a grid simple sin subgrid */
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    row-gap: 0;
+  }
+
+  .crear-hijo__divisor {
+    grid-column: 1;
+    grid-row: auto;
+    align-self: auto;
+    width: auto;
+    height: 1px;
+    margin: 0 20px;
+  }
+
+  .crear-hijo__panel {
+    /* Volver a flex column en mobile */
+    grid-row: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    grid-template-rows: none;
+    padding: 24px 20px;
+  }
+
+  .crear-hijo__fields {
+    /* Restaurar como flex column en mobile */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .crear-hijo__field-row {
     grid-template-columns: 1fr;
   }
 
   .crear-hijo__actions {
     flex-direction: column-reverse;
+    padding: 16px 20px 24px;
   }
 
   .crear-hijo__btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .crear-hijo__container {
+    padding: 0 12px;
+  }
+
+  .crear-hijo__error-banner {
+    margin: 0 20px;
   }
 }

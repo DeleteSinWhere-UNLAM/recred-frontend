@@ -25,6 +25,6 @@ export class ExitoPresenter {
   }
 
   verPendientes(): void {
-    this.router.navigateByUrl(this.usuarioService.homeUrl());
+    this.router.navigateByUrl('/movimientos');
   }
 }

@@ -16,168 +16,266 @@
   }
 
   <div class="crear-hijo__container">
+
+    <!-- Encabezado de página -->
     <header class="crear-hijo__header">
-      <span class="crear-hijo__icono" aria-hidden="true">
-        <i class="fa-solid fa-user-plus"></i>
-      </span>
-      <h1 class="crear-hijo__titulo">
-        @if (tieneHijos()) {
-          Agregar otro hijo
-        } @else {
-          Agregá a tu primer hijo
-        }
-      </h1>
-      <p class="crear-hijo__bajada">
-        Cargá los datos del alumno para asociarlo a tu cuenta. Luego va a poder
-        ingresar con su propio usuario.
-      </p>
+      <div class="crear-hijo__header-icon">
+        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+      </div>
+      <div class="crear-hijo__header-text">
+        <h1 class="crear-hijo__titulo">
+          @if (tieneHijos()) {
+            Agregar otro hijo
+          } @else {
+            Agregá a tu primer hijo
+          }
+        </h1>
+        <p class="crear-hijo__bajada">
+          Completá los datos del alumno para asociarlo a tu cuenta. Una vez creado, podrá ingresar con su propio usuario.
+        </p>
+      </div>
     </header>
 
+    <!-- Tarjeta grande con dos paneles -->
     <form
-      class="crear-hijo__form"
+      class="crear-hijo__card"
       [formGroup]="form"
       (submit)="onSubmit($event)"
       novalidate
     >
-      <div class="crear-hijo__grid">
-        <label class="crear-hijo__field">
-          <span class="crear-hijo__label">Nombre</span>
-          <input
-            type="text"
-            formControlName="nombre"
-            placeholder="Juan"
-            autocomplete="given-name"
-          />
-          @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
-            <span class="crear-hijo__error">Ingresá el nombre del hijo.</span>
-          }
-        </label>
+      <div class="crear-hijo__panels">
 
-        <label class="crear-hijo__field">
-          <span class="crear-hijo__label">Apellido</span>
-          <input
-            type="text"
-            formControlName="apellido"
-            placeholder="Pérez"
-            autocomplete="family-name"
-          />
-          @if (
-            form.controls.apellido.touched && form.controls.apellido.invalid
-          ) {
-            <span class="crear-hijo__error">Ingresá el apellido del hijo.</span>
-          }
-        </label>
+        <!-- Panel izquierdo: Datos Personales -->
+        <section class="crear-hijo__panel">
+          <div class="crear-hijo__panel-header">
+            <div class="crear-hijo__panel-icon crear-hijo__panel-icon--personal">
+              <i class="fa-solid fa-id-card" aria-hidden="true"></i>
+            </div>
+            <div>
+              <h2 class="crear-hijo__panel-titulo">Datos personales</h2>
+              <p class="crear-hijo__panel-subtitulo">Información de identificación del alumno</p>
+            </div>
+          </div>
 
-        <label class="crear-hijo__field">
-          <span class="crear-hijo__label">Usuario</span>
-          <input
-            type="text"
-            formControlName="username"
-            placeholder="juan.perez"
-            autocomplete="username"
-          />
-          <span class="crear-hijo__hint">
-            Lo va a usar para iniciar sesión. No puede tener formato de email.
-          </span>
-          @if (form.controls.username.touched && form.controls.username.invalid) {
-            @if (form.controls.username.errors?.['emailFormat']) {
-              <span class="crear-hijo__error">
-                El usuario no puede ser un email.
+          <div class="crear-hijo__fields">
+
+            <div class="crear-hijo__field-row">
+              <label class="crear-hijo__field">
+                <span class="crear-hijo__label">
+                  <i class="fa-solid fa-user" aria-hidden="true"></i>
+                  Nombre
+                </span>
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  placeholder="ej. Juan"
+                  autocomplete="given-name"
+                  id="campo-nombre"
+                />
+                @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+                  <span class="crear-hijo__error">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    Ingresá el nombre del hijo.
+                  </span>
+                }
+              </label>
+
+              <label class="crear-hijo__field">
+                <span class="crear-hijo__label">
+                  <i class="fa-solid fa-user" aria-hidden="true"></i>
+                  Apellido
+                </span>
+                <input
+                  type="text"
+                  formControlName="apellido"
+                  placeholder="ej. Pérez"
+                  autocomplete="family-name"
+                  id="campo-apellido"
+                />
+                @if (form.controls.apellido.touched && form.controls.apellido.invalid) {
+                  <span class="crear-hijo__error">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    Ingresá el apellido del hijo.
+                  </span>
+                }
+              </label>
+            </div>
+
+            <label class="crear-hijo__field">
+              <span class="crear-hijo__label">
+                <i class="fa-solid fa-fingerprint" aria-hidden="true"></i>
+                DNI
               </span>
-            } @else {
-              <span class="crear-hijo__error">Ingresá un usuario.</span>
-            }
-          }
-        </label>
-
-        <label class="crear-hijo__field">
-          <span class="crear-hijo__label">DNI</span>
-          <input
-            type="text"
-            inputmode="numeric"
-            formControlName="dni"
-            placeholder="12345678"
-          />
-          @if (form.controls.dni.touched && form.controls.dni.invalid) {
-            <span class="crear-hijo__error">
-              Ingresá un DNI válido (sólo números).
-            </span>
-          }
-        </label>
-
-        <label class="crear-hijo__field crear-hijo__field--full">
-          <span class="crear-hijo__label">Email</span>
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="juan.perez@example.com"
-            autocomplete="email"
-          />
-          @if (form.controls.email.touched && form.controls.email.invalid) {
-            <span class="crear-hijo__error">Ingresá un email válido.</span>
-          }
-        </label>
-
-        <label class="crear-hijo__field crear-hijo__field--full">
-          <span class="crear-hijo__label">Colegio</span>
-          <select formControlName="colegioId">
-            <option value="" disabled>
-              @if (presenter.cargandoColegios()) {
-                Cargando colegios...
-              } @else {
-                Elegí un colegio
+              <input
+                type="text"
+                inputmode="numeric"
+                formControlName="dni"
+                placeholder="ej. 12345678"
+                id="campo-dni"
+              />
+              @if (form.controls.dni.touched && form.controls.dni.invalid) {
+                <span class="crear-hijo__error">
+                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                  Ingresá un DNI válido (sólo números).
+                </span>
               }
-            </option>
-            @for (colegio of presenter.colegios(); track colegio.id) {
-              <option [value]="colegio.id">{{ colegio.nombre }}</option>
-            }
-          </select>
-          @if (
-            form.controls.colegioId.touched && form.controls.colegioId.invalid
-          ) {
-            <span class="crear-hijo__error">Elegí un colegio.</span>
-          }
-        </label>
+            </label>
 
-        <label class="crear-hijo__field crear-hijo__field--full">
-          <span class="crear-hijo__label">Grado</span>
-          <select
-            formControlName="gradoId"
-            [attr.disabled]="
-              !form.controls.colegioId.value ||
-              presenter.cargandoGrados() ||
-              presenter.grados().length === 0
-                ? true
-                : null
-            "
-          >
-            <option value="" disabled>
-              @if (!form.controls.colegioId.value) {
-                Elegí primero un colegio
-              } @else if (presenter.cargandoGrados()) {
-                Cargando grados...
-              } @else if (presenter.grados().length === 0) {
-                Sin grados disponibles
-              } @else {
-                Elegí un grado
+            <label class="crear-hijo__field">
+              <span class="crear-hijo__label">
+                <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                Email
+              </span>
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="ej. juan.perez@example.com"
+                autocomplete="email"
+                id="campo-email"
+              />
+              @if (form.controls.email.touched && form.controls.email.invalid) {
+                <span class="crear-hijo__error">
+                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                  Ingresá un email válido.
+                </span>
               }
-            </option>
-            @for (grado of presenter.grados(); track grado.id) {
-              <option [value]="grado.id">{{ grado.nombre }}</option>
-            }
-          </select>
-          @if (form.controls.gradoId.touched && form.controls.gradoId.invalid) {
-            <span class="crear-hijo__error">Elegí un grado.</span>
-          }
-        </label>
+            </label>
+
+          </div>
+        </section>
+
+        <!-- Divisor vertical -->
+        <div class="crear-hijo__divisor" aria-hidden="true"></div>
+
+        <!-- Panel derecho: Datos de Acceso y Escuela -->
+        <section class="crear-hijo__panel">
+          <div class="crear-hijo__panel-header">
+            <div class="crear-hijo__panel-icon crear-hijo__panel-icon--escolar">
+              <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+            </div>
+            <div>
+              <h2 class="crear-hijo__panel-titulo">Datos escolares y acceso</h2>
+              <p class="crear-hijo__panel-subtitulo">Credenciales de ingreso e institución educativa</p>
+            </div>
+          </div>
+
+          <div class="crear-hijo__fields">
+
+            <label class="crear-hijo__field">
+              <span class="crear-hijo__label">
+                <i class="fa-solid fa-at" aria-hidden="true"></i>
+                Usuario
+              </span>
+              <input
+                type="text"
+                formControlName="username"
+                placeholder="ej. juan.perez"
+                autocomplete="username"
+                id="campo-username"
+              />
+              <span class="crear-hijo__hint">
+                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                Lo usará para iniciar sesión. No puede tener formato de email.
+              </span>
+              @if (form.controls.username.touched && form.controls.username.invalid) {
+                @if (form.controls.username.errors?.['emailFormat']) {
+                  <span class="crear-hijo__error">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    El usuario no puede ser un email.
+                  </span>
+                } @else {
+                  <span class="crear-hijo__error">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    Ingresá un usuario.
+                  </span>
+                }
+              }
+            </label>
+
+            <label class="crear-hijo__field">
+              <span class="crear-hijo__label">
+                <i class="fa-solid fa-school" aria-hidden="true"></i>
+                Colegio
+              </span>
+              <div class="crear-hijo__select-wrapper">
+                <select formControlName="colegioId" id="campo-colegio">
+                  <option value="" disabled>
+                    @if (presenter.cargandoColegios()) {
+                      Cargando colegios...
+                    } @else {
+                      Elegí un colegio
+                    }
+                  </option>
+                  @for (colegio of presenter.colegios(); track colegio.id) {
+                    <option [value]="colegio.id">{{ colegio.nombre }}</option>
+                  }
+                </select>
+                <i class="fa-solid fa-chevron-down crear-hijo__select-chevron" aria-hidden="true"></i>
+              </div>
+              @if (form.controls.colegioId.touched && form.controls.colegioId.invalid) {
+                <span class="crear-hijo__error">
+                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                  Elegí un colegio.
+                </span>
+              }
+            </label>
+
+            <label class="crear-hijo__field">
+              <span class="crear-hijo__label">
+                <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+                Grado
+              </span>
+              <div class="crear-hijo__select-wrapper" [class.crear-hijo__select-wrapper--disabled]="!form.controls.colegioId.value || presenter.cargandoGrados() || presenter.grados().length === 0">
+                <select
+                  formControlName="gradoId"
+                  id="campo-grado"
+                  [attr.disabled]="
+                    !form.controls.colegioId.value ||
+                    presenter.cargandoGrados() ||
+                    presenter.grados().length === 0
+                      ? true
+                      : null
+                  "
+                >
+                  <option value="" disabled>
+                    @if (!form.controls.colegioId.value) {
+                      Elegí primero un colegio
+                    } @else if (presenter.cargandoGrados()) {
+                      Cargando grados...
+                    } @else if (presenter.grados().length === 0) {
+                      Sin grados disponibles
+                    } @else {
+                      Elegí un grado
+                    }
+                  </option>
+                  @for (grado of presenter.grados(); track grado.id) {
+                    <option [value]="grado.id">{{ grado.nombre }}</option>
+                  }
+                </select>
+                <i class="fa-solid fa-chevron-down crear-hijo__select-chevron" aria-hidden="true"></i>
+              </div>
+              @if (form.controls.gradoId.touched && form.controls.gradoId.invalid) {
+                <span class="crear-hijo__error">
+                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                  Elegí un grado.
+                </span>
+              }
+            </label>
+
+          </div>
+        </section>
+
       </div>
 
+      <!-- Banner de error general -->
       @if (presenter.error()) {
         <p class="crear-hijo__error-banner" role="alert">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
           {{ presenter.error() }}
         </p>
       }
 
+      <!-- Acciones -->
       <div class="crear-hijo__actions">
         @if (tieneHijos()) {
           <button
@@ -185,6 +283,7 @@
             class="crear-hijo__btn crear-hijo__btn--secundario"
             (click)="onCancelar()"
             [disabled]="presenter.guardando()"
+            id="btn-cancelar"
           >
             Cancelar
           </button>
@@ -193,15 +292,19 @@
           type="submit"
           class="crear-hijo__btn crear-hijo__btn--primario"
           [disabled]="presenter.guardando()"
+          id="btn-crear-hijo"
         >
           @if (presenter.guardando()) {
             <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
             Creando...
           } @else {
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
             Crear hijo
           }
         </button>
       </div>
+
     </form>
+
   </div>
 </main>
