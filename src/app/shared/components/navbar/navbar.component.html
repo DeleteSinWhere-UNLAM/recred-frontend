@@ -135,6 +135,54 @@
               <i class="fa-solid fa-id-card" aria-hidden="true"></i>
               <span>Mi perfil</span>
             </button>
+            @if (esVistaAlumno()) {
+              <button
+                type="button"
+                class="navbar__menu-item"
+                role="menuitem"
+                (click)="irABilletera()"
+              >
+                <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+                <span>Mi billetera</span>
+              </button>
+            } @else if (!esVistaKiosquero()) {
+              <button
+                type="button"
+                class="navbar__menu-item"
+                role="menuitem"
+                [attr.aria-expanded]="menuBilleteraAbierto()"
+                aria-haspopup="menu"
+                (click)="toggleMenuBilletera()"
+              >
+                <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+                <span>Billetera de mis hijos</span>
+                <i
+                  class="fa-solid navbar__menu-item-chevron"
+                  [class.fa-chevron-up]="menuBilleteraAbierto()"
+                  [class.fa-chevron-down]="!menuBilleteraAbierto()"
+                  aria-hidden="true"
+                ></i>
+              </button>
+              @if (menuBilleteraAbierto()) {
+                <div class="navbar__submenu" role="menu">
+                  @if (alumnos().length === 0) {
+                    <p class="navbar__submenu-vacio">Cargando hijos…</p>
+                  } @else {
+                    @for (hijo of alumnos(); track hijo.id) {
+                      <button
+                        type="button"
+                        class="navbar__menu-item navbar__submenu-item"
+                        role="menuitem"
+                        (click)="irABilleteraDeHijo(hijo.id)"
+                      >
+                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                        <span>{{ hijo.nombre }} {{ hijo.apellido }}</span>
+                      </button>
+                    }
+                  }
+                </div>
+              }
+            }
             <button
               type="button"
               class="navbar__menu-item"
