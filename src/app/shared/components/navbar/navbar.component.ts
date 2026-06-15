@@ -10,7 +10,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
-import { NotificacionesService } from '../../../data-access/services/notificaciones.service';
+import { NotificacionesService, Notificacion } from '../../../data-access/services/notificaciones.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 @Component({
@@ -33,6 +33,7 @@ export class NavbarComponent {
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   protected readonly esVistaKiosquero = this.usuarioService.esVistaKiosquero;
+  protected readonly notificaciones = this.notificacionesService.notificaciones;
   protected readonly notifCount = this.notificacionesService.cantidad;
   protected readonly menuAbierto = signal(false);
   protected readonly menuNotifAbierto = signal(false);
@@ -60,6 +61,14 @@ export class NavbarComponent {
     if (this.menuNotifAbierto()) {
       this.menuAbierto.set(false);
       this.menuKiosqueroAbierto.set(false);
+      this.notificacionesService.obtenerNotificaciones();
+    }
+  }
+
+  protected clickEnNotificacion(notif: Notificacion): void {
+    if (notif.tipo === 'RESUMEN_SEMANAL') {
+      this.menuNotifAbierto.set(false);
+      this.router.navigateByUrl('/resumen-semanal');
     }
   }
 
