@@ -33,6 +33,7 @@ export class NavbarComponent {
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   protected readonly esVistaKiosquero = this.usuarioService.esVistaKiosquero;
+  protected readonly notificaciones = this.notificacionesService.notificaciones;
   protected readonly notifCount = this.notificacionesService.cantidad;
   protected readonly menuAbierto = signal(false);
   protected readonly menuNotifAbierto = signal(false);
@@ -60,6 +61,7 @@ export class NavbarComponent {
     if (this.menuNotifAbierto()) {
       this.menuAbierto.set(false);
       this.menuKiosqueroAbierto.set(false);
+      this.notificacionesService.obtenerNotificaciones();
     }
   }
 

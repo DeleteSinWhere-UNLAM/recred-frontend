@@ -91,9 +91,14 @@
             @if (notifCount() === 0) {
               <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
             } @else {
-              <p class="navbar__menu-vacio">
-                Tenés {{ notifCount() }} notificaciones pendientes.
-              </p>
+              <div class="navbar__notif-list">
+                @for (notif of notificaciones(); track notif.id || $index) {
+                  <div class="navbar__notif-item">
+                    <p class="navbar__notif-titulo">{{ notif.titulo }}</p>
+                    <p class="navbar__notif-mensaje">{{ notif.mensaje }}</p>
+                  </div>
+                }
+              </div>
             }
           </div>
         }

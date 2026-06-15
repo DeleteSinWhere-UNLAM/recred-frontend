@@ -5,6 +5,7 @@ import { ToastHostComponent } from './shared/components/toast-host/toast-host.co
 import { AuthService } from './core/auth/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
 import { PerfilService } from './data-access/services/perfil.service';
+import { NotificacionesService } from './data-access/services/notificaciones.service';
 import { AsistenteVirtualComponent } from './features/asistente-virtual/asistente-virtual.component';
 import { NotificacionSaldoBajoComponent } from "./shared/components/notifications/notificacion-saldo-bajo/notificacion-saldo-bajo.component";
 import { NotificacionSugerenciaSaludableComponent } from "./shared/components/notifications/notificacion-sugerencia-saludable/notificacion-sugerencia-saludable.component";
@@ -22,6 +23,7 @@ export class App implements OnInit {
   private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
   private perfilService = inject(PerfilService);
+  private notificacionesService = inject(NotificacionesService);
 
   private rutaActual = signal(this.normalizarUrl(this.router.url));
   private autenticado = signal(false);
@@ -44,6 +46,7 @@ export class App implements OnInit {
     this.autenticado.set(isAutenticado);
     if (isAutenticado) {
       this.notificationService.requestNotificationPermission();
+      this.notificacionesService.obtenerNotificaciones();
     }
   }
 

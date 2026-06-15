@@ -10,8 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { NotificacionSaldoBajoService } from '../../shared/components/notifications/notificacion-saldo-bajo/notificacion-saldo-bajo.service';
 import { NotificacionSugerenciaSaludableService } from '../../shared/components/notifications/notificacion-sugerencia-saludable/notificacion-sugerencia-saludable.service';
-
-
+import { NotificacionesService } from '../../data-access/services/notificaciones.service';
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private messaging = inject(Messaging);
@@ -19,6 +18,7 @@ export class NotificationService {
   private injector = inject(Injector);
   private notificacionSaldoBajoService = inject(NotificacionSaldoBajoService);
   private notificacionSugerenciaSaludableService = inject(NotificacionSugerenciaSaludableService);
+  private notificacionesService = inject(NotificacionesService);
   private ngZone = inject(NgZone);
 
   requestNotificationPermission() {
@@ -54,11 +54,28 @@ export class NotificationService {
         this.ngZone.run(() => {
           console.log('Mensaje recibido en primer plano:', payload);
 
+          const title = payload.notification?.title || 'Nueva notificación';
+          const body = payload.notification?.body || '';
+
           const data = payload.data;
           if (!data) {
-            console.log('La notificación no contiene propiedad data');
+            console.log('La notificación no contiene propiedad data, agregando notificación simple');
+            this.notificacionesService.agregarNotificacion({
+              id: String(Date.now()),
+              titulo: title,
+              mensaje: body,
+              fecha: new Date().toISOString()
+            });
             return;
           }
+
+          const nuevaNotif = {
+            id: data['sugerenciaId'] || String(Date.now()),
+            titulo: data['titulo'] || title,
+            mensaje: data['mensaje'] || body,
+            fecha: new Date().toISOString()
+          };
+          this.notificacionesService.agregarNotificacion(nuevaNotif);
 
           console.log(`Evaluando Notificación -> type: ${data['type']}, rol: ${data['rol']}`);
 
