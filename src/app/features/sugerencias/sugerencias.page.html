@@ -8,27 +8,304 @@
 
   <div class="sugerencias__container">
     <header class="sugerencias__cabecera">
-      <div class="sugerencias__icono" aria-hidden="true">
-        <i class="fa-solid fa-robot"></i>
+      <div class="sugerencias__icono">
+        <i class="fa-solid fa-chart-line"></i>
       </div>
-      <div class="sugerencias__identidad">
-        <h2 class="sugerencias__titulo">Sugerencias del día</h2>
-        <p class="sugerencias__subtitulo">
-          Productos detectados según el consumo de hoy
+
+      <div>
+        <h1>Productos con baja rotación</h1>
+
+        <p>
+          Detectamos productos que podrían estar ocupando espacio y generando
+          poca rentabilidad.
         </p>
       </div>
     </header>
 
     @if (sugerencias.length > 0) {
-      <div class="sugerencias__lista">
-        @for (sugerencia of sugerencias; track sugerencia.productoOriginal) {
-          <app-sugerencia-card [sugerencia]="sugerencia" />
-        }
-      </div>
+      <!-- KPIs -->
+
+      <section class="overview">
+        <div class="overview-card">
+          <span>Productos críticos</span>
+          <strong>{{ totalProductosAnalizados }}</strong>
+        </div>
+
+        <div class="overview-card">
+          <span>Stock inmovilizado</span>
+          <strong>{{ totalStockInmovilizado }}</strong>
+        </div>
+
+        <div class="overview-card">
+          <span>Promedio sin venta</span>
+          <strong>{{ promedioDiasSinVenta }} días</strong>
+        </div>
+
+        <div class="overview-card">
+          <span>Más crítico</span>
+          <strong>
+            {{ productoMasCritico?.productoOriginal ?? "-" }}
+          </strong>
+        </div>
+      </section>
+
+      <!-- DASHBOARD -->
+
+      <section class="dashboard-grid">
+        <!-- PANEL IZQUIERDO -->
+
+        <aside class="products-panel">
+          <h2>Productos detectados</h2>
+
+          <div class="products-list">
+            @for (
+              sugerencia of sugerencias;
+              track sugerencia.productoOriginal
+            ) {
+              <button
+                type="button"
+                class="product-item"
+                [class.product-item--active]="
+                  sugerenciaSeleccionada?.productoOriginal ===
+                  sugerencia.productoOriginal
+                "
+                (click)="seleccionarProducto(sugerencia)"
+              >
+                <div class="product-item__header">
+                  <strong>
+                    {{ sugerencia.productoOriginal }}
+                  </strong>
+
+                  <span>
+                    {{ sugerencia.estadisticasVenta.diasSinVenta }}
+                    días
+                  </span>
+                </div>
+
+                <p>
+                  {{ sugerencia.resumen }}
+                </p>
+              </button>
+            }
+          </div>
+        </aside>
+
+        <!-- PANEL DERECHO -->
+
+        <section class="detail-panel">
+          @if (sugerenciaSeleccionada) {
+            <header class="detail-header">
+              <div>
+                <h2>
+                  {{ sugerenciaSeleccionada.productoOriginal }}
+                </h2>
+
+                <div class="detail-category">
+                  {{ estadisticasSeleccionadas?.categoria }}
+                </div>
+
+                <p>
+                  {{ sugerenciaSeleccionada.resumen }}
+                </p>
+              </div>
+            </header>
+
+            <!-- MÉTRICAS -->
+
+            <div class="detail-stats">
+              <div class="detail-stat">
+                <span>Ventas</span>
+                <strong>
+                  {{ estadisticasSeleccionadas?.ventasPeriodo }}
+                </strong>
+              </div>
+
+              <div class="detail-stat">
+                <span>Stock actual</span>
+                <strong>
+                  {{ estadisticasSeleccionadas?.stockActual }}
+                </strong>
+              </div>
+
+              <div class="detail-stat">
+                <span>Días sin venta</span>
+                <strong>
+                  {{ estadisticasSeleccionadas?.diasSinVenta }}
+                </strong>
+              </div>
+
+              <div class="detail-stat">
+                <span>Precio</span>
+                <strong>
+                  ${{ estadisticasSeleccionadas?.precioActual }}
+                </strong>
+              </div>
+
+              <div class="detail-stat">
+                <span>Participación</span>
+                <strong>
+                  {{ estadisticasSeleccionadas?.participacionVentas }}%
+                </strong>
+              </div>
+
+              <div class="detail-stat">
+                <span>Clientes</span>
+                <strong>
+                  {{ estadisticasSeleccionadas?.clientesDistintos }}
+                </strong>
+              </div>
+
+              <div class="detail-stat">
+                <span>Ranking general</span>
+                <strong>
+                  #{{ estadisticasSeleccionadas?.rankingGeneral }}
+                </strong>
+              </div>
+
+              <div class="detail-stat">
+                <span>Ranking categoría</span>
+                <strong>
+                  #{{ estadisticasSeleccionadas?.rankingCategoria }}
+                </strong>
+              </div>
+            </div>
+
+            <!-- ALERTAS -->
+
+            <div class="detail-section">
+              <h3>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Alertas detectadas
+              </h3>
+
+              <ul>
+                @for (alerta of sugerenciaSeleccionada.alertas; track alerta) {
+                  <li>{{ alerta }}</li>
+                }
+              </ul>
+            </div>
+
+            <!-- RECOMENDACIONES -->
+
+            <div class="detail-section">
+              <h3>
+                <i class="fa-solid fa-lightbulb"></i>
+                Recomendaciones IA
+              </h3>
+
+              <ul>
+                @for (
+                  producto of sugerenciaSeleccionada.productosSugeridos;
+                  track producto
+                ) {
+                  <li>{{ producto }}</li>
+                }
+              </ul>
+            </div>
+
+            <!-- COMPARATIVA -->
+
+            <div class="detail-section">
+              <h3>
+                <i class="fa-solid fa-chart-column"></i>
+                Comparativa con la categoría
+              </h3>
+
+              <div class="comparison-grid">
+                <div class="comparison-card">
+                  <span>Promedio ventas</span>
+
+                  <strong>
+                    {{
+                      estadisticasSeleccionadas?.promedioVentasCategoria ?? "-"
+                    }}
+                  </strong>
+                </div>
+
+                <div class="comparison-card">
+                  <span>Promedio precio</span>
+
+                  <strong>
+                    @if (
+                      estadisticasSeleccionadas?.promedioPrecioCategoria != null
+                    ) {
+                      ${{ estadisticasSeleccionadas?.promedioPrecioCategoria }}
+                    } @else {
+                      -
+                    }
+                  </strong>
+
+                  <div class="comparison-card">
+                    <span>Diferencia stock</span>
+
+                    <strong>
+                      {{
+                        (estadisticasSeleccionadas?.stockActual ?? 0) -
+                          (estadisticasSeleccionadas?.stockPromedioCategoria ??
+                            0)
+                      }}
+                    </strong>
+                  </div>
+                </div>
+
+                <div class="comparison-card">
+                  <span>Diferencia precio</span>
+
+                  <strong>
+                    @if (
+                      estadisticasSeleccionadas?.diferenciaPrecioCategoria !=
+                      null
+                    ) {
+                      ${{
+                        estadisticasSeleccionadas?.diferenciaPrecioCategoria
+                      }}
+                    } @else {
+                      -
+                    }
+                  </strong>
+                </div>
+
+                <div class="comparison-card">
+                  <span>Stock promedio</span>
+
+                  <strong>
+                    {{
+                      estadisticasSeleccionadas?.stockPromedioCategoria ?? "-"
+                    }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-footer">
+              <small> Motivo: {{ sugerenciaSeleccionada.motivoIA }} </small>
+
+              <small> Modelo IA: {{ sugerenciaSeleccionada.modeloIA }} </small>
+            </div>
+          } @else {
+            <div class="detail-empty">
+              <i class="fa-solid fa-arrow-left"></i>
+
+              <h3>Seleccioná un producto</h3>
+
+              <p>
+                Elegí uno de los productos detectados para ver el análisis
+                completo.
+              </p>
+            </div>
+          }
+        </section>
+      </section>
     } @else {
-      <p class="sugerencias__vacio">
-        Todavía no hay sugerencias disponibles para hoy.
-      </p>
+      <div class="empty-state">
+        <i class="fa-solid fa-circle-check"></i>
+
+        <h2>Excelente trabajo</h2>
+
+        <p>
+          No encontramos productos con problemas de rotación en este momento.
+        </p>
+      </div>
     }
   </div>
 </main>

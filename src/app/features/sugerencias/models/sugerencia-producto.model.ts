@@ -5,4 +5,31 @@ export interface SugerenciaProducto {
   productosSugeridos: string[];
   motivoIA: string;
   modeloIA: string;
+  estadisticasVenta: EstadisticasVenta;
+}
+
+export interface EstadisticasVenta {
+  productoId: string;
+  nombre: string;
+  categoria: string;
+
+  precioActual: number;
+
+  ventasPeriodo: number;
+  participacionVentas: number;
+
+  rankingGeneral: number;
+  rankingCategoria: number;
+
+  promedioVentasCategoria: number | null;
+  promedioPrecioCategoria: number | null;
+
+  diferenciaPrecioCategoria: number | null;
+
+  diasSinVenta: number;
+
+  clientesDistintos: number;
+
+  stockActual: number;
+  stockPromedioCategoria: number | null;
 }

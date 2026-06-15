@@ -1,81 +1,60 @@
-<article class="sugerencia-card">
-  <header class="sugerencia-card__cabecera">
-    <h3 class="sugerencia-card__titulo">{{ sugerencia.productoOriginal }}</h3>
-  </header>
+<article
+  class="sugerencia-card"
+  [class.sugerencia-card--selected]="seleccionada"
+  (click)="onSeleccionar()"
+>
+  <div class="sugerencia-card__header">
+    <div>
+      <h3>{{ sugerencia.productoOriginal }}</h3>
 
-  <p class="sugerencia-card__resumen">{{ sugerencia.resumen }}</p>
-
-  <div class="sugerencia-card__stats">
-    <div class="sugerencia-card__stat">
-      <span class="sugerencia-card__stat-valor">{{ sugerencia.alertas.length }}</span>
-      <span class="sugerencia-card__stat-label">Alertas</span>
+      <span class="sugerencia-card__category">
+        {{ sugerencia.estadisticasVenta.categoria }}
+      </span>
     </div>
-    <div class="sugerencia-card__stat">
-      <span class="sugerencia-card__stat-valor">{{ sugerencia.productosSugeridos.length }}</span>
-      <span class="sugerencia-card__stat-label">Sugerencias</span>
+
+    <div
+      class="sugerencia-card__status"
+      [class.sugerencia-card__status--critical]="
+        sugerencia.estadisticasVenta.diasSinVenta >= 15
+      "
+    >
+      {{ sugerencia.estadisticasVenta.diasSinVenta }} días
     </div>
   </div>
 
-  <button
-    type="button"
-    class="sugerencia-card__detalle-btn"
-    (click)="toggleDetalle()"
-  >
-    <i
-      class="fa-solid"
-      [class.fa-chevron-down]="!expandido"
-      [class.fa-chevron-up]="expandido"
-      aria-hidden="true"
-    ></i>
-    {{ expandido ? "Ocultar detalle" : "Ver detalle" }}
-  </button>
+  <div class="sugerencia-card__metrics">
+    <div class="metric">
+      <span>Ventas</span>
 
-  @if (expandido) {
-    <div class="sugerencia-card__detalle">
-      @if (sugerencia.alertas.length > 0) {
-        <div class="sugerencia-card__bloque">
-          <h4 class="sugerencia-card__subtitulo sugerencia-card__subtitulo--alerta">
-            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-            Alertas detectadas
-          </h4>
-          <ul class="sugerencia-card__lista sugerencia-card__lista--alerta" role="list">
-            @for (alerta of sugerencia.alertas; track alerta) {
-              <li>{{ alerta }}</li>
-            }
-          </ul>
-        </div>
-      }
-
-      @if (sugerencia.productosSugeridos.length > 0) {
-        <div class="sugerencia-card__bloque">
-          <h4 class="sugerencia-card__subtitulo sugerencia-card__subtitulo--reco">
-            <i class="fa-solid fa-check" aria-hidden="true"></i>
-            Productos recomendados
-          </h4>
-          <ul class="sugerencia-card__lista sugerencia-card__lista--reco" role="list">
-            @for (producto of sugerencia.productosSugeridos; track producto) {
-              <li>{{ producto }}</li>
-            }
-          </ul>
-        </div>
-      }
-
-      <div class="sugerencia-card__bloque">
-        <h4 class="sugerencia-card__subtitulo sugerencia-card__subtitulo--motivo">
-          <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
-          Motivo
-        </h4>
-        <p class="sugerencia-card__motivo">{{ sugerencia.motivoIA }}</p>
-      </div>
-
-      <div class="sugerencia-card__acciones">
-        <button type="button" class="sugerencia-card__btn sugerencia-card__btn--primary">
-          Ver producto
-        </button>
-        <button type="button" class="sugerencia-card__btn sugerencia-card__btn--secondary">
-          Aplicar sugerencia
-        </button>
-      </div>
+      <strong>
+        {{ sugerencia.estadisticasVenta.ventasPeriodo }}
+      </strong>
     </div>
-  }
+
+    <div class="metric">
+      <span>Stock</span>
+
+      <strong>
+        {{ sugerencia.estadisticasVenta.stockActual }}
+      </strong>
+    </div>
+
+    <div class="metric">
+      <span>Alertas</span>
+
+      <strong>
+        {{ sugerencia.alertas.length }}
+      </strong>
+    </div>
+  </div>
+
+  <div class="sugerencia-card__footer">
+    <small>
+      Sin ventas hace
+      {{ sugerencia.estadisticasVenta.diasSinVenta }}
+      días
+    </small>
+
+    <i class="fa-solid fa-chevron-right"></i>
+  </div>
 </article>
