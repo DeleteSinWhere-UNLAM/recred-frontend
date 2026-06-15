@@ -7,6 +7,21 @@ export interface Notificacion {
   titulo?: string;
   mensaje?: string;
   fecha?: string;
+  tipo?: string;
+}
+
+export interface NotificacionBackend {
+  id?: string;
+  type?: string;
+  title?: string;
+  message?: string;
+  read?: boolean;
+  createdAt?: string;
+  readAt?: string | null;
+  titulo?: string;
+  mensaje?: string;
+  fecha?: string;
+  tipo?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,7 +42,7 @@ export class NotificacionesService {
   }
 
   obtenerNotificaciones(): void {
-    this.http.get<any[]>(`${environment.apiUrl}/notifications/me?size=5`).subscribe({
+    this.http.get<NotificacionBackend[]>(`${environment.apiUrl}/notifications/me?size=5`).subscribe({
       next: (data) => {
         console.log('Lista de notificaciones:', data);
         const mapeadas: Notificacion[] = (data || []).map((item) => ({
@@ -35,6 +50,7 @@ export class NotificacionesService {
           titulo: item.titulo || item.title || 'Notificación',
           mensaje: item.mensaje || item.message || '',
           fecha: item.fecha || item.createdAt,
+          tipo: item.tipo || item.type,
         }));
         this.notificacionesState.set(mapeadas);
       },

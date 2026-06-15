@@ -93,7 +93,11 @@
             } @else {
               <div class="navbar__notif-list">
                 @for (notif of notificaciones(); track notif.id || $index) {
-                  <div class="navbar__notif-item">
+                  <div
+                    class="navbar__notif-item"
+                    [class.navbar__notif-item--clickable]="notif.tipo === 'RESUMEN_SEMANAL'"
+                    (click)="clickEnNotificacion(notif)"
+                  >
                     <p class="navbar__notif-titulo">{{ notif.titulo }}</p>
                     <p class="navbar__notif-mensaje">{{ notif.mensaje }}</p>
                   </div>

@@ -328,6 +328,10 @@
   background-color: var(--color-fondo);
 }
 
+.navbar__notif-item--clickable {
+  cursor: pointer;
+}
+
 .navbar__notif-titulo {
   font-family: var(--font-display);
   font-size: 13px;

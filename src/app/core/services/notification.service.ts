@@ -73,7 +73,8 @@ export class NotificationService {
             id: data['sugerenciaId'] || String(Date.now()),
             titulo: data['titulo'] || title,
             mensaje: data['mensaje'] || body,
-            fecha: new Date().toISOString()
+            fecha: new Date().toISOString(),
+            tipo: data['type'] || data['tipo'],
           };
           this.notificacionesService.agregarNotificacion(nuevaNotif);
 
