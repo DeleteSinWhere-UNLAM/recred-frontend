@@ -5,7 +5,7 @@ import { DatePipe } from '@angular/common';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { MovimientosService } from '../../../movimientos/services/movimientos.service';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
-import { MicrocreditosService } from '../../../../data-access/services/microcreditos.service';
+import { MicrocreditosService, SchoolCredit } from '../../../../data-access/services/microcreditos.service';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -28,7 +28,7 @@ export class AlumnoCardComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly microcreditosService = inject(MicrocreditosService);
   private readonly _cantidadPendientes = signal<number>(0);
-  creditoActivo = signal<any>(null);
+  creditoActivo = signal<SchoolCredit | null>(null);
 
   ngOnInit(): void {
     if (this.alumno?.id) {

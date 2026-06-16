@@ -178,7 +178,7 @@
           
           <!-- Selector Tipo -->
           <div class="modal-field">
-            <label class="modal-label">Modalidad</label>
+            <span class="modal-label">Modalidad</span>
             <div class="modal-radio-group">
               <label class="modal-radio">
                 <input type="radio" name="tipoMonto" value="porcentaje" [(ngModel)]="tipoMonto">
@@ -209,10 +209,10 @@
           @if (tipoMonto() === 'porcentaje') {
             <div class="modal-field">
               <div class="modal-flex-between">
-                <label class="modal-label">Porcentaje: {{ porcentaje() }}%</label>
+                <label for="slider-porcentaje" class="modal-label">Porcentaje: {{ porcentaje() }}%</label>
                 <span class="modal-monto-resaltado">${{ montoCalculado }}</span>
               </div>
-              <input type="range" [(ngModel)]="porcentaje" min="1" max="100" class="modal-slider">
+              <input id="slider-porcentaje" type="range" [(ngModel)]="porcentaje" min="1" max="100" class="modal-slider">
               <p class="modal-hint">Base de referencia: ${{ baseCalculo }}</p>
             </div>
           }
@@ -220,10 +220,10 @@
           <!-- Contenido Fijo -->
           @if (tipoMonto() === 'fijo') {
             <div class="modal-field">
-              <label class="modal-label">Monto ($)</label>
+              <label for="input-monto-fijo" class="modal-label">Monto ($)</label>
               <div class="modal-input-wrap">
                 <span class="modal-input-prefix">$</span>
-                <input type="number" [(ngModel)]="montoFijo" class="modal-input" min="1">
+                <input id="input-monto-fijo" type="number" [(ngModel)]="montoFijo" class="modal-input" min="1">
               </div>
               <div class="modal-quick-buttons">
                 <button (click)="setMontoRapido(25)" class="modal-btn-quick">25%</button>
@@ -235,8 +235,8 @@
 
           <!-- Cuotas -->
           <div class="modal-field">
-            <label class="modal-label">Cuotas (Meses)</label>
-            <input type="number" [(ngModel)]="cuotas" class="modal-input mb-2" min="1" max="24" placeholder="Otras...">
+            <label for="input-cuotas" class="modal-label">Cuotas (Meses)</label>
+            <input id="input-cuotas" type="number" [(ngModel)]="cuotas" class="modal-input mb-2" min="1" max="24" placeholder="Otras...">
             <div class="modal-quick-buttons">
               <button (click)="setCuotas(1)" [class.active]="cuotas() === 1" class="modal-btn-quick">1</button>
               <button (click)="setCuotas(3)" [class.active]="cuotas() === 3" class="modal-btn-quick">3</button>
