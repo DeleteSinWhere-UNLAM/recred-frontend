@@ -509,10 +509,19 @@ export class CarritoPresenter {
 
   avanzar(): void {
     if (!this.avanzarPosible()) return;
-    const ordenes: OrdenAlumno[] = this.grupos()
-      .filter((g) => g.seleccionado)
+    const gruposSeleccionados = this.grupos().filter((g) => g.seleccionado);
+    const faltaBuffet = gruposSeleccionados.some(
+      (g) => !this.buffetCache.get(g.alumno.id)?.id,
+    );
+    if (faltaBuffet) {
+      this.toastService.mostrar('No se pudo resolver el buffet del pedido', 'error');
+      return;
+    }
+
+    const ordenes: OrdenAlumno[] = gruposSeleccionados
       .map((g) => ({
         alumno: g.alumno,
+        buffetId: this.buffetCache.get(g.alumno.id)!.id,
         items: g.items,
         fecha: g.fecha,
         recreo: g.recreo,
@@ -560,15 +569,11 @@ export class CarritoPresenter {
         if (!alumno) return;
 
         try {
-          const buffet = this.buffetService.getBuffetDelAlumno(
-            alumno.colegioId,
+          const buffet = await firstValueFrom(this.resolverBuffet(alumnoId));
+          const products = await firstValueFrom(
+            this.buffetService.getProductosDelBuffet(buffet.id, alumnoId),
           );
-          if (buffet) {
-            const products = await firstValueFrom(
-              this.buffetService.getProductosDelBuffet(buffet.id, alumnoId),
-            );
-            this.carritoService.setCatalog(products);
-          }
+          this.carritoService.setCatalog(products);
           await this.carritoService.cargarPresupuestoYConsumo(alumnoId);
         } catch (error) {
           console.error(

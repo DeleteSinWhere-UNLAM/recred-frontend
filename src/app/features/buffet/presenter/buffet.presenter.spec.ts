@@ -97,7 +97,7 @@ describe('BuffetPresenter', () => {
   beforeEach(() => {
     alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>('AlumnosService', ['getAlumnoById']);
     buffetServiceSpy = jasmine.createSpyObj<BuffetService>('BuffetService', [
-      'getBuffetDelAlumno', 'getProductosDelBuffet',
+      'obtenerBuffetDelAlumno', 'getProductosDelBuffet',
     ]);
     favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos']);
     carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', [
@@ -124,7 +124,7 @@ describe('BuffetPresenter', () => {
     restriccionesNutricionalesServiceSpy = jasmine.createSpyObj<RestriccionesNutricionalesService>('RestriccionesNutricionalesService', ['getRestriccionesAlumno']);
 
     alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
-    buffetServiceSpy.getBuffetDelAlumno.and.returnValue(mockBuffet);
+    buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of(mockBuffet));
     buffetServiceSpy.getProductosDelBuffet.and.returnValue(of(mockProductos));
     favoritosServiceSpy.getFavoritos.and.returnValue(of([]));
     colegiosServiceSpy.getColegios.and.returnValue([{ id: 'colegio-1', nombre: 'Fernando Fader' }]);

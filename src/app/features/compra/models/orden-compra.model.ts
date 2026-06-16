@@ -9,6 +9,7 @@ export type Recreo =
 
 export interface OrdenAlumno {
   alumno: Alumno;
+  buffetId: string;
   items: ItemCarrito[];
   fecha: string;
   recreo: Recreo;
