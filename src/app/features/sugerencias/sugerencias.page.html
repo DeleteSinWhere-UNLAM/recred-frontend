@@ -227,7 +227,8 @@
 
                   <strong>
                     @if (
-                      estadisticasSeleccionadas?.promedioPrecioCategoria != null
+                      estadisticasSeleccionadas?.promedioPrecioCategoria !==
+                      null
                     ) {
                       ${{ estadisticasSeleccionadas?.promedioPrecioCategoria }}
                     } @else {
@@ -253,7 +254,7 @@
 
                   <strong>
                     @if (
-                      estadisticasSeleccionadas?.diferenciaPrecioCategoria !=
+                      estadisticasSeleccionadas?.diferenciaPrecioCategoria !==
                       null
                     ) {
                       ${{
