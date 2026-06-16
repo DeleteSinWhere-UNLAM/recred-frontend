@@ -3,6 +3,13 @@
 
   <div class="pedido-recreo__contenido">
     <article class="pedido-recreo__pedido">
+      <img
+        class="pedido-recreo__bolsa"
+        src="/bolsa.png"
+        alt=""
+        aria-hidden="true"
+      />
+
       <header class="pedido-recreo__header">
         <span class="pedido-recreo__icono pedido-recreo__icono--pedido" aria-hidden="true">
           <i class="fa-solid" [class]="iconoEstado"></i>
@@ -47,27 +54,36 @@
     </article>
 
     <article class="pedido-recreo__recreo">
-      <header class="pedido-recreo__header">
-        <span class="pedido-recreo__icono pedido-recreo__icono--recreo" aria-hidden="true">
-          <i class="fa-solid fa-clock"></i>
-        </span>
-        <div>
-          <p class="pedido-recreo__label">Próximo recreo</p>
-          @if (recreo) {
-            <h3 class="pedido-recreo__titulo">{{ recreo.nombre }}</h3>
-          } @else {
-            <h3 class="pedido-recreo__titulo">Sin recreo a la vista</h3>
-          }
-        </div>
-      </header>
+      <div class="pedido-recreo__recreo-info">
+        <header class="pedido-recreo__header">
+          <span class="pedido-recreo__icono pedido-recreo__icono--recreo" aria-hidden="true">
+            <i class="fa-solid fa-clock"></i>
+          </span>
+          <div>
+            <p class="pedido-recreo__label">Próximo recreo</p>
+            @if (recreo) {
+              <h3 class="pedido-recreo__titulo">{{ recreo.nombre }}</h3>
+            } @else {
+              <h3 class="pedido-recreo__titulo">Sin recreo a la vista</h3>
+            }
+          </div>
+        </header>
 
-      @if (recreo) {
-        <div class="pedido-recreo__horario">
-          <span class="pedido-recreo__hora">{{ recreo.horaInicio }}</span>
-          <span class="pedido-recreo__separador" aria-hidden="true">→</span>
-          <span class="pedido-recreo__hora">{{ recreo.horaFin }}</span>
-        </div>
-      }
+        @if (recreo) {
+          <div class="pedido-recreo__horario">
+            <span class="pedido-recreo__hora">{{ recreo.horaInicio }}</span>
+            <span class="pedido-recreo__separador" aria-hidden="true">→</span>
+            <span class="pedido-recreo__hora">{{ recreo.horaFin }}</span>
+          </div>
+        }
+      </div>
+
+      <img
+        class="pedido-recreo__reloj"
+        src="/reloj.png"
+        alt=""
+        aria-hidden="true"
+      />
     </article>
   </div>
 </section>

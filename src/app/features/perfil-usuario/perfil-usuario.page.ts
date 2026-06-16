@@ -56,6 +56,8 @@ export class PerfilUsuarioPage implements OnInit {
     }),
   });
 
+  protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
+
   protected readonly nombreNavbar = computed(() => {
     const perfil = this.perfil();
     const usuario = this.usuario();

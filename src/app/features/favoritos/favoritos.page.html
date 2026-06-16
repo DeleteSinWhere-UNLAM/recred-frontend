@@ -1,12 +1,12 @@
 <app-navbar [userName]="nombreUsuario" />
 
 <main class="favoritos">
-  <button type="button" class="favoritos__volver" (click)="volver()">
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    <span>Volver</span>
-  </button>
-
   <div class="favoritos__container">
+    <button type="button" class="favoritos__volver" (click)="volver()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
     <header class="favoritos__cabecera">
       <div class="favoritos__icono" aria-hidden="true">
         <i class="fa-solid fa-heart"></i>
@@ -17,6 +17,7 @@
           Tus productos preferidos del Buffet
         </p>
       </div>
+      <span class="favoritos__ola" aria-hidden="true"></span>
     </header>
 
     <!-- SECCIÓN DE PRODUCTOS FAVORITOS -->

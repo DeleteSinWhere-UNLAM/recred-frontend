@@ -7,9 +7,11 @@
       Volver
     </button>
 
-    <header class="billetera__header">
+    <header class="billetera__header" [class.billetera__header--alumno]="esVistaAlumno()">
       <div class="billetera__identidad">
-        <span class="billetera__iniciales" aria-hidden="true">{{ presenter.iniciales() }}</span>
+        <div class="billetera__avatar-wrap">
+          <span class="billetera__iniciales" aria-hidden="true">{{ presenter.iniciales() }}</span>
+        </div>
         <div>
           <p class="billetera__eyebrow">Billetera</p>
           <h1 class="billetera__titulo">{{ presenter.nombreAlumno() }}</h1>
@@ -17,7 +19,10 @@
       </div>
 
       <div class="billetera__saldo-card" [class.billetera__saldo-card--negativo]="presenter.saldoNegativo()">
-        <span class="billetera__saldo-label">Saldo disponible</span>
+        <span class="billetera__saldo-label">
+          <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+          Saldo disponible
+        </span>
         <span class="billetera__saldo-monto">{{ presenter.saldoActualFormateado() }}</span>
         @if (presenter.periodoLabel()) {
           <span class="billetera__saldo-periodo">{{ presenter.periodoLabel() }}</span>
@@ -25,8 +30,9 @@
       </div>
     </header>
 
-    <section class="billetera__periodo-card" aria-label="Selector de período">
-      <div class="billetera__chips" role="tablist">
+    <section class="billetera__filtros" aria-label="Selector de período y resumen">
+      <div class="billetera__filtros-top">
+        <div class="billetera__chips" role="tablist">
         <button
           type="button"
           class="billetera__chip"
@@ -53,6 +59,41 @@
         >Personalizado</button>
       </div>
 
+      @if (presenter.resumen() && !presenter.cargando() && !presenter.error()) {
+        <div class="billetera__resumen-inline">
+          @if (!esVistaAlumno()) {
+            <span class="billetera__resumen-pill billetera__resumen-pill--ingresado" title="Monto ingresado">
+              <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>
+              <span class="billetera__resumen-pill-label">Ingresado</span>
+              <span class="billetera__resumen-pill-valor">{{ presenter.montoIngresadoFormateado() }}</span>
+            </span>
+          }
+          <span class="billetera__resumen-pill billetera__resumen-pill--gastado" title="Monto gastado">
+            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+            <span class="billetera__resumen-pill-label">Gastado</span>
+            <span class="billetera__resumen-pill-valor">{{ presenter.montoGastadoFormateado() }}</span>
+          </span>
+          @if (!esVistaAlumno()) {
+            <span
+              class="billetera__resumen-pill"
+              [class.billetera__resumen-pill--positivo]="presenter.balancePositivo()"
+              [class.billetera__resumen-pill--negativo]="!presenter.balancePositivo()"
+              title="Balance del período"
+            >
+              <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+              <span class="billetera__resumen-pill-label">Balance</span>
+              <span class="billetera__resumen-pill-valor">{{ presenter.balancePeriodoFormateado() }}</span>
+            </span>
+          }
+          <span class="billetera__resumen-pill" title="Cantidad de compras">
+            <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+            <span class="billetera__resumen-pill-label">Compras</span>
+            <span class="billetera__resumen-pill-valor">{{ presenter.cantidadCompras() }}</span>
+          </span>
+        </div>
+      }
+      </div>
+
       @if (presenter.rangoFecha() === 'custom') {
         <div class="billetera__rango">
           <label class="billetera__rango-label">
@@ -75,32 +116,6 @@
         <button type="button" class="billetera__chip" (click)="presenter.recargar()">Reintentar</button>
       </div>
     } @else if (presenter.resumen()) {
-      <section class="billetera__resumen-grid" aria-label="Resumen del período">
-        @if (!esVistaAlumno()) {
-          <article class="billetera__resumen-card billetera__resumen-card--ingresado">
-            <span class="billetera__resumen-label">Monto ingresado</span>
-            <span class="billetera__resumen-valor">{{ presenter.montoIngresadoFormateado() }}</span>
-          </article>
-        }
-        <article class="billetera__resumen-card billetera__resumen-card--gastado">
-          <span class="billetera__resumen-label">Monto gastado</span>
-          <span class="billetera__resumen-valor">{{ presenter.montoGastadoFormateado() }}</span>
-        </article>
-        @if (!esVistaAlumno()) {
-          <article
-            class="billetera__resumen-card"
-            [class.billetera__resumen-card--positivo]="presenter.balancePositivo()"
-            [class.billetera__resumen-card--negativo]="!presenter.balancePositivo()"
-          >
-            <span class="billetera__resumen-label">Balance del período</span>
-            <span class="billetera__resumen-valor">{{ presenter.balancePeriodoFormateado() }}</span>
-          </article>
-        }
-        <article class="billetera__resumen-card">
-          <span class="billetera__resumen-label">Compras</span>
-          <span class="billetera__resumen-valor">{{ presenter.cantidadCompras() }}</span>
-        </article>
-      </section>
 
       <section
         class="billetera__analisis"
