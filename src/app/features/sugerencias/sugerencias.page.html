@@ -285,7 +285,7 @@
                 <article class="sg__stat-item">
                   <small>Participación</small>
                   <strong>
-                    {{ presenter.estadisticasSeleccionadas?.participacionVentas }}%
+                    {{ presenter.estadisticasSeleccionadas?.participacionVentas | number:'1.0-2' }}%
                   </strong>
                 </article>
 
@@ -372,9 +372,13 @@
                     </span>
                     <div>
                       <small>Promedio ventas</small>
-                      <strong>{{
-                        presenter.estadisticasSeleccionadas?.promedioVentasCategoria ?? "-"
-                      }}</strong>
+                      <strong>
+                        @if (presenter.estadisticasSeleccionadas?.promedioVentasCategoria != null) {
+                          {{ presenter.estadisticasSeleccionadas?.promedioVentasCategoria | number:'1.0-2' }}
+                        } @else {
+                          -
+                        }
+                      </strong>
                     </div>
                   </article>
 
@@ -386,10 +390,9 @@
                       <small>Promedio precio</small>
                       <strong>
                         @if (
-                          presenter.estadisticasSeleccionadas?.promedioPrecioCategoria !==
-                          null
+                          presenter.estadisticasSeleccionadas?.promedioPrecioCategoria != null
                         ) {
-                          ${{ presenter.estadisticasSeleccionadas?.promedioPrecioCategoria }}
+                          ${{ presenter.estadisticasSeleccionadas?.promedioPrecioCategoria | number:'1.0-2' }}
                         } @else {
                           -
                         }
@@ -403,9 +406,13 @@
                     </span>
                     <div>
                       <small>Stock promedio</small>
-                      <strong>{{
-                        presenter.estadisticasSeleccionadas?.stockPromedioCategoria ?? "-"
-                      }}</strong>
+                      <strong>
+                        @if (presenter.estadisticasSeleccionadas?.stockPromedioCategoria != null) {
+                          {{ presenter.estadisticasSeleccionadas?.stockPromedioCategoria | number:'1.0-2' }}
+                        } @else {
+                          -
+                        }
+                      </strong>
                     </div>
                   </article>
 
@@ -416,8 +423,8 @@
                     <div>
                       <small>Diferencia stock</small>
                       <strong>{{
-                        (presenter.estadisticasSeleccionadas?.stockActual ?? 0) -
-                          (presenter.estadisticasSeleccionadas?.stockPromedioCategoria ?? 0)
+                        ((presenter.estadisticasSeleccionadas?.stockActual ?? 0) -
+                          (presenter.estadisticasSeleccionadas?.stockPromedioCategoria ?? 0)) | number:'1.0-2'
                       }}</strong>
                     </div>
                   </article>
@@ -430,11 +437,10 @@
                       <small>Diferencia precio</small>
                       <strong>
                         @if (
-                          presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria !==
-                          null
+                          presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria != null
                         ) {
                           ${{
-                            presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria
+                            presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria | number:'1.0-2'
                           }}
                         } @else {
                           -

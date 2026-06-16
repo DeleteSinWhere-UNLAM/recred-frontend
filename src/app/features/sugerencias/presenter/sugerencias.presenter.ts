@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { SugerenciaProducto, EstadisticasVenta, ComboSuggestion, SuggestedProduct } from '../models/sugerencia-producto.model';
-import { Product } from '../../updated-inventory/models/product.interface';
+import { SugerenciaProducto, EstadisticasVenta, SuggestedProduct } from '../models/sugerencia-producto.model';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
 import { PromotionFormData } from '../components/combo-promotion-modal/combo-promotion-modal.component';

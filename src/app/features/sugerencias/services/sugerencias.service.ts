@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
-import { Product } from '../../updated-inventory/models/product.interface';
 
 @Injectable({
   providedIn: 'root',
