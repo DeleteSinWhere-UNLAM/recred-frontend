@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ComboPromotionModalComponent } from './combo-promotion-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Product } from '../../../updated-inventory/models/product.interface';
+import { SuggestedProduct } from '../../models/sugerencia-producto.model';
 
 describe('ComboPromotionModalComponent', () => {
   let component: ComboPromotionModalComponent;
@@ -16,8 +16,8 @@ describe('ComboPromotionModalComponent', () => {
     component = fixture.componentInstance;
     component.baseProductName = 'Test Product';
     component.suggestedProducts = [
-      { id: 'p1', nombre: 'Prod 1', precio: 100 } as Product,
-      { id: 'p2', nombre: 'Prod 2', precio: 200 } as Product
+      { id: 'p1', nombre: 'Prod 1', precio: 100 } as SuggestedProduct,
+      { id: 'p2', nombre: 'Prod 2', precio: 200 } as SuggestedProduct
     ];
     fixture.detectChanges();
   });

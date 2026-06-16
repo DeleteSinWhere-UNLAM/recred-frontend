@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { SugerenciaProducto, EstadisticasVenta } from '../models/sugerencia-producto.model';
+import { SugerenciaProducto, EstadisticasVenta, ComboSuggestion, SuggestedProduct } from '../models/sugerencia-producto.model';
 import { Product } from '../../updated-inventory/models/product.interface';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
@@ -17,7 +17,7 @@ export class SugerenciasPresenter {
   private readonly _isComboModalOpen = new BehaviorSubject<boolean>(false);
   readonly isComboModalOpen$ = this._isComboModalOpen.asObservable();
 
-  private readonly _suggestedProducts = new BehaviorSubject<Product[]>([]);
+  private readonly _suggestedProducts = new BehaviorSubject<SuggestedProduct[]>([]);
   readonly suggestedProducts$ = this._suggestedProducts.asObservable();
 
   private userId = '';
@@ -41,10 +41,12 @@ export class SugerenciasPresenter {
 
   openComboPromotionModal(): void {
     const selected = this._sugerenciaSeleccionada.getValue();
+
     if (this.hasSelectedProduct(selected)) {
-      this.sugerenciasService.getComboSuggestions(selected.productoOriginal, this.userId)
+      this.sugerenciasService.getComboSuggestions(selected.estadisticasVenta.productoId, this.userId)
         .subscribe((suggestions) => {
-          this._suggestedProducts.next(suggestions);
+          console.log(suggestions);
+          this._suggestedProducts.next(suggestions.suggestedProducts);
           this._isComboModalOpen.next(true);
         });
     }
@@ -61,11 +63,11 @@ export class SugerenciasPresenter {
       const promotionData = {
         name: `Combo ${selected.productoOriginal}`,
         discountPercentage: formData.discountPercentage,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        productIds: [selected.productoOriginal, ...formData.productIds]
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        productIds: [selected.estadisticasVenta.productoId, ...formData.productIds]
       };
-
+      console.log(promotionData)
       this.promotionService.createPromotion(promotionData).subscribe(() => {
         this.closeComboPromotionModal();
       });

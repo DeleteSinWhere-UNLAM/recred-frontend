@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Product } from '../../../updated-inventory/models/product.interface';
+import { SuggestedProduct } from '../../models/sugerencia-producto.model';
 
 export interface PromotionFormData {
   discountPercentage: number;
@@ -19,7 +19,7 @@ export interface PromotionFormData {
 })
 export class ComboPromotionModalComponent {
   @Input({ required: true }) baseProductName!: string;
-  @Input({ required: true }) suggestedProducts: Product[] = [];
+  @Input({ required: true }) suggestedProducts: SuggestedProduct[] = [];
   
   @Output() confirmPromotion = new EventEmitter<PromotionFormData>();
   @Output() closeModal = new EventEmitter<void>();

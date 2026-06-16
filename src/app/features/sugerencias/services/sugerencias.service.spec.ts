@@ -3,8 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { SugerenciasService } from './sugerencias.service';
 import { environment } from '../../../../environments/environment';
-import { SugerenciaProducto } from '../models/sugerencia-producto.model';
-import { Product } from '../../updated-inventory/models/product.interface';
+import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 
 describe('SugerenciasService', () => {
   let service: SugerenciasService;
@@ -60,7 +59,11 @@ describe('SugerenciasService', () => {
     it('debería hacer un GET a /combo-suggestions/:productId/:userId', () => {
       const productId = 'prod-123';
       const userId = 'user-123';
-      const mockResponse: Product[] = [];
+      const mockResponse: ComboSuggestion = {
+        idProduct: 'prod-123',
+        productName: 'Test Product',
+        suggestedProducts: []
+      };
 
       service.getComboSuggestions(productId, userId).subscribe(response => {
         expect(response).toEqual(mockResponse);

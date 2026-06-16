@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 
-import { SugerenciaProducto } from '../models/sugerencia-producto.model';
+import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 import { Product } from '../../updated-inventory/models/product.interface';
 
 @Injectable({
@@ -31,8 +31,8 @@ export class SugerenciasService {
     );
   }
 
-  getComboSuggestions(productId: string, userId: string): Observable<Product[]> {
-    return this.http.get<Product[]>(
+  getComboSuggestions(productId: string, userId: string): Observable<ComboSuggestion> {
+    return this.http.get<ComboSuggestion>(
       `${this.baseUrl}/combo-suggestions/${productId}/${userId}`,
     );
   }

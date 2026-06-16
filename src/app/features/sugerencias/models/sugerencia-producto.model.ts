@@ -33,3 +33,15 @@ export interface EstadisticasVenta {
   stockActual: number;
   stockPromedioCategoria: number | null;
 }
+
+export interface SuggestedProduct {
+  id: string;
+  nombre: string;
+  precio: number;
+}
+
+export interface ComboSuggestion {
+  idProduct: string;
+  productName: string;
+  suggestedProducts: SuggestedProduct[];
+}

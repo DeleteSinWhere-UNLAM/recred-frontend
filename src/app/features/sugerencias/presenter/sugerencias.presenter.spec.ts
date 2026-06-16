@@ -3,8 +3,7 @@ import { SugerenciasPresenter } from './sugerencias.presenter';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
 import { of } from 'rxjs';
-import { SugerenciaProducto } from '../models/sugerencia-producto.model';
-import { Product } from '../../updated-inventory/models/product.interface';
+import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 import { Promotion } from '../../../data-access/services/promociones/promotion.service';
 
 describe('SugerenciasPresenter', () => {
@@ -64,11 +63,18 @@ describe('SugerenciasPresenter', () => {
 
   describe('openComboPromotionModal', () => {
     it('debería cargar sugerencias de combo y abrir modal si hay producto seleccionado', () => {
-      const mockSugerencia = { productoOriginal: 'P1' } as SugerenciaProducto;
+      const mockSugerencia = {
+        productoOriginal: 'P1',
+        estadisticasVenta: { productoId: 'P1' }
+      } as unknown as SugerenciaProducto;
       presenter.seleccionarProducto(mockSugerencia);
 
-      const mockProducts = [{ id: 'combo1', nombre: 'Combo 1' }] as Product[];
-      mockSugerenciasService.getComboSuggestions.and.returnValue(of(mockProducts));
+      const mockComboSuggestion: ComboSuggestion = {
+        idProduct: 'P1',
+        productName: 'P1',
+        suggestedProducts: [{ id: 'combo1', nombre: 'Combo 1', precio: 100 }]
+      };
+      mockSugerenciasService.getComboSuggestions.and.returnValue(of(mockComboSuggestion));
 
       presenter['userId'] = 'user-1';
       presenter.openComboPromotionModal();
