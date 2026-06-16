@@ -1,75 +1,60 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { SugerenciasService } from '../../features/sugerencias/services/sugerencias.service';
-import {
-  EstadisticasVenta,
-  SugerenciaProducto,
-} from '../../features/sugerencias/models/sugerencia-producto.model';
+import { SugerenciaProducto } from '../../features/sugerencias/models/sugerencia-producto.model';
+import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
+import { ComboPromotionModalComponent, PromotionFormData } from './components/combo-promotion-modal/combo-promotion-modal.component';
+
 @Component({
   selector: 'app-sugerencias-page',
   standalone: true,
   templateUrl: './sugerencias.page.html',
   styleUrl: './sugerencias.page.css',
-  imports: [NavbarComponent],
+  imports: [CommonModule, NavbarComponent, ComboPromotionModalComponent],
+  providers: [SugerenciasPresenter]
 })
-export class SugerenciasPage {
-  private readonly usuarioService = inject(UsuarioService);
-  private readonly sugerenciasService = inject(SugerenciasService);
+export class SugerenciasPage implements OnInit {
+  readonly presenter = inject(SugerenciasPresenter);
   private readonly router = inject(Router);
+  private readonly usuarioService = inject(UsuarioService);
+
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
-  readonly usuarioId = this.usuarioService.getUsuarioActual().id;
-  sugerencias: SugerenciaProducto[] = [];
-  sugerenciaSeleccionada?: SugerenciaProducto;
+
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
+  }
+
+  ngOnInit(): void {
     const perfilRaw = localStorage.getItem('recred.perfil');
     const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
-    if (usuarioId) {
-      this.sugerenciasService.getSugerencias(usuarioId).subscribe((data) => {
-        this.sugerencias = data;
-        if (data.length > 0) {
-          this.sugerenciaSeleccionada = data[0];
-        }
-        console.log('SUGERENCIAS:', data);
-      });
+    if (this.hasUsuarioId(usuarioId)) {
+      this.presenter.initialize(usuarioId);
     }
   }
+
   volver(): void {
     this.router.navigateByUrl('/kiosquero');
   }
+
+  onGenerarPromocion(): void {
+    this.presenter.openComboPromotionModal();
+  }
+
+  onConfirmPromotion(formData: PromotionFormData): void {
+    this.presenter.generatePromotion(formData);
+  }
+
+  onCloseModal(): void {
+    this.presenter.closeComboPromotionModal();
+  }
+
+  private hasUsuarioId(usuarioId: any): boolean {
+    return usuarioId !== null && usuarioId !== undefined;
+  }
+
   seleccionarProducto(sugerencia: SugerenciaProducto): void {
-    this.sugerenciaSeleccionada = sugerencia;
-  }
-  get totalProductosAnalizados(): number {
-    return this.sugerencias.length;
-  }
-  get totalStockInmovilizado(): number {
-    return this.sugerencias.reduce(
-      (total, sugerencia) =>
-        total + (sugerencia.estadisticasVenta.stockActual ?? 0),
-      0,
-    );
-  }
-  get promedioDiasSinVenta(): number {
-    if (!this.sugerencias.length) {
-      return 0;
-    }
-    const totalDias = this.sugerencias.reduce(
-      (total, sugerencia) =>
-        total + (sugerencia.estadisticasVenta.diasSinVenta ?? 0),
-      0,
-    );
-    return Math.round(totalDias / this.sugerencias.length);
-  }
-  get productoMasCritico(): SugerenciaProducto | undefined {
-    return [...this.sugerencias].sort(
-      (a, b) =>
-        b.estadisticasVenta.diasSinVenta - a.estadisticasVenta.diasSinVenta,
-    )[0];
-  }
-  get estadisticasSeleccionadas(): EstadisticasVenta | undefined {
-    return this.sugerenciaSeleccionada?.estadisticasVenta;
+    this.presenter.seleccionarProducto(sugerencia);
   }
 }
