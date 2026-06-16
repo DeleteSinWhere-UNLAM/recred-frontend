@@ -27,23 +27,25 @@
         />
       </div>
 
-      <!-- Select de Hijo -->
-      <div class="form-group">
-        <label for="student-select" class="form-label">¿Para qué hijo es?</label>
-        <select
-          id="student-select"
-          [(ngModel)]="alumnoId"
-          class="form-select"
-          [disabled]="isSaving"
-        >
-          <option value="" disabled selected>Seleccioná un hijo</option>
-          @for (hijo of hijos(); track hijo.id) {
-            <option [value]="hijo.id">
-              {{ hijo.nombre }} {{ hijo.apellido }}
-            </option>
-          }
-        </select>
-      </div>
+      <!-- Select de Hijo (solo vista tutor) -->
+      @if (!esVistaAlumno()) {
+        <div class="form-group">
+          <label for="student-select" class="form-label">¿Para qué hijo es?</label>
+          <select
+            id="student-select"
+            [(ngModel)]="alumnoId"
+            class="form-select"
+            [disabled]="isSaving"
+          >
+            <option value="" disabled selected>Seleccioná un hijo</option>
+            @for (hijo of hijos(); track hijo.id) {
+              <option [value]="hijo.id">
+                {{ hijo.nombre }} {{ hijo.apellido }}
+              </option>
+            }
+          </select>
+        </div>
+      }
 
       <!-- Detalle de productos -->
       <section class="modal-section" aria-labelledby="products-title">

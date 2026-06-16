@@ -8,11 +8,11 @@
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
         <span>Volver</span>
       </button>
-      <div class="movimientos__titulo-area">
+      <div class="movimientos__titulo-area" [class.movimientos__titulo-area--alumno]="esVistaAlumno()">
         <div class="movimientos__icono">
           <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
         </div>
-        <div>
+        <div class="movimientos__titulo-texto">
           @if (esVistaIndividual() && !esVistaAlumno()) {
             <h1 id="page-title" class="movimientos__titulo">Movimientos de {{ nombreAlumno() }}</h1>
             <p class="movimientos__subtitulo">Historial completo de compras y consumos</p>
@@ -23,6 +23,9 @@
             }
           }
         </div>
+        @if (esVistaAlumno()) {
+          <span class="movimientos__ola" aria-hidden="true"></span>
+        }
       </div>
     </header>
 
@@ -35,7 +38,7 @@
             type="text"
             [ngModel]="filtroBusqueda()"
             (ngModelChange)="filtroBusqueda.set($event)"
-            placeholder="Buscar por alumno, item, código..."
+            [placeholder]="esVistaAlumno() ? 'Buscar por item, código...' : 'Buscar por alumno, item, código...'"
             class="movimientos__search-input"
             id="search-input"
           />
