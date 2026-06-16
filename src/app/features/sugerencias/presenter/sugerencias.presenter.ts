@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { SugerenciaProducto, EstadisticasVenta } from '../models/sugerencia-producto.model';
 import { Product } from '../../updated-inventory/models/product.interface';
 import { SugerenciasService } from '../services/sugerencias.service';
@@ -20,12 +20,10 @@ export class SugerenciasPresenter {
   private readonly _suggestedProducts = new BehaviorSubject<Product[]>([]);
   readonly suggestedProducts$ = this._suggestedProducts.asObservable();
 
-  private userId: string = '';
+  private userId = '';
 
-  constructor(
-    private readonly sugerenciasService: SugerenciasService,
-    private readonly promotionService: PromotionService
-  ) { }
+  private readonly sugerenciasService = inject(SugerenciasService);
+  private readonly promotionService = inject(PromotionService);
 
   initialize(userId: string): void {
     this.userId = userId;

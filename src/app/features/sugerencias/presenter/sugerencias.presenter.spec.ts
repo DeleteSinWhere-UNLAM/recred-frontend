@@ -5,6 +5,7 @@ import { PromotionService } from '../../../data-access/services/promociones/prom
 import { of } from 'rxjs';
 import { SugerenciaProducto } from '../models/sugerencia-producto.model';
 import { Product } from '../../updated-inventory/models/product.interface';
+import { Promotion } from '../../../data-access/services/promociones/promotion.service';
 
 describe('SugerenciasPresenter', () => {
   let presenter: SugerenciasPresenter;
@@ -89,7 +90,7 @@ describe('SugerenciasPresenter', () => {
     it('debería crear promoción y cerrar modal si hay producto seleccionado', () => {
       const mockSugerencia = { productoOriginal: 'P1' } as SugerenciaProducto;
       presenter.seleccionarProducto(mockSugerencia);
-      mockPromotionService.createPromotion.and.returnValue(of({} as any));
+      mockPromotionService.createPromotion.and.returnValue(of({} as Promotion));
 
       presenter.generatePromotion({
         discountPercentage: 10,

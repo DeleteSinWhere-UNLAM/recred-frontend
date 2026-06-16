@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Product } from '../../../updated-inventory/models/product.interface';
@@ -26,8 +26,9 @@ export class ComboPromotionModalComponent {
 
   promotionForm: FormGroup;
   selectedProductIds: Set<string> = new Set<string>();
+  private readonly formBuilder = inject(FormBuilder);
 
-  constructor(private readonly formBuilder: FormBuilder) {
+  constructor() {
     this.promotionForm = this.formBuilder.group({
       discountPercentage: [1, [Validators.required, Validators.min(1), Validators.max(100)]],
       startDate: ['', Validators.required],

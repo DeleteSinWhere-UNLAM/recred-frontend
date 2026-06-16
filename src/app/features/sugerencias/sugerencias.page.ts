@@ -5,7 +5,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { SugerenciaProducto } from '../../features/sugerencias/models/sugerencia-producto.model';
 import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
-import { ComboPromotionModalComponent, PromotionFormData } from './components/combo-promotion-modal/combo-promotion-modal.component';
+import { ComboPromotionModalComponent } from './components/combo-promotion-modal/combo-promotion-modal.component';
 
 @Component({
   selector: 'app-sugerencias-page',
@@ -42,15 +42,15 @@ export class SugerenciasPage implements OnInit {
     this.presenter.openComboPromotionModal();
   }
 
-  onConfirmPromotion(formData: PromotionFormData): void {
-    this.presenter.generatePromotion(formData);
+  onConfirmPromotion(promotionData: { discountPercentage: number, startDate: string, endDate: string, productIds: string[] }): void {
+    this.presenter.generatePromotion(promotionData);
   }
 
   onCloseModal(): void {
     this.presenter.closeComboPromotionModal();
   }
 
-  private hasUsuarioId(usuarioId: any): boolean {
+  private hasUsuarioId(usuarioId: string | null): boolean {
     return usuarioId !== null && usuarioId !== undefined;
   }
 

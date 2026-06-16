@@ -7,6 +7,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { CommonModule } from '@angular/common';
+import { Product } from '../updated-inventory/models/product.interface';
+import { SugerenciaProducto } from './models/sugerencia-producto.model';
 
 @Component({
   selector: 'app-combo-promotion-modal',
@@ -15,8 +17,8 @@ import { CommonModule } from '@angular/common';
 })
 class MockComboPromotionModalComponent {
   @Input() baseProductName!: string;
-  @Input() suggestedProducts: any[] = [];
-  @Output() confirmPromotion = new EventEmitter<any>();
+  @Input() suggestedProducts: Product[] = [];
+  @Output() confirmPromotion = new EventEmitter<{ discountPercentage: number, startDate: string, endDate: string, productIds: string[] }>();
   @Output() closeModal = new EventEmitter<void>();
 }
 
@@ -46,7 +48,7 @@ describe('SugerenciasPage', () => {
     ]);
 
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
-    
+
     mockUsuarioService = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual']);
     mockUsuarioService.getUsuarioActual.and.returnValue({ nombre: 'Test User', id: 'test-id' });
 
@@ -61,15 +63,15 @@ describe('SugerenciasPage', () => {
         provideHttpClientTesting()
       ]
     })
-    .overrideComponent(SugerenciasPage, {
-      set: {
-        imports: [CommonModule, MockNavbarComponent, MockComboPromotionModalComponent],
-        providers: [
-          { provide: SugerenciasPresenter, useValue: mockPresenter }
-        ]
-      }
-    })
-    .compileComponents();
+      .overrideComponent(SugerenciasPage, {
+        set: {
+          imports: [CommonModule, MockNavbarComponent, MockComboPromotionModalComponent],
+          providers: [
+            { provide: SugerenciasPresenter, useValue: mockPresenter }
+          ]
+        }
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(SugerenciasPage);
     component = fixture.componentInstance;
@@ -90,7 +92,7 @@ describe('SugerenciasPage', () => {
   });
 
   it('seleccionarProducto debería llamar a seleccionarProducto en el presenter', () => {
-    const mockSugerencia: any = {};
+    const mockSugerencia = {} as SugerenciaProducto;
     component.seleccionarProducto(mockSugerencia);
     expect(mockPresenter.seleccionarProducto).toHaveBeenCalledWith(mockSugerencia);
   });
@@ -101,7 +103,7 @@ describe('SugerenciasPage', () => {
   });
 
   it('onConfirmPromotion debería llamar a generatePromotion en el presenter', () => {
-    const mockData: any = {};
+    const mockData = {} as { discountPercentage: number, startDate: string, endDate: string, productIds: string[] };
     component.onConfirmPromotion(mockData);
     expect(mockPresenter.generatePromotion).toHaveBeenCalledWith(mockData);
   });
