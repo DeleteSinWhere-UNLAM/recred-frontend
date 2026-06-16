@@ -108,6 +108,42 @@ export class SugerenciasPresenter {
     return this._sugerenciaSeleccionada.getValue()?.estadisticasVenta;
   }
 
+  /** Horizontal bar chart: days without sale per product (sorted worst → best) */
+  get chartDiasSinVenta(): { nombre: string; dias: number; percent: number; stock: number; ventas: number }[] {
+    const sugerencias = this._sugerencias.getValue();
+    if (!this.hasSugerencias(sugerencias)) return [];
+
+    const sorted = [...sugerencias].sort(
+      (a, b) => b.estadisticasVenta.diasSinVenta - a.estadisticasVenta.diasSinVenta,
+    );
+    const maxDias = sorted[0].estadisticasVenta.diasSinVenta || 1;
+
+    return sorted.map((s) => ({
+      nombre: s.productoOriginal,
+      dias: s.estadisticasVenta.diasSinVenta,
+      percent: Math.round((s.estadisticasVenta.diasSinVenta / maxDias) * 100),
+      stock: s.estadisticasVenta.stockActual,
+      ventas: s.estadisticasVenta.ventasPeriodo,
+    }));
+  }
+
+  /** Vertical bar chart: stock vs ventas per product */
+  get chartStockVsVentas(): { nombre: string; stock: number; stockPercent: number; ventas: number; ventasPercent: number }[] {
+    const sugerencias = this._sugerencias.getValue();
+    if (!this.hasSugerencias(sugerencias)) return [];
+
+    const maxStock = Math.max(...sugerencias.map((s) => s.estadisticasVenta.stockActual), 1);
+    const maxVentas = Math.max(...sugerencias.map((s) => s.estadisticasVenta.ventasPeriodo), 1);
+
+    return sugerencias.map((s) => ({
+      nombre: s.productoOriginal,
+      stock: s.estadisticasVenta.stockActual,
+      stockPercent: Math.round((s.estadisticasVenta.stockActual / maxStock) * 100),
+      ventas: s.estadisticasVenta.ventasPeriodo,
+      ventasPercent: Math.round((s.estadisticasVenta.ventasPeriodo / maxVentas) * 100),
+    }));
+  }
+
   private hasSugerencias(data: SugerenciaProducto[]): boolean {
     return data.length > 0;
   }

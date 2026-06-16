@@ -73,6 +73,113 @@
         </section>
 
         <!-- ═══════════════════════════════════════
+             CHARTS
+        ═══════════════════════════════════════ -->
+
+        <div class="sg__charts-grid">
+          <!-- CHART 1: Days without sale (horizontal bars) -->
+
+          <section
+            class="sg__module sg__chart-panel"
+            aria-labelledby="sg-chart-days-title"
+          >
+            <div class="sg__module-header">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+              </span>
+              <div>
+                <h2 id="sg-chart-days-title">Días sin venta por producto</h2>
+                <small>Ordenados del más crítico al menos</small>
+              </div>
+            </div>
+
+            <div class="sg__hbar-chart" aria-label="Gráfico de barras horizontales">
+              @for (
+                item of presenter.chartDiasSinVenta;
+                track item.nombre;
+                let index = $index
+              ) {
+                <article
+                  class="sg__hbar-row"
+                  [class.sg__hbar-row--critical]="index === 0"
+                >
+                  <span class="sg__hbar-rank">{{ index + 1 }}</span>
+
+                  <div class="sg__hbar-label">
+                    <strong>{{ item.nombre }}</strong>
+                    <small>Stock: {{ item.stock }} · Ventas: {{ item.ventas }}</small>
+                  </div>
+
+                  <div class="sg__hbar-track" aria-hidden="true">
+                    <span
+                      class="sg__hbar-fill"
+                      [style.width.%]="item.percent"
+                    ></span>
+                  </div>
+
+                  <strong class="sg__hbar-value">{{ item.dias }}d</strong>
+                </article>
+              }
+            </div>
+          </section>
+
+          <!-- CHART 2: Stock vs Ventas (vertical grouped bars) -->
+
+          <section
+            class="sg__module sg__chart-panel"
+            aria-labelledby="sg-chart-sv-title"
+          >
+            <div class="sg__module-header">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-chart-column"></i>
+              </span>
+              <div>
+                <h2 id="sg-chart-sv-title">Stock vs Ventas</h2>
+                <small>Comparativa por producto</small>
+              </div>
+            </div>
+
+            <div class="sg__vbar-legend">
+              <span class="sg__vbar-legend-item sg__vbar-legend-item--stock">
+                <i aria-hidden="true"></i> Stock
+              </span>
+              <span class="sg__vbar-legend-item sg__vbar-legend-item--ventas">
+                <i aria-hidden="true"></i> Ventas
+              </span>
+            </div>
+
+            <div
+              class="sg__vbar-chart"
+              aria-label="Gráfico de barras verticales"
+            >
+              @for (
+                item of presenter.chartStockVsVentas;
+                track item.nombre
+              ) {
+                <article class="sg__vbar-group">
+                  <div class="sg__vbar-bars">
+                    <div
+                      class="sg__vbar sg__vbar--stock"
+                      [style.height.%]="item.stockPercent || 4"
+                    >
+                      <span class="sg__vbar-tooltip">{{ item.stock }}</span>
+                    </div>
+                    <div
+                      class="sg__vbar sg__vbar--ventas"
+                      [style.height.%]="item.ventasPercent || 4"
+                    >
+                      <span class="sg__vbar-tooltip">{{ item.ventas }}</span>
+                    </div>
+                  </div>
+
+                  <small class="sg__vbar-label">{{ item.nombre }}</small>
+                </article>
+              }
+            </div>
+          </section>
+        </div>
+
+        <!-- ═══════════════════════════════════════
              DASHBOARD GRID
         ═══════════════════════════════════════ -->
 

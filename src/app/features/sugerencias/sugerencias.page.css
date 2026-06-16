@@ -955,3 +955,313 @@
     min-height: 280px;
   }
 }
+
+/* =========================================================
+   CHARTS GRID
+   ========================================================= */
+
+.sg__charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.sg__chart-panel {
+  gap: 20px;
+}
+
+/* =========================================================
+   HORIZONTAL BAR CHART (Days without sale)
+   ========================================================= */
+
+.sg__hbar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sg__hbar-row {
+  display: grid;
+  grid-template-columns: 38px minmax(140px, 0.7fr) minmax(160px, 1fr) 60px;
+  align-items: center;
+  gap: 14px;
+
+  min-height: 68px;
+  padding: 10px 14px;
+
+  border: 1px solid rgba(74, 111, 165, 0.1);
+  border-radius: 16px;
+  background-color: rgba(248, 251, 255, 0.68);
+
+  transition:
+    transform var(--transition-ui),
+    box-shadow var(--transition-ui);
+}
+
+.sg__hbar-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(74, 111, 165, 0.1);
+}
+
+.sg__hbar-row--critical {
+  border-color: rgba(231, 111, 81, 0.28);
+  background:
+    linear-gradient(90deg, rgba(231, 111, 81, 0.08), rgba(255, 255, 255, 0.86));
+}
+
+.sg__hbar-rank {
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background-color: rgba(74, 111, 165, 0.1);
+  color: var(--color-pizarra-dark);
+
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.sg__hbar-row--critical .sg__hbar-rank {
+  background-color: var(--color-melocoton);
+  color: #fff;
+}
+
+.sg__hbar-label {
+  min-width: 0;
+}
+
+.sg__hbar-label strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--color-texto-oscuro);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.sg__hbar-label small {
+  display: block;
+  margin-top: 3px;
+  color: var(--color-texto-claro);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.sg__hbar-track {
+  overflow: hidden;
+  height: 12px;
+  border-radius: var(--radius-pill);
+  background-color: rgba(148, 163, 184, 0.16);
+}
+
+.sg__hbar-fill {
+  display: block;
+  height: 100%;
+  min-width: 8px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-melocoton), #e8a090);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sg__hbar-row--critical .sg__hbar-fill {
+  background: linear-gradient(90deg, #c0392b, var(--color-melocoton));
+}
+
+.sg__hbar-value {
+  justify-self: end;
+
+  color: var(--color-melocoton);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   VERTICAL BAR CHART (Stock vs Ventas)
+   ========================================================= */
+
+.sg__vbar-legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.sg__vbar-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--color-texto-claro);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.sg__vbar-legend-item i {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.sg__vbar-legend-item--stock i {
+  background: linear-gradient(180deg, var(--color-pizarra), #5f8fd1);
+}
+
+.sg__vbar-legend-item--ventas i {
+  background: linear-gradient(180deg, var(--color-menta), #70c79a);
+}
+
+.sg__vbar-chart {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+
+  min-height: 260px;
+  padding: 20px 16px 14px;
+
+  border: 1px solid rgba(74, 111, 165, 0.1);
+  border-radius: 20px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 51px,
+      rgba(148, 163, 184, 0.1) 52px
+    ),
+    rgba(255, 255, 255, 0.68);
+  overflow-x: auto;
+}
+
+.sg__vbar-group {
+  flex: 1 0 60px;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.sg__vbar-bars {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+
+  width: 100%;
+  height: 200px;
+}
+
+.sg__vbar {
+  position: relative;
+
+  flex: 1;
+  min-height: 8px;
+  min-width: 0;
+
+  border-radius: 10px 10px 0 0;
+
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sg__vbar--stock {
+  background: linear-gradient(180deg, var(--color-pizarra), #5f8fd1);
+}
+
+.sg__vbar--ventas {
+  background: linear-gradient(180deg, var(--color-menta), #70c79a);
+}
+
+.sg__vbar-tooltip {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: none;
+
+  min-height: 24px;
+  padding: 0 8px;
+
+  border-radius: 8px;
+  background-color: var(--color-pizarra-dark);
+  color: #fff;
+
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 24px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sg__vbar:hover .sg__vbar-tooltip {
+  display: block;
+}
+
+.sg__vbar-label {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+
+  color: var(--color-texto-claro);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   CHART RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1080px) {
+  .sg__charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .sg__hbar-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .sg__hbar-track {
+    grid-column: 1 / -1;
+  }
+
+  .sg__hbar-value {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .sg__vbar-chart {
+    min-height: 200px;
+    padding: 16px 12px 10px;
+  }
+
+  .sg__vbar-bars {
+    height: 160px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sg__chart-panel {
+    padding: 18px;
+  }
+
+  .sg__vbar-group {
+    flex: 1 0 48px;
+  }
+}
