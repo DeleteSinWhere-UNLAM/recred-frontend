@@ -14,6 +14,7 @@ import { FranjasHorariasService } from '../../../restricciones-horarias/services
 import { ToastService } from '../../../../shared/services/toast.service';
 
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 
 describe('CarritoPresenter', () => {
   let presenter: CarritoPresenter;
@@ -44,7 +45,13 @@ describe('CarritoPresenter', () => {
     perfilServiceSpy.rol.and.returnValue(signal('ALUMNO'));
     perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-1');
     
-    const buffetServiceSpy = jasmine.createSpyObj('BuffetService', ['obtenerBuffetDelAlumno', 'getBuffetDelAlumno', 'getProductosDelBuffet']);
+    const buffetServiceSpy = jasmine.createSpyObj('BuffetService', ['obtenerBuffetDelAlumno', 'getProductosDelBuffet']);
+    buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of({
+      id: '0f8fad5b-d9cb-469f-a165-70867728950e',
+      nombre: 'Buffet',
+      colegioId: 'colegio-1',
+    }));
+    buffetServiceSpy.getProductosDelBuffet.and.returnValue(of([]));
     const sugerenciasCarritoSpy = jasmine.createSpyObj('SugerenciasCarritoService', ['obtenerSugerencias']);
     const toastSpy = jasmine.createSpyObj('ToastService', ['mostrar']);
     

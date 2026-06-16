@@ -24,7 +24,14 @@ describe('ConfirmarPresenter', () => {
     id: '',
     total: 100,
     ordenes: [
-      { alumno: { id: 'alumno-1', nombre: 'Juan' } as unknown as Alumno, subtotal: 100, items: [], fecha: '', recreo: 'PRIMER_RECREO' }
+      {
+        alumno: { id: 'alumno-1', nombre: 'Juan' } as unknown as Alumno,
+        buffetId: '0f8fad5b-d9cb-469f-a165-70867728950e',
+        subtotal: 100,
+        items: [],
+        fecha: '',
+        recreo: 'PRIMER_RECREO',
+      }
     ],
     codigos: {}
   };

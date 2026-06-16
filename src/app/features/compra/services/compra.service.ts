@@ -74,6 +74,7 @@ export class CompraService {
 
       return {
         studentId: o.alumno.id,
+        buffetId: o.buffetId,
         buyerId: buyerId,
         buyerType: buyerType,
         date: o.fecha,
@@ -109,4 +110,3 @@ export class CompraService {
     return this.http.post<void>(url, { withdrawalCode: code });
   }
 }
-

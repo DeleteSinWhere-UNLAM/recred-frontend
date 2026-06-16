@@ -9,6 +9,7 @@ describe('BuffetService', () => {
   let httpMock: HttpTestingController;
 
   const alumnoId = '345c0add-4188-489f-a290-bf1ab68b260a';
+  const buffetId = '0f8fad5b-d9cb-469f-a165-70867728950e';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -21,6 +22,15 @@ describe('BuffetService', () => {
     service = TestBed.inject(BuffetService);
     httpMock = TestBed.inject(HttpTestingController);
   });
+
+  function expectMenuRequest() {
+    const req = httpMock.expectOne((request) =>
+      request.url === `${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet` &&
+      request.params.get('buffetId') === buffetId
+    );
+    expect(req.request.params.get('buffetId')).toBe(buffetId);
+    return req;
+  }
 
   afterEach(() => {
     httpMock.verify();
@@ -38,7 +48,7 @@ describe('BuffetService', () => {
         bloqueado: true, motivoBloqueo: 'Bloqueado por el tutor'
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].bloqueado).toBeTrue();
           expect(productos[0].bloqueadoPorRestriccion).toBeFalsy();
@@ -48,7 +58,7 @@ describe('BuffetService', () => {
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
 
     it('debería mapear bloqueadoPorRestriccion=true y bloqueado=false si el motivo es una restricción nutricional', (done) => {
@@ -57,7 +67,7 @@ describe('BuffetService', () => {
         bloqueado: true, motivoBloqueo: 'Contiene: Gluten (TACC)'
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].bloqueado).toBeFalsy();
           expect(productos[0].bloqueadoPorRestriccion).toBeTrue();
@@ -67,7 +77,7 @@ describe('BuffetService', () => {
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
 
     it('debería mapear bloqueadoPorRestriccion=true para restricción de lácteos', (done) => {
@@ -76,7 +86,7 @@ describe('BuffetService', () => {
         bloqueado: true, motivoBloqueo: 'Contiene: Lácteos'
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].bloqueado).toBeFalsy();
           expect(productos[0].bloqueadoPorRestriccion).toBeTrue();
@@ -85,7 +95,7 @@ describe('BuffetService', () => {
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
 
     it('debería mapear bloqueadoPorRestriccion=true para restricción horaria', (done) => {
@@ -94,7 +104,7 @@ describe('BuffetService', () => {
         bloqueado: true, motivoBloqueo: 'No permitido en este horario'
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].bloqueado).toBeFalsy();
           expect(productos[0].bloqueadoPorRestriccion).toBeTrue();
@@ -102,7 +112,7 @@ describe('BuffetService', () => {
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
 
     it('debería mapear superaPresupuesto=true y bloqueado=false para motivos de presupuesto general', (done) => {
@@ -111,7 +121,7 @@ describe('BuffetService', () => {
         bloqueado: true, motivoBloqueo: 'Supera el límite de gasto'
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].bloqueado).toBeFalsy();
           expect(productos[0].bloqueadoPorRestriccion).toBeFalsy();
@@ -121,7 +131,7 @@ describe('BuffetService', () => {
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
 
     it('debería mapear superaPresupuesto=true para motivo de presupuesto por categoría', (done) => {
@@ -130,7 +140,7 @@ describe('BuffetService', () => {
         bloqueado: true, motivoBloqueo: 'Supera límite de su categoría'
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].superaPresupuesto).toBeTrue();
           expect(productos[0].bloqueado).toBeFalsy();
@@ -139,7 +149,7 @@ describe('BuffetService', () => {
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
 
     it('debería mapear un producto sin bloqueo como disponible y sin restricciones', (done) => {
@@ -148,7 +158,7 @@ describe('BuffetService', () => {
         bloqueado: false, motivoBloqueo: null
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].bloqueado).toBeFalsy();
           expect(productos[0].bloqueadoPorRestriccion).toBeFalsy();
@@ -158,7 +168,7 @@ describe('BuffetService', () => {
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
 
     it('debería preservar el motivoBloqueo en el objeto Producto mapeado', (done) => {
@@ -168,14 +178,14 @@ describe('BuffetService', () => {
         bloqueado: true, motivoBloqueo: motivo
       }];
 
-      service.getProductosDelBuffet('buffet-1', alumnoId).subscribe({
+      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
         next: (productos) => {
           expect(productos[0].motivoBloqueo).toBe(motivo);
           done();
         }
       });
 
-      httpMock.expectOne(`${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet`).flush(mockDtos);
+      expectMenuRequest().flush(mockDtos);
     });
   });
 });

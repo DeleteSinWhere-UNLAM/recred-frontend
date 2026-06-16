@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 export interface AlumnoResumen {
@@ -35,7 +35,8 @@ export class VentaEspontaneaService {
   }
 
   cargarProductosDelAlumno(alumnoId: string): Observable<Producto[]> {
-    return this.buffetService.getProductosDelBuffet('buffet-san-jose', alumnoId).pipe(
+    return this.buffetService.obtenerBuffetDelAlumno(alumnoId).pipe(
+      switchMap((buffet) => this.buffetService.getProductosDelBuffet(buffet.id, alumnoId)),
       tap((productos: Producto[]) => {
         const prodsVenta = productos.map(p => ({
           ...p,
