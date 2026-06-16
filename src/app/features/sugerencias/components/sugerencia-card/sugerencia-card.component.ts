@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { SugerenciaProducto } from '../../models/sugerencia-producto.model';
 
@@ -11,9 +11,13 @@ export class SugerenciaCardComponent {
   @Input({ required: true })
   sugerencia!: SugerenciaProducto;
 
-  expandido = false;
+  @Input()
+  seleccionada = false;
 
-  toggleDetalle(): void {
-    this.expandido = !this.expandido;
+  @Output()
+  seleccionar = new EventEmitter<SugerenciaProducto>();
+
+  onSeleccionar(): void {
+    this.seleccionar.emit(this.sugerencia);
   }
 }
