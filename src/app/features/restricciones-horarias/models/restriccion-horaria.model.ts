@@ -14,7 +14,6 @@ export interface RestriccionHoraria {
   readonly categoryId?: string | null;
   readonly classificationId?: string | null;
   readonly activa: boolean;
-  // Campos anidados que vienen del backend (Java)
   readonly franjaHoraria?: {
     id: string;
     descripcion: string;

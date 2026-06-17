@@ -161,8 +161,6 @@ describe('BuffetPresenter', () => {
     expect(presenter).toBeTruthy();
   });
 
-  // ── Separación de tipos de bloqueo en productosFiltrados ──────────────────
-
   describe('productosFiltrados — separación bloqueo tutor vs restricción', () => {
     it('en vista tutor: debe mostrar todos los productos (disponibles, bloqueados por tutor y por restricción)', fakeAsync(() => {
       usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
@@ -179,8 +177,6 @@ describe('BuffetPresenter', () => {
       tick();
 
       const filtrados = presenter.productosFiltrados();
-      // El bloqueado por tutor (Alfajor) y el bloqueado por restricción nutricional (Oreo) quedan fuera;
-      // solo el libre (Agua Mineral) debe aparecer.
       expect(filtrados.length).toBe(1);
       expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
       expect(filtrados.some(p => p.id === 'prod-tutor')).toBeFalse();
@@ -196,8 +192,6 @@ describe('BuffetPresenter', () => {
       expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
     }));
   });
-
-  // ── toggleLock ─────────────────────────────────────────────────────────────
 
   describe('toggleLock — bloqueo y desbloqueo manual', () => {
     it('debería bloquear un producto de forma optimista y llamar al servicio', () => {

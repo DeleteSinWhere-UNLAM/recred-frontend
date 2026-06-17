@@ -3132,3 +3132,66 @@ strong.kr__purchase-percent {
     margin-left: 0;
   }
 }
+
+/* Final responsive overrides for dashboard rules declared later in the cascade. */
+.kr__purchase-item {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "purchase-info purchase-percent"
+    "purchase-progress purchase-progress";
+}
+
+.kr__purchase-item > div:first-child {
+  grid-area: purchase-info;
+  min-width: 0;
+}
+
+.kr__purchase-progress {
+  grid-area: purchase-progress;
+  width: 100%;
+  min-width: 0;
+}
+
+.kr__purchase-percent {
+  grid-area: purchase-percent;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+@media (max-width: 1280px) {
+  .kr__commerce-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .kr__category-table-head {
+    display: none;
+  }
+
+  .kr__category-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .kr__category-bar-cell {
+    grid-template-columns: 1fr auto !important;
+  }
+
+  .kr__category-total,
+  .kr__category-percent {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .kr__summary-actions,
+  .kr__date-field--summary,
+  .kr__date-field--summary input,
+  .kr__date-field--summary select,
+  .kr__refresh--summary {
+    width: 100%;
+    min-width: 0;
+  }
+}

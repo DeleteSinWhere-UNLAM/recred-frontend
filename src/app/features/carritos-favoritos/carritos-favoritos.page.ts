@@ -37,7 +37,6 @@ export class CarritosFavoritosPage implements OnInit {
   gruposHijos: GrupoHijo[] = [];
   isLoading = false;
 
-  // Modal de edición
   mostrarModalEditar = false;
   editarCartId: string | null = null;
   editarInitialNombre = '';

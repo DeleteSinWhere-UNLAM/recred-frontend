@@ -37,7 +37,6 @@ export class GuardarFavoritoModalComponent implements OnInit {
   readonly hijos = this.alumnosService.alumnos;
 
   constructor() {
-    // React to changes in initial values
     effect(() => {
       this.nombre = this.initialNombre;
       this.alumnoId = this.initialAlumnoId;

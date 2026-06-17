@@ -42,8 +42,6 @@ describe('ProductoCardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // ── Candado / bloqueo por tutor ────────────────────────────────────────────
-
   describe('Bloqueo manual por el tutor (candado)', () => {
     it('no debería mostrar el botón del candado si mostrarCandado es false', () => {
       fixture.componentRef.setInput('mostrarCandado', false);
@@ -118,8 +116,6 @@ describe('ProductoCardComponent', () => {
       expect(component.toggleLock.emit).toHaveBeenCalled();
     });
   });
-
-  // ── Bloqueo por restricción nutricional / horaria ─────────────────────────
 
   describe('Bloqueo por restricción nutricional o horaria', () => {
     it('debería mostrar el botón "No apto: Contiene TACC" para restricción de TACC', () => {
@@ -215,12 +211,9 @@ describe('ProductoCardComponent', () => {
       fixture.detectChanges();
 
       const lockBtn = fixture.debugElement.query(By.css('.producto-card__lock-btn'));
-      // El botón del candado existe pero debe mostrar candado abierto (producto.bloqueado = false)
       expect(lockBtn.nativeElement.classList.contains('producto-card__lock-btn--bloqueado')).toBeFalse();
     });
   });
-
-  // ── Computed mensajeRestriccion ────────────────────────────────────────────
 
   describe('mensajeRestriccion()', () => {
     it('debería retornar "No apto" si no hay motivoBloqueo', () => {
@@ -284,8 +277,6 @@ describe('ProductoCardComponent', () => {
     });
   });
 
-  // ── Computed disponible ────────────────────────────────────────────────────
-
   describe('disponible()', () => {
     it('debería ser true para un producto disponible sin bloqueos', () => {
       fixture.componentRef.setInput('producto', { ...mockProductoBase, estadoStock: 'DISPONIBLE' });
@@ -329,8 +320,6 @@ describe('ProductoCardComponent', () => {
       expect(component.disponible()).toBeFalse();
     });
   });
-
-  // ── Badge de clasificación ─────────────────────────────────────────────────
 
   describe('Badge de clasificación de salud', () => {
     it('debería mostrar el badge si el producto tiene clasificaciones de salud', () => {

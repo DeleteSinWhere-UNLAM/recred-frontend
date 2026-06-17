@@ -49,12 +49,10 @@ export class RestriccionesHorariasPresenter {
     const franjas = this.franjasState();
     const restricciones = this.restriccionesState();
 
-    // El backend usa 'activa' y objetos anidados
     const activas = restricciones.filter(r => r.activa !== false);
 
     return franjas.map(franja => {
       const deEstaFranja = activas.filter(r => {
-        // Según el backend, el ID está en r.franjaHoraria.id
         const idRecreo = r.franjaHoraria?.id || r.timeSlotId;
         return idRecreo === franja.id;
       });

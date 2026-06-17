@@ -47,7 +47,6 @@ export class OrdenAlumnoCardComponent {
   @Input() recreosDisponibles: RecreoOpcion[] = [];
   @Input() fechaMinima = '';
   @Input() motivoBloqueoPresupuesto?: string;
-  /** En modo solo lectura, los campos de fecha y recreo no son editables. */
   @Input() modoSoloLectura = false;
 
   @Output() toggleSeleccion = new EventEmitter<void>();
