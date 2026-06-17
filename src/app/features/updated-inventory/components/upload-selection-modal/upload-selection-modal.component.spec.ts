@@ -28,8 +28,8 @@ describe('UploadSelectionModalComponent', () => {
   });
 
   it('dado que hago clic en Cancelar o presiono esc/backdrop, deberia emitir el evento cancel', () => {
-    spyOn(component.cancel, 'emit');
+    spyOn(component.closeModal, 'emit');
     component.onCancel();
-    expect(component.cancel.emit).toHaveBeenCalled();
+    expect(component.closeModal.emit).toHaveBeenCalled();
   });
 });

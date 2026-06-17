@@ -375,7 +375,7 @@ describe('UpdatedInventoryPageComponent', () => {
   }));
 
   it('deberia inicializar selectedProduct a null y mostrar el formulario de alta', () => {
-    component.openCreateForm();
+    component.openIndividualForm();
 
     expect(component.selectedProduct).toBeNull();
     expect(component.isFormVisible).toBeTrue();
@@ -737,8 +737,8 @@ describe('UpdatedInventoryPageComponent', () => {
   });
 
   describe('Gestión del formulario', () => {
-    it('debería inicializar selectedProduct a null y mostrar el formulario al llamar openCreateForm', () => {
-      component.openCreateForm();
+    it('debería inicializar selectedProduct a null y mostrar el formulario al llamar openIndividualForm', () => {
+      component.openIndividualForm();
       expect(component.selectedProduct).toBeNull();
       expect(component.isFormVisible).toBeTrue();
     });
