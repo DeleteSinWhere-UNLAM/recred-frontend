@@ -5,6 +5,7 @@
       <p>Cargando panel global...</p>
     </div>
   } @else if (globalSummary) {
+    <!-- Global Header -->
     <div class="global-header card">
       <div class="global-balance-info">
         <h3>Saldo Total Consolidado</h3>
@@ -15,10 +16,77 @@
       </div>
     </div>
 
+    <!-- Quick Transfer & Children Selection Section -->
+    <div class="quick-transfer card">
+      <div class="quick-transfer-header">
+        <span class="quick-transfer-icon" aria-hidden="true">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+        <h2 class="quick-transfer-title">Transferencia Rápida</h2>
+      </div>
+      <p class="subtitle">Arrastrá el dinero desde el origen hacia el destinatario para transferir saldo.</p>
+      
+      <div class="transfer-grid">
+        @for (child of globalSummary.children; track child.studentId) {
+          <div 
+            class="child-transfer-card"
+            [class.selected]="selectedChild?.studentId === child.studentId"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event, child)"
+            (click)="selectChild(child)"
+            (keydown.enter)="selectChild(child)"
+            tabindex="0">
+            
+            <div class="alumno-card__identidad">
+              <div class="alumno-card__avatar-wrap">
+                <div class="alumno-card__avatar">
+                  <span>{{ getInitials(child.studentName) }}</span>
+                </div>
+              </div>
+              <div class="alumno-card__texto">
+                <h3 class="alumno-card__nombre">{{ child.studentName }}</h3>
+              </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div class="alumno-card__saldo" [class.alumno-card__saldo--bajo]="child.balance < 1000">
+                <span class="alumno-card__saldo-label">Saldo</span>
+                <span class="alumno-card__saldo-valor">$ {{ child.balance | number:'1.0-0' }}</span>
+              </div>
+              
+              <div class="transfer-input-wrapper">
+                <span class="transfer-prefix">$</span>
+                <input type="number" 
+                       class="quick-transfer-input"
+                       [(ngModel)]="transferAmounts[child.studentId]"
+                       (keydown.enter)="$event.target.blur()"
+                       placeholder="0"
+                       (click)="$event.stopPropagation()">
+              </div>
 
+              <div class="draggable-cash" 
+                draggable="true" 
+                (dragstart)="onDragStart($event, child)"
+                (dragend)="onDragEnd($event)"
+                title="Arrastrar para transferir"
+                (click)="$event.stopPropagation()"
+                (keydown.enter)="$event.stopPropagation()"
+                tabindex="0">
+                <i class="fa-solid fa-money-bill-wave fa-beat-fade"></i>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Selected Child View -->
     @if (selectedChild) {
       <div class="dashboard-grid">
-                @if (selectedChild.smartAction) {
+        
+        <!-- Smart Action Widget -->
+        @if (selectedChild.smartAction) {
           <section class="card smart-action-card">
             <div class="card-header">
               <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Sugerencia Inteligente</h3>
@@ -31,6 +99,7 @@
           </section>
         }
 
+        <!-- Financial Widget -->
         <section class="card finance-card">
           <div class="card-header">
             <h3>Finanzas: {{ selectedChild.studentName }}</h3>
@@ -58,6 +127,7 @@
           }
         </section>
 
+        <!-- Health & Gamification Widget -->
         <section class="card health-card">
           <div class="card-header">
             <h3>Salud y Hábitos</h3>
@@ -76,6 +146,7 @@
           </div>
         </section>
 
+        <!-- Logistics Widget -->
         <section class="card logistics-card">
           <div class="card-header">
             <h3>Logística del Día</h3>
@@ -95,6 +166,7 @@
           }
         </section>
 
+        <!-- Recent Transactions -->
         <section class="card transactions-card">
           <div class="card-header">
             <h3>Últimos Movimientos</h3>
@@ -115,6 +187,7 @@
       </div>
     }
   }
+
 
 
   <!-- Smart Action Modal -->
