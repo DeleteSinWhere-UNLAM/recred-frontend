@@ -495,13 +495,15 @@
                     >
                       <span class="kr__rank-number">{{ index + 1 }}</span>
 
-                      <span class="kr__rank-icon" aria-hidden="true">
-                        @if (index === 0) {
-                          <i class="fa-solid fa-medal"></i>
-                        } @else {
-                          <i class="fa-solid fa-box"></i>
-                        }
-                      </span>
+                      <div class="kr__rank-media">
+                        <img
+                          class="kr__rank-image"
+                          [src]="item.imageUrl || IMAGEN_FALLBACK"
+                          [alt]="item.label"
+                          loading="lazy"
+                          (error)="onImagenError($event)"
+                        />
+                      </div>
 
                       <div class="kr__rank-info">
                         <strong>{{ item.label }}</strong>
