@@ -94,7 +94,10 @@ describe('SugerenciasPresenter', () => {
 
   describe('generatePromotion', () => {
     it('debería crear promoción y cerrar modal si hay producto seleccionado', () => {
-      const mockSugerencia = { productoOriginal: 'P1' } as SugerenciaProducto;
+      const mockSugerencia = { 
+        productoOriginal: 'P1',
+        estadisticasVenta: { productoId: 'P1' }
+      } as unknown as SugerenciaProducto;
       presenter.seleccionarProducto(mockSugerencia);
       mockPromotionService.createPromotion.and.returnValue(of({} as Promotion));
 
@@ -108,8 +111,8 @@ describe('SugerenciasPresenter', () => {
       expect(mockPromotionService.createPromotion).toHaveBeenCalledWith(jasmine.objectContaining({
         name: 'Combo P1',
         discountPercentage: 10,
-        startDate: '2026-06-16',
-        endDate: '2026-06-20',
+        startDate: new Date('2026-06-16').toISOString(),
+        endDate: new Date('2026-06-20').toISOString(),
         productIds: ['P1', 'combo1']
       }));
 
