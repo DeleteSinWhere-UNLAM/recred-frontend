@@ -152,6 +152,24 @@
       (deleteProduct)="requestDeleteFromInventory($event)">
     </app-product-table>
 
+    @if (isSelectionModalVisible) {
+      <app-upload-selection-modal
+        (individualUpload)="openIndividualForm()"
+        (bulkUpload)="openBulkUploadModal()"
+        (cancel)="closeSelectionModal()"
+      />
+    }
+
+    @if (isBulkUploadModalVisible) {
+      <app-bulk-upload-table-modal
+        [isProcessingFile]="isProcessingFile"
+        [prefilledProducts]="bulkProductsData"
+        (fileSelected)="handleFileUpload($event)"
+        (saveProducts)="handleBulkProductsSave($event)"
+        (cancel)="closeBulkUploadModal()"
+      />
+    }
+
     @if (isFormVisible) {
       <app-product-form
         [product]="selectedProduct"
