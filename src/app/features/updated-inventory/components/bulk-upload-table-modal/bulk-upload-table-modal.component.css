@@ -159,6 +159,15 @@
 .bulk-upload-modal__table td {
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--color-borde);
+  transition: background-color 0.2s ease;
+}
+
+.bulk-upload-modal__row--invalid {
+  background-color: rgba(231, 111, 81, 0.03);
+}
+
+.bulk-upload-modal__row--invalid td:first-child {
+  border-left: 4px solid var(--color-melocoton, #e76f51);
 }
 
 .bulk-upload-modal__table th:nth-child(1),
@@ -182,11 +191,22 @@
 
 .bulk-upload-modal__table th:nth-child(6),
 .bulk-upload-modal__table td:nth-child(6) {
-  min-width: 160px;
+  min-width: 220px;
+}
+
+.bulk-upload-modal__category-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bulk-upload-modal__new-category-input {
+  margin-top: 0.25rem;
 }
 
 .bulk-upload-modal__table td input[type="text"],
-.bulk-upload-modal__table td input[type="number"] {
+.bulk-upload-modal__table td input[type="number"],
+.bulk-upload-modal__table td select {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--color-borde);
@@ -198,7 +218,12 @@
   transition: border-color 0.2s ease;
 }
 
-.bulk-upload-modal__table td input:focus {
+.bulk-upload-modal__table td select {
+  cursor: pointer;
+}
+
+.bulk-upload-modal__table td input:focus,
+.bulk-upload-modal__table td select:focus {
   border-color: var(--color-pizarra);
   outline: none;
 }

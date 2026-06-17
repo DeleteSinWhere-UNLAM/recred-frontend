@@ -66,34 +66,57 @@
                 <th>Precio</th>
                 <th>Stock</th>
                 <th>Peso</th>
-                <th>Categoría (Nueva)</th>
+                <th>Categoría</th>
                 <th>Prep.</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody formArrayName="products">
-              @for (control of productsArray.controls; track $index) {
-                <tr [formGroupName]="$index">
+              @for (control of productsArray.controls; track control) {
+                <tr
+                  [class.bulk-upload-modal__row--invalid]="control.invalid && control.touched"
+                >
                   <td>
-                    <input type="text" formControlName="nombre" placeholder="Nombre">
+                    <input type="text" [formControl]="$any(control).get('nombre')" placeholder="Nombre">
                   </td>
                   <td>
-                    <input type="text" formControlName="descripcion" placeholder="Descripción">
+                    <input type="text" [formControl]="$any(control).get('descripcion')" placeholder="Descripción">
                   </td>
                   <td>
-                    <input type="number" formControlName="precio" min="0" step="10">
+                    <input type="number" [formControl]="$any(control).get('precio')" min="0" step="10">
                   </td>
                   <td>
-                    <input type="number" formControlName="stockActual" min="0" step="1">
+                    <input type="number" [formControl]="$any(control).get('stockActual')" min="0" step="1">
                   </td>
                   <td>
-                    <input type="number" formControlName="peso" min="0" step="0.1">
+                    <input type="number" [formControl]="$any(control).get('peso')" min="0" step="0.1">
                   </td>
                   <td>
-                    <input type="text" formControlName="nuevaCategoriaNombre" placeholder="Categoría">
+                    <div class="bulk-upload-modal__category-cell">
+                      <select
+                        [formControl]="$any(control).get('categoriaId')"
+                        [class.ng-invalid]="control.get('categoriaId')?.invalid && control.get('categoriaId')?.touched"
+                      >
+                        <option value="" disabled selected>Seleccionar...</option>
+                        @for (cat of categories; track cat.id) {
+                          <option [value]="cat.id">{{ cat.descripcion }}</option>
+                        }
+                        <option value="NEW">+ Nueva categoría...</option>
+                      </select>
+
+                      @if (control.get('categoriaId')?.value === 'NEW') {
+                        <input
+                          type="text"
+                          [formControl]="$any(control).get('nuevaCategoriaNombre')"
+                          placeholder="Nombre de la categoría"
+                          class="bulk-upload-modal__new-category-input"
+                          [class.ng-invalid]="control.get('nuevaCategoriaNombre')?.invalid && control.get('nuevaCategoriaNombre')?.touched"
+                        >
+                      }
+                    </div>
                   </td>
                   <td>
-                    <input type="checkbox" formControlName="requierePreparacion">
+                    <input type="checkbox" [formControl]="$any(control).get('requierePreparacion')">
                   </td>
                   <td>
                     <button

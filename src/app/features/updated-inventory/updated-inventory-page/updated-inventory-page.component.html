@@ -164,6 +164,7 @@
       <app-bulk-upload-table-modal
         [isProcessingFile]="isProcessingFile"
         [prefilledProducts]="bulkProductsData"
+        [categories]="categories"
         (fileSelected)="handleFileUpload($event)"
         (saveProducts)="handleBulkProductsSave($event)"
         (closeModal)="closeBulkUploadModal()"

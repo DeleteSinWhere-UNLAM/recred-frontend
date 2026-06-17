@@ -11,6 +11,9 @@ import {
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BulkProductResponse } from '../../services/bulk-upload.service';
 
+import { Category } from '../../models/category.interface';
+import { ToastService } from '../../../../shared/services/toast.service';
+
 @Component({
   selector: 'app-bulk-upload-table-modal',
   standalone: true,
@@ -22,11 +25,13 @@ import { BulkProductResponse } from '../../services/bulk-upload.service';
 export class BulkUploadTableModalComponent implements OnChanges {
   @Input() isProcessingFile = false;
   @Input() prefilledProducts: BulkProductResponse[] = [];
+  @Input() categories: Category[] = [];
   @Output() fileSelected = new EventEmitter<File>();
   @Output() saveProducts = new EventEmitter<BulkProductResponse[]>();
   @Output() closeModal = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
+  private readonly toastService = inject(ToastService);
 
   readonly form: FormGroup = this.fb.group({
     products: this.fb.array([]),
@@ -34,6 +39,10 @@ export class BulkUploadTableModalComponent implements OnChanges {
 
   get productsArray(): FormArray {
     return this.form.get('products') as FormArray;
+  }
+
+  asFormGroup(control: any): FormGroup {
+    return control as FormGroup;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -58,6 +67,11 @@ export class BulkUploadTableModalComponent implements OnChanges {
       this.saveProducts.emit(this.form.value.products);
     } else {
       this.form.markAllAsTouched();
+      if (this.productsArray.length === 0) {
+        this.toastService.mostrar('No hay productos para guardar', 'error');
+      } else {
+        this.toastService.mostrar('¡Atención! Hay productos sin categoría asignada. Revise las filas marcadas en rojo.', 'error');
+      }
     }
   }
 
@@ -69,10 +83,21 @@ export class BulkUploadTableModalComponent implements OnChanges {
       peso: [product?.peso ?? 0, [Validators.min(0)]],
       stockActual: [product?.stockActual ?? 0, [Validators.min(0)]],
       requierePreparacion: [product?.requierePreparacion ?? false],
-      categoriaId: [product?.categoriaId ?? null],
+      categoriaId: [product?.categoriaId ?? '', [Validators.required]],
       nuevaCategoriaNombre: [product?.nuevaCategoriaNombre ?? ''],
       saludEtiquetasIds: [product?.saludEtiquetasIds ?? []],
       tipoEtiquetasIds: [product?.tipoEtiquetasIds ?? []],
+    });
+
+    // Validar nuevaCategoriaNombre si categoriaId es 'NEW'
+    row.get('categoriaId')?.valueChanges.subscribe(value => {
+      const nuevaCatCtrl = row.get('nuevaCategoriaNombre');
+      if (value === 'NEW') {
+        nuevaCatCtrl?.setValidators([Validators.required]);
+      } else {
+        nuevaCatCtrl?.clearValidators();
+      }
+      nuevaCatCtrl?.updateValueAndValidity();
     });
 
     this.productsArray.push(row);

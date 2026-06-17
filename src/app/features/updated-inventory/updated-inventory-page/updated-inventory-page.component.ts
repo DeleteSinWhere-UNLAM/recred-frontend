@@ -400,16 +400,33 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     }
 
     this.isProcessingFile = true;
+
+    // Mapa para normalizar y unificar nombres de nuevas categorías
+    // Clave: nombre en minúsculas y sin espacios, Valor: nombre original (el primero que aparezca)
+    const normalizedNewCategories = new Map<string, string>();
+
     const createRequests: CreateProductRequest[] = products.map((prod) => {
-      const isNewCategory = !prod.categoriaId && !!prod.nuevaCategoriaNombre;
+      const isNewCategory = prod.categoriaId === 'NEW';
+      let finalNuevaCategoriaNombre = '';
+
+      if (isNewCategory && prod.nuevaCategoriaNombre) {
+        const rawName = prod.nuevaCategoriaNombre.trim();
+        const key = rawName.toLowerCase();
+        
+        if (!normalizedNewCategories.has(key)) {
+          normalizedNewCategories.set(key, rawName);
+        }
+        finalNuevaCategoriaNombre = normalizedNewCategories.get(key)!;
+      }
+
       return {
         nombre: prod.nombre,
         descripcion: prod.descripcion ?? '',
         precio: prod.precio,
         peso: prod.peso,
         requierePreparacion: prod.requierePreparacion,
-        categoriaId: isNewCategory ? null : (prod.categoriaId ?? ''),
-        nuevaCategoriaNombre: isNewCategory ? (prod.nuevaCategoriaNombre ?? '') : '',
+        categoriaId: isNewCategory ? null : prod.categoriaId,
+        nuevaCategoriaNombre: finalNuevaCategoriaNombre,
         buffetId: currentBuffetId,
         stockActual: prod.stockActual,
         clasificacionesSaludIds: prod.saludEtiquetasIds ?? [],
