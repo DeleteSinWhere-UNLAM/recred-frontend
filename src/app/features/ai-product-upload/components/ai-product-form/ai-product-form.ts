@@ -113,7 +113,7 @@ export class AiProductForm implements OnInit, OnChanges {
     return value / 1000;
   }
 
-  private buildHealthClassificationIds(formValue: Record<string, any>): string[] {
+  private buildHealthClassificationIds(formValue: Record<string, unknown>): string[] {
     const ids: string[] = [];
     if (!formValue["contiene_tacc"]) ids.push("15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8");
     if (!formValue["contiene_azucar"]) ids.push("7e113952-93ca-4797-a80d-54f3a31b2165");

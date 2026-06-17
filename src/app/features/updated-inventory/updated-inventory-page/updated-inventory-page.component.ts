@@ -16,11 +16,9 @@ import { ProductFormComponent, ProductFormData } from '../components/product-for
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 import { InventoryRealtimeService } from '../services/inventory-realtime.service';
 import {
-  EstadoInventario,
   InventoryOverviewItem,
   InventoryStockMovement,
   InventoryStockUpdateRequest,
-  RealtimeInventoryEvent,
   TipoManejoInventario,
 } from '../models/inventory.interface';
 import {
@@ -58,14 +56,7 @@ type InventoryFilter =
   | 'AGOTADO';
 type RealtimeStatus = 'connecting' | 'connected' | 'disconnected';
 
-const PRODUCT_HIGHLIGHT_DURATION_MS = 3000;
 const INVENTORY_FULL_REFRESH_DEBOUNCE_MS = 5000;
-const INVENTORY_REALTIME_STOCK_EVENT_TYPES = new Set([
-  'STOCK_CHANGED',
-  'PRODUCT_SOLD_OUT',
-  'LOW_STOCK',
-  'DAILY_CAPACITY_LOW',
-]);
 
 const INVENTORY_MODE_DEFAULT_MOTIVOS: Record<TipoManejoInventario, string> = {
   STOCK_EXACTO: 'Volver a stock exacto',
@@ -603,9 +594,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const payload = this.buildInventoryStockPayload(
-      this.inventoryManagementTarget,
-    );
+    const payload = this.buildInventoryStockPayload();
 
     this.isSaving = true;
     this.productService
@@ -737,8 +726,8 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     this.realtimeAbortController = this.inventoryRealtimeService.connect(
       buffetId,
       {
-        onRefresh: (event) => {
-          this.zone.run(() => this.scheduleRealtimeRefresh(event));
+        onRefresh: () => {
+          this.zone.run(() => this.scheduleRealtimeRefresh());
         },
         onError: (error) => {
           console.warn('SSE de inventario desconectado o reintentando', error);
@@ -747,7 +736,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  private scheduleRealtimeRefresh(event: RealtimeInventoryEvent): void {
+  private scheduleRealtimeRefresh(): void {
     if (this.refreshTimeoutId !== null) {
       return;
     }
@@ -836,9 +825,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     this.inventoryManagementForm.patchValue({ motivo: defaultMotivo });
   }
 
-  private buildInventoryStockPayload(
-    product: InventoryOverviewItem,
-  ): InventoryStockUpdateRequest {
+  private buildInventoryStockPayload(): InventoryStockUpdateRequest {
     const values = this.inventoryManagementForm.value;
     const mode = values.tipoManejoInventario as TipoManejoInventario;
 
@@ -859,7 +846,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     return payload;
   }
 
-  private getInventoryErrorMessage(error: any): string {
+  private getInventoryErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       const code = error.error?.code || error.statusText;
       if (code && INVENTORY_ERROR_MESSAGES[code]) {
