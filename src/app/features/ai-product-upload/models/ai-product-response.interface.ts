@@ -1,4 +1,4 @@
-export interface AiProductResponse {
+﻿export interface AiProductResponse {
   nombre: string;
   descripcion: string;
   peso: string;
@@ -6,4 +6,5 @@ export interface AiProductResponse {
   contiene_mani: boolean;
   contiene_lactosa: boolean;
   contiene_tacc: boolean;
+  url_imagen?: string;
 }
