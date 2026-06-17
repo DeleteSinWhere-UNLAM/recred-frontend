@@ -30,26 +30,16 @@ export class TrackingPedidosPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
-
-  // States
   protected readonly userName = computed(() => this.usuarioService.getUsuarioActual().nombre);
   protected readonly loading = signal<boolean>(false);
   protected readonly isUpdating = signal<boolean>(false);
   protected readonly error = signal<string | null>(null);
-
-  // Pedidos cargados
   protected readonly allPickupsState = signal<ScheduledPickup[]>([]);
-
-  // Filtros
   protected readonly filterFecha = signal<string>('');
   protected readonly filterEstado = signal<string>('');
   protected readonly filterFranja = signal<string>('');
   protected readonly filterSearch = signal<string>('');
-
-  // Pedido seleccionado para ver detalles
   protected readonly selectedOrder = signal<ScheduledPickup | null>(null);
-
-  // Extraer las franjas horarias de forma dinámica de los pedidos cargados
   protected readonly timeSlots = computed<TimeSlotFilter[]>(() => {
     const unique = new Map<string, string>();
     for (const p of this.allPickupsState()) {
@@ -60,7 +50,6 @@ export class TrackingPedidosPage implements OnInit {
     return Array.from(unique.entries()).map(([id, description]) => ({ id, description }));
   });
 
-  // Filtrar localmente en el frontend para respuesta ultra-rápida y dinámica
   protected readonly filteredPickups = computed<ScheduledPickup[]>(() => {
     let list = this.allPickupsState();
     const fecha = this.filterFecha();
@@ -97,10 +86,8 @@ export class TrackingPedidosPage implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    // Hacemos el fetch de todos los pedidos programados del kiosquero para administrarlos fluidamente
     this.trackingService.getScheduledPickups().subscribe({
       next: (data) => {
-        // Ordenar cronológicamente por fecha y franja de retiro (el backend ya los devuelve ordenados, pero aseguramos en el cliente)
         const sorted = [...data].sort((a, b) => {
           const dateDiff = new Date(a.pickupDate).getTime() - new Date(b.pickupDate).getTime();
           if (dateDiff !== 0) return dateDiff;
@@ -110,7 +97,6 @@ export class TrackingPedidosPage implements OnInit {
         this.allPickupsState.set(sorted);
         this.loading.set(false);
 
-        // Si hay un modal abierto, actualizar la referencia del pedido seleccionado para reflejar cambios
         const selected = this.selectedOrder();
         if (selected) {
           const updated = sorted.find((p) => p.id === selected.id);
@@ -139,7 +125,7 @@ export class TrackingPedidosPage implements OnInit {
       next: () => {
         this.toastService.mostrar(`Estado del pedido actualizado a: ${event.nextStatus}`, 'success');
         this.isUpdating.set(false);
-        this.loadPickups(); // Recarga la lista completa
+        this.loadPickups();
       },
       error: (err) => {
         console.error('Error advancing status:', err);
@@ -155,8 +141,8 @@ export class TrackingPedidosPage implements OnInit {
       next: () => {
         this.toastService.mostrar('Pedido cancelado y saldo reembolsado', 'success');
         this.isUpdating.set(false);
-        this.onCerrarModal(); // Cerrar modal al cancelar
-        this.loadPickups(); // Recargar lista completa
+        this.onCerrarModal();
+        this.loadPickups();
       },
       error: (err) => {
         console.error('Error cancelling order:', err);

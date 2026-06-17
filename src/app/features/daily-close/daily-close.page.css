@@ -5524,3 +5524,33 @@
     flex-direction: column !important;
   }
 }
+
+/* Final responsive overrides for rules declared with !important above. */
+@media (max-width: 1180px) {
+  .dc-inventory-table__head {
+    display: none !important;
+  }
+
+  .dc-inventory-row {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    align-items: stretch !important;
+  }
+
+  .dc-inventory-row .dc-inventory-status {
+    justify-self: start !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .dc-inventory-count,
+  .dc-products-chip,
+  .dc-soldout-alert {
+    align-self: flex-start !important;
+  }
+
+  .dc-inventory-number,
+  .dc-inventory-status {
+    width: 100% !important;
+  }
+}

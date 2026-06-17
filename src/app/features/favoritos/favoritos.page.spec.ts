@@ -51,8 +51,8 @@ describe('FavoritosPage', () => {
         { provide: FavoritosService, useValue: favoritosServiceSpy },
         { provide: PerfilService, useValue: perfilServiceSpy },
         { provide: AlumnosService, useValue: {} },
-        UsuarioService, // Usar UsuarioService real para resolver señales y métodos de manera correcta
-        CarritoService, // Usar CarritoService real para evitar que falle Navbar con cartCount
+        UsuarioService,
+        CarritoService,
         { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
@@ -101,7 +101,7 @@ describe('FavoritosPage', () => {
 
     component.quitarFavorito('prod-123');
 
-    expect(component.favoritos.length).toBe(1); // Mantiene el favorito en la lista
+    expect(component.favoritos.length).toBe(1);
     expect(console.error).toHaveBeenCalled();
   });
 

@@ -18,7 +18,6 @@ import {
 } from '../models/inventory.interface';
 import { ProductFormData } from '../components/product-form/product-form.component';
 
-// IDs de clasificaciones tal como están en la BD
 const ID_SIN_TACC       = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
 const ID_SIN_AZUCAR     = '7e113952-93ca-4797-a80d-54f3a31b2165';
 const ID_CONT_LACTEOS   = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
@@ -470,12 +469,10 @@ describe('UpdatedInventoryPageComponent', () => {
         contiene_lactosa: true,
       };
 
-      // Crear
       component.selectedProduct = null;
       component.handleFormSubmit(formData);
       const payloadCreate = productServiceMock.create.calls.mostRecent().args[0];
 
-      // Actualizar
       component.selectedProduct = mockProducts[0];
       component.handleFormSubmit(formData);
       const payloadUpdate = productServiceMock.update.calls.mostRecent().args[1];
@@ -738,8 +735,6 @@ describe('UpdatedInventoryPageComponent', () => {
       'error',
     );
   });
-
-  // ── Gestión del formulario ─────────────────────────────────────────────────
 
   describe('Gestión del formulario', () => {
     it('debería inicializar selectedProduct a null y mostrar el formulario al llamar openCreateForm', () => {

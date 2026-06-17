@@ -65,7 +65,6 @@ export class OrderDetailsModalComponent {
     } else if (this.order.status === 'EN_PREPARACION') {
       nextStatus = 'LISTO';
     } else if (this.order.status === 'LISTO') {
-      // Open verification modal instead of directly advancing
       this.showVerificationModal = true;
       return;
     }

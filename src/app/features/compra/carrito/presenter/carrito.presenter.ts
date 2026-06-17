@@ -64,7 +64,6 @@ export class CarritoPresenter {
 
   readonly budgetBlockReasons = this.budgetBlockReasonsState.asReadonly();
 
-  /** Tanto en perfil Tutor como en perfil Alumno, la fecha y recreo se seleccionan en el buffet. */
   readonly esModoSoloLectura = computed(() => true);
 
   readonly recreosDisponiblesMap = computed(() => {
@@ -207,7 +206,6 @@ export class CarritoPresenter {
         0,
       );
 
-      // In tutor mode, take fecha/recreo from CarritoService (set in buffet)
       const retiro = soloLectura ? seleccionRetiro[alumnoId] : undefined;
       lista.push({
         alumno,

@@ -74,7 +74,6 @@ export class ProductoCardComponent {
 
   readonly disponible = computed(() => {
     const p = this.productoState();
-    // No disponible si: sin stock, bloqueado por tutor, por restricción nutricional/horaria, o supera presupuesto unitario
     return p ? (disponible(p) && !p.bloqueado && !p.bloqueadoPorRestriccion && !this.superaPresupuestoUnitario()) : false;
   });
 
@@ -82,11 +81,6 @@ export class ProductoCardComponent {
     return !!this.productoState()?.bloqueadoPorRestriccion;
   });
 
-  /**
-   * Convierte el motivoBloqueo del backend en una etiqueta corta para el botón.
-   * El backend devuelve: "Contiene: Gluten (TACC), Azúcar, Lácteos"
-   * Se mapea a: "No apto: Contiene TACC · Contiene Azúcar · Contiene Lácteos"
-   */
   readonly mensajeRestriccion = computed(() => {
     const motivo = this.productoState()?.motivoBloqueo ?? '';
     if (!motivo) return 'No apto';
@@ -99,7 +93,6 @@ export class ProductoCardComponent {
       'Ingredientes de origen animal':   'No Vegano',
     };
 
-    // El backend prefija con "Contiene: "
     const contenido = motivo.replace(/^Contiene:\s*/i, '');
     const partes = contenido.split(',').map(p => p.trim());
     const etiquetas = partes.map(p => MAPA[p] ?? p);

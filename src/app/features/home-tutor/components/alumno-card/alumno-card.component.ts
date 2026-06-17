@@ -99,7 +99,6 @@ export class AlumnoCardComponent implements OnInit {
     return this.perfilService.perfil()?.rol === 'PADRE';
   }
 
-  // --- Lógica Modal Microcrédito ---
   showMicrocreditoModal = signal<boolean>(false);
   tipoMonto = signal<'fijo' | 'porcentaje'>('porcentaje');
   montoFijo = signal<number>(5000);
@@ -113,7 +112,7 @@ export class AlumnoCardComponent implements OnInit {
     this.showMicrocreditoModal.set(true);
     
     if (this.creditoActivo()) {
-      return; // No calculamos recarga si ya hay crédito activo
+      return;
     }
 
     this.tipoMonto.set('porcentaje');

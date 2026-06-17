@@ -17,7 +17,6 @@ export class TutorDashboardComponent implements OnInit {
   selectedChild: ChildDashboardSummary | null = null;
   isLoading = true;
   
-  // Modals state
   showTransferModal = false;
   showSmartActionModal = false;
 
@@ -58,7 +57,6 @@ export class TutorDashboardComponent implements OnInit {
     return 'budget-red';
   }
   
-  // Modal Actions
   openTransferModal(): void {
     this.showTransferModal = true;
   }
@@ -76,7 +74,6 @@ export class TutorDashboardComponent implements OnInit {
   }
   
   applySmartAction(): void {
-    // In a real app, call a service here
     console.log('Action applied for', this.selectedChild?.studentName);
     this.closeSmartActionModal();
   }

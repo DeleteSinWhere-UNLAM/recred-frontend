@@ -36,7 +36,6 @@ describe('ConfirmarPresenter', () => {
     codigos: {}
   };
 
-  // Usamos un signal real para que la reactividad funcione en el presenter
   const ordenEnCursoSignal = signal<OrdenCompra | null>(mockOrdenBase);
 
   beforeEach(() => {
@@ -60,7 +59,7 @@ describe('ConfirmarPresenter', () => {
     });
 
     presenter = TestBed.inject(ConfirmarPresenter);
-    ordenEnCursoSignal.set(mockOrdenBase); // Resetear al valor base
+    ordenEnCursoSignal.set(mockOrdenBase);
   });
 
   it('debe confirmar la compra SIN sugerenciaId correctamente', () => {
