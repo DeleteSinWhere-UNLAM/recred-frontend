@@ -2,13 +2,11 @@
 
 @if (resumen && resumenProcesado) {
   <main class="dashboard">
-    <!-- HEADER -->
     <header class="dashboard__header">
       <h1>Resumen semanal</h1>
       <p>{{ resumen.fechaDesde }} - {{ resumen.fechaHasta }}</p>
     </header>
 
-    <!-- KPI -->
     <section class="kpi-grid">
       <div class="stat-card highlight">
         <div class="stat-card__icon">💰</div>
@@ -38,7 +36,6 @@
       </div>
     </section>
 
-    <!-- ANALISIS -->
     <section class="analysis-grid">
       <section class="chart-card">
         <h2>Distribución familiar</h2>
@@ -95,7 +92,6 @@
       </section>
     </section>
 
-    <!-- DETALLE -->
     <section class="children-section">
       <h2>Detalle por hijo</h2>
 

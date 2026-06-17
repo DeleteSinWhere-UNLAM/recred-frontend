@@ -1,6 +1,6 @@
 <div class="modal-backdrop" (click)="onClose()" (keyup.escape)="onClose()" tabindex="-1">
   <div class="modal-container" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" role="dialog" aria-modal="true">
-    <!-- Header -->
+    
     <header class="modal-header">
       <div class="modal-header__title-section">
         <h2 class="modal-header__title">
@@ -12,9 +12,9 @@
       </button>
     </header>
 
-    <!-- Body -->
+    
     <div class="modal-body">
-      <!-- Input de Nombre -->
+      
       <div class="form-group">
         <label for="cart-name" class="form-label">Nombre del Carrito</label>
         <input
@@ -27,7 +27,7 @@
         />
       </div>
 
-      <!-- Select de Hijo (solo vista tutor) -->
+      
       @if (!esVistaAlumno()) {
         <div class="form-group">
           <label for="student-select" class="form-label">¿Para qué hijo es?</label>
@@ -47,7 +47,7 @@
         </div>
       }
 
-      <!-- Detalle de productos -->
+      
       <section class="modal-section" aria-labelledby="products-title">
         <h3 id="products-title" class="modal-section__title">Productos agregados</h3>
         <div class="items-list">
@@ -75,7 +75,7 @@
       </section>
     </div>
 
-    <!-- Footer / Acciones -->
+    
     <footer class="modal-footer">
       <button
         class="modal-btn modal-btn--secondary"

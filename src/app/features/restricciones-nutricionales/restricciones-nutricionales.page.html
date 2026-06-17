@@ -13,7 +13,6 @@
   <div class="restricciones__container">
     <section class="restricciones__panel" aria-labelledby="restricciones-titulo">
       
-      <!-- Cabecera de Alumno -->
       <header class="restricciones__cabecera">
         <div class="restricciones__avatar" aria-hidden="true">
           <span>{{ presenter.iniciales() }}</span>
@@ -31,7 +30,6 @@
         </div>
       </header>
 
-      <!-- Horarios de Compra -->
       @if (presenter.horariosCompra().length > 0) {
         <div class="restricciones__horarios-seccion">
           <h3 class="restricciones__horarios-titulo">Horarios de Compra</h3>
@@ -46,7 +44,6 @@
               >
                 <div class="horario-card__clock-wrapper">
                   @if (horario.bloqueado) {
-                    <!-- Green clock (Selected / Blocked) -->
                     @if (i === 0) {
                       <svg class="clock-svg clock-svg--green" viewBox="0 0 100 100" aria-hidden="true">
                         <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" />
@@ -85,7 +82,6 @@
                       </svg>
                     }
                   } @else {
-                    <!-- Gray clock (Not Selected / Allowed) -->
                     @if (i === 0) {
                       <svg class="clock-svg clock-svg--gray" viewBox="0 0 100 100" aria-hidden="true">
                         <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#cbd5e1" stroke-width="6" />
@@ -132,7 +128,6 @@
         </div>
       }
 
-      <!-- Listado de Restricciones Nutricionales -->
       <ul class="restricciones__lista" role="list">
         @for (descriptor of presenter.catalogo; track descriptor.clave) {
           <li class="restriccion-item">
@@ -163,7 +158,6 @@
         }
       </ul>
 
-      <!-- Botón de Guardar -->
       <button
         type="button"
         class="restricciones__guardar"

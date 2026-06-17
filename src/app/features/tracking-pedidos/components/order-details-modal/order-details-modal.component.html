@@ -1,6 +1,5 @@
 <div class="modal-backdrop" (click)="onBackdropClick($event)" (keyup.escape)="onClose()" tabindex="-1">
   <div class="modal-container" role="dialog" aria-modal="true">
-    <!-- Header -->
     <header class="modal-header">
       <div class="modal-header__title-section">
         <span class="modal-header__badge" [class]="'modal-header__badge--' + order.status.toLowerCase()">
@@ -13,9 +12,7 @@
       </button>
     </header>
 
-    <!-- Body -->
     <div class="modal-body">
-      <!-- Info del retiro -->
       <section class="modal-section modal-section--client" aria-labelledby="client-info-title">
         <h3 id="client-info-title" class="modal-section__title">Información de Retiro</h3>
         <div class="info-grid">
@@ -38,8 +35,6 @@
         </div>
       </section>
 
-      <!-- Código de verificación -->
-        <!-- Clave de retiro ocultada por seguridad -->
         @if (order.status === 'ENTREGADO') {
           <section class="modal-section modal-section--keyword" aria-labelledby="keyword-title">
             <h3 id="keyword-title" class="modal-section__title">Clave de Retiro</h3>
@@ -49,7 +44,6 @@
             </div>
           </section>
         }
-        <!-- Modal de verificación al entregar pedido -->
         @if (order.status === 'LISTO' && showVerificationModal) {
           <section class="modal-section" aria-labelledby="verification-title">
             <h3 id="verification-title" class="modal-section__title">Confirmar entrega</h3>
@@ -63,7 +57,6 @@
           </section>
         }
 
-      <!-- Detalle de productos -->
       <section class="modal-section" aria-labelledby="products-title">
         <h3 id="products-title" class="modal-section__title">Productos Pedidos</h3>
         <div class="items-list">
@@ -87,7 +80,6 @@
       </section>
     </div>
 
-    <!-- Footer / Acciones -->
     <footer class="modal-footer">
       @if (canCancel()) {
         <button 
