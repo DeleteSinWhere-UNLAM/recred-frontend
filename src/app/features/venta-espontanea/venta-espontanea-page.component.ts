@@ -21,7 +21,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
     <app-navbar [userName]="'Kiosquero'" />
     <main class="venta">
       <div class="venta__container">
-        <!-- Header -->
         <div class="venta__cabecera">
           <button
             (click)="router.navigate(['/kiosquero'])"
@@ -47,8 +46,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
             </label>
           </div>
         </div>
-
-        <!-- Error modal básico -->
         @if (mensajeError()) {
           <div class="venta__error">
             <p class="venta__error-titulo">
@@ -61,8 +58,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
             </button>
           </div>
         }
-
-        <!-- Bloqueo de Fin de Semana / Feriado -->
         @if (bloqueadoPorDiaNoLaborable()) {
           <div class="venta__bloqueo-dia">
             <div class="venta__bloqueo-contenido">
@@ -84,7 +79,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
             </div>
           </div>
         } @else {
-          <!-- Paso 1: Seleccionar Alumno -->
           @if (!alumnoSeleccionado()) {
             <div class="venta__paso">
               <h2 class="venta__paso-titulo">
@@ -159,11 +153,8 @@ import { FeriadosService } from '../../shared/services/feriados.service';
               }
             </div>
           }
-
-          <!-- Paso 2: Productos -->
           @if (alumnoSeleccionado()) {
             <div>
-              <!-- Info Alumno Seleccionado -->
               <div class="venta__comprador">
                 <div class="venta__comprador-info">
                   <div class="venta__comprador-avatar">
@@ -191,8 +182,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
                 <span class="venta__paso-numero">2</span>
                 Catálogo Disponible
               </h2>
-
-              <!-- Grid de Productos -->
               <div class="venta__grid">
                 @for (producto of service.productos(); track producto.id) {
                   <div
@@ -202,22 +191,17 @@ import { FeriadosService } from '../../shared/services/feriados.service';
                       producto.estadoStock === 'SIN_STOCK'
                     "
                   >
-                    <!-- Imagen -->
                     <div class="producto-card__media">
                       <img
                         [src]="producto.imagen || 'assets/placeholder.png'"
                         alt="Producto"
                         class="producto-card__imagen"
                       />
-
-                      <!-- Clasificaciones -->
                       @if (producto.clasificacionesSalud.length) {
                         <div class="producto-card__badge">
                           {{ producto.clasificacionesSalud[0].descripcion }}
                         </div>
                       }
-
-                      <!-- Candado -->
                       @if (isBloqueado(producto)) {
                         <div
                           class="producto-card__lock-btn producto-card__lock-btn--bloqueado"
@@ -226,8 +210,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
                         </div>
                       }
                     </div>
-
-                    <!-- Contenido -->
                     <div class="producto-card__cuerpo">
                       <div class="producto-card__meta">
                         <span class="producto-card__categoria">{{
@@ -241,8 +223,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
                       <h3 class="producto-card__nombre">
                         {{ producto.nombre }}
                       </h3>
-
-                      <!-- Controles Agregar -->
                       <div class="producto-card__acciones">
                         @if (isBloqueado(producto)) {
                           <div
@@ -287,8 +267,6 @@ import { FeriadosService } from '../../shared/services/feriados.service';
           }
         }
       </div>
-
-      <!-- Footer Cart -->
       @if (alumnoSeleccionado() && getTotal() > 0) {
         <div class="venta__footer">
           <div class="venta__footer-container">

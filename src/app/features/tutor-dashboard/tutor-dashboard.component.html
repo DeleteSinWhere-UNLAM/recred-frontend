@@ -14,23 +14,71 @@
           <span class="amount">{{ globalSummary.totalBalance | number:'1.2-2' }}</span>
         </div>
       </div>
-      <div class="global-actions">
-        <button class="primary-btn" (click)="openTransferModal()">
-          <i class="fa-solid fa-money-bill-transfer"></i> Transferir Saldo
-        </button>
-      </div>
     </div>
 
-    <!-- Tabs for Children -->
-    <div class="children-tabs">
-      @for (child of globalSummary.children; track child.studentId) {
-        <button 
-          class="tab-btn" 
-          [class.active]="selectedChild?.studentId === child.studentId"
-          (click)="selectChild(child)">
-          <i class="fa-solid fa-child"></i> {{ child.studentName }}
-        </button>
-      }
+    <!-- Quick Transfer & Children Selection Section -->
+    <div class="quick-transfer card">
+      <div class="quick-transfer-header">
+        <span class="quick-transfer-icon" aria-hidden="true">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+        <h2 class="quick-transfer-title">Transferencia Rápida</h2>
+      </div>
+      <p class="subtitle">Arrastrá el dinero desde el origen hacia el destinatario para transferir saldo.</p>
+      
+      <div class="transfer-grid">
+        @for (child of globalSummary.children; track child.studentId) {
+          <div 
+            class="child-transfer-card"
+            [class.selected]="selectedChild?.studentId === child.studentId"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event, child)"
+            (click)="selectChild(child)"
+            (keydown.enter)="selectChild(child)"
+            tabindex="0">
+            
+            <div class="alumno-card__identidad">
+              <div class="alumno-card__avatar-wrap">
+                <div class="alumno-card__avatar">
+                  <span>{{ getInitials(child.studentName) }}</span>
+                </div>
+              </div>
+              <div class="alumno-card__texto">
+                <h3 class="alumno-card__nombre">{{ child.studentName }}</h3>
+              </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div class="alumno-card__saldo" [class.alumno-card__saldo--bajo]="child.balance < 1000">
+                <span class="alumno-card__saldo-label">Saldo</span>
+                <span class="alumno-card__saldo-valor">$ {{ child.balance | number:'1.0-0' }}</span>
+              </div>
+              
+              <div class="transfer-input-wrapper">
+                <span class="transfer-prefix">$</span>
+                <input type="number" 
+                       class="quick-transfer-input"
+                       [(ngModel)]="transferAmounts[child.studentId]"
+                       (keydown.enter)="$event.target.blur()"
+                       placeholder="0"
+                       (click)="$event.stopPropagation()">
+              </div>
+
+              <div class="draggable-cash" 
+                draggable="true" 
+                (dragstart)="onDragStart($event, child)"
+                (dragend)="onDragEnd($event)"
+                title="Arrastrar para transferir"
+                (click)="$event.stopPropagation()"
+                (keydown.enter)="$event.stopPropagation()"
+                tabindex="0">
+                <i class="fa-solid fa-money-bill-wave fa-beat-fade"></i>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Selected Child View -->
@@ -140,46 +188,31 @@
     }
   }
 
-  <!-- Transfer Modal -->
-  @if (showTransferModal) {
-    <div class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Transferir Saldo</h3>
-          <button class="close-btn" (click)="closeTransferModal()"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="modal-body">
-          <p>Seleccione desde quién y hacia quién desea transferir fondos.</p>
-          <!-- Form mock for transfer -->
-          <div class="form-group">
-            <label for="transferAmount">Monto:</label>
-            <input id="transferAmount" type="number" class="form-control" placeholder="$ 0.00">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="secondary-btn" (click)="closeTransferModal()">Cancelar</button>
-          <button class="primary-btn" (click)="closeTransferModal()">Confirmar Transferencia</button>
-        </div>
-      </div>
-    </div>
-  }
+
 
   <!-- Smart Action Modal -->
   @if (showSmartActionModal && selectedChild?.smartAction) {
     <div class="modal-overlay">
       <div class="modal-content smart-modal">
-        <div class="modal-header">
-          <h3>Aplicar Sugerencia</h3>
-          <button class="close-btn" (click)="closeSmartActionModal()"><i class="fa-solid fa-xmark"></i></button>
-        </div>
+        <button class="modal-close" (click)="closeSmartActionModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <h2 class="modal-title">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          Aplicar Sugerencia
+        </h2>
+        
         <div class="modal-body">
           <div class="smart-icon"><i class="fa-solid fa-lightbulb"></i></div>
           <p class="smart-text">{{ selectedChild!.smartAction?.description }}</p>
-          <p class="warning-text">Esto actualizará las reglas de consumo del alumno.</p>
+          <div class="modal-alert">
+            <p><i class="fa-solid fa-triangle-exclamation"></i> Esto actualizará las reglas de consumo del alumno.</p>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button class="secondary-btn" (click)="closeSmartActionModal()">Descartar</button>
-          <button class="action-btn" (click)="applySmartAction()">Aceptar e Implementar</button>
+        <div class="modal-actions">
+          <button class="modal-btn-cancelar" (click)="closeSmartActionModal()">Descartar</button>
+          <button class="modal-btn-confirmar" (click)="applySmartAction()">Aceptar e Implementar</button>
         </div>
       </div>
     </div>

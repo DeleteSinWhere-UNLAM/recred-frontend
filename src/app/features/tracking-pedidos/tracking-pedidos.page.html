@@ -1,7 +1,6 @@
 <app-navbar [userName]="userName()" />
 
 <main class="tracking-container">
-  <!-- Cabecera de la sección -->
   <header class="tracking-header">
     <button class="back-btn" (click)="volverHome()" aria-label="Volver al inicio">
       <i class="fa-solid fa-arrow-left"></i> Volver
@@ -12,10 +11,8 @@
     </div>
   </header>
 
-  <!-- Filtros -->
   <section class="filters-card" aria-label="Filtros de pedidos">
     <div class="filters-grid">
-      <!-- Búsqueda -->
       <div class="filter-item">
         <label for="search-input" class="filter-label">Buscar Alumno o Clave</label>
         <div class="search-input-wrap">
@@ -31,7 +28,6 @@
         </div>
       </div>
 
-      <!-- Filtro Fecha -->
       <div class="filter-item">
         <label for="fecha-input" class="filter-label">Fecha de Retiro</label>
         <input
@@ -43,7 +39,6 @@
         />
       </div>
 
-      <!-- Filtro Franja Horaria -->
       <div class="filter-item">
         <label for="franja-select" class="filter-label">Franja Horaria</label>
         <select
@@ -59,7 +54,6 @@
         </select>
       </div>
 
-      <!-- Filtro Estado -->
       <div class="filter-item">
         <label for="estado-select" class="filter-label">Estado de Retiro</label>
         <select
@@ -78,7 +72,6 @@
       </div>
     </div>
 
-    <!-- Botón Limpiar -->
     <div class="filters-actions">
       <button class="clear-filters-btn" (click)="limpiarFiltros()">
         <i class="fa-solid fa-eraser"></i> Limpiar Filtros
@@ -89,7 +82,6 @@
     </div>
   </section>
 
-  <!-- Listado de Pedidos -->
   <section class="orders-section" aria-labelledby="orders-list-title">
     <div class="orders-section__header">
       <h2 id="orders-list-title" class="orders-section__title">Pedidos Recibidos</h2>
@@ -114,7 +106,6 @@
         <button class="clear-filters-btn" (click)="limpiarFiltros()">Restablecer filtros</button>
       </div>
     } @else {
-      <!-- Grilla/Listado de Pedidos -->
       <div class="orders-list">
         @for (order of filteredPickups(); track order.id) {
           <article class="order-card" [class.order-card--active]="selectedOrder()?.id === order.id">
@@ -171,7 +162,6 @@
   </section>
 </main>
 
-<!-- Modal de Detalle -->
 @if (selectedOrder()) {
   <app-order-details-modal
     [order]="selectedOrder()!"

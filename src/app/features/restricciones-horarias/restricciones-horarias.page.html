@@ -12,7 +12,7 @@
 
   <div class="restricciones__container">
     
-    <!-- Title Header -->
+    
     <header class="restricciones__header">
       <h1 class="restricciones__titulo">Límites y Horarios</h1>
       <p class="restricciones__subtitulo">
@@ -26,11 +26,11 @@
         <span>Cargando configuración...</span>
       </div>
     } @else {
-      <!-- Active Content Card -->
+      
       @if (activeItem(); as item) {
         <article class="franja-card">
           
-          <!-- Tabs Bar Inside the Card -->
+          
           <nav class="restricciones__tabs" aria-label="Recreos de compra">
             @for (slot of presenter.franjasConRestricciones(); track slot.franja.id) {
               <button
@@ -44,7 +44,7 @@
             }
           </nav>
 
-          <!-- Card Header Info -->
+          
           <header class="franja-card__header">
             <div class="franja-card__info">
               <h2 class="franja-card__nombre">{{ item.franja.descripcion }}</h2>
@@ -69,7 +69,7 @@
 
           <div class="franja-card__contenido">
             
-            <!-- Clean / No restrictions Illustration -->
+            
             @if (item.restricciones.length === 0) {
               <div class="franja-card__libertad" role="status">
                 <div class="libertad-circle" aria-hidden="true">
@@ -81,7 +81,7 @@
               </div>
             }
 
-            <!-- Quick Toggles Section -->
+            
             <section class="quick-blocks-section" aria-label="Bloqueos rápidos">
               <h3 class="quick-blocks-titulo">Bloquear compra de:</h3>
               <div class="quick-blocks-grid">
@@ -106,7 +106,7 @@
               </div>
             </section>
 
-            <!-- Active Restrictions List -->
+            
             @if (item.restricciones.length > 0) {
               <section class="restricciones-lista" aria-label="Restricciones activas">
                 <h3 class="restricciones-lista__titulo">Restricciones activas:</h3>
@@ -152,7 +152,7 @@
               </section>
             }
 
-            <!-- Bottom Add Selector Form -->
+            
             <footer class="franja-card__acciones">
               <div class="add-restriction">
                 <div class="add-restriction__controles">

@@ -9,9 +9,7 @@
 
     @if ((presenter.sugerencias$ | async); as sugerencias) {
       @if (sugerencias.length > 0) {
-        <!-- ═══════════════════════════════════════
-             KPI SUMMARY PANEL
-        ═══════════════════════════════════════ -->
+        
 
         <section class="sg__summary-panel" aria-label="Resumen de sugerencias">
           <div class="sg__summary-heading">
@@ -72,12 +70,10 @@
           </div>
         </section>
 
-        <!-- ═══════════════════════════════════════
-             CHARTS
-        ═══════════════════════════════════════ -->
+        
 
         <div class="sg__charts-grid">
-          <!-- CHART 1: Days without sale (horizontal bars) -->
+          
 
           <section
             class="sg__module sg__chart-panel"
@@ -123,7 +119,7 @@
             </div>
           </section>
 
-          <!-- CHART 2: Stock vs Ventas (vertical grouped bars) -->
+          
 
           <section
             class="sg__module sg__chart-panel"
@@ -179,12 +175,10 @@
           </section>
         </div>
 
-        <!-- ═══════════════════════════════════════
-             DASHBOARD GRID
-        ═══════════════════════════════════════ -->
+        
 
         <section class="sg__dashboard">
-          <!-- LEFT PANEL: Products detected -->
+          
 
           <section class="sg__module" aria-labelledby="sg-products-title">
             <div class="sg__module-header">
@@ -227,7 +221,7 @@
             </div>
           </section>
 
-          <!-- RIGHT PANEL: Detail -->
+          
 
           <section class="sg__module" aria-labelledby="sg-detail-title">
             @if (presenter.sugerenciaSeleccionada$ | async; as sugerenciaSeleccionada) {
@@ -251,7 +245,7 @@
                 </p>
               </header>
 
-              <!-- STATS -->
+              
 
               <div class="sg__detail-stats">
                 <article class="sg__stat-item">
@@ -311,7 +305,7 @@
                 </article>
               </div>
 
-              <!-- PROMOTION BUTTON -->
+              
 
               <div>
                 <button
@@ -324,7 +318,7 @@
                 </button>
               </div>
 
-              <!-- ALERTS -->
+              
 
               <div class="sg__section sg__section--alerts">
                 <h3 class="sg__section-title">
@@ -339,7 +333,7 @@
                 </ul>
               </div>
 
-              <!-- RECOMMENDATIONS -->
+              
 
               <div class="sg__section sg__section--recommendations">
                 <h3 class="sg__section-title">
@@ -357,7 +351,7 @@
                 </ul>
               </div>
 
-              <!-- COMPARISON -->
+              
 
               <div class="sg__section">
                 <h3 class="sg__section-title">
@@ -451,7 +445,7 @@
                 </div>
               </div>
 
-              <!-- FOOTER IA -->
+              
 
               <div class="sg__detail-footer">
                 <span class="sg__footer-badge">
