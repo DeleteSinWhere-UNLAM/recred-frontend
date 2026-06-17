@@ -373,7 +373,7 @@
                     <div>
                       <small>Promedio ventas</small>
                       <strong>
-                        @if (presenter.estadisticasSeleccionadas?.promedioVentasCategoria != null) {
+                        @if (presenter.estadisticasSeleccionadas?.promedioVentasCategoria !== null && presenter.estadisticasSeleccionadas?.promedioVentasCategoria !== undefined) {
                           {{ presenter.estadisticasSeleccionadas?.promedioVentasCategoria | number:'1.0-2' }}
                         } @else {
                           -
@@ -390,7 +390,7 @@
                       <small>Promedio precio</small>
                       <strong>
                         @if (
-                          presenter.estadisticasSeleccionadas?.promedioPrecioCategoria != null
+                          presenter.estadisticasSeleccionadas?.promedioPrecioCategoria !== null && presenter.estadisticasSeleccionadas?.promedioPrecioCategoria !== undefined
                         ) {
                           ${{ presenter.estadisticasSeleccionadas?.promedioPrecioCategoria | number:'1.0-2' }}
                         } @else {
@@ -407,7 +407,7 @@
                     <div>
                       <small>Stock promedio</small>
                       <strong>
-                        @if (presenter.estadisticasSeleccionadas?.stockPromedioCategoria != null) {
+                        @if (presenter.estadisticasSeleccionadas?.stockPromedioCategoria !== null && presenter.estadisticasSeleccionadas?.stockPromedioCategoria !== undefined) {
                           {{ presenter.estadisticasSeleccionadas?.stockPromedioCategoria | number:'1.0-2' }}
                         } @else {
                           -
@@ -437,7 +437,7 @@
                       <small>Diferencia precio</small>
                       <strong>
                         @if (
-                          presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria != null
+                          presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria !== null && presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria !== undefined
                         ) {
                           ${{
                             presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria | number:'1.0-2'
