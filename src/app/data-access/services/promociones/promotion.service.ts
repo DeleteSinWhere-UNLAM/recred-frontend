@@ -31,4 +31,8 @@ export class PromotionService {
   discardPromotion(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  createPromotion(promotion: Partial<Promotion>): Observable<Promotion> {
+    return this.http.post<Promotion>(this.apiUrl, promotion);
+  }
 }
