@@ -28,8 +28,8 @@ describe('BulkUploadTableModalComponent', () => {
         precio: 500,
         peso: 500,
         requierePreparacion: false,
-        categoriaId: null,
-        nuevaCategoriaNombre: 'Bebidas',
+        categoriaId: 'cat-123',
+        nuevaCategoriaNombre: '',
         stockActual: 10,
         saludEtiquetasIds: [],
         tipoEtiquetasIds: []
@@ -48,6 +48,7 @@ describe('BulkUploadTableModalComponent', () => {
 
     expect(component.productsArray.length).toBe(1);
     expect(component.productsArray.at(0).value.nombre).toBe('Agua');
+    expect(component.productsArray.at(0).value.categoriaId).toBe('cat-123');
   });
 
   it('dado que agrego una fila, debe sumar un elemento al array', () => {
@@ -65,7 +66,11 @@ describe('BulkUploadTableModalComponent', () => {
   it('dado que hago click en guardar con form valido, debe emitir el listado', () => {
     spyOn(component.saveProducts, 'emit');
     component.addProductRow();
-    component.productsArray.at(0).patchValue({ nombre: 'Test', precio: 100 });
+    component.productsArray.at(0).patchValue({ 
+      nombre: 'Test', 
+      precio: 100, 
+      categoriaId: 'cat-123' 
+    });
     component.onSave();
     expect(component.saveProducts.emit).toHaveBeenCalled();
   });
