@@ -24,15 +24,23 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  align-items: stretch;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
+  .acciones-grid__items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (min-width: 980px) {
   .acciones-grid__titulo {
     font-size: 20px;
   }
 
   .acciones-grid__items {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 22px;
   }
 }

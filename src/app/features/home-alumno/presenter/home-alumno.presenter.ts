@@ -97,7 +97,7 @@ export class HomeAlumnoPresenter {
     {
       id: 'buffet',
       label: 'Ir al buffet',
-      descripcion: '¡Mirá qué rico hay hoy!',
+      descripcion: 'Hacé tu pedido',
       icono: 'fa-utensils',
       emoji: '🍔',
       color: 'menta',
@@ -115,7 +115,7 @@ export class HomeAlumnoPresenter {
     {
       id: 'favoritos',
       label: 'Mis favoritos',
-      descripcion: 'Tus productos preferidos',
+      descripcion: 'Lo que más te gusta',
       icono: 'fa-heart',
       emoji: '❤️',
       color: 'melocoton',

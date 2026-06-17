@@ -98,13 +98,11 @@ export class BuffetPresenter {
   private readonly filtrosState = signal<FiltrosBuffet>({ ...filtrosPorDefecto });
   private readonly restriccionesNutricionalesState = signal<ClasificacionSaludBackend[]>([]);
 
-  // Fecha/Recreo selection
   private readonly franjasState = signal<TimeSlot[]>([]);
   private readonly restriccionesState = signal<RestriccionHoraria[]>([]);
   private readonly fechaSeleccionadaState = signal<string>('');
   private readonly recreoSeleccionadoState = signal<Recreo>('PRIMER_RECREO');
 
-  // Backend budget check per date
   private readonly presupuestoPorFechaState = signal<PresupuestoPorFecha | null>(null);
   private readonly cargandoPresupuestoPorFechaState = signal(false);
 
@@ -259,7 +257,6 @@ export class BuffetPresenter {
       }
     }
 
-    // Fallback: if no slots loaded yet, show all recreos unlocked
     if (options.length === 0) {
       return recreosPosibles.map((rec) => ({
         recreo: rec,
@@ -398,11 +395,9 @@ export class BuffetPresenter {
 
     return this.productosState().filter((producto) => {
       if (esAlumno) {
-        // Ocultar productos bloqueados manualmente por el tutor
         if (producto.bloqueado) {
           return false;
         }
-        // Ocultar productos bloqueados por restricciones nutricionales
         if (producto.bloqueadoPorRestriccion && producto.motivoBloqueo?.toLowerCase().includes('contiene')) {
           return false;
         }
@@ -439,16 +434,8 @@ export class BuffetPresenter {
       return;
     }
 
-    const buffet = this.buffetService.getBuffetDelAlumno(alumno.colegioId);
-    if (!buffet) {
-      this.router.navigateByUrl(this.usuarioService.homeUrl());
-      return;
-    }
-
     this.alumnoState.set(alumno);
-    this.buffetState.set(buffet);
 
-    // Restore saved selection if present
     const savedSelection = this.carritoService.getSeleccionRetiro(alumnoId);
 
     this.favoritosService.getFavoritos(alumnoId).subscribe({
@@ -461,42 +448,47 @@ export class BuffetPresenter {
       }
     });
 
-    // Fetch nutritional restrictions
     this.restriccionesNutricionalesService.getRestriccionesAlumno(alumnoId)
       .then(res => this.restriccionesNutricionalesState.set(res))
       .catch(err => console.error('Error loading nutritional restrictions:', err));
 
-    // Load franjas and restrictions, then set initial date/recreo, then load products with date query param
-    Promise.all([
-      this.franjasService.getFranjasHorarias(alumno.colegioId),
-      this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
-    ]).then(([franjas, restricciones]) => {
-      this.franjasState.set(franjas);
-      this.restriccionesState.set(restricciones);
+    this.buffetService.obtenerBuffetDelAlumno(alumnoId).subscribe({
+      next: (buffet) => {
+        this.buffetState.set(buffet);
 
-      // Determine initial fecha and recreo
-      const minDate = this.fechaMinima();
-      const initialFecha = savedSelection?.fecha && savedSelection.fecha >= minDate
-        ? savedSelection.fecha
-        : minDate;
-      const initialRecreo = savedSelection?.recreo ?? this.firstAvailableRecreo();
+        Promise.all([
+          this.franjasService.getFranjasHorarias(alumno.colegioId),
+          this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
+        ]).then(([franjas, restricciones]) => {
+          this.franjasState.set(franjas);
+          this.restriccionesState.set(restricciones);
 
-      this.fechaSeleccionadaState.set(initialFecha);
-      this.recreoSeleccionadoState.set(initialRecreo);
-      this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
+          const minDate = this.fechaMinima();
+          const initialFecha = savedSelection?.fecha && savedSelection.fecha >= minDate
+            ? savedSelection.fecha
+            : minDate;
+          const initialRecreo = savedSelection?.recreo ?? this.firstAvailableRecreo();
 
-      // Fetch products for view with date-time query param
-      const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
-      this.cargarProductos(buffet.id, alumnoId, fechaHora);
+          this.fechaSeleccionadaState.set(initialFecha);
+          this.recreoSeleccionadoState.set(initialRecreo);
+          this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
 
-      // Initial budget check for the initial date
-      this.consultarPresupuestoPorFecha(alumnoId, initialFecha);
-    }).catch((err) => {
-      console.error('Error loading franjas/restricciones:', err);
-      // Fallback: still set a default date and load products
-      const minDate = this.calcularFechaMinima([]);
-      this.fechaSeleccionadaState.set(minDate);
-      this.cargarProductos(buffet.id, alumnoId);
+          const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
+          this.cargarProductos(buffet.id, alumnoId, fechaHora);
+
+          this.consultarPresupuestoPorFecha(alumnoId, initialFecha);
+        }).catch((err) => {
+          console.error('Error loading franjas/restricciones:', err);
+          const minDate = this.calcularFechaMinima([]);
+          this.fechaSeleccionadaState.set(minDate);
+          this.cargarProductos(buffet.id, alumnoId);
+        });
+      },
+      error: (err) => {
+        console.error('Error loading buffet for student:', err);
+        this.toastService.mostrar('No se pudo cargar el buffet del alumno', 'error');
+        this.router.navigateByUrl(this.usuarioService.homeUrl());
+      },
     });
 
     this.filtrosState.set({ ...filtrosPorDefecto });
@@ -545,7 +537,6 @@ export class BuffetPresenter {
 
     this.fechaSeleccionadaState.set(adjustedFecha);
 
-    // Auto-adjust recreo if it becomes blocked
     const recreoActual = this.recreoSeleccionadoState();
     const opciones = this.recreosDisponibles();
     const opcionActual = opciones.find((o) => o.recreo === recreoActual);

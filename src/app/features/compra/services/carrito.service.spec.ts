@@ -98,10 +98,8 @@ describe('CarritoService', () => {
 
       const p = { ...mockProductoBase, precio: 1000 };
       
-      // Agregamos el producto la primera vez (saldo 1500, precio 1000)
       service.agregar(p, 'alumno-1', 1);
       
-      // Intentamos agregarlo una segunda vez
       const res = service.validarAgregar(p, 'alumno-1', 1);
       
       expect(res.permitido).toBeFalse();

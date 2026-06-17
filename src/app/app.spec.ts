@@ -7,17 +7,20 @@ import { App } from './app';
 import { AuthService } from './core/auth/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
 import { PerfilService } from './data-access/services/perfil.service';
+import { NotificacionesService } from './data-access/services/notificaciones.service';
 
 describe('App', () => {
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockNotificationService: jasmine.SpyObj<NotificationService>;
   let mockPerfilService: Pick<PerfilService, 'rol'>;
+  let mockNotificacionesService: jasmine.SpyObj<NotificacionesService>;
 
   beforeEach(async () => {
     mockAuthService = jasmine.createSpyObj('AuthService', ['isAutenticado']);
     mockAuthService.isAutenticado.and.returnValue(Promise.resolve(false));
 
     mockNotificationService = jasmine.createSpyObj('NotificationService', ['requestNotificationPermission', 'requestPermission']);
+    mockNotificacionesService = jasmine.createSpyObj('NotificacionesService', ['obtenerNotificaciones']);
     mockPerfilService = {
       rol: signal(null).asReadonly(),
     };
@@ -31,6 +34,7 @@ describe('App', () => {
         { provide: AuthService, useValue: mockAuthService },
         { provide: NotificationService, useValue: mockNotificationService },
         { provide: PerfilService, useValue: mockPerfilService },
+        { provide: NotificacionesService, useValue: mockNotificacionesService },
       ],
     }).compileComponents();
   });

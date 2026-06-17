@@ -274,16 +274,12 @@ export class HomeKiosqueroPresenter {
     const daysLabel = days === 1 ? '1 día comparado' : `${days} días comparados`;
 
     if (this.selectedRangePresetState() === 'TODAY') {
-      return `Métricas de hoy · últimos 7 días · ${daysLabel}`;
+      return `${daysLabel}`;
     }
 
     return `${this.reportRangeLabel()} · ${daysLabel}`;
   });
 
-  /**
-   * Se mantiene por compatibilidad con el HTML viejo.
-   * En el rediseño usamos mainSummaryMetrics().
-   */
   readonly summaryMetrics = computed<PanelMetric[]>(() => {
     const summary = this.panelState()?.summary;
 

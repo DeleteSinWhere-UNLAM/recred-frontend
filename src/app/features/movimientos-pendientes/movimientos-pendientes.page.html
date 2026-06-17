@@ -2,7 +2,7 @@
 
 <main class="movimientos">
   <div class="movimientos__container">
-    <!-- Cabecera -->
+    
     <header class="movimientos__header">
       <button type="button" class="movimientos__volver" (click)="volver()" aria-label="Volver al panel">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -19,7 +19,7 @@
       </div>
     </header>
 
-    <!-- Search Bar & Filters Card -->
+    
     <section class="movimientos__control-card" aria-label="Búsqueda y filtros">
       <div class="movimientos__search-row">
         <div class="movimientos__search-input-wrapper">
@@ -46,10 +46,10 @@
         </button>
       </div>
 
-      <!-- Advanced Filters Collapsible Section -->
+      
       <div class="movimientos__filtros-avanzados-panel" [class.open]="mostrarFiltrosAvanzados()">
         <div class="movimientos__filtros-avanzados-grid">
-          <!-- Estado -->
+          
           <div class="movimientos__filtro-group">
             <label for="filtro-estado" class="movimientos__label">Estado</label>
             <div class="movimientos__select-wrapper">
@@ -68,7 +68,7 @@
             </div>
           </div>
 
-          <!-- Rango de Fechas -->
+          
           <div class="movimientos__filtro-group">
             <label for="fecha-desde" class="movimientos__label">Fecha Desde</label>
             <input
@@ -90,7 +90,7 @@
             />
           </div>
 
-          <!-- Rango de Precios -->
+          
           <div class="movimientos__filtro-group">
             <label for="precio-min" class="movimientos__label">Precio Mín.</label>
             <div class="movimientos__input-monto-wrapper">
@@ -121,7 +121,7 @@
           </div>
         </div>
 
-        <!-- Botón Limpiar -->
+        
         <div class="movimientos__filtros-actions">
           <button type="button" class="movimientos__limpiar-btn" (click)="limpiarFiltros()" id="limpiar-filtros-btn">
             <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
@@ -130,7 +130,7 @@
         </div>
       </div>
 
-      <!-- Active chips -->
+      
       @if (activeChips.length > 0) {
         <div class="movimientos__chips-row">
           @for (chip of activeChips; track chip.id) {
@@ -145,10 +145,10 @@
       }
     </section>
 
-    <!-- Lista de Movimientos -->
+    
     <div class="movimientos__list-container">
       @if (cargando()) {
-        <!-- Skeleton Loading -->
+        
         <div class="movimientos__loading">
           @for (i of [1, 2, 3]; track i) {
             <div class="movimientos__skeleton-card">
@@ -162,7 +162,7 @@
           }
         </div>
       } @else if (errorMsg()) {
-        <!-- Vista de Error -->
+        
         <div class="movimientos__error-card" role="alert">
           <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
           <p class="error-text">{{ errorMsg() }}</p>
@@ -171,7 +171,7 @@
           </button>
         </div>
       } @else if (movimientosFiltrados().length === 0) {
-        <!-- Lista Vacía -->
+        
         <div class="movimientos__vacio-card">
           <div class="vacio-icono-wrapper">
             <i class="fa-solid fa-receipt vacio-icon" aria-hidden="true"></i>
@@ -182,7 +182,7 @@
           </p>
         </div>
       } @else {
-        <!-- Listado Agrupado por Día -->
+        
         <div class="movimientos__timeline">
           @for (grupo of movimientosAgrupadosPorDia(); track grupo.fechaStr) {
             <div class="movimientos__fecha-grupo">
@@ -205,14 +205,14 @@
                       </div>
                     </div>
 
-                    <!-- Status Badge -->
+                    
                     <div class="movimientos__fila-status-col">
                       <span class="movimientos__status-pill" [attr.data-status]="mov.status">
                         {{ mov.statusLabel || mov.status }}
                       </span>
                     </div>
 
-                    <!-- Time/Slot -->
+                    
                     <div class="movimientos__fila-time-col">
                       <span class="movimientos__fila-time-label">
                         {{ mostrarHoraOMediodia(mov) }}
@@ -242,7 +242,7 @@
   </div>
 </main>
 
-<!-- Modal de Detalle Pop-up -->
+
 @if (modalMovimiento(); as mov) {
   <app-movimiento-detalle-modal
     [movimiento]="mov"

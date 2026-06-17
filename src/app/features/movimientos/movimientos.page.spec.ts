@@ -126,7 +126,7 @@ describe('MovimientosPage', () => {
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: PerfilService, useValue: perfilServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
-        UsuarioService, // Usar UsuarioService real para resolver señales y métodos de manera correcta en el Navbar
+        UsuarioService,
         {
           provide: ActivatedRoute,
           useValue: { paramMap: paramMapSubject.asObservable() },
@@ -209,17 +209,17 @@ describe('MovimientosPage', () => {
 
 
       component.filtroFechaDesde.set('2026-06-06');
-      expect(component.movimientosFiltrados().length).toBe(2); // mov-2 y mov-3
+      expect(component.movimientosFiltrados().length).toBe(2);
 
       component.filtroFechaHasta.set('2026-06-06');
-      expect(component.movimientosFiltrados().length).toBe(1); // solo mov-3
+      expect(component.movimientosFiltrados().length).toBe(1);
     });
 
     it('debería filtrar por rango de precios', () => {
 
 
       component.filtroPrecioMin.set(1000);
-      expect(component.movimientosFiltrados().length).toBe(2); // mov-1 y mov-3
+      expect(component.movimientosFiltrados().length).toBe(2);
 
       component.filtroPrecioMax.set(2000);
       expect(component.movimientosFiltrados().length).toBe(1);

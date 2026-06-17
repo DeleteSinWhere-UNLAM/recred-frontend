@@ -126,18 +126,14 @@ export class RestriccionesNutricionalesPresenter {
     const ids = this.idsSeleccionados();
     this.guardandoState.set(true);
     try {
-      // 1. Guardar restricciones nutricionales
       await this.restriccionesService.actualizarRestricciones(this.alumnoId, ids);
 
-      // 2. Guardar restricciones horarias
       const horarios = this.horariosCompraState();
       await Promise.all(
         horarios.map(async (h) => {
           if (!h.bloqueado && h.restriccionId) {
-            // Pasó de bloqueado a permitido: deshabilitar restricción
             await this.restriccionesHorariasService.deshabilitarRestriccion(h.restriccionId);
           } else if (h.bloqueado && !h.restriccionId) {
-            // Pasó de permitido a bloqueado: crear restricción
             await this.restriccionesHorariasService.crearRestriccion({
               studentId: this.alumnoId,
               timeSlotId: h.franjaId,

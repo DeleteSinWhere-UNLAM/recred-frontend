@@ -12,8 +12,28 @@ import { PresupuestoService } from '../../../presupuesto/services/presupuesto.se
 import { RestriccionesHorariasService } from '../../../restricciones-horarias/services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../../../restricciones-horarias/services/franjas-horarias.service';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { ItemCarrito } from '../../models/carrito.model';
 
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
+
+function crearItemCarrito(precio: number): ItemCarrito {
+  return {
+    id: `item-${precio}`,
+    alumnoId: 'alumno-1',
+    cantidad: 1,
+    producto: {
+      id: `producto-${precio}`,
+      nombre: 'Producto',
+      descripcion: '',
+      precio,
+      categoria: { id: 'categoria-1', descripcion: 'Categoria' },
+      clasificacionesSalud: [],
+      imagen: '',
+      estadoStock: 'DISPONIBLE',
+    },
+  };
+}
 
 describe('CarritoPresenter', () => {
   let presenter: CarritoPresenter;
@@ -44,7 +64,13 @@ describe('CarritoPresenter', () => {
     perfilServiceSpy.rol.and.returnValue(signal('ALUMNO'));
     perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-1');
     
-    const buffetServiceSpy = jasmine.createSpyObj('BuffetService', ['obtenerBuffetDelAlumno', 'getBuffetDelAlumno', 'getProductosDelBuffet']);
+    const buffetServiceSpy = jasmine.createSpyObj('BuffetService', ['obtenerBuffetDelAlumno', 'getProductosDelBuffet']);
+    buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of({
+      id: '0f8fad5b-d9cb-469f-a165-70867728950e',
+      nombre: 'Buffet',
+      colegioId: 'colegio-1',
+    }));
+    buffetServiceSpy.getProductosDelBuffet.and.returnValue(of([]));
     const sugerenciasCarritoSpy = jasmine.createSpyObj('SugerenciasCarritoService', ['obtenerSugerencias']);
     const toastSpy = jasmine.createSpyObj('ToastService', ['mostrar']);
     
@@ -97,24 +123,16 @@ describe('CarritoPresenter', () => {
 
   describe('validaciones de avance', () => {
     it('debería calcular grupos correctamente y permitir avanzar si todo está OK', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mapa = new Map<string, any[]>();
-      mapa.set('alumno-1', [
-        {
-          producto: { precio: 1000 },
-          cantidad: 1,
-          alumnoId: 'alumno-1'
-        }
-      ]);
+      const mapa = new Map<string, ItemCarrito[]>();
+      mapa.set('alumno-1', [crearItemCarrito(1000)]);
       carritoServiceSpy.itemsPorAlumno.and.returnValue(mapa);
       
       alumnosServiceSpy.getAlumnoById.and.returnValue({
         id: 'alumno-1', nombre: 'Test', saldo: 2000, apellido: '', grado: '', colegioId: ''
       });
       
-      // Simulamos que seleccionRetiro ya tiene fecha válida
       carritoServiceSpy.seleccionRetiro.and.returnValue({
-        'alumno-1': { fecha: '2050-01-03', recreo: 'PRIMER_RECREO' } // 2050-01-03 es lunes
+        'alumno-1': { fecha: '2050-01-03', recreo: 'PRIMER_RECREO' }
       });
       
       await presenter.init();
@@ -125,15 +143,8 @@ describe('CarritoPresenter', () => {
     });
 
     it('no debería permitir avanzar si el saldo es insuficiente', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mapa = new Map<string, any[]>();
-      mapa.set('alumno-1', [
-        {
-          producto: { precio: 5000 },
-          cantidad: 1,
-          alumnoId: 'alumno-1'
-        }
-      ]);
+      const mapa = new Map<string, ItemCarrito[]>();
+      mapa.set('alumno-1', [crearItemCarrito(5000)]);
       carritoServiceSpy.itemsPorAlumno.and.returnValue(mapa);
       
       alumnosServiceSpy.getAlumnoById.and.returnValue({
@@ -152,15 +163,8 @@ describe('CarritoPresenter', () => {
 
   describe('acciones', () => {
     it('debería llamar a iniciarOrden y navegar al avanzar', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mapa = new Map<string, any[]>();
-      mapa.set('alumno-1', [
-        {
-          producto: { precio: 1000 },
-          cantidad: 1,
-          alumnoId: 'alumno-1'
-        }
-      ]);
+      const mapa = new Map<string, ItemCarrito[]>();
+      mapa.set('alumno-1', [crearItemCarrito(1000)]);
       carritoServiceSpy.itemsPorAlumno.and.returnValue(mapa);
       
       alumnosServiceSpy.getAlumnoById.and.returnValue({

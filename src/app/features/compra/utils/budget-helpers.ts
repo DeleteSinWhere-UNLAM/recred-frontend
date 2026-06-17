@@ -31,7 +31,6 @@ export function getPeriodRange(periodo: Periodo, referenceDate = new Date()): Da
     } else {
       start.setDate(16);
       start.setHours(0, 0, 0, 0);
-      // Last day of month
       end.setMonth(end.getMonth() + 1);
       end.setDate(0);
       end.setHours(23, 59, 59, 999);

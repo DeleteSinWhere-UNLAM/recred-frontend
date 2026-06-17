@@ -28,17 +28,10 @@ import {
   getOperationalStockStatus,
 } from '../models/inventory-visual-state';
 
-// IDs de clasificaciones de salud en la base de datos
 const CLASIFICACION_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
 const CLASIFICACION_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
 const CLASIFICACION_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
 
-/**
- * Construye el array de IDs de clasificaciones de salud según el formulario.
- * - contiene_tacc = false  → agrega "Sin TACC" (apto para celíacos)
- * - contiene_azucar = false → agrega "Sin Azúcar"
- * - contiene_lactosa = true → agrega "Contiene Lácteos"
- */
 function buildHealthClassificationIds(data: ProductFormData): string[] {
   const ids: string[] = [];
   if (!data.contiene_tacc) ids.push(CLASIFICACION_SIN_TACC);

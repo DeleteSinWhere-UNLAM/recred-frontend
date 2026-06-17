@@ -1,0 +1,212 @@
+<app-navbar [userName]="presenter.nombreAlumno()" />
+
+<main class="billetera">
+  <div class="billetera__container">
+    <button type="button" class="billetera__volver" (click)="presenter.volver()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      Volver
+    </button>
+
+    <header class="billetera__header" [class.billetera__header--alumno]="esVistaAlumno()">
+      <div class="billetera__identidad">
+        <div class="billetera__avatar-wrap">
+          <span class="billetera__iniciales" aria-hidden="true">{{ presenter.iniciales() }}</span>
+        </div>
+        <div>
+          <p class="billetera__eyebrow">Billetera</p>
+          <h1 class="billetera__titulo">{{ presenter.nombreAlumno() }}</h1>
+        </div>
+      </div>
+
+      <div class="billetera__saldo-card" [class.billetera__saldo-card--negativo]="presenter.saldoNegativo()">
+        <span class="billetera__saldo-label">
+          <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+          Saldo disponible
+        </span>
+        <span class="billetera__saldo-monto">{{ presenter.saldoActualFormateado() }}</span>
+        @if (presenter.periodoLabel()) {
+          <span class="billetera__saldo-periodo">{{ presenter.periodoLabel() }}</span>
+        }
+      </div>
+    </header>
+
+    <section class="billetera__filtros" aria-label="Selector de período y resumen">
+      <div class="billetera__filtros-top">
+        <div class="billetera__chips" role="tablist">
+        <button
+          type="button"
+          class="billetera__chip"
+          [class.billetera__chip--activo]="presenter.rangoFecha() === 'hoy'"
+          (click)="cambiarFecha('hoy')"
+        >Hoy</button>
+        <button
+          type="button"
+          class="billetera__chip"
+          [class.billetera__chip--activo]="presenter.rangoFecha() === 'semana'"
+          (click)="cambiarFecha('semana')"
+        >Esta semana</button>
+        <button
+          type="button"
+          class="billetera__chip"
+          [class.billetera__chip--activo]="presenter.rangoFecha() === 'mes'"
+          (click)="cambiarFecha('mes')"
+        >Este mes</button>
+        <button
+          type="button"
+          class="billetera__chip"
+          [class.billetera__chip--activo]="presenter.rangoFecha() === 'custom'"
+          (click)="cambiarFecha('custom')"
+        >Personalizado</button>
+      </div>
+
+      @if (presenter.resumen() && !presenter.cargando() && !presenter.error()) {
+        <div class="billetera__resumen-inline">
+          @if (!esVistaAlumno()) {
+            <span class="billetera__resumen-pill billetera__resumen-pill--ingresado" title="Monto ingresado">
+              <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>
+              <span class="billetera__resumen-pill-label">Ingresado</span>
+              <span class="billetera__resumen-pill-valor">{{ presenter.montoIngresadoFormateado() }}</span>
+            </span>
+          }
+          <span class="billetera__resumen-pill billetera__resumen-pill--gastado" title="Monto gastado">
+            <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+            <span class="billetera__resumen-pill-label">Gastado</span>
+            <span class="billetera__resumen-pill-valor">{{ presenter.montoGastadoFormateado() }}</span>
+          </span>
+          @if (!esVistaAlumno()) {
+            <span
+              class="billetera__resumen-pill"
+              [class.billetera__resumen-pill--positivo]="presenter.balancePositivo()"
+              [class.billetera__resumen-pill--negativo]="!presenter.balancePositivo()"
+              title="Balance del período"
+            >
+              <i class="fa-solid fa-scale-balanced" aria-hidden="true"></i>
+              <span class="billetera__resumen-pill-label">Balance</span>
+              <span class="billetera__resumen-pill-valor">{{ presenter.balancePeriodoFormateado() }}</span>
+            </span>
+          }
+          <span class="billetera__resumen-pill" title="Cantidad de compras">
+            <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+            <span class="billetera__resumen-pill-label">Compras</span>
+            <span class="billetera__resumen-pill-valor">{{ presenter.cantidadCompras() }}</span>
+          </span>
+        </div>
+      }
+      </div>
+
+      @if (presenter.rangoFecha() === 'custom') {
+        <div class="billetera__rango">
+          <label class="billetera__rango-label">
+            Desde
+            <input type="date" [value]="presenter.desde()" (change)="onDesdeChange($event)" />
+          </label>
+          <label class="billetera__rango-label">
+            Hasta
+            <input type="date" [value]="presenter.hasta()" (change)="onHastaChange($event)" />
+          </label>
+        </div>
+      }
+    </section>
+
+    @if (presenter.cargando()) {
+      <div class="billetera__estado">Cargando billetera…</div>
+    } @else if (presenter.error()) {
+      <div class="billetera__estado billetera__estado--error">
+        {{ presenter.error() }}
+        <button type="button" class="billetera__chip" (click)="presenter.recargar()">Reintentar</button>
+      </div>
+    } @else if (presenter.resumen()) {
+
+      <section
+        class="billetera__analisis"
+        [class.billetera__analisis--solo]="esVistaAlumno()"
+      >
+        <article class="billetera__panel">
+          <h2 class="billetera__panel-titulo">Gasto por categoría</h2>
+          @if (presenter.hayCategorias()) {
+            <ul class="billetera__listado">
+              @for (cat of presenter.gastoPorCategoria(); track cat.categoria) {
+                <li class="billetera__fila">
+                  <div class="billetera__fila-top">
+                    <span class="billetera__fila-label">{{ cat.categoria }}</span>
+                    <span class="billetera__fila-monto">{{ presenter.formatearMonto(cat.monto) }}</span>
+                  </div>
+                  <div class="billetera__barra">
+                    <div class="billetera__barra-fill" [style.width.%]="cat.porcentaje"></div>
+                  </div>
+                  <span class="billetera__fila-porcentaje">{{ cat.porcentaje | number:'1.0-2' }}%</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="billetera__panel-vacio">Todavía no hay gastos en este período.</p>
+          }
+        </article>
+
+        @if (!esVistaAlumno()) {
+          <article class="billetera__panel">
+            <h2 class="billetera__panel-titulo">Gasto saludable</h2>
+            @if (presenter.hayClasificacionSalud()) {
+              <ul class="billetera__listado">
+                @for (item of presenter.gastoPorClasificacionSalud(); track item.clasificacion) {
+                  <li class="billetera__fila">
+                    <div class="billetera__fila-top">
+                      <span
+                        class="billetera__fila-label"
+                        [class.billetera__fila-label--saludable]="item.clasificacion === 'Saludable'"
+                        [class.billetera__fila-label--no-saludable]="item.clasificacion === 'No saludable'"
+                      >{{ item.clasificacion }}</span>
+                      <span class="billetera__fila-monto">{{ presenter.formatearMonto(item.monto) }}</span>
+                    </div>
+                    <div class="billetera__barra">
+                      <div
+                        class="billetera__barra-fill"
+                        [class.billetera__barra-fill--saludable]="item.clasificacion === 'Saludable'"
+                        [class.billetera__barra-fill--no-saludable]="item.clasificacion === 'No saludable'"
+                        [style.width.%]="item.porcentaje"
+                      ></div>
+                    </div>
+                    <span class="billetera__fila-porcentaje">{{ item.porcentaje | number:'1.0-2' }}%</span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="billetera__panel-vacio">No hay datos de clasificación saludable.</p>
+            }
+          </article>
+        }
+      </section>
+
+      <section class="billetera__panel">
+        <h2 class="billetera__panel-titulo">Movimientos recientes</h2>
+        @if (presenter.hayMovimientos()) {
+          <ul class="billetera__movimientos">
+            @for (mov of presenter.movimientos(); track mov.id) {
+              <li class="billetera__movimiento">
+                <span
+                  class="billetera__movimiento-icono"
+                  [class.billetera__movimiento-icono--entrada]="mov.direccion === 'ENTRADA'"
+                  [class.billetera__movimiento-icono--salida]="mov.direccion === 'SALIDA'"
+                  aria-hidden="true"
+                >
+                  <i class="fa-solid" [class]="presenter.iconoMovimiento(mov.tipo)"></i>
+                </span>
+                <div class="billetera__movimiento-info">
+                  <span class="billetera__movimiento-descripcion">{{ mov.descripcion }}</span>
+                  <span class="billetera__movimiento-fecha">{{ presenter.formatearFechaMovimiento(mov.fechaHora) }}</span>
+                </div>
+                <span
+                  class="billetera__movimiento-monto"
+                  [class.billetera__movimiento-monto--entrada]="mov.direccion === 'ENTRADA'"
+                  [class.billetera__movimiento-monto--salida]="mov.direccion === 'SALIDA'"
+                >{{ presenter.formatearMontoConSigno(mov) }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="billetera__panel-vacio">No hubo movimientos en este período.</p>
+        }
+      </section>
+    }
+  </div>
+</main>

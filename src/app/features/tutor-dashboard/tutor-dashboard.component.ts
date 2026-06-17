@@ -148,7 +148,6 @@ export class TutorDashboardComponent implements OnInit {
   }
   
   applySmartAction(): void {
-    // In a real app, call a service here
     console.log('Action applied for', this.selectedChild?.studentName);
     this.closeSmartActionModal();
   }

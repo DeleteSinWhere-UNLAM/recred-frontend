@@ -10,7 +10,8 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
-import { NotificacionesService } from '../../../data-access/services/notificaciones.service';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
+import { NotificacionesService, Notificacion } from '../../../data-access/services/notificaciones.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 @Component({
@@ -25,6 +26,7 @@ export class NavbarComponent {
   private readonly authService = inject(AuthService);
   private readonly carritoService = inject(CarritoService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly alumnosService = inject(AlumnosService);
   private readonly notificacionesService = inject(NotificacionesService);
   private readonly host = inject(ElementRef<HTMLElement>);
 
@@ -33,10 +35,13 @@ export class NavbarComponent {
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   protected readonly esVistaKiosquero = this.usuarioService.esVistaKiosquero;
+  protected readonly notificaciones = this.notificacionesService.notificaciones;
   protected readonly notifCount = this.notificacionesService.cantidad;
+  protected readonly alumnos = this.alumnosService.alumnos;
   protected readonly menuAbierto = signal(false);
   protected readonly menuNotifAbierto = signal(false);
   protected readonly menuKiosqueroAbierto = signal(false);
+  protected readonly menuBilleteraAbierto = signal(false);
 
   protected irAlCarrito(): void {
     this.router.navigateByUrl('/compra');
@@ -52,6 +57,15 @@ export class NavbarComponent {
     if (this.menuAbierto()) {
       this.menuNotifAbierto.set(false);
       this.menuKiosqueroAbierto.set(false);
+    } else {
+      this.menuBilleteraAbierto.set(false);
+    }
+  }
+
+  protected toggleMenuBilletera(): void {
+    this.menuBilleteraAbierto.update((abierto) => !abierto);
+    if (this.menuBilleteraAbierto() && this.alumnos().length === 0) {
+      void this.alumnosService.asegurarCargados();
     }
   }
 
@@ -60,6 +74,14 @@ export class NavbarComponent {
     if (this.menuNotifAbierto()) {
       this.menuAbierto.set(false);
       this.menuKiosqueroAbierto.set(false);
+      this.notificacionesService.obtenerNotificaciones();
+    }
+  }
+
+  protected clickEnNotificacion(notif: Notificacion): void {
+    if (notif.tipo === 'RESUMEN_SEMANAL') {
+      this.menuNotifAbierto.set(false);
+      this.router.navigateByUrl('/resumen-semanal');
     }
   }
 
@@ -86,6 +108,18 @@ export class NavbarComponent {
     this.router.navigateByUrl('/perfil');
   }
 
+  protected irABilletera(): void {
+    this.menuAbierto.set(false);
+    this.menuBilleteraAbierto.set(false);
+    this.router.navigateByUrl('/billetera');
+  }
+
+  protected irABilleteraDeHijo(alumnoId: string): void {
+    this.menuAbierto.set(false);
+    this.menuBilleteraAbierto.set(false);
+    void this.router.navigate(['/billetera', alumnoId]);
+  }
+
   protected async cerrarSesion(): Promise<void> {
     this.menuAbierto.set(false);
     try {
@@ -101,7 +135,8 @@ export class NavbarComponent {
     if (
       !this.menuAbierto() &&
       !this.menuNotifAbierto() &&
-      !this.menuKiosqueroAbierto()
+      !this.menuKiosqueroAbierto() &&
+      !this.menuBilleteraAbierto()
     ) {
       return;
     }
@@ -111,6 +146,7 @@ export class NavbarComponent {
       this.menuAbierto.set(false);
       this.menuNotifAbierto.set(false);
       this.menuKiosqueroAbierto.set(false);
+      this.menuBilleteraAbierto.set(false);
     }
   }
 
@@ -119,5 +155,6 @@ export class NavbarComponent {
     if (this.menuAbierto()) this.menuAbierto.set(false);
     if (this.menuNotifAbierto()) this.menuNotifAbierto.set(false);
     if (this.menuKiosqueroAbierto()) this.menuKiosqueroAbierto.set(false);
+    if (this.menuBilleteraAbierto()) this.menuBilleteraAbierto.set(false);
   }
 }

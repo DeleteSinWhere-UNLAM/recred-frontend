@@ -55,7 +55,6 @@ describe('HomeAlumnoPresenter', () => {
     
     presenter.init();
     
-    // Esperar a que la promesa de asegurarCargados resuelva
     await new Promise(r => setTimeout(r, 0));
 
     expect(alumnosServiceSpy.asegurarCargados).toHaveBeenCalled();
@@ -70,10 +69,10 @@ describe('HomeAlumnoPresenter', () => {
     presenter.init();
     await new Promise(r => setTimeout(r, 0));
 
-    presenter.ejecutarAccion(presenter.acciones()[0]); // buffet
+    presenter.ejecutarAccion(presenter.acciones()[0]);
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/buffet', 'alumno-1']);
 
-    presenter.ejecutarAccion(presenter.acciones()[2]); // favoritos
+    presenter.ejecutarAccion(presenter.acciones()[2]);
     expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/favoritos');
   });
 });

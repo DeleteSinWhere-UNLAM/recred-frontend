@@ -2,20 +2,31 @@
 
 <main class="carrito-page">
   <div class="carrito-page__container">
+    <button
+      type="button"
+      class="carrito-page__volver"
+      (click)="presenter.volverAlBuffet()"
+    >
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
     <header class="carrito-page__cabecera">
-      <button
-        type="button"
-        class="carrito-page__volver"
-        (click)="presenter.volverAlBuffet()"
-      >
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        <span>Volver</span>
-      </button>
-      <div class="carrito-page__titulo-bloque">
-        <h2 class="carrito-page__titulo">Mi Carrito</h2>
-        <p class="carrito-page__subtitulo">
-          Revisá lo que pediste y elegí cuándo retirarlo.
-        </p>
+      <div class="carrito-page__titulo-bloque" [class.carrito-page__titulo-bloque--alumno]="esVistaAlumno()">
+        @if (esVistaAlumno()) {
+          <div class="carrito-page__titulo-icono" aria-hidden="true">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </div>
+        }
+        <div class="carrito-page__titulo-texto">
+          <h2 class="carrito-page__titulo">Mi Carrito</h2>
+          <p class="carrito-page__subtitulo">
+            Revisá lo que pediste y elegí cuándo retirarlo.
+          </p>
+        </div>
+        @if (esVistaAlumno()) {
+          <span class="carrito-page__ola" aria-hidden="true"></span>
+        }
       </div>
     </header>
 

@@ -24,12 +24,18 @@ describe('ConfirmarPresenter', () => {
     id: '',
     total: 100,
     ordenes: [
-      { alumno: { id: 'alumno-1', nombre: 'Juan' } as unknown as Alumno, subtotal: 100, items: [], fecha: '', recreo: 'PRIMER_RECREO' }
+      {
+        alumno: { id: 'alumno-1', nombre: 'Juan' } as unknown as Alumno,
+        buffetId: '0f8fad5b-d9cb-469f-a165-70867728950e',
+        subtotal: 100,
+        items: [],
+        fecha: '',
+        recreo: 'PRIMER_RECREO',
+      }
     ],
     codigos: {}
   };
 
-  // Usamos un signal real para que la reactividad funcione en el presenter
   const ordenEnCursoSignal = signal<OrdenCompra | null>(mockOrdenBase);
 
   beforeEach(() => {
@@ -53,7 +59,7 @@ describe('ConfirmarPresenter', () => {
     });
 
     presenter = TestBed.inject(ConfirmarPresenter);
-    ordenEnCursoSignal.set(mockOrdenBase); // Resetear al valor base
+    ordenEnCursoSignal.set(mockOrdenBase);
   });
 
   it('debe confirmar la compra SIN sugerenciaId correctamente', () => {

@@ -30,6 +30,7 @@ export class CarritoPage implements OnInit {
   protected readonly presenter = inject(CarritoPresenter);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
+  protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   mostrarModalFavorito = false;
   favoritoModalAlumnoId = '';

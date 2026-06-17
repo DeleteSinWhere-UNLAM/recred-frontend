@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ProductoCardComponent } from './components/producto-card/producto-card.component';
 import { SeleccionarAlumnoModalComponent } from './components/seleccionar-alumno-modal/seleccionar-alumno-modal.component';
@@ -38,13 +39,14 @@ export interface DateCell {
 export class BuffetPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly colegiosService = inject(ColegiosService);
   protected readonly presenter = inject(BuffetPresenter);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
-  readonly todosLosAlumnos = this.alumnosService.getAlumnos();
+  readonly todosLosAlumnos = this.alumnosService.alumnos;
   readonly todosLosColegios = this.colegiosService.getColegios();
 
   protected readonly mostrarSelector = signal(false);
@@ -61,7 +63,18 @@ export class BuffetPage implements OnInit {
   }
 
   ngOnInit(): void {
+    this.usuarioService.setHomeUrl(this.homeUrlPorRol());
     const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
+    void this.inicializarBuffet(alumnoId);
+  }
+
+  private async inicializarBuffet(alumnoId: string): Promise<void> {
+    try {
+      await this.alumnosService.asegurarCargados(true);
+    } catch (err) {
+      console.error('Error al cargar alumnos para el buffet:', err);
+    }
+
     this.presenter.init(alumnoId);
   }
 
@@ -156,7 +169,6 @@ export class BuffetPage implements OnInit {
     const year = refDate.getFullYear();
     const month = refDate.getMonth();
     
-    // First day of the month
     const firstDayOfMonth = new Date(year, month, 1);
     let startDayOfWeek = firstDayOfMonth.getDay();
     startDayOfWeek = startDayOfWeek === 0 ? 7 : startDayOfWeek;
@@ -201,6 +213,13 @@ export class BuffetPage implements OnInit {
     this.presenter.setFecha(cell.fechaStr);
   }
 
+  private homeUrlPorRol(): string {
+    const rol = this.perfilService.rol();
+    if (rol === 'ALUMNO') return '/alumno';
+    if (rol === 'VENDEDOR') return '/kiosquero';
+    return '/tutor';
+  }
+
   protected obtenerRangoHorario(recreo: Recreo): string {
     const slot = this.presenter.franjas().find(s => {
       if (!s.descripcion) return false;
@@ -222,4 +241,3 @@ export class BuffetPage implements OnInit {
     return '';
   }
 }
-

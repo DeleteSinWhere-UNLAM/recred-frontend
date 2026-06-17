@@ -211,7 +211,6 @@ export class CarritoService {
     const referenceDate = seleccion?.fecha ? new Date(seleccion.fecha + 'T12:00:00') : new Date();
     const { start, end } = getPeriodRange(budget.periodo, referenceDate);
 
-    // Sum past approved purchases in the current range
     const pastPurchases = this.purchasesState().get(alumnoId) ?? [];
     const activeStatuses = ['APPROVED', 'PENDING', 'PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'];
     const approvedPastPurchases = pastPurchases.filter((m) => {
@@ -242,7 +241,6 @@ export class CarritoService {
       }
     }
 
-    // Sum items currently in the cart
     let spentCartGeneral = 0;
     let spentCartCategory = 0;
 
@@ -264,10 +262,8 @@ export class CarritoService {
 
     const additionalCost = producto.precio * cantidadAdicional;
 
-    // Check general budget limit capped by student wallet balance (credits)
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
     
-    // Check wallet balance specifically
     const limiteSaldo = (alumno?.saldo ?? Infinity) + spentPastGeneral;
     const totalGeneral = spentPastGeneral + spentCartGeneral + additionalCost;
     
@@ -293,7 +289,6 @@ export class CarritoService {
       return { permitido: false, razon: 'presupuesto' };
     }
 
-    // Check category budget limit (if applicable)
     const rule = budget.reglasCategoria.find((r) =>
       r.activo &&
       isSameCategory(

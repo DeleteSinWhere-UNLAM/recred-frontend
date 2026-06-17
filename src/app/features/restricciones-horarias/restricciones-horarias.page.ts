@@ -46,7 +46,6 @@ export class RestriccionesHorariasPage implements OnInit {
 
     const toggles: QuickToggleItem[] = [];
 
-    // 1. Bebidas
     const catBebidas = categories.find(c => c.descripcion.toLowerCase().includes('bebida') || c.descripcion.toLowerCase().includes('gaseosa'));
     if (catBebidas) {
       const rest = active.restricciones.find(r => r.categoryId === catBebidas.id || r.categoria?.id === catBebidas.id);
@@ -61,7 +60,6 @@ export class RestriccionesHorariasPage implements OnInit {
       });
     }
 
-    // 2. Snacks
     const catSnacks = categories.find(c => c.descripcion.toLowerCase().includes('snack') || c.descripcion.toLowerCase().includes('papa'));
     if (catSnacks) {
       const rest = active.restricciones.find(r => r.categoryId === catSnacks.id || r.categoria?.id === catSnacks.id);
@@ -76,7 +74,6 @@ export class RestriccionesHorariasPage implements OnInit {
       });
     }
 
-    // 3. Golosinas
     const catGolosinas = categories.find(c => c.descripcion.toLowerCase().includes('golosina') || c.descripcion.toLowerCase().includes('dulce') || c.descripcion.toLowerCase().includes('chocolate'));
     if (catGolosinas) {
       const rest = active.restricciones.find(r => r.categoryId === catGolosinas.id || r.categoria?.id === catGolosinas.id);
@@ -91,7 +88,6 @@ export class RestriccionesHorariasPage implements OnInit {
       });
     }
 
-    // 4. Gluten / TACC
     const salTacc = health.find(s => s.descripcion.toLowerCase().includes('tacc') || s.descripcion.toLowerCase().includes('gluten'));
     if (salTacc) {
       const rest = active.restricciones.find(r => r.classificationId === salTacc.id || r.clasificacionSalud?.id === salTacc.id);
@@ -106,7 +102,6 @@ export class RestriccionesHorariasPage implements OnInit {
       });
     }
 
-    // 5. Azúcar
     const salAzucar = health.find(s => s.descripcion.toLowerCase().includes('azucar') || s.descripcion.toLowerCase().includes('diabet'));
     if (salAzucar) {
       const rest = active.restricciones.find(r => r.classificationId === salAzucar.id || r.clasificacionSalud?.id === salAzucar.id);
@@ -121,7 +116,6 @@ export class RestriccionesHorariasPage implements OnInit {
       });
     }
 
-    // 6. Lácteos
     const salLacteos = health.find(s => s.descripcion.toLowerCase().includes('lacteo') || s.descripcion.toLowerCase().includes('leche'));
     if (salLacteos) {
       const rest = active.restricciones.find(r => r.classificationId === salLacteos.id || r.clasificacionSalud?.id === salLacteos.id);

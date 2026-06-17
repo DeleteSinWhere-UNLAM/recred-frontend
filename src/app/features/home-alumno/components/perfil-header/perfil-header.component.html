@@ -1,8 +1,13 @@
 <section class="perfil-header" [attr.aria-label]="'Perfil de ' + nombreCompleto">
+  <img class="perfil-header__nube perfil-header__nube--uno" src="/nube.png" alt="" aria-hidden="true" />
+  <img class="perfil-header__nube perfil-header__nube--dos" src="/nube.png" alt="" aria-hidden="true" />
+  <img class="perfil-header__nube perfil-header__nube--tres" src="/nube.png" alt="" aria-hidden="true" />
+
   <div class="perfil-header__avatar-wrap">
     <div class="perfil-header__avatar">
       <span>{{ iniciales }}</span>
     </div>
+    <span class="perfil-header__avatar-emoji" aria-hidden="true">😊</span>
   </div>
 
   <div class="perfil-header__info">

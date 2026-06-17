@@ -33,7 +33,7 @@ export class FeriadosService {
   esFeriadoHoy(): Observable<{ esFeriado: boolean; motivo?: string }> {
     const hoy = new Date();
     const dia = hoy.getDate();
-    const mes = hoy.getMonth() + 1; // getMonth es 0-indexado
+    const mes = hoy.getMonth() + 1;
     const anio = hoy.getFullYear();
 
     return this.obtenerFeriados(anio).pipe(

@@ -1,47 +1,60 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { SugerenciasService } from '../../features/sugerencias/services/sugerencias.service';
-
 import { SugerenciaProducto } from '../../features/sugerencias/models/sugerencia-producto.model';
-
-import { SugerenciaCardComponent } from './components/sugerencia-card/sugerencia-card.component';
+import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
+import { ComboPromotionModalComponent } from './components/combo-promotion-modal/combo-promotion-modal.component';
 
 @Component({
   selector: 'app-sugerencias-page',
   standalone: true,
   templateUrl: './sugerencias.page.html',
   styleUrl: './sugerencias.page.css',
-  imports: [NavbarComponent, SugerenciaCardComponent],
+  imports: [CommonModule, NavbarComponent, ComboPromotionModalComponent],
+  providers: [SugerenciasPresenter]
 })
-export class SugerenciasPage {
-  private readonly usuarioService = inject(UsuarioService);
-  private readonly sugerenciasService = inject(SugerenciasService);
+export class SugerenciasPage implements OnInit {
+  readonly presenter = inject(SugerenciasPresenter);
   private readonly router = inject(Router);
+  private readonly usuarioService = inject(UsuarioService);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
-  readonly usuarioId = this.usuarioService.getUsuarioActual().id;
-
-  sugerencias: SugerenciaProducto[] = [];
-
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
+  }
 
+  ngOnInit(): void {
     const perfilRaw = localStorage.getItem('recred.perfil');
-
     const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
-
-    if (usuarioId) {
-      this.sugerenciasService.getSugerencias(usuarioId).subscribe((data) => {
-        this.sugerencias = data;
-      });
+    if (this.hasUsuarioId(usuarioId)) {
+      this.presenter.initialize(usuarioId);
     }
   }
 
   volver(): void {
     this.router.navigateByUrl('/kiosquero');
+  }
+
+  onGenerarPromocion(): void {
+    this.presenter.openComboPromotionModal();
+  }
+
+  onConfirmPromotion(promotionData: { discountPercentage: number, startDate: string, endDate: string, productIds: string[] }): void {
+    this.presenter.generatePromotion(promotionData);
+  }
+
+  onCloseModal(): void {
+    this.presenter.closeComboPromotionModal();
+  }
+
+  private hasUsuarioId(usuarioId: string | null): boolean {
+    return usuarioId !== null && usuarioId !== undefined;
+  }
+
+  seleccionarProducto(sugerencia: SugerenciaProducto): void {
+    this.presenter.seleccionarProducto(sugerencia);
   }
 }

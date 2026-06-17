@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
 import { CarritosFavoritosService } from '../../../carritos-favoritos/services/carritos-favoritos.service';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { SaveCarritoFavoritoRequest } from '../../../carritos-favoritos/models/carritos-favoritos.model';
 
 @Component({
@@ -17,6 +18,9 @@ export class GuardarFavoritoModalComponent implements OnInit {
   private readonly alumnosService = inject(AlumnosService);
   private readonly carritosFavoritosService = inject(CarritosFavoritosService);
   private readonly toastService = inject(ToastService);
+  private readonly usuarioService = inject(UsuarioService);
+
+  readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   @Input() cartId: string | null = null;
   @Input() initialNombre = '';
@@ -33,7 +37,6 @@ export class GuardarFavoritoModalComponent implements OnInit {
   readonly hijos = this.alumnosService.alumnos;
 
   constructor() {
-    // React to changes in initial values
     effect(() => {
       this.nombre = this.initialNombre;
       this.alumnoId = this.initialAlumnoId;
