@@ -4,9 +4,9 @@
   <div class="buffet__container">
     <div class="buffet__layout-wrapper">
 
-      <!-- Main Content Area -->
+      
       <div class="buffet__main-content">
-        <!-- Cabecera -->
+        
         <header class="buffet__cabecera">
           <button type="button" class="buffet__volver" (click)="presenter.volver()">
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -52,17 +52,17 @@
           }
         </header>
 
-        <!-- Filtros Condensados -->
+        
         <section class="buffet__filtros-container" aria-label="Filtros del menú">
           <div class="buffet__filtros-row">
-            <!-- Search field -->
+            
             <div class="buffet__filtro-item buffet__filtro-item--search">
               <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
               <input type="search" class="buffet__search-input" placeholder="Buscar por nombre..."
                 [value]="presenter.filtros().busqueda" (input)="onBusqueda($event)" aria-label="Buscar productos" />
             </div>
 
-            <!-- Price Inputs (Min / Max) -->
+            
             <div class="buffet__filtro-item buffet__filtro-item--price">
               <span class="price-prefix">$</span>
               <input type="number" class="buffet__price-input" placeholder="Mín"
@@ -79,7 +79,7 @@
                 aria-label="Precio máximo" />
             </div>
 
-            <!-- Category select -->
+            
             <div class="buffet__filtro-item buffet__filtro-item--select">
               <select class="buffet__select" [value]="presenter.filtros().categoriaId" (change)="onCategoria($event)"
                 aria-label="Filtrar por categoría">
@@ -90,14 +90,14 @@
               </select>
             </div>
 
-            <!-- Favoritos toggle -->
+            
             <button type="button" class="buffet__favoritos-toggle" [class.active]="presenter.filtros().soloFavoritos"
               (click)="onToggleSoloFavoritos()" aria-label="Filtrar solo favoritos">
               <i class="fa-solid fa-heart" aria-hidden="true"></i>
               <span>FAVORITOS</span>
             </button>
 
-            <!-- Limpiar button inside the same row -->
+            
             <button type="button" class="buffet__limpiar-btn-inline" (click)="presenter.limpiarFiltros()"
               aria-label="Limpiar filtros">
               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
@@ -106,7 +106,7 @@
           </div>
         </section>
 
-        <!-- Product Grid -->
+        
         @if (presenter.productosFiltrados().length > 0) {
         <section class="buffet__grid" aria-label="Productos del buffet">
           @for (producto of presenter.productosFiltrados(); track producto.id) {
@@ -127,7 +127,7 @@
         }
       </div>
 
-      <!-- Right Sidebar Panel -->
+      
       @if (presenter.alumno(); as alumno) {
       <aside class="buffet__sidebar" [class.closed]="panelLateralCerrado()">
         <button type="button" class="buffet__sidebar-toggle-header" (click)="panelLateralCerrado.set(!panelLateralCerrado())">
@@ -140,7 +140,7 @@
         </button>
 
         <div class="buffet__sidebar-content">
-          <!-- Saldo Disponible Section -->
+          
           @if (presenter.presupuestoDisponible(); as presupuesto) {
           <div class="buffet__sidebar-section">
             <h3 class="buffet__sidebar-section-title">
@@ -253,7 +253,7 @@
           </div>
           }
 
-          <!-- Fecha y Horario de Retiro Section -->
+          
           <div class="buffet__sidebar-section">
             <h3 class="buffet__sidebar-section-title">
               <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
@@ -262,7 +262,7 @@
             <p class="buffet__sidebar-section-subtitle">Elegí cuándo retirará el pedido el alumno.</p>
 
             <div class="buffet__sidebar-retiro-layout">
-              <!-- Left: Custom Calendar Widget -->
+              
               <div class="buffet__calendar-widget">
                 <div class="calendar-widget-header">
                   <span class="calendar-current-month">{{ nombreMesCalendario() }}</span>
@@ -288,7 +288,7 @@
                 </div>
               </div>
 
-              <!-- Right: Franja Horaria Stack -->
+              
               <div class="buffet__sidebar-recreos">
                 <span class="recreo-section-label">FRANJA HORARIA</span>
                 <div class="recreos-btn-stack">
@@ -307,7 +307,7 @@
               </div>
             </div>
 
-            <!-- Budget status banner under calendar -->
+            
             @if (presenter.cargandoPresupuestoPorFecha()) {
             <div class="buffet__sidebar-budget-status budget-status--cargando">
               <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
@@ -333,7 +333,7 @@
             }
           </div>
 
-          <!-- Alumno / Restricciones Section -->
+          
           @if (!esVistaAlumno()) {
           <div class="buffet__sidebar-section">
             <h3 class="buffet__sidebar-section-title">
@@ -342,7 +342,7 @@
             </h3>
 
             <div class="buffet__sidebar-restricciones-content">
-              <!-- Dietary restrictions -->
+              
               <div class="restricciones-sidebar-group">
                 <span class="restricciones-group-label">Restricciones Alimenticias</span>
                 <div class="restricciones-pills-container">
@@ -362,7 +362,7 @@
                 </div>
               </div>
 
-              <!-- Time restrictions -->
+              
               <div class="restricciones-sidebar-group">
                 <span class="restricciones-group-label">Horarios Permitidos</span>
                 <div class="restricciones-pills-container">
@@ -393,7 +393,7 @@
   (cerrar)="cerrarSelector()" />
 }
 
-<!-- Sidebar Float Button when Closed -->
+
 @if (panelLateralCerrado() && presenter.alumno()) {
 <button type="button" class="buffet__sidebar-open-btn" (click)="panelLateralCerrado.set(false)"
   aria-label="Abrir panel de información">
@@ -402,7 +402,7 @@
 </button>
 }
 
-<!-- Floating Bottom Cart Bar -->
+
 @if (presenter.alumno(); as alumno) {
   @if (presenter.totalCarrito() > 0) {
     <div class="buffet__footer-cart">

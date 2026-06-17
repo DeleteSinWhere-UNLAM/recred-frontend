@@ -5,7 +5,6 @@
       <p>Cargando panel global...</p>
     </div>
   } @else if (globalSummary) {
-    <!-- Global Header -->
     <div class="global-header card">
       <div class="global-balance-info">
         <h3>Saldo Total Consolidado</h3>
@@ -21,7 +20,6 @@
       </div>
     </div>
 
-    <!-- Tabs for Children -->
     <div class="children-tabs">
       @for (child of globalSummary.children; track child.studentId) {
         <button 
@@ -33,12 +31,9 @@
       }
     </div>
 
-    <!-- Selected Child View -->
     @if (selectedChild) {
       <div class="dashboard-grid">
-        
-        <!-- Smart Action Widget -->
-        @if (selectedChild.smartAction) {
+                @if (selectedChild.smartAction) {
           <section class="card smart-action-card">
             <div class="card-header">
               <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Sugerencia Inteligente</h3>
@@ -51,7 +46,6 @@
           </section>
         }
 
-        <!-- Financial Widget -->
         <section class="card finance-card">
           <div class="card-header">
             <h3>Finanzas: {{ selectedChild.studentName }}</h3>
@@ -79,7 +73,6 @@
           }
         </section>
 
-        <!-- Health & Gamification Widget -->
         <section class="card health-card">
           <div class="card-header">
             <h3>Salud y Hábitos</h3>
@@ -98,7 +91,6 @@
           </div>
         </section>
 
-        <!-- Logistics Widget -->
         <section class="card logistics-card">
           <div class="card-header">
             <h3>Logística del Día</h3>
@@ -118,7 +110,6 @@
           }
         </section>
 
-        <!-- Recent Transactions -->
         <section class="card transactions-card">
           <div class="card-header">
             <h3>Últimos Movimientos</h3>
@@ -140,7 +131,6 @@
     }
   }
 
-  <!-- Transfer Modal -->
   @if (showTransferModal) {
     <div class="modal-overlay">
       <div class="modal-content">
@@ -150,7 +140,6 @@
         </div>
         <div class="modal-body">
           <p>Seleccione desde quién y hacia quién desea transferir fondos.</p>
-          <!-- Form mock for transfer -->
           <div class="form-group">
             <label for="transferAmount">Monto:</label>
             <input id="transferAmount" type="number" class="form-control" placeholder="$ 0.00">
@@ -163,8 +152,6 @@
       </div>
     </div>
   }
-
-  <!-- Smart Action Modal -->
   @if (showSmartActionModal && selectedChild?.smartAction) {
     <div class="modal-overlay">
       <div class="modal-content smart-modal">
