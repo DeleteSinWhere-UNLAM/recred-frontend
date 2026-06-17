@@ -24,7 +24,7 @@ export class BulkUploadTableModalComponent implements OnChanges {
   @Input() prefilledProducts: BulkProductResponse[] = [];
   @Output() fileSelected = new EventEmitter<File>();
   @Output() saveProducts = new EventEmitter<BulkProductResponse[]>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
 
@@ -50,7 +50,7 @@ export class BulkUploadTableModalComponent implements OnChanges {
   }
 
   onCancel(): void {
-    this.cancel.emit();
+    this.closeModal.emit();
   }
 
   onSave(): void {

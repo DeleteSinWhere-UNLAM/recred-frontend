@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angul
 export class UploadSelectionModalComponent {
   @Output() individualUpload = new EventEmitter<void>();
   @Output() bulkUpload = new EventEmitter<void>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
 
   onIndividualUpload(): void {
     this.individualUpload.emit();
@@ -21,6 +21,6 @@ export class UploadSelectionModalComponent {
   }
 
   onCancel(): void {
-    this.cancel.emit();
+    this.closeModal.emit();
   }
 }
