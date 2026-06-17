@@ -77,25 +77,25 @@
                   [class.bulk-upload-modal__row--invalid]="control.invalid && control.touched"
                 >
                   <td>
-                    <input type="text" [formControl]="asFormGroup(control).controls['nombre']" placeholder="Nombre">
+                    <input type="text" [formControl]="asFormControl(asFormGroup(control).get('nombre'))" placeholder="Nombre">
                   </td>
                   <td>
-                    <input type="text" [formControl]="asFormGroup(control).controls['descripcion']" placeholder="Descripción">
+                    <input type="text" [formControl]="asFormControl(asFormGroup(control).get('descripcion'))" placeholder="Descripción">
                   </td>
                   <td>
-                    <input type="number" [formControl]="asFormGroup(control).controls['precio']" min="0" step="10">
+                    <input type="number" [formControl]="asFormControl(asFormGroup(control).get('precio'))" min="0" step="10">
                   </td>
                   <td>
-                    <input type="number" [formControl]="asFormGroup(control).controls['stockActual']" min="0" step="1">
+                    <input type="number" [formControl]="asFormControl(asFormGroup(control).get('stockActual'))" min="0" step="1">
                   </td>
                   <td>
-                    <input type="number" [formControl]="asFormGroup(control).controls['peso']" min="0" step="0.1">
+                    <input type="number" [formControl]="asFormControl(asFormGroup(control).get('peso'))" min="0" step="0.1">
                   </td>
                   <td>
                     <div class="bulk-upload-modal__category-cell">
                       <select
-                        [formControl]="asFormGroup(control).controls['categoriaId']"
-                        [class.ng-invalid]="asFormGroup(control).controls['categoriaId']?.invalid && asFormGroup(control).controls['categoriaId']?.touched"
+                        [formControl]="asFormControl(asFormGroup(control).get('categoriaId'))"
+                        [class.ng-invalid]="asFormGroup(control).get('categoriaId')?.invalid && asFormGroup(control).get('categoriaId')?.touched"
                       >
                         <option value="" disabled selected>Seleccionar...</option>
                         @for (cat of categories; track cat.id) {
@@ -104,19 +104,19 @@
                         <option value="NEW">+ Nueva categoría...</option>
                       </select>
 
-                      @if (asFormGroup(control).controls['categoriaId']?.value === 'NEW') {
+                      @if (asFormGroup(control).get('categoriaId')?.value === 'NEW') {
                         <input
                           type="text"
-                          [formControl]="asFormGroup(control).controls['nuevaCategoriaNombre']"
+                          [formControl]="asFormControl(asFormGroup(control).get('nuevaCategoriaNombre'))"
                           placeholder="Nombre de la categoría"
                           class="bulk-upload-modal__new-category-input"
-                          [class.ng-invalid]="asFormGroup(control).controls['nuevaCategoriaNombre']?.invalid && asFormGroup(control).controls['nuevaCategoriaNombre']?.touched"
+                          [class.ng-invalid]="asFormGroup(control).get('nuevaCategoriaNombre')?.invalid && asFormGroup(control).get('nuevaCategoriaNombre')?.touched"
                         >
                       }
                     </div>
                   </td>
                   <td>
-                    <input type="checkbox" [formControl]="asFormGroup(control).controls['requierePreparacion']">
+                    <input type="checkbox" [formControl]="asFormControl(asFormGroup(control).get('requierePreparacion'))">
                   </td>
                   <td>
                     <button

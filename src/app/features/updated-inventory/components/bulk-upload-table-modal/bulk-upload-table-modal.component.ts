@@ -8,7 +8,7 @@ import {
   SimpleChanges,
   inject
 } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, FormControl } from '@angular/forms';
 import { BulkProductResponse } from '../../services/bulk-upload.service';
 
 import { Category } from '../../models/category.interface';
@@ -43,6 +43,10 @@ export class BulkUploadTableModalComponent implements OnChanges {
 
   asFormGroup(control: AbstractControl): FormGroup {
     return control as FormGroup;
+  }
+
+  asFormControl(control: AbstractControl | null): FormControl {
+    return control as FormControl;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
