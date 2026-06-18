@@ -578,6 +578,7 @@ describe('UpdatedInventoryPageComponent', () => {
       tipoManejoInventario: 'STOCK_EXACTO',
       motivo: '',
     });
+    component.onInventoryModeChange();
 
     component.submitInventoryManagement();
 

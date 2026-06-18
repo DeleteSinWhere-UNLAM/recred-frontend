@@ -1,4 +1,4 @@
-<app-navbar />
+﻿<app-navbar />
 
 <main class="inventario">
   <div class="inventario__container">
@@ -157,6 +157,7 @@
         [product]="selectedProduct"
         [categories]="categories"
         [isSaving]="isSaving"
+        [buffetId]="buffetId"
         (formSubmit)="handleFormSubmit($event)"
         (formCancel)="closeForm()">
       </app-product-form>

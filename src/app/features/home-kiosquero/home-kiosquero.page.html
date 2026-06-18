@@ -258,7 +258,15 @@
                               [class.pv__product-item--warning]="item.tone === 'warning'"
                               [class.pv__product-item--danger]="item.tone === 'danger'"
                             >
-                              <span aria-hidden="true"></span>
+                              <div class="pv__product-media">
+                                <img
+                                  class="pv__product-image"
+                                  [src]="item.imageUrl || IMAGEN_FALLBACK"
+                                  [alt]="item.label"
+                                  loading="lazy"
+                                  (error)="onImagenError($event)"
+                                />
+                              </div>
                               <div>
                                 <strong>{{ item.label }}</strong>
                                 <small>{{ item.detail }}</small>
