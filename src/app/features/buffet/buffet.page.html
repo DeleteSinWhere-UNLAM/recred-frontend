@@ -28,7 +28,11 @@
           @if (presenter.alumno(); as alumno) {
           <div class="buffet__alumno">
             <div class="buffet__avatar" aria-hidden="true">
-              <span>{{ presenter.iniciales() }}</span>
+              @if (presenter.urlFotoPerfil()) {
+                <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="buffet__avatar-img" />
+              } @else {
+                <span>{{ presenter.iniciales() }}</span>
+              }
             </div>
             <div class="buffet__alumno-textos">
               <div class="buffet__alumno-linea">

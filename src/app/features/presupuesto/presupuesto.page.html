@@ -13,7 +13,11 @@
   <div class="presupuesto__container">
     <header class="presupuesto__cabecera">
       <div class="presupuesto__avatar" aria-hidden="true">
-        <span>{{ presenter.iniciales() }}</span>
+        @if (presenter.urlFotoPerfil()) {
+          <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="presupuesto__avatar-img" />
+        } @else {
+          <span>{{ presenter.iniciales() }}</span>
+        }
       </div>
       <div class="presupuesto__identidad">
         <h2 class="presupuesto__titulo">Presupuesto</h2>

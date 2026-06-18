@@ -10,7 +10,11 @@
       <header class="pv__profile-card">
         <div class="pv__profile-identity">
           <div class="pv__avatar" aria-hidden="true">
-            <span>{{ presenter.iniciales() }}</span>
+            @if (presenter.urlFotoPerfil()) {
+              <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreKiosquero()" class="pv__avatar-img" />
+            } @else {
+              <span>{{ presenter.iniciales() }}</span>
+            }
           </div>
 
           <div>

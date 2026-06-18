@@ -53,6 +53,8 @@ export class PresupuestoPresenter {
 
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');
 
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const alumno = this.alumnoState();
     if (!alumno) return '';

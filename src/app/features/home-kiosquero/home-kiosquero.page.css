@@ -71,6 +71,12 @@
   background: #fff;
   color: #172554;
   box-shadow: 0 12px 28px rgba(242, 183, 5, 0.18);
+  overflow: hidden;
+}
+.pv__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .pv__avatar span {
   font-family: var(--font-display);

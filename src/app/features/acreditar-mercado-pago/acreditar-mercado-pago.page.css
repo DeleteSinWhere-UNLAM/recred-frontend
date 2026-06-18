@@ -63,6 +63,13 @@
     0 0 0 3px #ffffff,
     0 0 0 5px var(--color-dorado),
     0 8px 16px rgba(74, 111, 165, 0.08);
+  overflow: hidden;
+}
+
+.acreditar-page__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .acreditar-page__alumno-info h2 {

@@ -20,10 +20,12 @@ export class PerfilUsuarioService {
     );
   }
 
-  obtenerPerfil(): Promise<PerfilUsuario> {
-    return firstValueFrom(
+  async obtenerPerfil(): Promise<PerfilUsuario> {
+    const perfil = await firstValueFrom(
       this.http.get<PerfilUsuario>(`${environment.apiUrl}/users/me/profile`),
     );
+    this.perfilService.actualizarDatosUsuario(perfil);
+    return perfil;
   }
 
   async actualizarPerfil(
@@ -33,6 +35,19 @@ export class PerfilUsuarioService {
       this.http.patch<PerfilUsuario>(
         `${environment.apiUrl}/users/me/profile`,
         cambios,
+      ),
+    );
+    this.perfilService.actualizarDatosUsuario(perfil);
+    return perfil;
+  }
+
+  async subirFotoPerfil(archivo: File): Promise<PerfilUsuario> {
+    const formData = new FormData();
+    formData.append('foto', archivo);
+    const perfil = await firstValueFrom(
+      this.http.post<PerfilUsuario>(
+        `${environment.apiUrl}/users/me/profile/foto`,
+        formData,
       ),
     );
     this.perfilService.actualizarDatosUsuario(perfil);

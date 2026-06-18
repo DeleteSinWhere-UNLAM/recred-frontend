@@ -61,6 +61,8 @@ export class OrdenAlumnoCardComponent {
   readonly alumnoActual = computed(() => this.alumnoState());
   readonly itemsActuales = computed(() => this.itemsState());
 
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const a = this.alumnoState();
     if (!a) return '';

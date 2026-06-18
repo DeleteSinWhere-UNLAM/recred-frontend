@@ -26,13 +26,15 @@
 
 .alumno-card__avatar-wrap {
   flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
 }
 
 .alumno-card__avatar {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #1a3b5c; /* Deep slate blue */
+  background-color: #1a3b5c;
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -41,10 +43,67 @@
   font-weight: 700;
   font-size: 24px;
   letter-spacing: 0.5px;
+  overflow: hidden;
   box-shadow:
     0 0 0 3px #ffffff,
     0 0 0 5px var(--color-dorado),
     0 8px 16px rgba(74, 111, 165, 0.1);
+}
+
+.alumno-card__avatar--foto {
+  object-fit: cover;
+  background: none;
+}
+
+.alumno-card__avatar-editar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  cursor: pointer;
+}
+
+.alumno-card__avatar-wrap:hover .alumno-card__avatar-editar,
+.alumno-card__avatar-editar:focus-visible {
+  background-color: rgba(0, 0, 0, 0.44);
+  color: #fff;
+}
+
+.alumno-card__avatar-editar:disabled {
+  cursor: not-allowed;
+}
+
+.alumno-card__avatar-loader {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: alumno-card-girar 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes alumno-card-girar {
+  to { transform: rotate(360deg); }
+}
+
+.alumno-card__input-foto {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .alumno-card__texto {
