@@ -8,8 +8,41 @@
     </button>
 
     <header class="perfil-usuario__header" [class.perfil-usuario__header--alumno]="esVistaAlumno()">
-      <div class="perfil-usuario__avatar" aria-hidden="true">
-        {{ iniciales() }}
+      <div class="perfil-usuario__avatar-wrapper" aria-label="Foto de perfil">
+        @if (fotoPerfil()) {
+          <img
+            class="perfil-usuario__avatar perfil-usuario__avatar--foto"
+            [src]="fotoPerfil()!"
+            [alt]="nombreCompleto()"
+          />
+        } @else {
+          <div class="perfil-usuario__avatar" aria-hidden="true">
+            {{ iniciales() }}
+          </div>
+        }
+        <button
+          type="button"
+          class="perfil-usuario__avatar-editar"
+          [disabled]="subiendoFoto()"
+          (click)="abrirSelectorFoto()"
+          [title]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
+          [attr.aria-label]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
+        >
+          @if (subiendoFoto()) {
+            <span class="perfil-usuario__avatar-loader" aria-hidden="true"></span>
+          } @else {
+            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+          }
+        </button>
+        <input
+          #inputFoto
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          class="perfil-usuario__input-foto"
+          aria-hidden="true"
+          tabindex="-1"
+          (change)="onFotoSeleccionada($event)"
+        />
       </div>
       <div class="perfil-usuario__heading">
         <p class="perfil-usuario__eyebrow">Cuenta RECRED</p>

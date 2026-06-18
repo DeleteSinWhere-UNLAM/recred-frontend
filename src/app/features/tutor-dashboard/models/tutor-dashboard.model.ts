@@ -8,6 +8,7 @@ export interface ChildDashboardSummary {
   studentId: string;
   studentName: string;
   balance: number;
+  urlFotoPerfil?: string | null;
   spendingPredictionMessage: string;
   budget?: BudgetSummary;
   health: HealthSummary;

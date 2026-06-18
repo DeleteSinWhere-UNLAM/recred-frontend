@@ -84,6 +84,11 @@ export class BilleteraPresenter {
     return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
   });
 
+  readonly urlFotoPerfil = computed(() => {
+    const alumno = this.alumnosService.getAlumnoById(this.alumnoIdState());
+    return alumno?.urlFotoPerfil ?? null;
+  });
+
   readonly iniciales = computed(() => {
     const alumno = this.alumnosService.getAlumnoById(this.alumnoIdState());
     if (!alumno) return '';

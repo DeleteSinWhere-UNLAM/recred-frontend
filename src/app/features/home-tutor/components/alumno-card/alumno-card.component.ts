@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Alumno } from '../../../../data-access/models/alumno.model';
+import { AlumnosService } from '../../../../data-access/services/alumnos.service';
 import { MovimientosService } from '../../../movimientos/services/movimientos.service';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { MicrocreditosService, SchoolCredit } from '../../../../data-access/services/microcreditos.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -24,11 +26,16 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
 export class AlumnoCardComponent implements OnInit {
   @Input({ required: true }) alumno!: Alumno;
 
+  private readonly alumnosService = inject(AlumnosService);
   private readonly movimientosService = inject(MovimientosService);
   private readonly perfilService = inject(PerfilService);
   private readonly microcreditosService = inject(MicrocreditosService);
+  private readonly toastService = inject(ToastService);
   private readonly _cantidadPendientes = signal<number>(0);
   creditoActivo = signal<SchoolCredit | null>(null);
+  readonly subiendoFoto = signal(false);
+
+  @ViewChild('inputFotoAlumno') private readonly inputFotoAlumno!: ElementRef<HTMLInputElement>;
 
   ngOnInit(): void {
     if (this.alumno?.id) {
@@ -54,6 +61,41 @@ export class AlumnoCardComponent implements OnInit {
   get iniciales(): string {
     const ini = (this.alumno.nombre[0] ?? '') + (this.alumno.apellido[0] ?? '');
     return ini.toUpperCase();
+  }
+
+  get fotoPerfil(): string | null {
+    return this.alumno.urlFotoPerfil ?? null;
+  }
+
+  abrirSelectorFoto(): void {
+    this.inputFotoAlumno.nativeElement.click();
+  }
+
+  async onFotoSeleccionada(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    if (!archivo) return;
+
+    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!tiposPermitidos.includes(archivo.type)) {
+      this.toastService.mostrar('Solo se permiten imágenes JPG, PNG o WEBP.', 'error');
+      return;
+    }
+    if (archivo.size > 5 * 1024 * 1024) {
+      this.toastService.mostrar('La imagen no puede superar los 5 MB.', 'error');
+      return;
+    }
+
+    this.subiendoFoto.set(true);
+    try {
+      await this.alumnosService.subirFotoAlumno(this.alumno.id, archivo);
+      this.toastService.mostrar('Foto actualizada correctamente.', 'success');
+    } catch {
+      this.toastService.mostrar('No se pudo subir la foto. Intentá de nuevo.', 'error');
+    } finally {
+      this.subiendoFoto.set(false);
+      input.value = '';
+    }
   }
 
   get saldoFormateado(): string {

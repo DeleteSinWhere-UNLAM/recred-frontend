@@ -65,7 +65,12 @@
   overflow: hidden;
 }
 
-.perfil-usuario__header--alumno .perfil-usuario__avatar {
+.perfil-usuario__header--alumno .perfil-usuario__avatar-wrapper {
+  position: relative;
+}
+
+.perfil-usuario__header--alumno .perfil-usuario__avatar,
+.perfil-usuario__header--alumno .perfil-usuario__avatar-editar {
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-pizarra) 0%, var(--color-pizarra-dark) 100%);
   box-shadow: 0 8px 18px rgba(74, 111, 165, 0.22);
@@ -91,6 +96,12 @@
   pointer-events: none;
 }
 
+.perfil-usuario__avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
 .perfil-usuario__avatar {
   width: 64px;
   height: 64px;
@@ -104,6 +115,59 @@
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 900;
+  overflow: hidden;
+}
+
+.perfil-usuario__avatar--foto {
+  object-fit: cover;
+  background: none;
+}
+
+.perfil-usuario__avatar-editar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  background-color: rgba(0, 0, 0, 0);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  cursor: pointer;
+}
+
+.perfil-usuario__avatar-wrapper:hover .perfil-usuario__avatar-editar,
+.perfil-usuario__avatar-editar:focus-visible {
+  background-color: rgba(0, 0, 0, 0.44);
+  color: #fff;
+}
+
+.perfil-usuario__avatar-editar:disabled {
+  cursor: not-allowed;
+}
+
+.perfil-usuario__avatar-loader {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: perfil-usuario-girar 0.8s linear infinite;
+  display: inline-block;
+}
+
+.perfil-usuario__input-foto {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .perfil-usuario__heading {
@@ -380,14 +444,16 @@
     padding: 18px 18px 30px;
   }
 
-  .perfil-usuario__avatar {
+  .perfil-usuario__avatar,
+  .perfil-usuario__avatar-editar {
     width: 52px;
     height: 52px;
     border-radius: 16px;
     font-size: 20px;
   }
 
-  .perfil-usuario__header--alumno .perfil-usuario__avatar {
+  .perfil-usuario__header--alumno .perfil-usuario__avatar,
+  .perfil-usuario__header--alumno .perfil-usuario__avatar-editar {
     border-radius: 50%;
   }
 

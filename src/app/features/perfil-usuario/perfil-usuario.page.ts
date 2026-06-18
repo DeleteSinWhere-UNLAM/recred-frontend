@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
@@ -35,7 +35,10 @@ export class PerfilUsuarioPage implements OnInit {
   protected readonly perfil = signal<PerfilUsuario | null>(null);
   protected readonly cargando = signal(false);
   protected readonly guardando = signal(false);
+  protected readonly subiendoFoto = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  @ViewChild('inputFoto') private readonly inputFoto!: ElementRef<HTMLInputElement>;
 
   protected readonly form: PerfilUsuarioForm = new FormGroup({
     firstName: new FormControl('', {
@@ -76,6 +79,10 @@ export class PerfilUsuarioPage implements OnInit {
     const last = perfil?.lastName?.[0] ?? '';
     return `${first}${last}`.toUpperCase() || 'U';
   });
+
+  protected readonly fotoPerfil = computed(
+    () => this.perfil()?.urlFotoPerfil ?? null,
+  );
 
   ngOnInit(): void {
     void this.cargarPerfil();
@@ -143,6 +150,38 @@ export class PerfilUsuarioPage implements OnInit {
     if (!perfil) return;
     this.form.reset(this.valoresDesdePerfil(perfil));
     this.form.markAsPristine();
+  }
+
+  protected abrirSelectorFoto(): void {
+    this.inputFoto.nativeElement.click();
+  }
+
+  protected async onFotoSeleccionada(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    if (!archivo) return;
+
+    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!tiposPermitidos.includes(archivo.type)) {
+      this.toastService.mostrar('Solo se permiten imágenes JPG, PNG o WEBP.', 'error');
+      return;
+    }
+    if (archivo.size > 5 * 1024 * 1024) {
+      this.toastService.mostrar('La imagen no puede superar los 5 MB.', 'error');
+      return;
+    }
+
+    this.subiendoFoto.set(true);
+    try {
+      const perfilActualizado = await this.perfilUsuarioService.subirFotoPerfil(archivo);
+      this.aplicarPerfil(perfilActualizado);
+      this.toastService.mostrar('Foto de perfil actualizada.', 'success');
+    } catch {
+      this.toastService.mostrar('No se pudo subir la foto. Intentá de nuevo.', 'error');
+    } finally {
+      this.subiendoFoto.set(false);
+      input.value = '';
+    }
   }
 
   protected volver(): void {

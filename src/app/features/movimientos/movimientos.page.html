@@ -231,7 +231,11 @@
                   <article class="movimientos__fila">
                     <div class="movimientos__fila-left">
                       <div class="movimientos__iniciales" [attr.data-alumno]="mov.studentId">
-                        {{ getInicialesAlumno(mov.studentId) }}
+                        @if (getFotoPerfilAlumno(mov.studentId); as url) {
+                          <img [src]="url" [alt]="'Foto de ' + getNombreAlumno(mov.studentId)" class="movimientos__avatar-img" />
+                        } @else {
+                          {{ getInicialesAlumno(mov.studentId) }}
+                        }
                       </div>
                       <div class="movimientos__fila-info">
                         <h3 class="movimientos__fila-nombre">{{ getNombreAlumno(mov.studentId) }}</h3>

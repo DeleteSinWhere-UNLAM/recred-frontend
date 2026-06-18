@@ -28,6 +28,8 @@ export class CodigoRetiroCardComponent {
 
   readonly alumnoActual = computed(() => this.alumnoState());
 
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const a = this.alumnoState();
     if (!a) return '';

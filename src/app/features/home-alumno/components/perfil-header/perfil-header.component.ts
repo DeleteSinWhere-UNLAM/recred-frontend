@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 export class PerfilHeaderComponent {
   @Input({ required: true }) iniciales = '';
   @Input({ required: true }) nombreCompleto = '';
+  @Input() urlFotoPerfil: string | null = null;
   @Input({ required: true }) grado = '';
   @Input({ required: true }) colegio = '';
   @Input({ required: true }) saldoFormateado = '';

@@ -5,7 +5,11 @@
 
   <div class="perfil-header__avatar-wrap">
     <div class="perfil-header__avatar">
-      <span>{{ iniciales }}</span>
+      @if (urlFotoPerfil) {
+        <img [src]="urlFotoPerfil" [alt]="'Foto de ' + nombreCompleto" class="perfil-header__avatar-img" />
+      } @else {
+        <span>{{ iniciales }}</span>
+      }
     </div>
     <span class="perfil-header__avatar-emoji" aria-hidden="true">😊</span>
   </div>

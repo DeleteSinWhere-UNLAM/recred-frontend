@@ -33,7 +33,11 @@
             (click)="seleccionar.emit(alumno.id)"
           >
             <span class="modal-alumno__avatar" aria-hidden="true">
-              {{ iniciales(alumno) }}
+              @if (alumno.urlFotoPerfil) {
+                <img [src]="alumno.urlFotoPerfil" [alt]="'Foto de ' + alumno.nombre" class="modal-alumno__avatar-img" />
+              } @else {
+                {{ iniciales(alumno) }}
+              }
             </span>
             <span class="modal-alumno__datos">
               <span class="modal-alumno__nombre">

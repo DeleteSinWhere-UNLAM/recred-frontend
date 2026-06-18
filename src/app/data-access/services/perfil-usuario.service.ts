@@ -38,4 +38,17 @@ export class PerfilUsuarioService {
     this.perfilService.actualizarDatosUsuario(perfil);
     return perfil;
   }
+
+  async subirFotoPerfil(archivo: File): Promise<PerfilUsuario> {
+    const formData = new FormData();
+    formData.append('foto', archivo);
+    const perfil = await firstValueFrom(
+      this.http.post<PerfilUsuario>(
+        `${environment.apiUrl}/users/me/profile/foto`,
+        formData,
+      ),
+    );
+    this.perfilService.actualizarDatosUsuario(perfil);
+    return perfil;
+  }
 }

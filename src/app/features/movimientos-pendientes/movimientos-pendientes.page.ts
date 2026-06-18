@@ -232,6 +232,11 @@ export class MovimientosPendientesPage implements OnInit {
     return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
   }
 
+  getFotoPerfilAlumno(studentId: string): string | null {
+    const alumno = this.alumnosService.getAlumnoById(studentId);
+    return alumno?.urlFotoPerfil ?? null;
+  }
+
   formatearPrecio(precio: number): string {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',

@@ -222,6 +222,8 @@ export class HomeKiosqueroPresenter {
     { id: 'CUSTOM', label: 'Personalizado' },
   ];
 
+  readonly urlFotoPerfil = computed<string | null>(() => this.perfilService.getPerfil()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const partes = this.nombreKiosqueroState().trim().split(/\s+/);
     const primera = partes[0]?.[0] ?? '';
