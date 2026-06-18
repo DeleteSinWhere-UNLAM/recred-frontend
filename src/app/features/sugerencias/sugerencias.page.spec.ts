@@ -112,4 +112,22 @@ describe('SugerenciasPage', () => {
     component.onCloseModal();
     expect(mockPresenter.closeComboPromotionModal).toHaveBeenCalled();
   });
+
+  it('debería llamar a setHomeUrl del usuarioService con "/kiosquero" al construirse', () => {
+    expect(mockUsuarioService.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
+  });
+
+  it('no debería llamar a initialize en el presenter si no hay perfil en localStorage', () => {
+    mockPresenter.initialize.calls.reset();
+    (localStorage.getItem as jasmine.Spy).and.returnValue(null);
+    component.ngOnInit();
+    expect(mockPresenter.initialize).not.toHaveBeenCalled();
+  });
+
+  it('no debería llamar a initialize en el presenter si el perfil en localStorage no tiene id', () => {
+    mockPresenter.initialize.calls.reset();
+    (localStorage.getItem as jasmine.Spy).and.returnValue(JSON.stringify({ name: 'Sin ID' }));
+    component.ngOnInit();
+    expect(mockPresenter.initialize).not.toHaveBeenCalled();
+  });
 });
