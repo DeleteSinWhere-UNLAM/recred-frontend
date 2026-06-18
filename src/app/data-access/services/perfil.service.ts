@@ -29,6 +29,7 @@ interface DatosUsuarioActualizados {
   readonly role?: RolUsuario;
   readonly phone?: string | null;
   readonly documentNumber?: string | null;
+  readonly urlFotoPerfil?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -88,6 +89,7 @@ export class PerfilService {
       rol: datos.role ?? perfil.rol,
       phone: datos.phone ?? perfil.phone,
       documentNumber: datos.documentNumber ?? perfil.documentNumber,
+      urlFotoPerfil: datos.urlFotoPerfil ?? perfil.urlFotoPerfil,
     };
 
     this.perfilState.set(actualizado);

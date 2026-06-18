@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 export class TutorHeaderComponent {
   @Input({ required: true }) iniciales = '';
   @Input({ required: true }) nombreCompleto = '';
+  @Input() urlFotoPerfil: string | null = null;
   @Input({ required: true }) cantidadHijos = 0;
   @Input({ required: true }) cantidadColegios = 0;
   @Input({ required: true }) saldoTotalFormateado = '';

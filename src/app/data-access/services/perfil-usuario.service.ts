@@ -20,10 +20,12 @@ export class PerfilUsuarioService {
     );
   }
 
-  obtenerPerfil(): Promise<PerfilUsuario> {
-    return firstValueFrom(
+  async obtenerPerfil(): Promise<PerfilUsuario> {
+    const perfil = await firstValueFrom(
       this.http.get<PerfilUsuario>(`${environment.apiUrl}/users/me/profile`),
     );
+    this.perfilService.actualizarDatosUsuario(perfil);
+    return perfil;
   }
 
   async actualizarPerfil(

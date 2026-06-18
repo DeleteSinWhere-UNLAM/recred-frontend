@@ -176,3 +176,11 @@
     }
   </div>
 </main>
+
+@if (fotoEvent()) {
+  <app-crop-modal
+    [imageEvent]="fotoEvent()!"
+    (cropped)="onFotoRecortada($event)"
+    (canceled)="onCancelarRecorte()"
+  />
+}

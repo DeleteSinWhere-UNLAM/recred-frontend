@@ -2,7 +2,11 @@
   <div class="tutor-header__profile-container">
     <div class="tutor-header__avatar-wrap">
       <div class="tutor-header__avatar">
-        <span>{{ iniciales }}</span>
+        @if (urlFotoPerfil) {
+          <img [src]="urlFotoPerfil" [alt]="'Foto de ' + nombreCompleto" class="tutor-header__avatar-img" />
+        } @else {
+          <span>{{ iniciales }}</span>
+        }
       </div>
     </div>
 
