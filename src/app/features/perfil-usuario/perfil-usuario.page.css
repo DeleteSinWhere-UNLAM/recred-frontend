@@ -298,7 +298,8 @@
   font-weight: 800;
 }
 
-.perfil-usuario__campo input {
+.perfil-usuario__campo input,
+.perfil-usuario__campo select {
   width: 100%;
   height: 44px;
   border: 1px solid var(--color-borde-fuerte);
@@ -312,15 +313,80 @@
     box-shadow var(--transition-ui);
 }
 
-.perfil-usuario__campo input:focus {
+.perfil-usuario__campo input:focus,
+.perfil-usuario__campo select:focus {
   outline: none;
   border-color: var(--color-pizarra);
   box-shadow: 0 0 0 4px var(--color-foco);
 }
 
-.perfil-usuario__campo input.perfil-usuario__input--error {
+.perfil-usuario__campo input.perfil-usuario__input--error,
+.perfil-usuario__campo select.perfil-usuario__input--error {
   border-color: var(--color-melocoton);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-melocoton) 16%, transparent);
+}
+
+.perfil-usuario__campo select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='%2394A3B8'><path d='M7 10l5 5 5-5H7z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px !important;
+}
+
+.perfil-usuario__divider {
+  height: 1px;
+  background-color: var(--color-borde);
+  margin: 32px 0 24px;
+  width: 100%;
+}
+
+.perfil-usuario__campo--full {
+  grid-column: 1 / -1;
+}
+
+.perfil-usuario__payout-section {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.perfil-usuario__payout-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 18px;
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde-fuerte);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.perfil-usuario__payout-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 200px;
+}
+
+.perfil-usuario__payout-info-item i {
+  font-size: 18px;
+  color: var(--color-pizarra);
+}
+
+.perfil-usuario__payout-info-item .info-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-texto-claro);
+  letter-spacing: 0.05em;
+}
+
+.perfil-usuario__payout-info-item .info-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
 }
 
 .perfil-usuario__campo small {
