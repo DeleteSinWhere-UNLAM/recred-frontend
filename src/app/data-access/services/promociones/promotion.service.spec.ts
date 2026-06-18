@@ -3,17 +3,21 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { PromotionService, Promotion } from './promotion.service';
 import { environment } from '../../../../environments/environment';
+import { PerfilService } from '../perfil.service';
 
 describe('PromotionService', () => {
   let service: PromotionService;
   let httpMock: HttpTestingController;
+  let mockPerfilService: jasmine.SpyObj<PerfilService>;
 
   beforeEach(() => {
+    mockPerfilService = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
     TestBed.configureTestingModule({
       providers: [
         PromotionService,
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        { provide: PerfilService, useValue: mockPerfilService }
       ]
     });
     service = TestBed.inject(PromotionService);
@@ -25,8 +29,9 @@ describe('PromotionService', () => {
   });
 
   describe('approvePromotion', () => {
-    it('Dado que se llama a approvePromotion con un ID válido, debería hacer un PUT a /promotions/:id con status ACTIVE', () => {
+    it('Dado que se llama a approvePromotion con un ID válido, debería hacer un PUT a /promotions/:id con status ACTIVE y buffetId', () => {
       const mockId = 'promo-123';
+      const mockBuffetId = 'buffet-123';
       const mockResponse: Promotion = {
         id: mockId,
         name: 'Promo Test',
@@ -34,16 +39,17 @@ describe('PromotionService', () => {
         productIds: [],
         startDate: '2026-06-12',
         endDate: '2026-06-20',
-        status: 'ACTIVE'
+        status: 'ACTIVE',
+        buffetId: mockBuffetId
       };
 
-      service.approvePromotion(mockId).subscribe(response => {
+      service.approvePromotion(mockId, mockBuffetId).subscribe(response => {
         expect(response).toEqual(mockResponse);
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}/promotions/${mockId}`);
       expect(req.request.method).toBe('PUT');
-      expect(req.request.body).toEqual({ status: 'ACTIVE' });
+      expect(req.request.body).toEqual({ status: 'ACTIVE', buffetId: mockBuffetId });
       req.flush(mockResponse);
     });
   });
@@ -63,7 +69,8 @@ describe('PromotionService', () => {
   });
 
   describe('createPromotion', () => {
-    it('Dado que se llama a createPromotion con una promoción, debería hacer un POST a /promotions', () => {
+    it('Dado que se llama a createPromotion con una promoción, debería hacer un POST a /promotions con buffetId', () => {
+      mockPerfilService.obtenerBuffetId.and.returnValue('buffet-123');
       const mockPromo: Partial<Promotion> = {
         name: 'Promo Test',
         discountPercentage: 10,
@@ -75,7 +82,8 @@ describe('PromotionService', () => {
       const mockResponse: Promotion = {
         ...mockPromo,
         id: 'promo-123',
-        status: 'ACTIVE'
+        status: 'ACTIVE',
+        buffetId: 'buffet-123'
       } as Promotion;
 
       service.createPromotion(mockPromo).subscribe(response => {
@@ -84,7 +92,7 @@ describe('PromotionService', () => {
 
       const req = httpMock.expectOne(`${environment.apiUrl}/promotions`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(mockPromo);
+      expect(req.request.body).toEqual({ ...mockPromo, buffetId: 'buffet-123' });
       req.flush(mockResponse);
     });
   });
