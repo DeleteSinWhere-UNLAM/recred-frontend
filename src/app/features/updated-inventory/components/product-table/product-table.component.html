@@ -25,16 +25,6 @@
           [class.product-card--updated]="isHighlighted(product)"
         >
           <header class="product-card__header">
-            <div class="product-card__media">
-              <img
-                class="product-card__image"
-                [src]="product.urlImagen || IMAGEN_FALLBACK"
-                [alt]="product.nombre"
-                loading="lazy"
-                (error)="onImagenError($event)"
-              />
-            </div>
-
             <div class="product-card__title-group">
               <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
               <div class="product-card__name-container">
@@ -54,11 +44,15 @@
               <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
             </div>
 
-            @if (product.image) {
-              <div class="product-card__image-wrapper">
-                <img [src]="product.image" [alt]="product.nombre" class="product-card__image" />
-              </div>
-            }
+            <div class="product-card__image-wrapper">
+              <img
+                [src]="product.urlImagen || IMAGEN_FALLBACK"
+                [alt]="product.nombre"
+                class="product-card__image"
+                loading="lazy"
+                (error)="onImagenError($event)"
+              />
+            </div>
           </header>
 
           <section class="product-card__availability" aria-label="Disponibilidad">

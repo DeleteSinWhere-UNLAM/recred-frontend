@@ -4,7 +4,6 @@ export interface Product {
   descripcion: string;
   precio: number;
   peso: number;
-  image?: string;
   requierePreparacion: boolean;
   stockActual: number;
   urlImagen?: string | null;
