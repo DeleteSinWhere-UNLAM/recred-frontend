@@ -12,7 +12,7 @@ export interface PromocionCreada {
   startDate: string;
   endDate: string;
   status: string;
-  buffetId?: string;
+  buffet_id?: string;
 }
 
 export interface RecomendacionesResponse {

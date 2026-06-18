@@ -24,7 +24,7 @@ export class PromotionService {
   private readonly apiUrl = `${environment.apiUrl}/promotions`;
 
   getPromotions(): Observable<Promotion[]> {
-    return this.http.get<Promotion[]>(this.apiUrl);
+    return this.http.get<Promotion[]>(`${this.apiUrl}/buffet/${this.perfilService.obtenerBuffetId()}`);
   }
 
   approvePromotion(id: string, buffetId: string): Observable<Promotion> {
