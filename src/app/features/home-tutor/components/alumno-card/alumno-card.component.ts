@@ -8,6 +8,7 @@ import { MovimientosService } from '../../../movimientos/services/movimientos.se
 import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { MicrocreditosService, SchoolCredit } from '../../../../data-access/services/microcreditos.service';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { CropModalComponent } from '../../../perfil-usuario/components/crop-modal/crop-modal.component';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -20,7 +21,7 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   selector: 'app-alumno-card',
   templateUrl: './alumno-card.component.html',
   styleUrl: './alumno-card.component.css',
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlumnoCardComponent implements OnInit {
@@ -34,6 +35,7 @@ export class AlumnoCardComponent implements OnInit {
   private readonly _cantidadPendientes = signal<number>(0);
   creditoActivo = signal<SchoolCredit | null>(null);
   readonly subiendoFoto = signal(false);
+  protected readonly fotoEvent = signal<Event | null>(null);
 
   @ViewChild('inputFotoAlumno') private readonly inputFotoAlumno!: ElementRef<HTMLInputElement>;
 
@@ -79,16 +81,32 @@ export class AlumnoCardComponent implements OnInit {
     const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
     if (!tiposPermitidos.includes(archivo.type)) {
       this.toastService.mostrar('Solo se permiten imágenes JPG, PNG o WEBP.', 'error');
+      input.value = '';
       return;
     }
     if (archivo.size > 5 * 1024 * 1024) {
       this.toastService.mostrar('La imagen no puede superar los 5 MB.', 'error');
+      input.value = '';
       return;
     }
 
+    this.fotoEvent.set(event);
+  }
+
+  protected async onFotoRecortada(blob: Blob): Promise<void> {
+    const event = this.fotoEvent();
+    if (!event) return;
+
+    const input = event.target as HTMLInputElement;
+    const originalFile = input.files?.[0];
+    if (!originalFile) return;
+
+    this.fotoEvent.set(null);
     this.subiendoFoto.set(true);
+
     try {
-      await this.alumnosService.subirFotoAlumno(this.alumno.id, archivo);
+      const archivoRecortado = new File([blob], originalFile.name, { type: 'image/webp' });
+      await this.alumnosService.subirFotoAlumno(this.alumno.id, archivoRecortado);
       this.toastService.mostrar('Foto actualizada correctamente.', 'success');
     } catch {
       this.toastService.mostrar('No se pudo subir la foto. Intentá de nuevo.', 'error');
@@ -96,6 +114,14 @@ export class AlumnoCardComponent implements OnInit {
       this.subiendoFoto.set(false);
       input.value = '';
     }
+  }
+
+  protected onCancelarRecorte(): void {
+    const event = this.fotoEvent();
+    if (event) {
+      (event.target as HTMLInputElement).value = '';
+    }
+    this.fotoEvent.set(null);
   }
 
   get saldoFormateado(): string {
