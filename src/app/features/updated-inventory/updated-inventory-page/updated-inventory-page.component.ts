@@ -16,9 +16,11 @@ import { ProductFormComponent, ProductFormData } from '../components/product-for
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
 import { InventoryRealtimeService } from '../services/inventory-realtime.service';
 import {
+  EstadoInventario,
   InventoryOverviewItem,
   InventoryStockMovement,
   InventoryStockUpdateRequest,
+  RealtimeInventoryEvent,
   TipoManejoInventario,
 } from '../models/inventory.interface';
 import {
@@ -172,6 +174,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     stockMinimo: [null as number | null, [Validators.min(0)]],
     cupoMaximoDiario: [null as number | null, [Validators.min(0)]],
     disponible: [true],
+    estadoInventario: [null as EstadoInventario | null],
     motivo: [''],
   });
 
@@ -532,7 +535,16 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
 
   onInventoryModeChange(): void {
     this.updateInventoryManagementValidators();
-    this.setDefaultInventoryManagementMotivo();
+    const mode = this.getInventoryManagementMode();
+    const defaultMotivo = INVENTORY_MODE_DEFAULT_MOTIVOS[mode] || '';
+    
+    const patchValues: any = { motivo: defaultMotivo };
+    if (mode === 'STOCK_EXACTO') {
+      patchValues.disponible = true;
+      patchValues.estadoInventario = 'DISPONIBLE';
+    }
+    
+    this.inventoryManagementForm.patchValue(patchValues);
   }
 
   applyInventoryManagementShortcut(
@@ -542,6 +554,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       this.inventoryManagementForm.patchValue({
         tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
         disponible: true,
+        estadoInventario: 'DISPONIBLE',
         motivo: 'Producto disponible',
       });
     }
@@ -550,6 +563,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       this.inventoryManagementForm.patchValue({
         tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
         disponible: false,
+        estadoInventario: 'DESACTIVADO',
         motivo: 'Pausado temporalmente',
       });
     }
@@ -561,6 +575,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
         this.inventoryManagementForm.patchValue({
           cupoMaximoDiario: 0,
           disponible: true,
+          estadoInventario: 'SIN_STOCK',
           motivo: 'Marcar agotado',
         });
       } else {
@@ -574,6 +589,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
           stockActual: 0,
           stockMinimo,
           disponible: true,
+          estadoInventario: 'SIN_STOCK',
           motivo: 'Marcar agotado',
         });
       }
@@ -588,6 +604,16 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     }
 
     this.updateInventoryManagementValidators();
+    
+    // Sincronizar estadoInventario con disponible si estamos en modo DISPONIBLE_NO_DISPONIBLE
+    // y no se ha tocado explícitamente (o para asegurar consistencia en tests)
+    const values = this.inventoryManagementForm.value;
+    if (values.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE') {
+      const targetEstado = values.disponible ? 'DISPONIBLE' : 'DESACTIVADO';
+      if (values.estadoInventario !== targetEstado) {
+        this.inventoryManagementForm.patchValue({ estadoInventario: targetEstado });
+      }
+    }
 
     if (this.inventoryManagementForm.invalid) {
       this.inventoryManagementForm.markAllAsTouched();
@@ -726,8 +752,16 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     this.realtimeAbortController = this.inventoryRealtimeService.connect(
       buffetId,
       {
-        onRefresh: () => {
-          this.zone.run(() => this.scheduleRealtimeRefresh());
+        onRefresh: (event) => {
+          this.zone.run(() => this.scheduleRealtimeRefresh(event));
+        },
+        onPurchaseCreated: (event) => {
+          this.zone.run(() => {
+            const total = event.purchaseTotal
+              ? ` - Total: ${this.purchaseTotalFormatter.format(event.purchaseTotal)}`
+              : '';
+            this.toastService.mostrar(`${event.message || 'Nueva compra'}${total}`, 'success');
+          });
         },
         onError: (error) => {
           console.warn('SSE de inventario desconectado o reintentando', error);
@@ -736,7 +770,27 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  private scheduleRealtimeRefresh(): void {
+  private scheduleRealtimeRefresh(event: RealtimeInventoryEvent): void {
+    if (event.productId) {
+      const productId = event.productId;
+      const newHighlighted = new Set(this.highlightedProductIds);
+      newHighlighted.add(productId);
+      this.highlightedProductIds = newHighlighted;
+
+      if (this.highlightTimeoutIds.has(productId)) {
+        window.clearTimeout(this.highlightTimeoutIds.get(productId));
+      }
+
+      const timeoutId = window.setTimeout(() => {
+        const currentHighlighted = new Set(this.highlightedProductIds);
+        currentHighlighted.delete(productId);
+        this.highlightedProductIds = currentHighlighted;
+        this.highlightTimeoutIds.delete(productId);
+      }, 3000);
+
+      this.highlightTimeoutIds.set(productId, timeoutId);
+    }
+
     if (this.refreshTimeoutId !== null) {
       return;
     }
@@ -755,6 +809,25 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       .trim();
   }
 
+  private highlightProduct(productId: string): void {
+    const newHighlighted = new Set(this.highlightedProductIds);
+    newHighlighted.add(productId);
+    this.highlightedProductIds = newHighlighted;
+
+    if (this.highlightTimeoutIds.has(productId)) {
+      window.clearTimeout(this.highlightTimeoutIds.get(productId));
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const currentHighlighted = new Set(this.highlightedProductIds);
+      currentHighlighted.delete(productId);
+      this.highlightedProductIds = currentHighlighted;
+      this.highlightTimeoutIds.delete(productId);
+    }, 3000);
+
+    this.highlightTimeoutIds.set(productId, timeoutId);
+  }
+
   private openInventoryManagementFromQuery(data: InventoryOverviewItem[]): void {
     if (!this.inventoryManagementProductIdFromQuery) {
       return;
@@ -766,6 +839,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
 
     if (product) {
       this.openInventoryManagement(product);
+      this.highlightProduct(product.productId);
     }
 
     // Limpiar el query param para que no se abra de nuevo al refrescar
@@ -793,6 +867,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       stockMinimo: product.stockMinimo,
       cupoMaximoDiario: product.cupoMaximoDiario,
       disponible: product.disponible,
+      estadoInventario: product.estadoInventario,
       motivo: '',
     });
     this.updateInventoryManagementValidators();
@@ -833,8 +908,18 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       tipoManejoInventario: mode,
       disponible: !!values.disponible,
       motivo: values.motivo || 'Actualización manual',
-      usuarioId: this.obtenerUsuarioIdActual(),
     };
+
+    const usuarioId = this.obtenerUsuarioIdActual();
+    if (usuarioId) {
+      payload.usuarioId = usuarioId;
+    }
+
+    if (values.estadoInventario) {
+      payload.estadoInventario = values.estadoInventario as EstadoInventario;
+    } else if (mode === 'DISPONIBLE_NO_DISPONIBLE') {
+      payload.estadoInventario = values.disponible ? 'DISPONIBLE' : 'DESACTIVADO';
+    }
 
     if (mode === 'STOCK_EXACTO') {
       payload.stockActual = values.stockActual ?? 0;
