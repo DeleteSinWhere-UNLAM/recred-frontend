@@ -78,6 +78,10 @@ export class ProductService {
     return this.http.post<Product>(this.baseUrl, payload);
   }
 
+  createBulk(products: CreateProductRequest[]): Observable<Product[]> {
+    return this.http.post<Product[]>(`${this.baseUrl}/bulk`, products);
+  }
+
   update(id: string, payload: UpdateProductRequest): Observable<Product> {
     return this.http.put<Product>(`${this.baseUrl}/${id}`, payload);
   }

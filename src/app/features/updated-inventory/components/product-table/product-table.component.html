@@ -25,33 +25,34 @@
           [class.product-card--updated]="isHighlighted(product)"
         >
           <header class="product-card__header">
-            <div class="product-card__media">
+            <div class="product-card__title-group">
+              <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
+              <div class="product-card__name-container">
+                <h4 class="product-card__name">{{ product.nombre }}</h4>
+                <span
+                  class="product-card__status"
+                  [class.product-card__status--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+                  [class.product-card__status--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+                  [class.product-card__status--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
+                  [class.product-card__status--pausado]="getOperationalStatus(product) === 'PAUSADO'"
+                  [class.product-card__status--ok]="getOperationalStatus(product) === 'OK'"
+                >
+                  <i class="fa-solid" [ngClass]="getStatusIcon(product)" aria-hidden="true"></i>
+                  {{ getStatusLabel(product) }}
+                </span>
+              </div>
+              <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+
+            <div class="product-card__image-wrapper">
               <img
-                class="product-card__image"
                 [src]="product.urlImagen || IMAGEN_FALLBACK"
                 [alt]="product.nombre"
+                class="product-card__image"
                 loading="lazy"
                 (error)="onImagenError($event)"
               />
             </div>
-
-            <div class="product-card__title-group">
-              <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
-              <h4 class="product-card__name">{{ product.nombre }}</h4>
-              <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
-            </div>
-
-            <span
-              class="product-card__status"
-              [class.product-card__status--agotado]="getOperationalStatus(product) === 'AGOTADO'"
-              [class.product-card__status--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
-              [class.product-card__status--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
-              [class.product-card__status--pausado]="getOperationalStatus(product) === 'PAUSADO'"
-              [class.product-card__status--ok]="getOperationalStatus(product) === 'OK'"
-            >
-              <i class="fa-solid" [ngClass]="getStatusIcon(product)" aria-hidden="true"></i>
-              {{ getStatusLabel(product) }}
-            </span>
           </header>
 
           <section class="product-card__availability" aria-label="Disponibilidad">
