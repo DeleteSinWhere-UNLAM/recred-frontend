@@ -238,7 +238,7 @@ export class TutorDashboardComponent implements OnInit {
     this.saveLayout();
   }
 
-  private saveTimeout: any;
+  private saveTimeout: ReturnType<typeof setTimeout> | undefined;
 
   saveLayout() {
     const configStr = JSON.stringify(this.dashboardItems);
