@@ -41,6 +41,8 @@ export class HomeAlumnoPresenter {
     return a ? `${a.nombre} ${a.apellido}` : '';
   });
 
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const a = this.alumnoState();
     if (!a) return '';

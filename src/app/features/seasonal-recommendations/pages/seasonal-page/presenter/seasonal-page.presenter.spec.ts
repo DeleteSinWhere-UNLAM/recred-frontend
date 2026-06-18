@@ -4,6 +4,7 @@ import { RecomendacionesService } from '../../../services/recomendaciones.servic
 import { ProductService } from '../../../../updated-inventory/services/product.service';
 import { PromotionService } from '../../../../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../../../../shared/services/toast.service';
+import { PerfilService } from '../../../../../data-access/services/perfil.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
@@ -14,6 +15,7 @@ describe('SeasonalPagePresenter', () => {
   let mockPromotionService: jasmine.SpyObj<PromotionService>;
   let mockToastService: jasmine.SpyObj<ToastService>;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockPerfilService: jasmine.SpyObj<PerfilService>;
 
   beforeEach(() => {
     mockRecomendacionesService = jasmine.createSpyObj('RecomendacionesService', ['getSeasonalRecommendations']);
@@ -21,6 +23,9 @@ describe('SeasonalPagePresenter', () => {
     mockPromotionService = jasmine.createSpyObj('PromotionService', ['approvePromotion', 'discardPromotion']);
     mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
+    mockPerfilService = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
+
+    mockPerfilService.obtenerBuffetId.and.returnValue('buffet-123');
 
     TestBed.configureTestingModule({
       providers: [
@@ -29,7 +34,8 @@ describe('SeasonalPagePresenter', () => {
         { provide: ProductService, useValue: mockProductService },
         { provide: PromotionService, useValue: mockPromotionService },
         { provide: ToastService, useValue: mockToastService },
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: PerfilService, useValue: mockPerfilService }
       ]
     });
 
@@ -54,7 +60,7 @@ describe('SeasonalPagePresenter', () => {
     it('Dado que la promoción se aprueba exitosamente, debe mostrar toast de éxito y cerrar el modal', () => {
       mockPromotionService.approvePromotion.and.returnValue(of({} as import('../../../../../data-access/services/promociones/promotion.service').Promotion));
       presenter.approvePromotion('1');
-      expect(mockPromotionService.approvePromotion).toHaveBeenCalledWith('1');
+      expect(mockPromotionService.approvePromotion).toHaveBeenCalledWith('1', 'buffet-123');
       expect(mockToastService.mostrar).toHaveBeenCalledWith('Promoción aprobada exitosamente', 'success');
       expect(presenter.showModal()).toBeFalse();
     });

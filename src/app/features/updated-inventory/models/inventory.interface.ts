@@ -13,6 +13,7 @@ export interface InventoryOverviewItem {
   productId: string;
   nombre: string;
   precio: number;
+  urlImagen?: string | null;
   tipoManejoInventario: TipoManejoInventario;
   estadoInventario: EstadoInventario;
   stockActual: number | null;

@@ -1,4 +1,4 @@
-export interface CreateProductRequest {
+﻿export interface CreateProductRequest {
   nombre: string;
   descripcion: string;
   precio: number;
@@ -10,4 +10,5 @@ export interface CreateProductRequest {
   stockActual: number;
   clasificacionesSaludIds: string[];
   tiposIds: null;
+  urlImagen?: string | null;
 }

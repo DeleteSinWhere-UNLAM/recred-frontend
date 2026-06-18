@@ -78,6 +78,7 @@ export interface PanelKiosqueroProducts {
 export interface PanelKiosqueroProductTotal {
   productId: string;
   productName: string;
+  urlImagen?: string | null;
   quantity: number;
   total: number;
 }
@@ -85,6 +86,7 @@ export interface PanelKiosqueroProductTotal {
 export interface PanelKiosqueroInventoryProduct {
   productId: string;
   productName: string;
+  urlImagen?: string | null;
   stockDisponible: number;
   stockMinimo: number;
   estadoInventario: KiosqueroInventoryStatus;

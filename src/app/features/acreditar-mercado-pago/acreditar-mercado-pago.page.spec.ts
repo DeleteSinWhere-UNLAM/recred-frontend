@@ -21,7 +21,8 @@ describe('AcreditarMercadoPagoPage', () => {
       alumno: signal(undefined),
       nombreCompleto: signal(''),
       grado: signal(''),
-      iniciales: signal('')
+      iniciales: signal(''),
+      urlFotoPerfil: signal(null)
     });
 
     await TestBed.configureTestingModule({

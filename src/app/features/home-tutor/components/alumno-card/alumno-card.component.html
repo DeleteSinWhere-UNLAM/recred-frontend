@@ -2,10 +2,43 @@
   
   <header class="alumno-card__header">
     <div class="alumno-card__identidad">
-      <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreCompleto">
-        <div class="alumno-card__avatar">
-          <span>{{ iniciales }}</span>
-        </div>
+      <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Foto de ' + nombreCompleto">
+        @if (fotoPerfil) {
+          <img
+            class="alumno-card__avatar alumno-card__avatar--foto"
+            [src]="fotoPerfil"
+            [alt]="nombreCompleto"
+          />
+        } @else {
+          <div class="alumno-card__avatar">
+            <span>{{ iniciales }}</span>
+          </div>
+        }
+        @if (esPadre) {
+          <button
+            type="button"
+            class="alumno-card__avatar-editar"
+            [disabled]="subiendoFoto()"
+            (click)="abrirSelectorFoto()"
+            [title]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
+            [attr.aria-label]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de ' + alumno.nombre"
+          >
+            @if (subiendoFoto()) {
+              <span class="alumno-card__avatar-loader" aria-hidden="true"></span>
+            } @else {
+              <i class="fa-solid fa-pen" aria-hidden="true"></i>
+            }
+          </button>
+          <input
+            #inputFotoAlumno
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            class="alumno-card__input-foto"
+            aria-hidden="true"
+            tabindex="-1"
+            (change)="onFotoSeleccionada($event)"
+          />
+        }
       </div>
       <div class="alumno-card__texto">
         <h3 class="alumno-card__nombre">{{ nombreCompleto }}</h3>
@@ -263,4 +296,12 @@
       }
     </div>
   </div>
+}
+
+@if (fotoEvent()) {
+  <app-crop-modal
+    [imageEvent]="fotoEvent()!"
+    (cropped)="onFotoRecortada($event)"
+    (canceled)="onCancelarRecorte()"
+  />
 }

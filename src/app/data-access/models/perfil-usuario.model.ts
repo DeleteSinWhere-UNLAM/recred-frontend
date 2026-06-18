@@ -11,6 +11,7 @@ export interface UsuarioLogueado {
 export interface PerfilUsuario extends UsuarioLogueado {
   readonly phone?: string | null;
   readonly documentNumber?: string | null;
+  readonly urlFotoPerfil?: string | null;
 }
 
 export interface ActualizarPerfilUsuarioRequest {

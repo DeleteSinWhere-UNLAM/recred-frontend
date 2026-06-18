@@ -1,4 +1,4 @@
-export interface SaveProductRequest {
+﻿export interface SaveProductRequest {
   nombre: string;
   descripcion: string;
   precio: number;
@@ -10,4 +10,5 @@ export interface SaveProductRequest {
   stockActual: number;
   clasificacionesSaludIds: string[];
   tiposIds: string[];
+  urlImagen?: string | null;
 }

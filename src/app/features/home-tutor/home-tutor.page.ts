@@ -40,12 +40,27 @@ export class HomeTutorPage implements OnInit {
   private readonly colegiosService = inject(ColegiosService);
   private readonly alumnosService = inject(AlumnosService);
 
-  private readonly perfil = this.perfilService.getPerfil();
   private readonly alumnos = this.alumnosService.alumnos;
 
-  readonly nombreUsuario = this.perfil?.nombre ?? this.usuarioService.getUsuarioActual().nombre;
-  readonly nombreCompletoTutor = this.armarNombreCompleto();
-  readonly inicialesTutor = this.armarIniciales();
+  readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
+  
+  readonly nombreCompletoTutor = computed(() => {
+    const perfil = this.perfilService.perfil();
+    if (perfil) {
+      return `${perfil.nombre} ${perfil.apellido}`.trim();
+    }
+    return this.nombreUsuario();
+  });
+
+  readonly inicialesTutor = computed(() => {
+    const perfil = this.perfilService.perfil();
+    const nombre = perfil?.nombre ?? this.usuarioService.getUsuarioActual().nombre;
+    const apellido = perfil?.apellido ?? '';
+    const ini = (nombre[0] ?? '') + (apellido[0] ?? '');
+    return ini.toUpperCase();
+  });
+
+  readonly urlFotoPerfilTutor = computed(() => this.perfilService.perfil()?.urlFotoPerfil ?? null);
 
   readonly grupos = computed<GrupoColegio[]>(() => {
     const alumnos = this.alumnos();
@@ -75,24 +90,10 @@ export class HomeTutorPage implements OnInit {
 
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
-    this.usuarioService.setNombreNavbar(this.nombreUsuario);
+    this.usuarioService.setNombreNavbar(this.nombreUsuario());
   }
 
   ngOnInit(): void {
     void this.alumnosService.asegurarCargados(true);
-  }
-
-  private armarNombreCompleto(): string {
-    if (this.perfil) {
-      return `${this.perfil.nombre} ${this.perfil.apellido}`.trim();
-    }
-    return this.nombreUsuario;
-  }
-
-  private armarIniciales(): string {
-    const nombre = this.perfil?.nombre ?? this.nombreUsuario;
-    const apellido = this.perfil?.apellido ?? '';
-    const ini = (nombre[0] ?? '') + (apellido[0] ?? '');
-    return ini.toUpperCase();
   }
 }

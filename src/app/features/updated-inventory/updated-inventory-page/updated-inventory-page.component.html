@@ -1,4 +1,4 @@
-<app-navbar />
+﻿<app-navbar />
 
 <main class="inventario">
   <div class="inventario__container">
@@ -152,11 +152,31 @@
       (deleteProduct)="requestDeleteFromInventory($event)">
     </app-product-table>
 
+    @if (isSelectionModalVisible) {
+      <app-upload-selection-modal
+        (individualUpload)="openIndividualForm()"
+        (bulkUpload)="openBulkUploadModal()"
+        (closeModal)="closeSelectionModal()"
+      />
+    }
+
+    @if (isBulkUploadModalVisible) {
+      <app-bulk-upload-table-modal
+        [isProcessingFile]="isProcessingFile"
+        [prefilledProducts]="bulkProductsData"
+        [categories]="categories"
+        (fileSelected)="handleFileUpload($event)"
+        (saveProducts)="handleBulkProductsSave($event)"
+        (closeModal)="closeBulkUploadModal()"
+      />
+    }
+
     @if (isFormVisible) {
       <app-product-form
         [product]="selectedProduct"
         [categories]="categories"
         [isSaving]="isSaving"
+        [buffetId]="buffetId"
         (formSubmit)="handleFormSubmit($event)"
         (formCancel)="closeForm()">
       </app-product-form>

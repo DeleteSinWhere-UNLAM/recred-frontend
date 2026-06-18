@@ -57,6 +57,8 @@ export class RestriccionesNutricionalesPresenter {
     return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
   });
 
+  readonly urlFotoPerfil = computed<string | null>(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');
 
   readonly iniciales = computed(() => {

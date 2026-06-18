@@ -10,6 +10,7 @@ interface ProductDTO {
   nombre: string;
   descripcion?: string | null;
   precio: number;
+  urlImagen?: string | null;
   stockActual?: number;
   categoria?: { id: string; descripcion: string } | null;
   clasificacionesSalud?: { id: string; descripcion: string }[] | null;
@@ -109,7 +110,7 @@ export class FavoritosService {
       precio: dto.precio,
       categoria: dto.categoria ?? { id: 'comidas', descripcion: 'Comidas' },
       clasificacionesSalud: dto.clasificacionesSalud ?? [],
-      imagen: this.obtenerImagenProducto(dto.nombre),
+      imagen: dto.urlImagen || this.obtenerImagenProducto(dto.nombre),
       estadoStock: (dto.stockActual !== undefined ? dto.stockActual : 1) > 0 ? 'DISPONIBLE' : 'SIN_STOCK'
     };
   }

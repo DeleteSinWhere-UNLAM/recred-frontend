@@ -23,7 +23,8 @@ describe('AlumnosService', () => {
     apellido: 'García',
     grado: '4to Año A',
     colegioId: '1',
-    saldo: 2000
+    saldo: 2000,
+    urlFotoPerfil: null
   };
 
   const mockAlumnoActual: Alumno = {

@@ -1,10 +1,11 @@
-<app-navbar [userName]="nombreUsuario" />
+<app-navbar [userName]="nombreUsuario()" />
 
 <main class="home">
   <div class="home__container">
     <app-tutor-header
-      [iniciales]="inicialesTutor"
-      [nombreCompleto]="nombreCompletoTutor"
+      [iniciales]="inicialesTutor()"
+      [nombreCompleto]="nombreCompletoTutor()"
+      [urlFotoPerfil]="urlFotoPerfilTutor()"
       [cantidadHijos]="cantidadHijos()"
       [cantidadColegios]="cantidadColegios()"
       [saldoTotalFormateado]="saldoTotalFormateado()"

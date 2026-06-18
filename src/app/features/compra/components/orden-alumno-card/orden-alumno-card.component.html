@@ -18,7 +18,11 @@
       </label>
 
       <div class="orden-alumno__avatar" aria-hidden="true">
-        <span>{{ iniciales() }}</span>
+        @if (urlFotoPerfil()) {
+          <img [src]="urlFotoPerfil()" [alt]="'Foto de ' + nombreCompleto()" class="orden-alumno__avatar-img" />
+        } @else {
+          <span>{{ iniciales() }}</span>
+        }
       </div>
 
       <div class="orden-alumno__identidad">

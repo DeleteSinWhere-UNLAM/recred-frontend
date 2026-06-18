@@ -14,6 +14,7 @@ interface StudentDTO {
   readonly grado?: string | null;
   readonly colegioId?: string | null;
   readonly saldo?: number | string | null;
+  readonly urlFotoPerfil?: string | null;
 }
 
 export interface CrearHijoRequest {
@@ -166,6 +167,22 @@ export class AlumnosService {
     return undefined;
   }
 
+  async subirFotoAlumno(alumnoId: string, archivo: File): Promise<Alumno> {
+    const formData = new FormData();
+    formData.append('foto', archivo);
+    const dto = await firstValueFrom(
+      this.http.post<StudentDTO>(
+        `${environment.apiUrl}/tutores/me/hijos/${alumnoId}/foto`,
+        formData,
+      ),
+    );
+    const alumnoActualizado = this.fromDto(dto);
+    this.alumnosState.update((actuales) =>
+      actuales.map((a) => (a.id === alumnoId ? alumnoActualizado : a)),
+    );
+    return alumnoActualizado;
+  }
+
   private fromDto(dto: StudentDTO): Alumno {
     return {
       id: dto.id,
@@ -174,6 +191,7 @@ export class AlumnosService {
       grado: dto.grado ?? '',
       colegioId: dto.colegioId ?? '',
       saldo: Number(dto.saldo ?? 0),
+      urlFotoPerfil: dto.urlFotoPerfil ?? null,
     };
   }
 }

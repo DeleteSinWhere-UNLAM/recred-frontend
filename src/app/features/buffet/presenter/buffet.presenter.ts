@@ -153,6 +153,8 @@ export class BuffetPresenter {
     return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
   });
 
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const alumno = this.alumnoState();
     if (!alumno) return '';

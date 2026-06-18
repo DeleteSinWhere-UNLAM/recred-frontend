@@ -1,4 +1,4 @@
-export interface UpdateProductRequest {
+﻿export interface UpdateProductRequest {
   nombre: string;
   descripcion: string;
   precio: number;
@@ -8,4 +8,5 @@ export interface UpdateProductRequest {
   buffetId: string;
   categoriaId: string;
   clasificacionesSaludIds: string[];
+  urlImagen?: string | null;
 }

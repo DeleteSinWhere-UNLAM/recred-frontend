@@ -5,6 +5,7 @@ import { RecomendacionesService } from '../../../services/recomendaciones.servic
 import { ProductService } from '../../../../updated-inventory/services/product.service';
 import { PromotionService } from '../../../../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../../../../shared/services/toast.service';
+import { PerfilService } from '../../../../../data-access/services/perfil.service';
 import { Sugerencia, PromocionCreada } from '../../../models/recomendacion.model';
 import { Product } from '../../../../updated-inventory/models/product.interface';
 
@@ -15,6 +16,7 @@ export class SeasonalPagePresenter {
   private readonly promotionService = inject(PromotionService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly perfilService = inject(PerfilService);
 
   private readonly isLoadingState = signal<boolean>(false);
   private readonly errorState = signal<string | null>(null);
@@ -135,7 +137,8 @@ export class SeasonalPagePresenter {
 
   approvePromotion(id: string): void {
     this.isLoadingState.set(true);
-    this.promotionService.approvePromotion(id).pipe(
+    const buffetId = this.perfilService.obtenerBuffetId() ?? '';
+    this.promotionService.approvePromotion(id, buffetId).pipe(
       finalize(() => this.isLoadingState.set(false))
     ).subscribe({
       next: () => {
