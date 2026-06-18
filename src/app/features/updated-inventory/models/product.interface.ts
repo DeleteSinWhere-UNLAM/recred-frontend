@@ -7,6 +7,7 @@ export interface Product {
   image?: string;
   requierePreparacion: boolean;
   stockActual: number;
+  urlImagen?: string | null;
   categoria?: {
     id: string;
     descripcion: string;

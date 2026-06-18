@@ -61,4 +61,31 @@ describe('PromotionService', () => {
       req.flush(null);
     });
   });
+
+  describe('createPromotion', () => {
+    it('Dado que se llama a createPromotion con una promoción, debería hacer un POST a /promotions', () => {
+      const mockPromo: Partial<Promotion> = {
+        name: 'Promo Test',
+        discountPercentage: 10,
+        productIds: ['prod-1'],
+        startDate: '2026-06-12',
+        endDate: '2026-06-20'
+      };
+
+      const mockResponse: Promotion = {
+        ...mockPromo,
+        id: 'promo-123',
+        status: 'ACTIVE'
+      } as Promotion;
+
+      service.createPromotion(mockPromo).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/promotions`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(mockPromo);
+      req.flush(mockResponse);
+    });
+  });
 });

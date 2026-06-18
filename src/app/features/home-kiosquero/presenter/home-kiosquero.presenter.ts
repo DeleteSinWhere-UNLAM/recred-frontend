@@ -99,6 +99,7 @@ interface ProductListItem {
   id: string;
   label: string;
   detail: string;
+  imageUrl?: string | null;
   amount?: string;
   tone?: MetricTone;
 }
@@ -1371,6 +1372,7 @@ export class HomeKiosqueroPresenter {
       id: product.productId,
       label: product.productName,
       detail: `${this.formatNumber(product.quantity)} unidades`,
+      imageUrl: product.urlImagen,
       amount: this.formatMoney(product.total),
     };
   }
@@ -1383,6 +1385,7 @@ export class HomeKiosqueroPresenter {
       id: product.productId,
       label: product.productName,
       detail: `Disponible ${this.formatNumber(product.stockDisponible)} / mínimo ${this.formatNumber(product.stockMinimo)} - ${this.formatInventoryStatus(product.estadoInventario)}`,
+      imageUrl: product.urlImagen,
       tone,
     };
   }

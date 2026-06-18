@@ -8,9 +8,7 @@
         <p>Cargando información...</p>
       </div>
     } @else {
-      
-      <!-- Student Header Card -->
-      <header class="acreditar-page__alumno">
+            <header class="acreditar-page__alumno">
         <div class="acreditar-page__alumno-left">
           <div class="acreditar-page__avatar-wrap">
             <div class="acreditar-page__avatar">
@@ -40,12 +38,8 @@
           </div>
         </div>
       </header>
-
-      <!-- Two-Column Layout Grid -->
       <div class="acreditar-page__grid">
-        
-        <!-- Left Column: Form Section -->
-        <section class="acreditar-page__form-section">
+                <section class="acreditar-page__form-section">
           <h3>¿Cuánto querés acreditar?</h3>
           <p class="acreditar-page__description">
             Ingresá el monto y te redirigiremos a Mercado Pago para completar la operación.
@@ -76,55 +70,45 @@
                 </div>
               </div>
             </div>
-
-            <!-- Quick presets grid (Recargas sugeridas) -->
             <div class="acreditar-page__presets-section">
               <h4 class="acreditar-page__presets-title">Recargas sugeridas</h4>
               <div class="acreditar-page__presets-grid">
-                
-                <!-- 1. Acreditar $1000 -->
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '1000'; selectMonto(1000)">
+                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '1000'; selectMonto(1000)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$1.000</span>
                 </button>
-                
-                <!-- 2. Acreditar $2000 -->
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '2000'; selectMonto(2000)">
+                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '2000'; selectMonto(2000)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$2.000</span>
                 </button>
-                
-                <!-- 3. Acreditar $2500 -->
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '2500'; selectMonto(2500)">
+                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '2500'; selectMonto(2500)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$2.500</span>
                 </button>
-                
-                <!-- 4. Acreditar $5000 -->
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '5000'; selectMonto(5000)">
+                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '5000'; selectMonto(5000)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$5.000</span>
                 </button>
                 
-                <!-- 5. Acreditar $7500 -->
+                
                 <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '7500'; selectMonto(7500)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$7.500</span>
                 </button>
                 
-                <!-- 6. Acreditar $10000 -->
+                
                 <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '10000'; selectMonto(10000)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$10.000</span>
                 </button>
                 
-                <!-- 7. Acreditar $25000 -->
+                
                 <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '25000'; selectMonto(25000)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$25.000</span>
                 </button>
                 
-                <!-- 8. Acreditar $50000 -->
+                
                 <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '50000'; selectMonto(50000)">
                   <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
                   <span class="acreditar-page__preset-label">$50.000</span>
@@ -133,7 +117,7 @@
               </div>
             </div>
 
-            <!-- Bottom Action Buttons -->
+            
             <div class="acreditar-page__actions">
               <button 
                 type="submit" 
@@ -160,7 +144,7 @@
           </form>
         </section>
 
-        <!-- Right Column: Top-up History Card -->
+        
         <section class="acreditar-page__history-section">
           <h3>Historial de recargas</h3>
           <p class="acreditar-page__history-description">

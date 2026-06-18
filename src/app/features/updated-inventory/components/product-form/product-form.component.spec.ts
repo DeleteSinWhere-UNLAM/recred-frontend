@@ -3,6 +3,8 @@ import { ProductFormComponent, ProductFormData } from './product-form.component'
 import { ReactiveFormsModule } from '@angular/forms';
 import { Product } from '../../models/product.interface';
 import { Category } from '../../models/category.interface';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('ProductFormComponent', () => {
   let component: ProductFormComponent;
@@ -27,7 +29,11 @@ describe('ProductFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, ProductFormComponent]
+      imports: [ReactiveFormsModule, ProductFormComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     })
       .compileComponents();
 
@@ -143,7 +149,10 @@ describe('ProductFormComponent', () => {
 
     component.submitForm();
 
-    expect(component.formSubmit.emit).toHaveBeenCalledWith(validData);
+    expect(component.formSubmit.emit).toHaveBeenCalledWith({
+      ...validData,
+      urlImagen: null
+    });
   });
 
   it('debería marcar todos los controles como tocados y no emitir si se envía un formulario inválido', () => {

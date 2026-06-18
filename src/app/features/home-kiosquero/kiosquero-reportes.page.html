@@ -12,43 +12,7 @@
       aria-labelledby="kr-title"
       [attr.aria-busy]="presenter.isLoading()"
     >
-      <!-- <header class="kr__hero">
-        <div class="kr__hero-main">
-          <span class="kr__hero-icon" aria-hidden="true">
-            <i class="fa-solid fa-chart-line"></i>
-          </span>
-
-          <div class="kr__hero-copy">
-            <h1 id="kr-title">Reportes del buffet</h1>
-            <p>
-              Ventas, comportamiento de pedidos, productos destacados y
-              tendencias para analizar el día del kiosco.
-            </p>
-          </div>
-        </div>
-
-        <div class="kr__controls kr__controls--hero">
-          <label class="kr__date-field">
-            <span>Fecha</span>
-            <input
-              type="date"
-              [value]="presenter.selectedDate()"
-              (change)="presenter.onDateChange($event)"
-            />
-          </label>
-
-          <button
-            type="button"
-            class="kr__refresh"
-            [disabled]="presenter.isLoading()"
-            (click)="presenter.refrescarPanel()"
-            aria-label="Actualizar reportes"
-          >
-            <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
-            <span>Actualizar</span>
-          </button>
-        </div>
-      </header> -->
+      
 
       @if (presenter.errorMessage(); as errorMessage) {
         <div class="kr__notice kr__notice--error" role="alert">
@@ -380,72 +344,7 @@
             </section>
           </div>
 
-          <!-- <section class="kr__status-board" aria-labelledby="status-title">
-            <div class="kr__module-header kr__module-header--large">
-              <span aria-hidden="true">
-                <i class="fa-solid fa-clipboard-list"></i>
-              </span>
-              <div>
-                <h2 id="status-title">Pedidos por estado</h2>
-                <small>Resumen de tus pedidos</small>
-              </div>
-            </div>
-
-            <div class="kr__status-board-grid">
-              @for (
-                status of presenter.orderedStatusItems();
-                track status.status
-              ) {
-                <article
-                  class="kr__status-board-item"
-                  [class.kr__status-board-item--pending]="
-                    status.status === 'PENDIENTE'
-                  "
-                  [class.kr__status-board-item--preparing]="
-                    status.status === 'EN_PREPARACION'
-                  "
-                  [class.kr__status-board-item--ready]="
-                    status.status === 'LISTO'
-                  "
-                  [class.kr__status-board-item--delivered]="
-                    status.status === 'ENTREGADO'
-                  "
-                  [class.kr__status-board-item--cancelled]="
-                    status.status === 'CANCELADO'
-                  "
-                  [class.kr__status-board-item--rejected]="
-                    status.status === 'RECHAZADO'
-                  "
-                  [class.kr__status-board-item--expired]="
-                    status.status === 'VENCIDO'
-                  "
-                >
-                  <span class="kr__status-board-icon" aria-hidden="true">
-                    @if (status.status === "PENDIENTE") {
-                      <i class="fa-solid fa-kitchen-set"></i>
-                    } @else if (status.status === "EN_PREPARACION") {
-                      <i class="fa-solid fa-utensils"></i>
-                    } @else if (status.status === "LISTO") {
-                      <i class="fa-solid fa-bell-concierge"></i>
-                    } @else if (status.status === "ENTREGADO") {
-                      <i class="fa-solid fa-circle-check"></i>
-                    } @else if (status.status === "CANCELADO") {
-                      <i class="fa-solid fa-circle-xmark"></i>
-                    } @else if (status.status === "RECHAZADO") {
-                      <i class="fa-solid fa-ban"></i>
-                    } @else {
-                      <i class="fa-solid fa-clock"></i>
-                    }
-                  </span>
-
-                  <div>
-                    <strong>{{ status.label || status.status }}</strong>
-                    <span>{{ status.orders }}</span>
-                  </div>
-                </article>
-              }
-            </div>
-          </section> -->
+          
         </section>
 
         <div class="kr__grid kr__grid--rankings">
@@ -495,13 +394,15 @@
                     >
                       <span class="kr__rank-number">{{ index + 1 }}</span>
 
-                      <span class="kr__rank-icon" aria-hidden="true">
-                        @if (index === 0) {
-                          <i class="fa-solid fa-medal"></i>
-                        } @else {
-                          <i class="fa-solid fa-box"></i>
-                        }
-                      </span>
+                      <div class="kr__rank-media">
+                        <img
+                          class="kr__rank-image"
+                          [src]="item.imageUrl || IMAGEN_FALLBACK"
+                          [alt]="item.label"
+                          loading="lazy"
+                          (error)="onImagenError($event)"
+                        />
+                      </div>
 
                       <div class="kr__rank-info">
                         <strong>{{ item.label }}</strong>

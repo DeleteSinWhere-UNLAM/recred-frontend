@@ -13,4 +13,12 @@ export class TutorDashboardService {
   getGlobalDashboard(): Observable<TutorGlobalDashboardSummary> {
     return this.http.get<TutorGlobalDashboardSummary>(`${environment.apiUrl}/tutores/me/dashboard-global`);
   }
+
+  transferBalance(fromStudentId: string, toStudentId: string, amount: number): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/wallets/transfer`, {
+      fromStudentId,
+      toStudentId,
+      amount
+    });
+  }
 }

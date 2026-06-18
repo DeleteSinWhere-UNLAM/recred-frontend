@@ -1,8 +1,18 @@
-<form
+﻿<form
   [formGroup]="productForm"
   (ngSubmit)="submitForm()"
   class="ai-product-form"
 >
+  @if (productForm.get("urlImagen")?.value) {
+    <div class="ai-product-form__preview-container" style="margin-bottom: 2rem; display: flex; justify-content: center;">
+      <img 
+        [src]="productForm.get('urlImagen')?.value" 
+        alt="Previsualización del producto" 
+        style="width: 200px; height: 200px; object-fit: cover; border-radius: 12px; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+      >
+    </div>
+  }
+
   <section class="ai-product-form__seccion">
     <h3 class="ai-product-form__seccion-titulo">Información del producto</h3>
 
@@ -48,7 +58,7 @@
       </div>
 
       @if (productForm.get('categoriaId')?.value === 'NEW') {
-        <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('nuevaCategoriaNombre')">
+        <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('nuevaCategoriaNombre')">  
           <label for="ai-nueva-categoria" class="ai-product-form__label">Nombre de la nueva categoría</label>
           <input
             id="ai-nueva-categoria"

@@ -1,5 +1,5 @@
 <article class="alumno-card">
-  <!-- Card Header -->
+  
   <header class="alumno-card__header">
     <div class="alumno-card__identidad">
       <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreCompleto">
@@ -22,9 +22,9 @@
     </div>
   </header>
 
-  <!-- 3x3 Actions Grid (9 Buttons total) -->
+  
   <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones de alumno">
-    <!-- 1. Acreditar -->
+    
     <a class="alumno-card__btn alumno-card__btn--menta" [routerLink]="['/acreditar-mercado-pago', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-plus"></i>
@@ -32,7 +32,7 @@
       <span class="alumno-card__btn-label">Acreditar</span>
     </a>
     
-    <!-- 2. Restricciones -->
+    
     <a class="alumno-card__btn alumno-card__btn--melocoton" [routerLink]="['/restricciones-nutricionales', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-shield"></i>
@@ -40,7 +40,7 @@
       <span class="alumno-card__btn-label">Restricciones</span>
     </a>
     
-    <!-- 3. Horarios -->
+    
     <a class="alumno-card__btn alumno-card__btn--azul" [routerLink]="['/restricciones-horarias', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-clock"></i>
@@ -48,7 +48,7 @@
       <span class="alumno-card__btn-label">Horarios</span>
     </a>
     
-    <!-- 4. Presupuesto -->
+    
     <a class="alumno-card__btn alumno-card__btn--dorado" [routerLink]="['/presupuesto', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-piggy-bank"></i>
@@ -56,7 +56,7 @@
       <span class="alumno-card__btn-label">Presupuesto</span>
     </a>
     
-    <!-- 5. Estadística -->
+    
     <a class="alumno-card__btn alumno-card__btn--pizarra" [routerLink]="['/estadistica', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-chart-line"></i>
@@ -64,7 +64,7 @@
       <span class="alumno-card__btn-label">Estadística</span>
     </a>
     
-    <!-- 6. Pendientes -->
+    
     <a class="alumno-card__btn alumno-card__btn--morado" [routerLink]="['/movimientos-pendientes', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-clock-rotate-left"></i>
@@ -75,7 +75,7 @@
       <span class="alumno-card__btn-label">Pendientes</span>
     </a>
     
-    <!-- 7. Movimientos -->
+    
     <a class="alumno-card__btn alumno-card__btn--gris" [routerLink]="['/movimientos', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-list"></i>
@@ -83,7 +83,7 @@
       <span class="alumno-card__btn-label">Movimientos</span>
     </a>
     
-    <!-- 8. Predicción -->
+    
     <a class="alumno-card__btn alumno-card__btn--celeste" [routerLink]="['/prediccion-gasto', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-compass"></i>
@@ -91,7 +91,7 @@
       <span class="alumno-card__btn-label">Predicción</span>
     </a>
     
-    <!-- 9. Preferencias -->
+    
     <a class="alumno-card__btn alumno-card__btn--violeta" [routerLink]="['/preferencias']">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -99,7 +99,7 @@
       <span class="alumno-card__btn-label">Preferencias</span>
     </a>
 
-    <!-- 10. Microcrédito (Sólo PADRE) -->
+    
     @if (esPadre) {
       <button type="button" 
               class="alumno-card__btn alumno-card__btn--menta" 
@@ -118,7 +118,7 @@
     }
   </div>
 
-  <!-- Budget Progress Row -->
+  
   <div class="alumno-card__budget">
     <span class="alumno-card__budget-label">Presupuesto</span>
     <div class="alumno-card__budget-bar">
@@ -176,7 +176,7 @@
       } @else {
         <div class="modal-body">
           
-          <!-- Selector Tipo -->
+          
           <div class="modal-field">
             <span class="modal-label">Modalidad</span>
             <div class="modal-radio-group">
@@ -191,7 +191,7 @@
             </div>
           </div>
 
-          <!-- Base Manual si no hay recargas -->
+          
           @if (tipoMonto() === 'porcentaje' && ultimaRecarga() === 0) {
             <div class="modal-alert">
               <p>
@@ -205,7 +205,7 @@
             </div>
           }
 
-          <!-- Contenido Porcentaje -->
+          
           @if (tipoMonto() === 'porcentaje') {
             <div class="modal-field">
               <div class="modal-flex-between">
@@ -217,7 +217,7 @@
             </div>
           }
 
-          <!-- Contenido Fijo -->
+          
           @if (tipoMonto() === 'fijo') {
             <div class="modal-field">
               <label for="input-monto-fijo" class="modal-label">Monto ($)</label>
@@ -233,7 +233,7 @@
             </div>
           }
 
-          <!-- Cuotas -->
+          
           <div class="modal-field">
             <label for="input-cuotas" class="modal-label">Cuotas (Meses)</label>
             <input id="input-cuotas" type="number" [(ngModel)]="cuotas" class="modal-input mb-2" min="1" max="24" placeholder="Otras...">

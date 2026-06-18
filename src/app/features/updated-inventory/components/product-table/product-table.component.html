@@ -25,6 +25,16 @@
           [class.product-card--updated]="isHighlighted(product)"
         >
           <header class="product-card__header">
+            <div class="product-card__media">
+              <img
+                class="product-card__image"
+                [src]="product.urlImagen || IMAGEN_FALLBACK"
+                [alt]="product.nombre"
+                loading="lazy"
+                (error)="onImagenError($event)"
+              />
+            </div>
+
             <div class="product-card__title-group">
               <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
               <div class="product-card__name-container">
