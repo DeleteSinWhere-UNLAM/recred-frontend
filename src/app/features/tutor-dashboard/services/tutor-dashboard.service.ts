@@ -15,7 +15,7 @@ export class TutorDashboardService {
   }
 
   saveDashboardConfig(config: string): Observable<void> {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'text/plain' };
     return this.http.put<void>(`${environment.apiUrl}/tutores/me/dashboard-config`, config, { headers });
   }
 

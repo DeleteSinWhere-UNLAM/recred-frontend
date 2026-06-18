@@ -238,15 +238,22 @@ export class TutorDashboardComponent implements OnInit {
     this.saveLayout();
   }
 
+  private saveTimeout: any;
+
   saveLayout() {
     const configStr = JSON.stringify(this.dashboardItems);
     localStorage.setItem('tutorDashboardGrid', configStr);
     
-    // Persist to backend
-    this.dashboardService.saveDashboardConfig(configStr).subscribe({
-      next: () => console.log('Dashboard layout saved to backend'),
-      error: (err) => console.error('Error saving dashboard layout to backend', err)
-    });
+    // Persist to backend with debounce
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
+    this.saveTimeout = setTimeout(() => {
+      this.dashboardService.saveDashboardConfig(configStr).subscribe({
+        next: () => console.log('Dashboard layout saved to backend'),
+        error: (err) => console.error('Error saving dashboard layout to backend', err)
+      });
+    }, 1000);
   }
 
   private getNextPosition() {
