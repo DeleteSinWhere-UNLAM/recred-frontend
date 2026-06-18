@@ -537,13 +537,18 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     this.updateInventoryManagementValidators();
     const mode = this.getInventoryManagementMode();
     const defaultMotivo = INVENTORY_MODE_DEFAULT_MOTIVOS[mode] || '';
-    
-    const patchValues: any = { motivo: defaultMotivo };
+
+    const patchValues: {
+      motivo: string;
+      disponible?: boolean;
+      estadoInventario?: EstadoInventario | null;
+    } = { motivo: defaultMotivo };
+
     if (mode === 'STOCK_EXACTO') {
       patchValues.disponible = true;
       patchValues.estadoInventario = 'DISPONIBLE';
     }
-    
+
     this.inventoryManagementForm.patchValue(patchValues);
   }
 
