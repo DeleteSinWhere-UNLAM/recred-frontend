@@ -3,11 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TutorDashboardService } from './services/tutor-dashboard.service';
 import { TutorGlobalDashboardSummary, ChildDashboardSummary } from './models/tutor-dashboard.model';
+import { GridsterConfig, GridsterItemConfig, Gridster, GridsterItem } from 'angular-gridster2';
+import { SmartChartWidget, ChartWidgetConfig } from './components/smart-chart-widget/smart-chart-widget';
+
+export interface DashboardWidget extends GridsterItemConfig {
+  id: string;
+  type: string;
+  widgetConfig?: ChartWidgetConfig;
+}
 
 @Component({
   selector: 'app-tutor-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Gridster, GridsterItem, SmartChartWidget],
   templateUrl: './tutor-dashboard.component.html',
   styleUrls: ['./tutor-dashboard.component.css']
 })
@@ -25,7 +33,12 @@ export class TutorDashboardComponent implements OnInit {
   draggedChild: ChildDashboardSummary | null = null;
   transferAmounts: Record<string, number | null> = {};
 
+  // Grid state
+  gridConfig: GridsterConfig = {};
+  dashboardItems: DashboardWidget[] = [];
+
   ngOnInit(): void {
+    this.initGrid();
     this.isLoading = true;
     this.dashboardService.getGlobalDashboard().subscribe({
       next: (data) => {
@@ -150,5 +163,73 @@ export class TutorDashboardComponent implements OnInit {
   applySmartAction(): void {
     console.log('Action applied for', this.selectedChild?.studentName);
     this.closeSmartActionModal();
+  }
+
+  initGrid() {
+    this.gridConfig = {
+      gridType: 'fit', // 'fit' or 'scrollVertical'
+      compactType: 'none',
+      margin: 16,
+      outerMargin: true,
+      minCols: 1,
+      maxCols: 12,
+      minItemCols: 3,
+      minItemRows: 3,
+      minRows: 1,
+      maxRows: 100,
+      draggable: {
+        enabled: true,
+        ignoreContent: true, // only drag from header
+        dragHandleClass: 'drag-handler'
+      },
+      resizable: {
+        enabled: true
+      },
+      displayGrid: 'onDrag&Resize',
+      pushItems: true,
+      swap: true
+    };
+
+    // Load from local storage or set defaults
+    const savedLayout = localStorage.getItem('tutorDashboardGrid');
+    if (savedLayout) {
+      try {
+        this.dashboardItems = JSON.parse(savedLayout);
+        return;
+      } catch (e) {
+        console.error('Failed to parse saved grid layout', e);
+      }
+    }
+
+    // Default layout if none saved
+    this.dashboardItems = [
+      { id: 'smart-1', type: 'smart-chart', cols: 6, rows: 4, y: 0, x: 0, widgetConfig: { chartType: 'bar', dataSource: 'finance' } },
+      { id: 'finance', type: 'finance', cols: 3, rows: 3, y: 0, x: 6 },
+      { id: 'health', type: 'health', cols: 3, rows: 3, y: 0, x: 9 },
+      { id: 'logistics', type: 'logistics', cols: 6, rows: 3, y: 4, x: 6 },
+      { id: 'transactions', type: 'transactions', cols: 12, rows: 4, y: 7, x: 0 }
+    ];
+  }
+
+  onWidgetConfigChange(item: DashboardWidget, newConfig: ChartWidgetConfig) {
+    item.widgetConfig = newConfig;
+    this.saveLayout();
+  }
+
+  saveLayout() {
+    localStorage.setItem('tutorDashboardGrid', JSON.stringify(this.dashboardItems));
+  }
+
+  addSmartCard() {
+    this.dashboardItems.push({
+      id: 'smart-' + Date.now(),
+      type: 'smart-chart',
+      cols: 6,
+      rows: 4,
+      y: 0,
+      x: 0,
+      widgetConfig: { chartType: 'bar', dataSource: 'finance' }
+    });
+    // Optional: could trigger grid config update if needed
   }
 }
