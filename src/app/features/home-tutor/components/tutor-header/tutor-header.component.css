@@ -42,6 +42,62 @@
     0 12px 24px rgba(74, 111, 165, 0.12);
   transition: transform 0.2s ease;
   overflow: hidden;
+  position: relative;
+}
+
+.tutor-header__avatar-editar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  cursor: pointer;
+  border: none;
+  z-index: 2;
+}
+
+.tutor-header__avatar-wrap:hover .tutor-header__avatar-editar,
+.tutor-header__avatar-editar:focus-visible {
+  background-color: rgba(0, 0, 0, 0.44);
+  color: #fff;
+}
+
+.tutor-header__avatar-editar:disabled {
+  cursor: not-allowed;
+}
+
+.tutor-header__avatar-loader {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: tutor-header-girar 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes tutor-header-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tutor-header__input-foto {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 .tutor-header__avatar-img {
