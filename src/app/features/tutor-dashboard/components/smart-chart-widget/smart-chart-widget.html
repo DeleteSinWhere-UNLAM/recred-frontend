@@ -1,6 +1,7 @@
 <div class="smart-card">
   <div class="smart-card-header">
     <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
+    <h3 style="margin:0; font-size: 1.17em; color: white;">Gráficos</h3>
     <div class="header-controls">
       <select class="custom-select child-select" [(ngModel)]="selectedChildId" (change)="onConfigChange()">
         @for (child of children; track child.studentId) {
@@ -22,6 +23,10 @@
         <option value="pie">Torta</option>
         <option value="doughnut">Rosca</option>
       </select>
+      
+      <button class="close-btn" (click)="onClose()" title="Cerrar tarjeta">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
   </div>
 

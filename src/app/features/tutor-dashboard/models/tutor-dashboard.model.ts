@@ -1,6 +1,7 @@
 export interface TutorGlobalDashboardSummary {
   tutorId: string;
   totalBalance: number;
+  dashboardConfig?: string;
   children: ChildDashboardSummary[];
 }
 

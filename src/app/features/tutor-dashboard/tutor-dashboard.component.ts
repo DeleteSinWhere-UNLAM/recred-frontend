@@ -9,6 +9,7 @@ import { SmartChartWidget, ChartWidgetConfig } from './components/smart-chart-wi
 export interface DashboardWidget extends GridsterItemConfig {
   id: string;
   type: string;
+  studentId?: string;
   widgetConfig?: ChartWidgetConfig;
 }
 
@@ -39,10 +40,26 @@ export class TutorDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.initGrid();
-    this.isLoading = true;
+    this.loadDashboardData();
+  }
+
+  loadDashboardData() {
     this.dashboardService.getGlobalDashboard().subscribe({
       next: (data) => {
         this.globalSummary = data;
+        
+        // Load layout from backend if available, else localStorage, else default
+        if (data.dashboardConfig) {
+          try {
+            this.dashboardItems = JSON.parse(data.dashboardConfig);
+          } catch (e) {
+            console.error('Failed to parse backend dashboard config', e);
+            this.loadLocalOrDefaultLayout();
+          }
+        } else {
+          this.loadLocalOrDefaultLayout();
+        }
+
         if (data.children && data.children.length > 0) {
           // Keep the previous selection if it exists
           if (this.selectedChild) {
@@ -167,7 +184,7 @@ export class TutorDashboardComponent implements OnInit {
 
   initGrid() {
     this.gridConfig = {
-      gridType: 'fit', // 'fit' or 'scrollVertical'
+      gridType: 'fit',
       compactType: 'none',
       margin: 16,
       outerMargin: true,
@@ -187,10 +204,15 @@ export class TutorDashboardComponent implements OnInit {
       },
       displayGrid: 'onDrag&Resize',
       pushItems: true,
-      swap: true
+      swap: true,
+      itemChangeCallback: () => this.saveLayout(),
+      itemResizeCallback: () => this.saveLayout()
     };
 
-    // Load from local storage or set defaults
+    // Load layout logic is now handled after fetching global summary
+  }
+
+  private loadLocalOrDefaultLayout() {
     const savedLayout = localStorage.getItem('tutorDashboardGrid');
     if (savedLayout) {
       try {
@@ -201,13 +223,13 @@ export class TutorDashboardComponent implements OnInit {
       }
     }
 
-    // Default layout if none saved
+    // Default layout
     this.dashboardItems = [
-      { id: 'smart-1', type: 'smart-chart', cols: 6, rows: 4, y: 0, x: 0, widgetConfig: { chartType: 'bar', dataSource: 'finance' } },
-      { id: 'finance', type: 'finance', cols: 3, rows: 3, y: 0, x: 6 },
-      { id: 'health', type: 'health', cols: 3, rows: 3, y: 0, x: 9 },
-      { id: 'logistics', type: 'logistics', cols: 6, rows: 3, y: 4, x: 6 },
-      { id: 'transactions', type: 'transactions', cols: 12, rows: 4, y: 7, x: 0 }
+      { id: 'smart-1', type: 'smart-chart', cols: 4, rows: 3, y: 0, x: 0, widgetConfig: { chartType: 'bar', dataSource: 'finance' } },
+      { id: 'finance', type: 'finance', cols: 3, rows: 3, y: 0, x: 4 },
+      { id: 'health', type: 'health', cols: 3, rows: 3, y: 0, x: 7 },
+      { id: 'logistics', type: 'logistics', cols: 4, rows: 3, y: 3, x: 0 },
+      { id: 'transactions', type: 'transactions', cols: 6, rows: 3, y: 3, x: 4 }
     ];
   }
 
@@ -217,19 +239,119 @@ export class TutorDashboardComponent implements OnInit {
   }
 
   saveLayout() {
-    localStorage.setItem('tutorDashboardGrid', JSON.stringify(this.dashboardItems));
+    const configStr = JSON.stringify(this.dashboardItems);
+    localStorage.setItem('tutorDashboardGrid', configStr);
+    
+    // Persist to backend
+    this.dashboardService.saveDashboardConfig(configStr).subscribe({
+      next: () => console.log('Dashboard layout saved to backend'),
+      error: (err) => console.error('Error saving dashboard layout to backend', err)
+    });
+  }
+
+  private getNextPosition() {
+    const maxY = this.dashboardItems.reduce((max, item) => Math.max(max, item.y + item.rows), 0);
+    return { x: 0, y: maxY };
   }
 
   addSmartCard() {
+    const pos = this.getNextPosition();
     this.dashboardItems.push({
       id: 'smart-' + Date.now(),
       type: 'smart-chart',
-      cols: 6,
-      rows: 4,
-      y: 0,
-      x: 0,
+      cols: 4,
+      rows: 3,
+      x: pos.x,
+      y: pos.y,
       widgetConfig: { chartType: 'bar', dataSource: 'finance' }
     });
-    // Optional: could trigger grid config update if needed
+    this.saveLayout();
+  }
+
+  addFinanceCard() {
+    const pos = this.getNextPosition();
+    this.dashboardItems.push({
+      id: 'finance-' + Date.now(),
+      type: 'finance',
+      cols: 3,
+      rows: 3,
+      x: pos.x,
+      y: pos.y,
+      studentId: this.globalSummary?.children[0]?.studentId
+    });
+    this.saveLayout();
+  }
+
+  addHealthCard() {
+    const pos = this.getNextPosition();
+    this.dashboardItems.push({
+      id: 'health-' + Date.now(),
+      type: 'health',
+      cols: 3,
+      rows: 3,
+      x: pos.x,
+      y: pos.y,
+      studentId: this.globalSummary?.children[0]?.studentId
+    });
+    this.saveLayout();
+  }
+
+  addLogisticsCard() {
+    const pos = this.getNextPosition();
+    this.dashboardItems.push({
+      id: 'logistics-' + Date.now(),
+      type: 'logistics',
+      cols: 4,
+      rows: 3,
+      x: pos.x,
+      y: pos.y,
+      studentId: this.globalSummary?.children[0]?.studentId
+    });
+    this.saveLayout();
+  }
+
+  addTransactionsCard() {
+    const pos = this.getNextPosition();
+    this.dashboardItems.push({
+      id: 'transactions-' + Date.now(),
+      type: 'transactions',
+      cols: 4,
+      rows: 3,
+      x: pos.x,
+      y: pos.y,
+      studentId: this.globalSummary?.children[0]?.studentId
+    });
+    this.saveLayout();
+  }
+
+  removeCard(id: string) {
+    this.dashboardItems = this.dashboardItems.filter(item => item.id !== id);
+    this.saveLayout();
+  }
+
+  clearAllCards() {
+    if (confirm('¿Estás seguro de que quieres eliminar todas las tarjetas del panel?')) {
+      this.dashboardItems = [];
+      this.saveLayout();
+    }
+  }
+
+  getChildData(item: DashboardWidget): ChildDashboardSummary | null {
+    if (!this.globalSummary || !this.globalSummary.children) return null;
+    
+    // Si la tarjeta tiene un estudiante asociado, devolverlo
+    if (item.studentId) {
+      const found = this.globalSummary.children.find(c => c.studentId === item.studentId);
+      if (found) return found;
+    }
+    
+    // Si no tiene estudiante asignado o no se encuentra, usar el primer hijo como default y guardarlo en el item
+    const defaultChild = this.globalSummary.children[0];
+    if (defaultChild) {
+      item.studentId = defaultChild.studentId;
+      return defaultChild;
+    }
+    
+    return null;
   }
 }

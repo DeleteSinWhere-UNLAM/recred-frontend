@@ -321,6 +321,20 @@
   background-color: transparent;
 }
 
+.close-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 12px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tx-icon {
   width: 40px;
   height: 40px;
@@ -361,6 +375,30 @@
 }
 
 /* Buttons & Badges */
+.custom-select {
+  flex: 1;
+  min-width: 80px;
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  background-color: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.custom-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.child-select {
+  font-weight: 600;
+  color: #0f172a;
+}
+
 .primary-btn {
   background: #1a3b5c;
   color: white;

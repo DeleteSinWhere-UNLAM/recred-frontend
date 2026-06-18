@@ -22,6 +22,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
   @Input() children: ChildDashboardSummary[] = [];
   @Input() config: ChartWidgetConfig = {}; // { id, childId, chartType, dataSource }
   @Output() configChange = new EventEmitter<ChartWidgetConfig>();
+  @Output() closeCard = new EventEmitter<void>();
 
   selectedChildId = '';
   selectedChartType: ChartType = 'bar';
@@ -55,6 +56,10 @@ export class SmartChartWidget implements OnInit, OnChanges {
     this.config.dataSource = this.selectedDataSource;
     this.configChange.emit(this.config);
     this.updateChart();
+  }
+
+  onClose() {
+    this.closeCard.emit();
   }
 
   updateChart() {
