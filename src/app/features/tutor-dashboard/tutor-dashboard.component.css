@@ -32,8 +32,23 @@
   color: white;
 }
 
+.global-header .amount-debt {
+  color: #fca5a5; /* soft red for debt */
+}
+
 .global-header .currency {
   color: #94a3b8;
+}
+
+.global-balance-info, .global-debt-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.global-debt-info {
+  align-items: flex-end;
+  text-align: right;
 }
 
 /* Tabs */
