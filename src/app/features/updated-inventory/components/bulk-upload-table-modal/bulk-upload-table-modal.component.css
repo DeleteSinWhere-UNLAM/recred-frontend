@@ -146,6 +146,9 @@
 }
 
 .bulk-upload-modal__table th {
+  position: sticky;
+  top: -1px; /* To cover the border or slight gaps */
+  z-index: 10;
   background-color: var(--color-fondo);
   color: var(--color-texto-claro);
   font-weight: 600;
