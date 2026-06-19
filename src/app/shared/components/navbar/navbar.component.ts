@@ -129,6 +129,7 @@ export class NavbarComponent {
     this.menuAbierto.set(false);
     try {
       await this.authService.logout();
+      await this.router.navigateByUrl('/');
     } catch (err) {
       console.error('Error al cerrar sesión', err);
       this.router.navigateByUrl('/');
