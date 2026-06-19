@@ -20,6 +20,7 @@ export class NotificationService {
   private notificacionSugerenciaSaludableService = inject(NotificacionSugerenciaSaludableService);
   private notificacionesService = inject(NotificacionesService);
   private ngZone = inject(NgZone);
+  firebase = { getToken, onMessage };
 
   requestNotificationPermission() {
     Notification.requestPermission().then((permission) => {
@@ -32,7 +33,7 @@ export class NotificationService {
 
   handleTokenRegistration() {
     runInInjectionContext(this.injector, () => {
-      getToken(this.messaging, {
+      this.firebase.getToken(this.messaging, {
         vapidKey: environment.firebaseConfig.vapidKey,
       })
         .then((fcmToken) => {
@@ -50,7 +51,7 @@ export class NotificationService {
 
   private listenToForegroundMessages() {
     runInInjectionContext(this.injector, () => {
-      onMessage(this.messaging, (payload) => {
+      this.firebase.onMessage(this.messaging, (payload) => {
         this.ngZone.run(() => {
           console.log('Mensaje recibido en primer plano:', payload);
 
