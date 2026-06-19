@@ -2,10 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MovimientoDetalleModalComponent } from './movimiento-detalle-modal.component';
 import { Movimiento } from '../../models/movimiento.model';
 import { By } from '@angular/platform-browser';
+import { PromotionService } from '../../../../data-access/services/promociones/promotion.service';
+import { ProductService } from '../../../../features/updated-inventory/services/product.service';
 
 describe('MovimientoDetalleModalComponent', () => {
   let component: MovimientoDetalleModalComponent;
   let fixture: ComponentFixture<MovimientoDetalleModalComponent>;
+  let mockPromotionService: jasmine.SpyObj<PromotionService>;
+  let mockProductService: jasmine.SpyObj<ProductService>;
 
   const mockMovimiento: Movimiento = {
     id: 'mov-1',
@@ -22,8 +26,15 @@ describe('MovimientoDetalleModalComponent', () => {
   };
 
   beforeEach(async () => {
+    mockPromotionService = jasmine.createSpyObj('PromotionService', ['getPromotionById']);
+    mockProductService = jasmine.createSpyObj('ProductService', ['getById']);
+
     await TestBed.configureTestingModule({
-      imports: [MovimientoDetalleModalComponent]
+      imports: [MovimientoDetalleModalComponent],
+      providers: [
+        { provide: PromotionService, useValue: mockPromotionService },
+        { provide: ProductService, useValue: mockProductService }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MovimientoDetalleModalComponent);

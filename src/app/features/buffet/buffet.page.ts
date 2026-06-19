@@ -160,22 +160,18 @@ export class BuffetPage implements OnInit {
     const total = this.promocionesDestacadasFiltradas().length;
     if (total <= 1) return;
 
-    const container = this.promosContainer.nativeElement;
-    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+    const currentIndex = this.activeSlideIndex();
 
-    if (direction === 1 && container.scrollLeft >= maxScrollLeft - 5) {
+    if (direction === 1 && currentIndex >= total - 1) {
       this.scrollToSlide(0);
       return;
     }
-    if (direction === -1 && container.scrollLeft <= 5) {
-      container.scrollTo({ left: maxScrollLeft, behavior: 'smooth' });
+    if (direction === -1 && currentIndex <= 0) {
+      this.scrollToSlide(total - 1);
       return;
     }
 
-    const card = container.querySelector('.promo-card');
-    const cardWidth = card ? card.getBoundingClientRect().width : 340;
-    const gap = 24;
-    container.scrollBy({ left: direction * (cardWidth + gap), behavior: 'smooth' });
+    this.scrollToSlide(currentIndex + direction);
   }
 
   protected onCarouselScroll(event: Event): void {

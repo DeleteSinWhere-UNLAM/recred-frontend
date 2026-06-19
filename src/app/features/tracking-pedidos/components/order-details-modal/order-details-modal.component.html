@@ -61,14 +61,69 @@
         <h3 id="products-title" class="modal-section__title">Productos Pedidos</h3>
         <div class="items-list">
           @for (item of order.items; track item.productId) {
-            <div class="item-row">
-              <div class="item-row__info">
-                <span class="item-row__name">{{ item.productName }}</span>
-                <span class="item-row__qty">x{{ item.quantity }}</span>
+            <div class="item-wrapper">
+              <div class="item-row">
+                <div class="item-row__info">
+                  <span class="item-row__name">{{ item.productName }}</span>
+                  <span class="item-row__qty">x{{ item.quantity }}</span>
+                </div>
+                <span class="item-row__price">
+                  {{ (item.unitPrice * item.quantity) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+                </span>
               </div>
-              <span class="item-row__price">
-                {{ (item.unitPrice * item.quantity) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
-              </span>
+              @if (esPromocion(item.productName)) {
+                <div class="item-promo-action">
+                  <button type="button" class="promo-details-trigger" (click)="togglePromoDetails(item.productId)">
+                    <i class="fa-solid" [class.fa-chevron-down]="!expandedPromos.has(item.productId)" [class.fa-chevron-up]="expandedPromos.has(item.productId)"></i>
+                    {{ expandedPromos.has(item.productId) ? 'Ocultar detalles' : 'Ver detalles' }}
+                  </button>
+                </div>
+              }
+              @if (expandedPromos.has(item.productId)) {
+                <div class="promo-details-panel">
+                  @if (promosLoaded.get(item.productId)?.loading) {
+                    <div class="promo-details-loading">
+                      <i class="fa-solid fa-spinner fa-spin"></i> Cargando detalles...
+                    </div>
+                  } @else if (promosLoaded.get(item.productId)?.error) {
+                    <div class="promo-details-error">
+                      No se pudieron cargar los detalles de la promoción.
+                    </div>
+                  } @else {
+                    @let data = promosLoaded.get(item.productId);
+                    @if (data && data.promotion) {
+                      <div class="promo-details-grid">
+                        <div class="promo-details-section">
+                          <span class="promo-details-subtitle">Productos Incluidos:</span>
+                          <ul class="promo-details-list">
+                            @for (prod of data.products; track prod.id) {
+                              <li>
+                                <span class="prod-name">{{ prod.nombre }}</span>
+                                <span class="prod-price">{{ prod.precio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</span>
+                              </li>
+                            }
+                          </ul>
+                        </div>
+                        
+                        <div class="promo-details-summary">
+                          <div class="promo-summary-row">
+                            <span>Precio original (suma):</span>
+                            <span class="original-price">{{ getPromoOriginalPrice(item.productId) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</span>
+                          </div>
+                          <div class="promo-summary-row">
+                            <span>Descuento aplicado:</span>
+                            <span class="discount-badge">{{ data.promotion.discountPercentage }}% OFF</span>
+                          </div>
+                          <div class="promo-summary-row promo-summary-row--total">
+                            <span>Precio promocional (unitario):</span>
+                            <span class="promo-price">{{ getPromoDiscountedPrice(item.productId) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              }
             </div>
           }
         </div>

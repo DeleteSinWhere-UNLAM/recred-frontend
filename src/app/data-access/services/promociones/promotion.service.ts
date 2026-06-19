@@ -41,4 +41,8 @@ export class PromotionService {
     const payload = { ...promotion, buffetId };
     return this.http.post<Promotion>(this.apiUrl, payload);
   }
+
+  getPromotionById(id: string): Observable<Promotion> {
+    return this.http.get<Promotion>(`${this.apiUrl}/${id}`);
+  }
 }
