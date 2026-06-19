@@ -76,13 +76,13 @@ describe('CierreDiarioPage', () => {
     cierreDiarioService = jasmine.createSpyObj<CierreDiarioService>(
       'CierreDiarioService',
       [
-        'getReporteDiario',
+        'getDailyReport',
         'getDailyCloseStatus',
         'getDailyCloses',
         'closeDaily',
         'refreshAfterClose',
-        'getReporteDiarioCsvUrl',
-        'downloadReporteDiarioCsv',
+        'getDailyReportCsvUrl',
+        'downloadDailyReportCsv',
       ],
     );
     inventoryRealtimeService = jasmine.createSpyObj<InventoryRealtimeService>(
@@ -94,7 +94,7 @@ describe('CierreDiarioPage', () => {
     ]);
     toastService = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
 
-    cierreDiarioService.getReporteDiario.and.returnValue(of(report));
+    cierreDiarioService.getDailyReport.and.returnValue(of(report));
     inventoryRealtimeService.connect.and.returnValue(new AbortController());
     cierreDiarioService.getDailyCloseStatus.and.returnValue(
       of({
@@ -128,8 +128,8 @@ describe('CierreDiarioPage', () => {
       }),
     );
     cierreDiarioService.refreshAfterClose.and.returnValue(of(report));
-    cierreDiarioService.getReporteDiarioCsvUrl.and.returnValue('/daily.csv');
-    cierreDiarioService.downloadReporteDiarioCsv.and.returnValue(
+    cierreDiarioService.getDailyReportCsvUrl.and.returnValue('/daily.csv');
+    cierreDiarioService.downloadDailyReportCsv.and.returnValue(
       of(new Blob(['metric,value'], { type: 'text/csv' })),
     );
     perfilService.obtenerBuffetId.and.returnValue(buffetId);
@@ -155,7 +155,7 @@ describe('CierreDiarioPage', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(cierreDiarioService.getReporteDiario).toHaveBeenCalledWith(
+    expect(cierreDiarioService.getDailyReport).toHaveBeenCalledWith(
       buffetId,
       jasmine.any(String),
     );
@@ -190,7 +190,7 @@ describe('CierreDiarioPage', () => {
   });
 
   it('deberia ordenar el inventario dejando agotados y bajo stock primero', () => {
-    cierreDiarioService.getReporteDiario.and.returnValue(
+    cierreDiarioService.getDailyReport.and.returnValue(
       of({
         ...report,
         inventory: [
@@ -236,7 +236,7 @@ describe('CierreDiarioPage', () => {
   });
 
   it('deberia ordenar productos vendidos de mayor a menor por importe', () => {
-    cierreDiarioService.getReporteDiario.and.returnValue(
+    cierreDiarioService.getDailyReport.and.returnValue(
       of({
         ...report,
         products: [
@@ -311,7 +311,7 @@ describe('CierreDiarioPage', () => {
       total: (index + 1) * 1000,
     }));
 
-    cierreDiarioService.getReporteDiario.and.returnValue(
+    cierreDiarioService.getDailyReport.and.returnValue(
       of({
         ...report,
         products,
@@ -349,7 +349,7 @@ describe('CierreDiarioPage', () => {
       tipoManejoInventario: 'STOCK_EXACTO',
     }));
 
-    cierreDiarioService.getReporteDiario.and.returnValue(
+    cierreDiarioService.getDailyReport.and.returnValue(
       of({
         ...report,
         inventory,
@@ -407,7 +407,7 @@ describe('CierreDiarioPage', () => {
   });
 
   it('no deberia mostrar ventas por medio de pago en el reporte', () => {
-    cierreDiarioService.getReporteDiario.and.returnValue(
+    cierreDiarioService.getDailyReport.and.returnValue(
       of({
         ...report,
         salesByPaymentMethod: [
@@ -427,7 +427,7 @@ describe('CierreDiarioPage', () => {
   });
 
   it('deberia mostrar movimientos de stock con etiquetas capitalizadas', () => {
-    cierreDiarioService.getReporteDiario.and.returnValue(
+    cierreDiarioService.getDailyReport.and.returnValue(
       of({
         ...report,
         stockMovements: [
@@ -500,7 +500,7 @@ describe('CierreDiarioPage', () => {
 
     (component as unknown as { downloadCsv: () => void }).downloadCsv();
 
-    expect(cierreDiarioService.downloadReporteDiarioCsv).toHaveBeenCalledWith(
+    expect(cierreDiarioService.downloadDailyReportCsv).toHaveBeenCalledWith(
       buffetId,
       jasmine.any(String),
     );
@@ -531,7 +531,7 @@ describe('CierreDiarioPage', () => {
   });
 
   it('deberia mostrar error si no carga el reporte', () => {
-    cierreDiarioService.getReporteDiario.and.returnValue(
+    cierreDiarioService.getDailyReport.and.returnValue(
       throwError(() => new Error('API error')),
     );
 

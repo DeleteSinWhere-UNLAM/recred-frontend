@@ -76,7 +76,7 @@ describe('CierreDiarioService', () => {
   });
 
   it('deberia obtener el reporte diario JSON', () => {
-    service.getReporteDiario(buffetId, date).subscribe((result) => {
+    service.getDailyReport(buffetId, date).subscribe((result) => {
       expect(result).toEqual(report);
     });
 
@@ -149,7 +149,7 @@ describe('CierreDiarioService', () => {
   });
 
   it('deberia armar la URL directa del CSV', () => {
-    expect(service.getReporteDiarioCsvUrl(buffetId, date)).toBe(
+    expect(service.getDailyReportCsvUrl(buffetId, date)).toBe(
       `${kiosquerosUrl}/${buffetId}/reports/daily.csv?date=${date}`,
     );
   });
@@ -157,7 +157,7 @@ describe('CierreDiarioService', () => {
   it('deberia descargar el CSV como blob por HttpClient', () => {
     const csv = new Blob(['metric,value'], { type: 'text/csv' });
 
-    service.downloadReporteDiarioCsv(buffetId, date).subscribe((result) => {
+    service.downloadDailyReportCsv(buffetId, date).subscribe((result) => {
       expect(result).toBe(csv);
     });
 
