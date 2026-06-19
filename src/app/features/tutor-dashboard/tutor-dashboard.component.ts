@@ -1,10 +1,13 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TutorDashboardService } from './services/tutor-dashboard.service';
 import { TutorGlobalDashboardSummary, ChildDashboardSummary } from './models/tutor-dashboard.model';
 import { GridsterConfig, GridsterItemConfig, Gridster, GridsterItem } from 'angular-gridster2';
 import { SmartChartWidget, ChartWidgetConfig } from './components/smart-chart-widget/smart-chart-widget';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { PerfilService } from '../../data-access/services/perfil.service';
+import { UsuarioService } from '../../data-access/services/usuario.service';
 
 export interface DashboardWidget extends GridsterItemConfig {
   id: string;
@@ -16,12 +19,21 @@ export interface DashboardWidget extends GridsterItemConfig {
 @Component({
   selector: 'app-tutor-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, Gridster, GridsterItem, SmartChartWidget],
+  imports: [CommonModule, FormsModule, Gridster, GridsterItem, SmartChartWidget, NavbarComponent],
   templateUrl: './tutor-dashboard.component.html',
   styleUrls: ['./tutor-dashboard.component.css']
 })
 export class TutorDashboardComponent implements OnInit {
   private dashboardService = inject(TutorDashboardService);
+  private readonly perfilService = inject(PerfilService);
+  private readonly usuarioService = inject(UsuarioService);
+
+  readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
+
+  constructor() {
+    this.usuarioService.setHomeUrl('/tutor');
+    this.usuarioService.setNombreNavbar(this.nombreUsuario());
+  }
   
   globalSummary: TutorGlobalDashboardSummary | null = null;
   selectedChild: ChildDashboardSummary | null = null;
