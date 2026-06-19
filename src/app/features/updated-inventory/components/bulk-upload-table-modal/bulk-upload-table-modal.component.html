@@ -66,6 +66,7 @@
                 <th>Precio</th>
                 <th>Stock</th>
                 <th>Peso</th>
+                <th>Medida</th>
                 <th>Categoría</th>
                 <th>Prep.</th>
                 <th>Acciones</th>
@@ -90,6 +91,13 @@
                   </td>
                   <td>
                     <input type="number" [formControl]="asFormControl(asFormGroup(control).get('peso'))" min="0" step="0.1">
+                  </td>
+                  <td>
+                    <select [formControl]="asFormControl(asFormGroup(control).get('unidadMedida'))">
+                      @for (unidad of obtenerUnidadesPorCategoria(asFormGroup(control).get('categoriaId')?.value); track unidad) {
+                        <option [value]="unidad">{{ unidad }}</option>
+                      }
+                    </select>
                   </td>
                   <td>
                     <div class="bulk-upload-modal__category-cell">

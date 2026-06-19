@@ -68,7 +68,11 @@ export class BulkUploadTableModalComponent implements OnChanges {
 
   onSave(): void {
     if (this.form.valid && this.productsArray.length > 0) {
-      this.saveProducts.emit(this.form.value.products);
+      const productsToSave = this.form.value.products.map((p: any) => {
+        const { unidadMedida, ...rest } = p;
+        return rest;
+      });
+      this.saveProducts.emit(productsToSave);
     } else {
       this.form.markAllAsTouched();
       if (this.productsArray.length === 0) {
@@ -80,11 +84,15 @@ export class BulkUploadTableModalComponent implements OnChanges {
   }
 
   addProductRow(product?: BulkProductResponse): void {
+    const catIdInicial = product?.categoriaId ?? null;
+    const unidadInicial = this.obtenerUnidadesPorCategoria(catIdInicial)[0];
+
     const row = this.fb.group({
       nombre: [product?.nombre ?? '', [Validators.required]],
       descripcion: [product?.descripcion ?? ''],
       precio: [product?.precio ?? 0, [Validators.required, Validators.min(0)]],
       peso: [product?.peso ?? 0, [Validators.min(0)]],
+      unidadMedida: [unidadInicial],
       stockActual: [product?.stockActual ?? 0, [Validators.min(0)]],
       requierePreparacion: [product?.requierePreparacion ?? false],
       categoriaId: [product?.categoriaId ?? '', [Validators.required]],
@@ -102,6 +110,13 @@ export class BulkUploadTableModalComponent implements OnChanges {
         nuevaCatCtrl?.clearValidators();
       }
       nuevaCatCtrl?.updateValueAndValidity();
+
+      const unidadesValidas = this.obtenerUnidadesPorCategoria(value);
+      const unidadCtrl = row.get('unidadMedida');
+      const currentValue = unidadCtrl?.value as string | null;
+      if (unidadCtrl && (!currentValue || !unidadesValidas.includes(currentValue))) {
+        unidadCtrl.setValue(unidadesValidas[0], { emitEvent: false });
+      }
     });
 
     this.productsArray.push(row);
@@ -116,5 +131,16 @@ export class BulkUploadTableModalComponent implements OnChanges {
     for (const product of this.prefilledProducts) {
       this.addProductRow(product);
     }
+  }
+
+  obtenerUnidadesPorCategoria(categoriaId: string | null): string[] {
+    if (!categoriaId) return ['g', 'kg'];
+    const categoria = this.categories.find(c => c.id === categoriaId);
+    if (!categoria) return ['g', 'kg'];
+
+    const desc = categoria.descripcion.toLowerCase();
+    const esBebida = desc.includes('bebida') || desc.includes('jugo') || desc.includes('agua') || desc.includes('gaseosa') || desc.includes('liquido');
+    
+    return esBebida ? ['ml', 'l'] : ['g', 'kg'];
   }
 }
