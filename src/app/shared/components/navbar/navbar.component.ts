@@ -120,6 +120,11 @@ export class NavbarComponent {
     void this.router.navigate(['/billetera', alumnoId]);
   }
 
+  protected irAPremium(): void {
+    this.menuAbierto.set(false);
+    this.router.navigateByUrl('/premium');
+  }
+
   protected async cerrarSesion(): Promise<void> {
     this.menuAbierto.set(false);
     try {
