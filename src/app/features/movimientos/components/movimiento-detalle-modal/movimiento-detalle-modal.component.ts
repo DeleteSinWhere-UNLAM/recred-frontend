@@ -1,7 +1,8 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Movimiento } from '../../models/movimiento.model';
-import { PromotionService } from '../../../../data-access/services/promociones/promotion.service';
+import { PromotionService, Promotion } from '../../../../data-access/services/promociones/promotion.service';
 import { ProductService } from '../../../../features/updated-inventory/services/product.service';
+import { Product } from '../../../../features/updated-inventory/models/product.interface';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -15,7 +16,7 @@ export class MovimientoDetalleModalComponent {
   private readonly promotionService = inject(PromotionService);
   private readonly productService = inject(ProductService);
 
-  promosLoaded = new Map<string, { promotion: any; products: any[]; loading: boolean; error: boolean }>();
+  promosLoaded = new Map<string, { promotion: Promotion | null; products: Product[]; loading: boolean; error: boolean }>();
   expandedPromos = new Set<string>();
 
   esPromocion(nombre: string): boolean {

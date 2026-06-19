@@ -177,6 +177,38 @@
           }
         </div>
       }
+
+      <div class="movimientos__grouping-row">
+        <span class="grouping-label">Agrupar por:</span>
+        <div class="grouping-buttons">
+          <button 
+            type="button" 
+            class="grouping-btn" 
+            [class.active]="criterioAgrupacion() === 'FECHA_COMPRA'"
+            (click)="criterioAgrupacion.set('FECHA_COMPRA')"
+          >
+            <i class="fa-solid fa-calendar-day"></i> Fecha de compra
+          </button>
+          <button 
+            type="button" 
+            class="grouping-btn" 
+            [class.active]="criterioAgrupacion() === 'FECHA_RETIRO'"
+            (click)="criterioAgrupacion.set('FECHA_RETIRO')"
+          >
+            <i class="fa-solid fa-truck-ramp-box"></i> Fecha de retiro
+          </button>
+          @if (!esVistaAlumno() && !esVistaIndividual()) {
+            <button 
+              type="button" 
+              class="grouping-btn" 
+              [class.active]="criterioAgrupacion() === 'ALUMNO'"
+              (click)="criterioAgrupacion.set('ALUMNO')"
+            >
+              <i class="fa-solid fa-user"></i> Alumno
+            </button>
+          }
+        </div>
+      </div>
     </section>
 
     
@@ -222,11 +254,19 @@
       } @else {
         
         <div class="movimientos__timeline">
-          @for (grupo of movimientosAgrupadosPorDia(); track grupo.fechaStr) {
+          @for (grupo of movimientosAgrupados(); track grupo.titulo) {
             <div class="movimientos__fecha-grupo">
-              <h2 class="movimientos__fecha-titulo">{{ grupo.fechaStr }}</h2>
+              <button 
+                type="button" 
+                class="movimientos__fecha-header-btn" 
+                (click)="toggleGroup(grupo.titulo)"
+                [attr.aria-expanded]="isGroupExpanded(grupo.titulo)"
+              >
+                <span class="movimientos__fecha-titulo">{{ grupo.titulo }}</span>
+                <i class="fa-solid fa-chevron-up toggle-icon" [class.collapsed]="!isGroupExpanded(grupo.titulo)"></i>
+              </button>
               
-              <div class="movimientos__fecha-card">
+              <div class="movimientos__fecha-card" [class.collapsed]="!isGroupExpanded(grupo.titulo)">
                 @for (mov of grupo.movimientos; track mov.id; let last = $last) {
                   <article class="movimientos__fila">
                     <div class="movimientos__fila-left">
