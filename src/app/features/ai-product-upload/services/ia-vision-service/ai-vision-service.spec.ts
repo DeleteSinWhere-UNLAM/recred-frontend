@@ -16,7 +16,7 @@ describe('AiVisionService', () => {
     service = TestBed.inject(AiVisionService);
   });
 
-  it('should be created', () => {
+  it('dado que se inyecta, debe crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 });

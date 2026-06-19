@@ -55,7 +55,7 @@ describe('CompraService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
+  it('dado que se inyecta, debe crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 

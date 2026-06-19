@@ -43,7 +43,7 @@ describe('ProductFormComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('dado que se inicializa, debe crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 
