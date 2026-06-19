@@ -8,6 +8,7 @@ import { authInterceptor } from './core/auth/interceptors/auth.interceptor';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideMessaging, getMessaging } from '@angular/fire/messaging';
 import { environment } from '../environments/environment';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    provideMessaging(() => getMessaging())
+    provideMessaging(() => getMessaging()),
+    provideCharts(withDefaultRegisterables())
   ]
 };
