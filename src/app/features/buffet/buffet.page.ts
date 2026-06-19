@@ -19,7 +19,7 @@ import { ProductoCardComponent } from './components/producto-card/producto-card.
 import { SeleccionarAlumnoModalComponent } from './components/seleccionar-alumno-modal/seleccionar-alumno-modal.component';
 import { BuffetPresenter } from './presenter/buffet.presenter';
 import { Recreo } from '../compra/models/orden-compra.model';
-import { Producto } from './models/producto.model';
+import { Producto, CategoriaProducto, ClasificacionSalud } from './models/producto.model';
 import { CarritoService } from '../compra/services/carrito.service';
 
 export interface DateCell {
@@ -30,6 +30,20 @@ export interface DateCell {
   esFinDeSemana: boolean;
   bloqueado: boolean;
   seleccionada: boolean;
+}
+
+export interface MappedPromotion {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  itemsList: string[];
+  precio: number;
+  precioOriginal: number;
+  descuento: string;
+  imagen: string;
+  esPromoReal: boolean;
+  categoria: CategoriaProducto;
+  clasificacionesSalud: ClasificacionSalud[];
 }
 
 @Component({
@@ -192,7 +206,7 @@ export class BuffetPage implements OnInit {
     return this.activeSlideIndex() >= this.promocionesDestacadasFiltradas().length - 1;
   }
 
-  protected puedeComprarPromo(promo: any): boolean {
+  protected puedeComprarPromo(promo: MappedPromotion): boolean {
     const alumno = this.presenter.alumno();
     if (!alumno) return false;
 
@@ -211,7 +225,7 @@ export class BuffetPage implements OnInit {
     return this.carritoService.puedeAgregar(pTemp, alumno.id, 1);
   }
 
-  protected agregarPromoAlCarrito(promo: any): void {
+  protected agregarPromoAlCarrito(promo: MappedPromotion): void {
     const alumno = this.presenter.alumno();
     if (!alumno) return;
 
