@@ -7,6 +7,7 @@ import { AuthSessionService } from './auth-session.service';
 export class AuthService {
   private readonly perfilService = inject(PerfilService);
   private readonly authSessionService = inject(AuthSessionService);
+  amplify = { signInWithRedirect, signOut };
 
   async login(): Promise<void> {
     if (await this.isAutenticado()) {
@@ -14,7 +15,7 @@ export class AuthService {
     }
 
     this.perfilService.limpiar();
-    await signInWithRedirect({
+    await this.amplify.signInWithRedirect({
       options: {
         lang: 'es',
       },
@@ -25,7 +26,7 @@ export class AuthService {
     this.perfilService.limpiar();
 
     try {
-      await signOut();
+      await this.amplify.signOut();
     } catch (err) {
       console.error('Error durante el signOut', err);
     }

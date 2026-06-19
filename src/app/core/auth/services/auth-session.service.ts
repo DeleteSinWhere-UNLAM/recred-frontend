@@ -19,6 +19,7 @@ const INTERVALO_DEFAULT_MS = 250;
 
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
+  amplify = { fetchAuthSession };
   async haySesionAutenticada(): Promise<boolean> {
     const session = await this.obtenerSesionActual();
     return this.tieneTokenParaApi(session);
@@ -89,7 +90,7 @@ export class AuthSessionService {
     forceRefresh = false,
   ): Promise<AuthSession | null> {
     try {
-      return await fetchAuthSession(
+      return await this.amplify.fetchAuthSession(
         forceRefresh ? { forceRefresh } : undefined,
       );
     } catch (err) {
