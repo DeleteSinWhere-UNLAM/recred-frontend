@@ -3,7 +3,7 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { RestriccionesHorariasService } from '../services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../services/franjas-horarias.service';
 import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
-import { ProductService } from '../../updated-inventory/services/product.service';
+import { ProductoService } from '../../inventario/services/producto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { RestriccionHoraria, TimeSlot } from '../models/restriccion-horaria.model';
 import { CategoriaProducto } from '../../buffet/models/producto.model';
@@ -24,7 +24,7 @@ export class RestriccionesHorariasPresenter {
   private readonly restriccionesService = inject(RestriccionesHorariasService);
   private readonly franjasService = inject(FranjasHorariasService);
   private readonly nutricionalesService = inject(RestriccionesNutricionalesService);
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(ProductoService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly franjasState = signal<TimeSlot[]>([]);

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { PromocionCreada } from '../../models/recomendacion.model';
-import { Product } from '../../../updated-inventory/models/product.interface';
+import { Producto } from '../../../inventario/models/producto.model';
 
 @Component({
   selector: 'app-modal-aprobacion-promocion-ia',
@@ -13,7 +13,7 @@ import { Product } from '../../../updated-inventory/models/product.interface';
 })
 export class ModalAprobacionPromocionIaComponent {
   @Input({ required: true }) promotion!: PromocionCreada;
-  @Input({ required: true }) resolvedProducts: Product[] = [];
+  @Input({ required: true }) resolvedProducts: Producto[] = [];
 
   @Output() approve = new EventEmitter<string>();
   @Output() edit = new EventEmitter<string>();

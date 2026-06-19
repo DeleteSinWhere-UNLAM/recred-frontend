@@ -1,7 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RecomendacionesEstacionalesPresenter } from './recomendaciones-estacionales.presenter';
 import { RecomendacionesService } from '../services/recomendaciones.service';
-import { ProductService } from '../../updated-inventory/services/product.service';
+import { ProductoService } from '../../inventario/services/producto.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
@@ -11,7 +11,7 @@ import { of, throwError } from 'rxjs';
 describe('RecomendacionesEstacionalesPresenter', () => {
   let presenter: RecomendacionesEstacionalesPresenter;
   let recomendacionesServiceSpy: jasmine.SpyObj<RecomendacionesService>;
-  let productServiceSpy: jasmine.SpyObj<ProductService>;
+  let productServiceSpy: jasmine.SpyObj<ProductoService>;
   let promotionServiceSpy: jasmine.SpyObj<PromotionService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
@@ -19,7 +19,7 @@ describe('RecomendacionesEstacionalesPresenter', () => {
 
   beforeEach(() => {
     recomendacionesServiceSpy = jasmine.createSpyObj('RecomendacionesService', ['getSeasonalRecommendations']);
-    productServiceSpy = jasmine.createSpyObj('ProductService', ['getById']);
+    productServiceSpy = jasmine.createSpyObj('ProductoService', ['getById']);
     promotionServiceSpy = jasmine.createSpyObj('PromotionService', ['approvePromotion', 'discardPromotion']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['mostrar']);
     perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
@@ -29,7 +29,7 @@ describe('RecomendacionesEstacionalesPresenter', () => {
       providers: [
         RecomendacionesEstacionalesPresenter,
         { provide: RecomendacionesService, useValue: recomendacionesServiceSpy },
-        { provide: ProductService, useValue: productServiceSpy },
+        { provide: ProductoService, useValue: productServiceSpy },
         { provide: PromotionService, useValue: promotionServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: PerfilService, useValue: perfilServiceSpy },

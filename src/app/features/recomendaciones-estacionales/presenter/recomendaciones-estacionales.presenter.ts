@@ -2,17 +2,17 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, Observable, of, switchMap, forkJoin } from 'rxjs';
 import { RecomendacionesService } from '../services/recomendaciones.service';
-import { ProductService } from '../../updated-inventory/services/product.service';
+import { ProductoService } from '../../inventario/services/producto.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { Sugerencia, PromocionCreada } from '../models/recomendacion.model';
-import { Product } from '../../updated-inventory/models/product.interface';
+import { Producto } from '../../inventario/models/producto.model';
 
 @Injectable()
 export class RecomendacionesEstacionalesPresenter {
   private readonly recomendacionesService = inject(RecomendacionesService);
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(ProductoService);
   private readonly promotionService = inject(PromotionService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
@@ -24,7 +24,7 @@ export class RecomendacionesEstacionalesPresenter {
   private readonly tipPromocionalState = signal<string | null>(null);
 
   private readonly promotionState = signal<PromocionCreada | null>(null);
-  private readonly resolvedProductsState = signal<Product[]>([]);
+  private readonly resolvedProductsState = signal<Producto[]>([]);
   private readonly showModalState = signal<boolean>(false);
 
   readonly isLoading: Signal<boolean> = this.isLoadingState.asReadonly();
@@ -32,7 +32,7 @@ export class RecomendacionesEstacionalesPresenter {
   readonly sugerencias: Signal<Sugerencia[]> = this.sugerenciasState.asReadonly();
   readonly tipPromocional: Signal<string | null> = this.tipPromocionalState.asReadonly();
   readonly promotion: Signal<PromocionCreada | null> = this.promotionState.asReadonly();
-  readonly resolvedProducts: Signal<Product[]> = this.resolvedProductsState.asReadonly();
+  readonly resolvedProducts: Signal<Producto[]> = this.resolvedProductsState.asReadonly();
   readonly showModal: Signal<boolean> = this.showModalState.asReadonly();
 
   readonly shouldShowPromotionModal = computed(() => {
@@ -101,12 +101,12 @@ export class RecomendacionesEstacionalesPresenter {
     });
   }
 
-  private resolveProducts(productIds: string[]): Observable<Product[]> {
+  private resolveProducts(productIds: string[]): Observable<Producto[]> {
     if (!productIds || productIds.length === 0) return of([]);
 
     const requests = productIds.map(id =>
       this.productService.getById(id).pipe(
-        catchError(() => of({ id, nombre: 'Producto no disponible', descripcion: '', precio: 0, peso: 0, requierePreparacion: false, stockActual: 0 } as Product))
+        catchError(() => of({ id, nombre: 'Producto no disponible', descripcion: '', precio: 0, peso: 0, requierePreparacion: false, stockActual: 0 } as Producto))
       )
     );
 

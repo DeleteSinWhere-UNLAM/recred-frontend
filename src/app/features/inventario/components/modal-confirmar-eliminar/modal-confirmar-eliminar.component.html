@@ -1,0 +1,48 @@
+@if (isOpen) {
+  <div
+    class="modal-confirmar-eliminar__overlay"
+    tabindex="0"
+    role="button"
+    (click)="cancelled.emit()"
+    (keydown.enter)="cancelled.emit()"
+    (keydown.space)="cancelled.emit()"
+  >
+    <div
+      class="modal-confirmar-eliminar__card"
+      tabindex="-1"
+      role="presentation"
+      (click)="$event.stopPropagation()"
+      (keydown.enter)="$event.stopPropagation()"
+    >
+      <div class="modal-confirmar-eliminar__icono" aria-hidden="true">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+
+      <h2 class="modal-confirmar-eliminar__titulo">Confirmar eliminación</h2>
+
+      <p class="modal-confirmar-eliminar__mensaje">
+        ¿Estás seguro de que querés eliminar
+        <strong>{{ productName }}</strong>?
+        Esta acción no se puede deshacer.
+      </p>
+
+      <div class="modal-confirmar-eliminar__acciones">
+        <button
+          type="button"
+          class="modal-confirmar-eliminar__btn modal-confirmar-eliminar__btn--cancel"
+          (click)="cancelled.emit()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="modal-confirmar-eliminar__btn modal-confirmar-eliminar__btn--delete"
+          (click)="confirmed.emit()"
+        >
+          <i class="fa-solid fa-trash" aria-hidden="true"></i>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}

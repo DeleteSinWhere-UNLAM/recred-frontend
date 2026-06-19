@@ -8,13 +8,13 @@ import { ToastService } from '../../shared/services/toast.service';
 import { ReporteDiario } from './models/cierre-diario.model';
 import { CierreDiarioPage } from './cierre-diario.page';
 import { CierreDiarioService } from './services/cierre-diario.service';
-import { InventoryRealtimeService } from '../updated-inventory/services/inventory-realtime.service';
+import { InventarioRealtimeService } from '../inventario/services/inventario-realtime.service';
 
 describe('CierreDiarioPage', () => {
   let component: CierreDiarioPage;
   let fixture: ComponentFixture<CierreDiarioPage>;
   let cierreDiarioService: jasmine.SpyObj<CierreDiarioService>;
-  let inventoryRealtimeService: jasmine.SpyObj<InventoryRealtimeService>;
+  let inventoryRealtimeService: jasmine.SpyObj<InventarioRealtimeService>;
   let perfilService: jasmine.SpyObj<PerfilService>;
   let toastService: jasmine.SpyObj<ToastService>;
 
@@ -85,8 +85,8 @@ describe('CierreDiarioPage', () => {
         'downloadDailyReportCsv',
       ],
     );
-    inventoryRealtimeService = jasmine.createSpyObj<InventoryRealtimeService>(
-      'InventoryRealtimeService',
+    inventoryRealtimeService = jasmine.createSpyObj<InventarioRealtimeService>(
+      'InventarioRealtimeService',
       ['connect', 'recordRefetch'],
     );
     perfilService = jasmine.createSpyObj<PerfilService>('PerfilService', [
@@ -138,7 +138,7 @@ describe('CierreDiarioPage', () => {
       imports: [CierreDiarioPage],
       providers: [
         { provide: CierreDiarioService, useValue: cierreDiarioService },
-        { provide: InventoryRealtimeService, useValue: inventoryRealtimeService },
+        { provide: InventarioRealtimeService, useValue: inventoryRealtimeService },
         { provide: PerfilService, useValue: perfilService },
         { provide: ToastService, useValue: toastService },
         provideRouter([]),

@@ -4,7 +4,7 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { RestriccionesHorariasService } from '../services/restricciones-horarias.service';
 import { FranjasHorariasService } from '../services/franjas-horarias.service';
 import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
-import { ProductService } from '../../updated-inventory/services/product.service';
+import { ProductoService } from '../../inventario/services/producto.service';
 import { of } from 'rxjs';
 
 describe('RestriccionesHorariasPresenter', () => {
@@ -13,14 +13,14 @@ describe('RestriccionesHorariasPresenter', () => {
   let restriccionesServiceMock: jasmine.SpyObj<RestriccionesHorariasService>;
   let franjasServiceMock: jasmine.SpyObj<FranjasHorariasService>;
   let nutricionalesServiceMock: jasmine.SpyObj<RestriccionesNutricionalesService>;
-  let productServiceMock: jasmine.SpyObj<ProductService>;
+  let productServiceMock: jasmine.SpyObj<ProductoService>;
 
   beforeEach(() => {
     alumnosServiceMock = jasmine.createSpyObj('AlumnosService', ['asegurarCargados', 'getAlumnoById']);
     restriccionesServiceMock = jasmine.createSpyObj('RestriccionesHorariasService', ['getRestriccionesPorAlumno', 'crearRestriccion', 'deshabilitarRestriccion']);
     franjasServiceMock = jasmine.createSpyObj('FranjasHorariasService', ['getFranjasHorarias']);
     nutricionalesServiceMock = jasmine.createSpyObj('RestriccionesNutricionalesService', ['getCatalogo', 'getRestriccionesAlumno']);
-    productServiceMock = jasmine.createSpyObj('ProductService', ['getCategories']);
+    productServiceMock = jasmine.createSpyObj('ProductoService', ['getCategories']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -29,7 +29,7 @@ describe('RestriccionesHorariasPresenter', () => {
         { provide: RestriccionesHorariasService, useValue: restriccionesServiceMock },
         { provide: FranjasHorariasService, useValue: franjasServiceMock },
         { provide: RestriccionesNutricionalesService, useValue: nutricionalesServiceMock },
-        { provide: ProductService, useValue: productServiceMock }
+        { provide: ProductoService, useValue: productServiceMock }
       ]
     });
 
@@ -42,7 +42,7 @@ describe('RestriccionesHorariasPresenter', () => {
     restriccionesServiceMock.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([{ id: 'r1', activa: true, timeSlotId: 'ts1', categoryId: 'cat1' }] as unknown as import('../models/restriccion-horaria.model').RestriccionHoraria[]));
     nutricionalesServiceMock.getCatalogo.and.returnValue(Promise.resolve([{ id: 'sal1', descripcion: 'Salud 1' }]));
     nutricionalesServiceMock.getRestriccionesAlumno.and.returnValue(Promise.resolve([{ id: 'salGlobal1', descripcion: 'Salud Global' }]));
-    productServiceMock.getCategories.and.returnValue(of([{ id: 'cat1', descripcion: 'Categoria 1' }, { id: 'cat2', descripcion: 'Categoria 2' }] as unknown as import('../../updated-inventory/models/category.interface').Category[]));
+    productServiceMock.getCategories.and.returnValue(of([{ id: 'cat1', descripcion: 'Categoria 1' }, { id: 'cat2', descripcion: 'Categoria 2' }] as unknown as import('../../inventario/models/categoria.model').Categoria[]));
   });
 
   afterEach(() => {

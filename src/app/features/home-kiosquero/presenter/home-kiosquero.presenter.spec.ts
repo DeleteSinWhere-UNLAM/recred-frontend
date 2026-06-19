@@ -6,13 +6,13 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { PanelKiosquero } from '../models/panel-kiosquero.model';
 import { HomeKiosqueroService } from '../services/home-kiosquero.service';
-import { InventoryRealtimeService } from '../../updated-inventory/services/inventory-realtime.service';
+import { InventarioRealtimeService } from '../../inventario/services/inventario-realtime.service';
 import { HomeKiosqueroPresenter } from './home-kiosquero.presenter';
 
 describe('HomeKiosqueroPresenter', () => {
   let presenter: HomeKiosqueroPresenter;
   let homeKiosqueroService: jasmine.SpyObj<HomeKiosqueroService>;
-  let inventoryRealtimeService: jasmine.SpyObj<InventoryRealtimeService>;
+  let inventoryRealtimeService: jasmine.SpyObj<InventarioRealtimeService>;
   let router: jasmine.SpyObj<Router>;
 
   const panel: PanelKiosquero = {
@@ -139,8 +139,8 @@ describe('HomeKiosqueroPresenter', () => {
       'HomeKiosqueroService',
       ['getPanel', 'getPanelByRange', 'getNombreKiosquero'],
     );
-    inventoryRealtimeService = jasmine.createSpyObj<InventoryRealtimeService>(
-      'InventoryRealtimeService',
+    inventoryRealtimeService = jasmine.createSpyObj<InventarioRealtimeService>(
+      'InventarioRealtimeService',
       ['connect', 'recordRefetch'],
     );
     router = jasmine.createSpyObj<Router>('Router', [
@@ -168,7 +168,7 @@ describe('HomeKiosqueroPresenter', () => {
         { provide: PerfilService, useValue: perfilService },
         { provide: UsuarioService, useValue: usuarioService },
         { provide: HomeKiosqueroService, useValue: homeKiosqueroService },
-        { provide: InventoryRealtimeService, useValue: inventoryRealtimeService },
+        { provide: InventarioRealtimeService, useValue: inventoryRealtimeService },
         { provide: Router, useValue: router },
       ],
     });

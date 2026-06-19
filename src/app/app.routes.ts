@@ -182,8 +182,8 @@ export const routes: Routes = [
       {
         path: 'admin-productos',
         loadChildren: () =>
-          import('./features/updated-inventory/updated-inventory.routes').then(
-            (m) => m.updatedInventoryRoutes,
+          import('./features/inventario/inventario.routes').then(
+            (m) => m.inventarioRoutes,
           ),
       },
       {

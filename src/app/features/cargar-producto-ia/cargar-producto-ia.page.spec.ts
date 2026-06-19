@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { CargarProductoIaPage } from './cargar-producto-ia.page';
 import { IaVisionService } from './services/ia-vision.service';
-import { ProductService } from '../updated-inventory/services/product.service';
+import { ProductoService } from '../inventario/services/producto.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { GuardarProductoRequest } from './models/guardar-producto-request.model';
 import { of, throwError } from 'rxjs';
@@ -13,13 +13,13 @@ describe('CargarProductoIaPage', () => {
   let component: CargarProductoIaPage;
   let fixture: ComponentFixture<CargarProductoIaPage>;
   let iaVisionServiceMock: jasmine.SpyObj<IaVisionService>;
-  let productServiceMock: jasmine.SpyObj<ProductService>;
+  let productServiceMock: jasmine.SpyObj<ProductoService>;
   let perfilServiceMock: jasmine.SpyObj<PerfilService>;
   const mockBuffetId = 'buffet-test-123';
 
   beforeEach(async () => {
     iaVisionServiceMock = jasmine.createSpyObj('IaVisionService', ['analyzeImage', 'saveProduct']);
-    productServiceMock = jasmine.createSpyObj('ProductService', ['getCategories']);
+    productServiceMock = jasmine.createSpyObj('ProductoService', ['getCategories']);
     perfilServiceMock = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
 
     productServiceMock.getCategories.and.returnValue(of([]));
@@ -40,7 +40,7 @@ describe('CargarProductoIaPage', () => {
       imports: [CargarProductoIaPage],
       providers: [
         { provide: IaVisionService, useValue: iaVisionServiceMock },
-        { provide: ProductService, useValue: productServiceMock },
+        { provide: ProductoService, useValue: productServiceMock },
         { provide: PerfilService, useValue: perfilServiceMock },
         provideRouter([]),
         provideHttpClient(),

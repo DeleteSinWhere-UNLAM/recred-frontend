@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { IaVisionService } from './services/ia-vision.service';
 import { RespuestaProductoIa } from './models/respuesta-producto-ia.model';
 import { GuardarProductoRequest } from './models/guardar-producto-request.model';
-import { ProductService } from '../updated-inventory/services/product.service';
-import { Category } from '../updated-inventory/models/category.interface';
+import { ProductoService } from '../inventario/services/producto.service';
+import { Categoria } from '../inventario/models/categoria.model';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -21,12 +21,12 @@ import { FormularioProductoIaComponent } from './components/formulario-producto-
 })
 export class CargarProductoIaPage implements OnInit {
     private iaVisionService = inject(IaVisionService);
-    private productService = inject(ProductService);
+    private productService = inject(ProductoService);
     private router = inject(Router);
     private usuarioService = inject(UsuarioService);
     private perfilService = inject(PerfilService);
 
-    categories: Category[] = [];
+    categories: Categoria[] = [];
     buffetId = '';
 
     isLoading = false;

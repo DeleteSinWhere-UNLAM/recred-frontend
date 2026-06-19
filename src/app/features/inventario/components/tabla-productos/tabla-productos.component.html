@@ -1,0 +1,147 @@
+@if (isLoading) {
+  <div class="tabla-productos__estado">
+    <div class="tabla-productos__spinner"></div>
+    <p>Cargando inventario...</p>
+  </div>
+} @else if (products.length === 0) {
+  <div class="tabla-productos__estado tabla-productos__estado--vacio">
+    <div class="tabla-productos__estado-icono" aria-hidden="true">
+      <i class="fa-solid fa-box-open"></i>
+    </div>
+    <p class="tabla-productos__estado-titulo">Sin productos para mostrar</p>
+    <p class="tabla-productos__estado-subtitulo">No hay productos que coincidan con el filtro actual.</p>
+  </div>
+} @else {
+  <section class="tabla-productos" aria-labelledby="productos-stock-titulo">
+    <div class="tabla-productos__grid">
+      @for (product of products; track product.productId) {
+        <article
+          class="product-card"
+          [class.product-card--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+          [class.product-card--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+          [class.product-card--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
+          [class.product-card--pausado]="getOperationalStatus(product) === 'PAUSADO'"
+          [class.product-card--ok]="getOperationalStatus(product) === 'OK'"
+          [class.product-card--updated]="isHighlighted(product)"
+        >
+          <header class="product-card__header">
+            <div class="product-card__title-group">
+              <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
+              <div class="product-card__name-container">
+                <h4 class="product-card__name">{{ product.nombre }}</h4>
+                <span
+                  class="product-card__status"
+                  [class.product-card__status--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+                  [class.product-card__status--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+                  [class.product-card__status--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
+                  [class.product-card__status--pausado]="getOperationalStatus(product) === 'PAUSADO'"
+                  [class.product-card__status--ok]="getOperationalStatus(product) === 'OK'"
+                >
+                  <i class="fa-solid" [ngClass]="getStatusIcon(product)" aria-hidden="true"></i>
+                  {{ getStatusLabel(product) }}
+                </span>
+              </div>
+              <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+
+            <div class="product-card__image-wrapper">
+              <img
+                [src]="product.urlImagen || IMAGEN_FALLBACK"
+                [alt]="product.nombre"
+                class="product-card__image"
+                loading="lazy"
+                (error)="onImagenError($event)"
+              />
+            </div>
+          </header>
+
+          <section class="product-card__availability" aria-label="Disponibilidad">
+            <div class="product-card__availability-row">
+              <span>{{ getAvailabilityLabel(product) }}</span>
+              <strong>
+                {{ getStockValue(product) }}
+                @if (product.tipoManejoInventario === 'CUPO_DIARIO') {
+                  / {{ formatNullable(product.cupoMaximoDiario) }}
+                }
+              </strong>
+            </div>
+
+            @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
+              <div
+                class="product-card__bar"
+                [attr.aria-label]="'Disponibilidad ' + getAvailabilityPercent(product) + '%'"
+              >
+                <span
+                  class="product-card__bar-fill"
+                  [class.product-card__bar-fill--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+                  [class.product-card__bar-fill--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+                  [class.product-card__bar-fill--alta-reserva]="isHighReservation(product)"
+                  [style.width.%]="getAvailabilityPercent(product)"
+                ></span>
+              </div>
+
+              <div class="product-card__split">
+                <span>Reservado {{ formatNullable(product.stockReservado) }}</span>
+                <span>Total {{ getAvailabilityBase(product) }}</span>
+              </div>
+            }
+          </section>
+
+          @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
+            <dl class="product-card__metrics">
+              <div class="product-card__metric">
+                <dt>Actual</dt>
+                <dd>{{ formatNullable(product.stockActual) }}</dd>
+              </div>
+              <div class="product-card__metric">
+                <dt>Mínimo</dt>
+                <dd>{{ formatNullable(product.stockMinimo) }}</dd>
+              </div>
+              <div class="product-card__metric">
+                <dt>Reserva</dt>
+                <dd>{{ getReservationPercent(product) }}%</dd>
+              </div>
+            </dl>
+          }
+
+          <footer class="product-card__footer">
+            <div class="tabla-productos__acciones">
+              <button
+                type="button"
+                class="tabla-productos__btn tabla-productos__btn--manage"
+                (click)="emitManageInventory(product)"
+              >
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                <span>Gestionar</span>
+              </button>
+              <button
+                type="button"
+                class="tabla-productos__btn tabla-productos__btn--history"
+                (click)="emitViewHistory(product)"
+              >
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                <span>Historial</span>
+              </button>
+              <button
+                type="button"
+                class="tabla-productos__btn tabla-productos__btn--edit"
+                (click)="emitEditProduct(product)"
+              >
+                <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                <span>Editar</span>
+              </button>
+              <button
+                type="button"
+                class="tabla-productos__btn tabla-productos__btn--delete"
+                (click)="emitDeleteProduct(product)"
+              >
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                <span>Eliminar</span>
+              </button>
+            </div>
+          </footer>
+        </article>
+      }
+    </div>
+  </section>
+}

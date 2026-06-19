@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { RespuestaProductoIa } from "../../models/respuesta-producto-ia.model";
 import { GuardarProductoRequest } from "../../models/guardar-producto-request.model";
-import { Category } from "../../../updated-inventory/models/category.interface";
+import { Categoria } from "../../../inventario/models/categoria.model";
 
 @Component({
   selector: "app-formulario-producto-ia",
@@ -13,7 +13,7 @@ import { Category } from "../../../updated-inventory/models/category.interface";
 })
 export class FormularioProductoIaComponent implements OnInit, OnChanges {
   @Input() prefillData: RespuestaProductoIa | null = null;
-  @Input() categories: Category[] = [];
+  @Input() categories: Categoria[] = [];
   @Input() isSaving = false;
   @Input() buffetId = "";
   @Output() save = new EventEmitter<GuardarProductoRequest>();

@@ -15,8 +15,8 @@ import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../shared/services/toast.service';
-import { InventoryRealtimeService } from '../updated-inventory/services/inventory-realtime.service';
-import { RealtimeInventoryEvent } from '../updated-inventory/models/inventory.interface';
+import { InventarioRealtimeService } from '../inventario/services/inventario-realtime.service';
+import { EventoInventarioRealtime } from '../inventario/models/inventario.model';
 import {
   RegistroCierreDiario,
   ResultadoCierreDiario,
@@ -59,7 +59,7 @@ export class CierreDiarioPage implements OnInit, OnDestroy {
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly toastService = inject(ToastService);
-  private readonly inventoryRealtimeService = inject(InventoryRealtimeService);
+  private readonly inventoryRealtimeService = inject(InventarioRealtimeService);
   private readonly router = inject(Router);
   private readonly zone = inject(NgZone);
 
@@ -689,7 +689,7 @@ export class CierreDiarioPage implements OnInit, OnDestroy {
     );
   }
 
-  private scheduleRealtimeRefresh(event: RealtimeInventoryEvent): void {
+  private scheduleRealtimeRefresh(event: EventoInventarioRealtime): void {
     if (
       !this.shouldRefreshDailyCloseForRealtimeEvent(event) ||
       this.realtimeRefreshTimeoutId !== null
@@ -774,7 +774,7 @@ export class CierreDiarioPage implements OnInit, OnDestroy {
   }
 
   private shouldRefreshDailyCloseForRealtimeEvent(
-    event: RealtimeInventoryEvent,
+    event: EventoInventarioRealtime,
   ): boolean {
     return (
       document.visibilityState === 'visible' &&
@@ -784,7 +784,7 @@ export class CierreDiarioPage implements OnInit, OnDestroy {
     );
   }
 
-  private isRealtimeEventForSelectedDate(event: RealtimeInventoryEvent): boolean {
+  private isRealtimeEventForSelectedDate(event: EventoInventarioRealtime): boolean {
     const eventDate = event.date?.trim();
 
     if (eventDate) {
