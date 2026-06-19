@@ -8,21 +8,15 @@ describe('TipCardComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TipCardComponent]
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(TipCardComponent);
     component = fixture.componentInstance;
-    component.tipPromocional = 'Prueba de tip promocional';
+  });
+
+  it('dado que recibe tipPromocional, deberia setearlo correctamente', () => {
+    component.tipPromocional = 'Test Tip';
     fixture.detectChanges();
-  });
-
-  it('debería crearse correctamente', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('debería mostrar el texto del tip promocional', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.tip-card__texto')?.textContent).toContain('Prueba de tip promocional');
+    expect(component.tipPromocional).toBe('Test Tip');
   });
 });

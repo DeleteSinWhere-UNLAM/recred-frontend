@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { SeasonalPagePresenter } from './seasonal-page.presenter';
 import { RecomendacionesService } from '../../../services/recomendaciones.service';
 import { ProductService } from '../../../../updated-inventory/services/product.service';
@@ -10,83 +10,158 @@ import { of, throwError } from 'rxjs';
 
 describe('SeasonalPagePresenter', () => {
   let presenter: SeasonalPagePresenter;
-  let mockRecomendacionesService: jasmine.SpyObj<RecomendacionesService>;
-  let mockProductService: jasmine.SpyObj<ProductService>;
-  let mockPromotionService: jasmine.SpyObj<PromotionService>;
-  let mockToastService: jasmine.SpyObj<ToastService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockPerfilService: jasmine.SpyObj<PerfilService>;
+  let recomendacionesServiceSpy: jasmine.SpyObj<RecomendacionesService>;
+  let productServiceSpy: jasmine.SpyObj<ProductService>;
+  let promotionServiceSpy: jasmine.SpyObj<PromotionService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    mockRecomendacionesService = jasmine.createSpyObj('RecomendacionesService', ['getSeasonalRecommendations']);
-    mockProductService = jasmine.createSpyObj('ProductService', ['getById']);
-    mockPromotionService = jasmine.createSpyObj('PromotionService', ['approvePromotion', 'discardPromotion']);
-    mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
-    mockPerfilService = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
-
-    mockPerfilService.obtenerBuffetId.and.returnValue('buffet-123');
+    recomendacionesServiceSpy = jasmine.createSpyObj('RecomendacionesService', ['getSeasonalRecommendations']);
+    productServiceSpy = jasmine.createSpyObj('ProductService', ['getById']);
+    promotionServiceSpy = jasmine.createSpyObj('PromotionService', ['approvePromotion', 'discardPromotion']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['mostrar']);
+    perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
 
     TestBed.configureTestingModule({
       providers: [
         SeasonalPagePresenter,
-        { provide: RecomendacionesService, useValue: mockRecomendacionesService },
-        { provide: ProductService, useValue: mockProductService },
-        { provide: PromotionService, useValue: mockPromotionService },
-        { provide: ToastService, useValue: mockToastService },
-        { provide: Router, useValue: mockRouter },
-        { provide: PerfilService, useValue: mockPerfilService }
+        { provide: RecomendacionesService, useValue: recomendacionesServiceSpy },
+        { provide: ProductService, useValue: productServiceSpy },
+        { provide: PromotionService, useValue: promotionServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
+        { provide: PerfilService, useValue: perfilServiceSpy },
+        { provide: Router, useValue: routerSpy }
       ]
     });
-
+    
     presenter = TestBed.inject(SeasonalPagePresenter);
   });
 
-  it('Dado que se inicializa, los estados por defecto deben ser correctos', () => {
-    expect(presenter.isLoading()).toBeFalse();
-    expect(presenter.error()).toBeNull();
-    expect(presenter.sugerencias()).toEqual([]);
-    expect(presenter.showModal()).toBeFalse();
+  it('dado que se llama a volver, deberia navegar a kiosquero', () => {
+    presenter.volver();
+    expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
   });
 
-  describe('volver', () => {
-    it('Dado que se llama a volver, debe navegar a /kiosquero', () => {
-      presenter.volver();
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+  describe('loadRecommendations', () => {
+    beforeEach(() => {
+      spyOn(navigator.geolocation, 'getCurrentPosition').and.callFake((success, error) => {
+        success({ coords: { latitude: 10, longitude: 20 } } as GeolocationPosition);
+      });
     });
+
+    it('dado que loadRecommendations es exitoso sin promocion_creada, deberia setear sugerencias', fakeAsync(() => {
+      recomendacionesServiceSpy.getSeasonalRecommendations.and.returnValue(of({
+        sugerencias: [{ categoria: 'A', accion: 'A', motivo: 'M' }],
+        tip_promocional: 'Tip'
+      }));
+
+      presenter.loadRecommendations();
+      tick();
+
+      expect(presenter.sugerencias().length).toBe(1);
+      expect(presenter.tipPromocional()).toBe('Tip');
+      expect(presenter.isLoading()).toBeFalse();
+    }));
+
+    it('dado que loadRecommendations tiene promo y resuelve productos exitosamente, abre el modal', fakeAsync(() => {
+      recomendacionesServiceSpy.getSeasonalRecommendations.and.returnValue(of({
+        sugerencias: [],
+        promocion_creada: { id: 'promo1', name: 'P', discountPercentage: 10, startDate: '2026-01-01T00:00:00.000Z', endDate: '2026-12-31T00:00:00.000Z', productIds: ['prod1'], status: 'ACTIVE' }
+      }));
+      productServiceSpy.getById.and.returnValue(of({ id: 'prod1', nombre: 'Test', descripcion: '', precio: 1, peso: 1, stockActual: 1, categoriaId: '1', requierePreparacion: false }));
+
+      presenter.loadRecommendations();
+      tick();
+
+      expect(presenter.promotion()).not.toBeNull();
+      expect(presenter.resolvedProducts().length).toBe(1);
+      expect(presenter.showModal()).toBeTrue();
+      expect(presenter.shouldShowPromotionModal()).toBeTrue();
+    }));
+
+    it('dado que resolveProducts falla para un producto, deberia crear producto dummy no disponible', fakeAsync(() => {
+      recomendacionesServiceSpy.getSeasonalRecommendations.and.returnValue(of({
+        sugerencias: [],
+        promocion_creada: { id: 'promo1', name: 'P', productIds: ['prod-err'] } as any
+      }));
+      productServiceSpy.getById.and.returnValue(throwError(() => new Error('Error')));
+
+      presenter.loadRecommendations();
+      tick();
+
+      expect(presenter.resolvedProducts().length).toBe(1);
+      expect(presenter.resolvedProducts()[0].nombre).toBe('Producto no disponible');
+    }));
+
+    it('dado que getCurrentPosition devuelve un error de geolocalizacion, muestra error especifico', fakeAsync(() => {
+      (navigator.geolocation.getCurrentPosition as jasmine.Spy).and.callFake((success, error) => {
+        const err = new Error('Geoloc') as any;
+        Object.setPrototypeOf(err, GeolocationPositionError.prototype);
+        error(err);
+      });
+
+      presenter.loadRecommendations();
+      tick();
+
+      expect(presenter.error()).toContain('No pudimos acceder a tu ubicación');
+      expect(presenter.isLoading()).toBeFalse();
+    }));
+
+    it('dado que backend devuelve error generico, muestra error de conexion', fakeAsync(() => {
+      recomendacionesServiceSpy.getSeasonalRecommendations.and.returnValue(throwError(() => new Error('Net error')));
+
+      presenter.loadRecommendations();
+      tick();
+
+      expect(presenter.error()).toContain('Ocurrió un error al conectar con el motor');
+      expect(presenter.isLoading()).toBeFalse();
+    }));
   });
 
-  describe('approvePromotion', () => {
-    it('Dado que la promoción se aprueba exitosamente, debe mostrar toast de éxito y cerrar el modal', () => {
-      mockPromotionService.approvePromotion.and.returnValue(of({} as import('../../../../../data-access/services/promociones/promotion.service').Promotion));
-      presenter.approvePromotion('1');
-      expect(mockPromotionService.approvePromotion).toHaveBeenCalledWith('1', 'buffet-123');
-      expect(mockToastService.mostrar).toHaveBeenCalledWith('Promoción aprobada exitosamente', 'success');
+  describe('Promotions actions', () => {
+    it('dado que se aprueba promocion exitosamente, deberia emitir success y cerrar modal', () => {
+      perfilServiceSpy.obtenerBuffetId.and.returnValue('buffet1');
+      promotionServiceSpy.approvePromotion.and.returnValue(of({} as any));
+      presenter['showModalState'].set(true);
+
+      presenter.approvePromotion('promo1');
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Promoción aprobada exitosamente', 'success');
       expect(presenter.showModal()).toBeFalse();
     });
 
-    it('Dado que falla al aprobar, debe mostrar toast de error', () => {
-      mockPromotionService.approvePromotion.and.returnValue(throwError(() => new Error('error')));
-      presenter.approvePromotion('1');
-      expect(mockToastService.mostrar).toHaveBeenCalledWith('Error al aprobar la promoción', 'error');
-    });
-  });
+    it('dado que se aprueba promocion con error, deberia mostrar toast error', () => {
+      perfilServiceSpy.obtenerBuffetId.and.returnValue('buffet1');
+      promotionServiceSpy.approvePromotion.and.returnValue(throwError(() => new Error()));
 
-  describe('discardPromotion', () => {
-    it('Dado que la promoción se descarta, debe mostrar toast y cerrar modal', () => {
-      mockPromotionService.discardPromotion.and.returnValue(of(undefined));
-      presenter.discardPromotion('1');
-      expect(mockPromotionService.discardPromotion).toHaveBeenCalledWith('1');
-      expect(mockToastService.mostrar).toHaveBeenCalledWith('Promoción descartada', 'success');
+      presenter.approvePromotion('promo1');
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Error al aprobar la promoción', 'error');
+    });
+
+    it('dado que se descarta promocion exitosamente, deberia emitir success y cerrar modal', () => {
+      promotionServiceSpy.discardPromotion.and.returnValue(of(void 0));
+      presenter['showModalState'].set(true);
+
+      presenter.discardPromotion('promo1');
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Promoción descartada', 'success');
       expect(presenter.showModal()).toBeFalse();
     });
-  });
 
-  describe('editPromotion', () => {
-    it('Dado que se edita, debe navegar a /promociones/editar/id', () => {
-      presenter.editPromotion('1');
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/promociones/editar', '1']);
+    it('dado que se descarta promocion con error, deberia mostrar toast error', () => {
+      promotionServiceSpy.discardPromotion.and.returnValue(throwError(() => new Error()));
+
+      presenter.discardPromotion('promo1');
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Error al descartar la promoción', 'error');
+    });
+
+    it('dado que se edita promocion, deberia cerrar modal y navegar a editar', () => {
+      presenter['showModalState'].set(true);
+      presenter.editPromotion('promo1');
+      
       expect(presenter.showModal()).toBeFalse();
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/promociones/editar', 'promo1']);
     });
   });
 });

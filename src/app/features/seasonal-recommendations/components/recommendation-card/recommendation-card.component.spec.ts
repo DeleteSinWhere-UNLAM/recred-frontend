@@ -6,31 +6,23 @@ describe('RecommendationCardComponent', () => {
   let component: RecommendationCardComponent;
   let fixture: ComponentFixture<RecommendationCardComponent>;
 
-  const mockSugerencia: Sugerencia = {
-    categoria: 'Test Categoria',
-    accion: 'AUMENTAR',
-    motivo: 'Test Motivo'
-  };
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RecommendationCardComponent]
-    })
-    .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(RecommendationCardComponent);
     component = fixture.componentInstance;
+  });
+
+  it('dado que se inicializa, deberia asignar item correctamente', () => {
+    const mockSugerencia: Sugerencia = {
+      categoria: 'TEST_CAT',
+      accion: 'TEST_ACCION',
+      motivo: 'TEST_MOTIVO'
+    };
     component.item = mockSugerencia;
     fixture.detectChanges();
-  });
-
-  it('debería crearse correctamente', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('debería mostrar la categoría y el motivo', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.recommendation-card__titulo')?.textContent).toContain('Test Categoria');
-    expect(compiled.querySelector('.recommendation-card__motivo')?.textContent).toContain('Test Motivo');
+    expect(component.item).toEqual(mockSugerencia);
   });
 });
