@@ -84,4 +84,42 @@ describe('MovimientosService', () => {
     expect(req.request.method).toBe('GET');
     req.flush(mockMovimientos);
   });
+
+  it('getPendientesAlumno debería llamar a /purchases/alumno/:id/pendientes cuando el id es un UUID', (done) => {
+    const uuid = '550e8400-e29b-41d4-a716-446655440000';
+    service.getPendientesAlumno(uuid).subscribe({
+      next: (movimientos) => {
+        expect(movimientos).toEqual(mockMovimientos);
+        done();
+      }
+    });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/purchases/alumno/${uuid}/pendientes`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockMovimientos);
+  });
+
+  it('getPendientesAlumno debería retornar mock filtrado cuando el id no es un UUID', (done) => {
+    service.getPendientesAlumno('julian-garcia').subscribe({
+      next: (movimientos) => {
+        expect(movimientos.length).toBeGreaterThan(0);
+        const hasOtherStatus = movimientos.some(m => m.status !== 'PENDING' && m.status !== 'EN_PREPARACION' && m.status !== 'LISTO');
+        expect(hasOtherStatus).toBeFalse();
+        done();
+      }
+    });
+  });
+
+  it('cancelarCompra debería hacer PUT a /purchases/:id/cancel', (done) => {
+    service.cancelarCompra('mov-123').subscribe({
+      next: () => {
+        expect(true).toBeTrue();
+        done();
+      }
+    });
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/purchases/mov-123/cancel`);
+    expect(req.request.method).toBe('PUT');
+    req.flush(null);
+  });
 });
