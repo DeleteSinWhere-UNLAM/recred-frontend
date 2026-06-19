@@ -1,7 +1,7 @@
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { PerfilService, UsuarioSinPerfilError } from './perfil.service';
+import { PerfilService } from './perfil.service';
 import { AuthSessionService } from '../../core/auth/services/auth-session.service';
 import { environment } from '../../../environments/environment';
 import { Perfil } from '../models/perfil.model';
@@ -83,7 +83,7 @@ describe('PerfilService', () => {
       authSessionServiceSpy.obtenerAtributosUsuario.and.returnValue(Promise.resolve({ email: 'a@a.com', nombre: 'A', apellido: 'B' }));
       spyOn(console, 'error');
 
-      let caughtError: any;
+      let caughtError: unknown;
       service.cargarPerfil().catch(err => caughtError = err);
       flushMicrotasks();
 
@@ -97,9 +97,9 @@ describe('PerfilService', () => {
 
     it('dado que el rol es PENDIENTE, deberia lanzar UsuarioSinPerfilError', fakeAsync(() => {
       authSessionServiceSpy.obtenerAtributosUsuario.and.returnValue(Promise.resolve({ email: 'a@a.com', nombre: 'A', apellido: 'B' }));
-      const mockResponse: any = { id: '1', email: 'a@a.com', nombre: 'A', apellido: 'B', rol: 'PENDIENTE' };
+      const mockResponse: unknown = { id: '1', email: 'a@a.com', nombre: 'A', apellido: 'B', rol: 'PENDIENTE' };
 
-      let caughtError: any;
+      let caughtError: unknown;
       service.cargarPerfil().catch(err => caughtError = err);
       flushMicrotasks();
 
@@ -157,7 +157,7 @@ describe('PerfilService', () => {
     }));
 
     it('dado que existe un perfil pero su rol es PENDIENTE, deberia delegar a cargarPerfil', fakeAsync(() => {
-      const pendingProfile: any = { id: '1', email: 'a@a.com', nombre: 'A', apellido: 'B', rol: 'PENDIENTE' };
+      const pendingProfile: unknown = { id: '1', email: 'a@a.com', nombre: 'A', apellido: 'B', rol: 'PENDIENTE' };
       service['perfilState'].set(pendingProfile);
 
       authSessionServiceSpy.obtenerAtributosUsuario.and.returnValue(Promise.resolve({ email: 'a@a.com', nombre: 'A', apellido: 'B' }));

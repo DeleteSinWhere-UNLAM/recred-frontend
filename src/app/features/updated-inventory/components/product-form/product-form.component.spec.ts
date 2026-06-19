@@ -203,20 +203,20 @@ describe('ProductFormComponent', () => {
     const file = new File([''], 'test.png', { type: 'image/png' });
     const event = { target: { files: [file] } } as unknown as Event;
 
-    spyOn(component as any, 'uploadImage');
+    spyOn(component as unknown, 'uploadImage');
 
     component.onFileSelected(event);
 
-    expect((component as any).uploadImage).toHaveBeenCalledWith(file);
+    expect((component as unknown).uploadImage).toHaveBeenCalledWith(file);
   });
 
   it('dado que subo imagen exitosamente, deberia patchear el url y preview', () => {
     const file = new File([''], 'test.png', { type: 'image/png' });
-    const httpMock = TestBed.inject(provideHttpClientTesting()[0] as any);
     
+
     // Omitiendo la inyeccion real para simplemente mockear el HttpClient via spy si es posible
     // Pero ya tengo HttpTestingController inyectado
-    (component as any).uploadImage(file);
+    (component as unknown).uploadImage(file);
     expect(component.isUploadingImage()).toBeTrue();
   });
 

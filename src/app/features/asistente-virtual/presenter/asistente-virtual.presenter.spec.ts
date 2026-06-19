@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AsistenteVirtualPresenter } from './asistente-virtual.presenter';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { AsistenteVirtualService } from '../services/asistente-virtual.service';
@@ -194,7 +194,7 @@ describe('AsistenteVirtualPresenter', () => {
 
     it('dado que hay sugerencia backend con normalizarId invalido, deberia caer en fallback', () => {
       const mockResp = [{ label: 'test', mensaje: '???', tipoAccion: 'sugerencia_rapida' }];
-      const result = presenter['mapearSugerenciasBackend'](mockResp as any);
+      const result = presenter['mapearSugerenciasBackend'](mockResp as unknown);
       expect(result[0].id).toContain('backend-0-');
     });
 

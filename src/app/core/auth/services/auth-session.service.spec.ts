@@ -16,7 +16,7 @@ describe('AuthSessionService', () => {
 
   const mockSessionWithTokens: AuthSession = {
     tokens: {
-      accessToken: 'access-123' as any,
+      accessToken: 'access-123' as unknown,
       idToken: {
         payload: {
           sub: 'sub-123',
@@ -24,7 +24,7 @@ describe('AuthSessionService', () => {
           given_name: 'Juan',
           family_name: 'Perez',
         }
-      } as any
+      } as unknown
     },
     userSub: 'sub-123'
   };
@@ -187,10 +187,10 @@ describe('AuthSessionService', () => {
     it('dado que el payload tiene name en vez de given_name, debe mapearlo al nombre', async () => {
       const mockSessionName = {
         tokens: {
-          accessToken: 'access' as any,
+          accessToken: 'access' as unknown,
           idToken: {
             payload: { name: 'Pedro' }
-          } as any
+          } as unknown
         }
       };
       spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve(mockSessionName));
@@ -202,7 +202,7 @@ describe('AuthSessionService', () => {
     });
 
     it('dado que no hay payload en idToken, debe retornar objeto vacio', async () => {
-      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ tokens: { accessToken: 'a' as any } as any }));
+      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ tokens: { accessToken: 'a' as unknown } as unknown }));
 
       const result = await service.obtenerAtributosUsuario();
 
@@ -214,10 +214,10 @@ describe('AuthSessionService', () => {
     it('dado que los atributos del payload tienen espacios o no son strings, valorString los limpia', async () => {
       const mockSessionSpaces = {
         tokens: {
-          accessToken: 'access' as any,
+          accessToken: 'access' as unknown,
           idToken: {
             payload: { given_name: '   ', family_name: 123 }
-          } as any
+          } as unknown
         }
       };
       spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve(mockSessionSpaces));

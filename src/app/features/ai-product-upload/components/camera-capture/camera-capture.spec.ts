@@ -30,7 +30,7 @@ describe('CameraCapture', () => {
       spyOn(component.photoTaken, 'emit');
       const file = new File([''], 'test.pdf', { type: 'application/pdf' });
       const inputElement = document.createElement('input');
-      spyOnProperty(inputElement, 'files').and.returnValue([file] as any);
+      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown);
       const mockEvent = { target: inputElement } as unknown as Event;
 
       component.onFileSelected(mockEvent);
@@ -47,7 +47,7 @@ describe('CameraCapture', () => {
       Object.defineProperty(file, 'size', { value: 11 * 1024 * 1024 });
 
       const inputElement = document.createElement('input');
-      spyOnProperty(inputElement, 'files').and.returnValue([file] as any);
+      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown);
       const mockEvent = { target: inputElement } as unknown as Event;
 
       component.onFileSelected(mockEvent);
@@ -61,7 +61,7 @@ describe('CameraCapture', () => {
       spyOn(component.photoTaken, 'emit');
       const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
       const inputElement = document.createElement('input');
-      spyOnProperty(inputElement, 'files').and.returnValue([file] as any);
+      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown);
       const mockEvent = { target: inputElement } as unknown as Event;
 
       component.onFileSelected(mockEvent);

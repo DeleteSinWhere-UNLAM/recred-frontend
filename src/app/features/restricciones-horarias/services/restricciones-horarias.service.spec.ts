@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { RestriccionesHorariasService } from './restricciones-horarias.service';
@@ -52,14 +52,14 @@ describe('RestriccionesHorariasService', () => {
   }));
 
   it('dado que la peticion GET falla, deberia lanzar el error', fakeAsync(() => {
-    let error: any;
+    let error: unknown;
     service.getRestriccionesPorAlumno('s1').catch(err => error = err);
 
     const req = httpMock.expectOne(`${environment.apiUrl}/time-restrictions/student/s1`);
     req.flush('Error', { status: 500, statusText: 'Server Error' });
 
     tick();
-    expect(error).toBeDefined();
+    expect(_error).toBeDefined();
     expect(error.status).toBe(500);
   }));
 

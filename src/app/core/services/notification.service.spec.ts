@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { NotificationService } from './notification.service';
 import { Messaging } from '@angular/fire/messaging';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -53,7 +53,7 @@ describe('NotificationService', () => {
     it('dado que se otorga permiso, debe llamar a handleTokenRegistration y listenToForegroundMessages', fakeAsync(() => {
       spyOn(window.Notification, 'requestPermission').and.returnValue(Promise.resolve('granted'));
       spyOn(service, 'handleTokenRegistration');
-      spyOn<any>(service, 'listenToForegroundMessages');
+      spyOn<unknown>(service, 'listenToForegroundMessages');
 
       service.requestNotificationPermission();
       tick();
@@ -65,7 +65,7 @@ describe('NotificationService', () => {
     it('dado que se deniega el permiso, no debe llamar a handleTokenRegistration pero si a listenToForegroundMessages', fakeAsync(() => {
       spyOn(window.Notification, 'requestPermission').and.returnValue(Promise.resolve('denied'));
       spyOn(service, 'handleTokenRegistration');
-      spyOn<any>(service, 'listenToForegroundMessages');
+      spyOn<unknown>(service, 'listenToForegroundMessages');
 
       service.requestNotificationPermission();
       tick();
@@ -80,7 +80,7 @@ describe('NotificationService', () => {
       spyOn(service.firebase, 'getToken').and.returnValue(Promise.resolve('nuevo-token'));
       spyOn(localStorage, 'getItem').and.returnValue('viejo-token');
       spyOn(localStorage, 'setItem');
-      spyOn<any>(service, 'sendTokenToBackend');
+      spyOn<unknown>(service, 'sendTokenToBackend');
 
       service.handleTokenRegistration();
       tick();
@@ -92,7 +92,7 @@ describe('NotificationService', () => {
     it('dado que se obtiene el mismo token que ya existe, no debe enviarlo al backend', fakeAsync(() => {
       spyOn(service.firebase, 'getToken').and.returnValue(Promise.resolve('mismo-token'));
       spyOn(localStorage, 'getItem').and.returnValue('mismo-token');
-      spyOn<any>(service, 'sendTokenToBackend');
+      spyOn<unknown>(service, 'sendTokenToBackend');
 
       service.handleTokenRegistration();
       tick();
@@ -102,7 +102,7 @@ describe('NotificationService', () => {
 
     it('dado que no se obtiene token, no debe hacer nada', fakeAsync(() => {
       spyOn(service.firebase, 'getToken').and.returnValue(Promise.resolve(''));
-      spyOn<any>(service, 'sendTokenToBackend');
+      spyOn<unknown>(service, 'sendTokenToBackend');
 
       service.handleTokenRegistration();
       tick();
@@ -112,7 +112,7 @@ describe('NotificationService', () => {
 
     it('dado que falla al obtener el token, debe capturar el error', fakeAsync(() => {
       const error = new Error('Error token');
-      spyOn(service.firebase, 'getToken').and.returnValue(Promise.reject(error));
+      spyOn(service.firebase, 'getToken').and.returnValue(Promise.reject(_error));
 
       service.handleTokenRegistration();
       tick();
@@ -122,12 +122,12 @@ describe('NotificationService', () => {
   });
 
   describe('listenToForegroundMessages', () => {
-    let onMessageCallback: (payload: any) => void;
+    let onMessageCallback: (payload: unknown) => void;
 
     beforeEach(() => {
-      spyOn(service.firebase, 'onMessage').and.callFake((messaging: any, cb: any) => {
+      spyOn(service.firebase, 'onMessage').and.callFake((messaging: unknown, cb: unknown) => {
         onMessageCallback = cb;
-        return () => {};
+        return () => { return; };
       });
       service['listenToForegroundMessages']();
     });
@@ -188,7 +188,7 @@ describe('NotificationService', () => {
         tipo: 'PURCHASE_SUGGESTION'
       }));
       expect(notificacionSugerenciaSaludableSpy.mostrar).toHaveBeenCalledWith(
-        'sug1', 'Sugerencia', 'Compra esto', { id: 'prod1', nombre: 'Manzana' } as any, 'alumno2'
+        'sug1', 'Sugerencia', 'Compra esto', { id: 'prod1', nombre: 'Manzana' } as unknown, 'alumno2'
       );
     });
 
@@ -220,7 +220,7 @@ describe('NotificationService', () => {
       onMessageCallback(payload);
 
       expect(notificacionSugerenciaSaludableSpy.mostrar).toHaveBeenCalledWith(
-        undefined as any, undefined as any, undefined as any, { id: 'prod2', nombre: 'Pera' } as any, undefined as any
+        undefined as unknown, undefined as unknown, undefined as unknown, { id: 'prod2', nombre: 'Pera' } as unknown, undefined as unknown
       );
     });
   });

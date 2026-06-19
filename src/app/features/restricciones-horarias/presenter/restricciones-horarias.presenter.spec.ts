@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { RestriccionesHorariasPresenter } from './restricciones-horarias.presenter';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { RestriccionesHorariasService } from '../services/restricciones-horarias.service';
@@ -9,11 +9,11 @@ import { of } from 'rxjs';
 
 describe('RestriccionesHorariasPresenter', () => {
   let presenter: RestriccionesHorariasPresenter;
-  let alumnosServiceMock: any;
-  let restriccionesServiceMock: any;
-  let franjasServiceMock: any;
-  let nutricionalesServiceMock: any;
-  let productServiceMock: any;
+  let alumnosServiceMock: unknown;
+  let restriccionesServiceMock: unknown;
+  let franjasServiceMock: unknown;
+  let nutricionalesServiceMock: unknown;
+  let productServiceMock: unknown;
 
   beforeEach(() => {
     alumnosServiceMock = jasmine.createSpyObj('AlumnosService', ['asegurarCargados', 'getAlumnoById']);

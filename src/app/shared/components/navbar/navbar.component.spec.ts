@@ -54,7 +54,7 @@ describe('NavbarComponent', () => {
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
     
-    routerMock = TestBed.inject(Router) as any;
+    routerMock = TestBed.inject(Router) as unknown;
     spyOn(routerMock, 'navigateByUrl').and.returnValue(Promise.resolve(true));
     spyOn(routerMock, 'navigate').and.returnValue(Promise.resolve(true));
     

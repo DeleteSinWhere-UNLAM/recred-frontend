@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { InventoryRealtimeService } from './inventory-realtime.service';
 import { AuthSessionService } from '../../../core/auth/services/auth-session.service';
 
@@ -31,7 +31,7 @@ describe('InventoryRealtimeService', () => {
     let errorCalled = false;
 
     service.connect('buffet-1', {
-      onRefresh: () => {},
+      onRefresh: () => { return; },
       onError: () => {
         errorCalled = true;
       },
@@ -45,11 +45,11 @@ describe('InventoryRealtimeService', () => {
 
   it('dado que llamo a disconnect, deberia limpiar subscripciones y abortar conexion', fakeAsync(() => {
     authSessionServiceMock.obtenerAccessTokenParaApi.and.returnValue(
-      new Promise(() => {}) 
+      new Promise(() => { return; }) 
     );
 
     service.connect('buffet-1', {
-      onRefresh: () => {},
+      onRefresh: () => { return; },
     });
 
     expect(() => service.disconnect()).not.toThrow();
@@ -62,19 +62,19 @@ describe('InventoryRealtimeService', () => {
 
   it('dado que llamo a connect con otro buffetId, deberia cerrar conexion anterior', fakeAsync(() => {
     authSessionServiceMock.obtenerAccessTokenParaApi.and.returnValue(
-      new Promise(() => {})
+      new Promise(() => { return; })
     );
     let closeCalled = false;
 
     service.connect('buffet-1', {
-      onRefresh: () => {},
+      onRefresh: () => { return; },
       onClose: () => {
         closeCalled = true;
       },
     });
 
     service.connect('buffet-2', {
-      onRefresh: () => {},
+      onRefresh: () => { return; },
     });
 
     flushMicrotasks();
@@ -84,11 +84,11 @@ describe('InventoryRealtimeService', () => {
 
   it('dado que aborto la conexion del subscriber, deberia desconectarse tras idle', fakeAsync(() => {
     authSessionServiceMock.obtenerAccessTokenParaApi.and.returnValue(
-      new Promise(() => {})
+      new Promise(() => { return; })
     );
 
     const abortController = service.connect('buffet-1', {
-      onRefresh: () => {},
+      onRefresh: () => { return; },
     });
 
     abortController.abort();

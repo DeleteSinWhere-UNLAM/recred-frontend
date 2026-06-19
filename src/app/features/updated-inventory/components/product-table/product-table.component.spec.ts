@@ -121,12 +121,12 @@ describe('ProductTableComponent', () => {
     const imgElement = document.createElement('img');
     imgElement.src = 'bad-url.jpg';
     
-    component.onImagenError({ target: imgElement } as any);
+    component.onImagenError({ target: imgElement } as unknown);
     expect(imgElement.src).toContain('data:image/svg+xml');
     
     // Segunda vez no deberia volver a procesar si ya es fallback
     const fallbackSrc = imgElement.src;
-    component.onImagenError({ target: imgElement } as any);
+    component.onImagenError({ target: imgElement } as unknown);
     expect(imgElement.src).toBe(fallbackSrc);
   });
 

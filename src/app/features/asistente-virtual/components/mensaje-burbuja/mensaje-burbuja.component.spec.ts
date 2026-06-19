@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MensajeBurbujaComponent } from './mensaje-burbuja.component';
-import { MensajeAsistente } from '../../models/mensaje-asistente.model';
 
 describe('MensajeBurbujaComponent', () => {
   let component: MensajeBurbujaComponent;

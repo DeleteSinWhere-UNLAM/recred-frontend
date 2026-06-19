@@ -102,7 +102,7 @@ describe('AiProductForm', () => {
       nuevaCategoriaCtrl?.setValue('Deberia borrarse');
       categoriaCtrl?.setValue('uuid-existente');
 
-      expect(nuevaCategoriaCtrl?.hasValidator(jasmine.any(Function) as any)).toBeFalse();
+      expect(nuevaCategoriaCtrl?.hasValidator(jasmine.any(Function) as unknown)).toBeFalse();
       expect(nuevaCategoriaCtrl?.value).toBe('');
       expect(nuevaCategoriaCtrl?.valid).toBeTrue();
     });
