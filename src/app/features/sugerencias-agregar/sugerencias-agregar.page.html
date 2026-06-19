@@ -190,7 +190,7 @@
         }
       </div>
     </section>
-    } @else if (!(presenter.isLoading$ | async)) {
+    } @else if ((presenter.isLoading$ | async) === false) {
     <div class="sa__empty-state">
       <span aria-hidden="true">
         <i class="fa-solid fa-circle-check"></i>

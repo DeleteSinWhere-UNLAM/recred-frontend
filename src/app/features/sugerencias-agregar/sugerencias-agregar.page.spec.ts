@@ -16,7 +16,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
   standalone: true
 })
 class MockNavbarComponent {
-  @Input() userName: string = '';
+  @Input() userName = '';
 }
 
 describe('SugerenciasAgregarPage', () => {
@@ -30,7 +30,7 @@ describe('SugerenciasAgregarPage', () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     mockUsuarioService = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual', 'setHomeUrl']);
-    mockUsuarioService.getUsuarioActual.and.returnValue({ id: 'user-1', nombre: 'Test Kiosquero', rol: 'KIOSQUERO' } as any);
+    mockUsuarioService.getUsuarioActual.and.returnValue({ id: 'user-1', nombre: 'Test Kiosquero', rol: 'KIOSQUERO' } as ReturnType<UsuarioService['getUsuarioActual']>);
 
     mockPresenter = jasmine.createSpyObj('SugerenciasAgregarPresenter', ['initialize'], {
       isLoading$: of(false),
