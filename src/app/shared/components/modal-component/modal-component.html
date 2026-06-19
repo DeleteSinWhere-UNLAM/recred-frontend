@@ -11,11 +11,11 @@
 
       <div class="modal__acciones">
         @if (showCancel) {
-          <app-button-component variant="outline" (onClick)="dismiss.emit()">
+          <app-button-component variant="outline" (Click)="dismiss.emit()">
             {{ cancelText }}
           </app-button-component>
         }
-        <app-button-component variant="success" (onClick)="confirm.emit()">
+        <app-button-component variant="success" (Click)="confirm.emit()">
           {{ confirmText }}
         </app-button-component>
       </div>

@@ -2,11 +2,13 @@ import { Injectable, inject, signal, computed, Signal } from '@angular/core';
 import { PromotionService, Promotion } from '../../../data-access/services/promociones/promotion.service';
 import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
+import { DialogService } from '../../../shared/services/dialog.service';
 
 @Injectable()
 export class PromocionesPagePresenter {
   private readonly promotionService = inject(PromotionService);
   private readonly router = inject(Router);
+  private readonly dialogService = inject(DialogService);
 
   private readonly promotionsState = signal<Promotion[]>([]);
   private readonly isLoadingState = signal<boolean>(false);
@@ -59,8 +61,9 @@ export class PromocionesPagePresenter {
     this.router.navigateByUrl('/kiosquero');
   }
 
-  deletePromotion(id: string): void {
-    if (confirm('¿Estás seguro de que deseas eliminar esta promoción?')) {
+  async deletePromotion(id: string): Promise<void> {
+    const confirmed = await this.dialogService.confirm('¿Estás seguro de que deseas eliminar esta promoción?', 'Eliminar Promoción');
+    if (confirmed) {
       this.isLoadingState.set(true);
       this.promotionService.discardPromotion(id).pipe(
         catchError(() => {

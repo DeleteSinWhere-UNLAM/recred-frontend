@@ -2,7 +2,7 @@
 
 <main class="perfil-usuario">
   <div class="perfil-usuario__container">
-    <button type="button" class="perfil-usuario__volver" (click)="volver()">
+    <button type="button" class="perfil-usuario__volver" [class.perfil-usuario__volver--premium]="esPremium()" (click)="volver()">
       <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
       <span>Volver</span>
     </button>
@@ -23,6 +23,7 @@
         <button
           type="button"
           class="perfil-usuario__avatar-editar"
+          [class.perfil-usuario__avatar-editar--premium]="esPremium()"
           [disabled]="subiendoFoto()"
           (click)="abrirSelectorFoto()"
           [title]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
@@ -65,7 +66,7 @@
       <section class="perfil-usuario__estado perfil-usuario__estado--error">
         <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
         <p>{{ error() }}</p>
-        <button type="button" (click)="cargarPerfil()">Reintentar</button>
+        <button type="button" [class.perfil-usuario__boton--reintentar-premium]="esPremium()" (click)="cargarPerfil()">Reintentar</button>
       </section>
     } @else {
       <section class="perfil-usuario__grid" aria-label="Datos del usuario">
@@ -160,6 +161,7 @@
             <button
               type="button"
               class="perfil-usuario__boton perfil-usuario__boton--secundario"
+              [class.perfil-usuario__boton--secundario-premium]="esPremium()"
               [disabled]="guardando() || !form.dirty"
               (click)="descartarCambios()"
             >
@@ -312,6 +314,7 @@
                 <button
                   type="button"
                   class="perfil-usuario__boton perfil-usuario__boton--secundario"
+                  [class.perfil-usuario__boton--secundario-premium]="esPremium()"
                   [disabled]="guardandoPayout() || !payoutForm.dirty"
                   (click)="descartarCambiosPayout()"
                 >
@@ -320,6 +323,7 @@
                 <button
                   type="submit"
                   class="perfil-usuario__boton perfil-usuario__boton--primario"
+                  [class.perfil-usuario__boton--primario-premium]="esPremium()"
                   [disabled]="guardandoPayout() || payoutForm.invalid"
                 >
                   @if (guardandoPayout()) {

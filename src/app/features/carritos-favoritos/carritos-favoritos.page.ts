@@ -9,6 +9,8 @@ import { CarritoFavoritoResponse } from './models/carritos-favoritos.model';
 import { Producto } from '../buffet/models/producto.model';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { GuardarFavoritoModalComponent } from '../compra/components/guardar-favorito-modal/guardar-favorito-modal.component';
+import { DialogService } from '../../shared/services/dialog.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
 
 interface GrupoHijo {
   alumnoId: string;
@@ -30,8 +32,11 @@ export class CarritosFavoritosPage implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly router = inject(Router);
+  private readonly dialogService = inject(DialogService);
+  private readonly perfilService = inject(PerfilService);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
+  readonly esPlanGratuito = this.perfilService.esPlanGratuito;
 
   carritosFavoritos: CarritoFavoritoResponse[] = [];
   gruposHijos: GrupoHijo[] = [];
@@ -100,8 +105,9 @@ export class CarritosFavoritosPage implements OnInit {
     this.toastService.mostrar(`Se cargaron los productos del carrito "${carrito.nombre}" al carrito de compras`, 'success');
   }
 
-  eliminarCarrito(id: string): void {
-    if (confirm('¿Estás seguro de que querés eliminar este carrito favorito?')) {
+  async eliminarCarrito(id: string): Promise<void> {
+    const confirmed = await this.dialogService.confirm('¿Estás seguro de que querés eliminar este carrito favorito?', 'Eliminar Carrito');
+    if (confirmed) {
       this.carritosService.deleteCarritoFavorito(id).subscribe({
         next: () => {
           this.toastService.mostrar('Carrito favorito eliminado', 'success');

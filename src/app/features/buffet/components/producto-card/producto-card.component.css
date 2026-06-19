@@ -443,3 +443,22 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Premium Gold Metallic styling */
+.producto-card__cta--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 8px 16px rgba(212, 175, 55, 0.35) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.producto-card__cta--premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 12px 24px rgba(212, 175, 55, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+.producto-card__cta--premium:active {
+  transform: translateY(1px);
+}

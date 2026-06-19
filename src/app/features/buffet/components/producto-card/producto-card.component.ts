@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { CarritoService } from '../../../compra/services/carrito.service';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { Producto, disponible } from '../../models/producto.model';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
@@ -31,6 +32,7 @@ export interface AgregarEvento {
 })
 export class ProductoCardComponent {
   private readonly carritoService = inject(CarritoService);
+  private readonly perfilService = inject(PerfilService);
 
   private readonly productoState = signal<Producto | undefined>(undefined);
   private readonly alumnoIdState = signal<string>('');
@@ -71,6 +73,7 @@ export class ProductoCardComponent {
   }
 
   readonly productoActual = computed(() => this.productoState());
+  protected readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
 
   readonly disponible = computed(() => {
     const p = this.productoState();

@@ -82,7 +82,7 @@
 
         <button
           type="button"
-          [class]="(superaPresupuesto() || superaSaldo()) ? 'producto-card__cta producto-card__cta--presupuesto' : 'producto-card__cta'"
+          [class]="(superaPresupuesto() || superaSaldo()) ? 'producto-card__cta producto-card__cta--presupuesto' : (esPremium() ? 'producto-card__cta producto-card__cta--premium' : 'producto-card__cta')"
           [disabled]="superaPresupuesto() || superaSaldo()"
           (click)="onAgregar()"
         >

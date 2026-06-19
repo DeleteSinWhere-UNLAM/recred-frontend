@@ -165,6 +165,7 @@
       <button
         type="button"
         class="restricciones__guardar"
+        [class.restricciones__guardar--premium]="esPremium()"
         (click)="presenter.guardar()"
         [disabled]="presenter.cargando() || presenter.guardando()"
       >

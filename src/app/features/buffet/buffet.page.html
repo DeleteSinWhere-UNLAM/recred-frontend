@@ -164,7 +164,7 @@
                       </div>
 
                       @if (puedeComprarPromo(promo)) {
-                        <button type="button" class="promo-card__btn-agregar" (click)="agregarPromoAlCarrito(promo)">
+                        <button type="button" class="promo-card__btn-agregar" [class.promo-card__btn-agregar--premium]="esPremium()" (click)="agregarPromoAlCarrito(promo)">
                           Agregar Promo
                         </button>
                       } @else {
@@ -507,7 +507,7 @@
             <span class="buffet__footer-cart-total">{{ formatARS(presenter.totalCarrito()) }}</span>
           </div>
         </div>
-        <button type="button" class="buffet__footer-cart-btn" (click)="presenter.irAlCarrito()">
+        <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()" (click)="presenter.irAlCarrito()">
           <span>Ver Carrito y Pagar</span>
           <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
         </button>

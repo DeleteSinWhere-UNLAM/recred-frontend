@@ -9,12 +9,14 @@ import { NotificacionesService } from './data-access/services/notificaciones.ser
 import { AsistenteVirtualComponent } from './features/asistente-virtual/asistente-virtual.component';
 import { NotificacionSaldoBajoComponent } from "./shared/components/notifications/notificacion-saldo-bajo/notificacion-saldo-bajo.component";
 import { NotificacionSugerenciaSaludableComponent } from "./shared/components/notifications/notificacion-sugerencia-saludable/notificacion-sugerencia-saludable.component";
+import { ModalComponent } from './shared/components/modal-component/modal-component';
+import { DialogService } from './shared/services/dialog.service';
 
 const RUTAS_SIN_ASISTENTE = new Set(['/', '/seleccion-tipo-cuenta']);
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastHostComponent, AsistenteVirtualComponent, NotificacionSaldoBajoComponent, NotificacionSugerenciaSaludableComponent],
+  imports: [RouterOutlet, ToastHostComponent, AsistenteVirtualComponent, NotificacionSaldoBajoComponent, NotificacionSugerenciaSaludableComponent, ModalComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -24,6 +26,7 @@ export class App implements OnInit {
   private notificationService = inject(NotificationService);
   private perfilService = inject(PerfilService);
   private notificacionesService = inject(NotificacionesService);
+  protected readonly dialogService = inject(DialogService);
 
   private rutaActual = signal(this.normalizarUrl(this.router.url));
   private autenticado = signal(false);

@@ -9,6 +9,7 @@ import { RestriccionHoraria, TimeSlot } from '../models/restriccion-horaria.mode
 import { CategoriaProducto } from '../../buffet/models/producto.model';
 import { ClasificacionSaludBackend } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { firstValueFrom } from 'rxjs';
+import { DialogService } from '../../../shared/services/dialog.service';
 
 export interface FranjaConRestricciones {
   franja: TimeSlot;
@@ -25,6 +26,7 @@ export class RestriccionesHorariasPresenter {
   private readonly franjasService = inject(FranjasHorariasService);
   private readonly nutricionalesService = inject(RestriccionesNutricionalesService);
   private readonly productService = inject(ProductService);
+  private readonly dialogService = inject(DialogService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly franjasState = signal<TimeSlot[]>([]);
@@ -131,13 +133,13 @@ export class RestriccionesHorariasPresenter {
       if (error.status === 409) {
         console.error('Conflicto detectado en el backend:', error.error);
         const mensajeBack = error.error?.mensaje || 'Una de las restricciones ya existe o hay un problema de integridad.';
-        alert(`No se pudo guardar: ${mensajeBack}`);
+        await this.dialogService.alert(`No se pudo guardar: ${mensajeBack}`, 'Conflicto');
       } else if (error.status === 400) {
         const mensajeBack = error.error?.message || 'Error en los datos enviados. Es posible que falten campos obligatorios.';
-        alert(`No se pudo guardar: ${mensajeBack}`);
+        await this.dialogService.alert(`No se pudo guardar: ${mensajeBack}`, 'Error de Datos');
       } else {
         console.error('Error al crear restriccion horaria:', error);
-        alert('Ocurrió un error inesperado al intentar guardar. Revisá los logs.');
+        await this.dialogService.alert('Ocurrió un error inesperado al intentar guardar. Revisá los logs.', 'Error Inesperado');
       }
     } finally {
       this.cargandoState.set(false);
@@ -153,16 +155,17 @@ export class RestriccionesHorariasPresenter {
   }
 
   async quitarRestriccion(id: string): Promise<void> {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta restricción?')) return;
+    const confirmacion = await this.dialogService.confirm('¿Estás seguro de que deseas eliminar esta restricción?', 'Eliminar Restricción');
+    if (!confirmacion) return;
 
     this.cargandoState.set(true);
     try {
       await this.restriccionesService.deshabilitarRestriccion(id);
       this.restriccionesState.update(actual => actual.filter(r => r.id !== id));
-      alert('Restricción eliminada con éxito.');
+      await this.dialogService.alert('Restricción eliminada con éxito.', 'Éxito');
     } catch (error) {
       console.error('Error al eliminar restricción:', error);
-      alert('No se pudo eliminar la restricción. Intentá de nuevo más tarde.');
+      await this.dialogService.alert('No se pudo eliminar la restricción. Intentá de nuevo más tarde.', 'Error');
     } finally {
       this.cargandoState.set(false);
     }
