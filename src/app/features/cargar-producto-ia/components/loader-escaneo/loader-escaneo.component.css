@@ -1,4 +1,4 @@
-.scanner-loader {
+.loader-escaneo {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7,20 +7,20 @@
   background-color: var(--color-fondo);
   border-radius: 16px;
   box-shadow: var(--shadow-neu-concave);
-  animation: scanner-loader-in 0.25s ease-out;
+  animation: loader-escaneo-in 0.25s ease-out;
 }
 
-.scanner-loader__spinner {
+.loader-escaneo__spinner {
   width: 28px;
   height: 28px;
   border: 3px solid color-mix(in srgb, var(--color-pizarra) 15%, var(--color-fondo));
   border-left-color: var(--color-dorado);
   border-radius: 50%;
-  animation: scanner-loader-spin 0.8s linear infinite;
+  animation: loader-escaneo-spin 0.8s linear infinite;
   flex-shrink: 0;
 }
 
-.scanner-loader__texto {
+.loader-escaneo__texto {
   margin: 0;
   font-family: var(--font-display);
   font-size: 13px;
@@ -29,11 +29,11 @@
   letter-spacing: 0.3px;
 }
 
-@keyframes scanner-loader-spin {
+@keyframes loader-escaneo-spin {
   to { transform: rotate(360deg); }
 }
 
-@keyframes scanner-loader-in {
+@keyframes loader-escaneo-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }

@@ -1,10 +1,10 @@
 ﻿<form
   [formGroup]="productForm"
   (ngSubmit)="submitForm()"
-  class="ai-product-form"
+  class="formulario-producto-ia"
 >
   @if (productForm.get("urlImagen")?.value) {
-    <div class="ai-product-form__preview-container" style="margin-bottom: 2rem; display: flex; justify-content: center;">
+    <div class="formulario-producto-ia__preview-container" style="margin-bottom: 2rem; display: flex; justify-content: center;">
       <img 
         [src]="productForm.get('urlImagen')?.value" 
         alt="Previsualización del producto" 
@@ -13,37 +13,37 @@
     </div>
   }
 
-  <section class="ai-product-form__seccion">
-    <h3 class="ai-product-form__seccion-titulo">Información del producto</h3>
+  <section class="formulario-producto-ia__seccion">
+    <h3 class="formulario-producto-ia__seccion-titulo">Información del producto</h3>
 
-    <div class="ai-product-form__grid">
-      <div class="ai-product-form__group">
-        <label for="ai-nombre" class="ai-product-form__label">Nombre del producto</label>
+    <div class="formulario-producto-ia__grid">
+      <div class="formulario-producto-ia__group">
+        <label for="ai-nombre" class="formulario-producto-ia__label">Nombre del producto</label>
         <input
           id="ai-nombre"
-          class="ai-product-form__input"
+          class="formulario-producto-ia__input"
           formControlName="nombre"
           type="text"
           placeholder="Ej: Manzana Roja"
         >
       </div>
 
-      <div class="ai-product-form__group">
-        <label for="ai-descripcion" class="ai-product-form__label">Descripción</label>
+      <div class="formulario-producto-ia__group">
+        <label for="ai-descripcion" class="formulario-producto-ia__label">Descripción</label>
         <input
           id="ai-descripcion"
-          class="ai-product-form__input"
+          class="formulario-producto-ia__input"
           formControlName="descripcion"
           type="text"
           placeholder="Ej: Manzana roja fresca por unidad"
         >
       </div>
 
-      <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('categoriaId')">
-        <label for="ai-categoria" class="ai-product-form__label">Categoría</label>
+      <div class="formulario-producto-ia__group" [class.formulario-producto-ia__group--error]="hasError('categoriaId')">
+        <label for="ai-categoria" class="formulario-producto-ia__label">Categoría</label>
         <select
           id="ai-categoria"
-          class="ai-product-form__input ai-product-form__input--select"
+          class="formulario-producto-ia__input formulario-producto-ia__input--select"
           formControlName="categoriaId"
         >
           <option [ngValue]="null" disabled selected>Selecciona una categoría</option>
@@ -53,31 +53,31 @@
           <option value="NEW">+ Crear nueva categoría</option>
         </select>
         @if (hasError('categoriaId')) {
-          <span class="ai-product-form__error">{{ getErrorMessage('categoriaId') }}</span>
+          <span class="formulario-producto-ia__error">{{ getErrorMessage('categoriaId') }}</span>
         }
       </div>
 
       @if (productForm.get('categoriaId')?.value === 'NEW') {
-        <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('nuevaCategoriaNombre')">  
-          <label for="ai-nueva-categoria" class="ai-product-form__label">Nombre de la nueva categoría</label>
+        <div class="formulario-producto-ia__group" [class.formulario-producto-ia__group--error]="hasError('nuevaCategoriaNombre')">  
+          <label for="ai-nueva-categoria" class="formulario-producto-ia__label">Nombre de la nueva categoría</label>
           <input
             id="ai-nueva-categoria"
-            class="ai-product-form__input"
+            class="formulario-producto-ia__input"
             formControlName="nuevaCategoriaNombre"
             type="text"
             placeholder="Ej: Frutas y Verduras"
           >
           @if (hasError('nuevaCategoriaNombre')) {
-            <span class="ai-product-form__error">{{ getErrorMessage('nuevaCategoriaNombre') }}</span>
+            <span class="formulario-producto-ia__error">{{ getErrorMessage('nuevaCategoriaNombre') }}</span>
           }
         </div>
       }
 
-      <div class="ai-product-form__group">
-        <label for="ai-peso" class="ai-product-form__label">Peso (kg)</label>
+      <div class="formulario-producto-ia__group">
+        <label for="ai-peso" class="formulario-producto-ia__label">Peso (kg)</label>
         <input
           id="ai-peso"
-          class="ai-product-form__input"
+          class="formulario-producto-ia__input"
           formControlName="peso"
           type="number"
           step="0.001"
@@ -86,11 +86,11 @@
         >
       </div>
 
-      <div class="ai-product-form__group">
-        <label for="ai-precio" class="ai-product-form__label">Precio ($)</label>
+      <div class="formulario-producto-ia__group">
+        <label for="ai-precio" class="formulario-producto-ia__label">Precio ($)</label>
         <input
           id="ai-precio"
-          class="ai-product-form__input"
+          class="formulario-producto-ia__input"
           formControlName="precio"
           type="number"
           step="0.01"
@@ -99,11 +99,11 @@
         >
       </div>
 
-      <div class="ai-product-form__group">
-        <label for="ai-stock" class="ai-product-form__label">Stock actual</label>
+      <div class="formulario-producto-ia__group">
+        <label for="ai-stock" class="formulario-producto-ia__label">Stock actual</label>
         <input
           id="ai-stock"
-          class="ai-product-form__input"
+          class="formulario-producto-ia__input"
           formControlName="stockActual"
           type="number"
           min="0"
@@ -113,49 +113,49 @@
     </div>
   </section>
 
-  <section class="ai-product-form__seccion">
-    <h3 class="ai-product-form__seccion-titulo">Atributos</h3>
+  <section class="formulario-producto-ia__seccion">
+    <h3 class="formulario-producto-ia__seccion-titulo">Atributos</h3>
 
-    <div class="ai-product-form__toggles">
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Requiere preparación</span>
+    <div class="formulario-producto-ia__toggles">
+      <label class="formulario-producto-ia__toggle">
+        <span class="formulario-producto-ia__toggle-label">Requiere preparación</span>
         <input type="checkbox" formControlName="requierePreparacion">
-        <span class="ai-product-form__toggle-switch"></span>
+        <span class="formulario-producto-ia__toggle-switch"></span>
       </label>
 
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene azúcar</span>
+      <label class="formulario-producto-ia__toggle">
+        <span class="formulario-producto-ia__toggle-label">Contiene azúcar</span>
         <input type="checkbox" formControlName="contiene_azucar">
-        <span class="ai-product-form__toggle-switch"></span>
+        <span class="formulario-producto-ia__toggle-switch"></span>
       </label>
 
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene maní</span>
+      <label class="formulario-producto-ia__toggle">
+        <span class="formulario-producto-ia__toggle-label">Contiene maní</span>
         <input type="checkbox" formControlName="contiene_mani">
-        <span class="ai-product-form__toggle-switch"></span>
+        <span class="formulario-producto-ia__toggle-switch"></span>
       </label>
 
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene lactosa</span>
+      <label class="formulario-producto-ia__toggle">
+        <span class="formulario-producto-ia__toggle-label">Contiene lactosa</span>
         <input type="checkbox" formControlName="contiene_lactosa">
-        <span class="ai-product-form__toggle-switch"></span>
+        <span class="formulario-producto-ia__toggle-switch"></span>
       </label>
 
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene TACC</span>
+      <label class="formulario-producto-ia__toggle">
+        <span class="formulario-producto-ia__toggle-label">Contiene TACC</span>
         <input type="checkbox" formControlName="contiene_tacc">
-        <span class="ai-product-form__toggle-switch"></span>
+        <span class="formulario-producto-ia__toggle-switch"></span>
       </label>
     </div>
   </section>
 
   <button
     type="submit"
-    class="ai-product-form__submit"
+    class="formulario-producto-ia__submit"
     [disabled]="productForm.invalid || isSaving || !buffetId"
   >
     @if (isSaving) {
-      <span class="ai-product-form__submit-spinner"></span>
+      <span class="formulario-producto-ia__submit-spinner"></span>
       Guardando...
     } @else {
       <i class="fa-solid fa-check" aria-hidden="true"></i>

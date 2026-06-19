@@ -1,22 +1,22 @@
-﻿import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { AiProductResponse } from "../../models/ai-product-response.interface";
-import { SaveProductRequest } from "../../models/save-product-request.interface";
+import { RespuestaProductoIa } from "../../models/respuesta-producto-ia.model";
+import { GuardarProductoRequest } from "../../models/guardar-producto-request.model";
 import { Category } from "../../../updated-inventory/models/category.interface";
 
 @Component({
-  selector: "app-ai-product-form",
+  selector: "app-formulario-producto-ia",
   standalone: true,
   imports: [ReactiveFormsModule],
-  templateUrl: "./ai-product-form.html",
-  styleUrl: "./ai-product-form.css",
+  templateUrl: "./formulario-producto-ia.component.html",
+  styleUrl: "./formulario-producto-ia.component.css",
 })
-export class AiProductForm implements OnInit, OnChanges {
-  @Input() prefillData: AiProductResponse | null = null;
+export class FormularioProductoIaComponent implements OnInit, OnChanges {
+  @Input() prefillData: RespuestaProductoIa | null = null;
   @Input() categories: Category[] = [];
   @Input() isSaving = false;
   @Input() buffetId = "";
-  @Output() save = new EventEmitter<SaveProductRequest>();
+  @Output() save = new EventEmitter<GuardarProductoRequest>();
 
   private fb = inject(FormBuilder);
   productForm: FormGroup = this.fb.group({
@@ -81,7 +81,7 @@ export class AiProductForm implements OnInit, OnChanges {
   submitForm() {
     if (this.productForm.valid && this.buffetId) {
       const formValue = this.productForm.value;
-      const request: SaveProductRequest = {
+      const request: GuardarProductoRequest = {
         nombre: formValue.nombre,
         descripcion: formValue.descripcion,
         precio: formValue.precio,

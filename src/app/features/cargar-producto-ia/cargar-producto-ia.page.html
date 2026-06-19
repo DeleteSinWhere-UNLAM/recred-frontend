@@ -23,12 +23,12 @@
       </div>
     </header>
 
-    <app-camera-capture
+    <app-captura-camara
       [isScanning]="isLoading"
       (photoTaken)="handlePhoto($event)"
     />
 
-    <app-scanner-loader [isScanning]="isLoading" />
+    <app-loader-escaneo [isScanning]="isLoading" />
 
     @if (saveSuccess) {
       <div class="carga-producto__feedback carga-producto__feedback--success">
@@ -51,7 +51,7 @@
       </div>
     }
 
-    <app-ai-product-form
+    <app-formulario-producto-ia
       [prefillData]="scannedProductData"
       [categories]="categories"
       [isSaving]="isSaving"

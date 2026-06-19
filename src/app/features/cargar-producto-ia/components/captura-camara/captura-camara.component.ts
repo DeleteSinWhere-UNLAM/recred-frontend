@@ -5,13 +5,13 @@ const MAX_FILE_SIZE_MB = 10;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 @Component({
-  selector: 'app-camera-capture',
+  selector: 'app-captura-camara',
   standalone: true,
   imports: [],
-  templateUrl: './camera-capture.html',
-  styleUrl: './camera-capture.css',
+  templateUrl: './captura-camara.component.html',
+  styleUrl: './captura-camara.component.css',
 })
-export class CameraCapture {
+export class CapturaCamaraComponent {
   @Output() photoTaken = new EventEmitter<File>();
   @Input() isScanning = false;
 

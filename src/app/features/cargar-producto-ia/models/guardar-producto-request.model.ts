@@ -1,4 +1,4 @@
-﻿export interface SaveProductRequest {
+﻿export interface GuardarProductoRequest {
   nombre: string;
   descripcion: string;
   precio: number;

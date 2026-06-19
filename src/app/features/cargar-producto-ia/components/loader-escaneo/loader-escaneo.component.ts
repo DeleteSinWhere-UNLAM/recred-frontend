@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-scanner-loader',
+  selector: 'app-loader-escaneo',
   standalone: true,
   imports: [],
-  templateUrl: './scanner-loader.html',
-  styleUrl: './scanner-loader.css',
+  templateUrl: './loader-escaneo.component.html',
+  styleUrl: './loader-escaneo.component.css',
 })
-export class ScannerLoader {
+export class LoaderEscaneoComponent {
   @Input() isScanning = false;
 }

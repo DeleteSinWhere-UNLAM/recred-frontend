@@ -2,30 +2,30 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { AiProductUploadPageComponent } from './ai-product-upload-page.component';
-import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
-import { ProductService } from '../../updated-inventory/services/product.service';
-import { PerfilService } from '../../../data-access/services/perfil.service';
-import { SaveProductRequest } from '../models/save-product-request.interface';
+import { CargarProductoIaPage } from './cargar-producto-ia.page';
+import { IaVisionService } from './services/ia-vision.service';
+import { ProductService } from '../updated-inventory/services/product.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
+import { GuardarProductoRequest } from './models/guardar-producto-request.model';
 import { of, throwError } from 'rxjs';
 
-describe('AiProductUploadPageComponent', () => {
-  let component: AiProductUploadPageComponent;
-  let fixture: ComponentFixture<AiProductUploadPageComponent>;
-  let aiVisionServiceMock: jasmine.SpyObj<AiVisionService>;
+describe('CargarProductoIaPage', () => {
+  let component: CargarProductoIaPage;
+  let fixture: ComponentFixture<CargarProductoIaPage>;
+  let iaVisionServiceMock: jasmine.SpyObj<IaVisionService>;
   let productServiceMock: jasmine.SpyObj<ProductService>;
   let perfilServiceMock: jasmine.SpyObj<PerfilService>;
   const mockBuffetId = 'buffet-test-123';
 
   beforeEach(async () => {
-    aiVisionServiceMock = jasmine.createSpyObj('AiVisionService', ['analyzeImage', 'saveProduct']);
+    iaVisionServiceMock = jasmine.createSpyObj('IaVisionService', ['analyzeImage', 'saveProduct']);
     productServiceMock = jasmine.createSpyObj('ProductService', ['getCategories']);
     perfilServiceMock = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
 
     productServiceMock.getCategories.and.returnValue(of([]));
     perfilServiceMock.obtenerBuffetId.and.returnValue(mockBuffetId);
 
-    aiVisionServiceMock.analyzeImage.and.returnValue(of(
+    iaVisionServiceMock.analyzeImage.and.returnValue(of(
       {
         nombre: 'Galletas de arroz integral',
         descripcion: '-',
@@ -37,9 +37,9 @@ describe('AiProductUploadPageComponent', () => {
       }));
 
     await TestBed.configureTestingModule({
-      imports: [AiProductUploadPageComponent],
+      imports: [CargarProductoIaPage],
       providers: [
-        { provide: AiVisionService, useValue: aiVisionServiceMock },
+        { provide: IaVisionService, useValue: iaVisionServiceMock },
         { provide: ProductService, useValue: productServiceMock },
         { provide: PerfilService, useValue: perfilServiceMock },
         provideRouter([]),
@@ -48,7 +48,7 @@ describe('AiProductUploadPageComponent', () => {
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AiProductUploadPageComponent);
+    fixture = TestBed.createComponent(CargarProductoIaPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -62,14 +62,14 @@ describe('AiProductUploadPageComponent', () => {
     component.handlePhoto(file);
 
     expect(component.isLoading).toBeFalse();
-    expect(aiVisionServiceMock.analyzeImage).toHaveBeenCalledWith(file);
+    expect(iaVisionServiceMock.analyzeImage).toHaveBeenCalledWith(file);
     expect(component.scannedProductData?.nombre).toBe('Galletas de arroz integral');
   });
 
   it('debería manejar errores al fallar el análisis de la imagen', () => {
     spyOn(console, 'error');
     spyOn(window, 'alert');
-    aiVisionServiceMock.analyzeImage.and.returnValue(throwError(() => new Error('API Error')));
+    iaVisionServiceMock.analyzeImage.and.returnValue(throwError(() => new Error('API Error')));
 
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
     component.handlePhoto(file);
@@ -80,7 +80,7 @@ describe('AiProductUploadPageComponent', () => {
   });
 
   it('deberia guardar el producto usando el buffet del perfil', () => {
-    const request: SaveProductRequest = {
+    const request: GuardarProductoRequest = {
       nombre: 'Galletas',
       descripcion: 'Galletas de arroz',
       precio: 100,
@@ -93,11 +93,11 @@ describe('AiProductUploadPageComponent', () => {
       clasificacionesSaludIds: [],
       tiposIds: [],
     };
-    aiVisionServiceMock.saveProduct.and.returnValue(of({}));
+    iaVisionServiceMock.saveProduct.and.returnValue(of({}));
 
     component.saveProduct(request);
 
-    expect(aiVisionServiceMock.saveProduct).toHaveBeenCalledWith({
+    expect(iaVisionServiceMock.saveProduct).toHaveBeenCalledWith({
       ...request,
       buffetId: mockBuffetId,
     });

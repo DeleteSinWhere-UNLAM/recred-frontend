@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { AiProductUploadPageComponent } from './ai-product-upload-page/ai-product-upload-page.component';
+import { CargarProductoIaPage } from './cargar-producto-ia.page';
 
-export const aiProductUploadRoutes: Routes = [
+export const cargarProductoIaRoutes: Routes = [
     {
         path: '',
-        component: AiProductUploadPageComponent
+        component: CargarProductoIaPage
     }
 ];

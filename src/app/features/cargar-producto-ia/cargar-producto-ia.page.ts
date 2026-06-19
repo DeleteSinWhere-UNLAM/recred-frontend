@@ -1,26 +1,26 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
-import { AiProductResponse } from '../models/ai-product-response.interface';
-import { SaveProductRequest } from '../models/save-product-request.interface';
-import { ProductService } from '../../updated-inventory/services/product.service';
-import { Category } from '../../updated-inventory/models/category.interface';
-import { UsuarioService } from '../../../data-access/services/usuario.service';
-import { PerfilService } from '../../../data-access/services/perfil.service';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
-import { CameraCapture } from '../components/camera-capture/camera-capture';
-import { ScannerLoader } from '../components/scanner-loader/scanner-loader';
-import { AiProductForm } from '../components/ai-product-form/ai-product-form';
+import { IaVisionService } from './services/ia-vision.service';
+import { RespuestaProductoIa } from './models/respuesta-producto-ia.model';
+import { GuardarProductoRequest } from './models/guardar-producto-request.model';
+import { ProductService } from '../updated-inventory/services/product.service';
+import { Category } from '../updated-inventory/models/category.interface';
+import { UsuarioService } from '../../data-access/services/usuario.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { CapturaCamaraComponent } from './components/captura-camara/captura-camara.component';
+import { LoaderEscaneoComponent } from './components/loader-escaneo/loader-escaneo.component';
+import { FormularioProductoIaComponent } from './components/formulario-producto-ia/formulario-producto-ia.component';
 
 @Component({
-    selector: 'app-ai-product-upload-page',
+    selector: 'app-cargar-producto-ia-page',
     standalone: true,
-    imports: [NavbarComponent, CameraCapture, ScannerLoader, AiProductForm],
-    templateUrl: './ai-product-upload-page.component.html',
-    styleUrl: './ai-product-upload-page.component.css'
+    imports: [NavbarComponent, CapturaCamaraComponent, LoaderEscaneoComponent, FormularioProductoIaComponent],
+    templateUrl: './cargar-producto-ia.page.html',
+    styleUrl: './cargar-producto-ia.page.css'
 })
-export class AiProductUploadPageComponent implements OnInit {
-    private aiVisionService = inject(AiVisionService);
+export class CargarProductoIaPage implements OnInit {
+    private iaVisionService = inject(IaVisionService);
     private productService = inject(ProductService);
     private router = inject(Router);
     private usuarioService = inject(UsuarioService);
@@ -31,7 +31,7 @@ export class AiProductUploadPageComponent implements OnInit {
 
     isLoading = false;
     isSaving = false;
-    scannedProductData: AiProductResponse | null = null;
+    scannedProductData: RespuestaProductoIa | null = null;
     saveSuccess = false;
     saveError: string | null = null;
 
@@ -62,7 +62,7 @@ export class AiProductUploadPageComponent implements OnInit {
         this.saveSuccess = false;
         this.saveError = null;
 
-        this.aiVisionService.analyzeImage(file).subscribe({
+        this.iaVisionService.analyzeImage(file).subscribe({
             next: (data) => {
                 this.scannedProductData = data;
                 this.isLoading = false;
@@ -75,7 +75,7 @@ export class AiProductUploadPageComponent implements OnInit {
         });
     }
 
-    saveProduct(request: SaveProductRequest) {
+    saveProduct(request: GuardarProductoRequest) {
         const buffetId = this.actualizarBuffetId();
         if (!buffetId) {
             this.isSaving = false;
@@ -88,7 +88,7 @@ export class AiProductUploadPageComponent implements OnInit {
         this.saveSuccess = false;
         this.saveError = null;
 
-        this.aiVisionService.saveProduct({ ...request, buffetId }).subscribe({
+        this.iaVisionService.saveProduct({ ...request, buffetId }).subscribe({
             next: () => {
                 this.isSaving = false;
                 this.saveSuccess = true;

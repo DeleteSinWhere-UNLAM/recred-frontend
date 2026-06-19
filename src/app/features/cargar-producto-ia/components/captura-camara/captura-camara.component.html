@@ -1,36 +1,36 @@
-<section class="camera-capture" aria-labelledby="camera-capture-titulo">
+<section class="captura-camara" aria-labelledby="captura-camara-titulo">
   <input
     type="file"
     accept="image/*"
     capture="environment"
     #fileInput
     (change)="onFileSelected($event)"
-    class="camera-capture__input"
+    class="captura-camara__input"
   >
 
-  <h3 id="camera-capture-titulo" class="camera-capture__titulo">
+  <h3 id="captura-camara-titulo" class="captura-camara__titulo">
     Escaneo del producto
   </h3>
 
   <button
     type="button"
-    class="camera-capture__viewport"
+    class="captura-camara__viewport"
     (click)="fileInput.click()"
     aria-label="Tomar foto del producto"
   >
-    <div class="camera-capture__marco" aria-hidden="true">
-      <div class="camera-capture__placeholder">
-        <i class="fa-solid fa-camera-retro camera-capture__placeholder-icono"></i>
-        <span class="camera-capture__placeholder-texto">Tocá para tomar una foto</span>
+    <div class="captura-camara__marco" aria-hidden="true">
+      <div class="captura-camara__placeholder">
+        <i class="fa-solid fa-camera-retro captura-camara__placeholder-icono"></i>
+        <span class="captura-camara__placeholder-texto">Tocá para tomar una foto</span>
       </div>
 
-      <div class="camera-capture__dashed"></div>
-      <div class="camera-capture__scan-line"></div>
+      <div class="captura-camara__dashed"></div>
+      <div class="captura-camara__scan-line"></div>
 
-      <div class="camera-capture__badge">
+      <div class="captura-camara__badge">
         <i
           class="fa-solid fa-microchip"
-          [class.camera-capture__badge-icono--pulse]="isScanning"
+          [class.captura-camara__badge-icono--pulse]="isScanning"
           aria-hidden="true"
         ></i>
         <span>{{ isScanning ? 'Analizando...' : 'Listo para escanear' }}</span>
@@ -39,7 +39,7 @@
   </button>
 
   @if (errorMessage) {
-    <p class="camera-capture__error">
+    <p class="captura-camara__error">
       <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
       {{ errorMessage }}
     </p>

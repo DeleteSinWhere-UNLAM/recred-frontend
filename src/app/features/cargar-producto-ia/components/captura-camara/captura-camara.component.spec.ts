@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CameraCapture } from './camera-capture';
+import { CapturaCamaraComponent } from './captura-camara.component';
 
-describe('CameraCapture', () => {
-  let component: CameraCapture;
-  let fixture: ComponentFixture<CameraCapture>;
+describe('CapturaCamaraComponent', () => {
+  let component: CapturaCamaraComponent;
+  let fixture: ComponentFixture<CapturaCamaraComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CameraCapture]
+      imports: [CapturaCamaraComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CameraCapture);
+    fixture = TestBed.createComponent(CapturaCamaraComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

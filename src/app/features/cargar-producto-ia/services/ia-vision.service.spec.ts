@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { AiVisionService } from './ai-vision-service';
+import { IaVisionService } from './ia-vision.service';
 
-describe('AiVisionService', () => {
-  let service: AiVisionService;
+describe('IaVisionService', () => {
+  let service: IaVisionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -13,7 +13,7 @@ describe('AiVisionService', () => {
         provideHttpClientTesting()
       ]
     });
-    service = TestBed.inject(AiVisionService);
+    service = TestBed.inject(IaVisionService);
   });
 
   it('should be created', () => {

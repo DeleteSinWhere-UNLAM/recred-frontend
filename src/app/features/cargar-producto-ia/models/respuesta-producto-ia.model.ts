@@ -1,4 +1,4 @@
-﻿export interface AiProductResponse {
+﻿export interface RespuestaProductoIa {
   nombre: string;
   descripcion: string;
   peso: string;

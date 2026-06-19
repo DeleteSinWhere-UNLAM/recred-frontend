@@ -1,4 +1,4 @@
-.camera-capture {
+.captura-camara {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: 20px;
@@ -9,11 +9,11 @@
   gap: 14px;
 }
 
-.camera-capture__input {
+.captura-camara__input {
   display: none;
 }
 
-.camera-capture__titulo {
+.captura-camara__titulo {
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
@@ -21,19 +21,20 @@
   margin: 0;
 }
 
-.camera-capture__viewport {
+.captura-camara__viewport {
   position: relative;
-  width: 100%;
+  width: 50%;
+  margin: 0 auto;
   padding: 0;
   background: transparent;
   border: none;
   cursor: pointer;
 }
 
-.camera-capture__marco {
+.captura-camara__marco {
   position: relative;
   width: 100%;
-  height: 220px;
+  aspect-ratio: 1 / 1;
   background-color: rgba(74, 111, 165, 0.04);
   border-radius: 18px;
   border: 1px solid var(--color-borde);
@@ -42,15 +43,15 @@
   transition: transform 0.15s ease;
 }
 
-.camera-capture__viewport:hover .camera-capture__marco {
+.captura-camara__viewport:hover .captura-camara__marco {
   transform: scale(1.005);
 }
 
-.camera-capture__viewport:active .camera-capture__marco {
+.captura-camara__viewport:active .captura-camara__marco {
   transform: scale(0.99);
 }
 
-.camera-capture__placeholder {
+.captura-camara__placeholder {
   position: absolute;
   inset: 0;
   display: flex;
@@ -61,12 +62,12 @@
   color: var(--color-texto-claro);
 }
 
-.camera-capture__placeholder-icono {
+.captura-camara__placeholder-icono {
   font-size: 38px;
   color: color-mix(in srgb, var(--color-pizarra) 35%, var(--color-fondo));
 }
 
-.camera-capture__placeholder-texto {
+.captura-camara__placeholder-texto {
   font-family: var(--font-display);
   font-size: 12px;
   font-weight: 700;
@@ -74,7 +75,7 @@
   text-transform: uppercase;
 }
 
-.camera-capture__dashed {
+.captura-camara__dashed {
   position: absolute;
   inset: 16px;
   border: 2px dashed color-mix(in srgb, var(--color-dorado) 70%, transparent);
@@ -82,7 +83,7 @@
   pointer-events: none;
 }
 
-.camera-capture__scan-line {
+.captura-camara__scan-line {
   position: absolute;
   left: 0;
   top: 0;
@@ -92,18 +93,18 @@
   box-shadow:
     0 0 10px var(--color-dorado),
     0 0 20px var(--color-dorado);
-  animation: camera-capture-scan 3s linear infinite;
+  animation: captura-camara-scan 3s linear infinite;
   pointer-events: none;
   z-index: 2;
 }
 
-@keyframes camera-capture-scan {
+@keyframes captura-camara-scan {
   0%   { top: 0; }
   50%  { top: calc(100% - 3px); }
   100% { top: 0; }
 }
 
-.camera-capture__badge {
+.captura-camara__badge {
   position: absolute;
   bottom: 12px;
   left: 50%;
@@ -125,16 +126,16 @@
   z-index: 3;
 }
 
-.camera-capture__badge-icono--pulse {
-  animation: camera-capture-pulse 1.2s ease-in-out infinite;
+.captura-camara__badge-icono--pulse {
+  animation: captura-camara-pulse 1.2s ease-in-out infinite;
 }
 
-@keyframes camera-capture-pulse {
+@keyframes captura-camara-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%      { opacity: 0.55; transform: scale(0.85); }
 }
 
-.camera-capture__error {
+.captura-camara__error {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -149,37 +150,40 @@
 }
 
 @media (max-width: 640px) {
-  .camera-capture {
+  .captura-camara {
     padding: 16px;
     border-radius: 18px;
   }
 
-  .camera-capture__placeholder-icono {
+  .captura-camara__placeholder-icono {
     font-size: 32px;
   }
 
-  .camera-capture__placeholder-texto {
+  .captura-camara__placeholder-texto {
     font-size: 11px;
   }
 }
 
 @media (max-width: 480px) {
-  .camera-capture {
+  .captura-camara {
     padding: 14px;
     border-radius: 16px;
     gap: 10px;
   }
 
-  .camera-capture__titulo {
+  .captura-camara__titulo {
     font-size: 15px;
   }
 
-  .camera-capture__marco {
-    height: 190px;
+  .captura-camara__viewport {
+    width: 70%;
+  }
+
+  .captura-camara__marco {
     border-radius: 14px;
   }
 
-  .camera-capture__dashed {
+  .captura-camara__dashed {
     inset: 10px;
   }
 }

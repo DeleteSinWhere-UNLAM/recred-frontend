@@ -168,8 +168,8 @@ export const routes: Routes = [
       {
         path: 'cargar-producto-ia',
         loadChildren: () =>
-          import('./features/ai-product-upload/ai-product-upload.routes').then(
-            (m) => m.aiProductUploadRoutes,
+          import('./features/cargar-producto-ia/cargar-producto-ia.routes').then(
+            (m) => m.cargarProductoIaRoutes,
           ),
       },
       {

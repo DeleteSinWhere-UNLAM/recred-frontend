@@ -1,26 +1,26 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../../environments/environment';
-import { AiProductResponse } from '../../models/ai-product-response.interface';
-import { SaveProductRequest } from '../../models/save-product-request.interface';
+import { environment } from '../../../../environments/environment';
+import { RespuestaProductoIa } from '../models/respuesta-producto-ia.model';
+import { GuardarProductoRequest } from '../models/guardar-producto-request.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AiVisionService {
+export class IaVisionService {
   private readonly http = inject(HttpClient);
   private readonly apiBase = environment.apiUrl;
   private readonly uploadUrl = `${this.apiBase}/load-stock/upload-image`;
   private readonly saveUrl = `${this.apiBase}/load-stock/save-product`;
 
-  analyzeImage(file: File): Observable<AiProductResponse> {
+  analyzeImage(file: File): Observable<RespuestaProductoIa> {
     const formData = new FormData();
     formData.append('image', file);
-    return this.http.post<AiProductResponse>(this.uploadUrl, formData);
+    return this.http.post<RespuestaProductoIa>(this.uploadUrl, formData);
   }
 
-  saveProduct(request: SaveProductRequest): Observable<unknown> {
+  saveProduct(request: GuardarProductoRequest): Observable<unknown> {
     return this.http.post(this.saveUrl, request);
   }
 }

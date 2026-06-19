@@ -1,4 +1,4 @@
-.ai-product-form {
+.formulario-producto-ia {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: 20px;
@@ -9,13 +9,13 @@
   gap: 16px;
 }
 
-.ai-product-form__seccion {
+.formulario-producto-ia__seccion {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.ai-product-form__seccion-titulo {
+.formulario-producto-ia__seccion-titulo {
   margin: 0;
   font-family: var(--font-display);
   font-size: 14px;
@@ -25,19 +25,19 @@
   color: var(--color-pizarra);
 }
 
-.ai-product-form__grid {
+.formulario-producto-ia__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
 }
 
-.ai-product-form__group {
+.formulario-producto-ia__group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.ai-product-form__label {
+.formulario-producto-ia__label {
   font-family: var(--font-display);
   font-weight: 700;
   color: var(--color-pizarra);
@@ -46,7 +46,7 @@
   text-transform: uppercase;
 }
 
-.ai-product-form__input {
+.formulario-producto-ia__input {
   padding: 10px 14px;
   border: 1px solid var(--color-borde);
   border-radius: 12px;
@@ -59,17 +59,17 @@
   transition: box-shadow 0.15s ease;
 }
 
-.ai-product-form__input::placeholder {
+.formulario-producto-ia__input::placeholder {
   color: var(--color-texto-claro);
 }
 
-.ai-product-form__input:focus {
+.formulario-producto-ia__input:focus {
   outline: none;
   border-color: var(--color-pizarra);
   box-shadow: 0 0 0 4px var(--color-foco);
 }
 
-.ai-product-form__input--select {
+.formulario-producto-ia__input--select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -78,25 +78,25 @@
   cursor: pointer;
 }
 
-.ai-product-form__group--error .ai-product-form__input {
+.formulario-producto-ia__group--error .formulario-producto-ia__input {
   box-shadow:
     var(--shadow-neu-concave),
     0 0 0 2px var(--color-melocoton);
 }
 
-.ai-product-form__error {
+.formulario-producto-ia__error {
   font-size: 12px;
   color: var(--color-melocoton);
   font-weight: 600;
 }
 
-.ai-product-form__toggles {
+.formulario-producto-ia__toggles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 10px;
 }
 
-.ai-product-form__toggle {
+.formulario-producto-ia__toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,18 +109,18 @@
   cursor: pointer;
 }
 
-.ai-product-form__toggle-label {
+.formulario-producto-ia__toggle-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--color-texto-oscuro);
   user-select: none;
 }
 
-.ai-product-form__toggle input[type="checkbox"] {
+.formulario-producto-ia__toggle input[type="checkbox"] {
   display: none;
 }
 
-.ai-product-form__toggle-switch {
+.formulario-producto-ia__toggle-switch {
   position: relative;
   width: 38px;
   height: 22px;
@@ -130,7 +130,7 @@
   flex-shrink: 0;
 }
 
-.ai-product-form__toggle-switch::after {
+.formulario-producto-ia__toggle-switch::after {
   content: '';
   position: absolute;
   width: 16px;
@@ -143,15 +143,15 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.ai-product-form__toggle input[type="checkbox"]:checked + .ai-product-form__toggle-switch {
+.formulario-producto-ia__toggle input[type="checkbox"]:checked + .formulario-producto-ia__toggle-switch {
   background-color: var(--color-menta);
 }
 
-.ai-product-form__toggle input[type="checkbox"]:checked + .ai-product-form__toggle-switch::after {
+.formulario-producto-ia__toggle input[type="checkbox"]:checked + .formulario-producto-ia__toggle-switch::after {
   transform: translateX(16px);
 }
 
-.ai-product-form__submit {
+.formulario-producto-ia__submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -170,57 +170,57 @@
   transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-.ai-product-form__submit:hover:not(:disabled) {
+.formulario-producto-ia__submit:hover:not(:disabled) {
   background-color: var(--color-dorado-dark);
 }
 
-.ai-product-form__submit:active:not(:disabled) {
+.formulario-producto-ia__submit:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-.ai-product-form__submit:disabled {
+.formulario-producto-ia__submit:disabled {
   background-color: color-mix(in srgb, var(--color-dorado) 50%, var(--color-fondo));
   color: var(--color-texto-claro);
   cursor: not-allowed;
   box-shadow: none;
 }
 
-.ai-product-form__submit-spinner {
+.formulario-producto-ia__submit-spinner {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(0, 0, 0, 0.15);
   border-top-color: var(--color-texto-oscuro);
   border-radius: 50%;
-  animation: ai-product-form-spin 0.7s linear infinite;
+  animation: formulario-producto-ia-spin 0.7s linear infinite;
 }
 
-@keyframes ai-product-form-spin {
+@keyframes formulario-producto-ia-spin {
   to { transform: rotate(360deg); }
 }
 
 @media (max-width: 640px) {
-  .ai-product-form {
+  .formulario-producto-ia {
     padding: 16px;
     border-radius: 18px;
   }
 
-  .ai-product-form__grid,
-  .ai-product-form__toggles {
+  .formulario-producto-ia__grid,
+  .formulario-producto-ia__toggles {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .ai-product-form {
+  .formulario-producto-ia {
     padding: 14px;
     border-radius: 16px;
   }
 
-  .ai-product-form__seccion-titulo {
+  .formulario-producto-ia__seccion-titulo {
     font-size: 13px;
   }
 
-  .ai-product-form__submit {
+  .formulario-producto-ia__submit {
     font-size: 13px;
     padding: 12px 18px;
   }

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AiProductForm } from './ai-product-form';
+import { FormularioProductoIaComponent } from './formulario-producto-ia.component';
 import { SimpleChange } from '@angular/core';
 
-describe('AiProductForm', () => {
-  let component: AiProductForm;
-  let fixture: ComponentFixture<AiProductForm>;
+describe('FormularioProductoIaComponent', () => {
+  let component: FormularioProductoIaComponent;
+  let fixture: ComponentFixture<FormularioProductoIaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, AiProductForm]
+      imports: [ReactiveFormsModule, FormularioProductoIaComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AiProductForm);
+    fixture = TestBed.createComponent(FormularioProductoIaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
