@@ -10,7 +10,7 @@ describe('ProductoCardComponent', () => {
   let component: ProductoCardComponent;
   let fixture: ComponentFixture<ProductoCardComponent>;
   let carritoServiceSpy: jasmine.SpyObj<CarritoService>;
-  let mockPerfilService: any;
+  let mockPerfilService: Partial<PerfilService>;
 
   const mockProductoBase: Producto = {
     id: 'prod-123',
@@ -30,8 +30,7 @@ describe('ProductoCardComponent', () => {
     carritoServiceSpy.validarAgregar.and.callFake((prod) => ({ permitido: !prod.superaPresupuesto, razon: prod.superaPresupuesto ? 'presupuesto' : undefined }));
 
     mockPerfilService = {
-      esPlanGratuito: signal(true),
-      perfil: signal({ plan: 'FREE' })
+      esPlanGratuito: signal(true)
     };
 
     await TestBed.configureTestingModule({
