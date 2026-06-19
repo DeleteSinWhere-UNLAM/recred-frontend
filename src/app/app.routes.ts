@@ -270,6 +270,13 @@ export const routes: Routes = [
             (m) => m.PreferenciasDetectadasPage,
           ),
       },
+      {
+        path: 'premium',
+        loadComponent: () =>
+          import('./features/premium-plans/premium-plans.page').then(
+            (m) => m.PremiumPlansPage,
+          ),
+      },
     ],
   },
 ];

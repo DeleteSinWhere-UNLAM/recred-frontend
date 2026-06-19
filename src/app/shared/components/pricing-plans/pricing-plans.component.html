@@ -1,0 +1,45 @@
+<section class="pricing-container">
+  <div class="pricing-header">
+    <h2>Nuestros Planes</h2>
+    <p>Elige el plan que mejor se adapte a tus necesidades. Cancela en cualquier momento.</p>
+  </div>
+
+  <div class="pricing-grid">
+    @for (plan of plans(); track plan.id) {
+      <div class="pricing-card" [class.highlighted]="plan.isHighlighted">
+        
+        @if (plan.isHighlighted) {
+          <div class="badge-recomendado">Mejor Opción</div>
+        }
+
+        <div class="card-header">
+          <h3>{{ plan.name }}</h3>
+          <p class="description">{{ plan.description }}</p>
+        </div>
+
+        <div class="card-price">
+          <span class="currency">$</span>
+          <span class="amount">{{ plan.price }}</span>
+          <span class="period">/ {{ plan.period }}</span>
+        </div>
+
+        <ul class="card-features">
+          @for (feature of plan.features; track feature) {
+            <li>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              {{ feature }}
+            </li>
+          }
+        </ul>
+
+        <div class="card-action">
+          <button class="btn-select" (click)="selectPlan(plan.id)">
+            Seleccionar Plan
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</section>
