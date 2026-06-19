@@ -6,6 +6,7 @@ export interface Product {
   peso: number;
   requierePreparacion: boolean;
   stockActual: number;
+  urlImagen?: string | null;
   categoria?: {
     id: string;
     descripcion: string;

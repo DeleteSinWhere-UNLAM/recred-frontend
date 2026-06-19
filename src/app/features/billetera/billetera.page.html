@@ -10,7 +10,11 @@
     <header class="billetera__header" [class.billetera__header--alumno]="esVistaAlumno()">
       <div class="billetera__identidad">
         <div class="billetera__avatar-wrap">
-          <span class="billetera__iniciales" aria-hidden="true">{{ presenter.iniciales() }}</span>
+          @if (presenter.urlFotoPerfil()) {
+            <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreAlumno()" class="billetera__avatar-img" />
+          } @else {
+            <span class="billetera__iniciales" aria-hidden="true">{{ presenter.iniciales() }}</span>
+          }
         </div>
         <div>
           <p class="billetera__eyebrow">Billetera</p>

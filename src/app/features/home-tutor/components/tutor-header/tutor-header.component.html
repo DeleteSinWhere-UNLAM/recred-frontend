@@ -2,8 +2,35 @@
   <div class="tutor-header__profile-container">
     <div class="tutor-header__avatar-wrap">
       <div class="tutor-header__avatar">
-        <span>{{ iniciales }}</span>
+        @if (urlFotoPerfil) {
+          <img [src]="urlFotoPerfil" [alt]="'Foto de ' + nombreCompleto" class="tutor-header__avatar-img" />
+        } @else {
+          <span>{{ iniciales }}</span>
+        }
       </div>
+      <button
+        type="button"
+        class="tutor-header__avatar-editar"
+        [disabled]="subiendoFoto()"
+        (click)="abrirSelectorFoto()"
+        [title]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
+        [attr.aria-label]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
+      >
+        @if (subiendoFoto()) {
+          <span class="tutor-header__avatar-loader" aria-hidden="true"></span>
+        } @else {
+          <i class="fa-solid fa-pen" aria-hidden="true"></i>
+        }
+      </button>
+      <input
+        #inputFoto
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        class="tutor-header__input-foto"
+        aria-hidden="true"
+        tabindex="-1"
+        (change)="onFotoSeleccionada($event)"
+      />
     </div>
 
     <div class="tutor-header__info">
@@ -32,3 +59,11 @@
     </div>
   </div>
 </section>
+
+@if (fotoEvent()) {
+  <app-crop-modal
+    [imageEvent]="fotoEvent()!"
+    (cropped)="onFotoRecortada($event)"
+    (canceled)="onCancelarRecorte()"
+  />
+}

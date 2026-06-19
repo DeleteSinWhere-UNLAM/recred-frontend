@@ -85,12 +85,25 @@
 .billetera__avatar-wrap {
   position: relative;
   flex-shrink: 0;
-}
-
-.billetera__iniciales {
+  overflow: hidden;
   width: 46px;
   height: 46px;
   border-radius: 14px;
+  box-shadow:
+    0 0 0 2px var(--color-superficie),
+    0 0 0 4px var(--color-menta),
+    0 6px 14px rgba(74, 111, 165, 0.18);
+}
+
+.billetera__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.billetera__iniciales {
+  width: 100%;
+  height: 100%;
   background-color: var(--color-pizarra);
   color: #fff;
   display: flex;
@@ -100,10 +113,6 @@
   font-weight: 800;
   font-size: 18px;
   letter-spacing: 0.5px;
-  box-shadow:
-    0 0 0 2px var(--color-superficie),
-    0 0 0 4px var(--color-menta),
-    0 6px 14px rgba(74, 111, 165, 0.18);
 }
 
 

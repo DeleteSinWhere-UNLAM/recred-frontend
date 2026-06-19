@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+﻿import { HttpErrorResponse } from '@angular/common/http';
 import { Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,6 +14,9 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
+import { UploadSelectionModalComponent } from '../components/upload-selection-modal/upload-selection-modal.component';
+import { BulkUploadTableModalComponent } from '../components/bulk-upload-table-modal/bulk-upload-table-modal.component';
+import { BulkUploadService, BulkProductResponse } from '../services/bulk-upload.service';
 import { InventoryRealtimeService } from '../services/inventory-realtime.service';
 import {
   EstadoInventario,
@@ -42,10 +45,10 @@ function buildHealthClassificationIds(data: ProductFormData): string[] {
 
 const INVENTORY_ERROR_MESSAGES: Record<string, string> = {
   STOCK_INSUFFICIENT: 'No hay stock suficiente.',
-  INVENTORY_OPERATION_INVALID: 'La operación de inventario no es válida para este producto.',
-  PRODUCT_DAILY_CAPACITY_EXCEEDED: 'El cupo diario de este producto está agotado.',
-  FORBIDDEN: 'No tenés permisos sobre este buffet.',
-  NOT_FOUND: 'No se encontró el producto o inventario.',
+  INVENTORY_OPERATION_INVALID: 'La operaciÃ³n de inventario no es vÃ¡lida para este producto.',
+  PRODUCT_DAILY_CAPACITY_EXCEEDED: 'El cupo diario de este producto estÃ¡ agotado.',
+  FORBIDDEN: 'No tenÃ©s permisos sobre este buffet.',
+  NOT_FOUND: 'No se encontrÃ³ el producto o inventario.',
   BAD_REQUEST: 'Revisa los datos ingresados.',
 };
 
@@ -58,14 +61,7 @@ type InventoryFilter =
   | 'AGOTADO';
 type RealtimeStatus = 'connecting' | 'connected' | 'disconnected';
 
-const PRODUCT_HIGHLIGHT_DURATION_MS = 3000;
 const INVENTORY_FULL_REFRESH_DEBOUNCE_MS = 5000;
-const INVENTORY_REALTIME_STOCK_EVENT_TYPES = new Set([
-  'STOCK_CHANGED',
-  'PRODUCT_SOLD_OUT',
-  'LOW_STOCK',
-  'DAILY_CAPACITY_LOW',
-]);
 
 const INVENTORY_MODE_DEFAULT_MOTIVOS: Record<TipoManejoInventario, string> = {
   STOCK_EXACTO: 'Volver a stock exacto',
@@ -99,6 +95,8 @@ type InventoryManagementShortcut = 'MAKE_AVAILABLE' | 'PAUSE' | 'SOLD_OUT';
     ProductTableComponent,
     ProductFormComponent,
     ConfirmDeleteModalComponent,
+    UploadSelectionModalComponent,
+    BulkUploadTableModalComponent,
     ReactiveFormsModule,
   ],
   templateUrl: './updated-inventory-page.component.html',
@@ -112,6 +110,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly inventoryRealtimeService = inject(InventoryRealtimeService);
+  private readonly bulkUploadService = inject(BulkUploadService);
   private readonly zone = inject(NgZone);
   private readonly fb = inject(FormBuilder);
   private readonly purchaseTotalFormatter = new Intl.NumberFormat('es-AR', {
@@ -138,6 +137,10 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   isRefreshing = false;
   isSaving = false;
   isFormVisible = false;
+  isSelectionModalVisible = false;
+  isBulkUploadModalVisible = false;
+  isProcessingFile = false;
+  bulkProductsData: BulkProductResponse[] = [];
   selectedProduct: Product | null = null;
   deleteTarget: Product | null = null;
   activeFilter: InventoryFilter = 'TODOS';
@@ -181,10 +184,11 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     stockMinimo: [null as number | null, [Validators.min(0)]],
     cupoMaximoDiario: [null as number | null, [Validators.min(0)]],
     disponible: [true],
+    estadoInventario: [null as EstadoInventario | null],
     motivo: [''],
   });
 
-  private buffetId: string | null = null;
+  buffetId: string | null = null;
   private realtimeAbortController: AbortController | null = null;
   private refreshTimeoutId: number | null = null;
   private readonly highlightTimeoutIds = new Map<string, number>();
@@ -303,7 +307,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
         this.categories = data;
       },
       error: () => {
-        this.toastService.mostrar('Error al cargar las categorías', 'error');
+        this.toastService.mostrar('Error al cargar las categorÃ­as', 'error');
       },
     });
   }
@@ -314,7 +318,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       this.products = [];
       this.isLoading = false;
       this.isRefreshing = false;
-      this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
+      this.toastService.mostrar('No se encontrÃ³ un buffet asociado a tu perfil', 'error');
       return;
     }
 
@@ -342,8 +346,100 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   }
 
   openCreateForm(): void {
+    this.isSelectionModalVisible = true;
+  }
+
+  closeSelectionModal(): void {
+    this.isSelectionModalVisible = false;
+  }
+
+  openIndividualForm(): void {
+    this.isSelectionModalVisible = false;
     this.selectedProduct = null;
     this.isFormVisible = true;
+  }
+
+  openBulkUploadModal(): void {
+    this.isSelectionModalVisible = false;
+    this.isBulkUploadModalVisible = true;
+    this.bulkProductsData = [];
+  }
+
+  closeBulkUploadModal(): void {
+    this.isBulkUploadModalVisible = false;
+    this.bulkProductsData = [];
+    this.isProcessingFile = false;
+  }
+
+  handleFileUpload(file: File): void {
+    this.isProcessingFile = true;
+    this.bulkUploadService.uploadFile(file).subscribe({
+      next: (res) => {
+        this.bulkProductsData = res.products;
+        this.isProcessingFile = false;
+        this.toastService.mostrar('Archivo procesado correctamente', 'success');
+      },
+      error: () => {
+        this.isProcessingFile = false;
+        this.toastService.mostrar('Error al procesar el archivo', 'error');
+      }
+    });
+  }
+
+  handleBulkProductsSave(products: BulkProductResponse[]): void {
+    const currentBuffetId = this.buffetId ?? this.obtenerBuffetIdActual();
+    if (!currentBuffetId) {
+      this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
+      return;
+    }
+
+    this.isProcessingFile = true;
+
+    // Mapa para normalizar y unificar nombres de nuevas categorías
+    // Clave: nombre en minúsculas y sin espacios, Valor: nombre original (el primero que aparezca)
+    const normalizedNewCategories = new Map<string, string>();
+
+    const createRequests: CreateProductRequest[] = products.map((prod) => {
+      const isNewCategory = prod.categoriaId === 'NEW';
+      let finalNuevaCategoriaNombre = '';
+
+      if (isNewCategory && prod.nuevaCategoriaNombre) {
+        const rawName = prod.nuevaCategoriaNombre.trim();
+        const key = rawName.toLowerCase();
+        
+        if (!normalizedNewCategories.has(key)) {
+          normalizedNewCategories.set(key, rawName);
+        }
+        finalNuevaCategoriaNombre = normalizedNewCategories.get(key)!;
+      }
+
+      return {
+        nombre: prod.nombre,
+        descripcion: prod.descripcion ?? '',
+        precio: prod.precio,
+        peso: prod.peso,
+        requierePreparacion: prod.requierePreparacion,
+        categoriaId: isNewCategory ? null : prod.categoriaId,
+        nuevaCategoriaNombre: finalNuevaCategoriaNombre,
+        buffetId: currentBuffetId,
+        stockActual: prod.stockActual,
+        clasificacionesSaludIds: prod.saludEtiquetasIds ?? [],
+        tiposIds: null,
+      };
+    });
+
+    this.productService.createBulk(createRequests).subscribe({
+      next: () => {
+        this.isProcessingFile = false;
+        this.closeBulkUploadModal();
+        this.loadProducts(false);
+        this.toastService.mostrar('Productos cargados exitosamente', 'success');
+      },
+      error: () => {
+        this.isProcessingFile = false;
+        this.toastService.mostrar('Error al guardar los productos', 'error');
+      },
+    });
   }
 
   openEditForm(product: Product): void {
@@ -371,7 +467,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     const currentBuffetId = this.buffetId ?? this.obtenerBuffetIdActual();
     if (!currentBuffetId) {
       this.isSaving = false;
-      this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
+      this.toastService.mostrar('No se encontrÃ³ un buffet asociado a tu perfil', 'error');
       return;
     }
 
@@ -435,7 +531,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     const currentBuffetId = this.buffetId ?? this.obtenerBuffetIdActual();
 
     if (!currentBuffetId) {
-      this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
+      this.toastService.mostrar('No se encontrÃ³ un buffet asociado a tu perfil', 'error');
       return;
     }
 
@@ -483,7 +579,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   getStockMovementTypeLabel(type: InventoryStockMovement['tipo']): string {
     const labels: Record<InventoryStockMovement['tipo'], string> = {
       RESERVA: 'Reserva',
-      LIBERACION: 'Liberación',
+      LIBERACION: 'LiberaciÃ³n',
       CONSUMO: 'Consumo',
       VENTA: 'Venta',
       AJUSTE: 'Ajuste',
@@ -541,7 +637,21 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
 
   onInventoryModeChange(): void {
     this.updateInventoryManagementValidators();
-    this.setDefaultInventoryManagementMotivo();
+    const mode = this.getInventoryManagementMode();
+    const defaultMotivo = INVENTORY_MODE_DEFAULT_MOTIVOS[mode] || '';
+
+    const patchValues: {
+      motivo: string;
+      disponible?: boolean;
+      estadoInventario?: EstadoInventario | null;
+    } = { motivo: defaultMotivo };
+
+    if (mode === 'STOCK_EXACTO') {
+      patchValues.disponible = true;
+      patchValues.estadoInventario = 'DISPONIBLE';
+    }
+
+    this.inventoryManagementForm.patchValue(patchValues);
   }
 
   applyInventoryManagementShortcut(
@@ -551,6 +661,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       this.inventoryManagementForm.patchValue({
         tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
         disponible: true,
+        estadoInventario: 'DISPONIBLE',
         motivo: 'Producto disponible',
       });
     }
@@ -559,6 +670,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       this.inventoryManagementForm.patchValue({
         tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
         disponible: false,
+        estadoInventario: 'DESACTIVADO',
         motivo: 'Pausado temporalmente',
       });
     }
@@ -570,6 +682,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
         this.inventoryManagementForm.patchValue({
           cupoMaximoDiario: 0,
           disponible: true,
+          estadoInventario: 'SIN_STOCK',
           motivo: 'Marcar agotado',
         });
       } else {
@@ -583,6 +696,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
           stockActual: 0,
           stockMinimo,
           disponible: true,
+          estadoInventario: 'SIN_STOCK',
           motivo: 'Marcar agotado',
         });
       }
@@ -597,15 +711,23 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     }
 
     this.updateInventoryManagementValidators();
+    
+    // Sincronizar estadoInventario con disponible si estamos en modo DISPONIBLE_NO_DISPONIBLE
+    // y no se ha tocado explícitamente (o para asegurar consistencia en tests)
+    const values = this.inventoryManagementForm.value;
+    if (values.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE') {
+      const targetEstado = values.disponible ? 'DISPONIBLE' : 'DESACTIVADO';
+      if (values.estadoInventario !== targetEstado) {
+        this.inventoryManagementForm.patchValue({ estadoInventario: targetEstado });
+      }
+    }
 
     if (this.inventoryManagementForm.invalid) {
       this.inventoryManagementForm.markAllAsTouched();
       return;
     }
 
-    const payload = this.buildInventoryStockPayload(
-      this.inventoryManagementTarget,
-    );
+    const payload = this.buildInventoryStockPayload();
 
     this.isSaving = true;
     this.productService
@@ -641,7 +763,7 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   }
 
   private createProduct(data: ProductFormData, buffetId: string): void {
-    const isNewCategory = data.categoriaId === 'NEW';
+    const isNewCategory = data.categoriaId === "NEW";
     const payload: CreateProductRequest = {
       nombre: data.nombre,
       descripcion: data.descripcion,
@@ -649,11 +771,12 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       peso: data.peso,
       requierePreparacion: data.requierePreparacion,
       categoriaId: isNewCategory ? null : data.categoriaId,
-      nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : '',
+      nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : "",
       buffetId,
       stockActual: data.stockActual,
       clasificacionesSaludIds: buildHealthClassificationIds(data),
       tiposIds: null,
+      urlImagen: data.urlImagen
     };
 
     this.productService.create(payload).subscribe({
@@ -661,17 +784,17 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
         this.isSaving = false;
         this.closeForm();
         this.loadProducts(false);
-        this.toastService.mostrar('Producto creado exitosamente', 'success');
+        this.toastService.mostrar("Producto creado exitosamente", "success");
       },
       error: () => {
         this.isSaving = false;
-        this.toastService.mostrar('Error al crear el producto', 'error');
+        this.toastService.mostrar("Error al crear el producto", "error");
       },
     });
   }
 
   private updateProduct(id: string, data: ProductFormData, buffetId: string): void {
-    const isNewCategory = data.categoriaId === 'NEW';
+    const isNewCategory = data.categoriaId === "NEW";
     const payload: UpdateProductRequest = {
       nombre: data.nombre,
       descripcion: data.descripcion,
@@ -680,8 +803,9 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
       requierePreparacion: data.requierePreparacion,
       stockActual: data.stockActual,
       buffetId,
-      categoriaId: isNewCategory ? '' : (data.categoriaId || ''),
+      categoriaId: isNewCategory ? "" : (data.categoriaId || ""),
       clasificacionesSaludIds: buildHealthClassificationIds(data),
+      urlImagen: data.urlImagen
     };
 
     this.productService.update(id, payload).subscribe({
@@ -689,533 +813,25 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
         this.isSaving = false;
         this.closeForm();
         this.loadProducts(false);
-        this.toastService.mostrar('Producto actualizado exitosamente', 'success');
+        this.toastService.mostrar("Producto actualizado exitosamente", "success");
       },
       error: () => {
         this.isSaving = false;
-        this.toastService.mostrar('Error al actualizar el producto', 'error');
+        this.toastService.mostrar("Error al actualizar el producto", "error");
       },
     });
-  }
-
-  private openInventoryManagementFromQuery(
-    products: InventoryOverviewItem[],
-  ): void {
-    const productId = this.inventoryManagementProductIdFromQuery?.trim();
-    if (!productId || this.inventoryManagementTarget) {
-      return;
-    }
-
-    const product = products.find((item) => item.productId === productId);
-    if (!product) {
-      return;
-    }
-
-    this.openInventoryManagement(product);
-    this.inventoryManagementProductIdFromQuery = null;
-    this.highlightProduct(product.productId);
-  }
-
-  private configureInventoryManagementForm(product: InventoryOverviewItem): void {
-    this.inventoryManagementForm.reset({
-      tipoManejoInventario: product.tipoManejoInventario,
-      stockActual: product.stockActual,
-      stockMinimo: product.stockMinimo,
-      cupoMaximoDiario: product.cupoMaximoDiario,
-      disponible: product.disponible,
-      motivo: this.getDefaultInventoryManagementMotivo(
-        product.tipoManejoInventario,
-        product.disponible,
-      ),
-    });
-    this.updateInventoryManagementValidators(product);
-  }
-
-  private updateInventoryManagementValidators(
-    product = this.inventoryManagementTarget,
-  ): void {
-    const mode = this.getInventoryManagementMode();
-    const stockActualControl = this.inventoryManagementForm.controls.stockActual;
-    const stockMinimoControl = this.inventoryManagementForm.controls.stockMinimo;
-    const cupoMaximoDiarioControl =
-      this.inventoryManagementForm.controls.cupoMaximoDiario;
-
-    stockActualControl.setValidators([
-      Validators.min(0),
-      ...(mode === 'STOCK_EXACTO' && !this.hasStoredNumber(product?.stockActual)
-        ? [Validators.required]
-        : []),
-    ]);
-    stockMinimoControl.setValidators([
-      Validators.min(0),
-      ...(mode === 'STOCK_EXACTO' && !this.hasStoredNumber(product?.stockMinimo)
-        ? [Validators.required]
-        : []),
-    ]);
-    cupoMaximoDiarioControl.setValidators([
-      Validators.min(0),
-      ...(mode === 'CUPO_DIARIO' &&
-      !this.hasStoredNumber(product?.cupoMaximoDiario)
-        ? [Validators.required]
-        : []),
-    ]);
-
-    stockActualControl.updateValueAndValidity();
-    stockMinimoControl.updateValueAndValidity();
-    cupoMaximoDiarioControl.updateValueAndValidity();
-  }
-
-  private buildInventoryStockPayload(
-    product: InventoryOverviewItem,
-  ): InventoryStockUpdateRequest {
-    const rawValue = this.inventoryManagementForm.getRawValue();
-    const mode = rawValue.tipoManejoInventario ?? 'STOCK_EXACTO';
-    const disponible = rawValue.disponible === true;
-    const payload: InventoryStockUpdateRequest = {
-      tipoManejoInventario: mode,
-      motivo:
-        rawValue.motivo?.trim() ||
-        this.getDefaultInventoryManagementMotivo(mode, disponible),
-    };
-
-    if (mode === 'DISPONIBLE_NO_DISPONIBLE') {
-      payload.disponible = disponible;
-      payload.estadoInventario = disponible ? 'DISPONIBLE' : 'DESACTIVADO';
-    }
-
-    if (mode === 'STOCK_EXACTO') {
-      payload.disponible = true;
-      payload.estadoInventario = this.resolveStockExactStatus(product);
-
-      const stockActual = this.toOptionalNumber(rawValue.stockActual);
-      const stockMinimo = this.toOptionalNumber(rawValue.stockMinimo);
-
-      if (stockActual !== undefined) {
-        payload.stockActual = stockActual;
-      }
-
-      if (stockMinimo !== undefined) {
-        payload.stockMinimo = stockMinimo;
-      }
-    }
-
-    if (mode === 'CUPO_DIARIO') {
-      payload.disponible = true;
-      payload.estadoInventario = this.resolveDailyCapacityStatus(product);
-
-      const cupoMaximoDiario = this.toOptionalNumber(
-        rawValue.cupoMaximoDiario,
-      );
-
-      if (cupoMaximoDiario !== undefined) {
-        payload.cupoMaximoDiario = cupoMaximoDiario;
-      }
-    }
-
-    const usuarioId = this.obtenerUsuarioIdActual();
-    if (usuarioId) {
-      payload.usuarioId = usuarioId;
-    }
-
-    return payload;
-  }
-
-  private resolveStockExactStatus(
-    product: InventoryOverviewItem,
-  ): EstadoInventario {
-    const stockActual =
-      this.toOptionalNumber(
-        this.inventoryManagementForm.controls.stockActual.value,
-      ) ?? product.stockActual;
-    const stockMinimo =
-      this.toOptionalNumber(
-        this.inventoryManagementForm.controls.stockMinimo.value,
-      ) ?? product.stockMinimo;
-
-    if (stockActual !== null && stockActual !== undefined && stockActual <= 0) {
-      return 'SIN_STOCK';
-    }
-
-    if (
-      stockActual !== null &&
-      stockActual !== undefined &&
-      stockMinimo !== null &&
-      stockMinimo !== undefined &&
-      stockActual <= stockMinimo
-    ) {
-      return 'BAJO_STOCK';
-    }
-
-    return 'DISPONIBLE';
-  }
-
-  private resolveDailyCapacityStatus(
-    product: InventoryOverviewItem,
-  ): EstadoInventario {
-    const cupoMaximoDiario =
-      this.toOptionalNumber(
-        this.inventoryManagementForm.controls.cupoMaximoDiario.value,
-      ) ?? product.cupoMaximoDiario;
-
-    return cupoMaximoDiario !== null &&
-      cupoMaximoDiario !== undefined &&
-      cupoMaximoDiario <= 0
-      ? 'SIN_STOCK'
-      : 'DISPONIBLE';
-  }
-
-  private getDefaultInventoryManagementMotivo(
-    mode: TipoManejoInventario,
-    disponible: boolean,
-  ): string {
-    if (mode === 'DISPONIBLE_NO_DISPONIBLE') {
-      return disponible ? 'Producto disponible' : 'Pausado temporalmente';
-    }
-
-    return INVENTORY_MODE_DEFAULT_MOTIVOS[mode];
-  }
-
-  private setDefaultInventoryManagementMotivo(): void {
-    const motivoControl = this.inventoryManagementForm.controls.motivo;
-    const currentMotivo = motivoControl.value?.trim();
-
-    if (currentMotivo && !this.isDefaultInventoryManagementMotivo(currentMotivo)) {
-      return;
-    }
-
-    motivoControl.setValue(
-      this.getDefaultInventoryManagementMotivo(
-        this.getInventoryManagementMode(),
-        this.inventoryManagementForm.controls.disponible.value === true,
-      ),
-    );
-  }
-
-  private isDefaultInventoryManagementMotivo(value: string): boolean {
-    return [
-      ...Object.values(INVENTORY_MODE_DEFAULT_MOTIVOS),
-      'Producto disponible',
-      'Pausado temporalmente',
-      'Marcar agotado',
-    ].includes(value);
-  }
-
-  private hasStoredNumber(value: number | null | undefined): boolean {
-    return typeof value === 'number' && Number.isFinite(value);
-  }
-
-  private toOptionalNumber(
-    value: number | string | null | undefined,
-  ): number | undefined {
-    if (value === null || value === undefined || value === '') {
-      return undefined;
-    }
-
-    const numericValue = Number(value);
-
-    return Number.isFinite(numericValue) ? numericValue : undefined;
-  }
-
-  private getInventoryErrorMessage(error: unknown): string {
-    const responseError =
-      error instanceof HttpErrorResponse && typeof error.error === 'object'
-        ? error.error
-        : null;
-    const code =
-      responseError && 'code' in responseError && typeof responseError.code === 'string'
-        ? responseError.code
-        : null;
-
-    if (code && INVENTORY_ERROR_MESSAGES[code]) {
-      return INVENTORY_ERROR_MESSAGES[code];
-    }
-
-    if (
-      responseError &&
-      'mensaje' in responseError &&
-      typeof responseError.mensaje === 'string'
-    ) {
-      return responseError.mensaje;
-    }
-
-    return 'No se pudo actualizar el inventario.';
-  }
-
-  private connectRealtime(buffetId: string): void {
-    this.realtimeAbortController?.abort();
-    this.realtimeStatus = 'connecting';
-
-    this.realtimeAbortController = this.inventoryRealtimeService.connect(buffetId, {
-      onOpen: () => {
-        this.zone.run(() => {
-          this.realtimeStatus = 'connected';
-        });
-      },
-      onClose: () => {
-        this.zone.run(() => {
-          this.realtimeStatus = 'disconnected';
-        });
-      },
-      onRefresh: (event) => {
-        this.zone.run(() => {
-          if (!INVENTORY_REALTIME_STOCK_EVENT_TYPES.has(event.type)) {
-            return;
-          }
-
-          const shouldRefreshInventory = this.applyRealtimeInventoryEvent(event);
-          this.highlightProduct(event.productId);
-
-          if (shouldRefreshInventory) {
-            this.scheduleInventoryRefresh();
-          }
-        });
-      },
-      onPurchaseCreated: (event) => {
-        this.zone.run(() => this.showPurchaseCreatedToast(event));
-      },
-      onError: (error) => {
-        console.warn('SSE de inventario desconectado o reintentando', error);
-        this.zone.run(() => {
-          this.realtimeStatus = 'disconnected';
-        });
-      },
-    });
-  }
-
-  private showPurchaseCreatedToast(event: RealtimeInventoryEvent): void {
-    const message = event.message?.trim() || 'Pedido realizado';
-    const total = this.formatPurchaseTotal(event.purchaseTotal);
-    const toastMessage = total ? `${message} - Total: ${total}` : message;
-
-    this.toastService.mostrar(toastMessage, 'success');
-  }
-
-  private formatPurchaseTotal(total: unknown): string | null {
-    if (total === null || total === undefined || total === '') {
-      return null;
-    }
-
-    const numericTotal = Number(total);
-    if (!Number.isFinite(numericTotal)) {
-      return null;
-    }
-
-    return this.purchaseTotalFormatter.format(numericTotal);
-  }
-
-  private scheduleInventoryRefresh(): void {
-    if (this.refreshTimeoutId !== null) {
-      return;
-    }
-
-    this.refreshTimeoutId = window.setTimeout(() => {
-      this.refreshTimeoutId = null;
-      this.inventoryRealtimeService.recordRefetch('inventory-overview');
-      this.loadProducts(false);
-    }, INVENTORY_FULL_REFRESH_DEBOUNCE_MS);
-  }
-
-  private applyRealtimeInventoryEvent(event: RealtimeInventoryEvent): boolean {
-    const productId = event.productId?.trim();
-
-    if (!productId) {
-      return true;
-    }
-
-    let updatedProduct: InventoryOverviewItem | null = null;
-    let previousProduct: InventoryOverviewItem | null = null;
-
-    this.products = this.products.map((product) => {
-      if (product.productId !== productId) {
-        return product;
-      }
-
-      previousProduct = product;
-      updatedProduct = this.mergeRealtimeInventoryEvent(product, event);
-      return updatedProduct;
-    });
-
-    if (!updatedProduct) {
-      return true;
-    }
-
-    if (this.inventoryManagementTarget?.productId === productId) {
-      this.inventoryManagementTarget = updatedProduct;
-    }
-
-    if (this.stockMovementTarget?.productId === productId) {
-      this.stockMovementTarget = updatedProduct;
-    }
-
-    return this.shouldRefreshInventoryAfterRealtimeEvent(
-      event,
-      previousProduct,
-    );
-  }
-
-  private mergeRealtimeInventoryEvent(
-    product: InventoryOverviewItem,
-    event: RealtimeInventoryEvent,
-  ): InventoryOverviewItem {
-    const estadoInventario = this.resolveRealtimeInventoryStatus(
-      product,
-      event,
-    );
-
-    return {
-      ...product,
-      tipoManejoInventario:
-        event.tipoManejoInventario ?? product.tipoManejoInventario,
-      estadoInventario,
-      stockActual: event.stockActual ?? product.stockActual,
-      stockReservado: event.stockReservado ?? product.stockReservado,
-      stockDisponible: event.stockDisponible ?? product.stockDisponible,
-      stockMinimo: event.stockMinimo ?? product.stockMinimo,
-      cupoMaximoDiario:
-        event.cupoMaximoDiario ?? product.cupoMaximoDiario,
-      cupoDisponibleDia:
-        event.cupoDisponibleDia ?? product.cupoDisponibleDia,
-      disponible: event.disponible ?? estadoInventario !== 'DESACTIVADO',
-      bajoStock: estadoInventario === 'BAJO_STOCK',
-      agotado: estadoInventario === 'SIN_STOCK',
-    };
-  }
-
-  private resolveRealtimeInventoryStatus(
-    product: InventoryOverviewItem,
-    event: RealtimeInventoryEvent,
-  ): EstadoInventario {
-    if (event.estadoInventario) {
-      return event.estadoInventario;
-    }
-
-    if (event.type === 'PRODUCT_SOLD_OUT') {
-      return 'SIN_STOCK';
-    }
-
-    if (event.type === 'LOW_STOCK' || event.type === 'DAILY_CAPACITY_LOW') {
-      return 'BAJO_STOCK';
-    }
-
-    return product.estadoInventario;
-  }
-
-  private shouldRefreshInventoryAfterRealtimeEvent(
-    event: RealtimeInventoryEvent,
-    product: InventoryOverviewItem | null,
-  ): boolean {
-    if (!product) {
-      return true;
-    }
-
-    if (!this.hasRealtimeInventoryState(event)) {
-      return true;
-    }
-
-    return (
-      this.isInventoryConfigurationEvent(event) &&
-      !this.hasRealtimeConfigurationState(event)
-    );
-  }
-
-  private hasRealtimeInventoryState(event: RealtimeInventoryEvent): boolean {
-    return (
-      event.stockActual !== undefined ||
-      event.stockReservado !== undefined ||
-      event.stockDisponible !== undefined ||
-      event.stockMinimo !== undefined ||
-      event.cupoMaximoDiario !== undefined ||
-      event.cupoDisponibleDia !== undefined ||
-      event.disponible !== undefined ||
-      event.estadoInventario !== undefined ||
-      event.tipoManejoInventario !== undefined
-    );
-  }
-
-  private isInventoryConfigurationEvent(event: RealtimeInventoryEvent): boolean {
-    const normalizedText = this.normalizeSearchText(
-      [
-        event.message,
-        event.movementType,
-        event.changeKind,
-        event.reason,
-      ].join(' '),
-    );
-
-    return [
-      'minimo',
-      'cupo',
-      'modo',
-      'manejo',
-      'capacidad',
-      'disponibilidad',
-      'disponible',
-    ].some((keyword) => normalizedText.includes(keyword));
-  }
-
-  private hasRealtimeConfigurationState(event: RealtimeInventoryEvent): boolean {
-    return (
-      event.tipoManejoInventario !== undefined ||
-      event.stockMinimo !== undefined ||
-      event.cupoMaximoDiario !== undefined ||
-      event.cupoDisponibleDia !== undefined ||
-      event.disponible !== undefined ||
-      event.estadoInventario !== undefined
-    );
-  }
-
-  private highlightProduct(productId: string | undefined): void {
-    const normalizedProductId = productId?.trim();
-    if (!normalizedProductId) {
-      return;
-    }
-
-    const previousTimeoutId = this.highlightTimeoutIds.get(normalizedProductId);
-    if (previousTimeoutId !== undefined) {
-      window.clearTimeout(previousTimeoutId);
-    }
-
-    this.highlightedProductIds = new Set([
-      ...this.highlightedProductIds,
-      normalizedProductId,
-    ]);
-
-    const timeoutId = window.setTimeout(() => {
-      const nextHighlightedProductIds = new Set(this.highlightedProductIds);
-      nextHighlightedProductIds.delete(normalizedProductId);
-      this.highlightedProductIds = nextHighlightedProductIds;
-      this.highlightTimeoutIds.delete(normalizedProductId);
-    }, PRODUCT_HIGHLIGHT_DURATION_MS);
-
-    this.highlightTimeoutIds.set(normalizedProductId, timeoutId);
-  }
-
-  private normalizeSearchText(value: string): string {
-    return value
-      .trim()
-      .toLocaleLowerCase('es-AR')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-  }
-
-  private normalizeEditableProduct(product: Product): Product {
-    return {
-      ...product,
-      categoriaId: product.categoriaId ?? product.categoria?.id ?? null,
-      categoriaNombre:
-        product.categoriaNombre ?? product.categoria?.descripcion ?? '',
-    };
   }
 
   private productFromInventoryOverview(product: InventoryOverviewItem): Product {
     return {
       id: product.productId,
       nombre: product.nombre,
-      descripcion: '',
+      descripcion: "",
       precio: product.precio,
       peso: 0,
       requierePreparacion: false,
       stockActual: product.stockActual ?? 0,
+      urlImagen: product.urlImagen
     };
   }
 
@@ -1236,4 +852,224 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     const status = getOperationalStockStatus(product);
     return product.disponible && status !== 'AGOTADO' && status !== 'PAUSADO';
   }
+
+  private connectRealtime(buffetId: string): void {
+    this.realtimeAbortController?.abort();
+
+    this.realtimeAbortController = this.inventoryRealtimeService.connect(
+      buffetId,
+      {
+        onRefresh: (event) => {
+          this.zone.run(() => this.scheduleRealtimeRefresh(event));
+        },
+        onPurchaseCreated: (event) => {
+          this.zone.run(() => {
+            const total = event.purchaseTotal
+              ? ` - Total: ${this.purchaseTotalFormatter.format(event.purchaseTotal)}`
+              : '';
+            this.toastService.mostrar(`${event.message || 'Nueva compra'}${total}`, 'success');
+          });
+        },
+        onError: (error) => {
+          console.warn('SSE de inventario desconectado o reintentando', error);
+        },
+      },
+    );
+  }
+
+  private scheduleRealtimeRefresh(event: RealtimeInventoryEvent): void {
+    if (event.productId) {
+      const productId = event.productId;
+      const newHighlighted = new Set(this.highlightedProductIds);
+      newHighlighted.add(productId);
+      this.highlightedProductIds = newHighlighted;
+
+      if (this.highlightTimeoutIds.has(productId)) {
+        window.clearTimeout(this.highlightTimeoutIds.get(productId));
+      }
+
+      const timeoutId = window.setTimeout(() => {
+        const currentHighlighted = new Set(this.highlightedProductIds);
+        currentHighlighted.delete(productId);
+        this.highlightedProductIds = currentHighlighted;
+        this.highlightTimeoutIds.delete(productId);
+      }, 3000);
+
+      this.highlightTimeoutIds.set(productId, timeoutId);
+    }
+
+    if (this.refreshTimeoutId !== null) {
+      return;
+    }
+
+    this.refreshTimeoutId = window.setTimeout(() => {
+      this.refreshTimeoutId = null;
+      this.loadProducts(false);
+    }, INVENTORY_FULL_REFRESH_DEBOUNCE_MS);
+  }
+
+  private normalizeSearchText(text: string): string {
+    return (text ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  private highlightProduct(productId: string): void {
+    const newHighlighted = new Set(this.highlightedProductIds);
+    newHighlighted.add(productId);
+    this.highlightedProductIds = newHighlighted;
+
+    if (this.highlightTimeoutIds.has(productId)) {
+      window.clearTimeout(this.highlightTimeoutIds.get(productId));
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const currentHighlighted = new Set(this.highlightedProductIds);
+      currentHighlighted.delete(productId);
+      this.highlightedProductIds = currentHighlighted;
+      this.highlightTimeoutIds.delete(productId);
+    }, 3000);
+
+    this.highlightTimeoutIds.set(productId, timeoutId);
+  }
+
+  private openInventoryManagementFromQuery(data: InventoryOverviewItem[]): void {
+    if (!this.inventoryManagementProductIdFromQuery) {
+      return;
+    }
+
+    const product = data.find(
+      (p) => p.productId === this.inventoryManagementProductIdFromQuery,
+    );
+
+    if (product) {
+      this.openInventoryManagement(product);
+      this.highlightProduct(product.productId);
+    }
+
+    // Limpiar el query param para que no se abra de nuevo al refrescar
+    this.router.navigate([], {
+      queryParams: { productId: null },
+      queryParamsHandling: 'merge',
+    });
+    this.inventoryManagementProductIdFromQuery = null;
+  }
+
+  private normalizeEditableProduct(product: Product): Product {
+    // Asegurar que los campos numéricos sean números
+    return {
+      ...product,
+      precio: Number(product.precio),
+      peso: Number(product.peso),
+      stockActual: Number(product.stockActual),
+    };
+  }
+
+  private configureInventoryManagementForm(product: InventoryOverviewItem): void {
+    this.inventoryManagementForm.reset({
+      tipoManejoInventario: product.tipoManejoInventario,
+      stockActual: product.stockActual,
+      stockMinimo: product.stockMinimo,
+      cupoMaximoDiario: product.cupoMaximoDiario,
+      disponible: product.disponible,
+      estadoInventario: product.estadoInventario,
+      motivo: '',
+    });
+    this.updateInventoryManagementValidators();
+  }
+
+  private updateInventoryManagementValidators(): void {
+    const mode = this.getInventoryManagementMode();
+    const { stockActual, stockMinimo, cupoMaximoDiario } =
+      this.inventoryManagementForm.controls;
+
+    stockActual.clearValidators();
+    stockMinimo.clearValidators();
+    cupoMaximoDiario.clearValidators();
+
+    if (mode === 'STOCK_EXACTO') {
+      stockActual.setValidators([Validators.required, Validators.min(0)]);
+      stockMinimo.setValidators([Validators.required, Validators.min(0)]);
+    } else if (mode === 'CUPO_DIARIO') {
+      cupoMaximoDiario.setValidators([Validators.required, Validators.min(0)]);
+    }
+
+    stockActual.updateValueAndValidity();
+    stockMinimo.updateValueAndValidity();
+    cupoMaximoDiario.updateValueAndValidity();
+  }
+
+  private setDefaultInventoryManagementMotivo(): void {
+    const mode = this.getInventoryManagementMode();
+    const defaultMotivo = INVENTORY_MODE_DEFAULT_MOTIVOS[mode] || '';
+    this.inventoryManagementForm.patchValue({ motivo: defaultMotivo });
+  }
+
+  private buildInventoryStockPayload(): InventoryStockUpdateRequest {
+    const values = this.inventoryManagementForm.value;
+    const mode = values.tipoManejoInventario as TipoManejoInventario;
+
+    const payload: InventoryStockUpdateRequest = {
+      tipoManejoInventario: mode,
+      disponible: !!values.disponible,
+      motivo: values.motivo || 'Actualización manual',
+    };
+
+    const usuarioId = this.obtenerUsuarioIdActual();
+    if (usuarioId) {
+      payload.usuarioId = usuarioId;
+    }
+
+    if (values.estadoInventario) {
+      payload.estadoInventario = values.estadoInventario as EstadoInventario;
+    } else if (mode === 'DISPONIBLE_NO_DISPONIBLE') {
+      payload.estadoInventario = values.disponible ? 'DISPONIBLE' : 'DESACTIVADO';
+    }
+
+    if (mode === 'STOCK_EXACTO') {
+      payload.stockActual = values.stockActual ?? 0;
+      payload.stockMinimo = values.stockMinimo ?? 0;
+    } else if (mode === 'CUPO_DIARIO') {
+      payload.cupoMaximoDiario = values.cupoMaximoDiario ?? 0;
+    }
+
+    return payload;
+  }
+
+  private getInventoryErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const code = error.error?.code || error.statusText;
+      if (code && INVENTORY_ERROR_MESSAGES[code]) {
+        return INVENTORY_ERROR_MESSAGES[code];
+      }
+
+      if (error.status === 403) return INVENTORY_ERROR_MESSAGES['FORBIDDEN'];
+      if (error.status === 404) return INVENTORY_ERROR_MESSAGES['NOT_FOUND'];
+      if (error.status === 400) return INVENTORY_ERROR_MESSAGES['BAD_REQUEST'];
+    }
+
+    return 'Ocurrió un error inesperado al actualizar el inventario.';
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

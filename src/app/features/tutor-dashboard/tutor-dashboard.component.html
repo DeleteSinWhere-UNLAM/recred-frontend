@@ -48,7 +48,11 @@
             <div class="alumno-card__identidad">
               <div class="alumno-card__avatar-wrap">
                 <div class="alumno-card__avatar">
-                  <span>{{ getInitials(child.studentName) }}</span>
+                  @if (child.urlFotoPerfil) {
+                    <img [src]="child.urlFotoPerfil" [alt]="'Foto de ' + child.studentName" class="alumno-card__avatar--foto" />
+                  } @else {
+                    <span>{{ getInitials(child.studentName) }}</span>
+                  }
                 </div>
               </div>
               <div class="alumno-card__texto">

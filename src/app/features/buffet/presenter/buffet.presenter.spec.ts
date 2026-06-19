@@ -207,6 +207,7 @@ describe('BuffetPresenter', () => {
     });
 
     it('debería revertir el bloqueo optimista si el servicio falla', () => {
+      spyOn(console, 'error');
       presenter.init('alumno-1');
       const producto = { ...productoDisponible, bloqueado: false };
       restriccionProductoServiceSpy.bloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));
@@ -230,6 +231,7 @@ describe('BuffetPresenter', () => {
     });
 
     it('debería revertir el desbloqueo optimista si el servicio falla', () => {
+      spyOn(console, 'error');
       presenter.init('alumno-1');
       const producto = { ...productoBloqueadoPorTutor, bloqueado: true };
       restriccionProductoServiceSpy.desbloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));

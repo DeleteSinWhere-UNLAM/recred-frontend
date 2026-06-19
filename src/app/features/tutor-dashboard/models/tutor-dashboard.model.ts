@@ -11,6 +11,7 @@ export interface ChildDashboardSummary {
   studentName: string;
   balance: number;
   debt: number;
+  urlFotoPerfil?: string | null;
   spendingPredictionMessage: string;
   budget?: BudgetSummary;
   health: HealthSummary;

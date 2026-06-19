@@ -12,7 +12,11 @@
         <div class="acreditar-page__alumno-left">
           <div class="acreditar-page__avatar-wrap">
             <div class="acreditar-page__avatar">
-              <span>{{ presenter.iniciales() }}</span>
+              @if (presenter.urlFotoPerfil()) {
+                <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="acreditar-page__avatar-img" />
+              } @else {
+                <span>{{ presenter.iniciales() }}</span>
+              }
             </div>
           </div>
           <div class="acreditar-page__alumno-info">
