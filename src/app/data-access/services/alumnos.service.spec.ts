@@ -83,12 +83,30 @@ describe('AlumnosService', () => {
     httpMock.verify();
   });
 
-  it('debería crearse el servicio', () => {
+  it('dado que se inyecta el servicio, debería crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
+  describe('crearHijo', () => {
+    it('dado que se llama a crearHijo, debería hacer un POST a /tutores/me/hijos y agregarlo al estado', (done) => {
+      const reqPayload = { username: ' user ', nombre: ' N ', apellido: ' A ', email: ' e@e.com ', dni: ' 123 ', gradoId: ' g1 ' };
+      const dtoResponse = { id: 'new-1', nombre: 'N', apellido: 'A', grado: 'g1', colegioId: 'c1', saldo: 0, urlFotoPerfil: null };
+
+      service.crearHijo(reqPayload).then(alumno => {
+        expect(alumno.id).toBe('new-1');
+        expect(service.getAlumnos().some(a => a.id === 'new-1')).toBeTrue();
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/tutores/me/hijos`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ username: 'user', nombre: 'N', apellido: 'A', email: 'e@e.com', dni: '123', gradoId: 'g1' });
+      req.flush(dtoResponse);
+    });
+  });
+
   describe('cargarHijosDelTutor', () => {
-    it('debería hacer un request GET a /tutores/me/hijos', (done) => {
+    it('dado que se llama a cargarHijosDelTutor, debería hacer un request GET a /tutores/me/hijos', (done) => {
       const mockDtos = [
         { id: 'alumno-1', nombre: 'Julián', apellido: 'García', grado: '4to Año A', colegioId: '1', saldo: 2000 }
       ];
@@ -99,14 +117,66 @@ describe('AlumnosService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/tutores/me/hijos`);
+      const req = httpMock.expectOne(`${environment.apiUrl.replace(/\/$/, '')}/tutores/me/hijos`);
       expect(req.request.method).toBe('GET');
       req.flush(mockDtos);
+    });
+
+    it('dado que el endpoint devuelve un error o datos inválidos, debería retornar arreglo vacío o rechazar', (done) => {
+      service.cargarHijosDelTutor().then((alumnos) => {
+        expect(alumnos).toEqual([]);
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl.replace(/\/$/, '')}/tutores/me/hijos`);
+      req.flush(null);
+    });
+  });
+
+  describe('cargarPerfilAlumno', () => {
+    it('dado que se llama a cargarPerfilAlumno y el back responde, debería actualizar el estado', (done) => {
+      const dtoResponse = { id: 'a1', nombre: 'N', apellido: 'A', grado: 'g1', colegioId: 'c1', saldo: 10, urlFotoPerfil: null };
+
+      service.cargarPerfilAlumno().then(alumnos => {
+        expect(alumnos.length).toBe(1);
+        expect(alumnos[0].id).toBe('a1');
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl.replace(/\/$/, '')}/alumnos/me`);
+      expect(req.request.method).toBe('GET');
+      req.flush(dtoResponse);
+    });
+
+    it('dado que el back responde null en cargarPerfilAlumno, debería devolver el mock', (done) => {
+      perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
+      perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
+
+      service.cargarPerfilAlumno().then(alumnos => {
+        expect(alumnos[0].id).toBe('julian-garcia');
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl.replace(/\/$/, '')}/alumnos/me`);
+      req.flush(null);
+    });
+
+    it('dado que ocurre un error en cargarPerfilAlumno, debería devolver el mock', (done) => {
+      perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
+      perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
+
+      service.cargarPerfilAlumno().then(alumnos => {
+        expect(alumnos[0].id).toBe('julian-garcia');
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl.replace(/\/$/, '')}/alumnos/me`);
+      req.error(new ProgressEvent('error'));
     });
   });
 
   describe('asegurarCargados', () => {
-    it('debería retornar un array vacío si no hay perfil de usuario', (done) => {
+    it('dado que se llama a asegurarCargados y no hay perfil de usuario, debería retornar un array vacío', (done) => {
       perfilServiceSpy.getPerfil.and.returnValue(null);
 
       service.asegurarCargados().then((alumnos) => {
@@ -115,7 +185,7 @@ describe('AlumnosService', () => {
       });
     });
 
-    it('debería disparar el request HTTP a /alumnos/me si el rol es ALUMNO', (done) => {
+    it('dado que se llama a asegurarCargados y el rol es ALUMNO, debería disparar el request HTTP a /alumnos/me', (done) => {
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
       perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
 
@@ -125,13 +195,13 @@ describe('AlumnosService', () => {
         done();
       });
 
-      httpMock.expectNone(`${environment.apiUrl}/tutores/me/hijos`);
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/me`);
+      httpMock.expectNone(`${environment.apiUrl.replace(/\/$/, '')}/tutores/me/hijos`);
+      const req = httpMock.expectOne(`${environment.apiUrl.replace(/\/$/, '')}/alumnos/me`);
       expect(req.request.method).toBe('GET');
       req.flush({ id: 'julian-garcia', nombre: 'Julián', apellido: 'García', grado: '4to Año A', colegioId: 'instituto-san-jose', saldo: 2580 });
     });
 
-    it('debería disparar el request HTTP si el rol es PADRE', (done) => {
+    it('dado que se llama a asegurarCargados y el rol es PADRE, debería disparar el request HTTP para hijos', (done) => {
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilTutor);
 
       service.asegurarCargados().then((alumnos) => {
@@ -140,7 +210,7 @@ describe('AlumnosService', () => {
         done();
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/tutores/me/hijos`);
+      const req = httpMock.expectOne(`${environment.apiUrl.replace(/\/$/, '')}/tutores/me/hijos`);
       expect(req.request.method).toBe('GET');
       req.flush([
         { id: 'alumno-1', nombre: 'Julián', apellido: 'García', grado: '4to Año A', colegioId: '1', saldo: 2000 }
@@ -149,7 +219,7 @@ describe('AlumnosService', () => {
   });
 
   describe('getAlumnos', () => {
-    it('debería retornar el alumno mockeado si el rol es ALUMNO', () => {
+    it('dado que se llama a getAlumnos y el rol es ALUMNO, debería retornar el alumno mockeado', () => {
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
       perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
 
@@ -159,7 +229,7 @@ describe('AlumnosService', () => {
       expect(alumnos[0].nombre).toBe('Julián');
     });
 
-    it('debería retornar un array vacío si el rol es PADRE y no hay alumnos cargados', () => {
+    it('dado que se llama a getAlumnos, el rol es PADRE y no hay alumnos cargados, debería retornar un array vacío', () => {
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilTutor);
 
       const alumnos = service.getAlumnos();
@@ -168,7 +238,7 @@ describe('AlumnosService', () => {
   });
 
   describe('getAlumnoById', () => {
-    it('debería retornar el alumno si coincide con el del perfil de ALUMNO', () => {
+    it('dado que se llama a getAlumnoById y coincide con el del perfil de ALUMNO, debería retornar el alumno', () => {
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
       perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
 
@@ -177,12 +247,31 @@ describe('AlumnosService', () => {
       expect(alumno?.id).toBe('julian-garcia');
     });
 
-    it('debería retornar undefined si el ID no coincide', () => {
+    it('dado que se llama a getAlumnoById y el ID no coincide, debería retornar undefined', () => {
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
       perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
 
       const alumno = service.getAlumnoById('otro-id');
       expect(alumno).toBeUndefined();
+    });
+  });
+
+  describe('subirFotoAlumno', () => {
+    it('dado que se llama a subirFotoAlumno, debería hacer POST y actualizar el estado', (done) => {
+      const archivo = new File([''], 'test.png', { type: 'image/png' });
+      const dtoResponse = { id: 'alumno-1', nombre: 'Julián', apellido: 'García', grado: '4to Año A', colegioId: '1', saldo: 2000, urlFotoPerfil: 'url.png' };
+      
+      service['alumnosState'].set([mockAlumnoTutor]);
+
+      service.subirFotoAlumno('alumno-1', archivo).then(alumno => {
+        expect(alumno.urlFotoPerfil).toBe('url.png');
+        expect(service.getAlumnoById('alumno-1')?.urlFotoPerfil).toBe('url.png');
+        done();
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/tutores/me/hijos/alumno-1/foto`);
+      expect(req.request.method).toBe('POST');
+      req.flush(dtoResponse);
     });
   });
 });

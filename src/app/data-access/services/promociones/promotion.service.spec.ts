@@ -28,8 +28,23 @@ describe('PromotionService', () => {
     httpMock.verify();
   });
 
+  describe('getPromotions', () => {
+    it('dado que se llama a getPromotions, debería hacer un GET al endpoint de promociones del buffet', () => {
+      mockPerfilService.obtenerBuffetId.and.returnValue('buffet-123');
+      const mockResponse: Promotion[] = [];
+      
+      service.getPromotions().subscribe(res => {
+        expect(res).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/buffet/buffet-123`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
+    });
+  });
+
   describe('approvePromotion', () => {
-    it('Dado que se llama a approvePromotion con un ID válido, debería hacer un PUT a /promotions/:id con status ACTIVE y buffetId', () => {
+    it('dado que se llama a approvePromotion con un ID válido, debería hacer un PUT a /promotions/:id con status ACTIVE y buffetId', () => {
       const mockId = 'promo-123';
       const mockBuffetId = 'buffet-123';
       const mockResponse: Promotion = {
@@ -55,7 +70,7 @@ describe('PromotionService', () => {
   });
 
   describe('discardPromotion', () => {
-    it('Dado que se llama a discardPromotion con un ID válido, debería hacer un DELETE a /promotions/:id', () => {
+    it('dado que se llama a discardPromotion con un ID válido, debería hacer un DELETE a /promotions/:id', () => {
       const mockId = 'promo-123';
 
       service.discardPromotion(mockId).subscribe(response => {
@@ -69,7 +84,7 @@ describe('PromotionService', () => {
   });
 
   describe('createPromotion', () => {
-    it('Dado que se llama a createPromotion con una promoción, debería hacer un POST a /promotions con buffetId', () => {
+    it('dado que se llama a createPromotion con una promoción, debería hacer un POST a /promotions con buffetId', () => {
       mockPerfilService.obtenerBuffetId.and.returnValue('buffet-123');
       const mockPromo: Partial<Promotion> = {
         name: 'Promo Test',
