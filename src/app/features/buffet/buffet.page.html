@@ -111,19 +111,105 @@
         </section>
 
         
-        @if (presenter.productosFiltrados().length > 0) {
+        <!-- Carrusel de Promociones Destacadas -->
+        @if (promocionesDestacadasFiltradas().length > 0) {
+        <section class="promos-seccion" aria-label="Promociones Destacadas">
+          <div class="promos-seccion__header">
+            <h3 class="promos-seccion__titulo">Promociones Destacadas</h3>
+            <div class="promos-seccion__accent"></div>
+          </div>
+
+          <div class="promos-carousel-wrapper">
+            <button type="button" class="promos-carousel__nav promos-carousel__nav--left" 
+                    [disabled]="promocionesDestacadasFiltradas().length <= 1" (click)="scrollCarousel(-1)" aria-label="Anterior promoción">
+              <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+            </button>
+
+            <div #promosContainer class="promos-carousel__container" (scroll)="onCarouselScroll($event)">
+              @for (promo of promocionesDestacadasFiltradas(); track promo.id) {
+              <article class="promo-card">
+                <!-- Color vertical banner / Left side -->
+                <div class="promo-card__banner" [class]="'promo-card__banner--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
+                  <span class="promo-card__badge-promo">PROMO</span>
+                  <h4 class="promo-card__banner-title">{{ promo.nombre }}</h4>
+                  <p class="promo-card__banner-desc">
+                    @for (item of promo.itemsList; track $index) {
+                      + {{ item }}<br>
+                    }
+                  </p>
+                </div>
+
+                <!-- Right side info & image -->
+                <div class="promo-card__body">
+                  <div class="promo-card__media">
+                    <img [src]="promo.imagen" [alt]="promo.nombre" class="promo-card__image" loading="lazy" />
+                  </div>
+                  
+                  <div class="promo-card__content">
+                    <h4 class="promo-card__title">{{ promo.nombre }}</h4>
+                    <p class="promo-card__description">{{ promo.descripcion }}</p>
+                    
+                    <div class="promo-card__footer">
+                      <div class="promo-card__price-info">
+                        <span class="promo-card__price-label">SALDO</span>
+                        <div class="promo-card__price-value-container">
+                          @if (promo.precioOriginal && promo.precioOriginal !== promo.precio) {
+                            <span class="promo-card__price-original">{{ formatARS(promo.precioOriginal) }}</span>
+                          }
+                          <span class="promo-card__price-value">{{ formatARS(promo.precio) }}</span>
+                          @if (promo.descuento) {
+                            <span class="promo-card__discount-tag">{{ promo.descuento }}</span>
+                          }
+                        </div>
+                      </div>
+
+                      @if (puedeComprarPromo(promo)) {
+                        <button type="button" class="promo-card__btn-agregar" (click)="agregarPromoAlCarrito(promo)">
+                          Agregar Promo
+                        </button>
+                      } @else {
+                        <button type="button" class="promo-card__btn-insuficiente" disabled>
+                          Saldo insuficiente
+                        </button>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </article>
+              }
+            </div>
+
+            <button type="button" class="promos-carousel__nav promos-carousel__nav--right" 
+                    [disabled]="promocionesDestacadasFiltradas().length <= 1" (click)="scrollCarousel(1)" aria-label="Siguiente promoción">
+              <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="promos-carousel__dots">
+            @for (dot of promocionesDestacadasFiltradas(); track $index) {
+            <button type="button" class="promos-carousel__dot" [class.active]="$index === activeSlideIndex()"
+                    (click)="scrollToSlide($index)" [attr.aria-label]="'Ir a la promoción ' + ($index + 1)"></button>
+            }
+          </div>
+        </section>
+        }
+
+        <!-- Grid de Productos Sueltos -->
+        @if (productosSueltos().length > 0) {
         <section class="buffet__grid" aria-label="Productos del buffet">
-          @for (producto of presenter.productosFiltrados(); track producto.id) {
+          @for (producto of productosSueltos(); track producto.id) {
           <app-producto-card [producto]="producto" [alumnoId]="presenter.alumno()?.id ?? ''"
             [esFavorito]="presenter.favoritos().has(producto.id)" [mostrarCandado]="!esVistaAlumno()"
             (agregar)="presenter.agregarAlCarrito($event.producto, $event.cantidad)"
             (toggleFavorito)="presenter.toggleFavorito($event)" (toggleLock)="presenter.toggleLock($event)" />
           }
         </section>
-        } @else {
+        }
+
+        @if (productosSueltos().length === 0 && promocionesDestacadasFiltradas().length === 0) {
         <div class="buffet__vacio" role="status">
           <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-          <p>No hay productos que coincidan con los filtros.</p>
+          <p>No hay productos ni promociones que coincidan con los filtros.</p>
           <button type="button" class="buffet__vacio-cta" (click)="presenter.limpiarFiltros()">
             Limpiar filtros
           </button>

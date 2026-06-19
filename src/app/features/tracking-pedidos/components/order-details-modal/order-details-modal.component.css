@@ -314,3 +314,155 @@
     transform: scale(1);
   }
 }
+
+/* Accordion / Expandable Promo Details */
+.item-wrapper {
+  border-bottom: 1px solid var(--color-borde);
+  padding: 8px 0;
+}
+.item-wrapper:last-child {
+  border-bottom: none;
+}
+
+.item-row {
+  margin-bottom: 4px;
+}
+
+.item-promo-action {
+  display: flex;
+  margin-top: 2px;
+}
+
+.promo-details-trigger {
+  background: none;
+  border: none;
+  color: var(--color-pizarra);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+
+.promo-details-trigger:hover {
+  color: var(--color-pizarra-dark);
+  text-decoration: underline;
+}
+
+.promo-details-panel {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background-color: var(--color-superficie-alt);
+  border-radius: 8px;
+  border: 1px solid var(--color-borde-fuerte);
+  animation: slideDown 200ms ease-out forwards;
+}
+
+.promo-details-loading {
+  font-size: 0.8rem;
+  color: var(--color-texto-claro);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.promo-details-error {
+  font-size: 0.8rem;
+  color: var(--color-melocoton);
+}
+
+.promo-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.promo-details-subtitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.promo-details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.promo-details-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--color-texto-oscuro);
+  padding: 2px 0;
+}
+
+.promo-details-list .prod-name {
+  font-weight: 500;
+}
+
+.promo-details-list .prod-price {
+  color: var(--color-texto-claro);
+}
+
+.promo-details-summary {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-borde);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.promo-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--color-texto-claro);
+}
+
+.promo-summary-row .original-price {
+  text-decoration: line-through;
+}
+
+.promo-summary-row .discount-badge {
+  background-color: rgba(129, 178, 154, 0.15);
+  color: var(--color-menta);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.promo-summary-row--total {
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.promo-summary-row--total .promo-price {
+  color: var(--color-pizarra-dark);
+  font-weight: 800;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
