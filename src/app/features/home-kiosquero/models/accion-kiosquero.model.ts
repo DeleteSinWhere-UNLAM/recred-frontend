@@ -9,6 +9,7 @@ export type AccionKiosqueroId =
   | 'sugerencias'
   | 'recomendaciones'
   | 'recomendaciones-estacionales'
+  | 'oportunidades-stock'
   | 'promociones';
 
 export type AccionKiosqueroColor =
