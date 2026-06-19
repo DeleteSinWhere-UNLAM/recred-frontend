@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { VentaEspontaneaPage } from './venta-espontanea-page';
 
 describe('VentaEspontaneaPage', () => {
@@ -17,7 +16,7 @@ describe('VentaEspontaneaPage', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('dado que se inicializa el componente, deberia crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 });

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { AlumnoSelector } from './alumno-selector';
 
 describe('AlumnoSelector', () => {
@@ -17,7 +16,7 @@ describe('AlumnoSelector', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('dado que se inicializa el componente, deberia crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 });
