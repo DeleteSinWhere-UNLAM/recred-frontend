@@ -62,7 +62,7 @@
               </div>
             </div>
             
-            <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="transfer-actions-row">
               <div class="alumno-card__saldo" [class.alumno-card__saldo--bajo]="child.balance < 1000">
                 <span class="alumno-card__saldo-label">Saldo</span>
                 <span class="alumno-card__saldo-valor">$ {{ child.balance | number:'1.0-0' }}</span>

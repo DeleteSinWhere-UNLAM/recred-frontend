@@ -179,11 +179,11 @@
       }
 
       <div class="movimientos__grouping-row">
-        <span class="grouping-label">Agrupar por:</span>
-        <div class="grouping-buttons">
+        <span class="movimientos__grouping-label">Agrupar por:</span>
+        <div class="movimientos__grouping-buttons">
           <button 
             type="button" 
-            class="grouping-btn" 
+            class="movimientos__grouping-btn" 
             [class.active]="criterioAgrupacion() === 'FECHA_COMPRA'"
             (click)="criterioAgrupacion.set('FECHA_COMPRA')"
           >
@@ -191,7 +191,7 @@
           </button>
           <button 
             type="button" 
-            class="grouping-btn" 
+            class="movimientos__grouping-btn" 
             [class.active]="criterioAgrupacion() === 'FECHA_RETIRO'"
             (click)="criterioAgrupacion.set('FECHA_RETIRO')"
           >
@@ -200,7 +200,7 @@
           @if (!esVistaAlumno() && !esVistaIndividual()) {
             <button 
               type="button" 
-              class="grouping-btn" 
+              class="movimientos__grouping-btn" 
               [class.active]="criterioAgrupacion() === 'ALUMNO'"
               (click)="criterioAgrupacion.set('ALUMNO')"
             >
