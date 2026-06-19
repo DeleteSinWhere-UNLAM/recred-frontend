@@ -1,11 +1,11 @@
-.daily-close {
+.cierre-diario {
   position: relative;
   min-height: calc(100vh - 64px);
   padding: 28px 0 40px;
   background: var(--color-fondo);
 }
 
-.daily-close__container {
+.cierre-diario__container {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 28px;
@@ -14,18 +14,18 @@
   gap: 20px;
 }
 
-.daily-close__back {
+.cierre-diario__back {
   position: absolute;
   top: 28px;
   left: 28px;
   z-index: 1;
 }
 
-.daily-close__back,
-.daily-close__primary,
-.daily-close__secondary,
-.daily-close-modal__button,
-.daily-close__state button {
+.cierre-diario__back,
+.cierre-diario__primary,
+.cierre-diario__secondary,
+.cierre-diario-modal__button,
+.cierre-diario__state button {
   min-height: 46px;
   display: inline-flex;
   align-items: center;
@@ -41,27 +41,27 @@
   cursor: pointer;
 }
 
-.daily-close__back,
-.daily-close__secondary,
-.daily-close-modal__button--secondary,
-.daily-close__state button {
+.cierre-diario__back,
+.cierre-diario__secondary,
+.cierre-diario-modal__button--secondary,
+.cierre-diario__state button {
   border: 1px solid var(--color-borde);
   background: var(--color-superficie);
   color: var(--color-pizarra);
 }
 
-.daily-close__header,
-.daily-close__action-panel,
-.daily-close__close-result,
-.daily-close__state,
-.daily-close__section {
+.cierre-diario__header,
+.cierre-diario__action-panel,
+.cierre-diario__close-result,
+.cierre-diario__state,
+.cierre-diario__section {
   border: 1px solid var(--color-borde);
   border-radius: 8px;
   background: var(--color-superficie);
 }
 
-.daily-close__header,
-.daily-close__action-panel {
+.cierre-diario__header,
+.cierre-diario__action-panel {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -69,14 +69,14 @@
   padding: 22px 26px;
 }
 
-.daily-close__header {
+.cierre-diario__header {
   gap: 18px;
 }
 
-.daily-close__header-icon,
-.daily-close__result-message i,
-.daily-close__order-status i,
-.daily-close-modal__icon {
+.cierre-diario__header-icon,
+.cierre-diario__result-message i,
+.cierre-diario__order-status i,
+.cierre-diario-modal__icon {
   width: 46px;
   height: 46px;
   flex: 0 0 46px;
@@ -89,45 +89,45 @@
   font-size: 18px;
 }
 
-.daily-close__header-icon {
+.cierre-diario__header-icon {
   width: 64px;
   height: 64px;
   flex-basis: 64px;
   font-size: 28px;
 }
 
-.daily-close__heading,
-.daily-close__action-copy {
+.cierre-diario__heading,
+.cierre-diario__action-copy {
   flex: 1;
   min-width: 0;
 }
 
-.daily-close__title,
-.daily-close h2 {
+.cierre-diario__title,
+.cierre-diario h2 {
   margin: 0;
   color: var(--color-pizarra);
   font-family: var(--font-display);
   font-weight: 800;
 }
 
-.daily-close__title {
+.cierre-diario__title {
   font-size: 30px;
   line-height: 1.05;
 }
 
-.daily-close h2 {
+.cierre-diario h2 {
   font-size: 22px;
 }
 
-.daily-close p,
-.daily-close-modal p {
+.cierre-diario p,
+.cierre-diario-modal p {
   margin: 6px 0 0;
   color: var(--color-texto-claro);
   font-size: 15px;
   line-height: 1.5;
 }
 
-.daily-close__status {
+.cierre-diario__status {
   min-width: 250px;
   padding: 14px 16px;
   border: 1px solid var(--color-dorado);
@@ -136,23 +136,23 @@
   color: var(--color-texto-oscuro);
 }
 
-.daily-close__status--closed {
+.cierre-diario__status--closed {
   border-color: var(--color-menta);
   color: var(--color-menta);
 }
 
-.daily-close__status span {
+.cierre-diario__status span {
   color: inherit;
   font-size: 15px;
 }
 
-.daily-close__status small {
+.cierre-diario__status small {
   margin-top: 5px;
   font-size: 12px;
   line-height: 1.35;
 }
 
-.daily-close__date-field {
+.cierre-diario__date-field {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -163,7 +163,7 @@
   margin-bottom: 1em;
 }
 
-.daily-close__date-field input {
+.cierre-diario__date-field input {
   min-height: 44px;
   padding: 0 14px;
   border: 1px solid var(--color-borde);
@@ -172,29 +172,29 @@
   font: inherit;
 }
 
-.daily-close__refresh {
+.cierre-diario__refresh {
   color: var(--color-texto-claro);
   font-size: 13px;
   font-weight: 800;
 }
 
-.daily-close__action-panel {
+.cierre-diario__action-panel {
   align-items: stretch;
 }
 
-.daily-close__action-side {
+.cierre-diario__action-side {
   width: min(430px, 42%);
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.daily-close__action-panel--closed,
-.daily-close__section--stock {
+.cierre-diario__action-panel--closed,
+.cierre-diario__section--stock {
   border-color: var(--color-menta);
 }
 
-.daily-close__eyebrow {
+.cierre-diario__eyebrow {
   margin-bottom: 6px;
   color: var(--color-texto-claro);
   font-size: 12px;
@@ -202,14 +202,14 @@
   text-transform: uppercase;
 }
 
-.daily-close-modal__states {
+.cierre-diario-modal__states {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 16px;
 }
 
-.daily-close-modal__states span {
+.cierre-diario-modal__states span {
   min-height: 32px;
   display: inline-flex;
   align-items: center;
@@ -222,112 +222,112 @@
   font-weight: 800;
 }
 
-.daily-close__action-buttons {
+.cierre-diario__action-buttons {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
 }
 
-.daily-close__primary,
-.daily-close-modal__button--primary {
+.cierre-diario__primary,
+.cierre-diario-modal__button--primary {
   background: var(--color-dorado);
   color: var(--color-texto-oscuro);
 }
 
-.daily-close__primary:disabled,
-.daily-close__secondary:disabled,
-.daily-close-modal__button:disabled {
+.cierre-diario__primary:disabled,
+.cierre-diario__secondary:disabled,
+.cierre-diario-modal__button:disabled {
   cursor: wait;
   opacity: 0.65;
 }
 
-.daily-close__close-result,
-.daily-close__section {
+.cierre-diario__close-result,
+.cierre-diario__section {
   padding: 22px;
 }
 
-.daily-close__close-result {
+.cierre-diario__close-result {
   border-color: var(--color-menta);
 }
 
-.daily-close__close-result--already {
+.cierre-diario__close-result--already {
   border-color: var(--color-dorado);
 }
 
-.daily-close__close-result--already .daily-close__result-message i,
-.daily-close-modal__icon {
+.cierre-diario__close-result--already .cierre-diario__result-message i,
+.cierre-diario-modal__icon {
   background: var(--color-fondo);
   color: var(--color-texto-oscuro);
 }
 
-.daily-close__result-message,
-.daily-close__ranking-item,
-.daily-close__inventory-item,
-.daily-close__alert-item {
+.cierre-diario__result-message,
+.cierre-diario__ranking-item,
+.cierre-diario__inventory-item,
+.cierre-diario__alert-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
-.daily-close__result-message {
+.cierre-diario__result-message {
   justify-content: flex-start;
   align-items: flex-start;
 }
 
-.daily-close__result-grid,
-.daily-close__summary-grid,
-.daily-close__status-grid,
-.daily-close__compact-grid,
-.daily-close__closure-grid,
-.daily-close__history-list {
+.cierre-diario__result-grid,
+.cierre-diario__summary-grid,
+.cierre-diario__status-grid,
+.cierre-diario__compact-grid,
+.cierre-diario__closure-grid,
+.cierre-diario__history-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 14px;
 }
 
-.daily-close__closure-grid {
+.cierre-diario__closure-grid {
   width: 100%;
   align-self: stretch;
   grid-template-columns: repeat(2, minmax(160px, 1fr));
 }
 
-.daily-close__result-grid {
+.cierre-diario__result-grid {
   margin-top: 18px;
 }
 
-.daily-close__result-grid div,
-.daily-close__metric,
-.daily-close__order-status,
-.daily-close__compact-card,
-.daily-close__ranking-item,
-.daily-close__inventory-item,
-.daily-close__alert-item,
-.daily-close__history-item {
+.cierre-diario__result-grid div,
+.cierre-diario__metric,
+.cierre-diario__order-status,
+.cierre-diario__compact-card,
+.cierre-diario__ranking-item,
+.cierre-diario__inventory-item,
+.cierre-diario__alert-item,
+.cierre-diario__history-item {
   padding: 16px;
   border: 1px solid var(--color-borde);
   border-radius: 8px;
   background: var(--color-superficie);
 }
 
-.daily-close__metric--success {
+.cierre-diario__metric--success {
   border-color: var(--color-menta);
 }
 
-.daily-close__metric--warning {
+.cierre-diario__metric--warning {
   border-color: var(--color-dorado);
 }
 
-.daily-close span,
-.daily-close small {
+.cierre-diario span,
+.cierre-diario small {
   display: block;
   color: var(--color-texto-claro);
   font-size: 13px;
   font-weight: 800;
 }
 
-.daily-close strong {
+.cierre-diario strong {
   display: block;
   margin-top: 8px;
   color: var(--color-pizarra);
@@ -337,7 +337,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.daily-close__state {
+.cierre-diario__state {
   min-height: 220px;
   padding: 44px 24px;
   flex-direction: column;
@@ -345,79 +345,79 @@
   text-align: center;
 }
 
-.daily-close__state,
-.daily-close__section-header,
-.daily-close__order-status,
-.daily-close__inline-state {
+.cierre-diario__state,
+.cierre-diario__section-header,
+.cierre-diario__order-status,
+.cierre-diario__inline-state {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.daily-close__section-header {
+.cierre-diario__section-header {
   justify-content: space-between;
   margin-bottom: 16px;
 }
 
-.daily-close__section-header h2 {
+.cierre-diario__section-header h2 {
   font-size: 21px;
 }
 
-.daily-close__section-header--history {
+.cierre-diario__section-header--history {
   align-items: flex-start;
   gap: 18px;
 }
 
-.daily-close__order-status strong {
+.cierre-diario__order-status strong {
   margin: 0 0 0 auto;
 }
 
-.daily-close__ranking,
-.daily-close__inventory-list,
-.daily-close__alert-list {
+.cierre-diario__ranking,
+.cierre-diario__inventory-list,
+.cierre-diario__alert-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.daily-close__inventory-item {
+.cierre-diario__inventory-item {
   display: grid;
   grid-template-columns: minmax(220px, 1fr) minmax(300px, 1.4fr) 170px;
   align-items: center;
   min-height: 88px;
 }
 
-.daily-close__inventory-main {
+.cierre-diario__inventory-main {
   min-width: 0;
 }
 
-.daily-close__inventory-main strong,
-.daily-close__ranking-item strong:first-child {
+.cierre-diario__inventory-main strong,
+.cierre-diario__ranking-item strong:first-child {
   font-size: 18px;
 }
 
-.daily-close__inventory-numbers {
+.cierre-diario__inventory-numbers {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 18px;
 }
 
-.daily-close__inventory-numbers strong {
+.cierre-diario__inventory-numbers strong {
   margin-top: 4px;
   font-size: 17px;
 }
 
-.daily-close__product-row--sold-out {
+.cierre-diario__product-row--sold-out {
   border-color: var(--color-melocoton);
   box-shadow: inset 5px 0 0 var(--color-melocoton);
 }
 
-.daily-close__product-row--low-stock {
+.cierre-diario__product-row--low-stock {
   border-color: var(--color-dorado);
   box-shadow: inset 5px 0 0 var(--color-dorado);
 }
 
-.daily-close .daily-close__inventory-badge {
+.cierre-diario .cierre-diario__inventory-badge {
   min-height: 34px;
   min-width: 132px;
   max-width: 150px;
@@ -443,20 +443,20 @@
   white-space: nowrap;
 }
 
-.daily-close .daily-close__inventory-badge--sold-out {
+.cierre-diario .cierre-diario__inventory-badge--sold-out {
   color: var(--color-melocoton);
 }
 
-.daily-close .daily-close__inventory-badge--low-stock {
+.cierre-diario .cierre-diario__inventory-badge--low-stock {
   color: var(--color-texto-oscuro);
 }
 
-.daily-close__alert-item {
+.cierre-diario__alert-item {
   justify-content: flex-start;
   color: var(--color-melocoton);
 }
 
-.daily-close__history-filters {
+.cierre-diario__history-filters {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -464,12 +464,12 @@
   gap: 10px;
 }
 
-.daily-close__history-list {
+.cierre-diario__history-list {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
 }
 
-.daily-close__history-item {
+.cierre-diario__history-item {
   min-height: 116px;
   color: inherit;
   font: inherit;
@@ -477,39 +477,39 @@
   cursor: pointer;
 }
 
-.daily-close__history-item:hover,
-.daily-close__history-item--selected {
+.cierre-diario__history-item:hover,
+.cierre-diario__history-item--selected {
   border-color: var(--color-menta);
   box-shadow: inset 4px 0 0 var(--color-menta);
 }
 
-.daily-close__pagination,
-.daily-close__pagination div {
+.cierre-diario__pagination,
+.cierre-diario__pagination div {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.daily-close__pagination {
+.cierre-diario__pagination {
   justify-content: space-between;
   margin-top: 16px;
 }
 
-.daily-close__page-button {
+.cierre-diario__page-button {
   width: 46px;
   padding-inline: 0;
 }
 
-.daily-close__inline-state {
+.cierre-diario__inline-state {
   min-height: 84px;
   justify-content: center;
 }
 
-.daily-close__inline-state--error {
+.cierre-diario__inline-state--error {
   color: var(--color-melocoton);
 }
 
-.daily-close__empty {
+.cierre-diario__empty {
   margin: 0;
   padding: 22px;
   border-radius: 8px;
@@ -518,7 +518,7 @@
   text-align: center;
 }
 
-.daily-close__loader {
+.cierre-diario__loader {
   width: 22px;
   height: 22px;
   border: 3px solid var(--color-borde);
@@ -526,7 +526,7 @@
   border-radius: 50%;
 }
 
-.daily-close-modal__backdrop {
+.cierre-diario-modal__backdrop {
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -537,7 +537,7 @@
   background: rgba(27, 31, 35, 0.42);
 }
 
-.daily-close-modal {
+.cierre-diario-modal {
   width: min(520px, 100%);
   max-height: min(680px, calc(100vh - 40px));
   overflow: auto;
@@ -546,90 +546,90 @@
   background: var(--color-superficie);
 }
 
-.daily-close-modal__header,
-.daily-close-modal__footer {
+.cierre-diario-modal__header,
+.cierre-diario-modal__footer {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
 }
 
-.daily-close-modal__header {
+.cierre-diario-modal__header {
   border-bottom: 1px solid var(--color-borde);
 }
 
-.daily-close-modal__body {
+.cierre-diario-modal__body {
   padding: 18px 20px;
 }
 
-.daily-close-modal__footer {
+.cierre-diario-modal__footer {
   justify-content: flex-end;
   border-top: 1px solid var(--color-borde);
 }
 
 @media (max-width: 1080px) {
-  .daily-close {
+  .cierre-diario {
     padding-top: 88px;
   }
 
-  .daily-close__back {
+  .cierre-diario__back {
     top: 20px;
     left: 18px;
   }
 
-  .daily-close__action-panel,
-  .daily-close__section-header--history {
+  .cierre-diario__action-panel,
+  .cierre-diario__section-header--history {
     flex-direction: column;
   }
 
-  .daily-close__closure-grid,
-  .daily-close__action-side,
-  .daily-close__history-filters {
+  .cierre-diario__closure-grid,
+  .cierre-diario__action-side,
+  .cierre-diario__history-filters {
     width: 100%;
   }
 }
 
 @media (max-width: 760px) {
-  .daily-close__container {
+  .cierre-diario__container {
     padding: 0 16px;
     gap: 16px;
   }
 
-  .daily-close__header,
-  .daily-close__action-panel,
-  .daily-close__inventory-item,
-  .daily-close__ranking-item {
+  .cierre-diario__header,
+  .cierre-diario__action-panel,
+  .cierre-diario__inventory-item,
+  .cierre-diario__ranking-item {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .daily-close__inventory-item {
+  .cierre-diario__inventory-item {
     display: flex;
   }
 
-  .daily-close__status,
-  .daily-close__action-buttons,
-  .daily-close__primary,
-  .daily-close__secondary,
-  .daily-close__date-field,
-  .daily-close__date-field input {
+  .cierre-diario__status,
+  .cierre-diario__action-buttons,
+  .cierre-diario__primary,
+  .cierre-diario__secondary,
+  .cierre-diario__date-field,
+  .cierre-diario__date-field input {
     width: 100%;
   }
 
-  .daily-close .daily-close__inventory-badge {
+  .cierre-diario .cierre-diario__inventory-badge {
     width: fit-content;
     align-self: center;
   }
 
-  .daily-close__date-field,
-  .daily-close__history-filters,
-  .daily-close__pagination {
+  .cierre-diario__date-field,
+  .cierre-diario__history-filters,
+  .cierre-diario__pagination {
     align-items: stretch;
     flex-direction: column;
   }
 }
 
-.daily-close-modal__body ul {
+.cierre-diario-modal__body ul {
   margin: 14px 0 0;
   padding-left: 0;
   list-style: none;
@@ -638,7 +638,7 @@
   gap: 8px;
 }
 
-.daily-close-modal__body li {
+.cierre-diario-modal__body li {
   position: relative;
   padding-left: 22px;
   color: var(--color-pizarra);
@@ -646,7 +646,7 @@
   line-height: 1.4;
 }
 
-.daily-close-modal__body li::before {
+.cierre-diario-modal__body li::before {
   content: "•";
   position: absolute;
   left: 4px;
@@ -661,7 +661,7 @@
    Usa el azul institucional existente: --color-pizarra.
    ========================================================= */
 
-.daily-close {
+.cierre-diario {
   min-height: calc(100vh - 64px);
   padding: 30px 0 52px;
   background:
@@ -670,7 +670,7 @@
     var(--color-fondo);
 }
 
-.daily-close__container {
+.cierre-diario__container {
   max-width: 1480px;
   margin: 0 auto;
   padding: 0 36px;
@@ -681,7 +681,7 @@
   align-items: start;
 }
 
-.daily-close__back {
+.cierre-diario__back {
   top: 84px;
   left: max(24px, calc((100vw - 1480px) / 2 + 36px));
   min-height: 40px;
@@ -690,18 +690,18 @@
   box-shadow: var(--shadow-card);
 }
 
-.daily-close__header,
-.daily-close__action-panel,
-.daily-close__close-result,
-.daily-close__state,
-.daily-close__section {
+.cierre-diario__header,
+.cierre-diario__action-panel,
+.cierre-diario__close-result,
+.cierre-diario__state,
+.cierre-diario__section {
   border: 1px solid rgba(74, 111, 165, 0.12);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow-card);
 }
 
-.daily-close__header {
+.cierre-diario__header {
   grid-column: 1 / -1;
   order: 1;
 
@@ -710,7 +710,7 @@
   gap: 18px;
 }
 
-.daily-close__header-icon {
+.cierre-diario__header-icon {
   width: 70px;
   height: 70px;
   flex-basis: 70px;
@@ -720,18 +720,18 @@
   font-size: 28px;
 }
 
-.daily-close__title {
+.cierre-diario__title {
   color: var(--color-pizarra-dark);
   font-size: 34px;
   letter-spacing: -0.03em;
 }
 
-.daily-close__subtitle {
+.cierre-diario__subtitle {
   max-width: 620px;
   font-weight: 700;
 }
 
-.daily-close__status {
+.cierre-diario__status {
   min-width: 330px;
   padding: 14px 18px;
   border-color: rgba(74, 111, 165, 0.14);
@@ -739,7 +739,7 @@
   background: rgba(240, 244, 248, 0.64);
 }
 
-.daily-close__status span {
+.cierre-diario__status span {
   position: relative;
   padding-left: 18px;
   color: var(--color-texto-oscuro);
@@ -747,7 +747,7 @@
   font-weight: 900;
 }
 
-.daily-close__status span::before {
+.cierre-diario__status span::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -759,11 +759,11 @@
   transform: translateY(-50%);
 }
 
-.daily-close__status:not(.daily-close__status--closed) span::before {
+.cierre-diario__status:not(.cierre-diario__status--closed) span::before {
   background-color: var(--color-dorado);
 }
 
-.daily-close__action-panel {
+.cierre-diario__action-panel {
   grid-column: 1 / -1;
   order: 2;
 
@@ -772,14 +772,14 @@
   align-items: center;
 }
 
-.daily-close__action-copy {
+.cierre-diario__action-copy {
   display: grid;
   grid-template-columns: minmax(210px, 0.28fr) minmax(0, 1fr);
   align-items: center;
   gap: 18px 28px;
 }
 
-.daily-close__date-field {
+.cierre-diario__date-field {
   margin: 0;
   align-items: flex-start;
   flex-direction: column;
@@ -789,7 +789,7 @@
   text-transform: uppercase;
 }
 
-.daily-close__date-field input {
+.cierre-diario__date-field input {
   min-height: 50px;
   min-width: 180px;
   padding: 0 16px;
@@ -800,33 +800,33 @@
   box-shadow: var(--shadow-neu-concave);
 }
 
-.daily-close__eyebrow {
+.cierre-diario__eyebrow {
   margin-bottom: 2px;
   font-size: 11px;
   font-weight: 900;
   color: var(--color-texto-claro);
 }
 
-.daily-close__action-copy h2 {
+.cierre-diario__action-copy h2 {
   color: var(--color-pizarra-dark);
   font-size: 22px;
 }
 
-.daily-close__action-copy p {
+.cierre-diario__action-copy p {
   max-width: 660px;
   margin-top: 4px;
   font-size: 13px;
   font-weight: 700;
 }
 
-.daily-close__action-side {
+.cierre-diario__action-side {
   width: auto;
   min-width: 210px;
   align-items: flex-end;
 }
 
-.daily-close__primary,
-.daily-close-modal__button--primary {
+.cierre-diario__primary,
+.cierre-diario-modal__button--primary {
   min-height: 52px;
   padding: 0 24px;
   border-radius: 14px;
@@ -835,49 +835,49 @@
   box-shadow: 0 12px 24px rgba(242, 183, 5, 0.22);
 }
 
-.daily-close__secondary,
-.daily-close-modal__button--secondary,
-.daily-close__state button {
+.cierre-diario__secondary,
+.cierre-diario-modal__button--secondary,
+.cierre-diario__state button {
   min-height: 42px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.88);
   color: var(--color-pizarra);
 }
 
-.daily-close__close-result {
+.cierre-diario__close-result {
   grid-column: 1 / -1;
   order: 3;
 }
 
-.daily-close__state {
+.cierre-diario__state {
   grid-column: 1 / -1;
   order: 4;
 }
 
-.daily-close__section {
+.cierre-diario__section {
   padding: 22px;
 }
 
-.daily-close__section-header {
+.cierre-diario__section-header {
   margin-bottom: 18px;
 }
 
-.daily-close__section-header h2,
-.daily-close h2 {
+.cierre-diario__section-header h2,
+.cierre-diario h2 {
   color: var(--color-pizarra-dark);
   font-size: 21px;
   letter-spacing: -0.02em;
 }
 
-.daily-close__section-header>h2,
-.daily-close__section-header>div h2 {
+.cierre-diario__section-header>h2,
+.cierre-diario__section-header>div h2 {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.daily-close__section-header>h2::before,
-.daily-close__section-header>div h2::before {
+.cierre-diario__section-header>h2::before,
+.cierre-diario__section-header>div h2::before {
   content: '';
   width: 34px;
   height: 34px;
@@ -886,55 +886,55 @@
   background-color: rgba(74, 111, 165, 0.1);
 }
 
-.daily-close span,
-.daily-close small {
+.cierre-diario span,
+.cierre-diario small {
   color: var(--color-texto-claro);
   font-size: 12px;
   font-weight: 850;
 }
 
-.daily-close strong {
+.cierre-diario strong {
   color: var(--color-pizarra-dark);
 }
 
 /* Ubicación por columnas, sin cambiar HTML */
-.daily-close__section--summary {
+.cierre-diario__section--summary {
   grid-column: 1;
   order: 5;
 }
 
-.daily-close__history {
+.cierre-diario__history {
   grid-column: 2;
   order: 6;
 }
 
-.daily-close__section--stock {
+.cierre-diario__section--stock {
   grid-column: 1;
   order: 7;
 }
 
-.daily-close__section[aria-labelledby='daily-order-status-title'] {
+.cierre-diario__section[aria-labelledby='daily-order-status-title'] {
   grid-column: 2;
   order: 8;
 }
 
-.daily-close__section[aria-labelledby='daily-inventory-title'] {
+.cierre-diario__section[aria-labelledby='daily-inventory-title'] {
   grid-column: 1;
   order: 9;
 }
 
-.daily-close__section[aria-labelledby='daily-soldout-title'] {
+.cierre-diario__section[aria-labelledby='daily-soldout-title'] {
   grid-column: 2;
   order: 10;
 }
 
-.daily-close__section[aria-labelledby='daily-products-title'] {
+.cierre-diario__section[aria-labelledby='daily-products-title'] {
   grid-column: 1;
   order: 11;
 }
 
 /* Resumen: mismo azul institucional que la home, no azul oscuro nuevo */
-.daily-close__section--summary {
+.cierre-diario__section--summary {
   overflow: hidden;
   border: 0;
   background:
@@ -943,16 +943,16 @@
   box-shadow: 0 18px 38px rgba(74, 111, 165, 0.22);
 }
 
-.daily-close__section--summary .daily-close__section-header h2,
-.daily-close__section--summary .daily-close__section-header span {
+.cierre-diario__section--summary .cierre-diario__section-header h2,
+.cierre-diario__section--summary .cierre-diario__section-header span {
   color: #fff;
 }
 
-.daily-close__section--summary .daily-close__section-header h2::before {
+.cierre-diario__section--summary .cierre-diario__section-header h2::before {
   background-color: rgba(255, 255, 255, 0.18);
 }
 
-.daily-close__summary-grid {
+.cierre-diario__summary-grid {
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0;
   overflow: hidden;
@@ -960,7 +960,7 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-.daily-close__summary-grid .daily-close__metric {
+.cierre-diario__summary-grid .cierre-diario__metric {
   min-height: 104px;
   padding: 18px 16px;
   border: 0;
@@ -969,53 +969,53 @@
   box-shadow: none;
 }
 
-.daily-close__summary-grid .daily-close__metric+.daily-close__metric {
+.cierre-diario__summary-grid .cierre-diario__metric+.cierre-diario__metric {
   border-left: 1px solid rgba(255, 255, 255, 0.22);
 }
 
-.daily-close__summary-grid .daily-close__metric span {
+.cierre-diario__summary-grid .cierre-diario__metric span {
   color: rgba(255, 255, 255, 0.68);
 }
 
-.daily-close__summary-grid .daily-close__metric strong {
+.cierre-diario__summary-grid .cierre-diario__metric strong {
   color: #fff;
   font-size: 22px;
 }
 
-.daily-close__summary-grid .daily-close__metric--warning strong {
+.cierre-diario__summary-grid .cierre-diario__metric--warning strong {
   color: #ffe8a3;
 }
 
-.daily-close__summary-grid .daily-close__metric--success strong {
+.cierre-diario__summary-grid .cierre-diario__metric--success strong {
   color: #fff;
 }
 
 /* Historial */
-.daily-close__section-header--history {
+.cierre-diario__section-header--history {
   align-items: center;
   gap: 14px;
 }
 
-.daily-close__history-filters {
+.cierre-diario__history-filters {
   gap: 8px;
 }
 
-.daily-close__date-field--compact {
+.cierre-diario__date-field--compact {
   gap: 5px;
 }
 
-.daily-close__date-field--compact input {
+.cierre-diario__date-field--compact input {
   min-width: 142px;
   min-height: 38px;
   border-radius: 11px;
   font-size: 12px;
 }
 
-.daily-close__history-list {
+.cierre-diario__history-list {
   grid-template-columns: 1fr;
 }
 
-.daily-close__history-item {
+.cierre-diario__history-item {
   position: relative;
   min-height: 96px;
   padding: 16px 46px 16px 18px;
@@ -1023,7 +1023,7 @@
   background: rgba(255, 255, 255, 0.78);
 }
 
-.daily-close__history-item::after {
+.cierre-diario__history-item::after {
   content: '\f054';
   position: absolute;
   top: 50%;
@@ -1034,18 +1034,18 @@
   transform: translateY(-50%);
 }
 
-.daily-close__history-item:hover,
-.daily-close__history-item--selected {
+.cierre-diario__history-item:hover,
+.cierre-diario__history-item--selected {
   border-color: rgba(129, 178, 154, 0.44);
   box-shadow: inset 4px 0 0 var(--color-menta), var(--shadow-card);
 }
 
 /* Movimientos de stock */
-.daily-close__section--stock {
+.cierre-diario__section--stock {
   border-color: rgba(74, 111, 165, 0.12);
 }
 
-.daily-close__compact-grid {
+.cierre-diario__compact-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   overflow: hidden;
@@ -1054,35 +1054,35 @@
   background: rgba(248, 251, 255, 0.72);
 }
 
-.daily-close__compact-card {
+.cierre-diario__compact-card {
   min-height: 90px;
   border: 0;
   border-radius: 0;
   background: transparent;
 }
 
-.daily-close__compact-card+.daily-close__compact-card {
+.cierre-diario__compact-card+.cierre-diario__compact-card {
   border-left: 1px solid rgba(74, 111, 165, 0.1);
 }
 
-.daily-close__compact-card strong {
+.cierre-diario__compact-card strong {
   font-size: 24px;
 }
 
 /* Estados de pedidos */
-.daily-close__status-grid {
+.cierre-diario__status-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.daily-close__order-status {
+.cierre-diario__order-status {
   min-height: 78px;
   padding: 14px;
   border-radius: 16px;
   background: rgba(248, 251, 255, 0.76);
 }
 
-.daily-close__order-status i {
+.cierre-diario__order-status i {
   width: 42px;
   height: 42px;
   flex-basis: 42px;
@@ -1091,35 +1091,35 @@
   background: rgba(74, 111, 165, 0.1);
 }
 
-.daily-close__order-status strong {
+.cierre-diario__order-status strong {
   font-size: 22px;
 }
 
-.daily-close__order-status:nth-child(1) i,
-.daily-close__order-status:nth-child(4) i {
+.cierre-diario__order-status:nth-child(1) i,
+.cierre-diario__order-status:nth-child(4) i {
   color: #3f7a5d;
   background: rgba(129, 178, 154, 0.14);
 }
 
-.daily-close__order-status:nth-child(3) i {
+.cierre-diario__order-status:nth-child(3) i {
   color: #9a6f00;
   background: rgba(242, 183, 5, 0.15);
 }
 
-.daily-close__order-status:nth-child(5) i {
+.cierre-diario__order-status:nth-child(5) i {
   color: var(--color-melocoton);
   background: rgba(231, 111, 81, 0.12);
 }
 
 /* Inventario */
-.daily-close__inventory-list {
+.cierre-diario__inventory-list {
   gap: 0;
   overflow: hidden;
   border: 1px solid rgba(74, 111, 165, 0.12);
   border-radius: 16px;
 }
 
-.daily-close__inventory-item {
+.cierre-diario__inventory-item {
   min-height: 70px;
   padding: 13px 16px;
   border: 0;
@@ -1128,44 +1128,44 @@
   background: #fff;
 }
 
-.daily-close__inventory-item+.daily-close__inventory-item {
+.cierre-diario__inventory-item+.cierre-diario__inventory-item {
   border-top: 1px solid rgba(74, 111, 165, 0.1);
 }
 
-.daily-close__inventory-main strong {
+.cierre-diario__inventory-main strong {
   margin-top: 0;
   font-size: 15px;
 }
 
-.daily-close__inventory-numbers {
+.cierre-diario__inventory-numbers {
   display: grid;
   grid-template-columns: repeat(4, minmax(72px, 1fr));
   gap: 8px;
 }
 
-.daily-close__inventory-numbers span {
+.cierre-diario__inventory-numbers span {
   font-size: 11px;
   text-transform: uppercase;
 }
 
-.daily-close__inventory-numbers strong {
+.cierre-diario__inventory-numbers strong {
   margin-top: 2px;
   font-size: 15px;
 }
 
-.daily-close__product-row--low-stock {
+.cierre-diario__product-row--low-stock {
   border-color: transparent;
   background: rgba(242, 183, 5, 0.07);
   box-shadow: inset 4px 0 0 var(--color-dorado);
 }
 
-.daily-close__product-row--sold-out {
+.cierre-diario__product-row--sold-out {
   border-color: transparent;
   background: rgba(231, 111, 81, 0.075);
   box-shadow: inset 4px 0 0 var(--color-melocoton);
 }
 
-.daily-close .daily-close__inventory-badge {
+.cierre-diario .cierre-diario__inventory-badge {
   min-height: 30px;
   min-width: 112px;
   padding: 0 14px;
@@ -1174,43 +1174,43 @@
   color: #3f7a5d;
 }
 
-.daily-close .daily-close__inventory-badge--low-stock {
+.cierre-diario .cierre-diario__inventory-badge--low-stock {
   background: rgba(242, 183, 5, 0.16);
   color: #8a6100;
 }
 
-.daily-close .daily-close__inventory-badge--sold-out {
+.cierre-diario .cierre-diario__inventory-badge--sold-out {
   background: rgba(231, 111, 81, 0.14);
   color: var(--color-melocoton);
 }
 
-.daily-close__pagination {
+.cierre-diario__pagination {
   margin-top: 14px;
 }
 
-.daily-close__page-button {
+.cierre-diario__page-button {
   width: 42px;
   min-height: 42px;
   padding: 0;
 }
 
 /* Productos agotados y vendidos */
-.daily-close__section[aria-labelledby='daily-soldout-title'] {
+.cierre-diario__section[aria-labelledby='daily-soldout-title'] {
   border-color: rgba(231, 111, 81, 0.24);
   background:
     linear-gradient(180deg, rgba(231, 111, 81, 0.035), rgba(255, 255, 255, 0.94)),
     var(--color-superficie);
 }
 
-.daily-close__section[aria-labelledby='daily-soldout-title'] .daily-close__section-header h2 {
+.cierre-diario__section[aria-labelledby='daily-soldout-title'] .cierre-diario__section-header h2 {
   color: #8a321f;
 }
 
-.daily-close__section[aria-labelledby='daily-soldout-title'] .daily-close__section-header h2::before {
+.cierre-diario__section[aria-labelledby='daily-soldout-title'] .cierre-diario__section-header h2::before {
   background: rgba(231, 111, 81, 0.12);
 }
 
-.daily-close__alert-item {
+.cierre-diario__alert-item {
   min-height: 58px;
   padding: 14px 16px;
   border-radius: 14px;
@@ -1218,12 +1218,12 @@
   color: var(--color-melocoton);
 }
 
-.daily-close__ranking-item {
+.cierre-diario__ranking-item {
   min-height: 66px;
   border-radius: 14px;
 }
 
-.daily-close__empty {
+.cierre-diario__empty {
   min-height: 74px;
   display: flex;
   align-items: center;
@@ -1232,156 +1232,156 @@
   background: rgba(248, 251, 255, 0.58);
 }
 
-.daily-close__loader {
+.cierre-diario__loader {
   border-top-color: var(--color-pizarra);
 }
 
 /* Modal consistente */
-.daily-close-modal {
+.cierre-diario-modal {
   border-radius: 22px;
 }
 
-.daily-close-modal__header,
-.daily-close-modal__footer {
+.cierre-diario-modal__header,
+.cierre-diario-modal__footer {
   padding: 20px 22px;
 }
 
-.daily-close-modal__icon {
+.cierre-diario-modal__icon {
   border-radius: 14px;
   background: rgba(242, 183, 5, 0.14);
   color: #8a6100;
 }
 
 @media (max-width: 1280px) {
-  .daily-close__container {
+  .cierre-diario__container {
     max-width: 1180px;
     padding: 0 24px;
     grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.9fr);
   }
 
-  .daily-close__back {
+  .cierre-diario__back {
     left: max(18px, calc((100vw - 1180px) / 2 + 24px));
   }
 
-  .daily-close__summary-grid {
+  .cierre-diario__summary-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .daily-close__summary-grid .daily-close__metric:nth-child(4) {
+  .cierre-diario__summary-grid .cierre-diario__metric:nth-child(4) {
     border-left: 0;
   }
 
-  .daily-close__summary-grid .daily-close__metric:nth-child(n + 4) {
+  .cierre-diario__summary-grid .cierre-diario__metric:nth-child(n + 4) {
     border-top: 1px solid rgba(255, 255, 255, 0.22);
   }
 }
 
 @media (max-width: 1080px) {
-  .daily-close {
+  .cierre-diario {
     padding-top: 28px;
   }
 
-  .daily-close__container {
+  .cierre-diario__container {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__header,
-  .daily-close__action-panel,
-  .daily-close__close-result,
-  .daily-close__state,
-  .daily-close__section,
-  .daily-close__history,
-  .daily-close__section--summary,
-  .daily-close__section--stock,
-  .daily-close__section[aria-labelledby='daily-order-status-title'],
-  .daily-close__section[aria-labelledby='daily-inventory-title'],
-  .daily-close__section[aria-labelledby='daily-soldout-title'],
-  .daily-close__section[aria-labelledby='daily-products-title'] {
+  .cierre-diario__header,
+  .cierre-diario__action-panel,
+  .cierre-diario__close-result,
+  .cierre-diario__state,
+  .cierre-diario__section,
+  .cierre-diario__history,
+  .cierre-diario__section--summary,
+  .cierre-diario__section--stock,
+  .cierre-diario__section[aria-labelledby='daily-order-status-title'],
+  .cierre-diario__section[aria-labelledby='daily-inventory-title'],
+  .cierre-diario__section[aria-labelledby='daily-soldout-title'],
+  .cierre-diario__section[aria-labelledby='daily-products-title'] {
     grid-column: 1;
   }
 
-  .daily-close__back {
+  .cierre-diario__back {
     position: static;
     width: fit-content;
     margin-left: 24px;
     margin-bottom: 12px;
   }
 
-  .daily-close__action-panel,
-  .daily-close__section-header--history {
+  .cierre-diario__action-panel,
+  .cierre-diario__section-header--history {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .daily-close__action-copy {
+  .cierre-diario__action-copy {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__action-side,
-  .daily-close__history-filters {
+  .cierre-diario__action-side,
+  .cierre-diario__history-filters {
     width: 100%;
     align-items: stretch;
   }
 
-  .daily-close__action-buttons {
+  .cierre-diario__action-buttons {
     justify-content: stretch;
   }
 
-  .daily-close__primary {
+  .cierre-diario__primary {
     width: 100%;
   }
 }
 
 @media (max-width: 760px) {
-  .daily-close__container {
+  .cierre-diario__container {
     padding: 0 16px;
     gap: 16px;
   }
 
-  .daily-close__header {
+  .cierre-diario__header {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .daily-close__status {
+  .cierre-diario__status {
     min-width: 0;
     width: 100%;
   }
 
-  .daily-close__summary-grid,
-  .daily-close__compact-grid,
-  .daily-close__status-grid {
+  .cierre-diario__summary-grid,
+  .cierre-diario__compact-grid,
+  .cierre-diario__status-grid {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__summary-grid .daily-close__metric+.daily-close__metric,
-  .daily-close__compact-card+.daily-close__compact-card {
+  .cierre-diario__summary-grid .cierre-diario__metric+.cierre-diario__metric,
+  .cierre-diario__compact-card+.cierre-diario__compact-card {
     border-left: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.22);
   }
 
-  .daily-close__compact-card+.daily-close__compact-card {
+  .cierre-diario__compact-card+.cierre-diario__compact-card {
     border-top-color: rgba(74, 111, 165, 0.1);
   }
 
-  .daily-close__inventory-item {
+  .cierre-diario__inventory-item {
     display: flex;
     align-items: stretch;
     flex-direction: column;
     gap: 12px;
   }
 
-  .daily-close__inventory-numbers {
+  .cierre-diario__inventory-numbers {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .daily-close .daily-close__inventory-badge {
+  .cierre-diario .cierre-diario__inventory-badge {
     align-self: flex-start;
   }
 
-  .daily-close__date-field input,
-  .daily-close__date-field,
-  .daily-close__secondary {
+  .cierre-diario__date-field input,
+  .cierre-diario__date-field,
+  .cierre-diario__secondary {
     width: 100%;
   }
 
@@ -1398,7 +1398,7 @@
    - Inventario protagonista
    ========================================================= */
 
-.daily-close {
+.cierre-diario {
   min-height: calc(100vh - 64px);
   padding: 28px 0 48px;
   background:
@@ -1406,7 +1406,7 @@
     var(--color-fondo);
 }
 
-.daily-close__container {
+.cierre-diario__container {
   max-width: 1480px;
   padding: 0 36px;
 
@@ -1417,7 +1417,7 @@
 }
 
 /* Botón volver menos invasivo */
-.daily-close__back {
+.cierre-diario__back {
   top: 88px;
   left: calc((100vw - min(1480px, calc(100vw - 72px))) / 2 + 36px);
 
@@ -1435,52 +1435,52 @@
    Orden visual
 ========================= */
 
-.daily-close__header {
+.cierre-diario__header {
   order: 1;
   grid-column: 1 / -1;
 }
 
-.daily-close__action-panel {
+.cierre-diario__action-panel {
   order: 2;
   grid-column: 1 / -1;
 }
 
-.daily-close__close-result {
+.cierre-diario__close-result {
   order: 3;
   grid-column: 1 / -1;
 }
 
-.daily-close__section--summary {
+.cierre-diario__section--summary {
   order: 4;
   grid-column: 1 / -1;
 }
 
-.daily-close__section--stock {
+.cierre-diario__section--stock {
   order: 5;
   grid-column: 1 / 2;
 }
 
-.daily-close__section[aria-labelledby="daily-order-status-title"] {
+.cierre-diario__section[aria-labelledby="daily-order-status-title"] {
   order: 6;
   grid-column: 2 / 3;
 }
 
-.daily-close__section[aria-labelledby="daily-inventory-title"] {
+.cierre-diario__section[aria-labelledby="daily-inventory-title"] {
   order: 7;
   grid-column: 1 / -1;
 }
 
-.daily-close__section[aria-labelledby="daily-soldout-title"] {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] {
   order: 8;
   grid-column: 1 / 2;
 }
 
-.daily-close__section[aria-labelledby="daily-products-title"] {
+.cierre-diario__section[aria-labelledby="daily-products-title"] {
   order: 9;
   grid-column: 2 / 3;
 }
 
-.daily-close__history {
+.cierre-diario__history {
   order: 10;
   grid-column: 1 / -1;
 }
@@ -1489,24 +1489,24 @@
    Base de cards
 ========================= */
 
-.daily-close__header,
-.daily-close__action-panel,
-.daily-close__close-result,
-.daily-close__state,
-.daily-close__section {
+.cierre-diario__header,
+.cierre-diario__action-panel,
+.cierre-diario__close-result,
+.cierre-diario__state,
+.cierre-diario__section {
   border: 1px solid var(--color-borde);
   border-radius: 22px;
   background-color: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow-card);
 }
 
-.daily-close__header {
+.cierre-diario__header {
   min-height: 132px;
   padding: 26px 30px;
   gap: 22px;
 }
 
-.daily-close__header-icon {
+.cierre-diario__header-icon {
   width: 72px;
   height: 72px;
   flex-basis: 72px;
@@ -1516,16 +1516,16 @@
   color: #3f7a5d;
 }
 
-.daily-close__title {
+.cierre-diario__title {
   color: var(--color-pizarra-dark);
   font-size: 34px;
 }
 
-.daily-close__subtitle {
+.cierre-diario__subtitle {
   max-width: 620px;
 }
 
-.daily-close__status {
+.cierre-diario__status {
   min-width: 360px;
   padding: 16px 18px;
 
@@ -1534,7 +1534,7 @@
   background-color: rgba(240, 244, 248, 0.72);
 }
 
-.daily-close__status>span {
+.cierre-diario__status>span {
   position: relative;
   padding-left: 18px;
 
@@ -1544,7 +1544,7 @@
   font-weight: 900;
 }
 
-.daily-close__status>span::before {
+.cierre-diario__status>span::before {
   content: "";
   position: absolute;
   left: 0;
@@ -1558,11 +1558,11 @@
   transform: translateY(-50%);
 }
 
-.daily-close__status--closed>span::before {
+.cierre-diario__status--closed>span::before {
   background-color: var(--color-pizarra);
 }
 
-.daily-close__status small {
+.cierre-diario__status small {
   margin-top: 6px;
   color: var(--color-texto-claro);
 }
@@ -1571,21 +1571,21 @@
    Acción principal
 ========================= */
 
-.daily-close__action-panel {
+.cierre-diario__action-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   padding: 22px 26px;
 }
 
-.daily-close__action-copy {
+.cierre-diario__action-copy {
   display: grid;
   grid-template-columns: 210px minmax(0, 1fr);
   align-items: center;
   gap: 26px;
 }
 
-.daily-close__date-field {
+.cierre-diario__date-field {
   margin: 0;
   flex-direction: column;
   align-items: flex-start;
@@ -1596,7 +1596,7 @@
   text-transform: uppercase;
 }
 
-.daily-close__date-field input {
+.cierre-diario__date-field input {
   width: 190px;
   min-height: 48px;
 
@@ -1609,7 +1609,7 @@
   font-size: 15px;
 }
 
-.daily-close__eyebrow {
+.cierre-diario__eyebrow {
   margin: 0 0 4px;
 
   color: var(--color-texto-claro);
@@ -1617,27 +1617,27 @@
   font-weight: 900;
 }
 
-.daily-close__action-copy h2 {
+.cierre-diario__action-copy h2 {
   color: var(--color-pizarra-dark);
   font-size: 22px;
 }
 
-.daily-close__action-copy p {
+.cierre-diario__action-copy p {
   max-width: 760px;
   margin-top: 4px;
   font-size: 13px;
 }
 
-.daily-close__action-side {
+.cierre-diario__action-side {
   width: auto;
   min-width: 190px;
 }
 
-.daily-close__action-buttons {
+.cierre-diario__action-buttons {
   justify-content: flex-end;
 }
 
-.daily-close__primary {
+.cierre-diario__primary {
   min-height: 48px;
   padding: 0 24px;
 
@@ -1649,7 +1649,7 @@
   font-size: 15px;
 }
 
-.daily-close__primary:hover:not(:disabled) {
+.cierre-diario__primary:hover:not(:disabled) {
   transform: translateY(-1px);
   background-color: var(--color-dorado-dark);
 }
@@ -1658,7 +1658,7 @@
    Resumen del día
 ========================= */
 
-.daily-close__section--summary {
+.cierre-diario__section--summary {
   padding: 24px;
 
   border: 0;
@@ -1668,16 +1668,16 @@
   box-shadow: 0 18px 38px rgba(74, 111, 165, 0.22);
 }
 
-.daily-close__section--summary .daily-close__section-header {
+.cierre-diario__section--summary .cierre-diario__section-header {
   margin-bottom: 20px;
 }
 
-.daily-close__section--summary h2,
-.daily-close__section--summary .daily-close__section-header>span {
+.cierre-diario__section--summary h2,
+.cierre-diario__section--summary .cierre-diario__section-header>span {
   color: #ffffff;
 }
 
-.daily-close__summary-grid {
+.cierre-diario__summary-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0;
@@ -1687,7 +1687,7 @@
   background-color: rgba(255, 255, 255, 0.08);
 }
 
-.daily-close__summary-grid .daily-close__metric {
+.cierre-diario__summary-grid .cierre-diario__metric {
   min-height: 104px;
   padding: 18px 20px;
 
@@ -1697,15 +1697,15 @@
   box-shadow: none;
 }
 
-.daily-close__summary-grid .daily-close__metric+.daily-close__metric {
+.cierre-diario__summary-grid .cierre-diario__metric+.cierre-diario__metric {
   border-left: 1px solid rgba(255, 255, 255, 0.22);
 }
 
-.daily-close__summary-grid .daily-close__metric span {
+.cierre-diario__summary-grid .cierre-diario__metric span {
   color: rgba(255, 255, 255, 0.68);
 }
 
-.daily-close__summary-grid .daily-close__metric strong {
+.cierre-diario__summary-grid .cierre-diario__metric strong {
   color: #ffffff;
   font-size: 24px;
 }
@@ -1714,29 +1714,29 @@
    Secciones compactas
 ========================= */
 
-.daily-close__section {
+.cierre-diario__section {
   padding: 22px;
 }
 
-.daily-close__section-header {
+.cierre-diario__section-header {
   margin-bottom: 18px;
 }
 
-.daily-close__section-header h2 {
+.cierre-diario__section-header h2 {
   color: var(--color-pizarra-dark);
   font-size: 20px;
 }
 
-.daily-close__section-header>span {
+.cierre-diario__section-header>span {
   color: var(--color-texto-claro);
 }
 
 /* Movimientos de stock más simple */
-.daily-close__section--stock {
+.cierre-diario__section--stock {
   border-color: var(--color-borde);
 }
 
-.daily-close__compact-grid {
+.cierre-diario__compact-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
 
@@ -1745,7 +1745,7 @@
   border-radius: 18px;
 }
 
-.daily-close__compact-card {
+.cierre-diario__compact-card {
   min-height: 104px;
   padding: 20px;
 
@@ -1754,23 +1754,23 @@
   background-color: rgba(248, 251, 255, 0.8);
 }
 
-.daily-close__compact-card+.daily-close__compact-card {
+.cierre-diario__compact-card+.cierre-diario__compact-card {
   border-left: 1px solid var(--color-borde);
 }
 
-.daily-close__compact-card strong {
+.cierre-diario__compact-card strong {
   color: var(--color-pizarra-dark);
   font-size: 25px;
 }
 
 /* Estados de pedidos más limpio */
-.daily-close__status-grid {
+.cierre-diario__status-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.daily-close__order-status {
+.cierre-diario__order-status {
   min-height: 76px;
   padding: 14px;
 
@@ -1778,7 +1778,7 @@
   background-color: rgba(248, 251, 255, 0.84);
 }
 
-.daily-close__order-status i {
+.cierre-diario__order-status i {
   width: 38px;
   height: 38px;
   flex-basis: 38px;
@@ -1788,12 +1788,12 @@
   color: var(--color-pizarra);
 }
 
-.daily-close__order-status span {
+.cierre-diario__order-status span {
   flex: 1;
   color: var(--color-texto-claro);
 }
 
-.daily-close__order-status strong {
+.cierre-diario__order-status strong {
   margin: 0;
   color: var(--color-pizarra-dark);
 }
@@ -1802,11 +1802,11 @@
    Inventario protagonista
 ========================= */
 
-.daily-close__section[aria-labelledby="daily-inventory-title"] {
+.cierre-diario__section[aria-labelledby="daily-inventory-title"] {
   padding: 24px;
 }
 
-.daily-close__inventory-list {
+.cierre-diario__inventory-list {
   gap: 0;
   overflow: hidden;
 
@@ -1814,7 +1814,7 @@
   border-radius: 18px;
 }
 
-.daily-close__inventory-item {
+.cierre-diario__inventory-item {
   min-height: 72px;
   padding: 14px 18px;
 
@@ -1826,52 +1826,52 @@
   box-shadow: none;
 }
 
-.daily-close__inventory-item+.daily-close__inventory-item {
+.cierre-diario__inventory-item+.cierre-diario__inventory-item {
   border-top: 1px solid var(--color-borde);
 }
 
-.daily-close__inventory-main strong {
+.cierre-diario__inventory-main strong {
   margin: 0;
   color: var(--color-pizarra-dark);
   font-size: 15px;
 }
 
-.daily-close__inventory-main span {
+.cierre-diario__inventory-main span {
   margin-top: 2px;
   color: var(--color-texto-claro);
 }
 
-.daily-close__inventory-numbers {
+.cierre-diario__inventory-numbers {
   display: grid;
   grid-template-columns: repeat(4, minmax(72px, 1fr));
   gap: 12px;
 }
 
-.daily-close__inventory-numbers span {
+.cierre-diario__inventory-numbers span {
   color: var(--color-texto-claro);
   font-size: 11px;
   text-transform: uppercase;
 }
 
-.daily-close__inventory-numbers strong {
+.cierre-diario__inventory-numbers strong {
   margin-top: 3px;
   color: var(--color-pizarra-dark);
   font-size: 16px;
 }
 
-.daily-close__product-row--low-stock {
+.cierre-diario__product-row--low-stock {
   border-color: transparent;
   box-shadow: none;
   background-color: rgba(242, 183, 5, 0.06);
 }
 
-.daily-close__product-row--sold-out {
+.cierre-diario__product-row--sold-out {
   border-color: transparent;
   box-shadow: none;
   background-color: rgba(231, 111, 81, 0.07);
 }
 
-.daily-close .daily-close__inventory-badge {
+.cierre-diario .cierre-diario__inventory-badge {
   min-height: 32px;
   min-width: 116px;
 
@@ -1880,12 +1880,12 @@
   color: #3f7a5d;
 }
 
-.daily-close .daily-close__inventory-badge--low-stock {
+.cierre-diario .cierre-diario__inventory-badge--low-stock {
   background-color: rgba(242, 183, 5, 0.16);
   color: #946600;
 }
 
-.daily-close .daily-close__inventory-badge--sold-out {
+.cierre-diario .cierre-diario__inventory-badge--sold-out {
   background-color: rgba(231, 111, 81, 0.14);
   color: #a83b24;
 }
@@ -1894,19 +1894,19 @@
    Productos agotados / vendidos
 ========================= */
 
-.daily-close__section[aria-labelledby="daily-soldout-title"] {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] {
   border-color: rgba(231, 111, 81, 0.22);
 }
 
-.daily-close__section[aria-labelledby="daily-soldout-title"] h2 {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] h2 {
   color: #8a321f;
 }
 
-.daily-close__alert-list {
+.cierre-diario__alert-list {
   gap: 10px;
 }
 
-.daily-close__alert-item {
+.cierre-diario__alert-item {
   min-height: 58px;
   padding: 14px 16px;
 
@@ -1917,11 +1917,11 @@
   color: var(--color-melocoton);
 }
 
-.daily-close__alert-item span {
+.cierre-diario__alert-item span {
   color: #8a321f;
 }
 
-.daily-close__ranking-item {
+.cierre-diario__ranking-item {
   min-height: 72px;
   padding: 14px 16px;
 
@@ -1929,7 +1929,7 @@
 }
 
 /* Estados vacíos menos rígidos */
-.daily-close__empty {
+.cierre-diario__empty {
   border: 1px dashed var(--color-borde-fuerte);
   border-radius: 16px;
   background-color: rgba(248, 251, 255, 0.7);
@@ -1939,35 +1939,35 @@
    Historial abajo
 ========================= */
 
-.daily-close__history {
+.cierre-diario__history {
   margin-top: 4px;
 }
 
-.daily-close__section-header--history {
+.cierre-diario__section-header--history {
   align-items: center;
 }
 
-.daily-close__history-filters {
+.cierre-diario__history-filters {
   gap: 12px;
 }
 
-.daily-close__date-field--compact input {
+.cierre-diario__date-field--compact input {
   width: 150px;
   min-height: 40px;
 }
 
-.daily-close__history-list {
+.cierre-diario__history-list {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.daily-close__history-item {
+.cierre-diario__history-item {
   min-height: 94px;
 
   border-radius: 16px;
   background-color: rgba(248, 251, 255, 0.75);
 }
 
-.daily-close__history-item strong {
+.cierre-diario__history-item strong {
   color: var(--color-pizarra-dark);
 }
 
@@ -1975,20 +1975,20 @@
    Modal
 ========================= */
 
-.daily-close-modal {
+.cierre-diario-modal {
   border-radius: 22px;
 }
 
-.daily-close-modal__header,
-.daily-close-modal__footer {
+.cierre-diario-modal__header,
+.cierre-diario-modal__footer {
   padding: 20px 22px;
 }
 
-.daily-close-modal__body {
+.cierre-diario-modal__body {
   padding: 20px 22px;
 }
 
-.daily-close-modal__button {
+.cierre-diario-modal__button {
   border-radius: 14px;
 }
 
@@ -1997,126 +1997,126 @@
 ========================= */
 
 @media (max-width: 1280px) {
-  .daily-close__container {
+  .cierre-diario__container {
     max-width: 1180px;
     padding: 0 24px;
     grid-template-columns: minmax(0, 1fr) 360px;
   }
 
-  .daily-close__summary-grid {
+  .cierre-diario__summary-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .daily-close__summary-grid .daily-close__metric:nth-child(4) {
+  .cierre-diario__summary-grid .cierre-diario__metric:nth-child(4) {
     border-left: 0;
   }
 
-  .daily-close__summary-grid .daily-close__metric:nth-child(n + 4) {
+  .cierre-diario__summary-grid .cierre-diario__metric:nth-child(n + 4) {
     border-top: 1px solid rgba(255, 255, 255, 0.22);
   }
 
-  .daily-close__inventory-item {
+  .cierre-diario__inventory-item {
     grid-template-columns: minmax(220px, 1fr) minmax(360px, 1.2fr) 140px;
   }
 }
 
 @media (max-width: 1080px) {
-  .daily-close {
+  .cierre-diario {
     padding-top: 28px;
   }
 
-  .daily-close__back {
+  .cierre-diario__back {
     display: none;
   }
 
-  .daily-close__container {
+  .cierre-diario__container {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__section--stock,
-  .daily-close__section[aria-labelledby="daily-order-status-title"],
-  .daily-close__section[aria-labelledby="daily-soldout-title"],
-  .daily-close__section[aria-labelledby="daily-products-title"] {
+  .cierre-diario__section--stock,
+  .cierre-diario__section[aria-labelledby="daily-order-status-title"],
+  .cierre-diario__section[aria-labelledby="daily-soldout-title"],
+  .cierre-diario__section[aria-labelledby="daily-products-title"] {
     grid-column: 1 / -1;
   }
 
-  .daily-close__header,
-  .daily-close__action-panel {
+  .cierre-diario__header,
+  .cierre-diario__action-panel {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__status,
-  .daily-close__action-side {
+  .cierre-diario__status,
+  .cierre-diario__action-side {
     width: 100%;
     min-width: 0;
   }
 
-  .daily-close__action-copy {
+  .cierre-diario__action-copy {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__history-list {
+  .cierre-diario__history-list {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__status-grid {
+  .cierre-diario__status-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 760px) {
-  .daily-close__container {
+  .cierre-diario__container {
     padding: 0 16px;
     gap: 16px;
   }
 
-  .daily-close__header,
-  .daily-close__action-panel,
-  .daily-close__section {
+  .cierre-diario__header,
+  .cierre-diario__action-panel,
+  .cierre-diario__section {
     padding: 18px;
     border-radius: 18px;
   }
 
-  .daily-close__title {
+  .cierre-diario__title {
     font-size: 28px;
   }
 
-  .daily-close__summary-grid,
-  .daily-close__status-grid,
-  .daily-close__compact-grid {
+  .cierre-diario__summary-grid,
+  .cierre-diario__status-grid,
+  .cierre-diario__compact-grid {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__summary-grid .daily-close__metric,
-  .daily-close__compact-card {
+  .cierre-diario__summary-grid .cierre-diario__metric,
+  .cierre-diario__compact-card {
     border-left: 0 !important;
   }
 
-  .daily-close__summary-grid .daily-close__metric+.daily-close__metric {
+  .cierre-diario__summary-grid .cierre-diario__metric+.cierre-diario__metric {
     border-top: 1px solid rgba(255, 255, 255, 0.22);
   }
 
-  .daily-close__compact-card+.daily-close__compact-card {
+  .cierre-diario__compact-card+.cierre-diario__compact-card {
     border-top: 1px solid var(--color-borde);
   }
 
-  .daily-close__inventory-item {
+  .cierre-diario__inventory-item {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 14px;
   }
 
-  .daily-close__inventory-numbers {
+  .cierre-diario__inventory-numbers {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .daily-close .daily-close__inventory-badge {
+  .cierre-diario .cierre-diario__inventory-badge {
     align-self: flex-start;
   }
 
-  .daily-close__date-field input,
-  .daily-close__date-field--compact input {
+  .cierre-diario__date-field input,
+  .cierre-diario__date-field--compact input {
     width: 100%;
   }
 }
@@ -2130,7 +2130,7 @@
    ========================================================= */
 
 /* El botón volver deja de flotar sobre el header */
-.daily-close__back {
+.cierre-diario__back {
   position: static !important;
   width: fit-content;
   min-height: 38px;
@@ -2145,7 +2145,7 @@
 }
 
 /* Asegura que los items de cada fila del grid estiren parejo */
-.daily-close__container {
+.cierre-diario__container {
   align-items: stretch !important;
 }
 
@@ -2153,30 +2153,30 @@
    Header / acción de cierre
 ========================= */
 
-.daily-close__header {
+.cierre-diario__header {
   position: relative;
   overflow: hidden;
 }
 
-.daily-close__header-icon {
+.cierre-diario__header-icon {
   position: relative;
   z-index: 1;
 }
 
 /* Evita que el botón volver tape o se mezcle con el icono */
-.daily-close__header .daily-close__header-icon {
+.cierre-diario__header .cierre-diario__header-icon {
   margin-left: 0;
 }
 
 /* Acción principal más ordenada */
-.daily-close__action-panel {
+.cierre-diario__action-panel {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 24px;
 }
 
-.daily-close__action-copy {
+.cierre-diario__action-copy {
   display: grid !important;
   grid-template-columns: 210px minmax(0, 1fr);
   grid-template-areas:
@@ -2188,45 +2188,45 @@
   row-gap: 3px;
 }
 
-.daily-close__action-copy .daily-close__date-field {
+.cierre-diario__action-copy .cierre-diario__date-field {
   grid-area: date;
   align-self: center;
 }
 
-.daily-close__action-copy .daily-close__eyebrow {
+.cierre-diario__action-copy .cierre-diario__eyebrow {
   grid-area: eyebrow;
   align-self: end;
   margin: 0;
 }
 
-.daily-close__action-copy h2 {
+.cierre-diario__action-copy h2 {
   grid-area: title;
   margin: 0;
   line-height: 1.15;
 }
 
-.daily-close__action-copy p {
+.cierre-diario__action-copy p {
   grid-area: desc;
   margin: 0;
   max-width: 760px;
   line-height: 1.4;
 }
 
-.daily-close__date-field {
+.cierre-diario__date-field {
   margin: 0 !important;
 }
 
-.daily-close__action-side {
+.cierre-diario__action-side {
   width: auto !important;
   min-width: 190px;
   align-self: center;
 }
 
-.daily-close__action-buttons {
+.cierre-diario__action-buttons {
   align-items: center;
 }
 
-.daily-close__primary {
+.cierre-diario__primary {
   white-space: nowrap;
 }
 
@@ -2234,8 +2234,8 @@
    Movimientos / Estados misma altura
 ========================= */
 
-.daily-close__section--stock,
-.daily-close__section[aria-labelledby="daily-order-status-title"] {
+.cierre-diario__section--stock,
+.cierre-diario__section[aria-labelledby="daily-order-status-title"] {
   align-self: stretch;
   min-height: 236px;
 
@@ -2243,16 +2243,16 @@
   flex-direction: column;
 }
 
-.daily-close__section--stock .daily-close__compact-grid,
-.daily-close__section[aria-labelledby="daily-order-status-title"] .daily-close__status-grid {
+.cierre-diario__section--stock .cierre-diario__compact-grid,
+.cierre-diario__section[aria-labelledby="daily-order-status-title"] .cierre-diario__status-grid {
   flex: 1;
 }
 
-.daily-close__compact-grid {
+.cierre-diario__compact-grid {
   min-height: 126px;
 }
 
-.daily-close__status-grid {
+.cierre-diario__status-grid {
   align-content: start;
   grid-auto-rows: minmax(72px, auto);
 }
@@ -2261,8 +2261,8 @@
    Productos agotados / vendidos misma altura
 ========================= */
 
-.daily-close__section[aria-labelledby="daily-soldout-title"],
-.daily-close__section[aria-labelledby="daily-products-title"] {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"],
+.cierre-diario__section[aria-labelledby="daily-products-title"] {
   align-self: stretch;
   min-height: 178px;
 
@@ -2270,13 +2270,13 @@
   flex-direction: column;
 }
 
-.daily-close__section[aria-labelledby="daily-soldout-title"] .daily-close__alert-list,
-.daily-close__section[aria-labelledby="daily-products-title"] .daily-close__ranking {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] .cierre-diario__alert-list,
+.cierre-diario__section[aria-labelledby="daily-products-title"] .cierre-diario__ranking {
   flex: 1;
 }
 
-.daily-close__section[aria-labelledby="daily-soldout-title"] .daily-close__empty,
-.daily-close__section[aria-labelledby="daily-products-title"] .daily-close__empty {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] .cierre-diario__empty,
+.cierre-diario__section[aria-labelledby="daily-products-title"] .cierre-diario__empty {
   flex: 1;
   min-height: 70px;
 
@@ -2286,11 +2286,11 @@
 }
 
 /* Si hay un solo producto agotado, que no quede como una tirita perdida */
-.daily-close__alert-list {
+.cierre-diario__alert-list {
   min-height: 70px;
 }
 
-.daily-close__alert-item {
+.cierre-diario__alert-item {
   min-height: 58px;
 }
 
@@ -2298,32 +2298,32 @@
    Historial: filtros y botón buscar alineados
 ========================= */
 
-.daily-close__history .daily-close__section-header--history {
+.cierre-diario__history .cierre-diario__section-header--history {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: 24px;
 }
 
-.daily-close__history-filters {
+.cierre-diario__history-filters {
   display: grid;
   grid-template-columns: 150px 150px auto;
   align-items: end;
   gap: 12px;
 }
 
-.daily-close__history-filters .daily-close__date-field {
+.cierre-diario__history-filters .cierre-diario__date-field {
   width: 150px;
   align-items: stretch;
   gap: 6px;
 }
 
-.daily-close__history-filters .daily-close__date-field input {
+.cierre-diario__history-filters .cierre-diario__date-field input {
   width: 100%;
   min-height: 42px;
 }
 
-.daily-close__history-filters .daily-close__secondary {
+.cierre-diario__history-filters .cierre-diario__secondary {
   min-height: 42px;
   height: 42px;
   align-self: end;
@@ -2333,16 +2333,16 @@
 }
 
 /* Que el historial no quede con una altura exagerada cuando hay pocos cierres */
-.daily-close__history {
+.cierre-diario__history {
   min-height: auto;
 }
 
-.daily-close__history-list {
+.cierre-diario__history-list {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
 }
 
-.daily-close__history-item {
+.cierre-diario__history-item {
   min-height: 104px;
 }
 
@@ -2351,25 +2351,25 @@
 ========================= */
 
 @media (max-width: 1280px) {
-  .daily-close__back {
+  .cierre-diario__back {
     margin-left: 24px;
   }
 
-  .daily-close__history-list {
+  .cierre-diario__history-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 1080px) {
-  .daily-close__back {
+  .cierre-diario__back {
     margin-left: 24px;
   }
 
-  .daily-close__action-panel {
+  .cierre-diario__action-panel {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__action-copy {
+  .cierre-diario__action-copy {
     grid-template-columns: 1fr;
     grid-template-areas:
       "date"
@@ -2379,43 +2379,43 @@
     gap: 8px;
   }
 
-  .daily-close__action-side,
-  .daily-close__action-buttons,
-  .daily-close__primary {
+  .cierre-diario__action-side,
+  .cierre-diario__action-buttons,
+  .cierre-diario__primary {
     width: 100%;
   }
 
-  .daily-close__history .daily-close__section-header--history {
+  .cierre-diario__history .cierre-diario__section-header--history {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__history-filters {
+  .cierre-diario__history-filters {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
   }
 
-  .daily-close__history-filters .daily-close__date-field {
+  .cierre-diario__history-filters .cierre-diario__date-field {
     width: 100%;
   }
 }
 
 @media (max-width: 760px) {
-  .daily-close__back {
+  .cierre-diario__back {
     margin-left: 16px;
   }
 
-  .daily-close__history-filters {
+  .cierre-diario__history-filters {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__history-list {
+  .cierre-diario__history-list {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__section--stock,
-  .daily-close__section[aria-labelledby="daily-order-status-title"],
-  .daily-close__section[aria-labelledby="daily-soldout-title"],
-  .daily-close__section[aria-labelledby="daily-products-title"] {
+  .cierre-diario__section--stock,
+  .cierre-diario__section[aria-labelledby="daily-order-status-title"],
+  .cierre-diario__section[aria-labelledby="daily-soldout-title"],
+  .cierre-diario__section[aria-labelledby="daily-products-title"] {
     min-height: auto;
   }
 }
@@ -2431,14 +2431,14 @@
    Títulos con icono
 ========================= */
 
-.daily-close__section-header h2,
-.daily-close__title {
+.cierre-diario__section-header h2,
+.cierre-diario__title {
   display: inline-flex;
   align-items: center;
   gap: 12px;
 }
 
-.daily-close__section-header h2::before {
+.cierre-diario__section-header h2::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2495,13 +2495,13 @@
 }
 
 /* Resumen está sobre fondo azul */
-.daily-close__section--summary .daily-close__section-header h2::before {
+.cierre-diario__section--summary .cierre-diario__section-header h2::before {
   background-color: rgba(255, 255, 255, 0.16);
   color: #ffffff;
 }
 
 /* Productos agotados en rojo */
-.daily-close__section[aria-labelledby="daily-soldout-title"] .daily-close__section-header h2::before {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] .cierre-diario__section-header h2::before {
   background-color: rgba(231, 111, 81, 0.14);
   color: var(--color-melocoton);
 }
@@ -2510,14 +2510,14 @@
    Historial: filtros alineados
 ========================= */
 
-.daily-close__history .daily-close__section-header--history {
+.cierre-diario__history .cierre-diario__section-header--history {
   display: grid;
   grid-template-columns: 1fr;
   align-items: start;
   gap: 18px;
 }
 
-.daily-close__history-filters {
+.cierre-diario__history-filters {
   justify-content: flex-start;
   display: grid;
   grid-template-columns: 170px 170px auto;
@@ -2526,18 +2526,18 @@
   width: fit-content;
 }
 
-.daily-close__history-filters .daily-close__date-field {
+.cierre-diario__history-filters .cierre-diario__date-field {
   width: 170px;
   align-items: stretch;
   gap: 6px;
 }
 
-.daily-close__history-filters .daily-close__date-field input {
+.cierre-diario__history-filters .cierre-diario__date-field input {
   width: 100%;
   min-height: 44px;
 }
 
-.daily-close__history-filters .daily-close__secondary {
+.cierre-diario__history-filters .cierre-diario__secondary {
   height: 44px;
   min-height: 44px;
   align-self: end;
@@ -2548,12 +2548,12 @@
 }
 
 /* Lista de historial aprovecha mejor el ancho */
-.daily-close__history-list {
+.cierre-diario__history-list {
   grid-template-columns: repeat(3, minmax(260px, 1fr));
   align-items: stretch;
 }
 
-.daily-close__history-item {
+.cierre-diario__history-item {
   min-height: 112px;
 }
 
@@ -2562,19 +2562,19 @@
 ========================= */
 
 /* Que no se estire para igualar a Estados de pedidos */
-.daily-close__section--stock {
+.cierre-diario__section--stock {
   align-self: start !important;
   min-height: unset !important;
 }
 
 /* Estados puede mantener su altura natural */
-.daily-close__section[aria-labelledby="daily-order-status-title"] {
+.cierre-diario__section[aria-labelledby="daily-order-status-title"] {
   align-self: start !important;
   min-height: unset !important;
 }
 
 /* Movimientos como cards compactas, no como panel gigante */
-.daily-close__section--stock .daily-close__compact-grid {
+.cierre-diario__section--stock .cierre-diario__compact-grid {
   flex: initial;
   min-height: unset;
 
@@ -2588,7 +2588,7 @@
   background: transparent;
 }
 
-.daily-close__section--stock .daily-close__compact-card {
+.cierre-diario__section--stock .cierre-diario__compact-card {
   width: min(240px, 100%);
   min-height: 92px;
   padding: 16px 18px;
@@ -2599,25 +2599,25 @@
   box-shadow: var(--shadow-neu-concave);
 }
 
-.daily-close__section--stock .daily-close__compact-card+.daily-close__compact-card {
+.cierre-diario__section--stock .cierre-diario__compact-card+.cierre-diario__compact-card {
   border-left: 1px solid var(--color-borde);
 }
 
-.daily-close__section--stock .daily-close__compact-card span {
+.cierre-diario__section--stock .cierre-diario__compact-card span {
   font-size: 12px;
 }
 
-.daily-close__section--stock .daily-close__compact-card strong {
+.cierre-diario__section--stock .cierre-diario__compact-card strong {
   margin-top: 8px;
   font-size: 26px;
 }
 
-.daily-close__section--stock .daily-close__compact-card small {
+.cierre-diario__section--stock .cierre-diario__compact-card small {
   margin-top: 2px;
 }
 
 /* Si hay un solo movimiento, que no ocupe todo el ancho */
-.daily-close__section--stock .daily-close__compact-grid:has(.daily-close__compact-card:only-child) {
+.cierre-diario__section--stock .cierre-diario__compact-grid:has(.cierre-diario__compact-card:only-child) {
   justify-content: flex-start;
 }
 
@@ -2625,18 +2625,18 @@
    Empty states más prolijos
 ========================= */
 
-.daily-close__section[aria-labelledby="daily-soldout-title"],
-.daily-close__section[aria-labelledby="daily-products-title"] {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"],
+.cierre-diario__section[aria-labelledby="daily-products-title"] {
   align-self: stretch;
   min-height: 176px;
 }
 
-.daily-close__section[aria-labelledby="daily-soldout-title"] .daily-close__empty,
-.daily-close__section[aria-labelledby="daily-products-title"] .daily-close__empty {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] .cierre-diario__empty,
+.cierre-diario__section[aria-labelledby="daily-products-title"] .cierre-diario__empty {
   min-height: 76px;
 }
 
-.daily-close__section[aria-labelledby="daily-products-title"] .daily-close__ranking {
+.cierre-diario__section[aria-labelledby="daily-products-title"] .cierre-diario__ranking {
   min-height: 0;
   max-height: 292px;
   overflow-y: auto;
@@ -2645,16 +2645,16 @@
   scrollbar-gutter: stable;
 }
 
-.daily-close__section[aria-labelledby="daily-products-title"] .daily-close__ranking::-webkit-scrollbar {
+.cierre-diario__section[aria-labelledby="daily-products-title"] .cierre-diario__ranking::-webkit-scrollbar {
   width: 8px;
 }
 
-.daily-close__section[aria-labelledby="daily-products-title"] .daily-close__ranking::-webkit-scrollbar-track {
+.cierre-diario__section[aria-labelledby="daily-products-title"] .cierre-diario__ranking::-webkit-scrollbar-track {
   border-radius: var(--radius-pill);
   background-color: rgba(74, 111, 165, 0.08);
 }
 
-.daily-close__section[aria-labelledby="daily-products-title"] .daily-close__ranking::-webkit-scrollbar-thumb {
+.cierre-diario__section[aria-labelledby="daily-products-title"] .cierre-diario__ranking::-webkit-scrollbar-thumb {
   border-radius: var(--radius-pill);
   background-color: rgba(74, 111, 165, 0.28);
 }
@@ -2663,15 +2663,15 @@
    Movimientos de stock integrados
 ========================= */
 
-.daily-close__section--stock,
-.daily-close__section[aria-labelledby="daily-order-status-title"] {
+.cierre-diario__section--stock,
+.cierre-diario__section[aria-labelledby="daily-order-status-title"] {
   align-self: stretch !important;
   min-height: 236px !important;
   display: flex;
   flex-direction: column;
 }
 
-.daily-close__section--stock .daily-close__compact-grid {
+.cierre-diario__section--stock .cierre-diario__compact-grid {
   flex: 1;
   min-height: 0;
   display: grid;
@@ -2684,7 +2684,7 @@
   background: transparent;
 }
 
-.daily-close__section--stock .daily-close__compact-card {
+.cierre-diario__section--stock .cierre-diario__compact-card {
   width: auto;
   min-height: 54px;
   display: grid;
@@ -2701,18 +2701,18 @@
   box-shadow: none;
 }
 
-.daily-close__section--stock .daily-close__compact-card+.daily-close__compact-card {
+.cierre-diario__section--stock .cierre-diario__compact-card+.cierre-diario__compact-card {
   border-left: 0;
 }
 
-.daily-close__section--stock .daily-close__compact-card span {
+.cierre-diario__section--stock .cierre-diario__compact-card span {
   grid-area: label;
   color: var(--color-texto-claro);
   font-size: 13px;
   font-weight: 900;
 }
 
-.daily-close__section--stock .daily-close__compact-card strong {
+.cierre-diario__section--stock .cierre-diario__compact-card strong {
   grid-area: value;
   margin-top: 0;
   color: var(--color-pizarra-dark);
@@ -2720,7 +2720,7 @@
   line-height: 1;
 }
 
-.daily-close__section--stock .daily-close__compact-card small {
+.cierre-diario__section--stock .cierre-diario__compact-card small {
   grid-area: unit;
   margin-top: 4px;
   color: var(--color-texto-claro);
@@ -2733,40 +2733,40 @@
 ========================= */
 
 @media (max-width: 1080px) {
-  .daily-close__history-filters {
+  .cierre-diario__history-filters {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
   }
 
-  .daily-close__history-filters .daily-close__date-field {
+  .cierre-diario__history-filters .cierre-diario__date-field {
     width: 100%;
   }
 
-  .daily-close__history-list {
+  .cierre-diario__history-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .daily-close__section--stock .daily-close__compact-card {
+  .cierre-diario__section--stock .cierre-diario__compact-card {
     flex: 1 1 220px;
   }
 }
 
 @media (max-width: 760px) {
 
-  .daily-close__history-filters,
-  .daily-close__history-list {
+  .cierre-diario__history-filters,
+  .cierre-diario__history-list {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__section--stock .daily-close__compact-grid {
+  .cierre-diario__section--stock .cierre-diario__compact-grid {
     grid-template-columns: 1fr;
   }
 
-  .daily-close__section--stock .daily-close__compact-card {
+  .cierre-diario__section--stock .cierre-diario__compact-card {
     width: 100%;
   }
 
-  .daily-close__section-header h2::before {
+  .cierre-diario__section-header h2::before {
     width: 32px;
     height: 32px;
     border-radius: 11px;
@@ -2778,7 +2778,7 @@
    Historial de cierres en modal
 ========================= */
 
-.daily-close__header-actions {
+.cierre-diario__header-actions {
   min-width: 330px;
   display: flex;
   flex-direction: column;
@@ -2786,36 +2786,36 @@
   align-items: stretch;
 }
 
-.daily-close__header-actions .daily-close__status {
+.cierre-diario__header-actions .cierre-diario__status {
   min-width: 0;
 }
 
-.daily-close__history-button {
+.cierre-diario__history-button {
   width: 100%;
   justify-content: center;
   white-space: nowrap;
 }
 
-.daily-close-modal--history {
+.cierre-diario-modal--history {
   width: min(900px, 100%);
   max-height: min(760px, calc(100vh - 40px));
   display: flex;
   flex-direction: column;
 }
 
-.daily-close-modal--history .daily-close-modal__body {
+.cierre-diario-modal--history .cierre-diario-modal__body {
   min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.daily-close-modal--history #daily-history-title::before {
+.cierre-diario-modal--history #daily-history-title::before {
   display: none;
   content: none;
 }
 
-.daily-close-modal--history .daily-close__history-filters {
+.cierre-diario-modal--history .cierre-diario__history-filters {
   width: 100%;
   display: grid;
   grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr) auto;
@@ -2823,11 +2823,11 @@
   gap: 12px;
 }
 
-.daily-close-modal--history .daily-close__history-filters .daily-close__date-field {
+.cierre-diario-modal--history .cierre-diario__history-filters .cierre-diario__date-field {
   width: 100%;
 }
 
-.daily-close-modal--history .daily-close__history-list {
+.cierre-diario-modal--history .cierre-diario__history-list {
   min-height: 0;
   max-height: 420px;
   overflow-y: auto;
@@ -2838,7 +2838,7 @@
   padding-right: 4px;
 }
 
-.daily-close-modal--history .daily-close__history-item {
+.cierre-diario-modal--history .cierre-diario__history-item {
   min-height: 112px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2854,43 +2854,43 @@
   padding: 18px;
 }
 
-.daily-close-modal--history .daily-close__history-item span,
-.daily-close-modal--history .daily-close__history-item strong,
-.daily-close-modal--history .daily-close__history-item small {
+.cierre-diario-modal--history .cierre-diario__history-item span,
+.cierre-diario-modal--history .cierre-diario__history-item strong,
+.cierre-diario-modal--history .cierre-diario__history-item small {
   display: block;
   margin: 0;
   line-height: 1.25;
 }
 
-.daily-close-modal--history .daily-close__history-item span {
+.cierre-diario-modal--history .cierre-diario__history-item span {
   grid-area: date;
   color: var(--color-pizarra);
   font-size: 15px;
   font-weight: 700;
 }
 
-.daily-close-modal--history .daily-close__history-item strong {
+.cierre-diario-modal--history .cierre-diario__history-item strong {
   grid-area: expired;
   color: var(--color-pizarra-dark);
   font-size: 17px;
   font-weight: 900;
 }
 
-.daily-close-modal--history .daily-close__history-item small {
+.cierre-diario-modal--history .cierre-diario__history-item small {
   color: var(--color-texto-claro);
   font-size: 13px;
   font-weight: 800;
 }
 
-.daily-close-modal--history .daily-close__history-item small:first-of-type {
+.cierre-diario-modal--history .cierre-diario__history-item small:first-of-type {
   grid-area: reservations;
 }
 
-.daily-close-modal--history .daily-close__history-item small:last-of-type {
+.cierre-diario-modal--history .cierre-diario__history-item small:last-of-type {
   grid-area: refunded;
 }
 
-.daily-close-modal--history .daily-close__history-item::after {
+.cierre-diario-modal--history .cierre-diario__history-item::after {
   grid-area: arrow;
   position: static;
   align-self: center;
@@ -2899,7 +2899,7 @@
 }
 
 @media (max-width: 1080px) {
-  .daily-close__header-actions {
+  .cierre-diario__header-actions {
     width: 100%;
     min-width: 0;
   }
@@ -2907,8 +2907,8 @@
 
 @media (max-width: 760px) {
 
-  .daily-close-modal--history .daily-close__history-filters,
-  .daily-close-modal--history .daily-close__history-list {
+  .cierre-diario-modal--history .cierre-diario__history-filters,
+  .cierre-diario-modal--history .cierre-diario__history-list {
     grid-template-columns: 1fr;
   }
 }
@@ -2917,7 +2917,7 @@
    Primera sección rediseñada - Cierre diario
    ========================================================= */
 
-.daily-close__back {
+.cierre-diario__back {
   position: static !important;
   width: fit-content;
   min-height: 40px;
@@ -2929,7 +2929,7 @@
   font-size: 13px;
 }
 
-.daily-close-hero {
+.cierre-diario-hero {
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -2942,21 +2942,21 @@
   box-shadow: var(--shadow-card);
 }
 
-.daily-close-hero__top {
+.cierre-diario-hero__top {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.75fr) minmax(300px, 0.9fr);
   align-items: center;
   gap: 32px;
 }
 
-.daily-close-hero__identity {
+.cierre-diario-hero__identity {
   display: flex;
   align-items: center;
   gap: 22px;
   min-width: 0;
 }
 
-.daily-close-hero__icon {
+.cierre-diario-hero__icon {
   width: 86px;
   height: 86px;
 
@@ -2971,7 +2971,7 @@
   font-size: 35px;
 }
 
-.daily-close-hero__identity h1 {
+.cierre-diario-hero__identity h1 {
   margin: 0;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -2980,7 +2980,7 @@
   line-height: 1.04;
 }
 
-.daily-close-hero__identity p {
+.cierre-diario-hero__identity p {
   max-width: 430px;
   margin: 8px 0 0;
   color: var(--color-texto-claro);
@@ -2989,7 +2989,7 @@
   line-height: 1.35;
 }
 
-.daily-close-hero__date {
+.cierre-diario-hero__date {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2998,7 +2998,7 @@
   border-left: 1px solid var(--color-borde);
 }
 
-.daily-close-hero__date>span {
+.cierre-diario-hero__date>span {
   display: block;
   color: var(--color-texto-claro);
   font-size: 12px;
@@ -3006,12 +3006,12 @@
   text-transform: uppercase;
 }
 
-.daily-close-hero__date-input {
+.cierre-diario-hero__date-input {
   position: relative;
   width: min(260px, 100%);
 }
 
-.daily-close-hero__date-input input {
+.cierre-diario-hero__date-input input {
   width: 100%;
   min-height: 56px;
   padding: 0 46px 0 18px;
@@ -3027,7 +3027,7 @@
   font-weight: 900;
 }
 
-.daily-close-hero__date-input i {
+.cierre-diario-hero__date-input i {
   position: absolute;
   top: 50%;
   right: 16px;
@@ -3036,14 +3036,14 @@
   pointer-events: none;
 }
 
-.daily-close-hero__date small {
+.cierre-diario-hero__date small {
   display: block;
   color: var(--color-texto-claro);
   font-size: 14px;
   font-weight: 800;
 }
 
-.daily-close-hero__status {
+.cierre-diario-hero__status {
   min-height: 112px;
   padding: 20px 22px;
 
@@ -3058,13 +3058,13 @@
     linear-gradient(135deg, rgba(74, 111, 165, 0.08), rgba(255, 255, 255, 0.88));
 }
 
-.daily-close-hero__status>div {
+.cierre-diario-hero__status>div {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.daily-close-hero__status-icon {
+.cierre-diario-hero__status-icon {
   width: 40px;
   height: 40px;
 
@@ -3077,12 +3077,12 @@
   color: #a36f00;
 }
 
-.daily-close-hero__status--closed .daily-close-hero__status-icon {
+.cierre-diario-hero__status--closed .cierre-diario-hero__status-icon {
   background-color: rgba(129, 178, 154, 0.18);
   color: #3f7a5d;
 }
 
-.daily-close-hero__status strong {
+.cierre-diario-hero__status strong {
   margin: 0;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -3091,11 +3091,11 @@
   line-height: 1;
 }
 
-.daily-close-hero__status--closed strong {
+.cierre-diario-hero__status--closed strong {
   color: #3f7a5d;
 }
 
-.daily-close-hero__status small {
+.cierre-diario-hero__status small {
   color: var(--color-texto-claro);
   font-size: 14px;
   font-weight: 800;
@@ -3103,7 +3103,7 @@
 }
 
 /* Métricas del cierre dentro de una sola banda */
-.daily-close-hero__metrics {
+.cierre-diario-hero__metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
@@ -3114,7 +3114,7 @@
   background-color: rgba(248, 251, 255, 0.54);
 }
 
-.daily-close-hero__metric {
+.cierre-diario-hero__metric {
   min-height: 118px;
   padding: 20px 24px;
 
@@ -3124,11 +3124,11 @@
   gap: 16px;
 }
 
-.daily-close-hero__metric+.daily-close-hero__metric {
+.cierre-diario-hero__metric+.cierre-diario-hero__metric {
   border-left: 1px solid var(--color-borde);
 }
 
-.daily-close-hero__metric>span {
+.cierre-diario-hero__metric>span {
   width: 54px;
   height: 54px;
 
@@ -3142,17 +3142,17 @@
   font-size: 21px;
 }
 
-.daily-close-hero__metric--warning>span {
+.cierre-diario-hero__metric--warning>span {
   background-color: rgba(242, 183, 5, 0.16);
   color: #a36f00;
 }
 
-.daily-close-hero__metric--success>span {
+.cierre-diario-hero__metric--success>span {
   background-color: rgba(129, 178, 154, 0.16);
   color: #3f7a5d;
 }
 
-.daily-close-hero__metric small {
+.cierre-diario-hero__metric small {
   display: block;
   color: var(--color-texto-claro);
   font-size: 15px;
@@ -3160,7 +3160,7 @@
   line-height: 1.2;
 }
 
-.daily-close-hero__metric strong {
+.cierre-diario-hero__metric strong {
   display: block;
   margin-top: 7px;
 
@@ -3176,14 +3176,14 @@
 }
 
 /* Acciones */
-.daily-close-hero__actions {
+.cierre-diario-hero__actions {
   display: flex;
   justify-content: flex-end;
   gap: 16px;
 }
 
-.daily-close-hero__secondary,
-.daily-close-hero__primary {
+.cierre-diario-hero__secondary,
+.cierre-diario-hero__primary {
   min-height: 58px;
   padding: 0 26px;
 
@@ -3206,103 +3206,103 @@
     opacity var(--transition-ui);
 }
 
-.daily-close-hero__secondary {
+.cierre-diario-hero__secondary {
   border: 1px solid var(--color-borde-fuerte);
   background-color: var(--color-superficie);
   color: var(--color-pizarra);
 }
 
-.daily-close-hero__primary {
+.cierre-diario-hero__primary {
   border: 0;
   background-color: var(--color-dorado);
   color: var(--color-texto-oscuro);
   box-shadow: 0 14px 26px rgba(242, 183, 5, 0.24);
 }
 
-.daily-close-hero__primary--closed {
+.cierre-diario-hero__primary--closed {
   background-color: var(--color-pizarra);
   color: #ffffff;
   box-shadow: 0 14px 26px rgba(74, 111, 165, 0.22);
 }
 
-.daily-close-hero__primary:hover:not(:disabled),
-.daily-close-hero__secondary:hover {
+.cierre-diario-hero__primary:hover:not(:disabled),
+.cierre-diario-hero__secondary:hover {
   transform: translateY(-1px);
 }
 
-.daily-close-hero__primary:disabled {
+.cierre-diario-hero__primary:disabled {
   opacity: 0.62;
 }
 
 /* Anular estilos muy genéricos anteriores dentro de esta sección */
-.daily-close-hero span,
-.daily-close-hero small,
-.daily-close-hero strong {
+.cierre-diario-hero span,
+.cierre-diario-hero small,
+.cierre-diario-hero strong {
   max-width: 100%;
 }
 
 /* Responsive */
 @media (max-width: 1180px) {
-  .daily-close-hero__top {
+  .cierre-diario-hero__top {
     grid-template-columns: 1fr;
   }
 
-  .daily-close-hero__date {
+  .cierre-diario-hero__date {
     padding-left: 0;
     border-left: 0;
   }
 
-  .daily-close-hero__date-input {
+  .cierre-diario-hero__date-input {
     width: 100%;
   }
 
-  .daily-close-hero__metrics {
+  .cierre-diario-hero__metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .daily-close-hero__metric:nth-child(3) {
+  .cierre-diario-hero__metric:nth-child(3) {
     border-left: 0;
   }
 
-  .daily-close-hero__metric:nth-child(n + 3) {
+  .cierre-diario-hero__metric:nth-child(n + 3) {
     border-top: 1px solid var(--color-borde);
   }
 }
 
 @media (max-width: 760px) {
-  .daily-close-hero {
+  .cierre-diario-hero {
     padding: 22px;
     border-radius: 22px;
   }
 
-  .daily-close-hero__identity {
+  .cierre-diario-hero__identity {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .daily-close-hero__identity h1 {
+  .cierre-diario-hero__identity h1 {
     font-size: 32px;
   }
 
-  .daily-close-hero__metrics {
+  .cierre-diario-hero__metrics {
     grid-template-columns: 1fr;
   }
 
-  .daily-close-hero__metric,
-  .daily-close-hero__metric:nth-child(3) {
+  .cierre-diario-hero__metric,
+  .cierre-diario-hero__metric:nth-child(3) {
     border-left: 0;
   }
 
-  .daily-close-hero__metric+.daily-close-hero__metric {
+  .cierre-diario-hero__metric+.cierre-diario-hero__metric {
     border-top: 1px solid var(--color-borde);
   }
 
-  .daily-close-hero__actions {
+  .cierre-diario-hero__actions {
     flex-direction: column;
   }
 
-  .daily-close-hero__secondary,
-  .daily-close-hero__primary {
+  .cierre-diario-hero__secondary,
+  .cierre-diario-hero__primary {
     width: 100%;
   }
 }
@@ -3314,7 +3314,7 @@
    - Evita que la nueva card caiga en la columna derecha
    ========================================================= */
 
-.daily-close__container {
+.cierre-diario__container {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) 420px;
   gap: 20px;
@@ -3322,7 +3322,7 @@
 }
 
 /* Botón volver arriba, chico y alineado al contenido */
-.daily-close__back {
+.cierre-diario__back {
   order: 1;
   grid-column: 1 / -1;
 
@@ -3353,7 +3353,7 @@
 }
 
 /* La nueva card principal ocupa todo el ancho */
-.daily-close-hero {
+.cierre-diario-hero {
   order: 2;
   grid-column: 1 / -1;
 
@@ -3363,12 +3363,12 @@
 }
 
 /* Si aparece resultado de cierre, también full width */
-.daily-close__close-result {
+.cierre-diario__close-result {
   grid-column: 1 / -1;
 }
 
 /* Header interno de la hero bien distribuido */
-.daily-close-hero__top {
+.cierre-diario-hero__top {
   display: grid !important;
   grid-template-columns:
     minmax(0, 1.15fr) minmax(260px, 0.75fr) minmax(300px, 0.9fr);
@@ -3377,31 +3377,31 @@
 }
 
 /* Evita que la fecha/status se monten sobre el título */
-.daily-close-hero__identity,
-.daily-close-hero__date,
-.daily-close-hero__status {
+.cierre-diario-hero__identity,
+.cierre-diario-hero__date,
+.cierre-diario-hero__status {
   min-width: 0;
 }
 
-.daily-close-hero__date {
+.cierre-diario-hero__date {
   padding-left: 32px;
   border-left: 1px solid var(--color-borde);
 }
 
-.daily-close-hero__status {
+.cierre-diario-hero__status {
   width: 100%;
   max-width: 380px;
   justify-self: end;
 }
 
 /* Métricas dentro de la hero */
-.daily-close-hero__metrics {
+.cierre-diario-hero__metrics {
   width: 100%;
   min-width: 0;
 }
 
 /* Acciones abajo a la derecha */
-.daily-close-hero__actions {
+.cierre-diario-hero__actions {
   display: flex;
   justify-content: flex-end;
   gap: 16px;
@@ -3409,38 +3409,38 @@
 
 /* Responsive */
 @media (max-width: 1180px) {
-  .daily-close__container {
+  .cierre-diario__container {
     grid-template-columns: 1fr;
   }
 
-  .daily-close-hero__top {
+  .cierre-diario-hero__top {
     grid-template-columns: 1fr !important;
   }
 
-  .daily-close-hero__date {
+  .cierre-diario-hero__date {
     padding-left: 0;
     border-left: 0;
   }
 
-  .daily-close-hero__status {
+  .cierre-diario-hero__status {
     max-width: none;
     justify-self: stretch;
   }
 }
 
 @media (max-width: 760px) {
-  .daily-close-hero__actions {
+  .cierre-diario-hero__actions {
     flex-direction: column;
   }
 
-  .daily-close-hero__secondary,
-  .daily-close-hero__primary {
+  .cierre-diario-hero__secondary,
+  .cierre-diario-hero__primary {
     width: 100%;
   }
 }
 
 /* Fix icono principal de Cierre diario */
-.daily-close-hero__icon {
+.cierre-diario-hero__icon {
   width: 86px !important;
   height: 86px !important;
 
@@ -3455,14 +3455,14 @@
   flex: 0 0 86px !important;
 }
 
-.daily-close-hero__icon i {
+.cierre-diario-hero__icon i {
   font-size: 38px !important;
   line-height: 1 !important;
   color: inherit !important;
 }
 
 /* Fix icono del estado Cerrado / Abierto */
-.daily-close-hero__status-icon {
+.cierre-diario-hero__status-icon {
   width: 46px !important;
   height: 46px !important;
 
@@ -3474,21 +3474,21 @@
   flex: 0 0 46px !important;
 }
 
-.daily-close-hero__status-icon i {
+.cierre-diario-hero__status-icon i {
   font-size: 22px !important;
   line-height: 1 !important;
   color: inherit !important;
 }
 
 /* Cerrado */
-.daily-close-hero__status--closed .daily-close-hero__status-icon {
+.cierre-diario-hero__status--closed .cierre-diario-hero__status-icon {
   background-color: rgba(129, 178, 154, 0.18) !important;
   color: #3f7a5d !important;
 }
 
 /* Abierto */
-.daily-close-hero__status:not(.daily-close-hero__status--closed)
-  .daily-close-hero__status-icon {
+.cierre-diario-hero__status:not(.cierre-diario-hero__status--closed)
+  .cierre-diario-hero__status-icon {
   background-color: rgba(242, 183, 5, 0.16) !important;
   color: #a36f00 !important;
 }
@@ -3497,7 +3497,7 @@
    Cierre diario - Sección operaciones + inventario
    ========================================================= */
 
-.dc-operational-layout {
+.cd-operational-layout {
   grid-column: 1 / -1;
 
   display: grid;
@@ -3506,20 +3506,20 @@
   align-items: stretch;
 }
 
-.dc-section-header {
+.cd-section-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 22px;
 }
 
-.dc-section-title {
+.cd-section-title {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.dc-section-icon {
+.cd-section-icon {
   width: 42px;
   height: 42px;
 
@@ -3534,7 +3534,7 @@
   flex: 0 0 auto;
 }
 
-.dc-section-header h2 {
+.cd-section-header h2 {
   margin: 0;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -3547,17 +3547,17 @@
    Movimientos de stock
 ========================= */
 
-.dc-stock-movements {
+.cd-stock-movements {
   align-self: stretch;
 }
 
-.dc-stock-movements__grid {
+.cd-stock-movements__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
-.dc-stock-movement {
+.cd-stock-movement {
   min-height: 178px;
   padding: 22px 18px;
 
@@ -3573,7 +3573,7 @@
   text-align: center;
 }
 
-.dc-stock-movement__icon {
+.cd-stock-movement__icon {
   width: 56px;
   height: 56px;
 
@@ -3587,7 +3587,7 @@
   font-size: 23px;
 }
 
-.dc-stock-movement strong {
+.cd-stock-movement strong {
   margin-top: 8px;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -3596,46 +3596,46 @@
   line-height: 1;
 }
 
-.dc-stock-movement span:not(.dc-stock-movement__icon) {
+.cd-stock-movement span:not(.cd-stock-movement__icon) {
   color: var(--color-texto-claro);
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 900;
 }
 
-.dc-stock-movement small {
+.cd-stock-movement small {
   color: var(--color-texto-claro);
   font-size: 13px;
   font-weight: 800;
 }
 
-.dc-stock-movement--ajuste {
+.cd-stock-movement--ajuste {
   background: linear-gradient(180deg, rgba(74, 111, 165, 0.08), rgba(255, 255, 255, 0.86));
 }
 
-.dc-stock-movement--liberacion {
+.cd-stock-movement--liberacion {
   background: linear-gradient(180deg, rgba(129, 178, 154, 0.1), rgba(255, 255, 255, 0.86));
 }
 
-.dc-stock-movement--liberacion .dc-stock-movement__icon {
+.cd-stock-movement--liberacion .cd-stock-movement__icon {
   background-color: rgba(129, 178, 154, 0.16);
   color: #3f7a5d;
 }
 
-.dc-stock-movement--reserva {
+.cd-stock-movement--reserva {
   background: linear-gradient(180deg, rgba(242, 183, 5, 0.12), rgba(255, 255, 255, 0.86));
 }
 
-.dc-stock-movement--reserva .dc-stock-movement__icon {
+.cd-stock-movement--reserva .cd-stock-movement__icon {
   background-color: rgba(242, 183, 5, 0.18);
   color: #a36f00;
 }
 
-.dc-stock-movement--venta {
+.cd-stock-movement--venta {
   background: linear-gradient(180deg, rgba(124, 58, 237, 0.08), rgba(255, 255, 255, 0.86));
 }
 
-.dc-stock-movement--venta .dc-stock-movement__icon {
+.cd-stock-movement--venta .cd-stock-movement__icon {
   background-color: rgba(124, 58, 237, 0.12);
   color: #6d28d9;
 }
@@ -3644,17 +3644,17 @@
    Estados de pedidos
 ========================= */
 
-.dc-order-states {
+.cd-order-states {
   align-self: stretch;
 }
 
-.dc-order-states__grid {
+.cd-order-states__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.dc-order-state {
+.cd-order-state {
   min-height: 76px;
   padding: 13px 16px;
 
@@ -3668,7 +3668,7 @@
   background-color: rgba(248, 251, 255, 0.78);
 }
 
-.dc-order-state__icon {
+.cd-order-state__icon {
   width: 42px;
   height: 42px;
 
@@ -3682,7 +3682,7 @@
   font-size: 17px;
 }
 
-.dc-order-state__label {
+.cd-order-state__label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: normal;
@@ -3693,29 +3693,29 @@
   line-height: 1.2;
 }
 
-.dc-order-state strong {
+.cd-order-state strong {
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 900;
 }
 
-.dc-order-state--delivered .dc-order-state__icon {
+.cd-order-state--delivered .cd-order-state__icon {
   background-color: rgba(129, 178, 154, 0.16);
   color: #3f7a5d;
 }
 
-.dc-order-state--preparing .dc-order-state__icon {
+.cd-order-state--preparing .cd-order-state__icon {
   background-color: rgba(242, 183, 5, 0.16);
   color: #a36f00;
 }
 
-.dc-order-state--ready .dc-order-state__icon {
+.cd-order-state--ready .cd-order-state__icon {
   background-color: rgba(129, 178, 154, 0.14);
   color: #3f7a5d;
 }
 
-.dc-order-state--expired .dc-order-state__icon {
+.cd-order-state--expired .cd-order-state__icon {
   background-color: rgba(231, 111, 81, 0.14);
   color: var(--color-melocoton);
 }
@@ -3724,15 +3724,15 @@
    Inventario al cierre
 ========================= */
 
-.dc-inventory-panel {
+.cd-inventory-panel {
   grid-column: 1 / -1;
 }
 
-.dc-inventory-panel .daily-close__section-header {
+.cd-inventory-panel .cierre-diario__section-header {
   justify-content: space-between;
 }
 
-.dc-inventory-count {
+.cd-inventory-count {
   min-height: 34px;
   padding: 0 13px;
 
@@ -3748,14 +3748,14 @@
   font-weight: 900;
 }
 
-.dc-inventory-table {
+.cd-inventory-table {
   overflow: hidden;
   border: 1px solid var(--color-borde);
   border-radius: 18px;
 }
 
-.dc-inventory-table__head,
-.dc-inventory-row {
+.cd-inventory-table__head,
+.cd-inventory-row {
   display: grid;
   grid-template-columns:
     minmax(280px, 1.55fr)
@@ -3768,7 +3768,7 @@
   gap: 18px;
 }
 
-.dc-inventory-table__head {
+.cd-inventory-table__head {
   min-height: 52px;
   padding: 0 20px;
 
@@ -3776,24 +3776,24 @@
   border-bottom: 1px solid var(--color-borde);
 }
 
-.dc-inventory-table__head span {
+.cd-inventory-table__head span {
   color: var(--color-texto-claro);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
-.dc-inventory-row {
+.cd-inventory-row {
   min-height: 76px;
   padding: 12px 20px;
   background-color: rgba(255, 255, 255, 0.78);
 }
 
-.dc-inventory-row + .dc-inventory-row {
+.cd-inventory-row + .cd-inventory-row {
   border-top: 1px solid var(--color-borde);
 }
 
-.dc-inventory-product strong {
+.cd-inventory-product strong {
   display: block;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -3801,7 +3801,7 @@
   font-weight: 900;
 }
 
-.dc-inventory-product small {
+.cd-inventory-product small {
   display: block;
   margin-top: 3px;
   color: var(--color-texto-claro);
@@ -3809,7 +3809,7 @@
   font-weight: 800;
 }
 
-.dc-inventory-number small {
+.cd-inventory-number small {
   display: block;
   color: var(--color-texto-claro);
   font-size: 11px;
@@ -3817,7 +3817,7 @@
   text-transform: uppercase;
 }
 
-.dc-inventory-number strong {
+.cd-inventory-number strong {
   display: block;
   margin-top: 4px;
   color: var(--color-pizarra-dark);
@@ -3826,11 +3826,11 @@
   font-weight: 900;
 }
 
-.dc-inventory-number--available strong {
+.cd-inventory-number--available strong {
   color: #137a4b;
 }
 
-.dc-inventory-status {
+.cd-inventory-status {
   min-height: 34px;
   padding: 0 14px;
 
@@ -3848,25 +3848,25 @@
   white-space: nowrap;
 }
 
-.dc-inventory-status--low-stock {
+.cd-inventory-status--low-stock {
   background-color: rgba(242, 183, 5, 0.18);
   color: #946600;
 }
 
-.dc-inventory-status--sold-out {
+.cd-inventory-status--sold-out {
   background-color: rgba(231, 111, 81, 0.14);
   color: #a83b24;
 }
 
-.dc-inventory-row--low-stock {
+.cd-inventory-row--low-stock {
   background-color: rgba(242, 183, 5, 0.05);
 }
 
-.dc-inventory-row--sold-out {
+.cd-inventory-row--sold-out {
   background-color: rgba(231, 111, 81, 0.05);
 }
 
-.dc-inventory-pagination {
+.cd-inventory-pagination {
   margin-top: 16px;
 }
 
@@ -3875,36 +3875,36 @@
 ========================= */
 
 @media (max-width: 1180px) {
-  .dc-operational-layout {
+  .cd-operational-layout {
     grid-template-columns: 1fr;
   }
 
-  .dc-stock-movements__grid {
+  .cd-stock-movements__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .dc-inventory-table__head {
+  .cd-inventory-table__head {
     display: none;
   }
 
-  .dc-inventory-row {
+  .cd-inventory-row {
     grid-template-columns: 1fr;
     gap: 14px;
     align-items: stretch;
   }
 
-  .dc-inventory-status {
+  .cd-inventory-status {
     justify-self: start;
   }
 }
 
 @media (max-width: 760px) {
-  .dc-stock-movements__grid,
-  .dc-order-states__grid {
+  .cd-stock-movements__grid,
+  .cd-order-states__grid {
     grid-template-columns: 1fr;
   }
 
-  .dc-stock-movement {
+  .cd-stock-movement {
     min-height: 142px;
   }
 }
@@ -3914,59 +3914,59 @@
    ========================================================= */
 
 /* Orden correcto dentro del grid principal */
-.daily-close__back {
+.cierre-diario__back {
   order: 1;
 }
 
-.daily-close-hero {
+.cierre-diario-hero {
   order: 2;
   grid-column: 1 / -1;
 }
 
-.daily-close__close-result {
+.cierre-diario__close-result {
   order: 3;
   grid-column: 1 / -1;
 }
 
-.daily-close__state {
+.cierre-diario__state {
   order: 4;
   grid-column: 1 / -1;
 }
 
-.daily-close__section--summary {
+.cierre-diario__section--summary {
   order: 5;
   grid-column: 1 / -1;
 }
 
-.dc-operational-layout {
+.cd-operational-layout {
   order: 6;
   grid-column: 1 / -1;
 }
 
-.dc-inventory-panel {
+.cd-inventory-panel {
   order: 7;
   grid-column: 1 / -1;
 }
 
-.daily-close__section[aria-labelledby="daily-soldout-title"] {
+.cierre-diario__section[aria-labelledby="daily-soldout-title"] {
   order: 8;
   grid-column: 1 / 2;
 }
 
-.daily-close__section[aria-labelledby="daily-products-title"] {
+.cierre-diario__section[aria-labelledby="daily-products-title"] {
   order: 9;
   grid-column: 2 / 3;
 }
 
 /* Evita íconos duplicados/vacíos de CSS anterior */
-.dc-section-header h2::before,
-.dc-section-title h2::before {
+.cd-section-header h2::before,
+.cd-section-title h2::before {
   content: none !important;
   display: none !important;
 }
 
 /* Layout principal de esta parte */
-.dc-operational-layout {
+.cd-operational-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
   gap: 20px;
@@ -3974,24 +3974,24 @@
 }
 
 /* Headers */
-.dc-section-header {
+.cd-section-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 22px;
 }
 
-.dc-section-header--between {
+.cd-section-header--between {
   justify-content: space-between;
 }
 
-.dc-section-title {
+.cd-section-title {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.dc-section-icon {
+.cd-section-icon {
   width: 44px;
   height: 44px;
 
@@ -4007,13 +4007,13 @@
   flex: 0 0 44px;
 }
 
-.dc-section-icon i {
+.cd-section-icon i {
   font-size: 18px !important;
   line-height: 1 !important;
 }
 
-.dc-section-header h2,
-.dc-section-title h2 {
+.cd-section-header h2,
+.cd-section-title h2 {
   margin: 0;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -4026,18 +4026,18 @@
    Movimientos de stock
 ========================= */
 
-.dc-stock-movements {
+.cd-stock-movements {
   min-height: 300px;
   padding: 26px;
 }
 
-.dc-stock-movements__grid {
+.cd-stock-movements__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
-.dc-stock-movement {
+.cd-stock-movement {
   min-height: 166px;
   padding: 20px 16px;
 
@@ -4053,7 +4053,7 @@
   text-align: center;
 }
 
-.dc-stock-movement__icon {
+.cd-stock-movement__icon {
   width: 56px;
   height: 56px;
 
@@ -4068,12 +4068,12 @@
   font-size: 22px;
 }
 
-.dc-stock-movement__icon i {
+.cd-stock-movement__icon i {
   font-size: 22px !important;
   line-height: 1 !important;
 }
 
-.dc-stock-movement strong {
+.cd-stock-movement strong {
   margin-top: 8px;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -4082,47 +4082,47 @@
   line-height: 1;
 }
 
-.dc-stock-movement span:not(.dc-stock-movement__icon) {
+.cd-stock-movement span:not(.cd-stock-movement__icon) {
   color: var(--color-texto-claro);
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 900;
 }
 
-.dc-stock-movement small {
+.cd-stock-movement small {
   color: var(--color-texto-claro);
   font-size: 13px;
   font-weight: 800;
 }
 
 /* colores */
-.dc-stock-movement--ajuste {
+.cd-stock-movement--ajuste {
   background: linear-gradient(180deg, rgba(74, 111, 165, 0.08), rgba(255, 255, 255, 0.92));
 }
 
-.dc-stock-movement--liberacion {
+.cd-stock-movement--liberacion {
   background: linear-gradient(180deg, rgba(129, 178, 154, 0.12), rgba(255, 255, 255, 0.92));
 }
 
-.dc-stock-movement--liberacion .dc-stock-movement__icon {
+.cd-stock-movement--liberacion .cd-stock-movement__icon {
   background-color: rgba(129, 178, 154, 0.16);
   color: #3f7a5d;
 }
 
-.dc-stock-movement--reserva {
+.cd-stock-movement--reserva {
   background: linear-gradient(180deg, rgba(242, 183, 5, 0.14), rgba(255, 255, 255, 0.92));
 }
 
-.dc-stock-movement--reserva .dc-stock-movement__icon {
+.cd-stock-movement--reserva .cd-stock-movement__icon {
   background-color: rgba(242, 183, 5, 0.18);
   color: #a36f00;
 }
 
-.dc-stock-movement--venta {
+.cd-stock-movement--venta {
   background: linear-gradient(180deg, rgba(124, 58, 237, 0.09), rgba(255, 255, 255, 0.92));
 }
 
-.dc-stock-movement--venta .dc-stock-movement__icon {
+.cd-stock-movement--venta .cd-stock-movement__icon {
   background-color: rgba(124, 58, 237, 0.13);
   color: #6d28d9;
 }
@@ -4131,18 +4131,18 @@
    Estados de pedidos
 ========================= */
 
-.dc-order-states {
+.cd-order-states {
   min-height: 300px;
   padding: 26px;
 }
 
-.dc-order-states__grid {
+.cd-order-states__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.dc-order-state {
+.cd-order-state {
   min-height: 76px;
   padding: 13px 16px;
 
@@ -4156,7 +4156,7 @@
   background-color: rgba(248, 251, 255, 0.82);
 }
 
-.dc-order-state__icon {
+.cd-order-state__icon {
   width: 42px;
   height: 42px;
 
@@ -4171,37 +4171,37 @@
   font-size: 17px;
 }
 
-.dc-order-state__icon i {
+.cd-order-state__icon i {
   font-size: 17px !important;
   line-height: 1 !important;
 }
 
-.dc-order-state__label {
+.cd-order-state__label {
   color: var(--color-texto-claro);
   font-size: 13px;
   font-weight: 900;
   line-height: 1.2;
 }
 
-.dc-order-state strong {
+.cd-order-state strong {
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 900;
 }
 
-.dc-order-state--delivered .dc-order-state__icon,
-.dc-order-state--ready .dc-order-state__icon {
+.cd-order-state--delivered .cd-order-state__icon,
+.cd-order-state--ready .cd-order-state__icon {
   background-color: rgba(129, 178, 154, 0.16);
   color: #3f7a5d;
 }
 
-.dc-order-state--preparing .dc-order-state__icon {
+.cd-order-state--preparing .cd-order-state__icon {
   background-color: rgba(242, 183, 5, 0.16);
   color: #a36f00;
 }
 
-.dc-order-state--expired .dc-order-state__icon {
+.cd-order-state--expired .cd-order-state__icon {
   background-color: rgba(231, 111, 81, 0.14);
   color: var(--color-melocoton);
 }
@@ -4210,11 +4210,11 @@
    Inventario al cierre
 ========================= */
 
-.dc-inventory-panel {
+.cd-inventory-panel {
   padding: 26px;
 }
 
-.dc-inventory-count {
+.cd-inventory-count {
   min-height: 34px;
   padding: 0 13px;
 
@@ -4230,14 +4230,14 @@
   font-weight: 900;
 }
 
-.dc-inventory-table {
+.cd-inventory-table {
   overflow: hidden;
   border: 1px solid var(--color-borde);
   border-radius: 18px;
 }
 
-.dc-inventory-table__head,
-.dc-inventory-row {
+.cd-inventory-table__head,
+.cd-inventory-row {
   display: grid;
   grid-template-columns:
     minmax(280px, 1.55fr)
@@ -4250,31 +4250,31 @@
   gap: 18px;
 }
 
-.dc-inventory-table__head {
+.cd-inventory-table__head {
   min-height: 52px;
   padding: 0 20px;
   background-color: rgba(240, 244, 248, 0.58);
   border-bottom: 1px solid var(--color-borde);
 }
 
-.dc-inventory-table__head span {
+.cd-inventory-table__head span {
   color: var(--color-texto-claro);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
-.dc-inventory-row {
+.cd-inventory-row {
   min-height: 76px;
   padding: 12px 20px;
   background-color: rgba(255, 255, 255, 0.78);
 }
 
-.dc-inventory-row + .dc-inventory-row {
+.cd-inventory-row + .cd-inventory-row {
   border-top: 1px solid var(--color-borde);
 }
 
-.dc-inventory-product strong {
+.cd-inventory-product strong {
   display: block;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -4282,7 +4282,7 @@
   font-weight: 900;
 }
 
-.dc-inventory-product small {
+.cd-inventory-product small {
   display: block;
   margin-top: 3px;
   color: var(--color-texto-claro);
@@ -4290,7 +4290,7 @@
   font-weight: 800;
 }
 
-.dc-inventory-number small {
+.cd-inventory-number small {
   display: block;
   color: var(--color-texto-claro);
   font-size: 11px;
@@ -4298,7 +4298,7 @@
   text-transform: uppercase;
 }
 
-.dc-inventory-number strong {
+.cd-inventory-number strong {
   display: block;
   margin-top: 4px;
   color: var(--color-pizarra-dark);
@@ -4307,11 +4307,11 @@
   font-weight: 900;
 }
 
-.dc-inventory-number--available strong {
+.cd-inventory-number--available strong {
   color: #137a4b;
 }
 
-.dc-inventory-status {
+.cd-inventory-status {
   min-height: 34px;
   padding: 0 14px;
 
@@ -4329,71 +4329,71 @@
   white-space: nowrap;
 }
 
-.dc-inventory-status--low-stock {
+.cd-inventory-status--low-stock {
   background-color: rgba(242, 183, 5, 0.18);
   color: #946600;
 }
 
-.dc-inventory-status--sold-out {
+.cd-inventory-status--sold-out {
   background-color: rgba(231, 111, 81, 0.14);
   color: #a83b24;
 }
 
-.dc-inventory-row--low-stock {
+.cd-inventory-row--low-stock {
   background-color: rgba(242, 183, 5, 0.05);
 }
 
-.dc-inventory-row--sold-out {
+.cd-inventory-row--sold-out {
   background-color: rgba(231, 111, 81, 0.05);
 }
 
-.dc-inventory-pagination {
+.cd-inventory-pagination {
   margin-top: 16px;
 }
 
 /* Responsive */
 @media (max-width: 1180px) {
-  .daily-close__section[aria-labelledby="daily-soldout-title"],
-  .daily-close__section[aria-labelledby="daily-products-title"] {
+  .cierre-diario__section[aria-labelledby="daily-soldout-title"],
+  .cierre-diario__section[aria-labelledby="daily-products-title"] {
     grid-column: 1 / -1;
   }
 
-  .dc-operational-layout {
+  .cd-operational-layout {
     grid-template-columns: 1fr;
   }
 
-  .dc-stock-movements__grid {
+  .cd-stock-movements__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .dc-inventory-table__head {
+  .cd-inventory-table__head {
     display: none;
   }
 
-  .dc-inventory-row {
+  .cd-inventory-row {
     grid-template-columns: 1fr;
     gap: 14px;
     align-items: stretch;
   }
 
-  .dc-inventory-status {
+  .cd-inventory-status {
     justify-self: start;
   }
 }
 
 @media (max-width: 760px) {
-  .dc-stock-movements,
-  .dc-order-states,
-  .dc-inventory-panel {
+  .cd-stock-movements,
+  .cd-order-states,
+  .cd-inventory-panel {
     padding: 20px;
   }
 
-  .dc-stock-movements__grid,
-  .dc-order-states__grid {
+  .cd-stock-movements__grid,
+  .cd-order-states__grid {
     grid-template-columns: 1fr;
   }
 
-  .dc-stock-movement {
+  .cd-stock-movement {
     min-height: 142px;
   }
 }
@@ -4402,7 +4402,7 @@
    Fix badges de estado en Inventario al cierre
    ========================================================= */
 
-.dc-inventory-status {
+.cd-inventory-status {
   width: fit-content;
   min-width: 132px;
   min-height: 36px;
@@ -4423,7 +4423,7 @@
   white-space: nowrap;
 }
 
-.dc-inventory-status i {
+.cd-inventory-status i {
   width: 20px;
   height: 20px;
 
@@ -4441,23 +4441,23 @@
 }
 
 /* Bajo stock */
-.dc-inventory-status--low-stock {
+.cd-inventory-status--low-stock {
   background-color: rgba(242, 183, 5, 0.16);
   color: #946600;
 }
 
-.dc-inventory-status--low-stock i {
+.cd-inventory-status--low-stock i {
   background-color: rgba(242, 183, 5, 0.24);
   color: #946600;
 }
 
 /* Sin stock / agotado */
-.dc-inventory-status--sold-out {
+.cd-inventory-status--sold-out {
   background-color: rgba(231, 111, 81, 0.14);
   color: #a83b24;
 }
 
-.dc-inventory-status--sold-out i {
+.cd-inventory-status--sold-out i {
   background-color: rgba(231, 111, 81, 0.22);
   color: #a83b24;
 }
@@ -4466,13 +4466,13 @@
    Fix alineación columna Estado - Inventario al cierre
    ========================================================= */
 
-.dc-inventory-table__head span:last-child {
+.cd-inventory-table__head span:last-child {
   width: 100%;
   text-align: center;
   justify-self: center;
 }
 
-.dc-inventory-row .dc-inventory-status {
+.cd-inventory-row .cd-inventory-status {
   justify-self: center !important;
   align-self: center !important;
 
@@ -4487,7 +4487,7 @@
   padding: 0 12px !important;
 }
 
-.dc-inventory-status i {
+.cd-inventory-status i {
   width: 18px !important;
   height: 18px !important;
   flex: 0 0 18px !important;
@@ -4500,8 +4500,8 @@
 }
 
 /* Que la última columna no quede excesivamente grande */
-.dc-inventory-table__head,
-.dc-inventory-row {
+.cd-inventory-table__head,
+.cd-inventory-row {
   grid-template-columns:
     minmax(280px, 1.55fr)
     minmax(90px, 0.55fr)
@@ -4515,7 +4515,7 @@
    Productos agotados + Productos vendidos
    ========================================================= */
 
-.dc-products-layout {
+.cd-products-layout {
   order: 8;
   grid-column: 1 / -1;
 
@@ -4526,14 +4526,14 @@
 }
 
 /* Evitar que reglas anteriores rompan el layout interno */
-.dc-products-layout .daily-close__section[aria-labelledby="daily-soldout-title"],
-.dc-products-layout .daily-close__section[aria-labelledby="daily-products-title"] {
+.cd-products-layout .cierre-diario__section[aria-labelledby="daily-soldout-title"],
+.cd-products-layout .cierre-diario__section[aria-labelledby="daily-products-title"] {
   grid-column: auto !important;
   order: initial !important;
 }
 
-.dc-soldout-panel,
-.dc-sold-products-panel {
+.cd-soldout-panel,
+.cd-sold-products-panel {
   min-height: 520px;
   padding: 28px;
   display: flex;
@@ -4541,21 +4541,21 @@
   gap: 24px;
 }
 
-.dc-products-header {
+.cd-products-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px;
 }
 
-.dc-products-title {
+.cd-products-title {
   display: flex;
   align-items: center;
   gap: 18px;
   min-width: 0;
 }
 
-.dc-products-icon {
+.cd-products-icon {
   width: 64px;
   height: 64px;
 
@@ -4571,17 +4571,17 @@
   flex: 0 0 64px;
 }
 
-.dc-products-icon i {
+.cd-products-icon i {
   font-size: 26px !important;
   line-height: 1 !important;
 }
 
-.dc-products-icon--danger {
+.cd-products-icon--danger {
   background-color: rgba(231, 111, 81, 0.13);
   color: var(--color-melocoton);
 }
 
-.dc-products-title h2 {
+.cd-products-title h2 {
   margin: 0;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -4590,15 +4590,15 @@
   line-height: 1.08;
 }
 
-.dc-products-title p {
+.cd-products-title p {
   margin: 6px 0 0;
   color: var(--color-texto-claro);
   font-size: 16px;
   font-weight: 800;
 }
 
-.dc-soldout-alert,
-.dc-products-chip {
+.cd-soldout-alert,
+.cd-products-chip {
   min-height: 38px;
   padding: 0 14px;
 
@@ -4613,12 +4613,12 @@
   white-space: nowrap;
 }
 
-.dc-soldout-alert {
+.cd-soldout-alert {
   background-color: rgba(231, 111, 81, 0.12);
   color: #a83b24;
 }
 
-.dc-products-chip {
+.cd-products-chip {
   background-color: rgba(74, 111, 165, 0.08);
   color: var(--color-pizarra);
 }
@@ -4627,11 +4627,11 @@
    Productos agotados
 ========================= */
 
-.dc-soldout-panel {
+.cd-soldout-panel {
   border-color: rgba(231, 111, 81, 0.22);
 }
 
-.dc-soldout-summary {
+.cd-soldout-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   overflow: hidden;
@@ -4642,7 +4642,7 @@
     linear-gradient(135deg, rgba(231, 111, 81, 0.08), rgba(255, 255, 255, 0.86));
 }
 
-.dc-soldout-summary article {
+.cd-soldout-summary article {
   min-height: 122px;
   padding: 22px;
 
@@ -4652,17 +4652,17 @@
   gap: 10px;
 }
 
-.dc-soldout-summary article + article {
+.cd-soldout-summary article + article {
   border-left: 1px solid rgba(231, 111, 81, 0.18);
 }
 
-.dc-soldout-summary span {
+.cd-soldout-summary span {
   color: #a83b24;
   font-size: 15px;
   font-weight: 900;
 }
 
-.dc-soldout-summary strong {
+.cd-soldout-summary strong {
   color: #a83b24;
   font-family: var(--font-display);
   font-size: 36px;
@@ -4670,21 +4670,21 @@
   line-height: 1;
 }
 
-.dc-soldout-list-wrap {
+.cd-soldout-list-wrap {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.dc-soldout-list-wrap h3 {
+.cd-soldout-list-wrap h3 {
   margin: 0;
   color: var(--color-texto-claro);
   font-size: 17px;
   font-weight: 900;
 }
 
-.dc-soldout-list {
+.cd-soldout-list {
   flex: 1;
   overflow: hidden;
   border: 1px solid var(--color-borde);
@@ -4692,7 +4692,7 @@
   background-color: rgba(255, 255, 255, 0.72);
 }
 
-.dc-soldout-item {
+.cd-soldout-item {
   min-height: 70px;
   padding: 14px 16px;
 
@@ -4702,11 +4702,11 @@
   gap: 14px;
 }
 
-.dc-soldout-item + .dc-soldout-item {
+.cd-soldout-item + .cd-soldout-item {
   border-top: 1px solid var(--color-borde);
 }
 
-.dc-soldout-rank {
+.cd-soldout-rank {
   width: 38px;
   height: 38px;
 
@@ -4723,7 +4723,7 @@
   font-weight: 900;
 }
 
-.dc-soldout-item strong {
+.cd-soldout-item strong {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4734,7 +4734,7 @@
   font-weight: 900;
 }
 
-.dc-soldout-badge {
+.cd-soldout-badge {
   min-height: 32px;
   padding: 0 14px;
 
@@ -4751,7 +4751,7 @@
   white-space: nowrap;
 }
 
-.dc-soldout-empty {
+.cd-soldout-empty {
   min-height: 160px;
   padding: 24px;
 
@@ -4765,7 +4765,7 @@
   background-color: rgba(248, 251, 255, 0.62);
 }
 
-.dc-soldout-empty i {
+.cd-soldout-empty i {
   width: 52px;
   height: 52px;
 
@@ -4780,7 +4780,7 @@
   font-size: 22px;
 }
 
-.dc-soldout-empty strong {
+.cd-soldout-empty strong {
   display: block;
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
@@ -4788,7 +4788,7 @@
   font-weight: 900;
 }
 
-.dc-soldout-empty span {
+.cd-soldout-empty span {
   display: block;
   margin-top: 3px;
   color: var(--color-texto-claro);
@@ -4796,7 +4796,7 @@
   font-weight: 800;
 }
 
-.dc-soldout-action {
+.cd-soldout-action {
   align-self: center;
   min-height: 48px;
   padding: 0 22px;
@@ -4820,13 +4820,13 @@
    Productos vendidos
 ========================= */
 
-.dc-sold-products-list {
+.cd-sold-products-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.dc-sold-product-item {
+.cd-sold-product-item {
   min-height: 82px;
   padding: 14px 16px;
 
@@ -4840,12 +4840,12 @@
   background-color: rgba(248, 251, 255, 0.72);
 }
 
-.dc-sold-product-item--first {
+.cd-sold-product-item--first {
   background:
     linear-gradient(90deg, rgba(74, 111, 165, 0.08), rgba(255, 255, 255, 0.9));
 }
 
-.dc-sold-product-rank {
+.cd-sold-product-rank {
   width: 40px;
   height: 40px;
 
@@ -4862,16 +4862,16 @@
   font-weight: 900;
 }
 
-.dc-sold-product-item--first .dc-sold-product-rank {
+.cd-sold-product-item--first .cd-sold-product-rank {
   background-color: var(--color-pizarra);
   color: #fff;
 }
 
-.dc-sold-product-info {
+.cd-sold-product-info {
   min-width: 0;
 }
 
-.dc-sold-product-info strong {
+.cd-sold-product-info strong {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4883,7 +4883,7 @@
   font-weight: 900;
 }
 
-.dc-sold-product-info small {
+.cd-sold-product-info small {
   display: block;
   margin-top: 3px;
 
@@ -4892,7 +4892,7 @@
   font-weight: 800;
 }
 
-.dc-sold-product-amount {
+.cd-sold-product-amount {
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
   font-size: 21px;
@@ -4900,7 +4900,7 @@
   white-space: nowrap;
 }
 
-.dc-sold-products-footer {
+.cd-sold-products-footer {
   margin-top: auto;
   padding-top: 20px;
 
@@ -4910,21 +4910,21 @@
   gap: 14px;
 }
 
-.dc-sold-products-footer > span {
+.cd-sold-products-footer > span {
   color: var(--color-pizarra);
   font-size: 16px;
   font-weight: 900;
 }
 
-.dc-sold-products-pages {
+.cd-sold-products-pages {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.dc-sold-products-pages button,
-.dc-sold-products-pages strong,
-.dc-sold-products-pages span {
+.cd-sold-products-pages button,
+.cd-sold-products-pages strong,
+.cd-sold-products-pages span {
   min-width: 40px;
   height: 40px;
 
@@ -4942,62 +4942,62 @@
   font-weight: 900;
 }
 
-.dc-sold-products-pages strong {
+.cd-sold-products-pages strong {
   background-color: rgba(74, 111, 165, 0.12);
 }
 
-.dc-sold-products-pages button {
+.cd-sold-products-pages button {
   cursor: pointer;
 }
 
-.dc-sold-products-pages button:disabled {
+.cd-sold-products-pages button:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
 /* Responsive */
 @media (max-width: 1180px) {
-  .dc-products-layout {
+  .cd-products-layout {
     grid-template-columns: 1fr;
   }
 
-  .dc-soldout-panel,
-  .dc-sold-products-panel {
+  .cd-soldout-panel,
+  .cd-sold-products-panel {
     min-height: auto;
   }
 }
 
 @media (max-width: 760px) {
-  .dc-soldout-panel,
-  .dc-sold-products-panel {
+  .cd-soldout-panel,
+  .cd-sold-products-panel {
     padding: 20px;
   }
 
-  .dc-products-header {
+  .cd-products-header {
     flex-direction: column;
   }
 
-  .dc-soldout-summary {
+  .cd-soldout-summary {
     grid-template-columns: 1fr;
   }
 
-  .dc-soldout-summary article + article {
+  .cd-soldout-summary article + article {
     border-left: 0;
     border-top: 1px solid rgba(231, 111, 81, 0.18);
   }
 
-  .dc-sold-product-item,
-  .dc-soldout-item {
+  .cd-sold-product-item,
+  .cd-soldout-item {
     grid-template-columns: 40px minmax(0, 1fr);
   }
 
-  .dc-sold-product-amount,
-  .dc-soldout-badge {
+  .cd-sold-product-amount,
+  .cd-soldout-badge {
     grid-column: 2 / -1;
     justify-self: start;
   }
 
-  .dc-sold-products-footer {
+  .cd-sold-products-footer {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -5009,7 +5009,7 @@
    ========================================================= */
 
 /* Layout general */
-.dc-products-layout {
+.cd-products-layout {
   order: 8 !important;
   grid-column: 1 / -1 !important;
 
@@ -5019,23 +5019,23 @@
   align-items: stretch !important;
 }
 
-/* Evita que reglas viejas de daily-close pisen estas cards */
-.dc-products-layout .daily-close__section {
+/* Evita que reglas viejas de cierre-diario pisen estas cards */
+.cd-products-layout .cierre-diario__section {
   order: initial !important;
   grid-column: auto !important;
 }
 
 /* Mata cuadraditos / íconos generados por CSS viejo */
-.dc-products-layout h2::before,
-.dc-products-layout .dc-products-title h2::before,
-.dc-products-layout .daily-close__section-header h2::before {
+.cd-products-layout h2::before,
+.cd-products-layout .cd-products-title h2::before,
+.cd-products-layout .cierre-diario__section-header h2::before {
   content: none !important;
   display: none !important;
 }
 
 /* Cards */
-.dc-soldout-panel,
-.dc-sold-products-panel {
+.cd-soldout-panel,
+.cd-sold-products-panel {
   min-height: 520px !important;
   padding: 28px !important;
 
@@ -5048,7 +5048,7 @@
   box-shadow: var(--shadow-card) !important;
 }
 
-.dc-soldout-panel {
+.cd-soldout-panel {
   border-color: rgba(231, 111, 81, 0.22) !important;
   background:
     linear-gradient(180deg, rgba(231, 111, 81, 0.035), rgba(255, 255, 255, 0.96)),
@@ -5056,21 +5056,21 @@
 }
 
 /* Header de ambas cards */
-.dc-products-header {
+.cd-products-header {
   display: flex !important;
   align-items: flex-start !important;
   justify-content: space-between !important;
   gap: 18px !important;
 }
 
-.dc-products-title {
+.cd-products-title {
   display: flex !important;
   align-items: center !important;
   gap: 18px !important;
   min-width: 0 !important;
 }
 
-.dc-products-icon {
+.cd-products-icon {
   width: 64px !important;
   height: 64px !important;
   flex: 0 0 64px !important;
@@ -5086,7 +5086,7 @@
   font-size: 0 !important;
 }
 
-.dc-products-icon i {
+.cd-products-icon i {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -5096,12 +5096,12 @@
   color: inherit !important;
 }
 
-.dc-products-icon--danger {
+.cd-products-icon--danger {
   background-color: rgba(231, 111, 81, 0.14) !important;
   color: var(--color-melocoton) !important;
 }
 
-.dc-products-title h2 {
+.cd-products-title h2 {
   margin: 0 !important;
   color: var(--color-pizarra-dark) !important;
   font-family: var(--font-display) !important;
@@ -5110,11 +5110,11 @@
   line-height: 1.08 !important;
 }
 
-.dc-soldout-panel .dc-products-title h2 {
+.cd-soldout-panel .cd-products-title h2 {
   color: #8a321f !important;
 }
 
-.dc-products-title p {
+.cd-products-title p {
   margin: 6px 0 0 !important;
   color: var(--color-texto-claro) !important;
   font-size: 15px !important;
@@ -5123,8 +5123,8 @@
 }
 
 /* Chips superiores */
-.dc-soldout-alert,
-.dc-products-chip {
+.cd-soldout-alert,
+.cd-products-chip {
   min-height: 38px !important;
   padding: 0 14px !important;
 
@@ -5139,18 +5139,18 @@
   white-space: nowrap !important;
 }
 
-.dc-soldout-alert {
+.cd-soldout-alert {
   background-color: rgba(231, 111, 81, 0.12) !important;
   color: #a83b24 !important;
 }
 
-.dc-products-chip {
+.cd-products-chip {
   background-color: rgba(74, 111, 165, 0.08) !important;
   color: var(--color-pizarra) !important;
 }
 
-.dc-soldout-alert i,
-.dc-products-chip i {
+.cd-soldout-alert i,
+.cd-products-chip i {
   font-size: 14px !important;
   line-height: 1 !important;
 }
@@ -5159,7 +5159,7 @@
    Productos agotados
 ========================= */
 
-.dc-soldout-summary {
+.cd-soldout-summary {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   overflow: hidden !important;
@@ -5170,7 +5170,7 @@
     linear-gradient(135deg, rgba(231, 111, 81, 0.08), rgba(255, 255, 255, 0.9)) !important;
 }
 
-.dc-soldout-summary article {
+.cd-soldout-summary article {
   min-height: 112px !important;
   padding: 20px 22px !important;
 
@@ -5180,17 +5180,17 @@
   gap: 10px !important;
 }
 
-.dc-soldout-summary article + article {
+.cd-soldout-summary article + article {
   border-left: 1px solid rgba(231, 111, 81, 0.18) !important;
 }
 
-.dc-soldout-summary span {
+.cd-soldout-summary span {
   color: #a83b24 !important;
   font-size: 14px !important;
   font-weight: 900 !important;
 }
 
-.dc-soldout-summary strong {
+.cd-soldout-summary strong {
   color: #a83b24 !important;
   font-family: var(--font-display) !important;
   font-size: 34px !important;
@@ -5198,21 +5198,21 @@
   line-height: 1 !important;
 }
 
-.dc-soldout-list-wrap {
+.cd-soldout-list-wrap {
   flex: 1 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 12px !important;
 }
 
-.dc-soldout-list-wrap h3 {
+.cd-soldout-list-wrap h3 {
   margin: 0 !important;
   color: var(--color-texto-claro) !important;
   font-size: 16px !important;
   font-weight: 900 !important;
 }
 
-.dc-soldout-list {
+.cd-soldout-list {
   flex: 1 !important;
   overflow: hidden !important;
 
@@ -5221,7 +5221,7 @@
   background-color: rgba(255, 255, 255, 0.72) !important;
 }
 
-.dc-soldout-item {
+.cd-soldout-item {
   min-height: 64px !important;
   padding: 13px 16px !important;
 
@@ -5231,11 +5231,11 @@
   gap: 14px !important;
 }
 
-.dc-soldout-item + .dc-soldout-item {
+.cd-soldout-item + .cd-soldout-item {
   border-top: 1px solid var(--color-borde) !important;
 }
 
-.dc-soldout-rank {
+.cd-soldout-rank {
   width: 36px !important;
   height: 36px !important;
 
@@ -5252,7 +5252,7 @@
   font-weight: 900 !important;
 }
 
-.dc-soldout-item strong {
+.cd-soldout-item strong {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -5263,7 +5263,7 @@
   font-weight: 900 !important;
 }
 
-.dc-soldout-badge {
+.cd-soldout-badge {
   min-height: 30px !important;
   padding: 0 13px !important;
 
@@ -5280,7 +5280,7 @@
   white-space: nowrap !important;
 }
 
-.dc-soldout-empty {
+.cd-soldout-empty {
   min-height: 160px !important;
   padding: 24px !important;
 
@@ -5294,7 +5294,7 @@
   background-color: rgba(248, 251, 255, 0.62) !important;
 }
 
-.dc-soldout-empty i {
+.cd-soldout-empty i {
   width: 48px !important;
   height: 48px !important;
 
@@ -5309,7 +5309,7 @@
   font-size: 20px !important;
 }
 
-.dc-soldout-empty strong {
+.cd-soldout-empty strong {
   display: block !important;
   color: var(--color-pizarra-dark) !important;
   font-family: var(--font-display) !important;
@@ -5317,7 +5317,7 @@
   font-weight: 900 !important;
 }
 
-.dc-soldout-empty span {
+.cd-soldout-empty span {
   display: block !important;
   margin-top: 3px !important;
   color: var(--color-texto-claro) !important;
@@ -5325,7 +5325,7 @@
   font-weight: 800 !important;
 }
 
-.dc-soldout-action {
+.cd-soldout-action {
   align-self: center !important;
   min-height: 46px !important;
   padding: 0 22px !important;
@@ -5349,13 +5349,13 @@
    Productos vendidos
 ========================= */
 
-.dc-sold-products-list {
+.cd-sold-products-list {
   display: flex !important;
   flex-direction: column !important;
   gap: 10px !important;
 }
 
-.dc-sold-product-item {
+.cd-sold-product-item {
   min-height: 76px !important;
   padding: 13px 16px !important;
 
@@ -5369,13 +5369,13 @@
   background-color: rgba(248, 251, 255, 0.72) !important;
 }
 
-.dc-sold-product-item--first,
-.dc-sold-product-item:first-child {
+.cd-sold-product-item--first,
+.cd-sold-product-item:first-child {
   background:
     linear-gradient(90deg, rgba(74, 111, 165, 0.08), rgba(255, 255, 255, 0.92)) !important;
 }
 
-.dc-sold-product-rank {
+.cd-sold-product-rank {
   width: 38px !important;
   height: 38px !important;
 
@@ -5392,17 +5392,17 @@
   font-weight: 900 !important;
 }
 
-.dc-sold-product-item:first-child .dc-sold-product-rank,
-.dc-sold-product-item--first .dc-sold-product-rank {
+.cd-sold-product-item:first-child .cd-sold-product-rank,
+.cd-sold-product-item--first .cd-sold-product-rank {
   background-color: var(--color-pizarra) !important;
   color: #ffffff !important;
 }
 
-.dc-sold-product-info {
+.cd-sold-product-info {
   min-width: 0 !important;
 }
 
-.dc-sold-product-info strong {
+.cd-sold-product-info strong {
   display: block !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -5414,7 +5414,7 @@
   font-weight: 900 !important;
 }
 
-.dc-sold-product-info small {
+.cd-sold-product-info small {
   display: block !important;
   margin-top: 3px !important;
 
@@ -5423,7 +5423,7 @@
   font-weight: 800 !important;
 }
 
-.dc-sold-product-amount {
+.cd-sold-product-amount {
   color: var(--color-pizarra-dark) !important;
   font-family: var(--font-display) !important;
   font-size: 20px !important;
@@ -5431,7 +5431,7 @@
   white-space: nowrap !important;
 }
 
-.dc-sold-products-footer {
+.cd-sold-products-footer {
   margin-top: auto !important;
   padding-top: 16px !important;
 
@@ -5441,21 +5441,21 @@
   gap: 14px !important;
 }
 
-.dc-sold-products-footer > span {
+.cd-sold-products-footer > span {
   color: var(--color-pizarra) !important;
   font-size: 14px !important;
   font-weight: 900 !important;
 }
 
-.dc-sold-products-pages {
+.cd-sold-products-pages {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
 }
 
-.dc-sold-products-pages button,
-.dc-sold-products-pages strong,
-.dc-sold-products-pages span {
+.cd-sold-products-pages button,
+.cd-sold-products-pages strong,
+.cd-sold-products-pages span {
   min-width: 38px !important;
   height: 38px !important;
 
@@ -5473,53 +5473,53 @@
   font-weight: 900 !important;
 }
 
-.dc-sold-products-pages strong {
+.cd-sold-products-pages strong {
   background-color: rgba(74, 111, 165, 0.12) !important;
 }
 
 /* Responsive */
 @media (max-width: 1180px) {
-  .dc-products-layout {
+  .cd-products-layout {
     grid-template-columns: 1fr !important;
   }
 
-  .dc-soldout-panel,
-  .dc-sold-products-panel {
+  .cd-soldout-panel,
+  .cd-sold-products-panel {
     min-height: auto !important;
   }
 }
 
 @media (max-width: 760px) {
-  .dc-soldout-panel,
-  .dc-sold-products-panel {
+  .cd-soldout-panel,
+  .cd-sold-products-panel {
     padding: 20px !important;
   }
 
-  .dc-products-header {
+  .cd-products-header {
     flex-direction: column !important;
   }
 
-  .dc-soldout-summary {
+  .cd-soldout-summary {
     grid-template-columns: 1fr !important;
   }
 
-  .dc-soldout-summary article + article {
+  .cd-soldout-summary article + article {
     border-left: 0 !important;
     border-top: 1px solid rgba(231, 111, 81, 0.18) !important;
   }
 
-  .dc-sold-product-item,
-  .dc-soldout-item {
+  .cd-sold-product-item,
+  .cd-soldout-item {
     grid-template-columns: 38px minmax(0, 1fr) !important;
   }
 
-  .dc-sold-product-amount,
-  .dc-soldout-badge {
+  .cd-sold-product-amount,
+  .cd-soldout-badge {
     grid-column: 2 / -1 !important;
     justify-self: start !important;
   }
 
-  .dc-sold-products-footer {
+  .cd-sold-products-footer {
     align-items: flex-start !important;
     flex-direction: column !important;
   }
@@ -5527,30 +5527,30 @@
 
 /* Final responsive overrides for rules declared with !important above. */
 @media (max-width: 1180px) {
-  .dc-inventory-table__head {
+  .cd-inventory-table__head {
     display: none !important;
   }
 
-  .dc-inventory-row {
+  .cd-inventory-row {
     grid-template-columns: 1fr !important;
     gap: 14px !important;
     align-items: stretch !important;
   }
 
-  .dc-inventory-row .dc-inventory-status {
+  .cd-inventory-row .cd-inventory-status {
     justify-self: start !important;
   }
 }
 
 @media (max-width: 760px) {
-  .dc-inventory-count,
-  .dc-products-chip,
-  .dc-soldout-alert {
+  .cd-inventory-count,
+  .cd-products-chip,
+  .cd-soldout-alert {
     align-self: flex-start !important;
   }
 
-  .dc-inventory-number,
-  .dc-inventory-status {
+  .cd-inventory-number,
+  .cd-inventory-status {
     width: 100% !important;
   }
 }

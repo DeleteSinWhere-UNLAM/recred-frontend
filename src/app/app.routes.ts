@@ -147,8 +147,8 @@ export const routes: Routes = [
       {
         path: 'cierre-diario',
         loadComponent: () =>
-          import('./features/daily-close/daily-close.page').then(
-            (m) => m.DailyClosePage,
+          import('./features/cierre-diario/cierre-diario.page').then(
+            (m) => m.CierreDiarioPage,
           ),
       },
       {

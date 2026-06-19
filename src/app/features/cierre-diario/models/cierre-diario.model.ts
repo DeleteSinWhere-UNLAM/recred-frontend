@@ -1,12 +1,12 @@
-export interface DailyCloseResult {
+export interface ResultadoCierreDiario {
   alreadyClosed: boolean;
   expiredPurchases: number;
   releasedReservations: number;
   refundedCredits: number;
-  report: DailyReport;
+  report: ReporteDiario;
 }
 
-export interface DailyCloseStatus {
+export interface EstadoCierreDiario {
   buffetId: string;
   date: string;
   closed: boolean;
@@ -15,7 +15,7 @@ export interface DailyCloseStatus {
   refundedCredits: number;
 }
 
-export interface DailyCloseRecord {
+export interface RegistroCierreDiario {
   id: string;
   buffetId: string;
   date: string;
@@ -24,12 +24,12 @@ export interface DailyCloseRecord {
   refundedCredits: number;
 }
 
-export interface DailyCloseHistoryFilters {
+export interface FiltrosHistorialCierreDiario {
   from?: string;
   to?: string;
 }
 
-export interface DailyReport {
+export interface ReporteDiario {
   buffetId: string;
   date: string;
   totalOrders: number;
@@ -43,21 +43,21 @@ export interface DailyReport {
   deliveredTotal: number;
   refundedCredits: number;
   releasedReservations: number;
-  products: DailyProductSale[];
-  inventory: DailyInventorySnapshot[];
-  soldOutProducts: DailySoldOutProduct[];
-  salesByPaymentMethod: DailySalesByPaymentMethod[];
-  stockMovements: DailyStockMovement[];
+  products: VentaProductoDiaria[];
+  inventory: SnapshotInventarioDiario[];
+  soldOutProducts: ProductoAgotadoDiario[];
+  salesByPaymentMethod: VentasPorMedioPagoDiarias[];
+  stockMovements: MovimientoStockDiario[];
 }
 
-export interface DailyProductSale {
+export interface VentaProductoDiaria {
   productId: string;
   productName: string;
   quantity: number;
   total: number;
 }
 
-export interface DailyInventorySnapshot {
+export interface SnapshotInventarioDiario {
   productId: string;
   productName: string;
   stockActual: number | null;
@@ -68,19 +68,19 @@ export interface DailyInventorySnapshot {
   tipoManejoInventario: string;
 }
 
-export interface DailySoldOutProduct {
+export interface ProductoAgotadoDiario {
   productId?: string;
   productName?: string;
   nombre?: string;
 }
 
-export interface DailySalesByPaymentMethod {
+export interface VentasPorMedioPagoDiarias {
   paymentMethod: string;
   orders: number;
   total: number;
 }
 
-export interface DailyStockMovement {
+export interface MovimientoStockDiario {
   movementType: string;
   quantity: number;
 }

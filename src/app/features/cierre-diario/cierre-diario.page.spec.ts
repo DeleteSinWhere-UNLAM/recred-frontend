@@ -5,21 +5,21 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { DailyReport } from './models/daily-close.model';
-import { DailyClosePage } from './daily-close.page';
-import { DailyCloseService } from './services/daily-close.service';
+import { ReporteDiario } from './models/cierre-diario.model';
+import { CierreDiarioPage } from './cierre-diario.page';
+import { CierreDiarioService } from './services/cierre-diario.service';
 import { InventoryRealtimeService } from '../updated-inventory/services/inventory-realtime.service';
 
-describe('DailyClosePage', () => {
-  let component: DailyClosePage;
-  let fixture: ComponentFixture<DailyClosePage>;
-  let dailyCloseService: jasmine.SpyObj<DailyCloseService>;
+describe('CierreDiarioPage', () => {
+  let component: CierreDiarioPage;
+  let fixture: ComponentFixture<CierreDiarioPage>;
+  let cierreDiarioService: jasmine.SpyObj<CierreDiarioService>;
   let inventoryRealtimeService: jasmine.SpyObj<InventoryRealtimeService>;
   let perfilService: jasmine.SpyObj<PerfilService>;
   let toastService: jasmine.SpyObj<ToastService>;
 
   const buffetId = 'buffet-123';
-  const report: DailyReport = {
+  const report: ReporteDiario = {
     buffetId,
     date: '2026-06-09',
     totalOrders: 25,
@@ -73,16 +73,16 @@ describe('DailyClosePage', () => {
   };
 
   beforeEach(async () => {
-    dailyCloseService = jasmine.createSpyObj<DailyCloseService>(
-      'DailyCloseService',
+    cierreDiarioService = jasmine.createSpyObj<CierreDiarioService>(
+      'CierreDiarioService',
       [
-        'getDailyReport',
+        'getReporteDiario',
         'getDailyCloseStatus',
         'getDailyCloses',
         'closeDaily',
         'refreshAfterClose',
-        'getDailyReportCsvUrl',
-        'downloadDailyReportCsv',
+        'getReporteDiarioCsvUrl',
+        'downloadReporteDiarioCsv',
       ],
     );
     inventoryRealtimeService = jasmine.createSpyObj<InventoryRealtimeService>(
@@ -94,9 +94,9 @@ describe('DailyClosePage', () => {
     ]);
     toastService = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
 
-    dailyCloseService.getDailyReport.and.returnValue(of(report));
+    cierreDiarioService.getReporteDiario.and.returnValue(of(report));
     inventoryRealtimeService.connect.and.returnValue(new AbortController());
-    dailyCloseService.getDailyCloseStatus.and.returnValue(
+    cierreDiarioService.getDailyCloseStatus.and.returnValue(
       of({
         buffetId,
         date: report.date,
@@ -106,7 +106,7 @@ describe('DailyClosePage', () => {
         refundedCredits: 0,
       }),
     );
-    dailyCloseService.getDailyCloses.and.returnValue(
+    cierreDiarioService.getDailyCloses.and.returnValue(
       of([
         {
           id: 'close-1',
@@ -118,7 +118,7 @@ describe('DailyClosePage', () => {
         },
       ]),
     );
-    dailyCloseService.closeDaily.and.returnValue(
+    cierreDiarioService.closeDaily.and.returnValue(
       of({
         alreadyClosed: false,
         expiredPurchases: 3,
@@ -127,17 +127,17 @@ describe('DailyClosePage', () => {
         report,
       }),
     );
-    dailyCloseService.refreshAfterClose.and.returnValue(of(report));
-    dailyCloseService.getDailyReportCsvUrl.and.returnValue('/daily.csv');
-    dailyCloseService.downloadDailyReportCsv.and.returnValue(
+    cierreDiarioService.refreshAfterClose.and.returnValue(of(report));
+    cierreDiarioService.getReporteDiarioCsvUrl.and.returnValue('/daily.csv');
+    cierreDiarioService.downloadReporteDiarioCsv.and.returnValue(
       of(new Blob(['metric,value'], { type: 'text/csv' })),
     );
     perfilService.obtenerBuffetId.and.returnValue(buffetId);
 
     await TestBed.configureTestingModule({
-      imports: [DailyClosePage],
+      imports: [CierreDiarioPage],
       providers: [
-        { provide: DailyCloseService, useValue: dailyCloseService },
+        { provide: CierreDiarioService, useValue: cierreDiarioService },
         { provide: InventoryRealtimeService, useValue: inventoryRealtimeService },
         { provide: PerfilService, useValue: perfilService },
         { provide: ToastService, useValue: toastService },
@@ -147,7 +147,7 @@ describe('DailyClosePage', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DailyClosePage);
+    fixture = TestBed.createComponent(CierreDiarioPage);
     component = fixture.componentInstance;
   });
 
@@ -155,23 +155,23 @@ describe('DailyClosePage', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(dailyCloseService.getDailyReport).toHaveBeenCalledWith(
+    expect(cierreDiarioService.getReporteDiario).toHaveBeenCalledWith(
       buffetId,
       jasmine.any(String),
     );
-    expect(dailyCloseService.getDailyCloseStatus).toHaveBeenCalledWith(
+    expect(cierreDiarioService.getDailyCloseStatus).toHaveBeenCalledWith(
       buffetId,
       jasmine.any(String),
     );
-    expect(dailyCloseService.getDailyCloses).toHaveBeenCalledWith(buffetId, {
+    expect(cierreDiarioService.getDailyCloses).toHaveBeenCalledWith(buffetId, {
       from: undefined,
       to: undefined,
     });
     expect(fixture.nativeElement.textContent).toContain('Cierre diario');
     expect(fixture.nativeElement.textContent).toContain('Historial de cierres');
-    expect(compiled.querySelector('.daily-close__controls')).toBeNull();
+    expect(compiled.querySelector('.cierre-diario__controls')).toBeNull();
     expect(
-      compiled.querySelector('.daily-close-hero__date input[type="date"]'),
+      compiled.querySelector('.cierre-diario-hero__date input[type="date"]'),
     ).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('Alfajor');
     expect(fixture.nativeElement.textContent).not.toContain('2026-06-09');
@@ -183,14 +183,14 @@ describe('DailyClosePage', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('.dc-inventory-row--low-stock')).toBeTruthy();
-    expect(compiled.querySelector('.dc-inventory-row--sold-out')).toBeTruthy();
-    expect(compiled.querySelector('.dc-inventory-status--low-stock')).toBeTruthy();
-    expect(compiled.querySelector('.dc-inventory-status--sold-out')).toBeTruthy();
+    expect(compiled.querySelector('.cd-inventory-row--low-stock')).toBeTruthy();
+    expect(compiled.querySelector('.cd-inventory-row--sold-out')).toBeTruthy();
+    expect(compiled.querySelector('.cd-inventory-status--low-stock')).toBeTruthy();
+    expect(compiled.querySelector('.cd-inventory-status--sold-out')).toBeTruthy();
   });
 
   it('deberia ordenar el inventario dejando agotados y bajo stock primero', () => {
-    dailyCloseService.getDailyReport.and.returnValue(
+    cierreDiarioService.getReporteDiario.and.returnValue(
       of({
         ...report,
         inventory: [
@@ -230,13 +230,13 @@ describe('DailyClosePage', () => {
 
     const firstInventoryName = (
       fixture.nativeElement as HTMLElement
-    ).querySelector('.dc-inventory-product strong')?.textContent;
+    ).querySelector('.cd-inventory-product strong')?.textContent;
 
     expect(firstInventoryName).toContain('Jugo');
   });
 
   it('deberia ordenar productos vendidos de mayor a menor por importe', () => {
-    dailyCloseService.getDailyReport.and.returnValue(
+    cierreDiarioService.getReporteDiario.and.returnValue(
       of({
         ...report,
         products: [
@@ -296,7 +296,7 @@ describe('DailyClosePage', () => {
 
     const productNames = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll(
-        '.dc-sold-product-info strong',
+        '.cd-sold-product-info strong',
       ),
     ).map((element) => element.textContent?.trim());
 
@@ -311,7 +311,7 @@ describe('DailyClosePage', () => {
       total: (index + 1) * 1000,
     }));
 
-    dailyCloseService.getDailyReport.and.returnValue(
+    cierreDiarioService.getReporteDiario.and.returnValue(
       of({
         ...report,
         products,
@@ -349,7 +349,7 @@ describe('DailyClosePage', () => {
       tipoManejoInventario: 'STOCK_EXACTO',
     }));
 
-    dailyCloseService.getDailyReport.and.returnValue(
+    cierreDiarioService.getReporteDiario.and.returnValue(
       of({
         ...report,
         inventory,
@@ -373,19 +373,19 @@ describe('DailyClosePage', () => {
   it('deberia abrir el historial en modal y filtrar por fecha', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    const callsBeforeOpen = dailyCloseService.getDailyCloses.calls.count();
+    const callsBeforeOpen = cierreDiarioService.getDailyCloses.calls.count();
 
-    compiled.querySelector<HTMLButtonElement>('.daily-close-hero__secondary')?.click();
+    compiled.querySelector<HTMLButtonElement>('.cierre-diario-hero__secondary')?.click();
     fixture.detectChanges();
 
-    expect(dailyCloseService.getDailyCloses.calls.count()).toBe(callsBeforeOpen + 1);
-    expect(compiled.querySelector('.daily-close-modal--history')).toBeTruthy();
+    expect(cierreDiarioService.getDailyCloses.calls.count()).toBe(callsBeforeOpen + 1);
+    expect(compiled.querySelector('.cierre-diario-modal--history')).toBeTruthy();
     expect(compiled.textContent).toContain('Desde');
     expect(compiled.textContent).toContain('Hasta');
 
     const [fromInput, toInput] = Array.from(
       compiled.querySelectorAll<HTMLInputElement>(
-        '.daily-close-modal--history input[type="date"]',
+        '.cierre-diario-modal--history input[type="date"]',
       ),
     );
 
@@ -396,18 +396,18 @@ describe('DailyClosePage', () => {
 
     compiled
       .querySelector<HTMLButtonElement>(
-        '.daily-close-modal--history .daily-close__history-filters button',
+        '.cierre-diario-modal--history .cierre-diario__history-filters button',
       )
       ?.click();
 
-    expect(dailyCloseService.getDailyCloses).toHaveBeenCalledWith(buffetId, {
+    expect(cierreDiarioService.getDailyCloses).toHaveBeenCalledWith(buffetId, {
       from: '2026-06-01',
       to: '2026-06-12',
     });
   });
 
   it('no deberia mostrar ventas por medio de pago en el reporte', () => {
-    dailyCloseService.getDailyReport.and.returnValue(
+    cierreDiarioService.getReporteDiario.and.returnValue(
       of({
         ...report,
         salesByPaymentMethod: [
@@ -427,7 +427,7 @@ describe('DailyClosePage', () => {
   });
 
   it('deberia mostrar movimientos de stock con etiquetas capitalizadas', () => {
-    dailyCloseService.getDailyReport.and.returnValue(
+    cierreDiarioService.getReporteDiario.and.returnValue(
       of({
         ...report,
         stockMovements: [
@@ -450,7 +450,7 @@ describe('DailyClosePage', () => {
   });
 
   it('deberia avisar y bloquear el cierre si la fecha ya estaba cerrada', () => {
-    dailyCloseService.getDailyCloseStatus.and.returnValue(
+    cierreDiarioService.getDailyCloseStatus.and.returnValue(
       of({
         buffetId,
         date: report.date,
@@ -467,7 +467,7 @@ describe('DailyClosePage', () => {
 
     expect(fixture.nativeElement.textContent).toContain('Día cerrado');
     expect(fixture.nativeElement.textContent).toContain('Cierre confirmado');
-    expect(dailyCloseService.closeDaily).not.toHaveBeenCalled();
+    expect(cierreDiarioService.closeDaily).not.toHaveBeenCalled();
   });
 
   it('deberia cerrar el día y refrescar datos operativos', () => {
@@ -475,11 +475,11 @@ describe('DailyClosePage', () => {
 
     (component as unknown as { confirmDailyClose: () => void }).confirmDailyClose();
 
-    expect(dailyCloseService.closeDaily).toHaveBeenCalledWith(
+    expect(cierreDiarioService.closeDaily).toHaveBeenCalledWith(
       buffetId,
       jasmine.any(String),
     );
-    expect(dailyCloseService.refreshAfterClose).toHaveBeenCalledWith(
+    expect(cierreDiarioService.refreshAfterClose).toHaveBeenCalledWith(
       buffetId,
       jasmine.any(String),
     );
@@ -500,7 +500,7 @@ describe('DailyClosePage', () => {
 
     (component as unknown as { downloadCsv: () => void }).downloadCsv();
 
-    expect(dailyCloseService.downloadDailyReportCsv).toHaveBeenCalledWith(
+    expect(cierreDiarioService.downloadReporteDiarioCsv).toHaveBeenCalledWith(
       buffetId,
       jasmine.any(String),
     );
@@ -510,7 +510,7 @@ describe('DailyClosePage', () => {
   });
 
   it('deberia mostrar mensaje si el día ya estaba cerrado', () => {
-    dailyCloseService.closeDaily.and.returnValue(
+    cierreDiarioService.closeDaily.and.returnValue(
       of({
         alreadyClosed: true,
         expiredPurchases: 0,
@@ -531,7 +531,7 @@ describe('DailyClosePage', () => {
   });
 
   it('deberia mostrar error si no carga el reporte', () => {
-    dailyCloseService.getDailyReport.and.returnValue(
+    cierreDiarioService.getReporteDiario.and.returnValue(
       throwError(() => new Error('API error')),
     );
 

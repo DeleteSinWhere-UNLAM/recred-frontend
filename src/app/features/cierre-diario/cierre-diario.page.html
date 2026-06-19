@@ -1,29 +1,29 @@
 <app-navbar />
 
-<main class="daily-close">
-  <div class="daily-close__container">
-    <button type="button" class="daily-close__back" (click)="volver()">
+<main class="cierre-diario">
+  <div class="cierre-diario__container">
+    <button type="button" class="cierre-diario__back" (click)="volver()">
       <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
       <span>Volver</span>
     </button>
 
-    <section class="daily-close-hero" aria-labelledby="daily-close-title">
-      <div class="daily-close-hero__top">
-        <div class="daily-close-hero__identity">
-          <span class="daily-close-hero__icon" aria-hidden="true">
+    <section class="cierre-diario-hero" aria-labelledby="cierre-diario-title">
+      <div class="cierre-diario-hero__top">
+        <div class="cierre-diario-hero__identity">
+          <span class="cierre-diario-hero__icon" aria-hidden="true">
             <i class="fa-solid fa-calendar-check"></i>
           </span>
 
           <div>
-            <h1 id="daily-close-title">Cierre diario</h1>
+            <h1 id="cierre-diario-title">Cierre diario</h1>
             <p>Revisá el día y confirmá el cierre de operaciones.</p>
           </div>
         </div>
 
-        <label class="daily-close-hero__date">
+        <label class="cierre-diario-hero__date">
           <span>Fecha del cierre</span>
 
-          <div class="daily-close-hero__date-input">
+          <div class="cierre-diario-hero__date-input">
             <input
               type="date"
               [value]="selectedDate()"
@@ -34,11 +34,11 @@
         </label>
 
         <div
-          class="daily-close-hero__status"
-          [class.daily-close-hero__status--closed]="isClosedConfirmed()"
+          class="cierre-diario-hero__status"
+          [class.cierre-diario-hero__status--closed]="isClosedConfirmed()"
         >
           <div>
-            <span class="daily-close-hero__status-icon" aria-hidden="true">
+            <span class="cierre-diario-hero__status-icon" aria-hidden="true">
               @if (isClosedConfirmed()) {
                 <i class="fa-solid fa-circle-check"></i>
               } @else {
@@ -53,15 +53,15 @@
         </div>
       </div>
 
-      <div class="daily-close-hero__metrics" aria-label="Resumen del cierre">
+      <div class="cierre-diario-hero__metrics" aria-label="Resumen del cierre">
         @if (isClosedConfirmed() && closureMetrics().length > 0) {
           @for (metric of closureMetrics(); track metric.label) {
             <article
-              class="daily-close-hero__metric"
-              [class.daily-close-hero__metric--success]="
+              class="cierre-diario-hero__metric"
+              [class.cierre-diario-hero__metric--success]="
                 metric.tone === 'success'
               "
-              [class.daily-close-hero__metric--warning]="
+              [class.cierre-diario-hero__metric--warning]="
                 metric.tone === 'warning'
               "
             >
@@ -88,7 +88,7 @@
           }
         } @else if (report(); as report) {
           <article
-            class="daily-close-hero__metric daily-close-hero__metric--warning"
+            class="cierre-diario-hero__metric cierre-diario-hero__metric--warning"
           >
             <span aria-hidden="true">
               <i class="fa-solid fa-clipboard-list"></i>
@@ -99,7 +99,7 @@
             </div>
           </article>
 
-          <article class="daily-close-hero__metric">
+          <article class="cierre-diario-hero__metric">
             <span aria-hidden="true">
               <i class="fa-solid fa-lock-open"></i>
             </span>
@@ -109,7 +109,7 @@
             </div>
           </article>
 
-          <article class="daily-close-hero__metric">
+          <article class="cierre-diario-hero__metric">
             <span aria-hidden="true">
               <i class="fa-solid fa-rotate-left"></i>
             </span>
@@ -120,7 +120,7 @@
           </article>
 
           <article
-            class="daily-close-hero__metric daily-close-hero__metric--success"
+            class="cierre-diario-hero__metric cierre-diario-hero__metric--success"
           >
             <span aria-hidden="true">
               <i class="fa-solid fa-arrow-trend-up"></i>
@@ -131,7 +131,7 @@
             </div>
           </article>
         } @else {
-          <article class="daily-close-hero__metric">
+          <article class="cierre-diario-hero__metric">
             <span aria-hidden="true">
               <i class="fa-solid fa-clipboard-list"></i>
             </span>
@@ -141,7 +141,7 @@
             </div>
           </article>
 
-          <article class="daily-close-hero__metric">
+          <article class="cierre-diario-hero__metric">
             <span aria-hidden="true">
               <i class="fa-solid fa-lock-open"></i>
             </span>
@@ -151,7 +151,7 @@
             </div>
           </article>
 
-          <article class="daily-close-hero__metric">
+          <article class="cierre-diario-hero__metric">
             <span aria-hidden="true">
               <i class="fa-solid fa-rotate-left"></i>
             </span>
@@ -161,7 +161,7 @@
             </div>
           </article>
 
-          <article class="daily-close-hero__metric">
+          <article class="cierre-diario-hero__metric">
             <span aria-hidden="true">
               <i class="fa-solid fa-arrow-trend-up"></i>
             </span>
@@ -173,10 +173,10 @@
         }
       </div>
 
-      <div class="daily-close-hero__actions">
+      <div class="cierre-diario-hero__actions">
         <button
           type="button"
-          class="daily-close-hero__secondary"
+          class="cierre-diario-hero__secondary"
           [disabled]="loadingHistory() || !buffetId()"
           (click)="openHistoryModal()"
         >
@@ -188,7 +188,7 @@
         } @else {
           <button
             type="button"
-            class="daily-close-hero__primary"
+            class="cierre-diario-hero__primary"
             [disabled]="
               closingDay() ||
               loadingCloseStatus() ||
@@ -212,12 +212,12 @@
 
     @if (closeResult(); as result) {
       <section
-        class="daily-close__close-result"
-        [class.daily-close__close-result--already]="result.alreadyClosed"
+        class="cierre-diario__close-result"
+        [class.cierre-diario__close-result--already]="result.alreadyClosed"
         aria-live="polite"
       >
         @if (result.alreadyClosed) {
-          <div class="daily-close__result-message">
+          <div class="cierre-diario__result-message">
             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
             <div>
               <h2>El día ya estaba cerrado</h2>
@@ -225,7 +225,7 @@
             </div>
           </div>
         } @else {
-          <div class="daily-close__result-message">
+          <div class="cierre-diario__result-message">
             <i class="fa-solid fa-check" aria-hidden="true"></i>
             <div>
               <h2>Cierre realizado</h2>
@@ -236,7 +236,7 @@
             </div>
           </div>
 
-          <div class="daily-close__result-grid">
+          <div class="cierre-diario__result-grid">
             <div>
               <span>Pedidos vencidos</span>
               <strong>{{ formatNumber(result.expiredPurchases) }}</strong>
@@ -259,12 +259,12 @@
     }
 
     @if (loadingReport()) {
-      <section class="daily-close__state" aria-live="polite">
-        <span class="daily-close__loader" aria-hidden="true"></span>
+      <section class="cierre-diario__state" aria-live="polite">
+        <span class="cierre-diario__loader" aria-hidden="true"></span>
         <p>Cargando reporte diario...</p>
       </section>
     } @else if (errorMessage()) {
-      <section class="daily-close__state daily-close__state--error">
+      <section class="cierre-diario__state cierre-diario__state--error">
         <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
         <p>{{ errorMessage() }}</p>
         @if (buffetId()) {
@@ -272,13 +272,13 @@
         }
       </section>
     } @else if (report(); as report) {
-      <div class="dc-operational-layout">
+      <div class="cd-operational-layout">
         <section
-          class="daily-close__section dc-stock-movements"
+          class="cierre-diario__section cd-stock-movements"
           aria-labelledby="daily-movements-title"
         >
-          <div class="dc-section-header">
-            <span class="dc-section-icon" aria-hidden="true">
+          <div class="cd-section-header">
+            <span class="cd-section-icon" aria-hidden="true">
               <i class="fa-solid fa-boxes-stacked"></i>
             </span>
 
@@ -286,27 +286,27 @@
           </div>
 
           @if (report.stockMovements.length > 0) {
-            <div class="dc-stock-movements__grid">
+            <div class="cd-stock-movements__grid">
               @for (
                 movement of report.stockMovements;
                 track movement.movementType
               ) {
                 <article
-                  class="dc-stock-movement"
-                  [class.dc-stock-movement--ajuste]="
+                  class="cd-stock-movement"
+                  [class.cd-stock-movement--ajuste]="
                     movement.movementType === 'AJUSTE'
                   "
-                  [class.dc-stock-movement--liberacion]="
+                  [class.cd-stock-movement--liberacion]="
                     movement.movementType === 'LIBERACION'
                   "
-                  [class.dc-stock-movement--reserva]="
+                  [class.cd-stock-movement--reserva]="
                     movement.movementType === 'RESERVA'
                   "
-                  [class.dc-stock-movement--venta]="
+                  [class.cd-stock-movement--venta]="
                     movement.movementType === 'VENTA'
                   "
                 >
-                  <span class="dc-stock-movement__icon" aria-hidden="true">
+                  <span class="cd-stock-movement__icon" aria-hidden="true">
                     @if (movement.movementType === "AJUSTE") {
                       <i class="fa-solid fa-sliders"></i>
                     } @else if (movement.movementType === "LIBERACION") {
@@ -327,55 +327,55 @@
               }
             </div>
           } @else {
-            <p class="daily-close__empty">
+            <p class="cierre-diario__empty">
               No hay movimientos de stock agrupados.
             </p>
           }
         </section>
 
         <section
-          class="daily-close__section dc-order-states"
+          class="cierre-diario__section cd-order-states"
           aria-labelledby="daily-order-status-title"
         >
-          <div class="dc-section-header">
-            <span class="dc-section-icon" aria-hidden="true">
+          <div class="cd-section-header">
+            <span class="cd-section-icon" aria-hidden="true">
               <i class="fa-solid fa-clipboard-list"></i>
             </span>
 
             <h2 id="daily-order-status-title">Estados de pedidos</h2>
           </div>
 
-          <div class="dc-order-states__grid">
+          <div class="cd-order-states__grid">
             @for (item of orderStatusMetrics(); track item.label) {
               <article
-                class="dc-order-state"
-                [class.dc-order-state--delivered]="
+                class="cd-order-state"
+                [class.cd-order-state--delivered]="
                   item.label.toLowerCase().includes('entregado')
                 "
-                [class.dc-order-state--pending]="
+                [class.cd-order-state--pending]="
                   item.label.toLowerCase().includes('pendiente')
                 "
-                [class.dc-order-state--preparing]="
+                [class.cd-order-state--preparing]="
                   item.label.toLowerCase().includes('prepar')
                 "
-                [class.dc-order-state--ready]="
+                [class.cd-order-state--ready]="
                   item.label.toLowerCase().includes('listo')
                 "
-                [class.dc-order-state--expired]="
+                [class.cd-order-state--expired]="
                   item.label.toLowerCase().includes('vencido')
                 "
-                [class.dc-order-state--cancelled]="
+                [class.cd-order-state--cancelled]="
                   item.label.toLowerCase().includes('cancelado')
                 "
-                [class.dc-order-state--rejected]="
+                [class.cd-order-state--rejected]="
                   item.label.toLowerCase().includes('rechazado')
                 "
               >
-                <span class="dc-order-state__icon" aria-hidden="true">
+                <span class="cd-order-state__icon" aria-hidden="true">
                   <i class="fa-solid" [ngClass]="item.icon"></i>
                 </span>
 
-                <span class="dc-order-state__label">{{ item.label }}</span>
+                <span class="cd-order-state__label">{{ item.label }}</span>
                 <strong>{{ formatNumber(item.value) }}</strong>
               </article>
             }
@@ -384,26 +384,26 @@
       </div>
 
       <section
-        class="daily-close__section dc-inventory-panel"
+        class="cierre-diario__section cd-inventory-panel"
         aria-labelledby="daily-inventory-title"
       >
-        <div class="dc-section-header dc-section-header--between">
-          <div class="dc-section-title">
-            <span class="dc-section-icon" aria-hidden="true">
+        <div class="cd-section-header cd-section-header--between">
+          <div class="cd-section-title">
+            <span class="cd-section-icon" aria-hidden="true">
               <i class="fa-solid fa-cube"></i>
             </span>
 
             <h2 id="daily-inventory-title">Inventario al cierre</h2>
           </div>
 
-          <span class="dc-inventory-count"
+          <span class="cd-inventory-count"
             >{{ sortedInventory().length }} productos</span
           >
         </div>
 
         @if (sortedInventory().length > 0) {
-          <div class="dc-inventory-table">
-            <div class="dc-inventory-table__head">
+          <div class="cd-inventory-table">
+            <div class="cd-inventory-table__head">
               <span>Producto</span>
               <span>Actual</span>
               <span>Reservado</span>
@@ -414,43 +414,43 @@
 
             @for (item of paginatedInventory(); track item.productId) {
               <article
-                class="dc-inventory-row"
-                [class.dc-inventory-row--sold-out]="isInventorySoldOut(item)"
-                [class.dc-inventory-row--low-stock]="isInventoryLowStock(item)"
+                class="cd-inventory-row"
+                [class.cd-inventory-row--sold-out]="isInventorySoldOut(item)"
+                [class.cd-inventory-row--low-stock]="isInventoryLowStock(item)"
               >
-                <div class="dc-inventory-product">
+                <div class="cd-inventory-product">
                   <strong>{{ item.productName }}</strong>
                   <small>{{
                     formatInventoryMode(item.tipoManejoInventario)
                   }}</small>
                 </div>
 
-                <div class="dc-inventory-number">
+                <div class="cd-inventory-number">
                   <small>Actual</small>
                   <strong>{{ formatNumber(item.stockActual) }}</strong>
                 </div>
 
-                <div class="dc-inventory-number">
+                <div class="cd-inventory-number">
                   <small>Reservado</small>
                   <strong>{{ formatNumber(item.stockReservado) }}</strong>
                 </div>
 
-                <div class="dc-inventory-number dc-inventory-number--available">
+                <div class="cd-inventory-number cd-inventory-number--available">
                   <small>Disponible</small>
                   <strong>{{ formatNumber(item.stockDisponible) }}</strong>
                 </div>
 
-                <div class="dc-inventory-number">
+                <div class="cd-inventory-number">
                   <small>Mínimo </small>
                   <strong>{{ formatOptionalNumber(item.stockMinimo) }}</strong>
                 </div>
 
                 <span
-                  class="dc-inventory-status"
-                  [class.dc-inventory-status--sold-out]="
+                  class="cd-inventory-status"
+                  [class.cd-inventory-status--sold-out]="
                     isInventorySoldOut(item)
                   "
-                  [class.dc-inventory-status--low-stock]="
+                  [class.cd-inventory-status--low-stock]="
                     isInventoryLowStock(item)
                   "
                 >
@@ -473,7 +473,7 @@
 
           @if (inventoryTotalPages() > 1) {
             <div
-              class="daily-close__pagination dc-inventory-pagination"
+              class="cierre-diario__pagination cd-inventory-pagination"
               aria-label="Paginación de inventario"
             >
               <span>
@@ -484,7 +484,7 @@
               <div>
                 <button
                   type="button"
-                  class="daily-close__secondary daily-close__page-button"
+                  class="cierre-diario__secondary cierre-diario__page-button"
                   [disabled]="inventoryPage() === 1"
                   (click)="previousInventoryPage()"
                   aria-label="Página anterior de inventario"
@@ -496,7 +496,7 @@
 
                 <button
                   type="button"
-                  class="daily-close__secondary daily-close__page-button"
+                  class="cierre-diario__secondary cierre-diario__page-button"
                   [disabled]="inventoryPage() === inventoryTotalPages()"
                   (click)="nextInventoryPage()"
                   aria-label="Página siguiente de inventario"
@@ -507,20 +507,20 @@
             </div>
           }
         } @else {
-          <p class="daily-close__empty">
+          <p class="cierre-diario__empty">
             No hay snapshot de inventario para esta fecha.
           </p>
         }
       </section>
-      <div class="dc-products-layout">
+      <div class="cd-products-layout">
         <section
-          class="daily-close__section dc-soldout-panel"
+          class="cierre-diario__section cd-soldout-panel"
           aria-labelledby="daily-soldout-title"
         >
-          <div class="dc-products-header">
-            <div class="dc-products-title">
+          <div class="cd-products-header">
+            <div class="cd-products-title">
               <span
-                class="dc-products-icon dc-products-icon--danger"
+                class="cd-products-icon cd-products-icon--danger"
                 aria-hidden="true"
               >
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -533,7 +533,7 @@
             </div>
 
             @if (report.soldOutProducts.length > 0) {
-              <span class="dc-soldout-alert">
+              <span class="cd-soldout-alert">
                 <i
                   class="fa-solid fa-triangle-exclamation"
                   aria-hidden="true"
@@ -543,7 +543,7 @@
             }
           </div>
 
-          <div class="dc-soldout-summary">
+          <div class="cd-soldout-summary">
             <article>
               <span>Total de productos agotados</span>
               <strong>{{ formatNumber(report.soldOutProducts.length) }}</strong>
@@ -559,27 +559,27 @@
             </article>
           </div>
 
-          <div class="dc-soldout-list-wrap">
+          <div class="cd-soldout-list-wrap">
             <h3>Lista de productos agotados</h3>
 
             @if (report.soldOutProducts.length > 0) {
-              <div class="dc-soldout-list">
+              <div class="cd-soldout-list">
                 @for (
                   product of report.soldOutProducts.slice(0, 5);
                   track $index;
                   let index = $index
                 ) {
-                  <article class="dc-soldout-item">
-                    <span class="dc-soldout-rank">{{ index + 1 }}</span>
+                  <article class="cd-soldout-item">
+                    <span class="cd-soldout-rank">{{ index + 1 }}</span>
 
                     <strong>{{ soldOutProductName(product) }}</strong>
 
-                    <span class="dc-soldout-badge"> Agotado </span>
+                    <span class="cd-soldout-badge"> Agotado </span>
                   </article>
                 }
               </div>
             } @else {
-              <div class="dc-soldout-empty">
+              <div class="cd-soldout-empty">
                 <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
                 <div>
                   <strong>Sin productos agotados</strong>
@@ -589,19 +589,19 @@
             }
           </div>
 
-          <a class="dc-soldout-action" href="/admin-productos">
+          <a class="cd-soldout-action" href="/admin-productos">
             <i class="fa-solid fa-rotate" aria-hidden="true"></i>
             <span>Ver inventario completo</span>
           </a>
         </section>
 
         <section
-          class="daily-close__section dc-sold-products-panel"
+          class="cierre-diario__section cd-sold-products-panel"
           aria-labelledby="daily-products-title"
         >
-          <div class="dc-products-header">
-            <div class="dc-products-title">
-              <span class="dc-products-icon" aria-hidden="true">
+          <div class="cd-products-header">
+            <div class="cd-products-title">
+              <span class="cd-products-icon" aria-hidden="true">
                 <i class="fa-solid fa-cart-shopping"></i>
               </span>
 
@@ -611,49 +611,49 @@
               </div>
             </div>
 
-            <span class="dc-products-chip">
+            <span class="cd-products-chip">
               <i class="fa-solid fa-ranking-star" aria-hidden="true"></i>
               Top ventas
             </span>
           </div>
 
           @if (sortedProducts().length > 0) {
-            <div class="dc-sold-products-list">
+            <div class="cd-sold-products-list">
               @for (
                 product of paginatedProducts();
                 track product.productId;
                 let index = $index
               ) {
                 <article
-                  class="dc-sold-product-item"
-                  [class.dc-sold-product-item--first]="
+                  class="cd-sold-product-item"
+                  [class.cd-sold-product-item--first]="
                     soldProductsPageStart() + index === 1
                   "
                 >
-                  <span class="dc-sold-product-rank">{{
+                  <span class="cd-sold-product-rank">{{
                     soldProductsPageStart() + index
                   }}</span>
 
-                  <div class="dc-sold-product-info">
+                  <div class="cd-sold-product-info">
                     <strong>{{ product.productName }}</strong>
                     <small>{{ formatNumber(product.quantity) }} unidades</small>
                   </div>
 
-                  <strong class="dc-sold-product-amount">
+                  <strong class="cd-sold-product-amount">
                     {{ formatMoney(product.total) }}
                   </strong>
                 </article>
               }
             </div>
 
-            <footer class="dc-sold-products-footer">
+            <footer class="cd-sold-products-footer">
               <span>
                 {{ soldProductsPageStart() }}-{{ soldProductsPageEnd() }} de
                 {{ sortedProducts().length }} productos
               </span>
 
               <div
-                class="dc-sold-products-pages"
+                class="cd-sold-products-pages"
                 aria-label="PaginaciÃ³n de productos vendidos"
               >
                 <button
@@ -678,7 +678,7 @@
               </div>
             </footer>
           } @else {
-            <p class="daily-close__empty">
+            <p class="cierre-diario__empty">
               No hay productos vendidos para esta fecha.
             </p>
           }
@@ -690,7 +690,7 @@
 
 @if (historyModalOpen()) {
   <div
-    class="daily-close-modal__backdrop"
+    class="cierre-diario-modal__backdrop"
     tabindex="0"
     role="button"
     (click)="closeHistoryModal()"
@@ -698,7 +698,7 @@
     (keydown.space)="closeHistoryModal()"
   >
     <section
-      class="daily-close-modal daily-close-modal--history"
+      class="cierre-diario-modal cierre-diario-modal--history"
       role="dialog"
       aria-modal="true"
       aria-labelledby="daily-history-title"
@@ -707,8 +707,8 @@
       (keydown.enter)="$event.stopPropagation()"
       (keydown.space)="$event.stopPropagation()"
     >
-      <header class="daily-close-modal__header">
-        <div class="daily-close-modal__icon" aria-hidden="true">
+      <header class="cierre-diario-modal__header">
+        <div class="cierre-diario-modal__icon" aria-hidden="true">
           <i class="fa-solid fa-clock-rotate-left"></i>
         </div>
         <div>
@@ -717,10 +717,10 @@
         </div>
       </header>
 
-      <div class="daily-close-modal__body">
-        <div class="daily-close__history-filters">
+      <div class="cierre-diario-modal__body">
+        <div class="cierre-diario__history-filters">
           <label
-            class="daily-close__date-field daily-close__date-field--compact"
+            class="cierre-diario__date-field cierre-diario__date-field--compact"
           >
             <span>Desde</span>
             <input
@@ -731,7 +731,7 @@
           </label>
 
           <label
-            class="daily-close__date-field daily-close__date-field--compact"
+            class="cierre-diario__date-field cierre-diario__date-field--compact"
           >
             <span>Hasta</span>
             <input
@@ -743,7 +743,7 @@
 
           <button
             type="button"
-            class="daily-close__secondary"
+            class="cierre-diario__secondary"
             [disabled]="loadingHistory() || !buffetId()"
             (click)="loadCloseHistory()"
           >
@@ -753,27 +753,27 @@
         </div>
 
         @if (loadingHistory()) {
-          <div class="daily-close__inline-state" aria-live="polite">
-            <span class="daily-close__loader" aria-hidden="true"></span>
+          <div class="cierre-diario__inline-state" aria-live="polite">
+            <span class="cierre-diario__loader" aria-hidden="true"></span>
             <p>Cargando cierres...</p>
           </div>
         } @else if (historyErrorMessage()) {
           <div
-            class="daily-close__inline-state daily-close__inline-state--error"
+            class="cierre-diario__inline-state cierre-diario__inline-state--error"
           >
             <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
             <p>{{ historyErrorMessage() }}</p>
           </div>
         } @else if (dailyCloses().length > 0) {
-          <div class="daily-close__history-list">
+          <div class="cierre-diario__history-list">
             @for (
               close of dailyCloses();
               track trackDailyClose($index, close)
             ) {
               <button
                 type="button"
-                class="daily-close__history-item"
-                [class.daily-close__history-item--selected]="
+                class="cierre-diario__history-item"
+                [class.cierre-diario__history-item--selected]="
                   isSelectedClose(close)
                 "
                 (click)="selectDailyClose(close)"
@@ -792,16 +792,16 @@
             }
           </div>
         } @else {
-          <p class="daily-close__empty">
+          <p class="cierre-diario__empty">
             No hay cierres registrados para mostrar.
           </p>
         }
       </div>
 
-      <footer class="daily-close-modal__footer">
+      <footer class="cierre-diario-modal__footer">
         <button
           type="button"
-          class="daily-close-modal__button daily-close-modal__button--secondary"
+          class="cierre-diario-modal__button cierre-diario-modal__button--secondary"
           (click)="closeHistoryModal()"
         >
           Cerrar
@@ -813,7 +813,7 @@
 
 @if (confirmModalOpen()) {
   <div
-    class="daily-close-modal__backdrop"
+    class="cierre-diario-modal__backdrop"
     tabindex="0"
     role="button"
     (click)="closeConfirmModal()"
@@ -821,26 +821,26 @@
     (keydown.space)="closeConfirmModal()"
   >
     <section
-      class="daily-close-modal"
+      class="cierre-diario-modal"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="daily-close-modal-title"
+      aria-labelledby="cierre-diario-modal-title"
       tabindex="-1"
       (click)="$event.stopPropagation()"
       (keydown.enter)="$event.stopPropagation()"
       (keydown.space)="$event.stopPropagation()"
     >
-      <header class="daily-close-modal__header">
-        <div class="daily-close-modal__icon" aria-hidden="true">
+      <header class="cierre-diario-modal__header">
+        <div class="cierre-diario-modal__icon" aria-hidden="true">
           <i class="fa-solid fa-lock"></i>
         </div>
         <div>
-          <h2 id="daily-close-modal-title">Confirmar cierre diario</h2>
+          <h2 id="cierre-diario-modal-title">Confirmar cierre diario</h2>
           <p>{{ formatDate(selectedDate()) }}</p>
         </div>
       </header>
 
-      <div class="daily-close-modal__body">
+      <div class="cierre-diario-modal__body">
         <p>Esta acción realiza el cierre operativo de la fecha seleccionada.</p>
         <ul>
           <li>Vence compras anticipadas activas del día.</li>
@@ -850,10 +850,10 @@
         </ul>
       </div>
 
-      <footer class="daily-close-modal__footer">
+      <footer class="cierre-diario-modal__footer">
         <button
           type="button"
-          class="daily-close-modal__button daily-close-modal__button--secondary"
+          class="cierre-diario-modal__button cierre-diario-modal__button--secondary"
           [disabled]="closingDay()"
           (click)="closeConfirmModal()"
         >
@@ -862,7 +862,7 @@
 
         <button
           type="button"
-          class="daily-close-modal__button daily-close-modal__button--primary"
+          class="cierre-diario-modal__button cierre-diario-modal__button--primary"
           [disabled]="closingDay()"
           (click)="confirmDailyClose()"
         >

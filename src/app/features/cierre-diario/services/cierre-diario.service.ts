@@ -3,29 +3,29 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
-  DailyCloseHistoryFilters,
-  DailyCloseRecord,
-  DailyCloseResult,
-  DailyCloseStatus,
-  DailyReport,
-} from '../models/daily-close.model';
+  FiltrosHistorialCierreDiario,
+  RegistroCierreDiario,
+  ResultadoCierreDiario,
+  EstadoCierreDiario,
+  ReporteDiario,
+} from '../models/cierre-diario.model';
 
 @Injectable({ providedIn: 'root' })
-export class DailyCloseService {
+export class CierreDiarioService {
   private readonly http = inject(HttpClient);
   private readonly kiosquerosUrl = `${environment.apiUrl}/kiosqueros`;
   private readonly inventoryUrl = `${environment.apiUrl}/inventory`;
 
-  closeDaily(buffetId: string, date: string): Observable<DailyCloseResult> {
-    return this.http.post<DailyCloseResult>(
+  closeDaily(buffetId: string, date: string): Observable<ResultadoCierreDiario> {
+    return this.http.post<ResultadoCierreDiario>(
       `${this.kiosquerosUrl}/${buffetId}/daily-close`,
       null,
       { params: this.buildDateParams(date) },
     );
   }
 
-  getDailyReport(buffetId: string, date: string): Observable<DailyReport> {
-    return this.http.get<DailyReport>(
+  getDailyReport(buffetId: string, date: string): Observable<ReporteDiario> {
+    return this.http.get<ReporteDiario>(
       `${this.kiosquerosUrl}/${buffetId}/reports/daily`,
       { params: this.buildDateParams(date) },
     );
@@ -34,8 +34,8 @@ export class DailyCloseService {
   getDailyCloseStatus(
     buffetId: string,
     date?: string,
-  ): Observable<DailyCloseStatus> {
-    return this.http.get<DailyCloseStatus>(
+  ): Observable<EstadoCierreDiario> {
+    return this.http.get<EstadoCierreDiario>(
       `${this.kiosquerosUrl}/${buffetId}/daily-close/status`,
       { params: this.buildDateParams(date) },
     );
@@ -43,8 +43,8 @@ export class DailyCloseService {
 
   getDailyCloses(
     buffetId: string,
-    filters: DailyCloseHistoryFilters = {},
-  ): Observable<DailyCloseRecord[]> {
+    filters: FiltrosHistorialCierreDiario = {},
+  ): Observable<RegistroCierreDiario[]> {
     let params = new HttpParams();
 
     if (filters.from) {
@@ -55,7 +55,7 @@ export class DailyCloseService {
       params = params.set('to', filters.to);
     }
 
-    return this.http.get<DailyCloseRecord[]>(
+    return this.http.get<RegistroCierreDiario[]>(
       `${this.kiosquerosUrl}/${buffetId}/daily-closes`,
       { params },
     );
@@ -77,7 +77,7 @@ export class DailyCloseService {
     );
   }
 
-  refreshAfterClose(buffetId: string, date: string): Observable<DailyReport> {
+  refreshAfterClose(buffetId: string, date: string): Observable<ReporteDiario> {
     return forkJoin({
       inventory: this.http
         .get<unknown>(`${this.inventoryUrl}/${buffetId}/overview`)

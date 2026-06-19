@@ -18,23 +18,23 @@ import { ToastService } from '../../shared/services/toast.service';
 import { InventoryRealtimeService } from '../updated-inventory/services/inventory-realtime.service';
 import { RealtimeInventoryEvent } from '../updated-inventory/models/inventory.interface';
 import {
-  DailyCloseRecord,
-  DailyCloseResult,
-  DailyCloseStatus,
-  DailyInventorySnapshot,
-  DailyProductSale,
-  DailyReport,
-  DailySoldOutProduct,
-} from './models/daily-close.model';
-import { DailyCloseService } from './services/daily-close.service';
+  RegistroCierreDiario,
+  ResultadoCierreDiario,
+  EstadoCierreDiario,
+  SnapshotInventarioDiario,
+  VentaProductoDiaria,
+  ReporteDiario,
+  ProductoAgotadoDiario,
+} from './models/cierre-diario.model';
+import { CierreDiarioService } from './services/cierre-diario.service';
 
-interface ReportMetric {
+interface MetricaReporte {
   label: string;
   value: string;
   tone?: 'success' | 'warning';
 }
 
-interface OrderStatusMetric {
+interface MetricaEstadoPedido {
   label: string;
   value: number;
   icon: string;
@@ -42,20 +42,20 @@ interface OrderStatusMetric {
 
 const INVENTORY_PAGE_SIZE = 5;
 const SOLD_PRODUCTS_PAGE_SIZE = 5;
-const DAILY_CLOSE_REALTIME_REFRESH_DELAY_MS = 2500;
-const DAILY_CLOSE_REALTIME_REFRESH_TYPES = new Set([
+const CIERRE_DIARIO_REALTIME_REFRESH_DELAY_MS = 2500;
+const CIERRE_DIARIO_REALTIME_REFRESH_TYPES = new Set([
   'DAILY_REPORT_CHANGED',
 ]);
 
 @Component({
-  selector: 'app-daily-close-page',
-  templateUrl: './daily-close.page.html',
-  styleUrl: './daily-close.page.css',
+  selector: 'app-cierre-diario-page',
+  templateUrl: './cierre-diario.page.html',
+  styleUrl: './cierre-diario.page.css',
   imports: [NavbarComponent, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DailyClosePage implements OnInit, OnDestroy {
-  private readonly dailyCloseService = inject(DailyCloseService);
+export class CierreDiarioPage implements OnInit, OnDestroy {
+  private readonly cierreDiarioService = inject(CierreDiarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly toastService = inject(ToastService);
@@ -65,10 +65,10 @@ export class DailyClosePage implements OnInit, OnDestroy {
 
   protected readonly buffetId = signal<string | null>(null);
   protected readonly selectedDate = signal(this.getTodayInputDate());
-  protected readonly report = signal<DailyReport | null>(null);
-  protected readonly closeStatus = signal<DailyCloseStatus | null>(null);
-  protected readonly closeResult = signal<DailyCloseResult | null>(null);
-  protected readonly dailyCloses = signal<DailyCloseRecord[]>([]);
+  protected readonly report = signal<ReporteDiario | null>(null);
+  protected readonly closeStatus = signal<EstadoCierreDiario | null>(null);
+  protected readonly closeResult = signal<ResultadoCierreDiario | null>(null);
+  protected readonly dailyCloses = signal<RegistroCierreDiario[]>([]);
   protected readonly loadingReport = signal(false);
   protected readonly loadingCloseStatus = signal(false);
   protected readonly loadingHistory = signal(false);
@@ -116,7 +116,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     return 'Todavía no se hizo un cierre para esta fecha.';
   });
 
-  protected readonly summaryMetrics = computed<ReportMetric[]>(() => {
+  protected readonly summaryMetrics = computed<MetricaReporte[]>(() => {
     const report = this.report();
     if (!report) return [];
 
@@ -148,7 +148,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     ];
   });
 
-  protected readonly orderStatusMetrics = computed<OrderStatusMetric[]>(() => {
+  protected readonly orderStatusMetrics = computed<MetricaEstadoPedido[]>(() => {
     const report = this.report();
     if (!report) return [];
 
@@ -167,11 +167,11 @@ export class DailyClosePage implements OnInit, OnDestroy {
     ];
   });
 
-  protected readonly closureMetrics = computed<ReportMetric[]>(() => {
+  protected readonly closureMetrics = computed<MetricaReporte[]>(() => {
     const summary = this.closedSummary();
     if (!summary) return [];
 
-    const metrics: ReportMetric[] = [
+    const metrics: MetricaReporte[] = [
       {
         label: 'Pedidos vencidos',
         value: this.formatNumber(summary.expiredPurchases),
@@ -199,7 +199,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     return metrics;
   });
 
-  protected readonly sortedInventory = computed<DailyInventorySnapshot[]>(() => {
+  protected readonly sortedInventory = computed<SnapshotInventarioDiario[]>(() => {
     const inventory = this.report()?.inventory ?? [];
 
     return [...inventory].sort((first, second) => {
@@ -211,7 +211,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     });
   });
 
-  protected readonly sortedProducts = computed<DailyProductSale[]>(() => {
+  protected readonly sortedProducts = computed<VentaProductoDiaria[]>(() => {
     const products = this.report()?.products ?? [];
 
     return [...products].sort((first, second) => {
@@ -227,7 +227,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     });
   });
 
-  protected readonly paginatedProducts = computed<DailyProductSale[]>(() => {
+  protected readonly paginatedProducts = computed<VentaProductoDiaria[]>(() => {
     const start = (this.soldProductsPage() - 1) * SOLD_PRODUCTS_PAGE_SIZE;
 
     return this.sortedProducts().slice(start, start + SOLD_PRODUCTS_PAGE_SIZE);
@@ -253,7 +253,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     ),
   );
 
-  protected readonly paginatedInventory = computed<DailyInventorySnapshot[]>(() => {
+  protected readonly paginatedInventory = computed<SnapshotInventarioDiario[]>(() => {
     const start = (this.inventoryPage() - 1) * INVENTORY_PAGE_SIZE;
 
     return this.sortedInventory().slice(start, start + INVENTORY_PAGE_SIZE);
@@ -335,7 +335,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
       this.errorMessage.set(null);
     }
 
-    this.dailyCloseService
+    this.cierreDiarioService
       .getDailyReport(buffetId, this.selectedDate())
       .pipe(finalize(() => {
         if (showLoading) {
@@ -366,7 +366,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
       this.closeStatusErrorMessage.set(null);
     }
 
-    this.dailyCloseService
+    this.cierreDiarioService
       .getDailyCloseStatus(buffetId, this.selectedDate())
       .pipe(finalize(() => {
         if (showLoading) {
@@ -395,7 +395,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     this.loadingHistory.set(true);
     this.historyErrorMessage.set(null);
 
-    this.dailyCloseService
+    this.cierreDiarioService
       .getDailyCloses(buffetId, {
         from: this.historyFrom() || undefined,
         to: this.historyTo() || undefined,
@@ -429,7 +429,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     this.historyTo.set(this.getInputValue(event));
   }
 
-  protected selectDailyClose(close: DailyCloseRecord): void {
+  protected selectDailyClose(close: RegistroCierreDiario): void {
     this.selectedDate.set(close.date);
     this.closeResult.set(null);
     this.inventoryPage.set(1);
@@ -477,7 +477,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     this.closingDay.set(true);
     this.errorMessage.set(null);
 
-    this.dailyCloseService
+    this.cierreDiarioService
       .closeDaily(buffetId, this.selectedDate())
       .pipe(finalize(() => this.closingDay.set(false)))
       .subscribe({
@@ -514,7 +514,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
 
     this.downloadingCsv.set(true);
 
-    this.dailyCloseService
+    this.cierreDiarioService
       .downloadDailyReportCsv(buffetId, this.selectedDate())
       .pipe(finalize(() => this.downloadingCsv.set(false)))
       .subscribe({
@@ -596,23 +596,23 @@ export class DailyClosePage implements OnInit, OnDestroy {
     return normalized.charAt(0).toLocaleUpperCase('es-AR') + normalized.slice(1);
   }
 
-  protected soldOutProductName(product: DailySoldOutProduct): string {
+  protected soldOutProductName(product: ProductoAgotadoDiario): string {
     return product.productName ?? product.nombre ?? 'Producto agotado';
   }
 
-  protected isInventorySoldOut(product: DailyInventorySnapshot): boolean {
+  protected isInventorySoldOut(product: SnapshotInventarioDiario): boolean {
     return product.estadoInventario === 'SIN_STOCK';
   }
 
-  protected isInventoryLowStock(product: DailyInventorySnapshot): boolean {
+  protected isInventoryLowStock(product: SnapshotInventarioDiario): boolean {
     return product.estadoInventario === 'BAJO_STOCK';
   }
 
-  protected isSoldProductSoldOut(product: DailyProductSale): boolean {
+  protected isSoldProductSoldOut(product: VentaProductoDiaria): boolean {
     return this.findInventorySnapshot(product.productId)?.estadoInventario === 'SIN_STOCK';
   }
 
-  protected isSoldProductLowStock(product: DailyProductSale): boolean {
+  protected isSoldProductLowStock(product: VentaProductoDiaria): boolean {
     return this.findInventorySnapshot(product.productId)?.estadoInventario === 'BAJO_STOCK';
   }
 
@@ -620,15 +620,15 @@ export class DailyClosePage implements OnInit, OnDestroy {
     return product.productId;
   }
 
-  protected trackInventory(_: number, product: DailyInventorySnapshot): string {
+  protected trackInventory(_: number, product: SnapshotInventarioDiario): string {
     return product.productId;
   }
 
-  protected trackDailyClose(_: number, close: DailyCloseRecord): string {
+  protected trackDailyClose(_: number, close: RegistroCierreDiario): string {
     return close.id;
   }
 
-  protected isSelectedClose(close: DailyCloseRecord): boolean {
+  protected isSelectedClose(close: RegistroCierreDiario): boolean {
     return close.date === this.selectedDate();
   }
 
@@ -655,7 +655,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
   private refreshAfterClose(buffetId: string): void {
     this.refreshingAfterClose.set(true);
 
-    this.dailyCloseService
+    this.cierreDiarioService
       .refreshAfterClose(buffetId, this.selectedDate())
       .pipe(finalize(() => this.refreshingAfterClose.set(false)))
       .subscribe({
@@ -710,14 +710,14 @@ export class DailyClosePage implements OnInit, OnDestroy {
       if (this.historyModalOpen()) {
         this.loadCloseHistory();
       }
-    }, DAILY_CLOSE_REALTIME_REFRESH_DELAY_MS);
+    }, CIERRE_DIARIO_REALTIME_REFRESH_DELAY_MS);
   }
 
-  private findInventorySnapshot(productId: string): DailyInventorySnapshot | undefined {
+  private findInventorySnapshot(productId: string): SnapshotInventarioDiario | undefined {
     return this.report()?.inventory.find((item) => item.productId === productId);
   }
 
-  private getInventoryPriority(product: DailyInventorySnapshot): number {
+  private getInventoryPriority(product: SnapshotInventarioDiario): number {
     return this.getInventoryStatusPriority(product.estadoInventario);
   }
 
@@ -732,7 +732,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     return status ? priorities[status] ?? 4 : 4;
   }
 
-  private closedSummary(): DailyCloseStatus | null {
+  private closedSummary(): EstadoCierreDiario | null {
     const status = this.closeStatus();
     if (status?.closed) return status;
 
@@ -742,7 +742,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
     return this.resultToCloseStatus(result);
   }
 
-  private resultToCloseStatus(result: DailyCloseResult): DailyCloseStatus {
+  private resultToCloseStatus(result: ResultadoCierreDiario): EstadoCierreDiario {
     return {
       buffetId: result.report.buffetId,
       date: result.report.date,
@@ -780,7 +780,7 @@ export class DailyClosePage implements OnInit, OnDestroy {
       document.visibilityState === 'visible' &&
       this.isRealtimeEventForSelectedDate(event) &&
       !this.isClosedConfirmed() &&
-      DAILY_CLOSE_REALTIME_REFRESH_TYPES.has(event.type)
+      CIERRE_DIARIO_REALTIME_REFRESH_TYPES.has(event.type)
     );
   }
 

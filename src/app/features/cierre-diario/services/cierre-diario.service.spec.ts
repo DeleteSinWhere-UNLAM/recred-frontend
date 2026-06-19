@@ -5,18 +5,18 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { environment } from '../../../../environments/environment';
-import { DailyReport } from '../models/daily-close.model';
-import { DailyCloseService } from './daily-close.service';
+import { ReporteDiario } from '../models/cierre-diario.model';
+import { CierreDiarioService } from './cierre-diario.service';
 
-describe('DailyCloseService', () => {
-  let service: DailyCloseService;
+describe('CierreDiarioService', () => {
+  let service: CierreDiarioService;
   let httpMock: HttpTestingController;
 
   const buffetId = 'buffet-123';
   const date = '2026-06-09';
   const kiosquerosUrl = `${environment.apiUrl}/kiosqueros`;
 
-  const report: DailyReport = {
+  const report: ReporteDiario = {
     buffetId,
     date,
     totalOrders: 25,
@@ -40,13 +40,13 @@ describe('DailyCloseService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        DailyCloseService,
+        CierreDiarioService,
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
     });
 
-    service = TestBed.inject(DailyCloseService);
+    service = TestBed.inject(CierreDiarioService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -76,7 +76,7 @@ describe('DailyCloseService', () => {
   });
 
   it('deberia obtener el reporte diario JSON', () => {
-    service.getDailyReport(buffetId, date).subscribe((result) => {
+    service.getReporteDiario(buffetId, date).subscribe((result) => {
       expect(result).toEqual(report);
     });
 
@@ -149,7 +149,7 @@ describe('DailyCloseService', () => {
   });
 
   it('deberia armar la URL directa del CSV', () => {
-    expect(service.getDailyReportCsvUrl(buffetId, date)).toBe(
+    expect(service.getReporteDiarioCsvUrl(buffetId, date)).toBe(
       `${kiosquerosUrl}/${buffetId}/reports/daily.csv?date=${date}`,
     );
   });
@@ -157,7 +157,7 @@ describe('DailyCloseService', () => {
   it('deberia descargar el CSV como blob por HttpClient', () => {
     const csv = new Blob(['metric,value'], { type: 'text/csv' });
 
-    service.downloadDailyReportCsv(buffetId, date).subscribe((result) => {
+    service.downloadReporteDiarioCsv(buffetId, date).subscribe((result) => {
       expect(result).toBe(csv);
     });
 
