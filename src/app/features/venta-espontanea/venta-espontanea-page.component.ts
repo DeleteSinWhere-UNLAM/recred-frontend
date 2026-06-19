@@ -11,6 +11,7 @@ import {
 } from './services/venta-espontanea';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { FeriadosService } from '../../shared/services/feriados.service';
+import { DialogService } from '../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-venta-espontanea-page',
@@ -300,6 +301,7 @@ export class VentaEspontaneaPageComponent implements OnInit {
   service = inject(VentaEspontaneaService);
   router = inject(Router);
   feriadosService = inject(FeriadosService);
+  dialogService = inject(DialogService);
 
   formats = [BarcodeFormat.QR_CODE];
 
@@ -490,9 +492,9 @@ export class VentaEspontaneaPageComponent implements OnInit {
     this.mensajeError.set('');
 
     this.service.procesarVenta(alumno.id, items).subscribe({
-      next: () => {
+      next: async () => {
         this.procesando.set(false);
-        alert('¡Venta realizada con éxito!');
+        await this.dialogService.alert('¡Venta realizada con éxito!', 'Venta Exitosa');
         this.router.navigate(['/kiosquero']);
       },
       error: (err) => {

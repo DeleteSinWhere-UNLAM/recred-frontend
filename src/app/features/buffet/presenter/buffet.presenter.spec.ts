@@ -15,6 +15,8 @@ import { RestriccionesHorariasService } from '../../restricciones-horarias/servi
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
 import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
+import { Perfil } from '../../../data-access/models/perfil.model';
 import { BuffetPresenter } from './buffet.presenter';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { Buffet } from '../models/buffet.model';
@@ -36,6 +38,7 @@ describe('BuffetPresenter', () => {
   let presupuestoServiceSpy: jasmine.SpyObj<PresupuestoService>;
   let restriccionesNutricionalesServiceSpy: jasmine.SpyObj<RestriccionesNutricionalesService>;
   let promotionServiceSpy: jasmine.SpyObj<PromotionService>;
+  let mockPerfilService: Partial<PerfilService>;
 
   const mockAlumno: Alumno = {
     id: 'alumno-1',
@@ -139,6 +142,11 @@ describe('BuffetPresenter', () => {
     restriccionesNutricionalesServiceSpy.getRestriccionesAlumno.and.returnValue(Promise.resolve([]));
     promotionServiceSpy.getPromotions.and.returnValue(of([]));
 
+    mockPerfilService = {
+      esPlanGratuito: signal(true),
+      perfil: signal<Perfil | null>({ plan: 'FREE' } as unknown as Perfil)
+    };
+
     TestBed.configureTestingModule({
       providers: [
         BuffetPresenter,
@@ -148,6 +156,7 @@ describe('BuffetPresenter', () => {
         { provide: CarritoService, useValue: carritoServiceSpy },
         { provide: ColegiosService, useValue: colegiosServiceSpy },
         { provide: UsuarioService, useValue: usuarioServiceSpy },
+        { provide: PerfilService, useValue: mockPerfilService },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: RestriccionProductoService, useValue: restriccionProductoServiceSpy },

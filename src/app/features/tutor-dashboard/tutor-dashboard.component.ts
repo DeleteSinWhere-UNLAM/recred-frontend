@@ -8,6 +8,7 @@ import { SmartChartWidget, ChartWidgetConfig } from './components/smart-chart-wi
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { DialogService } from '../../shared/services/dialog.service';
 
 export interface DashboardWidget extends GridsterItemConfig {
   id: string;
@@ -27,6 +28,7 @@ export class TutorDashboardComponent implements OnInit {
   private dashboardService = inject(TutorDashboardService);
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly dialogService = inject(DialogService);
 
   readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
 
@@ -119,8 +121,24 @@ export class TutorDashboardComponent implements OnInit {
     return 'budget-red';
   }
   
+  get esPlanGratuito(): boolean {
+    return this.perfilService.perfil()?.plan !== 'PREMIUM';
+  }
+
+  get esPremium(): boolean {
+    return !this.esPlanGratuito;
+  }
+
+  get puedeAgregarTarjeta(): boolean {
+    return !this.esPlanGratuito || this.dashboardItems.length < 5;
+  }
+
   // Drag and Drop Logic
   onDragStart(event: DragEvent, child: ChildDashboardSummary): void {
+    if (this.esPlanGratuito) {
+      event.preventDefault();
+      return;
+    }
     this.draggedChild = child;
     if (event.dataTransfer) {
       event.dataTransfer.setData('text/plain', child.studentId);
@@ -154,10 +172,15 @@ export class TutorDashboardComponent implements OnInit {
     target.classList.remove('drag-over');
   }
 
-  onDrop(event: DragEvent, targetChild: ChildDashboardSummary): void {
+  async onDrop(event: DragEvent, targetChild: ChildDashboardSummary): Promise<void> {
     event.preventDefault();
     const target = event.currentTarget as HTMLElement;
     target.classList.remove('drag-over');
+
+    if (this.esPlanGratuito) {
+      await this.dialogService.alert('La transferencia entre hijos no está permitida en cuentas gratuitas.', 'Plan Gratuito');
+      return;
+    }
 
     if (this.draggedChild && this.draggedChild.studentId !== targetChild.studentId) {
       const sourceChild = this.draggedChild;
@@ -170,13 +193,13 @@ export class TutorDashboardComponent implements OnInit {
             this.transferAmounts[sourceChild.studentId] = null; // reset the input
             this.ngOnInit(); // Refresh dashboard to fetch updated balances
           },
-          error: (err) => {
+          error: async (err) => {
             console.error('Transfer failed', err);
-            alert('Hubo un error al procesar la transferencia. Revisa el monto o la conexión.');
+            await this.dialogService.alert('Hubo un error al procesar la transferencia. Revisa el monto o la conexión.', 'Error de Transferencia');
           }
         });
       } else {
-        alert('Debes ingresar un monto mayor a 0 antes de arrastrar para transferir.');
+        await this.dialogService.alert('Debes ingresar un monto mayor a 0 antes de arrastrar para transferir.', 'Monto Inválido');
       }
     }
   }
@@ -348,8 +371,9 @@ export class TutorDashboardComponent implements OnInit {
     this.saveLayout();
   }
 
-  clearAllCards() {
-    if (confirm('¿Estás seguro de que quieres eliminar todas las tarjetas del panel?')) {
+  async clearAllCards() {
+    const confirmacion = await this.dialogService.confirm('¿Estás seguro de que quieres eliminar todas las tarjetas del panel?', 'Eliminar Tarjetas');
+    if (confirmacion) {
       this.dashboardItems = [];
       this.saveLayout();
     }

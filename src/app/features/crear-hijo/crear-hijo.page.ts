@@ -4,6 +4,7 @@ import {
   DestroyRef,
   OnInit,
   inject,
+  computed,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -96,6 +97,8 @@ export class CrearHijoPage implements OnInit {
   protected readonly nombreUsuario =
     this.perfilService.getPerfil()?.nombre ??
     this.usuarioService.getUsuarioActual().nombre;
+
+  protected readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
 
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');

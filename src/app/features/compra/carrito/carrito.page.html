@@ -57,6 +57,7 @@
               [fechaMinima]="presenter.fechaMinimaMap()[grupo.alumno.id] || presenter.fechaMinima"
               [motivoBloqueoPresupuesto]="presenter.budgetBlockReasons()[grupo.alumno.id]"
               [modoSoloLectura]="presenter.esModoSoloLectura()"
+              [favoritoDeshabilitado]="limiteCarritosAlcanzado()"
               (toggleSeleccion)="presenter.toggleSeleccion(grupo.alumno.id)"
               (fechaCambia)="presenter.setFecha(grupo.alumno.id, $event)"
               (recreoCambia)="presenter.setRecreo(grupo.alumno.id, $event)"

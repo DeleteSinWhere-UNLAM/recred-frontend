@@ -2549,4 +2549,33 @@
   }
 }
 
+/* Premium Gold Metallic styles for Buffet Promo and Footer Cart buttons */
+.promo-card__btn-agregar--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 8px 16px rgba(212, 175, 55, 0.35) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.promo-card__btn-agregar--premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 10px 20px rgba(212, 175, 55, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+.buffet__footer-cart-btn--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 10px 24px rgba(212, 175, 55, 0.4) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.buffet__footer-cart-btn--premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 14px 28px rgba(212, 175, 55, 0.55) !important;
+  transform: translateY(-2px);
+}
+
 

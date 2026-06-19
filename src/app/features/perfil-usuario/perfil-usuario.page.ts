@@ -57,6 +57,19 @@ export class PerfilUsuarioPage implements OnInit {
     return role === 'VENDEDOR';
   });
 
+  protected readonly planUsuario = computed(() => {
+    return this.perfilService.perfil()?.plan;
+  });
+
+  protected readonly esTutor = computed(() => {
+    const role = this.usuario()?.role || this.perfil()?.role;
+    return role === 'PADRE';
+  });
+
+  protected readonly esPremium = computed(() => {
+    return this.planUsuario() === 'PREMIUM';
+  });
+
   protected readonly payoutForm = new FormGroup({
     destinationCvu: new FormControl<string>('', {
       nonNullable: true,

@@ -11,6 +11,7 @@ import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { DialogService } from '../../shared/services/dialog.service';
 import { Movimiento } from './models/movimiento.model';
 import { Alumno } from '../../data-access/models/alumno.model';
 
@@ -23,6 +24,7 @@ describe('MovimientosPage', () => {
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let dialogServiceSpy: jasmine.SpyObj<DialogService>;
 
   let paramMapSubject: BehaviorSubject<ParamMap>;
 
@@ -95,6 +97,11 @@ describe('MovimientosPage', () => {
     toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', [
       'mostrar',
     ]);
+    dialogServiceSpy = jasmine.createSpyObj<DialogService>('DialogService', [
+      'confirm',
+      'alert',
+    ]);
+    dialogServiceSpy.confirm.and.returnValue(Promise.resolve(true));
 
     alumnosServiceSpy.asegurarCargados.and.resolveTo([mockAlumno1, mockAlumno2]);
     Object.defineProperty(alumnosServiceSpy, 'alumnos', {
@@ -126,6 +133,7 @@ describe('MovimientosPage', () => {
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: PerfilService, useValue: perfilServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
+        { provide: DialogService, useValue: dialogServiceSpy },
         UsuarioService,
         {
           provide: ActivatedRoute,
@@ -250,16 +258,17 @@ describe('MovimientosPage', () => {
       expect(component.modalMovimiento()).toBeNull();
     });
 
-    it('debería cancelar el pedido y actualizar el estado a CANCELADO', () => {
-      spyOn(window, 'confirm').and.returnValue(true);
+    it('debería cancelar el pedido y actualizar el estado a CANCELADO', fakeAsync(() => {
       component.modalMovimiento.set(mockMovimiento2);
       
       component.cancelarPedido('mov-2');
+      tick();
       
+      expect(dialogServiceSpy.confirm).toHaveBeenCalled();
       expect(movimientosServiceSpy.cancelarCompra).toHaveBeenCalledWith('mov-2');
       expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Pedido cancelado y saldo reembolsado', 'success');
       expect(component.modalMovimiento()?.status).toBe('CANCELADO');
-    });
+    }));
   });
 
   describe('Formateadores y selectores de UI', () => {

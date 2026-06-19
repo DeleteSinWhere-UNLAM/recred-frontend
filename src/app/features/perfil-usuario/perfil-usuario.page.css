@@ -440,6 +440,18 @@
   background-color: var(--color-dorado-dark);
 }
 
+.perfil-usuario__boton--primario-premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 10px 20px rgba(212, 175, 55, 0.35) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.perfil-usuario__boton--primario-premium:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+}
+
 .perfil-usuario__estado {
   min-height: 180px;
   display: flex;
@@ -534,4 +546,59 @@
   .perfil-usuario__boton {
     width: 100%;
   }
+}
+
+/* Premium Gold Metallic Theme for All Buttons */
+.perfil-usuario__volver--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.perfil-usuario__volver--premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.45) !important;
+}
+
+.perfil-usuario__avatar-wrapper:hover .perfil-usuario__avatar-editar--premium,
+.perfil-usuario__avatar-editar--premium:focus-visible {
+  background-color: rgba(212, 175, 55, 0.75) !important;
+  color: #1e293b !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.perfil-usuario__boton--secundario-premium {
+  background: transparent !important;
+  color: #D4AF37 !important;
+  border: 2px solid #D4AF37 !important;
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.15) !important;
+}
+
+.perfil-usuario__boton--secundario-premium:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.1) !important;
+  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.25) !important;
+}
+
+.perfil-usuario__boton--secundario-premium:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+.perfil-usuario__boton--reintentar-premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  border: none !important;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.perfil-usuario__boton--reintentar-premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
 }

@@ -11,6 +11,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { DialogService } from '../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-movimientos-page',
@@ -26,6 +27,7 @@ export class MovimientosPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly toastService = inject(ToastService);
+  private readonly dialogService = inject(DialogService);
 
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly esVistaIndividual = signal<boolean>(false);
@@ -405,8 +407,9 @@ export class MovimientosPage implements OnInit {
     }
   }
 
-  cancelarPedido(id: string): void {
-    if (confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.')) {
+  async cancelarPedido(id: string): Promise<void> {
+    const confirmed = await this.dialogService.confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.', 'Cancelar Pedido');
+    if (confirmed) {
       this.movimientosService.cancelarCompra(id).subscribe({
         next: () => {
           this.toastService.mostrar('Pedido cancelado y saldo reembolsado', 'success');

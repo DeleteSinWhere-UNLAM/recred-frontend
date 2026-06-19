@@ -9,6 +9,7 @@ import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { MicrocreditosService, SchoolCredit } from '../../../../data-access/services/microcreditos.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CropModalComponent } from '../../../perfil-usuario/components/crop-modal/crop-modal.component';
+import { DialogService } from '../../../../shared/services/dialog.service';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -32,6 +33,7 @@ export class AlumnoCardComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly microcreditosService = inject(MicrocreditosService);
   private readonly toastService = inject(ToastService);
+  private readonly dialogService = inject(DialogService);
   private readonly _cantidadPendientes = signal<number>(0);
   creditoActivo = signal<SchoolCredit | null>(null);
   readonly subiendoFoto = signal(false);
@@ -167,6 +169,10 @@ export class AlumnoCardComponent implements OnInit {
     return this.perfilService.perfil()?.rol === 'PADRE';
   }
 
+  get esPremium(): boolean {
+    return this.perfilService.perfil()?.plan === 'PREMIUM';
+  }
+
   showMicrocreditoModal = signal<boolean>(false);
   tipoMonto = signal<'fijo' | 'porcentaje'>('porcentaje');
   montoFijo = signal<number>(5000);
@@ -225,29 +231,29 @@ export class AlumnoCardComponent implements OnInit {
     this.cuotas.set(c);
   }
 
-  confirmarMicrocredito(): void {
+  async confirmarMicrocredito(): Promise<void> {
     const parentId = this.perfilService.perfil()?.id;
     if (!parentId || !this.alumno?.id) return;
     
     const finalAmount = this.montoCalculado;
     if (finalAmount <= 0) {
-      alert('El monto debe ser mayor a cero.');
+      await this.dialogService.alert('El monto debe ser mayor a cero.', 'Monto Inválido');
       return;
     }
 
     this.microcreditosService.requestCredit(this.alumno.id, parentId, finalAmount, this.cuotas())
       .subscribe({
-        next: (res) => {
-          alert('Microcrédito habilitado exitosamente por: $' + res.amount);
+        next: async (res) => {
+          await this.dialogService.alert('Microcrédito habilitado exitosamente por: $' + res.amount, 'Microcrédito Habilitado');
           this.creditoActivo.set(res);
           this.cerrarModalMicrocredito();
         },
-        error: (err) => {
+        error: async (err) => {
           console.error('Error HTTP:', err);
           if (err.status === 409) {
-            alert('El alumno ya tiene un microcrédito activo.');
+            await this.dialogService.alert('El alumno ya tiene un microcrédito activo.', 'Crédito Activo');
           } else {
-            alert('Error al solicitar microcrédito: ' + (err.error || err.message));
+            await this.dialogService.alert('Error al solicitar microcrédito: ' + (err.error || err.message), 'Error');
           }
         }
       });

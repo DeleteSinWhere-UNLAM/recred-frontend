@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
 import { CompraService } from '../../../compra/services/compra.service';
+import { DialogService } from '../../../../shared/services/dialog.service';
 import { ScheduledPickup, EstadoCompra } from '../../models/tracking-pedidos.model';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,6 +22,7 @@ export class OrderDetailsModalComponent {
   private readonly compraService = inject(CompraService);
   private readonly promotionService = inject(PromotionService);
   private readonly productService = inject(ProductService);
+  private readonly dialogService = inject(DialogService);
 
   promosLoaded = new Map<string, { promotion: Promotion | null; products: Product[]; loading: boolean; error: boolean }>();
   expandedPromos = new Set<string>();
@@ -176,15 +178,16 @@ export class OrderDetailsModalComponent {
         this.showVerificationModal = false;
         this.verificationCode = '';
       },
-      error: () => {
-        alert('Código incorrecto. Intente nuevamente.');
+      error: async () => {
+        await this.dialogService.alert('Código incorrecto. Intente nuevamente.', 'Código Inválido');
       }
     });
   }
 
-protected onCancel(): void {
+  protected async onCancel(): Promise<void> {
     if (this.isUpdating) return;
-    if (confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.')) {
+    const confirmacion = await this.dialogService.confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.', 'Cancelar Pedido');
+    if (confirmacion) {
       this.cancelOrder.emit(this.order.id);
     }
   }

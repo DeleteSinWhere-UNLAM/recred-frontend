@@ -5,6 +5,7 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { CarritoService } from '../../compra/services/carrito.service';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { BuffetService } from '../services/buffet.service';
 import { FavoritosService } from '../../favoritos/services/favoritos.service';
@@ -82,6 +83,7 @@ export class BuffetPresenter {
   private readonly carritoService = inject(CarritoService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly restriccionProductoService = inject(RestriccionProductoService);
@@ -676,6 +678,11 @@ export class BuffetPresenter {
         error: (err) => console.error('Error removing favorite:', err)
       });
     } else {
+      const esPlanGratuito = this.perfilService.perfil()?.plan !== 'PREMIUM';
+      if (esPlanGratuito && ids.size >= 5) {
+        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 por hijo).', 'error');
+        return;
+      }
       ids.add(producto.id);
       this.favoritosState.set(ids);
       this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({

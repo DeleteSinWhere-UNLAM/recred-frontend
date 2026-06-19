@@ -245,6 +245,17 @@
   color: var(--color-melocoton);
 }
 
+.orden-alumno__favorito-btn:disabled {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+.orden-alumno__favorito-btn:disabled i {
+  color: #94a3b8 !important;
+}
+
 /* Read-only retiro display */
 .orden-alumno__retiro-lectura {
   display: grid;
