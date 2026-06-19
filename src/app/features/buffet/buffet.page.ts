@@ -6,6 +6,8 @@ import {
   signal,
   computed,
   effect,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -17,6 +19,8 @@ import { ProductoCardComponent } from './components/producto-card/producto-card.
 import { SeleccionarAlumnoModalComponent } from './components/seleccionar-alumno-modal/seleccionar-alumno-modal.component';
 import { BuffetPresenter } from './presenter/buffet.presenter';
 import { Recreo } from '../compra/models/orden-compra.model';
+import { Producto } from './models/producto.model';
+import { CarritoService } from '../compra/services/carrito.service';
 
 export interface DateCell {
   date: Date;
@@ -42,6 +46,7 @@ export class BuffetPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly colegiosService = inject(ColegiosService);
+  private readonly carritoService = inject(CarritoService);
   protected readonly presenter = inject(BuffetPresenter);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
@@ -52,6 +57,249 @@ export class BuffetPage implements OnInit {
   protected readonly mostrarSelector = signal(false);
   protected readonly panelLateralCerrado = signal<boolean>(false);
   protected readonly diasCalendario = signal<DateCell[]>([]);
+
+  // Carrusel de Promociones
+  @ViewChild('promosContainer') promosContainer!: ElementRef<HTMLDivElement>;
+  protected readonly activeSlideIndex = signal(0);
+
+  // Mapeo dinámico y estático de promociones
+  protected esPromocion(producto: Producto): boolean {
+    if (!producto) return false;
+    const nombre = (producto.nombre || '').toLowerCase();
+    const descCat = (producto.categoria?.descripcion || '').toLowerCase();
+    const idCat = (producto.categoria?.id || '').toLowerCase();
+    return (
+      nombre.startsWith('promo') ||
+      nombre.startsWith('combo') ||
+      nombre.includes('duo pack') ||
+      descCat.includes('promo') ||
+      descCat.includes('combo') ||
+      idCat.includes('promo') ||
+      idCat.includes('combo')
+    );
+  }
+
+  readonly promocionesDestacadas = computed(() => {
+    const todos = this.presenter.productos();
+    
+    const promoAlmuerzo = todos.find(p => {
+      const n = p.nombre.toLowerCase();
+      return n.includes('almuerzo') && n.includes('express');
+    });
+    const comboMerienda = todos.find(p => {
+      const n = p.nombre.toLowerCase();
+      return n.includes('merienda');
+    });
+    const duoPack = todos.find(p => {
+      const n = p.nombre.toLowerCase();
+      return n.includes('duo') || n.includes('pack');
+    });
+
+    const list: any[] = [];
+
+    // 1. Promo Almuerzo Express
+    if (promoAlmuerzo) {
+      list.push({
+        ...promoAlmuerzo,
+        itemsList: ['Milanesa', 'Puré', 'Bebida'],
+        descuento: '-30%',
+        imagen: promoAlmuerzo.imagen || 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80',
+        esPromoReal: true
+      });
+    } else {
+      list.push({
+        id: 'mock-promo-almuerzo-express',
+        nombre: 'Promo Almuerzo Express',
+        descripcion: 'Milanesa + Puré + Bebida',
+        itemsList: ['Milanesa', 'Puré', 'Bebida'],
+        precio: 120,
+        descuento: '-30%',
+        imagen: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80',
+        esPromoReal: false,
+        categoria: { id: 'comidas', descripcion: 'Comidas' }
+      });
+    }
+
+    // 2. Combo Merienda
+    if (comboMerienda) {
+      list.push({
+        ...comboMerienda,
+        itemsList: ['Café', 'Factura', 'Jugo de Naranja'],
+        descuento: '-50%',
+        imagen: comboMerienda.imagen || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
+        esPromoReal: true
+      });
+    } else {
+      list.push({
+        id: 'mock-combo-merienda',
+        nombre: 'Combo Merienda',
+        descripcion: 'Café + Factura + Jugo de Naranja',
+        itemsList: ['Café', 'Factura', 'Jugo de Naranja'],
+        precio: 130,
+        descuento: '-50%',
+        imagen: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
+        esPromoReal: false,
+        categoria: { id: 'bebidas', descripcion: 'Bebidas' }
+      });
+    }
+
+    // 3. Duo Pack
+    if (duoPack) {
+      list.push({
+        ...duoPack,
+        itemsList: ['Patas', 'Pack...'],
+        descuento: '',
+        imagen: duoPack.imagen || 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80',
+        esPromoReal: true
+      });
+    } else {
+      list.push({
+        id: 'mock-duo-pack',
+        nombre: 'Duo Pack',
+        descripcion: 'Patas + Pack...',
+        itemsList: ['Patas', 'Pack...'],
+        precio: 150,
+        descuento: '',
+        imagen: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80',
+        esPromoReal: false,
+        categoria: { id: 'comidas', descripcion: 'Comidas' }
+      });
+    }
+
+    // Otras promos del buffet
+    for (const p of todos) {
+      if (this.esPromocion(p) && p.id !== promoAlmuerzo?.id && p.id !== comboMerienda?.id && p.id !== duoPack?.id) {
+        const parts = p.descripcion ? p.descripcion.split('+').map(i => i.trim()) : [p.nombre];
+        list.push({
+          ...p,
+          itemsList: parts,
+          descuento: p.precio < 500 ? '-30%' : '',
+          esPromoReal: true
+        });
+      }
+    }
+
+    return list;
+  });
+
+  readonly promocionesDestacadasFiltradas = computed(() => {
+    const promos = this.promocionesDestacadas();
+    const { busqueda, categoriaId, precioMin, precioMax } = this.presenter.filtros();
+    const texto = busqueda.trim().toLowerCase();
+    
+    return promos.filter(p => {
+      if (texto && !p.nombre.toLowerCase().includes(texto) && !p.descripcion.toLowerCase().includes(texto)) {
+        return false;
+      }
+      if (precioMin !== null && p.precio < precioMin) return false;
+      if (precioMax !== null && p.precio > precioMax) return false;
+      if (categoriaId !== 'todas' && p.categoria?.id !== categoriaId) {
+        return false;
+      }
+      return true;
+    });
+  });
+
+  readonly productosSueltos = computed(() => {
+    return this.presenter.productosFiltrados().filter(p => !this.esPromocion(p));
+  });
+
+  protected scrollCarousel(direction: number): void {
+    if (!this.promosContainer) return;
+    const total = this.promocionesDestacadasFiltradas().length;
+    if (total <= 1) return;
+
+    const currentIndex = this.activeSlideIndex();
+    if (direction === 1 && currentIndex >= total - 1) {
+      this.scrollToSlide(0);
+      return;
+    }
+    if (direction === -1 && currentIndex <= 0) {
+      this.scrollToSlide(total - 1);
+      return;
+    }
+
+    const container = this.promosContainer.nativeElement;
+    const card = container.querySelector('.promo-card');
+    const cardWidth = card ? card.getBoundingClientRect().width : 340;
+    const gap = 24;
+    container.scrollBy({ left: direction * (cardWidth + gap), behavior: 'smooth' });
+  }
+
+  protected onCarouselScroll(event: Event): void {
+    const container = event.target as HTMLDivElement;
+    const card = container.querySelector('.promo-card');
+    const cardWidth = card ? card.getBoundingClientRect().width : 340;
+    const gap = 24;
+    const step = cardWidth + gap;
+    const index = Math.round(container.scrollLeft / step);
+    this.activeSlideIndex.set(index);
+  }
+
+  protected scrollToSlide(index: number): void {
+    if (!this.promosContainer) return;
+    const container = this.promosContainer.nativeElement;
+    const card = container.querySelector('.promo-card');
+    const cardWidth = card ? card.getBoundingClientRect().width : 340;
+    const gap = 24;
+    const step = cardWidth + gap;
+    container.scrollTo({ left: index * step, behavior: 'smooth' });
+  }
+
+  protected isAtStart(): boolean {
+    return this.activeSlideIndex() === 0;
+  }
+
+  protected isAtEnd(): boolean {
+    return this.activeSlideIndex() >= this.promocionesDestacadasFiltradas().length - 1;
+  }
+
+  protected puedeComprarPromo(promo: any): boolean {
+    const alumno = this.presenter.alumno();
+    if (!alumno) return false;
+
+    // Construir un Producto temporal para la validación del CarritoService
+    const pTemp: Producto = {
+      id: promo.id,
+      nombre: promo.nombre,
+      descripcion: promo.descripcion || '',
+      precio: promo.precio,
+      categoria: promo.categoria || { id: 'comidas', descripcion: 'Comidas' },
+      clasificacionesSalud: promo.clasificacionesSalud || [],
+      imagen: promo.imagen || '',
+      estadoStock: 'DISPONIBLE'
+    };
+
+    return this.carritoService.puedeAgregar(pTemp, alumno.id, 1);
+  }
+
+  protected agregarPromoAlCarrito(promo: any): void {
+    const alumno = this.presenter.alumno();
+    if (!alumno) return;
+
+    if (promo.esPromoReal) {
+      const p = this.presenter.productos().find(x => x.id === promo.id);
+      if (p) {
+        this.presenter.agregarAlCarrito(p, 1);
+        return;
+      }
+    }
+
+    // Si es mock o fallback, buscamos si hay un producto real correspondiente o creamos uno temporal
+    // que se agrega al carrito usando la interfaz Producto
+    const pTemp: Producto = {
+      id: promo.id,
+      nombre: promo.nombre,
+      descripcion: promo.descripcion || '',
+      precio: promo.precio,
+      categoria: promo.categoria || { id: 'comidas', descripcion: 'Comidas' },
+      clasificacionesSalud: promo.clasificacionesSalud || [],
+      imagen: promo.imagen || '',
+      estadoStock: 'DISPONIBLE'
+    };
+
+    this.presenter.agregarAlCarrito(pTemp, 1);
+  }
 
   constructor() {
     effect(() => {
