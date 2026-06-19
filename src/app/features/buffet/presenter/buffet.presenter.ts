@@ -5,9 +5,11 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { CarritoService } from '../../compra/services/carrito.service';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { BuffetService } from '../services/buffet.service';
 import { FavoritosService } from '../../favoritos/services/favoritos.service';
+import { PromotionService, Promotion } from '../../../data-access/services/promociones/promotion.service';
 import { Buffet } from '../models/buffet.model';
 import {
   CategoriaProducto,
@@ -81,6 +83,7 @@ export class BuffetPresenter {
   private readonly carritoService = inject(CarritoService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly restriccionProductoService = inject(RestriccionProductoService);
@@ -88,6 +91,7 @@ export class BuffetPresenter {
   private readonly restriccionesService = inject(RestriccionesHorariasService);
   private readonly presupuestoService = inject(PresupuestoService);
   private readonly restriccionesNutricionalesService = inject(RestriccionesNutricionalesService);
+  private readonly promotionService = inject(PromotionService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly buffetState = signal<Buffet | undefined>(undefined);
@@ -97,6 +101,7 @@ export class BuffetPresenter {
   private readonly clasificacionesState = signal<ClasificacionSalud[]>([]);
   private readonly filtrosState = signal<FiltrosBuffet>({ ...filtrosPorDefecto });
   private readonly restriccionesNutricionalesState = signal<ClasificacionSaludBackend[]>([]);
+  private readonly promocionesState = signal<Promotion[]>([]);
 
   private readonly franjasState = signal<TimeSlot[]>([]);
   private readonly restriccionesState = signal<RestriccionHoraria[]>([]);
@@ -120,6 +125,7 @@ export class BuffetPresenter {
   readonly presupuestoPorFecha: Signal<PresupuestoPorFecha | null> = this.presupuestoPorFechaState.asReadonly();
   readonly cargandoPresupuestoPorFecha: Signal<boolean> = this.cargandoPresupuestoPorFechaState.asReadonly();
   readonly restriccionesNutricionales = this.restriccionesNutricionalesState.asReadonly();
+  readonly promociones: Signal<Promotion[]> = this.promocionesState.asReadonly();
 
   readonly restriccionesHorariasInformativas = computed(() => {
     const slots = this.franjasState();
@@ -458,6 +464,15 @@ export class BuffetPresenter {
       next: (buffet) => {
         this.buffetState.set(buffet);
 
+        this.promotionService.getPromotions(buffet.id).subscribe({
+          next: (promos) => {
+            this.promocionesState.set(promos);
+          },
+          error: (err) => {
+            console.error('Error loading promotions:', err);
+          }
+        });
+
         Promise.all([
           this.franjasService.getFranjasHorarias(alumno.colegioId),
           this.restriccionesService.getRestriccionesPorAlumno(alumnoId),
@@ -663,6 +678,11 @@ export class BuffetPresenter {
         error: (err) => console.error('Error removing favorite:', err)
       });
     } else {
+      const esPlanGratuito = this.perfilService.perfil()?.plan !== 'PREMIUM';
+      if (esPlanGratuito && ids.size >= 5) {
+        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 por hijo).', 'error');
+        return;
+      }
       ids.add(producto.id);
       this.favoritosState.set(ids);
       this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({

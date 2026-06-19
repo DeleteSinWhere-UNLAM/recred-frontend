@@ -5,9 +5,11 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 
 import { authInterceptor } from './core/auth/interceptors/auth.interceptor';
+import { encodingInterceptor } from './core/interceptors/encoding.interceptor';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideMessaging, getMessaging } from '@angular/fire/messaging';
 import { environment } from '../environments/environment';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,8 +22,9 @@ export const appConfig: ApplicationConfig = {
         anchorScrolling: 'enabled',
       }),
     ),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, encodingInterceptor])),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    provideMessaging(() => getMessaging())
+    provideMessaging(() => getMessaging()),
+    provideCharts(withDefaultRegisterables())
   ]
 };

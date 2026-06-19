@@ -194,6 +194,11 @@
 
 .bulk-upload-modal__table th:nth-child(6),
 .bulk-upload-modal__table td:nth-child(6) {
+  min-width: 100px;
+}
+
+.bulk-upload-modal__table th:nth-child(7),
+.bulk-upload-modal__table td:nth-child(7) {
   min-width: 220px;
 }
 
@@ -220,6 +225,8 @@
   background-color: var(--color-superficie);
   transition: border-color 0.2s ease;
 }
+
+
 
 .bulk-upload-modal__table td select {
   cursor: pointer;

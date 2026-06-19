@@ -15,10 +15,10 @@ describe('UploadSelectionModalComponent', () => {
     fixture.detectChanges();
   });
 
-  it('dado que hago clic en Carga Individual, deberia emitir el evento individualUpload', () => {
-    spyOn(component.individualUpload, 'emit');
-    component.onIndividualUpload();
-    expect(component.individualUpload.emit).toHaveBeenCalled();
+  it('dado que hago clic en Carga Asistida, deberia emitir el evento iaUpload', () => {
+    spyOn(component.iaUpload, 'emit');
+    component.onIaUpload();
+    expect(component.iaUpload.emit).toHaveBeenCalled();
   });
 
   it('dado que hago clic en Carga Masiva, deberia emitir el evento bulkUpload', () => {

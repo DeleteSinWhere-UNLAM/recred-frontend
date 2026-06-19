@@ -48,6 +48,7 @@ export class OrdenAlumnoCardComponent {
   @Input() fechaMinima = '';
   @Input() motivoBloqueoPresupuesto?: string;
   @Input() modoSoloLectura = false;
+  @Input() favoritoDeshabilitado = false;
 
   @Output() toggleSeleccion = new EventEmitter<void>();
   @Output() fechaCambia = new EventEmitter<string>();

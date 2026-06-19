@@ -192,6 +192,7 @@
         <button
           type="submit"
           class="crear-hijo__btn crear-hijo__btn--primario"
+          [class.crear-hijo__btn--primario-premium]="esPremium()"
           [disabled]="presenter.guardando()"
         >
           @if (presenter.guardando()) {

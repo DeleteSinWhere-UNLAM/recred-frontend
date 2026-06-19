@@ -2199,3 +2199,383 @@
   transform: translateY(1px);
 }
 
+/* ── Promociones Destacadas ─────────────────────────────────── */
+.promos-seccion {
+  margin-bottom: 32px;
+  padding: 12px 0;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.promos-seccion__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.promos-seccion__titulo {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+
+.promos-seccion__accent {
+  width: 50px;
+  height: 4px;
+  background-color: var(--color-dorado);
+  border-radius: var(--radius-pill);
+}
+
+.promos-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.promos-carousel__container {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  width: 100%;
+  padding: 12px 8px 16px;
+  margin: 0;
+  scrollbar-width: none; /* Firefox */
+}
+
+.promos-carousel__container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.promos-carousel__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: #fff;
+  border: 1px solid rgba(74, 111, 165, 0.12);
+  border-radius: 50%;
+  color: var(--color-pizarra);
+  box-shadow: 0 4px 12px rgba(51, 65, 85, 0.08);
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.promos-carousel__nav:hover:not(:disabled) {
+  transform: scale(1.1);
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra-dark);
+  box-shadow: 0 6px 16px rgba(51, 65, 85, 0.12);
+}
+
+.promos-carousel__nav:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.promos-carousel__nav:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.promos-carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.promos-carousel__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(74, 111, 165, 0.2);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.24s ease;
+}
+
+.promos-carousel__dot.active {
+  width: 24px;
+  background-color: var(--color-dorado-dark);
+  border-radius: var(--radius-pill);
+}
+
+/* ── Tarjeta de Promoción ───────────────────────────────────── */
+.promo-card {
+  flex: 0 0 calc(50% - 12px);
+  min-width: 480px;
+  display: flex;
+  background-color: #fff;
+  border: 1px solid rgba(74, 111, 165, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.06);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.promo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(51, 65, 85, 0.12);
+  border-color: rgba(74, 111, 165, 0.16);
+}
+
+/* Banner de Color de la Promo */
+.promo-card__banner {
+  flex: 0 0 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  color: #fff;
+  position: relative;
+}
+
+.promo-card__banner--almuerzo {
+  background: linear-gradient(135deg, #f97316 0%, #d97706 100%);
+}
+
+.promo-card__banner--merienda {
+  background: linear-gradient(135deg, #854d0e 0%, #451a03 100%);
+}
+
+.promo-card__banner--duopack {
+  background: linear-gradient(135deg, #a21caf 0%, #701a75 100%);
+}
+
+.promo-card__badge-promo {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  font-size: 10px;
+  font-weight: 900;
+  background-color: rgba(255, 255, 255, 0.25);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 1px;
+}
+
+.promo-card__banner-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  letter-spacing: -0.2px;
+}
+
+.promo-card__banner-desc {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.88;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Cuerpo de la Tarjeta */
+.promo-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  background-color: #fff;
+}
+
+.promo-card__media {
+  height: 120px;
+  overflow: hidden;
+  border-radius: 16px;
+  background-color: var(--color-superficie-alt);
+  margin-bottom: 12px;
+}
+
+.promo-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.promo-card:hover .promo-card__image {
+  transform: scale(1.05);
+}
+
+.promo-card__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-card__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.promo-card__description {
+  font-size: 13px;
+  color: var(--color-texto-claro);
+  margin: 0 0 16px 0;
+  line-height: 1.35;
+}
+
+.promo-card__footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.promo-card__price-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.promo-card__price-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-texto-claro);
+  letter-spacing: 0.6px;
+}
+
+.promo-card__price-value-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.promo-card__price-original {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-texto-claro);
+  text-decoration: line-through;
+  opacity: 0.8;
+  margin-right: 2px;
+}
+
+.promo-card__price-value {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+  line-height: 1;
+}
+
+.promo-card__discount-tag {
+  font-size: 10px;
+  font-weight: 800;
+  color: #e63946;
+  background-color: rgba(230, 57, 70, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+}
+
+/* Botones del Carrusel */
+.promo-card__btn-agregar {
+  min-height: 40px;
+  padding: 0 20px;
+  background-color: #facc15;
+  color: #1a3b5c;
+  border: none;
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 8px 16px rgba(250, 204, 21, 0.25);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.promo-card__btn-agregar:hover {
+  transform: translateY(-2px);
+  background-color: #fde047;
+  box-shadow: 0 10px 20px rgba(250, 204, 21, 0.35);
+}
+
+.promo-card__btn-agregar:active {
+  transform: translateY(1px);
+}
+
+.promo-card__btn-insuficiente {
+  min-height: 40px;
+  padding: 0 20px;
+  background-color: #fdf2e9;
+  color: #78350f;
+  border: 1px solid rgba(120, 53, 15, 0.15);
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: not-allowed;
+}
+
+/* Responsivo para Carrusel */
+@media (max-width: 1120px) {
+  .promo-card {
+    min-width: 440px;
+    flex: 0 0 calc(100% - 80px);
+  }
+}
+
+@media (max-width: 560px) {
+  .promo-card {
+    min-width: 100%;
+    flex: 0 0 100%;
+    flex-direction: column;
+  }
+  
+  .promo-card__banner {
+    flex: 0 0 auto;
+    padding: 20px;
+  }
+  
+  .promo-card__banner-title {
+    margin-top: 12px;
+  }
+}
+
+/* Premium Gold Metallic styles for Buffet Promo and Footer Cart buttons */
+.promo-card__btn-agregar--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 8px 16px rgba(212, 175, 55, 0.35) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.promo-card__btn-agregar--premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 10px 20px rgba(212, 175, 55, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+.buffet__footer-cart-btn--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 10px 24px rgba(212, 175, 55, 0.4) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.buffet__footer-cart-btn--premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 14px 28px rgba(212, 175, 55, 0.55) !important;
+  transform: translateY(-2px);
+}
+
+

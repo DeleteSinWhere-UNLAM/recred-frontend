@@ -6,6 +6,8 @@ import {
   signal,
   computed,
   effect,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -17,6 +19,8 @@ import { ProductoCardComponent } from './components/producto-card/producto-card.
 import { SeleccionarAlumnoModalComponent } from './components/seleccionar-alumno-modal/seleccionar-alumno-modal.component';
 import { BuffetPresenter } from './presenter/buffet.presenter';
 import { Recreo } from '../compra/models/orden-compra.model';
+import { Producto, CategoriaProducto, ClasificacionSalud } from './models/producto.model';
+import { CarritoService } from '../compra/services/carrito.service';
 
 export interface DateCell {
   date: Date;
@@ -26,6 +30,20 @@ export interface DateCell {
   esFinDeSemana: boolean;
   bloqueado: boolean;
   seleccionada: boolean;
+}
+
+export interface MappedPromotion {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  itemsList: string[];
+  precio: number;
+  precioOriginal: number;
+  descuento: string;
+  imagen: string;
+  esPromoReal: boolean;
+  categoria: CategoriaProducto;
+  clasificacionesSalud: ClasificacionSalud[];
 }
 
 @Component({
@@ -42,16 +60,187 @@ export class BuffetPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly colegiosService = inject(ColegiosService);
+  private readonly carritoService = inject(CarritoService);
   protected readonly presenter = inject(BuffetPresenter);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
+  readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
   readonly todosLosAlumnos = this.alumnosService.alumnos;
   readonly todosLosColegios = this.colegiosService.getColegios();
 
   protected readonly mostrarSelector = signal(false);
   protected readonly panelLateralCerrado = signal<boolean>(false);
   protected readonly diasCalendario = signal<DateCell[]>([]);
+
+  // Carrusel de Promociones
+  @ViewChild('promosContainer') promosContainer!: ElementRef<HTMLDivElement>;
+  protected readonly activeSlideIndex = signal(0);
+
+  // Mapeo dinámico y estático de promociones
+  protected esPromocion(producto: Producto): boolean {
+    if (!producto) return false;
+    const nombre = (producto.nombre || '').toLowerCase();
+    const descCat = (producto.categoria?.descripcion || '').toLowerCase();
+    const idCat = (producto.categoria?.id || '').toLowerCase();
+    return (
+      nombre.startsWith('promo') ||
+      nombre.startsWith('combo') ||
+      nombre.includes('duo pack') ||
+      descCat.includes('promo') ||
+      descCat.includes('combo') ||
+      idCat.includes('promo') ||
+      idCat.includes('combo')
+    );
+  }
+
+  readonly promocionesDestacadas = computed(() => {
+    const promos = this.presenter.promociones();
+    const todosProductos = this.presenter.productos();
+
+    return promos.map(promo => {
+      const products = (promo.productIds || [])
+        .map(id => todosProductos.find(p => p.id === id))
+        .filter((p): p is Producto => !!p);
+
+      const itemsList = products.map(p => p.nombre);
+      const originalPrice = products.reduce((acc, p) => acc + (p.precio || 0), 0);
+      const discountPercentage = promo.discountPercentage || 0;
+      const discountedPrice = Math.round(originalPrice * (1 - discountPercentage / 100));
+
+      const firstProductImage = products.find(p => p.imagen)?.imagen;
+      const defaultPromoImage = 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80';
+      const imagen = firstProductImage || defaultPromoImage;
+
+      const uniqueClasificaciones = Array.from(
+        new Map(
+          products.flatMap(p => p.clasificacionesSalud || []).map(c => [c.id, c])
+        ).values()
+      );
+
+      return {
+        id: promo.id,
+        nombre: promo.name,
+        descripcion: products.map(p => p.nombre).join(' + '),
+        itemsList,
+        precio: discountedPrice,
+        precioOriginal: originalPrice,
+        descuento: discountPercentage > 0 ? `-${Math.round(discountPercentage)}%` : '',
+        imagen,
+        esPromoReal: true,
+        categoria: products[0]?.categoria || { id: 'promociones', descripcion: 'Promociones' },
+        clasificacionesSalud: uniqueClasificaciones
+      };
+    });
+  });
+
+  readonly promocionesDestacadasFiltradas = computed(() => {
+    const promos = this.promocionesDestacadas();
+    const { busqueda, categoriaId, precioMin, precioMax } = this.presenter.filtros();
+    const texto = busqueda.trim().toLowerCase();
+    
+    return promos.filter(p => {
+      if (texto && !p.nombre.toLowerCase().includes(texto) && !p.descripcion.toLowerCase().includes(texto)) {
+        return false;
+      }
+      if (precioMin !== null && p.precio < precioMin) return false;
+      if (precioMax !== null && p.precio > precioMax) return false;
+      if (categoriaId !== 'todas' && p.categoria?.id !== categoriaId) {
+        return false;
+      }
+      return true;
+    });
+  });
+
+  readonly productosSueltos = computed(() => {
+    return this.presenter.productosFiltrados().filter(p => !this.esPromocion(p));
+  });
+
+  protected scrollCarousel(direction: number): void {
+    if (!this.promosContainer) return;
+    const total = this.promocionesDestacadasFiltradas().length;
+    if (total <= 1) return;
+
+    const currentIndex = this.activeSlideIndex();
+
+    if (direction === 1 && currentIndex >= total - 1) {
+      this.scrollToSlide(0);
+      return;
+    }
+    if (direction === -1 && currentIndex <= 0) {
+      this.scrollToSlide(total - 1);
+      return;
+    }
+
+    this.scrollToSlide(currentIndex + direction);
+  }
+
+  protected onCarouselScroll(event: Event): void {
+    const container = event.target as HTMLDivElement;
+    const card = container.querySelector('.promo-card');
+    const cardWidth = card ? card.getBoundingClientRect().width : 340;
+    const gap = 24;
+    const step = cardWidth + gap;
+    const index = Math.round(container.scrollLeft / step);
+    this.activeSlideIndex.set(index);
+  }
+
+  protected scrollToSlide(index: number): void {
+    if (!this.promosContainer) return;
+    const container = this.promosContainer.nativeElement;
+    const card = container.querySelector('.promo-card');
+    const cardWidth = card ? card.getBoundingClientRect().width : 340;
+    const gap = 24;
+    const step = cardWidth + gap;
+    container.scrollTo({ left: index * step, behavior: 'smooth' });
+  }
+
+  protected isAtStart(): boolean {
+    return this.activeSlideIndex() === 0;
+  }
+
+  protected isAtEnd(): boolean {
+    return this.activeSlideIndex() >= this.promocionesDestacadasFiltradas().length - 1;
+  }
+
+  protected puedeComprarPromo(promo: MappedPromotion): boolean {
+    const alumno = this.presenter.alumno();
+    if (!alumno) return false;
+
+    // Construir un Producto temporal para la validación del CarritoService
+    const pTemp: Producto = {
+      id: promo.id,
+      nombre: promo.nombre,
+      descripcion: promo.descripcion || '',
+      precio: promo.precio,
+      categoria: promo.categoria || { id: 'comidas', descripcion: 'Comidas' },
+      clasificacionesSalud: promo.clasificacionesSalud || [],
+      imagen: promo.imagen || '',
+      estadoStock: 'DISPONIBLE'
+    };
+
+    return this.carritoService.puedeAgregar(pTemp, alumno.id, 1);
+  }
+
+  protected agregarPromoAlCarrito(promo: MappedPromotion): void {
+    const alumno = this.presenter.alumno();
+    if (!alumno) return;
+
+    // Si es una promocion real de la base de datos o fallback, creamos un producto temporal
+    // que se agrega al carrito usando la interfaz Producto, con el ID de la promocion.
+    const pTemp: Producto = {
+      id: promo.id,
+      nombre: promo.nombre,
+      descripcion: promo.descripcion || '',
+      precio: promo.precio,
+      categoria: promo.categoria || { id: 'comidas', descripcion: 'Comidas' },
+      clasificacionesSalud: promo.clasificacionesSalud || [],
+      imagen: promo.imagen || '',
+      estadoStock: 'DISPONIBLE'
+    };
+
+    this.presenter.agregarAlCarrito(pTemp, 1);
+  }
 
   constructor() {
     effect(() => {

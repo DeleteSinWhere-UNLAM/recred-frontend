@@ -53,6 +53,9 @@
         <p class="producto-card__precio">{{ precioFormateado() }}</p>
       </div>
       <h3 class="producto-card__nombre">{{ producto.nombre }}</h3>
+      @if (producto.descripcion) {
+        <p class="producto-card__descripcion">{{ producto.descripcion }}</p>
+      }
 
       @if (disponible()) {
         <div class="producto-card__cantidad">
@@ -79,7 +82,7 @@
 
         <button
           type="button"
-          [class]="(superaPresupuesto() || superaSaldo()) ? 'producto-card__cta producto-card__cta--presupuesto' : 'producto-card__cta'"
+          [class]="(superaPresupuesto() || superaSaldo()) ? 'producto-card__cta producto-card__cta--presupuesto' : (esPremium() ? 'producto-card__cta producto-card__cta--premium' : 'producto-card__cta')"
           [disabled]="superaPresupuesto() || superaSaldo()"
           (click)="onAgregar()"
         >

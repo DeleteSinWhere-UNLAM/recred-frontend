@@ -14,6 +14,9 @@ import { FranjasHorariasService } from '../../restricciones-horarias/services/fr
 import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
 import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
+import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
+import { Perfil } from '../../../data-access/models/perfil.model';
 import { BuffetPresenter } from './buffet.presenter';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { Buffet } from '../models/buffet.model';
@@ -34,6 +37,8 @@ describe('BuffetPresenter', () => {
   let restriccionesHorariasServiceSpy: jasmine.SpyObj<RestriccionesHorariasService>;
   let presupuestoServiceSpy: jasmine.SpyObj<PresupuestoService>;
   let restriccionesNutricionalesServiceSpy: jasmine.SpyObj<RestriccionesNutricionalesService>;
+  let promotionServiceSpy: jasmine.SpyObj<PromotionService>;
+  let mockPerfilService: Partial<PerfilService>;
 
   const mockAlumno: Alumno = {
     id: 'alumno-1',
@@ -122,6 +127,7 @@ describe('BuffetPresenter', () => {
     restriccionesHorariasServiceSpy = jasmine.createSpyObj<RestriccionesHorariasService>('RestriccionesHorariasService', ['getRestriccionesPorAlumno']);
     presupuestoServiceSpy = jasmine.createSpyObj<PresupuestoService>('PresupuestoService', ['checkBudgetDates', 'getPresupuesto']);
     restriccionesNutricionalesServiceSpy = jasmine.createSpyObj<RestriccionesNutricionalesService>('RestriccionesNutricionalesService', ['getRestriccionesAlumno']);
+    promotionServiceSpy = jasmine.createSpyObj<PromotionService>('PromotionService', ['getPromotions']);
 
     alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
     buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of(mockBuffet));
@@ -134,6 +140,12 @@ describe('BuffetPresenter', () => {
     restriccionesHorariasServiceSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([]));
     presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.resolve([]));
     restriccionesNutricionalesServiceSpy.getRestriccionesAlumno.and.returnValue(Promise.resolve([]));
+    promotionServiceSpy.getPromotions.and.returnValue(of([]));
+
+    mockPerfilService = {
+      esPlanGratuito: signal(true),
+      perfil: signal<Perfil | null>({ plan: 'FREE' } as unknown as Perfil)
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -144,6 +156,7 @@ describe('BuffetPresenter', () => {
         { provide: CarritoService, useValue: carritoServiceSpy },
         { provide: ColegiosService, useValue: colegiosServiceSpy },
         { provide: UsuarioService, useValue: usuarioServiceSpy },
+        { provide: PerfilService, useValue: mockPerfilService },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: RestriccionProductoService, useValue: restriccionProductoServiceSpy },
@@ -151,6 +164,7 @@ describe('BuffetPresenter', () => {
         { provide: RestriccionesHorariasService, useValue: restriccionesHorariasServiceSpy },
         { provide: PresupuestoService, useValue: presupuestoServiceSpy },
         { provide: RestriccionesNutricionalesService, useValue: restriccionesNutricionalesServiceSpy },
+        { provide: PromotionService, useValue: promotionServiceSpy },
       ],
     });
 

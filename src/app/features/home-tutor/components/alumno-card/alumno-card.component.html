@@ -161,7 +161,7 @@
     <span class="alumno-card__budget-fraction">{{ budgetSpentFormateado }} / {{ budgetLimitFormateado }}</span>
   </div>
 
-  <a class="alumno-card__cta" [routerLink]="['/buffet', alumno.id]">
+  <a class="alumno-card__cta" [class.alumno-card__cta--premium]="esPremium" [routerLink]="['/buffet', alumno.id]">
     <i class="fa-solid fa-utensils" aria-hidden="true"></i>
     Ir al Buffet
   </a>

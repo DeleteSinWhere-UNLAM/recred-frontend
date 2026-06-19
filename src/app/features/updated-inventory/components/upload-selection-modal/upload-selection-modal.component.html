@@ -19,10 +19,10 @@
     <header class="upload-selection-modal__header">
       <div>
         <h3 id="upload-selection-title" class="upload-selection-modal__titulo">
-          Nuevo producto
+          Cargar Producto
         </h3>
         <p class="upload-selection-modal__subtitle">
-          Elige cómo deseas agregar productos al inventario
+          Elige cómo deseas agregar productos
         </p>
       </div>
       <button
@@ -39,14 +39,14 @@
       <button
         type="button"
         class="upload-selection-modal__option"
-        (click)="onIndividualUpload()"
+        (click)="onIaUpload()"
       >
         <div class="upload-selection-modal__icon" aria-hidden="true">
-          <i class="fa-solid fa-box"></i>
+          <i class="fa-solid fa-cloud-arrow-up"></i>
         </div>
         <div class="upload-selection-modal__text">
-          <strong class="upload-selection-modal__option-title">Carga individual</strong>
-          <span class="upload-selection-modal__option-desc">Carga un producto a la vez mediante un formulario simple</span>
+          <strong class="upload-selection-modal__option-title">Carga asistida por IA</strong>
+          <span class="upload-selection-modal__option-desc">Alta asistida usando foto y procesado automático</span>
         </div>
         <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
       </button>

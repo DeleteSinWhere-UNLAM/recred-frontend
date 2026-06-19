@@ -275,13 +275,6 @@ export class AsistenteVirtualPresenter {
     const perfil = this.perfilService.getPerfil();
     if (!perfil) return null;
 
-    if (perfil.rol === 'ALUMNO') {
-      return {
-        rol: perfil.rol,
-        alumnoId: this.perfilService.obtenerAlumnoId(),
-      };
-    }
-
     return { rol: perfil.rol };
   }
 

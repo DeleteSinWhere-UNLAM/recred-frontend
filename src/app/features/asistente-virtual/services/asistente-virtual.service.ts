@@ -16,7 +16,6 @@ interface SchoolAssistantRequest {
 
 export interface ContextoAsistente {
   readonly rol: RolUsuario;
-  readonly alumnoId?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -84,13 +83,8 @@ export class AsistenteVirtualService {
         return `${this.iaBase}/tutores/me/asistente`;
       case 'VENDEDOR':
         return `${this.iaBase}/kiosqueros/me/asistente`;
-      case 'ALUMNO': {
-        const alumnoId = contexto.alumnoId?.trim();
-        if (!alumnoId) {
-          throw new Error('No se pudo resolver el alumno para usar el asistente.');
-        }
-        return `${this.iaBase}/alumnos/${encodeURIComponent(alumnoId)}/asistente`;
-      }
+      case 'ALUMNO':
+        return `${this.iaBase}/alumnos/me/asistente`;
     }
   }
 }

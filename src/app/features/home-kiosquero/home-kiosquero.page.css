@@ -1168,6 +1168,11 @@
   .pv__operation-card {
     padding-inline: 16px;
   }
+  .pv__side-column {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+  }
 }
 @media (max-width: 980px) {
   .home-kiosquero__container {

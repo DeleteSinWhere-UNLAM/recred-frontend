@@ -6,6 +6,7 @@ import { CarritosFavoritosService } from '../../../carritos-favoritos/services/c
 import { ToastService } from '../../../../shared/services/toast.service';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { SaveCarritoFavoritoRequest } from '../../../carritos-favoritos/models/carritos-favoritos.model';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 
 @Component({
   selector: 'app-guardar-favorito-modal',
@@ -19,6 +20,7 @@ export class GuardarFavoritoModalComponent implements OnInit {
   private readonly carritosFavoritosService = inject(CarritosFavoritosService);
   private readonly toastService = inject(ToastService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
 
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
@@ -33,6 +35,7 @@ export class GuardarFavoritoModalComponent implements OnInit {
   nombre = '';
   alumnoId = '';
   isSaving = false;
+  limitReached = false;
 
   readonly hijos = this.alumnosService.alumnos;
 
@@ -47,6 +50,18 @@ export class GuardarFavoritoModalComponent implements OnInit {
     this.nombre = this.initialNombre;
     this.alumnoId = this.initialAlumnoId;
     void this.alumnosService.asegurarCargados();
+
+    const esPlanGratuito = this.perfilService.perfil()?.plan !== 'PREMIUM';
+    if (esPlanGratuito && !this.cartId) {
+      this.carritosFavoritosService.getCarritosFavoritos().subscribe({
+        next: (carts) => {
+          if (carts.length >= 3) {
+            this.limitReached = true;
+          }
+        },
+        error: (err) => console.error('Error al obtener carritos favoritos para validar límite:', err)
+      });
+    }
   }
 
   get total(): number {

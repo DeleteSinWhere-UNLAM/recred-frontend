@@ -11,6 +11,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { DialogService } from '../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-movimientos-page',
@@ -26,6 +27,7 @@ export class MovimientosPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly toastService = inject(ToastService);
+  private readonly dialogService = inject(DialogService);
 
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly esVistaIndividual = signal<boolean>(false);
@@ -37,6 +39,9 @@ export class MovimientosPage implements OnInit {
   readonly rawMovimientos = signal<Movimiento[]>([]);
   readonly cargando = signal(true);
   readonly errorMsg = signal<string | null>(null);
+
+  readonly criterioAgrupacion = signal<'FECHA_COMPRA' | 'FECHA_RETIRO' | 'ALUMNO'>('FECHA_COMPRA');
+  readonly collapsedGroups = signal<Set<string>>(new Set<string>());
 
   readonly filtroBusqueda = signal<string>('');
   readonly filtroFecha = signal<string>('');
@@ -100,31 +105,104 @@ export class MovimientosPage implements OnInit {
     });
   });
 
-  readonly movimientosAgrupadosPorDia = computed<{ fechaStr: string; movimientos: Movimiento[] }[]>(() => {
+  readonly movimientosAgrupados = computed<{ titulo: string; movimientos: Movimiento[] }[]>(() => {
     const list = this.movimientosFiltrados();
     const groupsMap = new Map<string, Movimiento[]>();
     const orderedKeys: string[] = [];
+    const criterio = this.criterioAgrupacion();
 
-    for (const m of list) {
-      const d = new Date(m.date);
-      const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-      const dia = d.getDate();
-      const mes = meses[d.getMonth()];
-      const anio = d.getFullYear();
-      const dateStr = `${dia} ${mes} ${anio}`;
-
-      if (!groupsMap.has(dateStr)) {
-        groupsMap.set(dateStr, []);
-        orderedKeys.push(dateStr);
+    if (criterio === 'ALUMNO') {
+      for (const m of list) {
+        const nombre = this.getNombreAlumno(m.studentId);
+        if (!groupsMap.has(nombre)) {
+          groupsMap.set(nombre, []);
+          orderedKeys.push(nombre);
+        }
+        groupsMap.get(nombre)!.push(m);
       }
-      groupsMap.get(dateStr)!.push(m);
+      orderedKeys.sort((a, b) => a.localeCompare(b));
+    } else if (criterio === 'FECHA_RETIRO') {
+      const fallbackKey = 'Consumos Presenciales / Sin Retiro Programado';
+      for (const m of list) {
+        let key = fallbackKey;
+        if (m.tipo === 'ANTICIPADA' && m.pickupDate) {
+          const parts = m.pickupDate.split('-');
+          if (parts.length === 3) {
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            const d = new Date(year, month, day);
+            const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const mes = meses[d.getMonth()];
+            key = `${day} ${mes} ${year}`;
+          } else {
+            key = m.pickupDate;
+          }
+        }
+        if (!groupsMap.has(key)) {
+          groupsMap.set(key, []);
+          orderedKeys.push(key);
+        }
+        groupsMap.get(key)!.push(m);
+      }
+
+      orderedKeys.sort((a, b) => {
+        if (a === fallbackKey) return 1;
+        if (b === fallbackKey) return -1;
+        
+        const parseKey = (k: string) => {
+          const parts = k.split(' ');
+          if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const month = meses.indexOf(parts[1]);
+            const year = parseInt(parts[2], 10);
+            return new Date(year, month, day).getTime();
+          }
+          return new Date(k).getTime();
+        };
+
+        return parseKey(b) - parseKey(a);
+      });
+    } else {
+      // Default: FECHA_COMPRA
+      for (const m of list) {
+        const d = new Date(m.date);
+        const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+        const dia = d.getDate();
+        const mes = meses[d.getMonth()];
+        const anio = d.getFullYear();
+        const dateStr = `${dia} ${mes} ${anio}`;
+
+        if (!groupsMap.has(dateStr)) {
+          groupsMap.set(dateStr, []);
+          orderedKeys.push(dateStr);
+        }
+        groupsMap.get(dateStr)!.push(m);
+      }
     }
 
     return orderedKeys.map((key) => ({
-      fechaStr: key,
+      titulo: key,
       movimientos: groupsMap.get(key)!,
     }));
   });
+
+  toggleGroup(titulo: string): void {
+    this.collapsedGroups.update((set) => {
+      const next = new Set(set);
+      if (next.has(titulo)) {
+        next.delete(titulo);
+      } else {
+        next.add(titulo);
+      }
+      return next;
+    });
+  }
+
+  isGroupExpanded(titulo: string): boolean {
+    return !this.collapsedGroups().has(titulo);
+  }
 
   ngOnInit(): void {
     void this.alumnosService.asegurarCargados().then(() => {
@@ -329,8 +407,9 @@ export class MovimientosPage implements OnInit {
     }
   }
 
-  cancelarPedido(id: string): void {
-    if (confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.')) {
+  async cancelarPedido(id: string): Promise<void> {
+    const confirmed = await this.dialogService.confirm('¿Estás seguro de que deseas cancelar este pedido? Se le reembolsará el saldo al alumno.', 'Cancelar Pedido');
+    if (confirmed) {
       this.movimientosService.cancelarCompra(id).subscribe({
         next: () => {
           this.toastService.mostrar('Pedido cancelado y saldo reembolsado', 'success');

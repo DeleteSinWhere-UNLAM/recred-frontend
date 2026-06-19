@@ -1,13 +1,17 @@
 export interface TutorGlobalDashboardSummary {
   tutorId: string;
   totalBalance: number;
+  totalDebt: number;
+  dashboardConfig?: string;
   children: ChildDashboardSummary[];
+  plan?: string;
 }
 
 export interface ChildDashboardSummary {
   studentId: string;
   studentName: string;
   balance: number;
+  debt: number;
   urlFotoPerfil?: string | null;
   spendingPredictionMessage: string;
   budget?: BudgetSummary;

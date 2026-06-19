@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, inject, signal, computed } from '@angular/core';
 import { PerfilUsuarioService } from '../../../../data-access/services/perfil-usuario.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CropModalComponent } from '../../../perfil-usuario/components/crop-modal/crop-modal.component';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 
 @Component({
   selector: 'app-tutor-header',
@@ -21,6 +22,9 @@ export class TutorHeaderComponent {
 
   private readonly perfilUsuarioService = inject(PerfilUsuarioService);
   private readonly toastService = inject(ToastService);
+  private readonly perfilService = inject(PerfilService);
+
+  protected readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
 
   protected readonly subiendoFoto = signal(false);
   protected readonly fotoEvent = signal<Event | null>(null);

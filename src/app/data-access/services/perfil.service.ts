@@ -45,6 +45,9 @@ export class PerfilService {
   readonly rol: Signal<RolUsuario | null> = computed(
     () => this.perfilState()?.rol ?? null,
   );
+  readonly esPlanGratuito: Signal<boolean> = computed(
+    () => this.perfilState()?.plan !== 'PREMIUM',
+  );
 
   async cargarPerfil(): Promise<Perfil> {
     if (this.syncPerfilEnCurso) {
