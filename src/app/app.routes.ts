@@ -116,6 +116,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'sugerencias-agregar',
+        loadComponent: () =>
+          import('./features/sugerencias-agregar/sugerencias-agregar.page').then(
+            (m) => m.SugerenciasAgregarPage,
+          ),
+      },
+      {
         path: 'consumo',
         loadComponent: () =>
           import('./features/consumo/consumo.page').then((m) => m.ConsumoPage),
