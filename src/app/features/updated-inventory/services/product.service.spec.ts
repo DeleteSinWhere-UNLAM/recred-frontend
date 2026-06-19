@@ -98,7 +98,7 @@ describe('ProductService', () => {
     httpMock.verify();
   });
 
-  it('deberia retornar un arreglo de productos al llamar a getAll', () => {
+  it('dado que llamo a getAll, deberia retornar un arreglo de productos', () => {
     service.getAll().subscribe((products) => {
       expect(products).toEqual(mockProducts);
     });
@@ -108,7 +108,7 @@ describe('ProductService', () => {
     req.flush(mockProducts);
   });
 
-  it('deberia retornar categorias al llamar a getCategories', () => {
+  it('dado que llamo a getCategories, deberia retornar categorias', () => {
     service.getCategories().subscribe((categories) => {
       expect(categories).toEqual(mockCategories);
     });
@@ -118,7 +118,7 @@ describe('ProductService', () => {
     req.flush(mockCategories);
   });
 
-  it('deberia enviar buffetId como parametro al llamar a getAllByBuffetId', () => {
+  it('dado que llamo a getAllByBuffetId, deberia enviar buffetId como parametro', () => {
     const buffetId = 'test-buffet-123';
 
     service.getAllByBuffetId(buffetId).subscribe((products) => {
@@ -132,7 +132,7 @@ describe('ProductService', () => {
     req.flush(mockProducts);
   });
 
-  it('deberia obtener el overview de inventario por buffet', () => {
+  it('dado que consulto el inventory, deberia obtener el overview por buffet', () => {
     const buffetId = 'test-buffet-123';
 
     service.getInventoryOverview(buffetId).subscribe((overview) => {
@@ -144,7 +144,7 @@ describe('ProductService', () => {
     req.flush(mockOverview);
   });
 
-  it('deberia enviar quick action de inventario', () => {
+  it('dado que envio accion rapida, deberia actualizar el inventario', () => {
     const buffetId = 'test-buffet-123';
     const productId = 'product-123';
     const payload: QuickStockActionRequest = {
@@ -165,7 +165,7 @@ describe('ProductService', () => {
     req.flush({ ok: true });
   });
 
-  it('deberia actualizar stock con el endpoint general', () => {
+  it('dado que llamo a updateInventoryStock, deberia actualizar el stock con el endpoint general', () => {
     const buffetId = 'test-buffet-123';
     const productId = 'product-123';
     const payload: InventoryStockUpdateRequest = {
@@ -189,7 +189,7 @@ describe('ProductService', () => {
     req.flush({ ok: true });
   });
 
-  it('deberia obtener movimientos de stock por producto', () => {
+  it('dado que consulto movimientos, deberia obtener movimientos de stock por producto', () => {
     const buffetId = 'test-buffet-123';
     const productId = 'product-123';
 
@@ -204,7 +204,7 @@ describe('ProductService', () => {
     req.flush(mockMovements);
   });
 
-  it('deberia obtener un producto por id', () => {
+  it('dado que consulto por id, deberia obtener un producto', () => {
     const productId = '1';
 
     service.getById(productId).subscribe((product) => {
@@ -216,7 +216,7 @@ describe('ProductService', () => {
     req.flush(mockProducts[0]);
   });
 
-  it('deberia crear un producto', () => {
+  it('dado que envio un producto nuevo, deberia crearlo', () => {
     const payload: CreateProductRequest = {
       nombre: 'New Product',
       descripcion: 'New Desc',
@@ -242,7 +242,7 @@ describe('ProductService', () => {
     req.flush(expectedResponse);
   });
 
-  it('debería manejar el error de validación si create falla', () => {
+  it('dado que falla la creacion, deberia manejar el error de validacion', () => {
     const payload = {} as CreateProductRequest;
 
     service.create(payload).subscribe({
@@ -256,7 +256,7 @@ describe('ProductService', () => {
     req.flush('Bad Request', { status: 400, statusText: 'Bad Request' });
   });
 
-  it('debería enviar un PUT y retornar el producto actualizado al llamar a update', () => {
+  it('dado que llamo a update, deberia enviar un PUT y retornar el producto actualizado', () => {
     const productId = '1';
     const payload: UpdateProductRequest = {
       nombre: 'Updated Name',
@@ -281,7 +281,7 @@ describe('ProductService', () => {
     req.flush(expectedResponse);
   });
 
-  it('deberia eliminar un producto', () => {
+  it('dado que llamo a delete, deberia eliminar un producto', () => {
     const productId = '1';
 
     service.delete(productId).subscribe((response) => {

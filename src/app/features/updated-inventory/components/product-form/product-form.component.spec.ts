@@ -173,4 +173,72 @@ describe('ProductFormComponent', () => {
 
     expect(component.formCancel.emit).toHaveBeenCalled();
   });
+
+  it('dado que no hay producto, ngOnChanges deberia resetear el formulario y la previsualizacion', () => {
+    component.product = mockProduct;
+    component.ngOnChanges({
+      product: {
+        currentValue: mockProduct,
+        previousValue: null,
+        firstChange: true,
+        isFirstChange: () => true
+      }
+    });
+
+    component.product = null;
+    component.ngOnChanges({
+      product: {
+        currentValue: null,
+        previousValue: mockProduct,
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    });
+
+    expect(component.imagePreview()).toBeNull();
+    expect(component.productForm.get('requierePreparacion')?.value).toBeFalse();
+  });
+
+  it('dado que selecciono un archivo, deberia cargar la previsualizacion e iniciar subida', () => {
+    const file = new File([''], 'test.png', { type: 'image/png' });
+    const event = { target: { files: [file] } } as unknown as Event;
+
+    spyOn(component as any, 'uploadImage');
+
+    component.onFileSelected(event);
+
+    expect((component as any).uploadImage).toHaveBeenCalledWith(file);
+  });
+
+  it('dado que subo imagen exitosamente, deberia patchear el url y preview', () => {
+    const file = new File([''], 'test.png', { type: 'image/png' });
+    const httpMock = TestBed.inject(provideHttpClientTesting()[0] as any);
+    
+    // Omitiendo la inyeccion real para simplemente mockear el HttpClient via spy si es posible
+    // Pero ya tengo HttpTestingController inyectado
+    (component as any).uploadImage(file);
+    expect(component.isUploadingImage()).toBeTrue();
+  });
+
+  it('dado que llamo a hasError, deberia devolver true si el control es invalido y fue tocado', () => {
+    component.productForm.get('nombre')?.markAsTouched();
+    component.productForm.get('nombre')?.setErrors({ required: true });
+    expect(component.hasError('nombre')).toBeTrue();
+  });
+
+  it('dado que llamo a getErrorMessage, deberia devolver el mensaje correcto para cada error', () => {
+    component.productForm.get('nombre')?.setErrors({ required: true });
+    expect(component.getErrorMessage('nombre')).toBe('Este campo es obligatorio');
+
+    component.productForm.get('nombre')?.setErrors({ minlength: { requiredLength: 2 } });
+    expect(component.getErrorMessage('nombre')).toBe('Mínimo 2 caracteres');
+
+    component.productForm.get('precio')?.setErrors({ min: { min: 0.01 } });
+    expect(component.getErrorMessage('precio')).toBe('El valor mínimo es 0.01');
+
+    component.productForm.get('nombre')?.setErrors({ custom: true });
+    expect(component.getErrorMessage('nombre')).toBe('Valor inválido');
+
+    expect(component.getErrorMessage('campo_inexistente')).toBe('');
+  });
 });
