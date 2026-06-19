@@ -108,6 +108,20 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.cargando()).toBeFalse();
     });
 
+    it('devuelve strings vacios en getters si no hay alumno', async () => {
+      alumnosService.getAlumnoById.and.returnValue(undefined);
+      expect(presenter.nombreCompleto()).toBe('');
+      expect(presenter.iniciales()).toBe('');
+      expect(presenter.grado()).toBe('');
+      expect(presenter.urlFotoPerfil()).toBeNull();
+    });
+
+    it('maneja iniciales cuando el nombre o apellido estan vacios', async () => {
+      alumnosService.getAlumnoById.and.returnValue({ ...alumnoMock, nombre: '', apellido: '' });
+      await presenter.init('alumno-1');
+      expect(presenter.iniciales()).toBe('');
+    });
+
     it('reemplaza el presupuesto por el del back si existe', async () => {
       const presupuestoBack: Presupuesto = {
         id: 'pres-1',
@@ -323,6 +337,19 @@ describe('PresupuestoPresenter', () => {
   describe('guardar', () => {
     beforeEach(async () => {
       await presenter.init('alumno-1');
+    });
+
+    it('no hace nada si esta cargando o guardando', async () => {
+      (presenter as any).guardandoState.set(true);
+      await presenter.guardar();
+      expect(presupuestoService.guardar).not.toHaveBeenCalled();
+
+      (presenter as any).guardandoState.set(false);
+      (presenter as any).cargandoState.set(true);
+      await presenter.guardar();
+      expect(presupuestoService.guardar).not.toHaveBeenCalled();
+      
+      (presenter as any).cargandoState.set(false);
     });
 
     it('no llama al service si el porcentaje no es válido', async () => {

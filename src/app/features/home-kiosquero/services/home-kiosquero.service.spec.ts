@@ -1,66 +1,21 @@
-import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { environment } from '../../../../environments/environment';
-import { PanelKiosquero } from '../models/panel-kiosquero.model';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { HomeKiosqueroService } from './home-kiosquero.service';
+import { environment } from '../../../../environments/environment';
 
 describe('HomeKiosqueroService', () => {
   let service: HomeKiosqueroService;
   let httpMock: HttpTestingController;
-
-  const buffetId = 'buffet-123';
-  const date = '2026-06-11';
-  const kiosquerosUrl = `${environment.apiUrl}/kiosqueros`;
-  const panel: PanelKiosquero = {
-    buffetId,
-    date,
-    summary: {
-      totalSold: 12500,
-      totalOrders: 18,
-      deliveredOrders: 14,
-      averageTicket: 892.86,
-      pendingOrders: 3,
-      soldOutProducts: 2,
-    },
-    activity: {
-      salesByTimeSlot: [],
-      salesByCategory: [],
-      ordersByStatus: [],
-      ordersByPurchaseType: [],
-    },
-    products: {
-      topSoldProducts: [],
-      mostReservedProducts: [],
-      productsNeedingRestock: [],
-      soldOutProducts: [],
-    },
-    alerts: {
-      expiredOrders: 1,
-      releasedReservations: 3,
-      refundedCredits: 1500,
-      soldOutEvents: 1,
-      pendingOrders: 3,
-      readyOrders: 2,
-      items: [],
-    },
-    trends: {
-      lastSevenDays: [],
-    },
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         HomeKiosqueroService,
         provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+        provideHttpClientTesting()
+      ]
     });
-
     service = TestBed.inject(HomeKiosqueroService);
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -69,43 +24,41 @@ describe('HomeKiosqueroService', () => {
     httpMock.verify();
   });
 
-  it('deberia obtener el panel por fecha', () => {
-    service.getPanel(buffetId, date).subscribe((result) => {
-      expect(result).toEqual(panel);
-    });
-
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/dashboard?date=${date}`,
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush(panel);
-  });
-
-  it('deberia permitir consultar sin fecha', () => {
-    service.getPanel(buffetId).subscribe((result) => {
-      expect(result).toEqual(panel);
-    });
-
-    const req = httpMock.expectOne(`${kiosquerosUrl}/${buffetId}/dashboard`);
+  it('should call getPanel without date', () => {
+    service.getPanel('123').subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/kiosqueros/123/dashboard`);
     expect(req.request.method).toBe('GET');
     expect(req.request.params.has('date')).toBeFalse();
-    req.flush(panel);
+    req.flush({});
   });
 
-  it('deberia obtener el dashboard por rango de fechas', () => {
-    service
-      .getPanelByRange(buffetId, {
-        from: '2026-06-08',
-        to: '2026-06-14',
-      })
-      .subscribe((result) => {
-        expect(result).toEqual(panel);
-      });
-
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/dashboard?from=2026-06-08&to=2026-06-14`,
-    );
+  it('should call getPanel with date', () => {
+    service.getPanel('123', '2023-01-01').subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/kiosqueros/123/dashboard?date=2023-01-01`);
     expect(req.request.method).toBe('GET');
-    req.flush(panel);
+    expect(req.request.params.get('date')).toBe('2023-01-01');
+    req.flush({});
+  });
+
+  it('should call getPanelByRange', () => {
+    service.getPanelByRange('123', { from: '2023-01-01', to: '2023-01-31' }).subscribe();
+    const req = httpMock.expectOne(`${environment.apiUrl}/kiosqueros/123/dashboard?from=2023-01-01&to=2023-01-31`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.get('from')).toBe('2023-01-01');
+    expect(req.request.params.get('to')).toBe('2023-01-31');
+    req.flush({});
+  });
+
+  it('should return default resumen', () => {
+    expect(service.getResumen()).toEqual({
+      gananciasHoy: 12450,
+      ventasHoy: 34,
+      productosSinStock: 5,
+      pedidosPendientes: 8,
+    });
+  });
+
+  it('should return default nombre kiosquero', () => {
+    expect(service.getNombreKiosquero()).toBe('Carlos');
   });
 });

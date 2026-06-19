@@ -87,7 +87,9 @@ export class OrdenAlumnoCardComponent {
     return `${day}/${month}/${year}`;
   });
 
-  readonly recreoLabel = computed(() => RECREO_LABELS[this.recreo] ?? this.recreo);
+  get recreoLabel() {
+    return RECREO_LABELS[this.recreo] ?? this.recreo;
+  }
 
   readonly subtotalFormateado = computed(() =>
     formateadorPrecio.format(this.subtotal()),

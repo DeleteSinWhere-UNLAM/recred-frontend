@@ -1,171 +1,164 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import { environment } from '../../../../environments/environment';
-import { DailyReport } from '../models/daily-close.model';
 import { DailyCloseService } from './daily-close.service';
+import { environment } from '../../../../environments/environment';
+import { DailyReport, DailyCloseStatus, DailyCloseResult, DailyCloseRecord } from '../models/daily-close.model';
 
 describe('DailyCloseService', () => {
   let service: DailyCloseService;
-  let httpMock: HttpTestingController;
-
-  const buffetId = 'buffet-123';
-  const date = '2026-06-09';
-  const kiosquerosUrl = `${environment.apiUrl}/kiosqueros`;
-
-  const report: DailyReport = {
-    buffetId,
-    date,
-    totalOrders: 25,
-    deliveredOrders: 18,
-    pendingOrders: 2,
-    inPreparationOrders: 1,
-    readyOrders: 1,
-    expiredOrders: 3,
-    cancelledOrders: 0,
-    rejectedOrders: 0,
-    deliveredTotal: 12500,
-    refundedCredits: 0,
-    releasedReservations: 8,
-    products: [],
-    inventory: [],
-    soldOutProducts: [],
-    salesByPaymentMethod: [],
-    stockMovements: [],
-  };
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         DailyCloseService,
         provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+        provideHttpClientTesting()
+      ]
     });
-
     service = TestBed.inject(DailyCloseService);
-    httpMock = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
-    httpMock.verify();
+    httpTestingController.verify();
   });
 
-  it('deberia cerrar el dia sin body y con fecha', () => {
-    const response = {
-      alreadyClosed: false,
-      expiredPurchases: 3,
-      releasedReservations: 8,
-      refundedCredits: 0,
-      report,
-    };
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
 
-    service.closeDaily(buffetId, date).subscribe((result) => {
-      expect(result).toEqual(response);
+  describe('closeDaily', () => {
+    it('should call POST with date param if provided', () => {
+      const mockResult: DailyCloseResult = {} as any;
+      service.closeDaily('buffet-1', '2023-10-10').subscribe(res => {
+        expect(res).toEqual(mockResult);
+      });
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/daily-close?date=2023-10-10`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toBeNull();
+      req.flush(mockResult);
+    });
+  });
+
+  describe('getDailyReport', () => {
+    it('should call GET with date param', () => {
+      const mockReport: DailyReport = {} as any;
+      service.getDailyReport('buffet-1', '2023-10-10').subscribe(res => {
+        expect(res).toEqual(mockReport);
+      });
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/reports/daily?date=2023-10-10`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockReport);
+    });
+  });
+
+  describe('getDailyCloseStatus', () => {
+    it('should call GET without date param if not provided', () => {
+      const mockStatus: DailyCloseStatus = {} as any;
+      service.getDailyCloseStatus('buffet-1').subscribe(res => {
+        expect(res).toEqual(mockStatus);
+      });
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/daily-close/status`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockStatus);
     });
 
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/daily-close?date=${date}`,
-    );
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toBeNull();
-    req.flush(response);
+    it('should call GET with date param if provided', () => {
+      const mockStatus: DailyCloseStatus = {} as any;
+      service.getDailyCloseStatus('buffet-1', '2023-10-10').subscribe(res => {
+        expect(res).toEqual(mockStatus);
+      });
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/daily-close/status?date=2023-10-10`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockStatus);
+    });
   });
 
-  it('deberia obtener el reporte diario JSON', () => {
-    service.getDailyReport(buffetId, date).subscribe((result) => {
-      expect(result).toEqual(report);
+  describe('getDailyCloses', () => {
+    it('should call GET with from and to params if provided', () => {
+      const mockRecords: DailyCloseRecord[] = [];
+      service.getDailyCloses('buffet-1', { from: '2023-01-01', to: '2023-12-31' }).subscribe(res => {
+        expect(res).toEqual(mockRecords);
+      });
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/daily-closes?from=2023-01-01&to=2023-12-31`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockRecords);
     });
 
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/reports/daily?date=${date}`,
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush(report);
-  });
-
-  it('deberia obtener el estado del cierre diario por fecha', () => {
-    const response = {
-      buffetId,
-      date,
-      closed: true,
-      expiredPurchases: 2,
-      releasedReservations: 4,
-      refundedCredits: 0,
-    };
-
-    service.getDailyCloseStatus(buffetId, date).subscribe((result) => {
-      expect(result).toEqual(response);
+    it('should call GET without params if not provided', () => {
+      const mockRecords: DailyCloseRecord[] = [];
+      service.getDailyCloses('buffet-1').subscribe(res => {
+        expect(res).toEqual(mockRecords);
+      });
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/daily-closes`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockRecords);
     });
-
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/daily-close/status?date=${date}`,
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush(response);
   });
 
-  it('deberia listar cierres diarios con filtros opcionales', () => {
-    const response = [
-      {
-        id: 'close-1',
-        buffetId,
-        date,
-        expiredPurchases: 2,
-        releasedReservations: 4,
-        refundedCredits: 0,
-      },
-    ];
+  describe('getDailyReportCsvUrl', () => {
+    it('should return correct URL', () => {
+      const url = service.getDailyReportCsvUrl('buffet-1', '2023-10-10');
+      expect(url).toBe(`${environment.apiUrl}/kiosqueros/buffet-1/reports/daily.csv?date=2023-10-10`);
+    });
+  });
 
-    service
-      .getDailyCloses(buffetId, { from: '2026-06-01', to: '2026-06-30' })
-      .subscribe((result) => {
-        expect(result).toEqual(response);
+  describe('downloadDailyReportCsv', () => {
+    it('should call GET expecting a blob response', () => {
+      const mockBlob = new Blob(['test']);
+      service.downloadDailyReportCsv('buffet-1', '2023-10-10').subscribe(res => {
+        expect(res).toEqual(mockBlob);
+      });
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/reports/daily.csv?date=2023-10-10`);
+      expect(req.request.method).toBe('GET');
+      expect(req.request.responseType).toBe('blob');
+      req.flush(mockBlob);
+    });
+  });
+
+  describe('refreshAfterClose', () => {
+    it('should perform requests using forkJoin and return report', () => {
+      const mockReport: DailyReport = { buffetId: 'buffet-1' } as any;
+      service.refreshAfterClose('buffet-1', '2023-10-10').subscribe(res => {
+        expect(res).toEqual(mockReport);
       });
 
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/daily-closes?from=2026-06-01&to=2026-06-30`,
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush(response);
-  });
+      const reqInventory = httpTestingController.expectOne(`${environment.apiUrl}/inventory/buffet-1/overview`);
+      expect(reqInventory.request.method).toBe('GET');
+      reqInventory.flush({});
 
-  it('deberia refrescar endpoints operativos despues del cierre y devolver reporte', () => {
-    service.refreshAfterClose(buffetId, date).subscribe((result) => {
-      expect(result).toEqual(report);
+      const reqOrders = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/orders`);
+      expect(reqOrders.request.method).toBe('GET');
+      reqOrders.flush({});
+
+      const reqAlerts = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/alerts`);
+      expect(reqAlerts.request.method).toBe('GET');
+      reqAlerts.flush({});
+
+      const reqReport = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/reports/daily?date=2023-10-10`);
+      expect(reqReport.request.method).toBe('GET');
+      reqReport.flush(mockReport);
     });
 
-    httpMock
-      .expectOne(`${environment.apiUrl}/inventory/${buffetId}/overview`)
-      .flush([]);
-    httpMock.expectOne(`${kiosquerosUrl}/${buffetId}/orders`).flush([]);
-    httpMock.expectOne(`${kiosquerosUrl}/${buffetId}/alerts`).flush([]);
-    httpMock
-      .expectOne(`${kiosquerosUrl}/${buffetId}/reports/daily?date=${date}`)
-      .flush(report);
-  });
+    it('should handle errors gracefully using catchError and resolve to null for secondary reqs', () => {
+      const mockReport: DailyReport = { buffetId: 'buffet-1' } as any;
+      service.refreshAfterClose('buffet-1', '2023-10-10').subscribe(res => {
+        expect(res).toEqual(mockReport);
+      });
 
-  it('deberia armar la URL directa del CSV', () => {
-    expect(service.getDailyReportCsvUrl(buffetId, date)).toBe(
-      `${kiosquerosUrl}/${buffetId}/reports/daily.csv?date=${date}`,
-    );
-  });
+      const reqInventory = httpTestingController.expectOne(`${environment.apiUrl}/inventory/buffet-1/overview`);
+      reqInventory.error(new ProgressEvent('error'));
 
-  it('deberia descargar el CSV como blob por HttpClient', () => {
-    const csv = new Blob(['metric,value'], { type: 'text/csv' });
+      const reqOrders = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/orders`);
+      reqOrders.error(new ProgressEvent('error'));
 
-    service.downloadDailyReportCsv(buffetId, date).subscribe((result) => {
-      expect(result).toBe(csv);
+      const reqAlerts = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/alerts`);
+      reqAlerts.error(new ProgressEvent('error'));
+
+      const reqReport = httpTestingController.expectOne(`${environment.apiUrl}/kiosqueros/buffet-1/reports/daily?date=2023-10-10`);
+      reqReport.flush(mockReport);
     });
-
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/reports/daily.csv?date=${date}`,
-    );
-    expect(req.request.method).toBe('GET');
-    expect(req.request.responseType).toBe('blob');
-    req.flush(csv);
   });
 });

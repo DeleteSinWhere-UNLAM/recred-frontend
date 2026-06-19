@@ -129,6 +129,12 @@ describe('PresupuestoService', () => {
     });
   });
 
+  describe('getPrediccion', () => {
+    it('siempre retorna undefined (stub temporal)', () => {
+      expect(service.getPrediccion('alumno-1')).toBeUndefined();
+    });
+  });
+
   describe('cargarPrediccion', () => {
     it('GET /ia/alumnos/{id}/prediccion-gasto con periodo y mapea la IA', async () => {
       const promesa = service.cargarPrediccion('alumno-1', 'MENSUAL');
@@ -201,6 +207,33 @@ describe('PresupuestoService', () => {
       expect(resultado?.alertas).toEqual([]);
       expect(resultado?.recomendaciones).toEqual([]);
       expect(resultado?.categoriasMasConsumidas).toEqual([]);
+    });
+  });
+
+  describe('checkBudgetDates', () => {
+    it('POST /budgets/student/{id}/check-dates y devuelve validationResults', async () => {
+      const promesa = service.checkBudgetDates('alumno-1', ['2026-06-01'], [{ productId: 'prod-1', quantity: 2 }]);
+      const req = httpMock.expectOne(`${apiBase}/budgets/student/alumno-1/check-dates`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ dates: ['2026-06-01'], items: [{ productId: 'prod-1', quantity: 2 }] });
+      req.flush({
+        validationResults: [
+          { date: '2026-06-01', blocked: false, reason: null }
+        ]
+      });
+
+      const resultado = await promesa;
+      expect(resultado.length).toBe(1);
+      expect(resultado[0].blocked).toBeFalse();
+    });
+
+    it('devuelve array vacio si response es null (ej validacion de safety bounds)', async () => {
+      const promesa = service.checkBudgetDates('alumno-1', [], []);
+      const req = httpMock.expectOne(`${apiBase}/budgets/student/alumno-1/check-dates`);
+      req.flush(null);
+
+      const resultado = await promesa;
+      expect(resultado).toEqual([]);
     });
   });
 

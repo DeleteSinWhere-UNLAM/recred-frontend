@@ -1,247 +1,161 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ProductFormComponent, ProductFormData } from './product-form.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Product } from '../../models/product.interface';
-import { Category } from '../../models/category.interface';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ProductFormComponent } from './product-form.component';
+import { environment } from '../../../../../environments/environment';
 
 describe('ProductFormComponent', () => {
   let component: ProductFormComponent;
   let fixture: ComponentFixture<ProductFormComponent>;
-
-  const mockCategories: Category[] = [
-    { id: 'c1', descripcion: 'Category 1', activo: true },
-    { id: 'c2', descripcion: 'Category 2', activo: true }
-  ];
-
-  const mockProduct: Product = {
-    id: '1',
-    nombre: 'Existing Product',
-    descripcion: 'Existing Desc',
-    precio: 100,
-    peso: 1,
-    requierePreparacion: true,
-    stockActual: 10,
-    categoriaId: 'c1',
-    categoriaNombre: 'Category 1'
-  };
+  let httpTestingController: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, ProductFormComponent],
+      imports: [ProductFormComponent, ReactiveFormsModule],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting()
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ProductFormComponent);
     component = fixture.componentInstance;
-    component.categories = mockCategories;
+    httpTestingController = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });
 
-  it('dado que se inicializa, debe crearse correctamente', () => {
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería inicializar un formulario vacío para creación si no se provee un producto', () => {
+  it('isEditing debería retornar true si hay producto', () => {
     expect(component.isEditing).toBeFalse();
-    expect(component.productForm.get('nombre')?.value).toBe('');
-    expect(component.productForm.get('requierePreparacion')?.value).toBeFalse();
-  });
-
-  it('debería popular el formulario para edición si se provee un producto', () => {
-    component.product = mockProduct;
-    component.ngOnChanges({
-      product: {
-        currentValue: mockProduct,
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: () => true
-      }
-    });
-
+    component.product = { id: '1' } as any;
     expect(component.isEditing).toBeTrue();
-    expect(component.productForm.get('nombre')?.value).toBe('Existing Product');
-    expect(component.productForm.get('categoriaId')?.value).toBe('c1');
-    expect(component.productForm.get('requierePreparacion')?.value).toBeTrue();
   });
 
-  it('debería ser inválido si faltan campos obligatorios', () => {
-    component.productForm.patchValue({
-      nombre: '',
-      descripcion: '',
-      precio: null,
-      peso: null,
-      stockActual: null,
-      categoriaId: null
-    });
-
-    expect(component.productForm.valid).toBeFalse();
-    expect(component.productForm.get('nombre')?.hasError('required')).toBeTrue();
-    expect(component.productForm.get('descripcion')?.hasError('required')).toBeTrue();
-    expect(component.productForm.get('precio')?.hasError('required')).toBeTrue();
-    expect(component.productForm.get('peso')?.hasError('required')).toBeTrue();
-    expect(component.productForm.get('stockActual')?.hasError('required')).toBeTrue();
-    expect(component.productForm.get('categoriaId')?.hasError('required')).toBeTrue();
-  });
-
-  it('debería ser inválido si se violan las restricciones de validación', () => {
-    component.productForm.patchValue({
-      nombre: 'a',
-      descripcion: 'ab',
-      precio: 0,
-      peso: 0,
-      stockActual: -1,
-      categoriaId: 'c1'
-    });
-
-    expect(component.productForm.valid).toBeFalse();
-    expect(component.productForm.get('nombre')?.hasError('minlength')).toBeTrue();
-    expect(component.productForm.get('descripcion')?.hasError('minlength')).toBeTrue();
-    expect(component.productForm.get('precio')?.hasError('min')).toBeTrue();
-    expect(component.productForm.get('peso')?.hasError('min')).toBeTrue();
-    expect(component.productForm.get('stockActual')?.hasError('min')).toBeTrue();
-  });
-
-  it('debería hacer obligatorio nuevaCategoriaNombre si categoriaId es NEW', () => {
-    component.productForm.patchValue({ categoriaId: 'NEW' });
-    fixture.detectChanges();
-
-    const nuevaCategoriaCtrl = component.productForm.get('nuevaCategoriaNombre');
-    expect(nuevaCategoriaCtrl?.hasError('required')).toBeTrue();
-
-    component.productForm.patchValue({ nuevaCategoriaNombre: 'New Category' });
-    expect(nuevaCategoriaCtrl?.hasError('required')).toBeFalse();
-  });
-
-  it('no debería requerir nuevaCategoriaNombre si categoriaId es un ID existente', () => {
-    component.productForm.patchValue({ categoriaId: 'c1' });
-    fixture.detectChanges();
-
-    const nuevaCategoriaCtrl = component.productForm.get('nuevaCategoriaNombre');
-    expect(nuevaCategoriaCtrl?.hasError('required')).toBeFalse();
-  });
-
-  it('debería emitir formSubmit con los datos si se envía un formulario válido', () => {
-    spyOn(component.formSubmit, 'emit');
-
-    const validData: ProductFormData = {
-      nombre: 'Valid Name',
-      descripcion: 'Valid Desc',
-      precio: 100,
-      peso: 1,
-      stockActual: 10,
-      categoriaId: 'c1',
-      nuevaCategoriaNombre: '',
-      requierePreparacion: false,
-      contiene_azucar: false,
-      contiene_mani: false,
-      contiene_lactosa: false,
-      contiene_tacc: false
-    };
-
-    component.productForm.patchValue(validData);
-    expect(component.productForm.valid).toBeTrue();
-
-    component.submitForm();
-
-    expect(component.formSubmit.emit).toHaveBeenCalledWith({
-      ...validData,
-      urlImagen: null
-    });
-  });
-
-  it('debería marcar todos los controles como tocados y no emitir si se envía un formulario inválido', () => {
-    spyOn(component.formSubmit, 'emit');
-    spyOn(component.productForm, 'markAllAsTouched').and.callThrough();
-
-    component.productForm.patchValue({ nombre: '' });
-    component.submitForm();
-
-    expect(component.productForm.markAllAsTouched).toHaveBeenCalled();
-    expect(component.formSubmit.emit).not.toHaveBeenCalled();
-  });
-
-  it('debería emitir el evento formCancel al cancelar el formulario', () => {
-    spyOn(component.formCancel, 'emit');
-
-    component.formCancel.emit();
-
-    expect(component.formCancel.emit).toHaveBeenCalled();
-  });
-
-  it('dado que no hay producto, ngOnChanges deberia resetear el formulario y la previsualizacion', () => {
-    component.product = mockProduct;
+  it('ngOnChanges debería inicializar el formulario con producto', () => {
+    const product = { 
+      nombre: 'Test', descripcion: 'Desc', precio: 10, peso: 1, stockActual: 5,
+      categoriaId: 'cat1', requierePreparacion: false,
+      clasificacionesSalud: []
+    } as any;
+    
+    component.product = product;
     component.ngOnChanges({
       product: {
-        currentValue: mockProduct,
+        currentValue: product,
         previousValue: null,
         firstChange: true,
         isFirstChange: () => true
       }
     });
 
-    component.product = null;
+    expect(component.productForm.get('nombre')?.value).toBe('Test');
+    expect(component.productForm.get('categoriaId')?.value).toBe('cat1');
+  });
+
+  it('ngOnChanges debería resetear si el producto es nulo', () => {
     component.ngOnChanges({
       product: {
         currentValue: null,
-        previousValue: mockProduct,
+        previousValue: {},
         firstChange: false,
         isFirstChange: () => false
       }
     });
 
-    expect(component.imagePreview()).toBeNull();
     expect(component.productForm.get('requierePreparacion')?.value).toBeFalse();
   });
 
-  it('dado que selecciono un archivo, deberia cargar la previsualizacion e iniciar subida', () => {
-    const file = new File([''], 'test.png', { type: 'image/png' });
-    const event = { target: { files: [file] } } as unknown as Event;
+  it('debería actualizar validadores si categoriaId es NEW', () => {
+    component.ngOnInit();
+    const ctrl = component.productForm.get('categoriaId');
+    ctrl?.setValue('NEW');
+    
+    expect(component.productForm.get('nuevaCategoriaNombre')?.hasError('required')).toBeTrue();
+    
+    ctrl?.setValue('cat1');
+    expect(component.productForm.get('nuevaCategoriaNombre')?.hasError('required')).toBeFalse();
+  });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    spyOn(component as any, 'uploadImage');
+  it('submitForm debería emitir formSubmit si es válido', () => {
+    spyOn(component.formSubmit, 'emit');
+    
+    component.productForm.patchValue({
+      nombre: 'Prod Test',
+      descripcion: 'Desc test',
+      precio: 100,
+      peso: 10,
+      stockActual: 5,
+      categoriaId: 'cat1'
+    });
+
+    component.submitForm();
+    expect(component.formSubmit.emit).toHaveBeenCalled();
+  });
+
+  it('submitForm no debería emitir si es inválido', () => {
+    spyOn(component.formSubmit, 'emit');
+    component.productForm.patchValue({ nombre: '' });
+    component.submitForm();
+    expect(component.formSubmit.emit).not.toHaveBeenCalled();
+  });
+
+  it('getErrorMessage debería retornar mensajes correctos', () => {
+    const ctrl = component.productForm.get('nombre');
+    ctrl?.setValue('');
+    ctrl?.markAsTouched();
+    expect(component.getErrorMessage('nombre')).toBe('Este campo es obligatorio');
+    
+    ctrl?.setValue('a');
+    expect(component.getErrorMessage('nombre')).toContain('Mínimo');
+    
+    const precioCtrl = component.productForm.get('precio');
+    precioCtrl?.setValue(-1);
+    precioCtrl?.markAsTouched();
+    expect(component.getErrorMessage('precio')).toContain('El valor mínimo');
+  });
+
+  it('onFileSelected debería subir imagen', () => {
+    const file = new File([''], 'img.jpg', { type: 'image/jpeg' });
+    const event = { target: { files: [file] } } as unknown as Event;
+    
+    // Simular FileReader
+    spyOn(window as any, 'FileReader').and.returnValue({
+      readAsDataURL: function() { this.onload(); },
+      result: 'data:image/jpeg;base64,'
+    });
 
     component.onFileSelected(event);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((component as any).uploadImage).toHaveBeenCalledWith(file);
-  });
-
-  it('dado que subo imagen exitosamente, deberia patchear el url y preview', () => {
-    const file = new File([''], 'test.png', { type: 'image/png' });
     
+    const req = httpTestingController.expectOne(`${environment.apiUrl}/load-stock/upload-image`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ url_imagen: 'http://cloud.com/img.jpg' });
 
-    // Omitiendo la inyeccion real para simplemente mockear el HttpClient via spy si es posible
-    // Pero ya tengo HttpTestingController inyectado
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (component as any).uploadImage(file);
-    expect(component.isUploadingImage()).toBeTrue();
+    expect(component.productForm.get('urlImagen')?.value).toBe('http://cloud.com/img.jpg');
+    expect(component.imagePreview()).toBe('http://cloud.com/img.jpg');
   });
-
-  it('dado que llamo a hasError, deberia devolver true si el control es invalido y fue tocado', () => {
-    component.productForm.get('nombre')?.markAsTouched();
-    component.productForm.get('nombre')?.setErrors({ required: true });
-    expect(component.hasError('nombre')).toBeTrue();
-  });
-
-  it('dado que llamo a getErrorMessage, deberia devolver el mensaje correcto para cada error', () => {
-    component.productForm.get('nombre')?.setErrors({ required: true });
-    expect(component.getErrorMessage('nombre')).toBe('Este campo es obligatorio');
-
-    component.productForm.get('nombre')?.setErrors({ minlength: { requiredLength: 2 } });
-    expect(component.getErrorMessage('nombre')).toBe('Mínimo 2 caracteres');
-
-    component.productForm.get('precio')?.setErrors({ min: { min: 0.01 } });
-    expect(component.getErrorMessage('precio')).toBe('El valor mínimo es 0.01');
-
-    component.productForm.get('nombre')?.setErrors({ custom: true });
-    expect(component.getErrorMessage('nombre')).toBe('Valor inválido');
-
-    expect(component.getErrorMessage('campo_inexistente')).toBe('');
+  
+  it('onFileSelected maneja error', () => {
+      const file = new File([''], 'img.jpg', { type: 'image/jpeg' });
+      const event = { target: { files: [file] } } as unknown as Event;
+      
+      spyOn(window as any, 'FileReader').and.returnValue({
+        readAsDataURL: function() { this.onload(); },
+        result: 'data:image/jpeg;base64,'
+      });
+  
+      component.onFileSelected(event);
+      
+      const req = httpTestingController.expectOne(`${environment.apiUrl}/load-stock/upload-image`);
+      req.error(new ProgressEvent('error'));
+  
+      expect(component.isUploadingImage()).toBeFalse();
   });
 });

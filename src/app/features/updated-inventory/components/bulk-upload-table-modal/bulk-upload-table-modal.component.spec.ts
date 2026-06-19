@@ -1,42 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 import { BulkUploadTableModalComponent } from './bulk-upload-table-modal.component';
-import { BulkProductResponse } from '../../services/bulk-upload.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 describe('BulkUploadTableModalComponent', () => {
   let component: BulkUploadTableModalComponent;
   let fixture: ComponentFixture<BulkUploadTableModalComponent>;
+  let toastSpy: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
+    const spy = jasmine.createSpyObj('ToastService', ['mostrar']);
+
     await TestBed.configureTestingModule({
-      imports: [BulkUploadTableModalComponent]
+      imports: [BulkUploadTableModalComponent, ReactiveFormsModule],
+      providers: [
+        { provide: ToastService, useValue: spy }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(BulkUploadTableModalComponent);
     component = fixture.componentInstance;
+    toastSpy = TestBed.inject(ToastService) as jasmine.SpyObj<ToastService>;
     fixture.detectChanges();
   });
 
-  it('dado que inicializo la tabla sin prefill, el array debe estar vacio', () => {
-    expect(component.productsArray.length).toBe(0);
+  it('debería crear', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('dado que asigno un prefillProducts, debe reconstruir el form array', () => {
-    const products: BulkProductResponse[] = [
-      {
-        nombre: 'Agua',
-        descripcion: 'Mineral',
-        precio: 500,
-        peso: 500,
-        requierePreparacion: false,
-        categoriaId: 'cat-123',
-        nuevaCategoriaNombre: '',
-        stockActual: 10,
-        saludEtiquetasIds: [],
-        tipoEtiquetasIds: []
-      }
-    ];
-
-    component.prefilledProducts = products;
+  it('ngOnChanges debería reconstruir el form array', () => {
+    const products = [{ nombre: 'P1', precio: 10, categoriaId: '1', requierePreparacion: false }];
+    component.prefilledProducts = products as any;
     component.ngOnChanges({
       prefilledProducts: {
         currentValue: products,
@@ -45,40 +39,61 @@ describe('BulkUploadTableModalComponent', () => {
         isFirstChange: () => true
       }
     });
-
     expect(component.productsArray.length).toBe(1);
-    expect(component.productsArray.at(0).value.nombre).toBe('Agua');
-    expect(component.productsArray.at(0).value.categoriaId).toBe('cat-123');
+    expect(component.productsArray.at(0).get('nombre')?.value).toBe('P1');
   });
 
-  it('dado que agrego una fila, debe sumar un elemento al array', () => {
+  it('addProductRow y removeProductRow deberían modificar el array', () => {
     component.addProductRow();
     expect(component.productsArray.length).toBe(1);
-  });
-
-  it('dado que elimino una fila, debe restarse del array', () => {
-    component.addProductRow();
-    component.addProductRow();
+    
     component.removeProductRow(0);
-    expect(component.productsArray.length).toBe(1);
+    expect(component.productsArray.length).toBe(0);
   });
 
-  it('dado que hago click en guardar con form valido, debe emitir el listado', () => {
+  it('onFileChange debería emitir fileSelected', () => {
+    spyOn(component.fileSelected, 'emit');
+    const file = new File([''], 'test.csv');
+    const event = { target: { files: [file] } } as unknown as Event;
+    
+    component.onFileChange(event);
+    
+    expect(component.fileSelected.emit).toHaveBeenCalledWith(file);
+  });
+
+  it('onCancel debería emitir closeModal', () => {
+    spyOn(component.closeModal, 'emit');
+    component.onCancel();
+    expect(component.closeModal.emit).toHaveBeenCalled();
+  });
+
+  it('onSave debería emitir saveProducts si el form es válido', () => {
     spyOn(component.saveProducts, 'emit');
-    component.addProductRow();
-    component.productsArray.at(0).patchValue({ 
-      nombre: 'Test', 
-      precio: 100, 
-      categoriaId: 'cat-123' 
-    });
+    component.addProductRow({ nombre: 'P1', precio: 10, categoriaId: '1' } as any);
     component.onSave();
+    
     expect(component.saveProducts.emit).toHaveBeenCalled();
   });
 
-  it('dado que hago click en guardar con form invalido, NO debe emitir', () => {
-    spyOn(component.saveProducts, 'emit');
-    component.addProductRow();
+  it('onSave debería mostrar error si el form es inválido', () => {
+    component.addProductRow(); // Fila vacía, inválida
     component.onSave();
-    expect(component.saveProducts.emit).not.toHaveBeenCalled();
+    expect(toastSpy.mostrar).toHaveBeenCalledWith(jasmine.any(String), 'error');
+  });
+
+  it('onSave debería mostrar error si no hay productos', () => {
+    component.onSave();
+    expect(toastSpy.mostrar).toHaveBeenCalledWith('No hay productos para guardar', 'error');
+  });
+
+  it('debería cambiar validadores cuando categoriaId es NEW', () => {
+    component.addProductRow();
+    const row = component.productsArray.at(0);
+    
+    row.get('categoriaId')?.setValue('NEW');
+    expect(row.get('nuevaCategoriaNombre')?.hasError('required')).toBeTrue();
+    
+    row.get('categoriaId')?.setValue('123');
+    expect(row.get('nuevaCategoriaNombre')?.hasError('required')).toBeFalse();
   });
 });

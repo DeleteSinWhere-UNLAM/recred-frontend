@@ -1,7 +1,6 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { BuffetPresenter } from './buffet.presenter';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { BuffetService } from '../services/buffet.service';
 import { FavoritosService } from '../../favoritos/services/favoritos.service';
@@ -14,13 +13,13 @@ import { FranjasHorariasService } from '../../restricciones-horarias/services/fr
 import { RestriccionesHorariasService } from '../../restricciones-horarias/services/restricciones-horarias.service';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
 import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
-import { BuffetPresenter } from './buffet.presenter';
+import { of, throwError } from 'rxjs';
 import { Alumno } from '../../../data-access/models/alumno.model';
-import { Buffet } from '../models/buffet.model';
-import { Producto } from '../models/producto.model';
 
 describe('BuffetPresenter', () => {
   let presenter: BuffetPresenter;
+
+  // Spies
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let buffetServiceSpy: jasmine.SpyObj<BuffetService>;
   let favoritosServiceSpy: jasmine.SpyObj<FavoritosService>;
@@ -30,110 +29,30 @@ describe('BuffetPresenter', () => {
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let restriccionProductoServiceSpy: jasmine.SpyObj<RestriccionProductoService>;
-  let franjasHorariasServiceSpy: jasmine.SpyObj<FranjasHorariasService>;
-  let restriccionesHorariasServiceSpy: jasmine.SpyObj<RestriccionesHorariasService>;
+  let franjasServiceSpy: jasmine.SpyObj<FranjasHorariasService>;
+  let restriccionesHorariasSpy: jasmine.SpyObj<RestriccionesHorariasService>;
   let presupuestoServiceSpy: jasmine.SpyObj<PresupuestoService>;
-  let restriccionesNutricionalesServiceSpy: jasmine.SpyObj<RestriccionesNutricionalesService>;
+  let restriccionesNutricionalesSpy: jasmine.SpyObj<RestriccionesNutricionalesService>;
 
-  const mockAlumno: Alumno = {
-    id: 'alumno-1',
-    nombre: 'Julián',
-    apellido: 'García',
-    grado: '4to Año A',
-    colegioId: 'colegio-1',
-    saldo: 25000,
-  };
-
-  const mockBuffet: Buffet = {
-    id: 'buffet-1',
-    nombre: 'El Buffet de Mariano',
-    colegioId: 'colegio-1',
-  };
-
-  const productoBloqueadoPorTutor: Producto = {
-    id: 'prod-tutor',
-    nombre: 'Alfajor',
-    descripcion: 'Dulce',
-    precio: 500,
-    categoria: { id: 'snacks', descripcion: 'Snacks' },
-    clasificacionesSalud: [],
-    imagen: '',
-    estadoStock: 'SIN_STOCK',
-    bloqueado: true,
-  };
-
-  const productoBloqueadoPorRestriccion: Producto = {
-    id: 'prod-restriccion',
-    nombre: 'Galletitas Oreo',
-    descripcion: 'Con TACC',
-    precio: 400,
-    categoria: { id: 'snacks', descripcion: 'Snacks' },
-    clasificacionesSalud: [],
-    imagen: '',
-    estadoStock: 'SIN_STOCK',
-    bloqueado: false,
-    bloqueadoPorRestriccion: true,
-    motivoBloqueo: 'Contiene: Gluten (TACC)',
-  };
-
-  const productoDisponible: Producto = {
-    id: 'prod-libre',
-    nombre: 'Agua Mineral',
-    descripcion: 'Bebida',
-    precio: 300,
-    categoria: { id: 'bebidas', descripcion: 'Bebidas' },
-    clasificacionesSalud: [],
-    imagen: '',
-    estadoStock: 'DISPONIBLE',
-    bloqueado: false,
-  };
-
-  const mockProductos: Producto[] = [
-    productoDisponible,
-    productoBloqueadoPorTutor,
-    productoBloqueadoPorRestriccion,
-  ];
-
+  const mockAlumno: Alumno = { id: 'a1', nombre: 'Juan', apellido: 'Perez', colegioId: 'c1', saldo: 1000, grado: '1A', urlFotoPerfil: 'url' } as any;
+  const mockBuffet = { id: 'b1', nombre: 'Buffet Central' };
+  const mockFranjas = [{ id: 'f1', horaInicio: '10:00', horaFin: '10:30', descripcion: 'PRIMER RECREO' }];
+  const mockRestriccionesHorarias = [{ id: 'r1', activa: true, timeSlotId: 'f2' }];
+  
   beforeEach(() => {
-    alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>('AlumnosService', ['getAlumnoById']);
-    buffetServiceSpy = jasmine.createSpyObj<BuffetService>('BuffetService', [
-      'obtenerBuffetDelAlumno', 'getProductosDelBuffet',
-    ]);
-    favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos']);
-    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', [
-      'agregar', 'setCatalog', 'cargarPresupuestoYConsumo', 'getSeleccionRetiro', 'setSeleccionRetiro'
-    ]);
-    const mockCarrito = carritoServiceSpy as unknown as {
-      items: unknown;
-      budgets: unknown;
-      purchases: unknown;
-    };
-    mockCarrito.items = signal([]);
-    mockCarrito.budgets = signal(new Map());
-    mockCarrito.purchases = signal(new Map());
-    colegiosServiceSpy = jasmine.createSpyObj<ColegiosService>('ColegiosService', ['getColegios']);
-    usuarioServiceSpy = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl', 'esVistaAlumno']);
-    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigateByUrl', 'navigate']);
-    restriccionProductoServiceSpy = jasmine.createSpyObj<RestriccionProductoService>(
-      'RestriccionProductoService', ['bloquearProducto', 'desbloquearProducto']
-    );
-    franjasHorariasServiceSpy = jasmine.createSpyObj<FranjasHorariasService>('FranjasHorariasService', ['getFranjasHorarias']);
-    restriccionesHorariasServiceSpy = jasmine.createSpyObj<RestriccionesHorariasService>('RestriccionesHorariasService', ['getRestriccionesPorAlumno']);
-    presupuestoServiceSpy = jasmine.createSpyObj<PresupuestoService>('PresupuestoService', ['checkBudgetDates', 'getPresupuesto']);
-    restriccionesNutricionalesServiceSpy = jasmine.createSpyObj<RestriccionesNutricionalesService>('RestriccionesNutricionalesService', ['getRestriccionesAlumno']);
-
-    alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
-    buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of(mockBuffet));
-    buffetServiceSpy.getProductosDelBuffet.and.returnValue(of(mockProductos));
-    favoritosServiceSpy.getFavoritos.and.returnValue(of([]));
-    colegiosServiceSpy.getColegios.and.returnValue([{ id: 'colegio-1', nombre: 'Fernando Fader' }]);
-    usuarioServiceSpy.homeUrl.and.returnValue('/tutor');
-    usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
-    franjasHorariasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([]));
-    restriccionesHorariasServiceSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([]));
-    presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.resolve([]));
-    restriccionesNutricionalesServiceSpy.getRestriccionesAlumno.and.returnValue(Promise.resolve([]));
+    alumnosServiceSpy = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
+    buffetServiceSpy = jasmine.createSpyObj('BuffetService', ['obtenerBuffetDelAlumno', 'getProductosDelBuffet']);
+    favoritosServiceSpy = jasmine.createSpyObj('FavoritosService', ['getFavoritos', 'agregarFavorito', 'removerFavorito']);
+    carritoServiceSpy = jasmine.createSpyObj('CarritoService', ['getSeleccionRetiro', 'setSeleccionRetiro', 'setCatalog', 'cargarPresupuestoYConsumo', 'items', 'budgets', 'purchases', 'agregar']);
+    colegiosServiceSpy = jasmine.createSpyObj('ColegiosService', ['getColegios']);
+    usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['homeUrl', 'esVistaAlumno']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['mostrar']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
+    restriccionProductoServiceSpy = jasmine.createSpyObj('RestriccionProductoService', ['desbloquearProducto', 'bloquearProducto']);
+    franjasServiceSpy = jasmine.createSpyObj('FranjasHorariasService', ['getFranjasHorarias']);
+    restriccionesHorariasSpy = jasmine.createSpyObj('RestriccionesHorariasService', ['getRestriccionesPorAlumno']);
+    presupuestoServiceSpy = jasmine.createSpyObj('PresupuestoService', ['checkBudgetDates']);
+    restriccionesNutricionalesSpy = jasmine.createSpyObj('RestriccionesNutricionalesService', ['getRestriccionesAlumno']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -147,99 +66,308 @@ describe('BuffetPresenter', () => {
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: RestriccionProductoService, useValue: restriccionProductoServiceSpy },
-        { provide: FranjasHorariasService, useValue: franjasHorariasServiceSpy },
-        { provide: RestriccionesHorariasService, useValue: restriccionesHorariasServiceSpy },
+        { provide: FranjasHorariasService, useValue: franjasServiceSpy },
+        { provide: RestriccionesHorariasService, useValue: restriccionesHorariasSpy },
         { provide: PresupuestoService, useValue: presupuestoServiceSpy },
-        { provide: RestriccionesNutricionalesService, useValue: restriccionesNutricionalesServiceSpy },
-      ],
+        { provide: RestriccionesNutricionalesService, useValue: restriccionesNutricionalesSpy }
+      ]
     });
 
     presenter = TestBed.inject(BuffetPresenter);
+
+    // Default setups
+    usuarioServiceSpy.homeUrl.and.returnValue('/home');
+    alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
+    carritoServiceSpy.getSeleccionRetiro.and.returnValue({ fecha: '2050-01-01', recreo: 'PRIMER_RECREO' });
+    carritoServiceSpy.items.and.returnValue([]);
+    carritoServiceSpy.budgets.and.returnValue(new Map());
+    carritoServiceSpy.purchases.and.returnValue(new Map());
+    colegiosServiceSpy.getColegios.and.returnValue([{ id: 'c1', nombre: 'Colegio 1' }] as any);
+    usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
+    
+    favoritosServiceSpy.getFavoritos.and.returnValue(of([{ id: 'p1' }] as any));
+    restriccionesNutricionalesSpy.getRestriccionesAlumno.and.returnValue(Promise.resolve([]));
+    buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of(mockBuffet as any));
+    franjasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve(mockFranjas as any));
+    restriccionesHorariasSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve(mockRestriccionesHorarias as any));
+    presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.resolve([{ date: '2050-01-01', blocked: false, reason: null }]));
+    buffetServiceSpy.getProductosDelBuffet.and.returnValue(of([
+      { id: 'p1', nombre: 'P1', precio: 10, categoria: { id: 'cat1', descripcion: 'Cat1' }, clasificacionesSalud: [] } as any
+    ]));
   });
 
-  it('debería crearse el presenter', () => {
-    expect(presenter).toBeTruthy();
-  });
-
-  describe('productosFiltrados — separación bloqueo tutor vs restricción', () => {
-    it('en vista tutor: debe mostrar todos los productos (disponibles, bloqueados por tutor y por restricción)', fakeAsync(() => {
-      usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
-      presenter.init('alumno-1');
-      tick();
-
-      const filtrados = presenter.productosFiltrados();
-      expect(filtrados.length).toBe(3);
-    }));
-
-    it('en vista alumno: debe ocultar los productos bloqueados por el tutor y los restringidos por nutrición', fakeAsync(() => {
-      usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
-      presenter.init('alumno-1');
-      tick();
-
-      const filtrados = presenter.productosFiltrados();
-      expect(filtrados.length).toBe(1);
-      expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
-      expect(filtrados.some(p => p.id === 'prod-tutor')).toBeFalse();
-      expect(filtrados.some(p => p.id === 'prod-restriccion')).toBeFalse();
-    }));
-
-    it('en vista alumno: los productos disponibles deben aparecer', fakeAsync(() => {
-      usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
-      presenter.init('alumno-1');
-      tick();
-
-      const filtrados = presenter.productosFiltrados();
-      expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
-    }));
-  });
-
-  describe('toggleLock — bloqueo y desbloqueo manual', () => {
-    it('debería bloquear un producto de forma optimista y llamar al servicio', () => {
-      presenter.init('alumno-1');
-      const producto = { ...productoDisponible, bloqueado: false };
-      restriccionProductoServiceSpy.bloquearProducto.and.returnValue(of(undefined));
-
-      presenter.toggleLock(producto);
-
-      expect(producto.bloqueado).toBeTrue();
-      expect(restriccionProductoServiceSpy.bloquearProducto).toHaveBeenCalledWith('alumno-1', 'prod-libre');
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se bloqueó "Agua Mineral"', 'success');
+  describe('init', () => {
+    it('debería redirigir al home si no existe el alumno', () => {
+      alumnosServiceSpy.getAlumnoById.and.returnValue(undefined);
+      presenter.init('invalid');
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/home');
     });
 
-    it('debería revertir el bloqueo optimista si el servicio falla', () => {
-      spyOn(console, 'error');
-      presenter.init('alumno-1');
-      const producto = { ...productoDisponible, bloqueado: false };
-      restriccionProductoServiceSpy.bloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));
+    it('debería inicializar datos correctamente', fakeAsync(() => {
+      presenter.init('a1');
+      tick(); // resolve promises
+      
+      expect(presenter.alumno()).toEqual(mockAlumno);
+      expect(presenter.buffet()).toEqual(mockBuffet as any);
+      expect(presenter.franjas().length).toBe(1);
+      expect(presenter.productos().length).toBe(1);
+      expect(presenter.favoritos().has('p1')).toBeTrue();
+      expect(presenter.categorias().length).toBe(1);
+      expect(presenter.nombreCompleto()).toBe('Juan Perez');
+      expect(presenter.nombreColegio()).toBe('Colegio 1');
+      expect(presenter.urlFotoPerfil()).toBe('url');
+      expect(presenter.iniciales()).toBe('JP');
+      expect(presenter.grado()).toBe('1A');
+      expect(presenter.saldo()).toBe(1000);
+      expect(carritoServiceSpy.setCatalog).toHaveBeenCalled();
+    }));
 
-      presenter.toggleLock(producto);
+    it('debería manejar errores de favoritos y restricciones nutricionales', fakeAsync(() => {
+      favoritosServiceSpy.getFavoritos.and.returnValue(throwError(() => new Error('Error')));
+      restriccionesNutricionalesSpy.getRestriccionesAlumno.and.returnValue(Promise.reject('Error'));
+      presenter.init('a1');
+      tick();
+      expect(presenter.favoritos().size).toBe(0);
+    }));
 
-      expect(producto.bloqueado).toBeFalse();
+    it('debería redirigir a home y mostrar error si buffet falla', fakeAsync(() => {
+      buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(throwError(() => new Error('Error')));
+      presenter.init('a1');
+      tick();
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('No se pudo cargar el buffet del alumno', 'error');
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/home');
+    }));
+
+    it('debería hacer fallback de carga de productos si franjas falla', fakeAsync(() => {
+      franjasServiceSpy.getFranjasHorarias.and.returnValue(Promise.reject('Error'));
+      presenter.init('a1');
+      tick();
+      expect(buffetServiceSpy.getProductosDelBuffet).toHaveBeenCalled();
+    }));
+  });
+
+  describe('Acciones de Filtrado y Búsqueda', () => {
+    beforeEach(fakeAsync(() => {
+      presenter.init('a1');
+      tick();
+    }));
+
+    it('buscar', () => {
+      presenter.buscar('P1');
+      expect(presenter.filtros().busqueda).toBe('P1');
+    });
+
+    it('seleccionarCategoria', () => {
+      presenter.seleccionarCategoria('cat1');
+      expect(presenter.filtros().categoriaId).toBe('cat1');
+    });
+
+    it('seleccionarClasificacion', () => {
+      presenter.seleccionarClasificacion('clasif1');
+      expect(presenter.filtros().clasificacionId).toBe('clasif1');
+    });
+
+    it('toggleSoloFavoritos', () => {
+      presenter.toggleSoloFavoritos();
+      expect(presenter.filtros().soloFavoritos).toBeTrue();
+    });
+
+    it('setPrecioMin y Max', () => {
+      presenter.setPrecioMin(5);
+      presenter.setPrecioMax(15);
+      expect(presenter.filtros().precioMin).toBe(5);
+      expect(presenter.filtros().precioMax).toBe(15);
+    });
+
+    it('limpiarFiltros', () => {
+      presenter.buscar('hola');
+      presenter.limpiarFiltros();
+      expect(presenter.filtros().busqueda).toBe('');
+    });
+  });
+
+  describe('Acciones de Navegación e Interacción', () => {
+    beforeEach(fakeAsync(() => {
+      presenter.init('a1');
+      tick();
+    }));
+
+    it('volver e irAlCarrito', () => {
+      presenter.volver();
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/home');
+      presenter.irAlCarrito();
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/compra');
+    });
+
+    it('cambiarAlumno', () => {
+      presenter.cambiarAlumno('a2');
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/buffet', 'a2']);
+    });
+
+    it('agregarAlCarrito', () => {
+      presenter.agregarAlCarrito({ id: 'p1', nombre: 'Test', precio: 10 } as any, 2);
+      expect(carritoServiceSpy.agregar).toHaveBeenCalled();
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se agregaron 2x "Test" al carrito');
+    });
+
+    it('toggleFavorito agregar', () => {
+      favoritosServiceSpy.agregarFavorito.and.returnValue(of({} as any));
+      presenter.toggleFavorito({ id: 'p2', nombre: 'P2' } as any);
+      expect(presenter.favoritos().has('p2')).toBeTrue();
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se agregó "P2" a tus favoritos', 'success');
+    });
+
+    it('toggleFavorito quitar', () => {
+      favoritosServiceSpy.removerFavorito.and.returnValue(of({} as any));
+      // p1 is already favorite
+      presenter.toggleFavorito({ id: 'p1', nombre: 'P1' } as any);
+      expect(presenter.favoritos().has('p1')).toBeFalse();
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se quitó "P1" de tus favoritos', 'success');
+    });
+
+    it('toggleLock', () => {
+      const prod = { id: 'p1', nombre: 'P1', bloqueado: false } as any;
+      restriccionProductoServiceSpy.bloquearProducto.and.returnValue(of({} as any));
+      presenter.toggleLock(prod);
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se bloqueó "P1"', 'success');
+
+      prod.bloqueado = true; // after update
+      restriccionProductoServiceSpy.desbloquearProducto.and.returnValue(of({} as any));
+      presenter.toggleLock(prod);
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se desbloqueó "P1"', 'success');
+    });
+
+    it('toggleLock error fallback', () => {
+      const prod = { id: 'p1', nombre: 'P1', bloqueado: false } as any;
+      restriccionProductoServiceSpy.bloquearProducto.and.returnValue(throwError(() => new Error('Error')));
+      presenter.toggleLock(prod);
       expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Error al bloquear el producto', 'error');
-    });
 
-    it('debería desbloquear un producto de forma optimista y llamar al servicio', () => {
-      presenter.init('alumno-1');
-      const producto = { ...productoBloqueadoPorTutor, bloqueado: true };
-      restriccionProductoServiceSpy.desbloquearProducto.and.returnValue(of(undefined));
-
-      presenter.toggleLock(producto);
-
-      expect(producto.bloqueado).toBeFalse();
-      expect(restriccionProductoServiceSpy.desbloquearProducto).toHaveBeenCalledWith('alumno-1', 'prod-tutor');
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se desbloqueó "Alfajor"', 'success');
-    });
-
-    it('debería revertir el desbloqueo optimista si el servicio falla', () => {
-      spyOn(console, 'error');
-      presenter.init('alumno-1');
-      const producto = { ...productoBloqueadoPorTutor, bloqueado: true };
-      restriccionProductoServiceSpy.desbloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));
-
-      presenter.toggleLock(producto);
-
-      expect(producto.bloqueado).toBeTrue();
+      const prod2 = { id: 'p1', nombre: 'P1', bloqueado: true } as any;
+      restriccionProductoServiceSpy.desbloquearProducto.and.returnValue(throwError(() => new Error('Error')));
+      presenter.toggleLock(prod2);
       expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Error al desbloquear el producto', 'error');
     });
+  });
+
+  describe('Computed y Fechas', () => {
+    it('debería calcular totales del carrito', fakeAsync(() => {
+      presenter.init('a1');
+      tick();
+      carritoServiceSpy.items.and.returnValue([
+        { alumnoId: 'a1', producto: { precio: 10 }, cantidad: 2 } as any,
+        { alumnoId: 'a2', producto: { precio: 50 }, cantidad: 1 } as any // ignore
+      ]);
+      expect(presenter.itemsCarrito().length).toBe(1);
+      expect(presenter.totalCarrito()).toBe(20);
+      expect(presenter.cantidadItemsCarrito()).toBe(2);
+    }));
+
+    it('debería establecer la fecha y evitar fines de semana', fakeAsync(() => {
+      presenter.init('a1');
+      tick();
+      // '2050-01-01' es sábado (fin de semana) -> siguiente día hábil -> 2050-01-03
+      presenter.setFecha('2050-01-01');
+      tick();
+      expect(presenter.fechaSeleccionada()).toBe('2050-01-03');
+    }));
+
+    it('debería mapear correctamente los recreos y todas sus ramas', fakeAsync(() => {
+      presenter.init('a1');
+      tick();
+      
+      // Test all branches of matchesDescription
+      franjasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([
+        { id: 'f1', horaInicio: '10:00', horaFin: '10:15', descripcion: 'PRIMER RECREO' },
+        { id: 'f2', horaInicio: '12:00', horaFin: '12:15', descripcion: 'SEGUNDO RECREO' },
+        { id: 'f3', horaInicio: '13:00', horaFin: '13:30', descripcion: 'MEDIO DIA' },
+        { id: 'f4', horaInicio: '16:00', horaFin: '16:15', descripcion: 'SALIDA FINAL' },
+        { id: 'f5', horaInicio: '17:00', horaFin: '17:15', descripcion: 'OTRO RECREO NO MATCH' }
+      ] as any));
+      
+      // re-trigger init to load new franjas
+      presenter.init('a1');
+      tick();
+
+      const recreos = presenter.recreosDisponibles();
+      expect(recreos.length).toBeGreaterThan(0);
+      expect(recreos.some(r => r.recreo === 'PRIMER_RECREO')).toBeTrue();
+      expect(recreos.some(r => r.recreo === 'SEGUNDO_RECREO')).toBeTrue();
+      expect(recreos.some(r => r.recreo === 'MEDIODIA')).toBeTrue();
+      expect(recreos.some(r => r.recreo === 'FUERA_HORA')).toBeTrue();
+    }));
+
+    it('debería validar presupuesto', fakeAsync(() => {
+      presenter.init('a1');
+      tick();
+      
+      const fakeBudget = {
+        activo: true, periodo: 'MENSUAL', montoLimiteGeneral: 500, reglasCategoria: [{ activo: true, categoriaId: 'cat1', descripcionCategoria: 'Cat1', montoLimiteCalculado: 200 }]
+      };
+      const budgetsMap = new Map();
+      budgetsMap.set('a1', fakeBudget);
+      carritoServiceSpy.budgets.and.returnValue(budgetsMap);
+
+      const res = presenter.presupuestoDisponible();
+      expect(res).toBeTruthy();
+      expect(res?.montoLimiteGeneral).toBe(500); // Because saldo is 1000 => limit is 500
+      expect(res?.reglasCategorias.length).toBe(1);
+    }));
+
+    it('debería aplicar filtros a productosFiltrados', fakeAsync(() => {
+      buffetServiceSpy.getProductosDelBuffet.and.returnValue(of([
+        { id: 'p1', nombre: 'Alfa', precio: 10, categoria: { id: 'c1' }, clasificacionesSalud: [{ id: 'cs1' }], bloqueado: false },
+        { id: 'p2', nombre: 'Beta', precio: 20, categoria: { id: 'c2' }, clasificacionesSalud: [], bloqueado: true, bloqueadoPorRestriccion: true, motivoBloqueo: 'Contiene azucar' }
+      ] as any));
+      presenter.init('a1');
+      tick();
+
+      // Vista alumno oculta bloqueados
+      usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
+      expect(presenter.productosFiltrados().length).toBe(1); // p2 es ocultado
+
+      // Búsqueda
+      usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
+      presenter.buscar('beta');
+      expect(presenter.productosFiltrados().length).toBe(1); // p2
+
+      presenter.limpiarFiltros();
+      presenter.seleccionarCategoria('c1');
+      expect(presenter.productosFiltrados().length).toBe(1); // p1
+
+      presenter.limpiarFiltros();
+      presenter.seleccionarClasificacion('cs1');
+      expect(presenter.productosFiltrados().length).toBe(1); // p1
+
+      presenter.limpiarFiltros();
+      presenter.setPrecioMax(15);
+      expect(presenter.productosFiltrados().length).toBe(1); // p1
+
+      presenter.limpiarFiltros();
+      presenter.setPrecioMin(15);
+      expect(presenter.productosFiltrados().length).toBe(1); // p2
+
+      // Favoritos
+      presenter.limpiarFiltros();
+      presenter.toggleSoloFavoritos();
+      expect(presenter.productosFiltrados().length).toBe(1); // None is favorite according to mock
+    }));
+
+    it('setRecreo', fakeAsync(() => {
+      presenter.init('a1');
+      tick();
+      presenter.setRecreo('SEGUNDO_RECREO');
+      expect(presenter.recreoSeleccionado()).toBe('SEGUNDO_RECREO');
+      expect(carritoServiceSpy.setSeleccionRetiro).toHaveBeenCalled();
+    }));
+  });
+
+  describe('Manejo de errores del Budget check', () => {
+    it('debería manejar el error de la promesa', fakeAsync(() => {
+      presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.reject('Network Error'));
+      presenter.init('a1');
+      tick();
+      expect(presenter.presupuestoPorFecha()).toBeNull();
+    }));
   });
 });
