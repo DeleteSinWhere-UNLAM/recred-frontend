@@ -582,23 +582,23 @@ export class HomeKiosqueroPresenter {
     const groups: (ProductGroup | null)[] = [
       soldOutTotal > 0 || soldOutItems.length > 0
         ? {
-            title: 'Productos sin stock',
-            icon: 'fa-triangle-exclamation',
-            emptyLabel: 'Hay productos agotados, pero no llegó el detalle.',
-            items: soldOutItems,
-            countLabel: this.formatNumber(soldOutTotal),
-            tone: 'danger',
-          }
+          title: 'Productos sin stock',
+          icon: 'fa-triangle-exclamation',
+          emptyLabel: 'Hay productos agotados, pero no llegó el detalle.',
+          items: soldOutItems,
+          countLabel: this.formatNumber(soldOutTotal),
+          tone: 'danger',
+        }
         : null,
       lowStockItems.length > 0
         ? {
-            title: 'Productos bajo stock',
-            icon: 'fa-boxes-stacked',
-            emptyLabel: 'No hay productos bajo mínimo.',
-            items: lowStockItems,
-            countLabel: this.formatNumber(lowStockItems.length),
-            tone: 'warning',
-          }
+          title: 'Productos bajo stock',
+          icon: 'fa-boxes-stacked',
+          emptyLabel: 'No hay productos bajo mínimo.',
+          items: lowStockItems,
+          countLabel: this.formatNumber(lowStockItems.length),
+          tone: 'warning',
+        }
         : null,
     ];
 
@@ -880,7 +880,7 @@ export class HomeKiosqueroPresenter {
     {
       id: 'cargar-productos',
       titulo: 'Cargar producto',
-      descripcion: 'Alta asistida por foto',
+      descripcion: 'Funcionalidad premium',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
@@ -965,7 +965,7 @@ export class HomeKiosqueroPresenter {
     {
       id: 'cargar-productos',
       titulo: 'Cargar producto',
-      descripcion: 'Alta asistida por foto',
+      descripcion: 'Funcionalidad premium',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',

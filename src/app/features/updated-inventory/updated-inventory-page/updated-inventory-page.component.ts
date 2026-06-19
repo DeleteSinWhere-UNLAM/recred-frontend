@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,6 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
-import { UploadSelectionModalComponent } from '../components/upload-selection-modal/upload-selection-modal.component';
 import { BulkUploadTableModalComponent } from '../components/bulk-upload-table-modal/bulk-upload-table-modal.component';
 import { BulkUploadService, BulkProductResponse } from '../services/bulk-upload.service';
 import { InventoryRealtimeService } from '../services/inventory-realtime.service';
@@ -95,7 +94,6 @@ type InventoryManagementShortcut = 'MAKE_AVAILABLE' | 'PAUSE' | 'SOLD_OUT';
     ProductTableComponent,
     ProductFormComponent,
     ConfirmDeleteModalComponent,
-    UploadSelectionModalComponent,
     BulkUploadTableModalComponent,
     ReactiveFormsModule,
   ],
@@ -137,7 +135,6 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   isRefreshing = false;
   isSaving = false;
   isFormVisible = false;
-  isSelectionModalVisible = false;
   isBulkUploadModalVisible = false;
   isProcessingFile = false;
   bulkProductsData: BulkProductResponse[] = [];
@@ -209,6 +206,19 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
     if (this.buffetId) {
       this.connectRealtime(this.buffetId);
     }
+
+    this.route.queryParams.subscribe(params => {
+      if (params['action'] === 'bulk-upload') {
+        // Limpiamos el query param para que no persista si refresca
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { action: null },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+        this.openBulkUploadModal();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -346,21 +356,15 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   }
 
   openCreateForm(): void {
-    this.isSelectionModalVisible = true;
-  }
-
-  closeSelectionModal(): void {
-    this.isSelectionModalVisible = false;
+    this.openIndividualForm();
   }
 
   openIndividualForm(): void {
-    this.isSelectionModalVisible = false;
     this.selectedProduct = null;
     this.isFormVisible = true;
   }
 
   openBulkUploadModal(): void {
-    this.isSelectionModalVisible = false;
     this.isBulkUploadModalVisible = true;
     this.bulkProductsData = [];
   }

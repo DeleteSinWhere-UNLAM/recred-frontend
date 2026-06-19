@@ -8,6 +8,8 @@ import {
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
+import { UploadSelectionModalComponent } from '../updated-inventory/components/upload-selection-modal/upload-selection-modal.component';
+import { Router } from '@angular/router';
 
 const IMAGEN_FALLBACK =
   "data:image/svg+xml;utf8," +
@@ -25,15 +27,18 @@ const IMAGEN_FALLBACK =
   selector: 'app-home-kiosquero-page',
   templateUrl: './home-kiosquero.page.html',
   styleUrl: './home-kiosquero.page.css',
-  imports: [NavbarComponent],
+  imports: [NavbarComponent, UploadSelectionModalComponent],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeKiosqueroPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
+  private readonly router = inject(Router);
   protected readonly presenter = inject(HomeKiosqueroPresenter);
 
   protected readonly IMAGEN_FALLBACK = IMAGEN_FALLBACK;
+  
+  isUploadModalVisible = false;
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
@@ -44,5 +49,27 @@ export class HomeKiosqueroPage implements OnInit {
     const img = event.target as HTMLImageElement;
     if (img.src === IMAGEN_FALLBACK) return;
     img.src = IMAGEN_FALLBACK;
+  }
+
+  onActionClick(action: any): void {
+    if (action.id === 'cargar-productos') {
+      this.isUploadModalVisible = true;
+    } else {
+      this.presenter.ejecutarAccion(action);
+    }
+  }
+
+  goToIaUpload(): void {
+    this.isUploadModalVisible = false;
+    this.router.navigateByUrl('/cargar-producto-ia');
+  }
+
+  goToBulkUpload(): void {
+    this.isUploadModalVisible = false;
+    this.router.navigate(['/admin-productos'], { queryParams: { action: 'bulk-upload' } });
+  }
+
+  closeUploadModal(): void {
+    this.isUploadModalVisible = false;
   }
 }

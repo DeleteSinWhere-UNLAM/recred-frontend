@@ -1,4 +1,4 @@
-﻿<app-navbar />
+<app-navbar />
 
 <main class="inventario">
   <div class="inventario__container">
@@ -151,14 +151,6 @@
       (editProduct)="openEditFormFromInventory($event)"
       (deleteProduct)="requestDeleteFromInventory($event)">
     </app-product-table>
-
-    @if (isSelectionModalVisible) {
-      <app-upload-selection-modal
-        (individualUpload)="openIndividualForm()"
-        (bulkUpload)="openBulkUploadModal()"
-        (closeModal)="closeSelectionModal()"
-      />
-    }
 
     @if (isBulkUploadModalVisible) {
       <app-bulk-upload-table-modal
