@@ -27,11 +27,11 @@ describe('BilleteraService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('debería crearse', () => {
+  it('dado que se inyecta el servicio, deberia crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getResumen debería enviar el rango de fechas como query params', () => {
+  it('dado que se llama a getResumen con rango, deberia enviar el rango de fechas como query params', () => {
     let resultado: BilleteraResumen | undefined;
 
     service.getResumen('alumno-1', '2026-06-01', '2026-06-14').subscribe((r) => {
@@ -64,7 +64,7 @@ describe('BilleteraService', () => {
     expect(resultado).toEqual(mock);
   });
 
-  it('getResumen debería omitir el rango cuando no se informa', () => {
+  it('dado que se llama a getResumen sin rango, deberia omitirlo', () => {
     service.getResumen('alumno-1').subscribe();
 
     const req = httpMock.expectOne(

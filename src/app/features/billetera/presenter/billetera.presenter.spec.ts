@@ -95,11 +95,11 @@ describe('BilleteraPresenter', () => {
     presenter = TestBed.inject(BilleteraPresenter);
   });
 
-  it('debería crearse', () => {
+  it('dado que se inicializa el presenter, deberia crearse correctamente', () => {
     expect(presenter).toBeTruthy();
   });
 
-  it('init debería resolver alumnoId desde la ruta y cargar resumen', async () => {
+  it('dado que se llama a init con id, deberia resolver alumnoId desde la ruta y cargar resumen', async () => {
     presenter.init('alumno-1');
     await new Promise((r) => setTimeout(r, 0));
 
@@ -110,7 +110,7 @@ describe('BilleteraPresenter', () => {
     expect(presenter.cargando()).toBeFalse();
   });
 
-  it('init sin id de ruta debería usar el perfilService', async () => {
+  it('dado que se llama a init sin id de ruta, deberia usar el perfilService', async () => {
     perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-1');
     presenter.init(null);
     await new Promise((r) => setTimeout(r, 0));
@@ -119,7 +119,7 @@ describe('BilleteraPresenter', () => {
     expect(billeteraServiceSpy.getResumen.calls.mostRecent().args[0]).toBe('alumno-1');
   });
 
-  it('cambiarFecha debería recargar el resumen y actualizar el rango activo', async () => {
+  it('dado que se llama a cambiarFecha, deberia recargar el resumen y actualizar el rango activo', async () => {
     presenter.init('alumno-1');
     await new Promise((r) => setTimeout(r, 0));
     billeteraServiceSpy.getResumen.calls.reset();
@@ -130,7 +130,7 @@ describe('BilleteraPresenter', () => {
     expect(presenter.rangoFecha()).toBe('semana');
   });
 
-  it('debería formatear montos con signo según dirección', () => {
+  it('dado que recibe montos, deberia formatear montos con signo segun direccion', () => {
     expect(
       presenter.formatearMontoConSigno({
         id: 'a',
