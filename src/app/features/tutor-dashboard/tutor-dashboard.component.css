@@ -869,6 +869,12 @@
   opacity: 0.5;
 }
 
+.transfer-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 /* Inline Quick Transfer Input */
 .transfer-input-wrapper {
   position: relative;
@@ -972,4 +978,49 @@
 
 ::ng-deep gridster-preview {
   background-color: rgba(242, 183, 5, 0.4) !important;
+}
+
+@media (max-width: 768px) {
+  .tutor-dashboard {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .global-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  
+  .global-balance-info, .global-debt-info {
+    align-items: center;
+    text-align: center;
+  }
+
+  .child-transfer-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    min-width: 100%;
+    padding: 16px;
+  }
+
+  .transfer-actions-row {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .transfer-actions-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .transfer-input-wrapper {
+    width: 80px;
+  }
 }

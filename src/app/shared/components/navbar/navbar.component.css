@@ -489,11 +489,15 @@
   }
 
   .navbar__logo-text {
-    font-size: 20px;
+    display: none; /* Hide redundant text to prevent overlap on mobile */
   }
 
   .navbar__logo-img {
     height: 34px;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__actions {
+    gap: 8px; /* Reduce gap on mobile to prevent overflow */
   }
 
   .navbar__kiosk-link,
@@ -868,5 +872,38 @@
   .navbar--kiosquero .navbar__scan i:last-child,
   .navbar--kiosquero .navbar__kiosk-tools i:last-child {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar__inner {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__actions {
+    gap: 6px;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__cart,
+  .navbar:not(.navbar--kiosquero) .navbar__perfil,
+  .navbar:not(.navbar--kiosquero) .navbar__notif,
+  .navbar:not(.navbar--kiosquero) .navbar__kiosk-tools,
+  .navbar__dashboard-link,
+  .navbar__movimientos-link,
+  .navbar__carritos-favoritos-link {
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    border-radius: 10px;
+  }
+
+  .navbar__cart-badge,
+  .navbar__notif-badge {
+    min-width: 17px;
+    height: 17px;
+    font-size: 10px;
+    top: -4px;
+    right: -4px;
   }
 }
