@@ -68,9 +68,10 @@ export class BulkUploadTableModalComponent implements OnChanges {
 
   onSave(): void {
     if (this.form.valid && this.productsArray.length > 0) {
-      const productsToSave = this.form.value.products.map((p: any) => {
-        const { unidadMedida, ...rest } = p;
-        return rest;
+      const productsToSave = this.form.value.products.map((p: Record<string, unknown>) => {
+        const payload = { ...p };
+        delete payload['unidadMedida'];
+        return payload as unknown as BulkProductResponse;
       });
       this.saveProducts.emit(productsToSave);
     } else {

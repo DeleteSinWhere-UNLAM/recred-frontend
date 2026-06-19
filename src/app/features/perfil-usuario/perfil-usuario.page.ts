@@ -22,15 +22,6 @@ type PerfilUsuarioForm = FormGroup<{
   documentNumber: FormControl<string>;
 }>;
 
-type PayoutForm = FormGroup<{
-  destinationCvu: FormControl<string>;
-  destinationCuit: FormControl<string>;
-  accountHolderName: FormControl<string>;
-  cantidadIntervalo: FormControl<number>;
-  unidadIntervalo: FormControl<'DAYS' | 'WEEKS' | 'MONTHS'>;
-  estado: FormControl<'ACTIVE' | 'PAUSED' | 'CANCELLED'>;
-}>;
-
 @Component({
   selector: 'app-perfil-usuario-page',
   templateUrl: './perfil-usuario.page.html',
