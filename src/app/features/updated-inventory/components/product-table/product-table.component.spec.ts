@@ -121,12 +121,22 @@ describe('ProductTableComponent', () => {
     const imgElement = document.createElement('img');
     imgElement.src = 'bad-url.jpg';
     
-    component.onImagenError({ target: imgElement } as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component.onImagenError({ target: imgElement } as any);
+    expect(imgElement.src).toContain('data:image/svg+xml');
+  });
+
+  it('dado que la imagen falla al cargar repetidas veces, deberia usar la imagen por defecto solo una vez', () => {
+    const imgElement = document.createElement('img');
+    imgElement.src = 'invalid-url';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component.onImagenError({ target: imgElement } as any);
     expect(imgElement.src).toContain('data:image/svg+xml');
     
     // Segunda vez no deberia volver a procesar si ya es fallback
     const fallbackSrc = imgElement.src;
-    component.onImagenError({ target: imgElement } as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component.onImagenError({ target: imgElement } as any);
     expect(imgElement.src).toBe(fallbackSrc);
   });
 

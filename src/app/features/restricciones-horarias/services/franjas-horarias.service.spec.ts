@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { FranjasHorariasService } from './franjas-horarias.service';
@@ -49,14 +49,13 @@ describe('FranjasHorariasService', () => {
   }));
 
   it('dado que falla la peticion, deberia lanzar error', fakeAsync(() => {
-    let error: unknown;
-    service.getFranjasHorarias('c1').catch(err => error = err);
+    service.getFranjasHorarias('c1').catch((error: import('@angular/common/http').HttpErrorResponse) => {
+      expect(error).toBeDefined();
+      expect(error.status).toBe(500);
+    });
 
     const req = httpMock.expectOne(`${environment.apiUrl}/colegios/c1/franjas-horarias`);
     req.flush('Error', { status: 500, statusText: 'Server Error' });
-
     tick();
-    expect(_error).toBeDefined();
-    expect(error.status).toBe(500);
   }));
 });

@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { SeasonalPagePresenter } from './seasonal-page.presenter';
 import { RecomendacionesService } from '../../../services/recomendaciones.service';
 import { ProductService } from '../../../../updated-inventory/services/product.service';
@@ -85,7 +85,8 @@ describe('SeasonalPagePresenter', () => {
     it('dado que resolveProducts falla para un producto, deberia crear producto dummy no disponible', fakeAsync(() => {
       recomendacionesServiceSpy.getSeasonalRecommendations.and.returnValue(of({
         sugerencias: [],
-        promocion_creada: { id: 'promo1', name: 'P', productIds: ['prod-err'] } as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        promocion_creada: { id: 'promo1', name: 'P', productIds: ['prod-err'] } as any
       }));
       productServiceSpy.getById.and.returnValue(throwError(() => new Error('Error')));
 
@@ -124,7 +125,8 @@ describe('SeasonalPagePresenter', () => {
   describe('Promotions actions', () => {
     it('dado que se aprueba promocion exitosamente, deberia emitir success y cerrar modal', () => {
       perfilServiceSpy.obtenerBuffetId.and.returnValue('buffet1');
-      promotionServiceSpy.approvePromotion.and.returnValue(of({} as unknown));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      promotionServiceSpy.approvePromotion.and.returnValue(of({} as any));
       presenter['showModalState'].set(true);
 
       presenter.approvePromotion('promo1');

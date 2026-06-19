@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RestriccionesHorariasPresenter } from './restricciones-horarias.presenter';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { RestriccionesHorariasService } from '../services/restricciones-horarias.service';
@@ -9,11 +9,11 @@ import { of } from 'rxjs';
 
 describe('RestriccionesHorariasPresenter', () => {
   let presenter: RestriccionesHorariasPresenter;
-  let alumnosServiceMock: unknown;
-  let restriccionesServiceMock: unknown;
-  let franjasServiceMock: unknown;
-  let nutricionalesServiceMock: unknown;
-  let productServiceMock: unknown;
+  let alumnosServiceMock: jasmine.SpyObj<AlumnosService>;
+  let restriccionesServiceMock: jasmine.SpyObj<RestriccionesHorariasService>;
+  let franjasServiceMock: jasmine.SpyObj<FranjasHorariasService>;
+  let nutricionalesServiceMock: jasmine.SpyObj<RestriccionesNutricionalesService>;
+  let productServiceMock: jasmine.SpyObj<ProductService>;
 
   beforeEach(() => {
     alumnosServiceMock = jasmine.createSpyObj('AlumnosService', ['asegurarCargados', 'getAlumnoById']);
@@ -36,13 +36,13 @@ describe('RestriccionesHorariasPresenter', () => {
     presenter = TestBed.inject(RestriccionesHorariasPresenter);
 
     // Default mocks setup
-    alumnosServiceMock.asegurarCargados.and.returnValue(Promise.resolve());
-    alumnosServiceMock.getAlumnoById.and.returnValue({ id: 'a1', colegioId: 'c1' });
-    franjasServiceMock.getFranjasHorarias.and.returnValue(Promise.resolve([{ id: 'ts1', descripcion: 'Recreo 1' }]));
-    restriccionesServiceMock.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([{ id: 'r1', activa: true, timeSlotId: 'ts1', categoryId: 'cat1' }]));
+    alumnosServiceMock.asegurarCargados.and.returnValue(Promise.resolve() as unknown as never);
+    alumnosServiceMock.getAlumnoById.and.returnValue({ id: 'a1', colegioId: 'c1' } as unknown as import('../../../data-access/models/alumno.model').Alumno);
+    franjasServiceMock.getFranjasHorarias.and.returnValue(Promise.resolve([{ id: 'ts1', descripcion: 'Recreo 1' }] as unknown as never[]));
+    restriccionesServiceMock.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([{ id: 'r1', activa: true, timeSlotId: 'ts1', categoryId: 'cat1' }] as unknown as import('../models/restriccion-horaria.model').RestriccionHoraria[]));
     nutricionalesServiceMock.getCatalogo.and.returnValue(Promise.resolve([{ id: 'sal1', descripcion: 'Salud 1' }]));
     nutricionalesServiceMock.getRestriccionesAlumno.and.returnValue(Promise.resolve([{ id: 'salGlobal1', descripcion: 'Salud Global' }]));
-    productServiceMock.getCategories.and.returnValue(of([{ id: 'cat1', descripcion: 'Categoria 1' }, { id: 'cat2', descripcion: 'Categoria 2' }]));
+    productServiceMock.getCategories.and.returnValue(of([{ id: 'cat1', descripcion: 'Categoria 1' }, { id: 'cat2', descripcion: 'Categoria 2' }] as unknown as import('../../updated-inventory/models/category.interface').Category[]));
   });
 
   afterEach(() => {
@@ -69,11 +69,11 @@ describe('RestriccionesHorariasPresenter', () => {
   }));
 
   it('dado que agregarRestriccion categoria es llamado, deberia delegar en servicio y actualizar', fakeAsync(() => {
-    restriccionesServiceMock.crearRestriccion.and.returnValue(Promise.resolve({}));
+    restriccionesServiceMock.crearRestriccion.and.returnValue(Promise.resolve({} as unknown as import('../models/restriccion-horaria.model').RestriccionHoraria));
     restriccionesServiceMock.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([
       { id: 'r1', activa: true, timeSlotId: 'ts1', categoryId: 'cat1' },
       { id: 'r2', activa: true, timeSlotId: 'ts1', categoryId: 'cat2' }
-    ]));
+    ] as unknown as import('../models/restriccion-horaria.model').RestriccionHoraria[]));
 
     presenter.init('a1');
     tick();

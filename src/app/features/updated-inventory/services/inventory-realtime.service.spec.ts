@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { InventoryRealtimeService } from './inventory-realtime.service';
 import { AuthSessionService } from '../../../core/auth/services/auth-session.service';
 

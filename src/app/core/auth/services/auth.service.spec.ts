@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { AuthSessionService } from './auth-session.service';
 
-
 describe('AuthService', () => {
   let service: AuthService;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
@@ -71,7 +70,7 @@ describe('AuthService', () => {
 
     it('dado que signOut de amplify falla, debe capturar el error y no romper la ejecucion', async () => {
       const error = new Error('Error al cerrar sesion');
-      (service.amplify.signOut as jasmine.Spy).and.returnValue(Promise.reject(_error));
+      (service.amplify.signOut as jasmine.Spy).and.returnValue(Promise.reject(error));
       spyOn(console, 'error');
 
       await service.logout();
@@ -94,7 +93,7 @@ describe('AuthService', () => {
 
   describe('esperarAutenticacion', () => {
     it('dado que la sesion se obtiene correctamente, debe retornar true', async () => {
-      authSessionServiceSpy.esperarSesionAutenticada.and.returnValue(Promise.resolve({} as unknown));
+      authSessionServiceSpy.esperarSesionAutenticada.and.returnValue(Promise.resolve({} as unknown as import('aws-amplify/auth').AuthSession));
 
       const result = await service.esperarAutenticacion();
 

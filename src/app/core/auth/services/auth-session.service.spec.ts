@@ -14,9 +14,9 @@ describe('AuthSessionService', () => {
     spyOn(console, 'warn');
   });
 
-  const mockSessionWithTokens: AuthSession = {
+  const mockSessionWithTokens = {
     tokens: {
-      accessToken: 'access-123' as unknown,
+      accessToken: 'access-123' as unknown as import('aws-amplify/auth').JWT,
       idToken: {
         payload: {
           sub: 'sub-123',
@@ -24,14 +24,14 @@ describe('AuthSessionService', () => {
           given_name: 'Juan',
           family_name: 'Perez',
         }
-      } as unknown
+      } as unknown as import('aws-amplify/auth').JWT
     },
     userSub: 'sub-123'
-  };
+  } as unknown as import('aws-amplify/auth').AuthSession;
 
-  const mockSessionWithoutTokens: AuthSession = {
+  const mockSessionWithoutTokens = {
     tokens: undefined
-  };
+  } as unknown as import('aws-amplify/auth').AuthSession;
 
   it('dado que se crea el servicio, debe estar definido', () => {
     expect(service).toBeTruthy();
@@ -85,7 +85,7 @@ describe('AuthSessionService', () => {
         Promise.resolve(mockSessionWithTokens)
       );
 
-      let result: AuthSession | null | undefined;
+      let result: import('aws-amplify/auth').AuthSession | null | undefined;
       service.esperarSesionAutenticada({ reintentos: 3, intervaloMs: 100 }).then(res => {
         result = res;
       });
@@ -101,7 +101,7 @@ describe('AuthSessionService', () => {
     it('dado que se acaban los reintentos y no hay sesion, debe retornar null', fakeAsync(() => {
       const fetchSpy = spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve(null as unknown as AuthSession));
 
-      let result: AuthSession | null | undefined;
+      let result: import('aws-amplify/auth').AuthSession | null | undefined;
       service.esperarSesionAutenticada({ reintentos: 2, intervaloMs: 50 }).then(res => {
         result = res;
       });
@@ -146,7 +146,7 @@ describe('AuthSessionService', () => {
 
   describe('obtenerSub', () => {
     it('dado que la sesion tiene userSub, debe retornarlo', async () => {
-      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ ...mockSessionWithTokens, userSub: 'sub-especifico' }));
+      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ ...mockSessionWithTokens, userSub: 'sub-especifico' } as unknown as import('aws-amplify/auth').AuthSession));
 
       const result = await service.obtenerSub();
 
@@ -154,7 +154,7 @@ describe('AuthSessionService', () => {
     });
 
     it('dado que la sesion no tiene userSub pero si en payload, debe retornarlo del payload', async () => {
-      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ ...mockSessionWithTokens, userSub: undefined }));
+      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ ...mockSessionWithTokens, userSub: undefined } as unknown as import('aws-amplify/auth').AuthSession));
 
       const result = await service.obtenerSub();
 
@@ -187,13 +187,13 @@ describe('AuthSessionService', () => {
     it('dado que el payload tiene name en vez de given_name, debe mapearlo al nombre', async () => {
       const mockSessionName = {
         tokens: {
-          accessToken: 'access' as unknown,
+          accessToken: 'access',
           idToken: {
             payload: { name: 'Pedro' }
-          } as unknown
+          }
         }
       };
-      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve(mockSessionName));
+      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve(mockSessionName) as unknown as Promise<import('aws-amplify/auth').AuthSession>);
 
       const result = await service.obtenerAtributosUsuario();
 
@@ -202,7 +202,7 @@ describe('AuthSessionService', () => {
     });
 
     it('dado que no hay payload en idToken, debe retornar objeto vacio', async () => {
-      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ tokens: { accessToken: 'a' as unknown } as unknown }));
+      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve({ tokens: { accessToken: 'a' } } as unknown as AuthSession));
 
       const result = await service.obtenerAtributosUsuario();
 
@@ -214,13 +214,13 @@ describe('AuthSessionService', () => {
     it('dado que los atributos del payload tienen espacios o no son strings, valorString los limpia', async () => {
       const mockSessionSpaces = {
         tokens: {
-          accessToken: 'access' as unknown,
+          accessToken: 'access',
           idToken: {
             payload: { given_name: '   ', family_name: 123 }
-          } as unknown
+          }
         }
       };
-      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve(mockSessionSpaces));
+      spyOn(service.amplify, 'fetchAuthSession').and.returnValue(Promise.resolve(mockSessionSpaces) as unknown as Promise<import('aws-amplify/auth').AuthSession>);
 
       const result = await service.obtenerAtributosUsuario();
 

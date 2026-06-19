@@ -194,7 +194,7 @@ describe('AsistenteVirtualPresenter', () => {
 
     it('dado que hay sugerencia backend con normalizarId invalido, deberia caer en fallback', () => {
       const mockResp = [{ label: 'test', mensaje: '???', tipoAccion: 'sugerencia_rapida' }];
-      const result = presenter['mapearSugerenciasBackend'](mockResp as unknown);
+      const result = presenter['mapearSugerenciasBackend'](mockResp as unknown as never);
       expect(result[0].id).toContain('backend-0-');
     });
 

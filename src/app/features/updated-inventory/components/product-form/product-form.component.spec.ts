@@ -203,11 +203,13 @@ describe('ProductFormComponent', () => {
     const file = new File([''], 'test.png', { type: 'image/png' });
     const event = { target: { files: [file] } } as unknown as Event;
 
-    spyOn(component as unknown, 'uploadImage');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    spyOn(component as any, 'uploadImage');
 
     component.onFileSelected(event);
 
-    expect((component as unknown).uploadImage).toHaveBeenCalledWith(file);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((component as any).uploadImage).toHaveBeenCalledWith(file);
   });
 
   it('dado que subo imagen exitosamente, deberia patchear el url y preview', () => {
@@ -216,7 +218,8 @@ describe('ProductFormComponent', () => {
 
     // Omitiendo la inyeccion real para simplemente mockear el HttpClient via spy si es posible
     // Pero ya tengo HttpTestingController inyectado
-    (component as unknown).uploadImage(file);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (component as any).uploadImage(file);
     expect(component.isUploadingImage()).toBeTrue();
   });
 

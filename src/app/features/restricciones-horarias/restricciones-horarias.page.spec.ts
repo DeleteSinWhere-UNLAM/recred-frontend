@@ -10,9 +10,12 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 describe('RestriccionesHorariasPage', () => {
   let component: RestriccionesHorariasPage;
   let fixture: ComponentFixture<RestriccionesHorariasPage>;
-  let presenterMock: unknown;
-  let locationMock: unknown;
-  let activatedRouteMock: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let presenterMock: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let locationMock: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let activatedRouteMock: any;
 
   beforeEach(async () => {
     presenterMock = jasmine.createSpyObj('RestriccionesHorariasPresenter', [
@@ -110,8 +113,10 @@ describe('RestriccionesHorariasPage', () => {
 
   it('dado que llamo a quitarBloqueoTotal, deberia buscar y quitar la restriccion sin IDs', () => {
     const item = {
-      franja: { id: 'ts1' } as unknown,
-      restricciones: [{ id: 'rtotal' } as unknown],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      franja: { id: 'ts1' } as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      restricciones: [{ id: 'rtotal' } as any],
       categoriasDisponibles: [], saludDisponible: [], tieneBloqueoTotal: true
     };
     component['quitarBloqueoTotal'](item);

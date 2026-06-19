@@ -59,7 +59,8 @@ describe('ButtonComponent', () => {
   });
 
   it('dado que se provee una variante desconocida, deberia retornar las clases base por defecto', () => {
-    component.variant = 'unknown' as unknown;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    component.variant = 'unknown' as any;
     component.disabled = false;
     const classes = component.getClasses();
     expect(classes.trim()).toBe('px-4 py-2 rounded-lg font-semibold transition-all duration-200');

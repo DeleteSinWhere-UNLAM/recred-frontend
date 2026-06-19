@@ -18,7 +18,7 @@ describe('CameraCapture', () => {
   describe('onFileSelected', () => {
     it('dado que no se selecciona ningun archivo, deberia retornar temprano y no emitir', () => {
       spyOn(component.photoTaken, 'emit');
-      const mockEvent = { target: { files: [] } } as unknown as Event;
+      const mockEvent = { target: { files: [] } } as unknown as never as Event;
 
       component.onFileSelected(mockEvent);
 
@@ -30,8 +30,8 @@ describe('CameraCapture', () => {
       spyOn(component.photoTaken, 'emit');
       const file = new File([''], 'test.pdf', { type: 'application/pdf' });
       const inputElement = document.createElement('input');
-      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown);
-      const mockEvent = { target: inputElement } as unknown as Event;
+      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown as never);
+      const mockEvent = { target: inputElement } as unknown as never as Event;
 
       component.onFileSelected(mockEvent);
 
@@ -47,8 +47,8 @@ describe('CameraCapture', () => {
       Object.defineProperty(file, 'size', { value: 11 * 1024 * 1024 });
 
       const inputElement = document.createElement('input');
-      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown);
-      const mockEvent = { target: inputElement } as unknown as Event;
+      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown as never);
+      const mockEvent = { target: inputElement } as unknown as never as Event;
 
       component.onFileSelected(mockEvent);
 
@@ -61,8 +61,8 @@ describe('CameraCapture', () => {
       spyOn(component.photoTaken, 'emit');
       const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
       const inputElement = document.createElement('input');
-      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown);
-      const mockEvent = { target: inputElement } as unknown as Event;
+      spyOnProperty(inputElement, 'files').and.returnValue([file] as unknown as never);
+      const mockEvent = { target: inputElement } as unknown as never as Event;
 
       component.onFileSelected(mockEvent);
 
