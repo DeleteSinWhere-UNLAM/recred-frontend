@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { OrdenAlumnoCardComponent } from '../components/orden-alumno-card/orden-alumno-card.component';
@@ -10,6 +10,8 @@ import { SugerenciasCarritoComponent } from '../components/sugerencias-carrito/s
 import { CarritoPresenter } from './presenter/carrito.presenter';
 import { GuardarFavoritoModalComponent } from '../components/guardar-favorito-modal/guardar-favorito-modal.component';
 import { ItemCarrito } from '../models/carrito.model';
+import { PerfilService } from '../../../data-access/services/perfil.service';
+import { CarritosFavoritosService } from '../../carritos-favoritos/services/carritos-favoritos.service';
 
 @Component({
   selector: 'app-carrito-page',
@@ -28,9 +30,15 @@ import { ItemCarrito } from '../models/carrito.model';
 export class CarritoPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   protected readonly presenter = inject(CarritoPresenter);
+  private readonly perfilService = inject(PerfilService);
+  private readonly carritosFavoritosService = inject(CarritosFavoritosService);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
+
+  cantCarritos = signal(0);
+  readonly esPlanGratuito = computed(() => this.perfilService.perfil()?.plan !== 'PREMIUM');
+  readonly limiteCarritosAlcanzado = computed(() => this.esPlanGratuito() && this.cantCarritos() >= 3);
 
   mostrarModalFavorito = false;
   favoritoModalAlumnoId = '';
@@ -38,6 +46,10 @@ export class CarritoPage implements OnInit {
 
   ngOnInit(): void {
     this.presenter.init();
+    this.carritosFavoritosService.getCarritosFavoritos().subscribe({
+      next: (carts) => this.cantCarritos.set(carts.length),
+      error: (err) => console.error('Error al cargar carritos favoritos en CarritoPage:', err)
+    });
   }
 
   protected readonly lineasResumen = computed<ResumenLinea[]>(() =>

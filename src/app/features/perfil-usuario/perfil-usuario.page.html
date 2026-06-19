@@ -81,6 +81,12 @@
               <dt>Rol</dt>
               <dd>{{ rolLabel(usuario()?.role || perfil()?.role) }}</dd>
             </div>
+            @if (esTutor()) {
+              <div>
+                <dt>Plan</dt>
+                <dd>{{ esPremium() ? 'Premium' : 'Gratuito' }}</dd>
+              </div>
+            }
           </dl>
         </article>
 
@@ -162,6 +168,7 @@
             <button
               type="submit"
               class="perfil-usuario__boton perfil-usuario__boton--primario"
+              [class.perfil-usuario__boton--primario-premium]="esPremium()"
               [disabled]="guardando() || form.invalid"
             >
               @if (guardando()) {

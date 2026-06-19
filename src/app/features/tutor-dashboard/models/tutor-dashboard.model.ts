@@ -4,6 +4,7 @@ export interface TutorGlobalDashboardSummary {
   totalDebt: number;
   dashboardConfig?: string;
   children: ChildDashboardSummary[];
+  plan?: string;
 }
 
 export interface ChildDashboardSummary {

@@ -119,8 +119,20 @@ export class TutorDashboardComponent implements OnInit {
     return 'budget-red';
   }
   
+  get esPlanGratuito(): boolean {
+    return this.perfilService.perfil()?.plan !== 'PREMIUM';
+  }
+
+  get puedeAgregarTarjeta(): boolean {
+    return !this.esPlanGratuito || this.dashboardItems.length < 5;
+  }
+
   // Drag and Drop Logic
   onDragStart(event: DragEvent, child: ChildDashboardSummary): void {
+    if (this.esPlanGratuito) {
+      event.preventDefault();
+      return;
+    }
     this.draggedChild = child;
     if (event.dataTransfer) {
       event.dataTransfer.setData('text/plain', child.studentId);
@@ -158,6 +170,11 @@ export class TutorDashboardComponent implements OnInit {
     event.preventDefault();
     const target = event.currentTarget as HTMLElement;
     target.classList.remove('drag-over');
+
+    if (this.esPlanGratuito) {
+      alert('La transferencia entre hijos no está permitida en cuentas gratuitas.');
+      return;
+    }
 
     if (this.draggedChild && this.draggedChild.studentId !== targetChild.studentId) {
       const sourceChild = this.draggedChild;

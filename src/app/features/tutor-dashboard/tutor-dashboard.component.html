@@ -34,6 +34,12 @@
         <h2 class="quick-transfer-title">Transferencia Rápida</h2>
       </div>
       <p class="subtitle">Arrastrá el dinero desde el origen hacia el destinatario para transferir saldo.</p>
+      @if (esPlanGratuito) {
+        <div class="premium-feature-badge">
+          <i class="fa-solid fa-crown"></i>
+          <span>La transferencia rápida entre hijos es una funcionalidad Premium.</span>
+        </div>
+      }
       
       <div class="transfer-grid">
         @for (child of globalSummary.children; track child.studentId) {
@@ -75,18 +81,23 @@
                        [(ngModel)]="transferAmounts[child.studentId]"
                        (keydown.enter)="$event.target.blur()"
                        placeholder="0"
+                       [disabled]="esPlanGratuito"
                        (click)="$event.stopPropagation()">
               </div>
 
               <div class="draggable-cash" 
-                draggable="true" 
+                [attr.draggable]="esPlanGratuito ? 'false' : 'true'"
                 (dragstart)="onDragStart($event, child)"
                 (dragend)="onDragEnd($event)"
-                title="Arrastrar para transferir"
+                [attr.title]="esPlanGratuito ? 'Disponible en Planes Premium' : 'Arrastrar para transferir'"
                 (click)="$event.stopPropagation()"
                 (keydown.enter)="$event.stopPropagation()"
                 tabindex="0">
-                <i class="fa-solid fa-money-bill-wave fa-beat-fade"></i>
+                @if (esPlanGratuito) {
+                  <i class="fa-solid fa-lock" style="color: #94a3b8;"></i>
+                } @else {
+                  <i class="fa-solid fa-money-bill-wave fa-beat-fade"></i>
+                }
               </div>
             </div>
           </div>
@@ -96,20 +107,26 @@
 
     <!-- Selected Child View -->
     @if (selectedChild) {
+      @if (esPlanGratuito && dashboardItems.length >= 5) {
+        <div class="dashboard-limit-alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          <span>Límite de 5 tarjetas alcanzado para cuenta gratuita. Pasate a Premium para agregar más.</span>
+        </div>
+      }
       <div class="dashboard-actions" style="margin-bottom: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-        <button class="action-btn" (click)="addFinanceCard()" style="background-color: #f2b705; color: #1e293b;">
+        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addFinanceCard()" style="background-color: #f2b705; color: #1e293b;">
           <i class="fa-solid fa-plus"></i> Finanzas
         </button>
-        <button class="action-btn" (click)="addHealthCard()" style="background-color: #10b981; color: white;">
+        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addHealthCard()" style="background-color: #10b981; color: white;">
           <i class="fa-solid fa-plus"></i> Salud y Hábitos
         </button>
-        <button class="action-btn" (click)="addLogisticsCard()" style="background-color: #8b5cf6; color: white;">
+        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addLogisticsCard()" style="background-color: #8b5cf6; color: white;">
           <i class="fa-solid fa-plus"></i> Logística del Día
         </button>
-        <button class="action-btn" (click)="addTransactionsCard()" style="background-color: #64748b; color: white;">
+        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addTransactionsCard()" style="background-color: #64748b; color: white;">
           <i class="fa-solid fa-plus"></i> Últimos Movimientos
         </button>
-        <button class="action-btn" (click)="addSmartCard()" style="background-color: #3b82f6; color: white;">
+        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addSmartCard()" style="background-color: #3b82f6; color: white;">
           <i class="fa-solid fa-plus"></i> Gráficos
         </button>
         <button class="action-btn" (click)="clearAllCards()" style="background-color: #ef4444; color: white; margin-left: 16px;">
