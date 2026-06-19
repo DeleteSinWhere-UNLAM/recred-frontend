@@ -22,12 +22,12 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
-    this.perfilService.limpiar();
-
     try {
       await signOut();
     } catch (err) {
       console.error('Error durante el signOut', err);
+    } finally {
+      this.perfilService.limpiar();
     }
   }
 
