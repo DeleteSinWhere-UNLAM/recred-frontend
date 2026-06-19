@@ -1,49 +1,49 @@
-<div class="prediction-analysis">
-  <section class="prediction-analysis__panel" aria-labelledby="categorias-titulo">
-    <h3 id="categorias-titulo" class="prediction-analysis__titulo">
+<div class="analisis-prediccion">
+  <section class="analisis-prediccion__panel" aria-labelledby="categorias-titulo">
+    <h3 id="categorias-titulo" class="analisis-prediccion__titulo">
       Categorías más consumidas
     </h3>
 
     @if (categoriasMasConsumidas && categoriasMasConsumidas.length > 0) {
-      <div class="prediction-analysis__tags">
+      <div class="analisis-prediccion__tags">
         @for (cat of categoriasMasConsumidas; track cat.descripcion) {
-          <span class="prediction-analysis__tag">
+          <span class="analisis-prediccion__tag">
             <span>{{ cat.descripcion }}</span>
             <strong>{{ cat.montoTotal | number:'1.2-2' }} $</strong>
           </span>
         }
       </div>
     } @else {
-      <p class="prediction-analysis__vacio">
+      <p class="analisis-prediccion__vacio">
         No hay suficientes datos de categorías para mostrar.
       </p>
     }
   </section>
 
   @if (analisisIa) {
-    <section class="prediction-analysis__panel" aria-labelledby="analisis-titulo">
-      <header class="prediction-analysis__ia-header">
-        <h3 id="analisis-titulo" class="prediction-analysis__titulo">
+    <section class="analisis-prediccion__panel" aria-labelledby="analisis-titulo">
+      <header class="analisis-prediccion__ia-header">
+        <h3 id="analisis-titulo" class="analisis-prediccion__titulo">
           Análisis de IA
         </h3>
-        <span class="prediction-analysis__modelo">
+        <span class="analisis-prediccion__modelo">
           <i class="fa-solid fa-microchip" aria-hidden="true"></i>
           {{ analisisIa.modelo }}
         </span>
       </header>
 
-      <p class="prediction-analysis__resumen">
+      <p class="analisis-prediccion__resumen">
         <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
         <span>{{ analisisIa.resumen }}</span>
       </p>
 
       @if (analisisIa.alertas && analisisIa.alertas.length > 0) {
-        <div class="prediction-analysis__bloque">
-          <h4 class="prediction-analysis__subtitulo prediction-analysis__subtitulo--alerta">
+        <div class="analisis-prediccion__bloque">
+          <h4 class="analisis-prediccion__subtitulo analisis-prediccion__subtitulo--alerta">
             <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
             Alertas
           </h4>
-          <ul class="prediction-analysis__lista prediction-analysis__lista--alerta" role="list">
+          <ul class="analisis-prediccion__lista analisis-prediccion__lista--alerta" role="list">
             @for (alerta of analisisIa.alertas; track alerta) {
               <li>{{ alerta }}</li>
             }
@@ -52,12 +52,12 @@
       }
 
       @if (analisisIa.recomendaciones && analisisIa.recomendaciones.length > 0) {
-        <div class="prediction-analysis__bloque">
-          <h4 class="prediction-analysis__subtitulo prediction-analysis__subtitulo--reco">
+        <div class="analisis-prediccion__bloque">
+          <h4 class="analisis-prediccion__subtitulo analisis-prediccion__subtitulo--reco">
             <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
             Recomendaciones
           </h4>
-          <ul class="prediction-analysis__lista prediction-analysis__lista--reco" role="list">
+          <ul class="analisis-prediccion__lista analisis-prediccion__lista--reco" role="list">
             @for (rec of analisisIa.recomendaciones; track rec) {
               <li>{{ rec }}</li>
             }
@@ -66,7 +66,7 @@
       }
     </section>
   } @else {
-    <p class="prediction-analysis__vacio prediction-analysis__vacio--bloque">
+    <p class="analisis-prediccion__vacio analisis-prediccion__vacio--bloque">
       No hay un análisis disponible en este momento.
     </p>
   }

@@ -1,10 +1,10 @@
-.prediction-analysis {
+.analisis-prediccion {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.prediction-analysis__panel {
+.analisis-prediccion__panel {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: 20px;
@@ -15,7 +15,7 @@
   gap: 12px;
 }
 
-.prediction-analysis__titulo {
+.analisis-prediccion__titulo {
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
@@ -23,13 +23,13 @@
   margin: 0;
 }
 
-.prediction-analysis__tags {
+.analisis-prediccion__tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.prediction-analysis__tag {
+.analisis-prediccion__tag {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -42,12 +42,12 @@
   font-weight: 600;
 }
 
-.prediction-analysis__tag strong {
+.analisis-prediccion__tag strong {
   color: var(--color-dorado-dark);
   font-weight: 700;
 }
 
-.prediction-analysis__ia-header {
+.analisis-prediccion__ia-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,7 +55,7 @@
   flex-wrap: wrap;
 }
 
-.prediction-analysis__modelo {
+.analisis-prediccion__modelo {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -70,7 +70,7 @@
   text-transform: uppercase;
 }
 
-.prediction-analysis__resumen {
+.analisis-prediccion__resumen {
   display: flex;
   gap: 12px;
   align-items: flex-start;
@@ -86,20 +86,20 @@
   color: var(--color-texto-oscuro);
 }
 
-.prediction-analysis__resumen i {
+.analisis-prediccion__resumen i {
   color: var(--color-dorado-dark);
   font-size: 16px;
   margin-top: 2px;
   flex-shrink: 0;
 }
 
-.prediction-analysis__bloque {
+.analisis-prediccion__bloque {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.prediction-analysis__subtitulo {
+.analisis-prediccion__subtitulo {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -111,15 +111,15 @@
   margin: 0;
 }
 
-.prediction-analysis__subtitulo--alerta {
+.analisis-prediccion__subtitulo--alerta {
   color: var(--color-melocoton);
 }
 
-.prediction-analysis__subtitulo--reco {
+.analisis-prediccion__subtitulo--reco {
   color: var(--color-pizarra);
 }
 
-.prediction-analysis__lista {
+.analisis-prediccion__lista {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -128,7 +128,7 @@
   gap: 6px;
 }
 
-.prediction-analysis__lista li {
+.analisis-prediccion__lista li {
   padding: 10px 14px;
   border-radius: 12px;
   font-family: var(--font-body);
@@ -136,17 +136,17 @@
   line-height: 1.5;
 }
 
-.prediction-analysis__lista--alerta li {
+.analisis-prediccion__lista--alerta li {
   background-color: color-mix(in srgb, var(--color-melocoton) 12%, var(--color-fondo));
   color: var(--color-melocoton);
 }
 
-.prediction-analysis__lista--reco li {
+.analisis-prediccion__lista--reco li {
   background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-fondo));
   color: var(--color-pizarra);
 }
 
-.prediction-analysis__vacio {
+.analisis-prediccion__vacio {
   margin: 0;
   padding: 10px 14px;
   background-color: rgba(74, 111, 165, 0.04);
@@ -160,42 +160,42 @@
   font-style: italic;
 }
 
-.prediction-analysis__vacio--bloque {
+.analisis-prediccion__vacio--bloque {
   padding: 18px 20px;
   border-radius: 20px;
   box-shadow: var(--shadow-neu-convex);
 }
 
 @media (max-width: 640px) {
-  .prediction-analysis__panel {
+  .analisis-prediccion__panel {
     padding: 16px;
     border-radius: 18px;
   }
 
-  .prediction-analysis__resumen {
+  .analisis-prediccion__resumen {
     font-size: 13px;
     padding: 12px 14px;
   }
 }
 
 @media (max-width: 480px) {
-  .prediction-analysis__panel {
+  .analisis-prediccion__panel {
     padding: 14px;
     border-radius: 16px;
     gap: 10px;
   }
 
-  .prediction-analysis__tag {
+  .analisis-prediccion__tag {
     font-size: 12px;
     padding: 5px 12px;
   }
 
-  .prediction-analysis__resumen {
+  .analisis-prediccion__resumen {
     font-size: 12px;
     gap: 10px;
   }
 
-  .prediction-analysis__lista li {
+  .analisis-prediccion__lista li {
     font-size: 12px;
     padding: 8px 12px;
   }

@@ -1,0 +1,70 @@
+<section class="resumen-prediccion" aria-labelledby="summary-titulo">
+  <header class="resumen-prediccion__cabecera">
+    <h3 id="summary-titulo" class="resumen-prediccion__titulo">
+      Resumen del período {{ periodo }}
+    </h3>
+    <span class="resumen-prediccion__fecha">
+      Calculado: {{ fechaCalculo | date:'dd/MM/yyyy' }}
+    </span>
+  </header>
+
+  <div class="resumen-prediccion__rango">
+    <span><i class="fa-solid fa-flag" aria-hidden="true"></i> {{ fechaInicio | date:'dd/MM/yyyy' }}</span>
+    <span class="resumen-prediccion__rango-sep" aria-hidden="true">→</span>
+    <span><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> {{ fechaFin | date:'dd/MM/yyyy' }}</span>
+  </div>
+
+  <div class="resumen-prediccion__grid">
+    <div class="resumen-prediccion__card">
+      <span class="resumen-prediccion__card-label">Gasto actual</span>
+      <span class="resumen-prediccion__card-valor">{{ gastoActual | number:'1.2-2' }} $</span>
+    </div>
+
+    <div class="resumen-prediccion__card">
+      <span class="resumen-prediccion__card-label">Gasto predicho</span>
+      <span class="resumen-prediccion__card-valor">{{ gastoPredicho | number:'1.2-2' }} $</span>
+    </div>
+
+    <div class="resumen-prediccion__card">
+      <span class="resumen-prediccion__card-label">Promedio diario</span>
+      <span class="resumen-prediccion__card-valor">{{ promedioGastoDiario | number:'1.2-2' }} $</span>
+    </div>
+  </div>
+
+  @if (montoLimite !== null) {
+    <div
+      class="resumen-prediccion__limite"
+      [class.resumen-prediccion__limite--danger]="(porcentajePresupuesto || 0) > 0.8"
+    >
+      <div class="resumen-prediccion__limite-info">
+        <span>Límite: {{ montoLimite | number:'1.2-2' }} $</span>
+        <strong>{{ (porcentajePresupuesto || 0) | percent:'1.0-2' }}</strong>
+      </div>
+      <div class="resumen-prediccion__barra">
+        <div
+          class="resumen-prediccion__barra-fill"
+          [style.width.%]="((porcentajePresupuesto || 0) * 100) > 100 ? 100 : (porcentajePresupuesto || 0) * 100"
+        ></div>
+      </div>
+    </div>
+  } @else {
+    <p class="resumen-prediccion__vacio">
+      No hay un límite de presupuesto definido para este período.
+    </p>
+  }
+
+  <div class="resumen-prediccion__footer">
+    <div class="resumen-prediccion__stat">
+      <span class="resumen-prediccion__stat-valor">{{ confianza | percent:'1.0-0' }}</span>
+      <span class="resumen-prediccion__stat-label">Confianza</span>
+    </div>
+    <div class="resumen-prediccion__stat">
+      <span class="resumen-prediccion__stat-valor">{{ diasHistoricosUsados }}</span>
+      <span class="resumen-prediccion__stat-label">Días analizados</span>
+    </div>
+    <div class="resumen-prediccion__stat">
+      <span class="resumen-prediccion__stat-valor">{{ diasRestantes }}</span>
+      <span class="resumen-prediccion__stat-label">Días restantes</span>
+    </div>
+  </div>
+</section>

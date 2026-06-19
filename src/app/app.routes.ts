@@ -189,8 +189,8 @@ export const routes: Routes = [
       {
         path: 'prediccion-gasto',
         loadChildren: () =>
-          import('./features/spending-prediction/spending-prediction.routes').then(
-            (m) => m.SPENDING_PREDICTION_ROUTES,
+          import('./features/prediccion-gasto/prediccion-gasto.routes').then(
+            (m) => m.PREDICCION_GASTO_ROUTES,
           ),
       },
       {

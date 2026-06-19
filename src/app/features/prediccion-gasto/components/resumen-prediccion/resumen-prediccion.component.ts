@@ -2,13 +2,13 @@ import { Component, Input } from '@angular/core';
 import { CommonModule, DecimalPipe, PercentPipe, DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-prediction-summary',
+  selector: 'app-resumen-prediccion',
   standalone: true,
   imports: [CommonModule, DecimalPipe, PercentPipe, DatePipe],
-  templateUrl: './prediction-summary.component.html',
-  styleUrl: './prediction-summary.component.css'
+  templateUrl: './resumen-prediccion.component.html',
+  styleUrl: './resumen-prediccion.component.css'
 })
-export class PredictionSummaryComponent {
+export class ResumenPrediccionComponent {
   @Input() periodo = '';
   @Input() fechaCalculo = '';
   @Input() fechaInicio = '';

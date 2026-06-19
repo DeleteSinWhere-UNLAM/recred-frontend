@@ -1,4 +1,4 @@
-export interface IaAnalysis {
+export interface AnalisisIa {
   resumen: string;
   alertas: string[];
   recomendaciones: string[];

@@ -1,11 +1,11 @@
-import { IaAnalysis } from './ia-analysis.interface';
+import { AnalisisIa } from './analisis-ia.model';
 
 export interface CategoriaMasConsumida {
   descripcion: string;
   montoTotal: number;
 }
 
-export interface SpendingPrediction {
+export interface PrediccionGasto {
   periodo: string;
   fechaCalculo: string;
   fechaInicio: string;
@@ -19,5 +19,5 @@ export interface SpendingPrediction {
   diasHistoricosUsados: number;
   diasRestantes: number;
   categoriasMasConsumidas: CategoriaMasConsumida[];
-  analisisIa: IaAnalysis;
+  analisisIa: AnalisisIa;
 }
