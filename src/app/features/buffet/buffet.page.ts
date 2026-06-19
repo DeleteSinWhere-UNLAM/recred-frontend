@@ -146,17 +146,18 @@ export class BuffetPage implements OnInit {
     const total = this.promocionesDestacadasFiltradas().length;
     if (total <= 1) return;
 
-    const currentIndex = this.activeSlideIndex();
-    if (direction === 1 && currentIndex >= total - 1) {
+    const container = this.promosContainer.nativeElement;
+    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+
+    if (direction === 1 && container.scrollLeft >= maxScrollLeft - 5) {
       this.scrollToSlide(0);
       return;
     }
-    if (direction === -1 && currentIndex <= 0) {
-      this.scrollToSlide(total - 1);
+    if (direction === -1 && container.scrollLeft <= 5) {
+      container.scrollTo({ left: maxScrollLeft, behavior: 'smooth' });
       return;
     }
 
-    const container = this.promosContainer.nativeElement;
     const card = container.querySelector('.promo-card');
     const cardWidth = card ? card.getBoundingClientRect().width : 340;
     const gap = 24;
