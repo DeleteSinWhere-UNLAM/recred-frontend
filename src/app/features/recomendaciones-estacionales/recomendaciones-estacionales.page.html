@@ -1,0 +1,63 @@
+<app-navbar />
+
+<main class="recomendaciones-estacionales-page">
+  <button
+    type="button"
+    class="recomendaciones-estacionales-page__volver"
+    (click)="presenter.volver()"
+  >
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Volver</span>
+  </button>
+
+  <div class="recomendaciones-estacionales-page__container">
+    <header class="recomendaciones-estacionales-page__cabecera">
+      <div class="recomendaciones-estacionales-page__icono" aria-hidden="true">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+      <div class="recomendaciones-estacionales-page__identidad">
+        <h2 class="recomendaciones-estacionales-page__titulo">Recomendaciones estacionales</h2>
+        <p class="recomendaciones-estacionales-page__subtitulo">
+          Basadas en tu ubicación y el clima del entorno escolar
+        </p>
+      </div>
+    </header>
+
+    @if (presenter.isLoading()) {
+      <div class="recomendaciones-estacionales-page__estado">
+        <div class="recomendaciones-estacionales-page__spinner"></div>
+        <p>Analizando el clima de tu zona y generando recomendaciones...</p>
+      </div>
+    } @else if (presenter.error()) {
+      <div class="recomendaciones-estacionales-page__estado recomendaciones-estacionales-page__estado--error">
+        <div class="recomendaciones-estacionales-page__error-icono">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        </div>
+        <p>{{ presenter.error() }}</p>
+        <button
+          type="button"
+          class="recomendaciones-estacionales-page__reintentar"
+          (click)="presenter.loadRecommendations()"
+        >
+          Reintentar
+        </button>
+      </div>
+    } @else {
+      <app-lista-estacional
+        [sugerencias]="presenter.sugerencias()"
+        [tipPromocional]="presenter.tipPromocional()">
+      </app-lista-estacional>
+    }
+  </div>
+</main>
+
+@if (presenter.shouldShowPromotionModal()) {
+  <app-modal-aprobacion-promocion-ia
+    [promotion]="presenter.promotion()!"
+    [resolvedProducts]="presenter.resolvedProducts()"
+    (approve)="presenter.approvePromotion($event)"
+    (edit)="presenter.editPromotion($event)"
+    (discard)="presenter.discardPromotion($event)"
+    (closeModal)="presenter.closeModal()">
+  </app-modal-aprobacion-promocion-ia>
+}

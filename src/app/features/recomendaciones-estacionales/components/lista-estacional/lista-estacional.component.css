@@ -1,0 +1,68 @@
+.lista-estacional {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lista-estacional__panel {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lista-estacional__titulo {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-pizarra);
+  margin: 0;
+}
+
+.lista-estacional__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.lista-estacional__vacio {
+  margin: 0;
+  padding: 18px 20px;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-texto-claro);
+  text-align: center;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .lista-estacional__panel {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .lista-estacional__grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lista-estacional__panel {
+    padding: 14px;
+    border-radius: 16px;
+    gap: 10px;
+  }
+
+  .lista-estacional__titulo {
+    font-size: 15px;
+  }
+}

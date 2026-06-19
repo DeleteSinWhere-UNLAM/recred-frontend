@@ -175,8 +175,8 @@ export const routes: Routes = [
       {
         path: 'recomendaciones-estacionales',
         loadComponent: () =>
-          import('./features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component').then(
-            (m) => m.SeasonalPageComponent,
+          import('./features/recomendaciones-estacionales/recomendaciones-estacionales.page').then(
+            (m) => m.RecomendacionesEstacionalesPage,
           ),
       },
       {

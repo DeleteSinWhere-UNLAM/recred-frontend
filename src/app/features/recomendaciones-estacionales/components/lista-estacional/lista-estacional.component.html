@@ -1,0 +1,22 @@
+<div class="lista-estacional">
+  @if (tipPromocional) {
+    <app-consejo-card [tipPromocional]="tipPromocional"></app-consejo-card>
+  }
+
+  @if (sugerencias.length > 0) {
+    <section class="lista-estacional__panel" aria-labelledby="sugerencias-titulo">
+      <h3 id="sugerencias-titulo" class="lista-estacional__titulo">
+        Sugerencias de stock
+      </h3>
+      <div class="lista-estacional__grid">
+        @for (item of sugerencias; track item.categoria) {
+          <app-recomendacion-card [item]="item"></app-recomendacion-card>
+        }
+      </div>
+    </section>
+  } @else {
+    <p class="lista-estacional__vacio">
+      No hay sugerencias disponibles en tu zona para esta temporada.
+    </p>
+  }
+</div>

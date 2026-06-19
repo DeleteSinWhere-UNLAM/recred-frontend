@@ -1,0 +1,15 @@
+<article class="recomendacion-card" [ngClass]="'recomendacion-card--' + item.accion.toLowerCase()">
+  <header class="recomendacion-card__header">
+    <h4 class="recomendacion-card__titulo">{{ item.categoria }}</h4>
+    <span class="recomendacion-card__badge" [ngClass]="'recomendacion-card__badge--' + item.accion.toLowerCase()">
+      @if (item.accion === 'AUMENTAR') {
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i> Aumentar
+      } @else if (item.accion === 'REDUCIR') {
+        <i class="fa-solid fa-arrow-down" aria-hidden="true"></i> Reducir
+      } @else {
+        <i class="fa-solid fa-minus" aria-hidden="true"></i> {{ item.accion }}
+      }
+    </span>
+  </header>
+  <p class="recomendacion-card__motivo">{{ item.motivo }}</p>
+</article>
