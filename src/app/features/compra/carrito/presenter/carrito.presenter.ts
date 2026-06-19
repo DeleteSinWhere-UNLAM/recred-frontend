@@ -76,7 +76,10 @@ export class CarritoPresenter {
     for (const alumnoId of itemsPorAlumno.keys()) {
       const slots = franjas[alumnoId] || [];
       const studentRestrictions = restricciones[alumnoId] || [];
-      const selectedDateStr = dates[alumnoId] || this.fechaMinima;
+      const soloLectura = this.esModoSoloLectura();
+      const seleccionRetiro = this.carritoService.seleccionRetiro();
+      const retiro = soloLectura ? seleccionRetiro[alumnoId] : undefined;
+      const selectedDateStr = retiro?.fecha ?? dates[alumnoId] ?? (this.fechaMinimaMap()[alumnoId] || this.fechaMinima);
 
       const generalRestrictions = studentRestrictions.filter(
         (r) =>
