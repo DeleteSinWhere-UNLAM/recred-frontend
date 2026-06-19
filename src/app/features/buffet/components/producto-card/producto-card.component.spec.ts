@@ -1,13 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { signal } from '@angular/core';
 import { ProductoCardComponent } from './producto-card.component';
 import { CarritoService } from '../../../compra/services/carrito.service';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { Producto } from '../../models/producto.model';
 
 describe('ProductoCardComponent', () => {
   let component: ProductoCardComponent;
   let fixture: ComponentFixture<ProductoCardComponent>;
   let carritoServiceSpy: jasmine.SpyObj<CarritoService>;
+  let mockPerfilService: any;
 
   const mockProductoBase: Producto = {
     id: 'prod-123',
@@ -26,9 +29,17 @@ describe('ProductoCardComponent', () => {
     carritoServiceSpy.puedeAgregar.and.callFake((prod) => !prod.superaPresupuesto);
     carritoServiceSpy.validarAgregar.and.callFake((prod) => ({ permitido: !prod.superaPresupuesto, razon: prod.superaPresupuesto ? 'presupuesto' : undefined }));
 
+    mockPerfilService = {
+      esPlanGratuito: signal(true),
+      perfil: signal({ plan: 'FREE' })
+    };
+
     await TestBed.configureTestingModule({
       imports: [ProductoCardComponent],
-      providers: [{ provide: CarritoService, useValue: carritoServiceSpy }]
+      providers: [
+        { provide: CarritoService, useValue: carritoServiceSpy },
+        { provide: PerfilService, useValue: mockPerfilService }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductoCardComponent);

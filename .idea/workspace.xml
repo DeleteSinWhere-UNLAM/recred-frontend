@@ -13,21 +13,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "DomineYanina"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;DomineYanina&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/DeleteSinWhere-UNLAM/recred-frontend.git",
-    "accountId": "79cf475a-c457-4054-8f2d-554dfd5502d2"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/DeleteSinWhere-UNLAM/recred-frontend.git&quot;,
+    &quot;accountId&quot;: &quot;79cf475a-c457-4054-8f2d-554dfd5502d2&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="3Ey2utxwpYCBu3DF4DAaqDW3uBm" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -37,9 +37,9 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feat/restricciones",
+    "git-widget-placeholder": "feat/limites-freemium",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/usuario/Desktop/Recred/Repositorios/Front/recred-frontend",
+    "last_opened_file_path": "C:/Users/usuario/Desktop/Recred/Repositorios/Front",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -81,6 +81,7 @@
       <option name="presentableId" value="Default" />
       <updated>1781136714630</updated>
       <workItem from="1781136715831" duration="6178000" />
+      <workItem from="1781910633742" duration="26000" />
     </task>
     <servers />
   </component>

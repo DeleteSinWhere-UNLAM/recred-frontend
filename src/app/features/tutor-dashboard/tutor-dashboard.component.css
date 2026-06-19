@@ -1074,3 +1074,17 @@
 .draggable-cash[draggable="false"] i {
   animation: none !important;
 }
+
+/* Premium Gold Metallic style for Tutor Dashboard Finanzas button */
+.action-btn--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3) !important;
+  border: none !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.action-btn--premium:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.45) !important;
+}

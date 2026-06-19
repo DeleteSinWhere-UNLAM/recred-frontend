@@ -125,6 +125,10 @@ export class TutorDashboardComponent implements OnInit {
     return this.perfilService.perfil()?.plan !== 'PREMIUM';
   }
 
+  get esPremium(): boolean {
+    return !this.esPlanGratuito;
+  }
+
   get puedeAgregarTarjeta(): boolean {
     return !this.esPlanGratuito || this.dashboardItems.length < 5;
   }

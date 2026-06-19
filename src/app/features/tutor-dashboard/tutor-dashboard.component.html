@@ -114,7 +114,7 @@
         </div>
       }
       <div class="dashboard-actions" style="margin-bottom: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addFinanceCard()" style="background-color: #f2b705; color: #1e293b;">
+        <button class="action-btn" [class.action-btn--premium]="esPremium" [disabled]="!puedeAgregarTarjeta" (click)="addFinanceCard()" [style.background-color]="esPlanGratuito ? '#f2b705' : null" [style.color]="esPlanGratuito ? '#1e293b' : null">
           <i class="fa-solid fa-plus"></i> Finanzas
         </button>
         <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addHealthCard()" style="background-color: #10b981; color: white;">
