@@ -23,8 +23,9 @@ export class PromotionService {
   private readonly perfilService = inject(PerfilService);
   private readonly apiUrl = `${environment.apiUrl}/promotions`;
 
-  getPromotions(): Observable<Promotion[]> {
-    return this.http.get<Promotion[]>(`${this.apiUrl}/buffet/${this.perfilService.obtenerBuffetId()}`);
+  getPromotions(buffetId?: string): Observable<Promotion[]> {
+    const id = buffetId ?? this.perfilService.obtenerBuffetId();
+    return this.http.get<Promotion[]>(`${this.apiUrl}/buffet/${id}`);
   }
 
   approvePromotion(id: string, buffetId: string): Observable<Promotion> {

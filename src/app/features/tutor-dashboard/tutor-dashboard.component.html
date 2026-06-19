@@ -11,14 +11,14 @@
         <h3>Saldo Total Consolidado</h3>
         <div class="balance-display">
           <span class="currency">$</span>
-          <span class="amount">{{ globalSummary?.totalBalance | number:'1.0-2' }}</span>
+          <span class="amount">{{ globalSummary.totalBalance | number:'1.0-2' }}</span>
         </div>
       </div>
       <div class="global-debt-info">
         <h3>Deuda Total Consolidada</h3>
         <div class="balance-display debt-display">
           <span class="currency">$</span>
-          <span class="amount amount-debt">{{ globalSummary?.totalDebt | number:'1.0-2' }}</span>
+          <span class="amount amount-debt">{{ globalSummary.totalDebt | number:'1.0-2' }}</span>
         </div>
       </div>
     </div>

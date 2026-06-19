@@ -2458,6 +2458,16 @@
   gap: 6px;
 }
 
+.promo-card__price-original {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-texto-claro);
+  text-decoration: line-through;
+  opacity: 0.8;
+  margin-right: 2px;
+}
+
 .promo-card__price-value {
   font-family: var(--font-display);
   font-size: 20px;

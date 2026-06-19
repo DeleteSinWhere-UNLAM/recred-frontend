@@ -80,106 +80,43 @@ export class BuffetPage implements OnInit {
   }
 
   readonly promocionesDestacadas = computed(() => {
-    const todos = this.presenter.productos();
-    
-    const promoAlmuerzo = todos.find(p => {
-      const n = p.nombre.toLowerCase();
-      return n.includes('almuerzo') && n.includes('express');
+    const promos = this.presenter.promociones();
+    const todosProductos = this.presenter.productos();
+
+    return promos.map(promo => {
+      const products = (promo.productIds || [])
+        .map(id => todosProductos.find(p => p.id === id))
+        .filter((p): p is Producto => !!p);
+
+      const itemsList = products.map(p => p.nombre);
+      const originalPrice = products.reduce((acc, p) => acc + (p.precio || 0), 0);
+      const discountPercentage = promo.discountPercentage || 0;
+      const discountedPrice = Math.round(originalPrice * (1 - discountPercentage / 100));
+
+      const firstProductImage = products.find(p => p.imagen)?.imagen;
+      const defaultPromoImage = 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80';
+      const imagen = firstProductImage || defaultPromoImage;
+
+      const uniqueClasificaciones = Array.from(
+        new Map(
+          products.flatMap(p => p.clasificacionesSalud || []).map(c => [c.id, c])
+        ).values()
+      );
+
+      return {
+        id: promo.id,
+        nombre: promo.name,
+        descripcion: products.map(p => p.nombre).join(' + '),
+        itemsList,
+        precio: discountedPrice,
+        precioOriginal: originalPrice,
+        descuento: discountPercentage > 0 ? `-${Math.round(discountPercentage)}%` : '',
+        imagen,
+        esPromoReal: true,
+        categoria: products[0]?.categoria || { id: 'promociones', descripcion: 'Promociones' },
+        clasificacionesSalud: uniqueClasificaciones
+      };
     });
-    const comboMerienda = todos.find(p => {
-      const n = p.nombre.toLowerCase();
-      return n.includes('merienda');
-    });
-    const duoPack = todos.find(p => {
-      const n = p.nombre.toLowerCase();
-      return n.includes('duo') || n.includes('pack');
-    });
-
-    const list: any[] = [];
-
-    // 1. Promo Almuerzo Express
-    if (promoAlmuerzo) {
-      list.push({
-        ...promoAlmuerzo,
-        itemsList: ['Milanesa', 'Puré', 'Bebida'],
-        descuento: '-30%',
-        imagen: promoAlmuerzo.imagen || 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80',
-        esPromoReal: true
-      });
-    } else {
-      list.push({
-        id: 'mock-promo-almuerzo-express',
-        nombre: 'Promo Almuerzo Express',
-        descripcion: 'Milanesa + Puré + Bebida',
-        itemsList: ['Milanesa', 'Puré', 'Bebida'],
-        precio: 120,
-        descuento: '-30%',
-        imagen: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80',
-        esPromoReal: false,
-        categoria: { id: 'comidas', descripcion: 'Comidas' }
-      });
-    }
-
-    // 2. Combo Merienda
-    if (comboMerienda) {
-      list.push({
-        ...comboMerienda,
-        itemsList: ['Café', 'Factura', 'Jugo de Naranja'],
-        descuento: '-50%',
-        imagen: comboMerienda.imagen || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
-        esPromoReal: true
-      });
-    } else {
-      list.push({
-        id: 'mock-combo-merienda',
-        nombre: 'Combo Merienda',
-        descripcion: 'Café + Factura + Jugo de Naranja',
-        itemsList: ['Café', 'Factura', 'Jugo de Naranja'],
-        precio: 130,
-        descuento: '-50%',
-        imagen: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
-        esPromoReal: false,
-        categoria: { id: 'bebidas', descripcion: 'Bebidas' }
-      });
-    }
-
-    // 3. Duo Pack
-    if (duoPack) {
-      list.push({
-        ...duoPack,
-        itemsList: ['Patas', 'Pack...'],
-        descuento: '',
-        imagen: duoPack.imagen || 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80',
-        esPromoReal: true
-      });
-    } else {
-      list.push({
-        id: 'mock-duo-pack',
-        nombre: 'Duo Pack',
-        descripcion: 'Patas + Pack...',
-        itemsList: ['Patas', 'Pack...'],
-        precio: 150,
-        descuento: '',
-        imagen: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80',
-        esPromoReal: false,
-        categoria: { id: 'comidas', descripcion: 'Comidas' }
-      });
-    }
-
-    // Otras promos del buffet
-    for (const p of todos) {
-      if (this.esPromocion(p) && p.id !== promoAlmuerzo?.id && p.id !== comboMerienda?.id && p.id !== duoPack?.id) {
-        const parts = p.descripcion ? p.descripcion.split('+').map(i => i.trim()) : [p.nombre];
-        list.push({
-          ...p,
-          itemsList: parts,
-          descuento: p.precio < 500 ? '-30%' : '',
-          esPromoReal: true
-        });
-      }
-    }
-
-    return list;
   });
 
   readonly promocionesDestacadasFiltradas = computed(() => {
@@ -277,16 +214,8 @@ export class BuffetPage implements OnInit {
     const alumno = this.presenter.alumno();
     if (!alumno) return;
 
-    if (promo.esPromoReal) {
-      const p = this.presenter.productos().find(x => x.id === promo.id);
-      if (p) {
-        this.presenter.agregarAlCarrito(p, 1);
-        return;
-      }
-    }
-
-    // Si es mock o fallback, buscamos si hay un producto real correspondiente o creamos uno temporal
-    // que se agrega al carrito usando la interfaz Producto
+    // Si es una promocion real de la base de datos o fallback, creamos un producto temporal
+    // que se agrega al carrito usando la interfaz Producto, con el ID de la promocion.
     const pTemp: Producto = {
       id: promo.id,
       nombre: promo.nombre,
