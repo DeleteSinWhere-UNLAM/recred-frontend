@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,9 +14,6 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
-import { UploadSelectionModalComponent } from '../components/upload-selection-modal/upload-selection-modal.component';
-import { BulkUploadTableModalComponent } from '../components/bulk-upload-table-modal/bulk-upload-table-modal.component';
-import { BulkUploadService, BulkProductResponse } from '../services/bulk-upload.service';
 import { InventoryRealtimeService } from '../services/inventory-realtime.service';
 import {
   EstadoInventario,
@@ -95,8 +92,6 @@ type InventoryManagementShortcut = 'MAKE_AVAILABLE' | 'PAUSE' | 'SOLD_OUT';
     ProductTableComponent,
     ProductFormComponent,
     ConfirmDeleteModalComponent,
-    UploadSelectionModalComponent,
-    BulkUploadTableModalComponent,
     ReactiveFormsModule,
   ],
   templateUrl: './updated-inventory-page.component.html',
@@ -110,7 +105,6 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly inventoryRealtimeService = inject(InventoryRealtimeService);
-  private readonly bulkUploadService = inject(BulkUploadService);
   private readonly zone = inject(NgZone);
   private readonly fb = inject(FormBuilder);
   private readonly purchaseTotalFormatter = new Intl.NumberFormat('es-AR', {
@@ -137,10 +131,6 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   isRefreshing = false;
   isSaving = false;
   isFormVisible = false;
-  isSelectionModalVisible = false;
-  isBulkUploadModalVisible = false;
-  isProcessingFile = false;
-  bulkProductsData: BulkProductResponse[] = [];
   selectedProduct: Product | null = null;
   deleteTarget: Product | null = null;
   activeFilter: InventoryFilter = 'TODOS';
@@ -346,100 +336,12 @@ export class UpdatedInventoryPageComponent implements OnInit, OnDestroy {
   }
 
   openCreateForm(): void {
-    this.isSelectionModalVisible = true;
-  }
-
-  closeSelectionModal(): void {
-    this.isSelectionModalVisible = false;
+    this.openIndividualForm();
   }
 
   openIndividualForm(): void {
-    this.isSelectionModalVisible = false;
     this.selectedProduct = null;
     this.isFormVisible = true;
-  }
-
-  openBulkUploadModal(): void {
-    this.isSelectionModalVisible = false;
-    this.isBulkUploadModalVisible = true;
-    this.bulkProductsData = [];
-  }
-
-  closeBulkUploadModal(): void {
-    this.isBulkUploadModalVisible = false;
-    this.bulkProductsData = [];
-    this.isProcessingFile = false;
-  }
-
-  handleFileUpload(file: File): void {
-    this.isProcessingFile = true;
-    this.bulkUploadService.uploadFile(file).subscribe({
-      next: (res) => {
-        this.bulkProductsData = res.products;
-        this.isProcessingFile = false;
-        this.toastService.mostrar('Archivo procesado correctamente', 'success');
-      },
-      error: () => {
-        this.isProcessingFile = false;
-        this.toastService.mostrar('Error al procesar el archivo', 'error');
-      }
-    });
-  }
-
-  handleBulkProductsSave(products: BulkProductResponse[]): void {
-    const currentBuffetId = this.buffetId ?? this.obtenerBuffetIdActual();
-    if (!currentBuffetId) {
-      this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
-      return;
-    }
-
-    this.isProcessingFile = true;
-
-    // Mapa para normalizar y unificar nombres de nuevas categorías
-    // Clave: nombre en minúsculas y sin espacios, Valor: nombre original (el primero que aparezca)
-    const normalizedNewCategories = new Map<string, string>();
-
-    const createRequests: CreateProductRequest[] = products.map((prod) => {
-      const isNewCategory = prod.categoriaId === 'NEW';
-      let finalNuevaCategoriaNombre = '';
-
-      if (isNewCategory && prod.nuevaCategoriaNombre) {
-        const rawName = prod.nuevaCategoriaNombre.trim();
-        const key = rawName.toLowerCase();
-        
-        if (!normalizedNewCategories.has(key)) {
-          normalizedNewCategories.set(key, rawName);
-        }
-        finalNuevaCategoriaNombre = normalizedNewCategories.get(key)!;
-      }
-
-      return {
-        nombre: prod.nombre,
-        descripcion: prod.descripcion ?? '',
-        precio: prod.precio,
-        peso: prod.peso,
-        requierePreparacion: prod.requierePreparacion,
-        categoriaId: isNewCategory ? null : prod.categoriaId,
-        nuevaCategoriaNombre: finalNuevaCategoriaNombre,
-        buffetId: currentBuffetId,
-        stockActual: prod.stockActual,
-        clasificacionesSaludIds: prod.saludEtiquetasIds ?? [],
-        tiposIds: null,
-      };
-    });
-
-    this.productService.createBulk(createRequests).subscribe({
-      next: () => {
-        this.isProcessingFile = false;
-        this.closeBulkUploadModal();
-        this.loadProducts(false);
-        this.toastService.mostrar('Productos cargados exitosamente', 'success');
-      },
-      error: () => {
-        this.isProcessingFile = false;
-        this.toastService.mostrar('Error al guardar los productos', 'error');
-      },
-    });
   }
 
   openEditForm(product: Product): void {

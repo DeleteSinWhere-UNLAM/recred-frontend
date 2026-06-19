@@ -178,7 +178,7 @@
                   [class.pv__featured-card--menta]="action.color === 'menta'"
                   [class.pv__featured-card--pizarra]="action.color === 'pizarra'"
                   [class.pv__featured-card--melocoton]="action.color === 'melocoton'"
-                  (click)="presenter.ejecutarAccion(action)"
+                  (click)="onActionClick(action)"
                 >
                   <span class="pv__featured-icon" aria-hidden="true">
                     <i class="fa-solid {{ action.icono }}"></i>
@@ -315,3 +315,22 @@
     </section>
   </div>
 </main>
+
+@if (isUploadModalVisible) {
+  <app-upload-selection-modal
+    (iaUpload)="goToIaUpload()"
+    (bulkUpload)="goToBulkUpload()"
+    (closeModal)="closeUploadModal()"
+  />
+}
+
+@if (isBulkUploadModalVisible) {
+  <app-bulk-upload-table-modal
+    [isProcessingFile]="isProcessingFile"
+    [prefilledProducts]="bulkProductsData"
+    [categories]="categories"
+    (fileSelected)="handleFileUpload($event)"
+    (saveProducts)="handleBulkProductsSave($event)"
+    (closeModal)="closeBulkUploadModal()"
+  />
+}

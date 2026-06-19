@@ -173,6 +173,159 @@
           </div>
         </form>
       </section>
+
+      @if (esKiosquero()) {
+        <div class="perfil-usuario__divider" aria-hidden="true"></div>
+
+        <section class="perfil-usuario__payout-section" aria-label="Configuración de pagos">
+          @if (cargandoPayout()) {
+            <div class="perfil-usuario__estado" aria-live="polite">
+              <span class="perfil-usuario__loader" aria-hidden="true"></span>
+              <p>Cargando configuración de pagos...</p>
+            </div>
+          } @else {
+            <form
+              class="perfil-usuario__panel perfil-usuario__form"
+              [formGroup]="payoutForm"
+              (ngSubmit)="guardarPayout()"
+            >
+              <div class="perfil-usuario__form-header">
+                <h2 class="perfil-usuario__panel-titulo">Configuración de Cobros / Transferencias</h2>
+                @if (payoutForm.dirty) {
+                  <span class="perfil-usuario__cambios">Cambios sin guardar</span>
+                }
+              </div>
+
+              @if (proximaEjecucion()) {
+                <div class="perfil-usuario__payout-info perfil-usuario__campo--full">
+                  <div class="perfil-usuario__payout-info-item">
+                    <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+                    <div>
+                      <span class="info-label">Próxima liquidación:</span>
+                      <strong class="info-value">{{ proximaEjecucion() }}</strong>
+                    </div>
+                  </div>
+                  @if (ultimaEjecucion()) {
+                    <div class="perfil-usuario__payout-info-item">
+                      <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                      <div>
+                        <span class="info-label">Último pago realizado:</span>
+                        <strong class="info-value">{{ ultimaEjecucion() }}</strong>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <label class="perfil-usuario__campo perfil-usuario__campo--full">
+                <span>Titular de la cuenta / Razón Social</span>
+                <input
+                  type="text"
+                  formControlName="accountHolderName"
+                  placeholder="Nombre del Kiosquero o Razón Social"
+                  [class.perfil-usuario__input--error]="campoPayoutInvalido('accountHolderName')"
+                />
+                @if (campoPayoutInvalido('accountHolderName')) {
+                  <small>Ingresá un nombre de titular válido.</small>
+                }
+              </label>
+
+              <label class="perfil-usuario__campo">
+                <span>CUIT del destinatario</span>
+                <input
+                  type="text"
+                  formControlName="destinationCuit"
+                  placeholder="20304567890"
+                  maxlength="11"
+                  [class.perfil-usuario__input--error]="campoPayoutInvalido('destinationCuit')"
+                />
+                @if (campoPayoutInvalido('destinationCuit')) {
+                  <small>El CUIT debe tener exactamente 11 dígitos numéricos.</small>
+                }
+              </label>
+
+              <label class="perfil-usuario__campo">
+                <span>CVU del destinatario</span>
+                <input
+                  type="text"
+                  formControlName="destinationCvu"
+                  placeholder="1234567890123456789012"
+                  maxlength="22"
+                  [class.perfil-usuario__input--error]="campoPayoutInvalido('destinationCvu')"
+                />
+                @if (campoPayoutInvalido('destinationCvu')) {
+                  <small>El CVU debe tener exactamente 22 dígitos numéricos.</small>
+                }
+              </label>
+
+              <label class="perfil-usuario__campo">
+                <span>Estado de transferencias</span>
+                <select
+                  formControlName="estado"
+                  [class.perfil-usuario__input--error]="campoPayoutInvalido('estado')"
+                >
+                  <option value="ACTIVE">Activo</option>
+                  <option value="PAUSED">Pausado</option>
+                  <option value="CANCELLED">Cancelado</option>
+                </select>
+                @if (campoPayoutInvalido('estado')) {
+                  <small>Seleccioná un estado válido.</small>
+                }
+              </label>
+
+              <label class="perfil-usuario__campo">
+                <span>Frecuencia (Cantidad)</span>
+                <input
+                  type="number"
+                  formControlName="cantidadIntervalo"
+                  placeholder="7"
+                  [class.perfil-usuario__input--error]="campoPayoutInvalido('cantidadIntervalo')"
+                />
+                @if (campoPayoutInvalido('cantidadIntervalo')) {
+                  <small>Ingresá una cantidad de intervalo válida (mínimo 1).</small>
+                }
+              </label>
+
+              <label class="perfil-usuario__campo">
+                <span>Frecuencia (Unidad)</span>
+                <select
+                  formControlName="unidadIntervalo"
+                  [class.perfil-usuario__input--error]="campoPayoutInvalido('unidadIntervalo')"
+                >
+                  <option value="DAYS">Días</option>
+                  <option value="WEEKS">Semanas</option>
+                  <option value="MONTHS">Meses</option>
+                </select>
+                @if (campoPayoutInvalido('unidadIntervalo')) {
+                  <small>Seleccioná una unidad válida.</small>
+                }
+              </label>
+
+              <div class="perfil-usuario__acciones">
+                <button
+                  type="button"
+                  class="perfil-usuario__boton perfil-usuario__boton--secundario"
+                  [disabled]="guardandoPayout() || !payoutForm.dirty"
+                  (click)="descartarCambiosPayout()"
+                >
+                  Descartar
+                </button>
+                <button
+                  type="submit"
+                  class="perfil-usuario__boton perfil-usuario__boton--primario"
+                  [disabled]="guardandoPayout() || payoutForm.invalid"
+                >
+                  @if (guardandoPayout()) {
+                    Guardando...
+                  } @else {
+                    Guardar configuración
+                  }
+                </button>
+              </div>
+            </form>
+          }
+        </section>
+      }
     }
   </div>
 </main>

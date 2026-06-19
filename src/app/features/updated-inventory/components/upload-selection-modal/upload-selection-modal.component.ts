@@ -8,12 +8,12 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angul
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadSelectionModalComponent {
-  @Output() individualUpload = new EventEmitter<void>();
+  @Output() iaUpload = new EventEmitter<void>();
   @Output() bulkUpload = new EventEmitter<void>();
   @Output() closeModal = new EventEmitter<void>();
 
-  onIndividualUpload(): void {
-    this.individualUpload.emit();
+  onIaUpload(): void {
+    this.iaUpload.emit();
   }
 
   onBulkUpload(): void {

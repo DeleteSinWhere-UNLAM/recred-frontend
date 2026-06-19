@@ -8,6 +8,9 @@ import {
 } from '../../data-access/models/perfil-usuario.model';
 import { PerfilUsuarioService } from '../../data-access/services/perfil-usuario.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { PayoutConfigService } from '../../data-access/services/payout-config.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
+import { PayoutConfig } from '../../data-access/models/payout-config.model';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../shared/services/toast.service';
 import { CropModalComponent } from './components/crop-modal/crop-modal.component';
@@ -29,6 +32,8 @@ type PerfilUsuarioForm = FormGroup<{
 export class PerfilUsuarioPage implements OnInit {
   private readonly perfilUsuarioService = inject(PerfilUsuarioService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
+  private readonly payoutConfigService = inject(PayoutConfigService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -39,6 +44,51 @@ export class PerfilUsuarioPage implements OnInit {
   protected readonly subiendoFoto = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly fotoEvent = signal<Event | null>(null);
+
+  protected readonly cargandoPayout = signal(false);
+  protected readonly guardandoPayout = signal(false);
+  protected readonly errorPayout = signal<string | null>(null);
+  protected readonly tienePayoutExistente = signal(false);
+  protected readonly proximaEjecucion = signal<string | null>(null);
+  protected readonly ultimaEjecucion = signal<string | null>(null);
+
+  protected readonly esKiosquero = computed(() => {
+    const role = this.usuario()?.role || this.perfil()?.role;
+    return role === 'VENDEDOR';
+  });
+
+  protected readonly payoutForm = new FormGroup({
+    destinationCvu: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.pattern(/^\d{22}$/),
+      ],
+    }),
+    destinationCuit: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.pattern(/^\d{11}$/),
+      ],
+    }),
+    accountHolderName: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(100)],
+    }),
+    cantidadIntervalo: new FormControl<number>(1, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(1)],
+    }),
+    unidadIntervalo: new FormControl<'DAYS' | 'WEEKS' | 'MONTHS'>('DAYS', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    estado: new FormControl<'ACTIVE' | 'PAUSED' | 'CANCELLED'>('ACTIVE', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
 
   @ViewChild('inputFoto') private readonly inputFoto!: ElementRef<HTMLInputElement>;
 
@@ -103,6 +153,10 @@ export class PerfilUsuarioPage implements OnInit {
       this.usuario.set(usuario);
       this.aplicarPerfil(perfil);
       this.usuarioService.setNombreNavbar(perfil.firstName || usuario.firstName);
+
+      if (usuario.role === 'VENDEDOR' || perfil.role === 'VENDEDOR') {
+        await this.cargarConfiguracionPayout();
+      }
     } catch (err) {
       console.error('Error cargando el perfil del usuario:', err);
       this.error.set('No pudimos cargar tu perfil. Probá de nuevo en unos minutos.');
@@ -286,5 +340,93 @@ export class PerfilUsuarioPage implements OnInit {
       lastName: perfil.lastName,
       role: perfil.role,
     };
+  }
+
+  protected async cargarConfiguracionPayout(): Promise<void> {
+    const kiosqueroId = this.perfilService.obtenerBuffetId();
+    if (!kiosqueroId) {
+      console.warn('No se encontró el ID del kiosquero para cargar la configuración de pagos.');
+      return;
+    }
+
+    this.cargandoPayout.set(true);
+    this.errorPayout.set(null);
+
+    try {
+      const config = await this.payoutConfigService.obtenerConfiguracion(kiosqueroId);
+      if (config) {
+        this.payoutForm.setValue({
+          destinationCvu: config.destinationCvu || '',
+          destinationCuit: config.destinationCuit || '',
+          accountHolderName: config.accountHolderName || '',
+          cantidadIntervalo: config.cantidadIntervalo || 1,
+          unidadIntervalo: config.unidadIntervalo || 'DAYS',
+          estado: config.estado || 'ACTIVE',
+        });
+        this.proximaEjecucion.set(config.proximaEjecucion || null);
+        this.ultimaEjecucion.set(config.ultimaEjecucion || null);
+        this.tienePayoutExistente.set(true);
+      }
+    } catch (err) {
+      console.warn('Error al cargar la configuración de pagos o inexistente:', err);
+      this.tienePayoutExistente.set(false);
+      this.proximaEjecucion.set(null);
+      this.ultimaEjecucion.set(null);
+    } finally {
+      this.cargandoPayout.set(false);
+    }
+  }
+
+  protected async guardarPayout(): Promise<void> {
+    if (this.guardandoPayout() || this.cargandoPayout()) return;
+
+    if (this.payoutForm.invalid) {
+      this.payoutForm.markAllAsTouched();
+      this.toastService.mostrar('Revisá los campos de la configuración de pagos.', 'error');
+      return;
+    }
+
+    const kiosqueroId = this.perfilService.obtenerBuffetId();
+    if (!kiosqueroId) {
+      this.toastService.mostrar('No se encontró el ID del kiosquero.', 'error');
+      return;
+    }
+
+    this.guardandoPayout.set(true);
+    this.errorPayout.set(null);
+
+    const data: PayoutConfig = this.payoutForm.getRawValue();
+
+    try {
+      const response = await this.payoutConfigService.guardarConfiguracion(kiosqueroId, data);
+      
+      const proxima = response?.proximaEjecucion;
+      this.proximaEjecucion.set(proxima || null);
+      
+      let mensajeExito = 'Vinculación exitosa y configuración guardada correctamente.';
+      if (proxima) {
+        mensajeExito += ` Próximo pago programado para: ${proxima}`;
+      }
+      
+      this.toastService.mostrar(mensajeExito, 'success');
+      this.payoutForm.markAsPristine();
+      this.tienePayoutExistente.set(true);
+    } catch (err) {
+      console.error('Error al guardar la configuración de pagos:', err);
+      this.toastService.mostrar('No se pudo procesar la configuración. Por favor, verificá los datos y reintentá.', 'error');
+      this.errorPayout.set('No se pudo guardar la configuración. Intentá de nuevo.');
+    } finally {
+      this.guardandoPayout.set(false);
+    }
+  }
+
+  protected descartarCambiosPayout(): void {
+    this.payoutForm.markAsPristine();
+    void this.cargarConfiguracionPayout();
+  }
+
+  protected campoPayoutInvalido(campo: keyof typeof this.payoutForm.controls): boolean {
+    const control = this.payoutForm.controls[campo];
+    return control.invalid && (control.dirty || control.touched);
   }
 }
