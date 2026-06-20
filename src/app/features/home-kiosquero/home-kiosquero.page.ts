@@ -3,6 +3,7 @@ import {
   Component,
   OnInit,
   inject,
+  ChangeDetectorRef,
 } from '@angular/core';
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
@@ -46,6 +47,7 @@ export class HomeKiosqueroPage implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly toastService = inject(ToastService);
   private readonly perfilService = inject(PerfilService);
+  private readonly cdr = inject(ChangeDetectorRef);
   protected readonly presenter = inject(HomeKiosqueroPresenter);
 
   protected readonly IMAGEN_FALLBACK = IMAGEN_FALLBACK;
@@ -115,10 +117,12 @@ export class HomeKiosqueroPage implements OnInit {
         this.bulkProductsData = res.products;
         this.isProcessingFile = false;
         this.toastService.mostrar('Archivo procesado correctamente', 'success');
+        this.cdr.markForCheck();
       },
       error: () => {
         this.isProcessingFile = false;
         this.toastService.mostrar('Error al procesar el archivo', 'error');
+        this.cdr.markForCheck();
       }
     });
   }
@@ -168,10 +172,13 @@ export class HomeKiosqueroPage implements OnInit {
         this.isProcessingFile = false;
         this.closeBulkUploadModal();
         this.toastService.mostrar('Productos cargados exitosamente', 'success');
+        this.cdr.markForCheck();
+        this.router.navigateByUrl('/admin-productos');
       },
       error: () => {
         this.isProcessingFile = false;
         this.toastService.mostrar('Error al guardar los productos', 'error');
+        this.cdr.markForCheck();
       },
     });
   }
