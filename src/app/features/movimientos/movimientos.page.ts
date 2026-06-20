@@ -29,6 +29,7 @@ export class MovimientosPage implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly dialogService = inject(DialogService);
 
+  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly esVistaIndividual = signal<boolean>(false);
   readonly nombreAlumno = signal<string>('');
