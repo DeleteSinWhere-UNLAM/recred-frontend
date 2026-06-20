@@ -21,6 +21,7 @@ describe('CarritosFavoritosPage', () => {
   let usuarioServiceSpy: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(async () => {
+    spyOn(console, 'error');
     carritosServiceSpy = jasmine.createSpyObj('CarritosFavoritosService', ['getCarritosFavoritos', 'deleteCarritoFavorito']);
     carritoServiceSpy = jasmine.createSpyObj('CarritoService', ['agregar']);
     toastSpy = jasmine.createSpyObj('ToastService', ['mostrar']);

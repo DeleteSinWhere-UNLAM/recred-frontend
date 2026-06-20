@@ -81,6 +81,7 @@ describe('MovimientosPendientesPage', () => {
   ];
 
   beforeEach(async () => {
+    spyOn(console, 'error');
     movimientosService = jasmine.createSpyObj<MovimientosService>(
       'MovimientosService',
       ['getPendientesAlumno', 'cancelarCompra'],

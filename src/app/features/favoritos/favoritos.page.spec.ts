@@ -29,6 +29,7 @@ describe('FavoritosPage', () => {
   let notificacionesSpy: jasmine.SpyObj<NotificacionesService>;
 
   beforeEach(async () => {
+    spyOn(console, 'error');
     favoritosSpy = jasmine.createSpyObj('FavoritosService', ['getFavoritos', 'removerFavorito']);
     usuarioSpy = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual', 'getAlumnoActual', 'homeUrl']);
     perfilSpy = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);

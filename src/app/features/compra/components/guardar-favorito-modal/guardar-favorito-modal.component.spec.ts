@@ -48,6 +48,7 @@ describe('GuardarFavoritoModalComponent', () => {
   const esVistaAlumnoSignal = signal<boolean>(false);
 
   beforeEach(async () => {
+    spyOn(console, 'error');
     alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>(
       'AlumnosService',
       ['asegurarCargados'],
