@@ -7,10 +7,11 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { HijoResumen, ResumenSemanal } from './models/resumen-semanal.model';
 
 describe('ResumenSemanalPage', () => {
   let mockResumenService: jasmine.SpyObj<ResumenSemanalService>;
-  let mockUsuarioService: any;
+  let mockUsuarioService: unknown;
 
   beforeEach(async () => {
     mockResumenService = jasmine.createSpyObj('ResumenSemanalService', ['getResumen']);
@@ -62,7 +63,7 @@ describe('ResumenSemanalPage', () => {
           },
           mensaje: JSON.stringify([{ nombre: 'Ahorro', mensaje: 'Buen ahorro' }])
         })
-      } as any));
+      } as unknown as ResumenSemanal));
 
       fixture = TestBed.createComponent(ResumenSemanalPage);
       component = fixture.componentInstance;
@@ -102,12 +103,12 @@ describe('ResumenSemanalPage', () => {
     });
 
     it('debería manejar el caso donde totalFamiliar sea 0 para los porcentajes', () => {
-      component.hijos = [{ nombre: 'Cero', datos: { totalGastado: 0 } as any }];
+      component.hijos = [{ nombre: 'Cero', datos: { totalGastado: 0 } as unknown as HijoResumen }];
       expect(component.hijosResumen[0].porcentaje).toBe(0);
     });
 
     it('debería manejar el caso de fallbacks en totalGastado nulo', () => {
-      component.hijos = [{ nombre: 'Nulo', datos: { totalGastado: undefined } as any }];
+      component.hijos = [{ nombre: 'Nulo', datos: { totalGastado: undefined } as unknown as HijoResumen }];
       expect(component.totalFamiliar).toBe(0);
       expect(component.hijosResumen[0].gasto).toBe(0);
     });
@@ -134,7 +135,7 @@ describe('ResumenSemanalPage', () => {
           hijos: {},
           mensaje: null
         })
-      } as any));
+      } as unknown as ResumenSemanal));
 
       const fixture = TestBed.createComponent(ResumenSemanalPage);
       const component = fixture.componentInstance;

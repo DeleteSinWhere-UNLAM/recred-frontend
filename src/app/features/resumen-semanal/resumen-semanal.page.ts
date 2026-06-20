@@ -78,7 +78,7 @@ export class ResumenSemanalPage {
 
   get hijosResumen() {
     return this.hijos
-      .map((hijo, index) => ({
+      .map((hijo) => ({
         nombre: hijo.nombre,
         gasto: hijo.datos.totalGastado ?? 0,
         porcentaje:
