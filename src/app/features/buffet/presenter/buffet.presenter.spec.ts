@@ -40,6 +40,8 @@ describe('BuffetPresenter', () => {
   const mockRestriccionesHorarias = [{ id: 'r1', activa: true, timeSlotId: 'f2' }];
   
   beforeEach(() => {
+    spyOn(console, 'error');
+    spyOn(console, 'warn');
     alumnosServiceSpy = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
     buffetServiceSpy = jasmine.createSpyObj('BuffetService', ['obtenerBuffetDelAlumno', 'getProductosDelBuffet']);
     favoritosServiceSpy = jasmine.createSpyObj('FavoritosService', ['getFavoritos', 'agregarFavorito', 'removerFavorito']);
@@ -486,10 +488,9 @@ describe('BuffetPresenter', () => {
     }));
 
     it('cargarProductos maneja error', fakeAsync(() => {
-      const consoleSpy = spyOn(console, 'error');
       buffetServiceSpy.getProductosDelBuffet.and.returnValue(throwError(() => new Error('Error')));
       (presenter as any).cargarProductos('b1', 'a1');
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalled();
     }));
 
     it('setFecha si fecha es fin de semana salta al dia habil y ajusta recreo si esta bloqueado', fakeAsync(() => {
