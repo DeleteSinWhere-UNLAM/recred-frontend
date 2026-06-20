@@ -227,14 +227,18 @@ describe('CarritoPresenter', () => {
       alumnosServiceSpy.getAlumnoById.and.returnValue({
         id: 'alumno-1', nombre: 'Test', saldo: 10000, apellido: '', grado: '', colegioId: ''
       });
-      await presenter.init();
-
-      // Find a sunday
+      // Find a future sunday beyond the minimum date.
       let sunday = new Date();
+      sunday.setDate(sunday.getDate() + 7);
       while (sunday.getDay() !== 0) {
         sunday.setDate(sunday.getDate() + 1);
       }
-      presenter.setFecha('alumno-1', sunday.toISOString().split('T')[0]);
+      const sundayStr = `${sunday.getFullYear()}-${String(sunday.getMonth() + 1).padStart(2, '0')}-${String(sunday.getDate()).padStart(2, '0')}`;
+      carritoServiceSpy.seleccionRetiro.and.returnValue({
+        'alumno-1': { fecha: sundayStr, recreo: 'PRIMER_RECREO' }
+      });
+
+      await presenter.init();
 
       expect(presenter.advertencia()).toContain('fin de semana');
     });

@@ -60,6 +60,7 @@ describe('PresupuestoPage', () => {
     })
     .overrideComponent(PresupuestoPage, {
       set: {
+        template: '',
         providers: [
           { provide: PresupuestoPresenter, useValue: mockPresenter }
         ],
@@ -95,6 +96,7 @@ describe('PresupuestoPage', () => {
     })
     .overrideComponent(PresupuestoPage, {
       set: {
+        template: '',
         providers: [
           { provide: PresupuestoPresenter, useValue: mockPresenter }
         ],

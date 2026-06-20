@@ -16,14 +16,21 @@ describe('HomeTutorPage', () => {
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
   let colegiosServiceSpy: jasmine.SpyObj<ColegiosService>;
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
+  let alumnosSignal: ReturnType<typeof signal<any[]>>;
+  let perfilSignal: ReturnType<typeof signal<any>>;
 
   beforeEach(async () => {
     usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'setNombreNavbar', 'getUsuarioActual']);
-    perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['perfil']);
+    perfilSignal = signal(null);
+    perfilServiceSpy = { perfil: perfilSignal } as unknown as jasmine.SpyObj<PerfilService>;
     colegiosServiceSpy = jasmine.createSpyObj('ColegiosService', ['getColegios']);
-    alumnosServiceSpy = jasmine.createSpyObj('AlumnosService', ['asegurarCargados'], { alumnos: signal([]) });
+    alumnosSignal = signal([]);
+    alumnosServiceSpy = jasmine.createSpyObj('AlumnosService', ['asegurarCargados'], { alumnos: alumnosSignal });
 
     usuarioServiceSpy.getUsuarioActual.and.returnValue({ nombre: 'JuanUser' } as any);
+    alumnosServiceSpy.asegurarCargados.and.resolveTo();
+    colegiosServiceSpy.getColegios.and.returnValue([]);
+    perfilSignal.set(null);
 
     await TestBed.configureTestingModule({
       imports: [HomeTutorPage],
@@ -36,7 +43,11 @@ describe('HomeTutorPage', () => {
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: ActivatedRoute, useValue: {} }
       ]
-    }).compileComponents();
+    })
+    .overrideComponent(HomeTutorPage, {
+      set: { template: '' }
+    })
+    .compileComponents();
 
     fixture = TestBed.createComponent(HomeTutorPage);
   });
@@ -52,7 +63,7 @@ describe('HomeTutorPage', () => {
 
   describe('computed properties with profile', () => {
     beforeEach(() => {
-      perfilServiceSpy.perfil.and.returnValue({ nombre: 'Ana', apellido: 'Perez', urlFotoPerfil: 'img.jpg' } as any);
+      perfilSignal.set({ nombre: 'Ana', apellido: 'Perez', urlFotoPerfil: 'img.jpg' });
       component = fixture.componentInstance;
     });
 
@@ -66,7 +77,7 @@ describe('HomeTutorPage', () => {
 
   describe('computed properties without profile', () => {
     beforeEach(() => {
-      perfilServiceSpy.perfil.and.returnValue(null);
+      perfilSignal.set(null);
       component = fixture.componentInstance;
     });
 
@@ -81,12 +92,11 @@ describe('HomeTutorPage', () => {
   describe('grouping and balances', () => {
     beforeEach(() => {
       colegiosServiceSpy.getColegios.and.returnValue([{ id: 'c1', nombre: 'Colegio 1' } as any]);
-      alumnosServiceSpy = TestBed.inject(AlumnosService) as jasmine.SpyObj<AlumnosService>;
-      Object.defineProperty(alumnosServiceSpy, 'alumnos', { value: signal([
+      alumnosSignal.set([
         { id: 'a1', colegioId: 'c1', saldo: 100 },
         { id: 'a2', colegioId: 'c2', saldo: -50 },
         { id: 'a3', colegioId: null, saldo: 0 }
-      ])});
+      ]);
       component = fixture.componentInstance;
     });
 
@@ -105,9 +115,9 @@ describe('HomeTutorPage', () => {
     });
 
     it('should calculate negative total balance correctly', () => {
-      Object.defineProperty(alumnosServiceSpy, 'alumnos', { value: signal([
+      alumnosSignal.set([
         { id: 'a1', colegioId: 'c1', saldo: -100 }
-      ])});
+      ]);
       expect(component.saldoTotalNegativo()).toBeTrue();
     });
   });

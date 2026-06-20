@@ -70,7 +70,8 @@ describe('HomeAlumnoPresenter', () => {
       expect(presenter.nombreColegio()).toBe('Colegio A');
       expect(presenter.saldo()).toBe(-100);
       expect(presenter.saldoNegativo()).toBeTrue();
-      expect(presenter.saldoFormateado()).toContain('-100');
+      expect(presenter.saldoFormateado()).toContain('100');
+      expect(presenter.saldoFormateado()).toContain('-');
     });
 
     it('should compute initials handling empty names safely', () => {

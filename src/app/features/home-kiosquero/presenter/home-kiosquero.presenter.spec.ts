@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -83,8 +83,24 @@ describe('HomeKiosqueroPresenter', () => {
       ],
     },
     products: {
-      topSoldProducts: [],
-      mostReservedProducts: [],
+      topSoldProducts: [
+        {
+          productId: 'top-1',
+          productName: 'Medialuna',
+          urlImagen: 'medialuna.jpg',
+          quantity: 5,
+          total: 7500,
+        },
+      ],
+      mostReservedProducts: [
+        {
+          productId: 'reserved-1',
+          productName: 'Sandwich',
+          urlImagen: null,
+          quantity: 3,
+          total: 9000,
+        },
+      ],
       productsNeedingRestock: [
         {
           productId: 'low-1',
@@ -118,10 +134,43 @@ describe('HomeKiosqueroPresenter', () => {
       soldOutEvents: 50,
       pendingOrders: 99,
       readyOrders: 3,
-      items: [],
+      items: [
+        {
+          type: 'EXPIRED',
+          label: 'Pedidos vencidos',
+          quantity: 1,
+          amount: 0,
+        },
+        {
+          type: 'REFUND',
+          label: 'Creditos devueltos',
+          quantity: 0,
+          amount: 1250,
+        },
+        {
+          type: 'EMPTY',
+          label: 'Sin impacto',
+          quantity: 0,
+          amount: 0,
+        },
+      ],
     },
     trends: {
-      lastSevenDays: [],
+      lastSevenDays: [
+        {
+          date: '2026-06-10',
+          totalSold: 1000,
+          totalOrders: 2,
+          deliveredOrders: 2,
+        },
+        {
+          date: '2026-06-11',
+          totalSold: 4000,
+          totalOrders: 4,
+          deliveredOrders: 3,
+          expiredOrders: 1,
+        },
+      ],
     },
   };
 
@@ -185,6 +234,40 @@ describe('HomeKiosqueroPresenter', () => {
       ['Ya listos', '3'],
       ['Vencidos', '1'],
     ]);
+  });
+
+  it('expone metricas de resumen y atencion', () => {
+    expect(
+      presenter.summaryMetrics().map((metric) => [
+        metric.label,
+        metric.tone,
+      ]),
+    ).toEqual([
+      ['Total vendido', 'success'],
+      ['Pedidos totales', undefined],
+      ['Entregados', 'success'],
+      ['Venta promedio', undefined],
+      ['A preparar', 'warning'],
+      ['Sin stock', 'danger'],
+    ]);
+
+    expect(presenter.mainSummaryMetrics().map((metric) => metric.label)).toEqual(
+      ['Total vendido hoy', 'Pedidos totales', 'Entregados'],
+    );
+    expect(
+      presenter.reportSummaryMetrics().map((metric) => metric.label),
+    ).toEqual([
+      'Total vendido',
+      'Pedidos totales',
+      'Entregados',
+      'Venta promedio',
+    ]);
+    expect(presenter.attentionItems().map((item) => item.label)).toEqual([
+      'A preparar',
+      'Ya listos',
+      'Vencidos',
+    ]);
+    expect(presenter.hasPanelData()).toBeTrue();
   });
 
   it('se suscribe a realtime del buffet al iniciar', () => {
@@ -349,6 +432,183 @@ describe('HomeKiosqueroPresenter', () => {
       ['Anticipada', '4 de 12 compras', '33%'],
     ]);
   });
+
+  it('completa estados operativos y grupos de productos', () => {
+    expect(presenter.ordersByStatus().map((status) => status.status)).toEqual([
+      'EN_PREPARACION',
+      'LISTO',
+    ]);
+    expect(
+      presenter.orderedStatusItems().map((status) => [
+        status.status,
+        status.orders,
+      ]),
+    ).toEqual([
+      ['PENDIENTE', 0],
+      ['EN_PREPARACION', 2],
+      ['LISTO', 3],
+      ['ENTREGADO', 0],
+      ['CANCELADO', 0],
+      ['RECHAZADO', 0],
+      ['VENCIDO', 0],
+    ]);
+
+    expect(presenter.productGroups().map((group) => group.title)).toEqual([
+      'Más vendidos',
+      'Más reservados ahora',
+      'Reposición',
+      'Agotados',
+    ]);
+    expect(presenter.productGroups()[0].items[0]).toEqual(
+      jasmine.objectContaining({
+        id: 'top-1',
+        label: 'Medialuna',
+        detail: '5 unidades',
+      }),
+    );
+    expect(presenter.rankingProductGroups().map((group) => group.title)).toEqual(
+      ['Más vendidos', 'Más reservados ahora'],
+    );
+    expect(presenter.hasCriticalStock()).toBeTrue();
+    expect(presenter.primaryAction()?.id).toBe('ver-pedidos');
+  });
+
+  it('expone alertas visibles y metricas de reporte', () => {
+    const alertLabels = presenter.alertMetrics().map((metric) => metric.label);
+    const visibleAlertLabels = presenter
+      .visibleAlertMetrics()
+      .map((metric) => metric.label);
+
+    expect(alertLabels.length).toBe(6);
+    expect(alertLabels).toContain('Pedidos vencidos');
+    expect(alertLabels).toContain('A preparar');
+    expect(visibleAlertLabels.length).toBe(4);
+    expect(visibleAlertLabels).toContain('Pedidos vencidos');
+    expect(visibleAlertLabels).toContain('A preparar');
+    expect(presenter.reportAlertMetrics().length).toBe(4);
+    expect(presenter.alertItems().map((item) => item.quantityLabel)).toEqual([
+      '1',
+      '0',
+      '0',
+    ]);
+    expect(
+      presenter.visibleAlertItems().map((item) => [item.type, item.amountLabel]),
+    ).toEqual([
+      ['EXPIRED', jasmine.any(String)],
+      ['REFUND', jasmine.any(String)],
+    ]);
+    expect(presenter.hasVisibleAlerts()).toBeTrue();
+    expect(presenter.hasReportAlerts()).toBeTrue();
+  });
+
+  it('actualiza fecha, rango y seleccion de tendencia desde handlers publicos', () => {
+    const initialPanelCalls = homeKiosqueroService.getPanel.calls.count();
+    const initialRangeCalls = homeKiosqueroService.getPanelByRange.calls.count();
+
+    presenter.onDateChange({
+      target: { value: '2026-06-12' },
+    } as unknown as Event);
+    presenter.refrescarPanel();
+
+    expect(presenter.selectedDate()).toBe('2026-06-12');
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(
+      initialPanelCalls + 2,
+    );
+
+    presenter.onReportRangePresetChange({
+      target: { value: 'LAST_7_DAYS' },
+    } as unknown as Event);
+    presenter.onReportRangeFromChange({
+      target: { value: '2026-06-01' },
+    } as unknown as Event);
+    presenter.onReportRangeToChange({
+      target: { value: '2026-06-15' },
+    } as unknown as Event);
+    presenter.refrescarReportes();
+    presenter.selectTrendDay('2026-06-10');
+
+    expect(presenter.selectedRangePreset()).toBe('CUSTOM');
+    expect(presenter.reportRangeFrom()).toBe('2026-06-01');
+    expect(presenter.reportRangeTo()).toBe('2026-06-15');
+    expect(homeKiosqueroService.getPanelByRange.calls.count()).toBeGreaterThan(
+      initialRangeCalls,
+    );
+    expect(presenter.selectedTrendDay()?.date).toBe('2026-06-10');
+  });
+
+  it('ignora cambios invalidos de fecha y rango', () => {
+    const panelCalls = homeKiosqueroService.getPanel.calls.count();
+    const rangeCalls = homeKiosqueroService.getPanelByRange.calls.count();
+
+    presenter.onDateChange({ target: { value: '' } } as unknown as Event);
+    presenter.onDateChange({
+      target: { value: presenter.selectedDate() },
+    } as unknown as Event);
+    presenter.onReportRangePresetChange({
+      target: { value: 'INVALIDO' },
+    } as unknown as Event);
+    presenter.onReportRangeFromChange({
+      target: { value: presenter.reportRangeFrom() },
+    } as unknown as Event);
+    presenter.onReportRangeToChange({
+      target: { value: presenter.reportRangeTo() },
+    } as unknown as Event);
+
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(panelCalls);
+    expect(homeKiosqueroService.getPanelByRange.calls.count()).toBe(rangeCalls);
+  });
+
+  it('devuelve claves de tracking para listas del template', () => {
+    expect(presenter.trackMetric(0, presenter.summaryMetrics()[0])).toBe(
+      'Total vendido',
+    );
+    expect(presenter.trackAttentionItem(0, presenter.attentionItems()[0])).toBe(
+      'A preparar',
+    );
+    expect(presenter.trackTimeSlot(0, presenter.salesByTimeSlot()[0])).toBe(
+      'slot-1',
+    );
+    expect(presenter.trackStatus(0, presenter.orderedStatusItems()[0])).toBe(
+      'PENDIENTE',
+    );
+    expect(
+      presenter.trackPurchaseType(0, presenter.ordersByPurchaseType()[0]),
+    ).toBe('PRESENCIAL');
+    expect(presenter.trackProductGroup(0, presenter.productGroups()[0])).toBe(
+      'Más vendidos',
+    );
+    expect(
+      presenter.trackProductItem(0, presenter.productGroups()[0].items[0]),
+    ).toBe('top-1');
+    expect(presenter.trackAlertItem(0, presenter.alertItems()[0])).toBe(
+      'EXPIRED',
+    );
+    expect(presenter.trackTrendDay(0, presenter.trendDays()[0])).toBe(
+      '2026-06-10',
+    );
+  });
+
+  it('refresca el panel con debounce cuando llega DASHBOARD_CHANGED', fakeAsync(() => {
+    const handlers = inventoryRealtimeService.connect.calls.mostRecent()
+      .args[1] as {
+      onRefresh: (event: { type: string; buffetId: string; occurredAt: string }) => void;
+    };
+    const initialCalls = homeKiosqueroService.getPanel.calls.count();
+
+    handlers.onRefresh({
+      type: 'DASHBOARD_CHANGED',
+      buffetId: 'buffet-1',
+      occurredAt: new Date().toISOString(),
+    });
+    tick(2499);
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(initialCalls);
+
+    tick(1);
+    expect(inventoryRealtimeService.recordRefetch).toHaveBeenCalledWith(
+      'home-kiosquero-panel',
+    );
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(initialCalls + 1);
+  }));
 
   it('navega a pedidos con fecha y estado preparados para filtro', () => {
     presenter.abrirPedidos('LISTO');

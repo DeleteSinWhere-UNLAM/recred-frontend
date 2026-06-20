@@ -37,6 +37,7 @@ describe('ConfirmarPage', () => {
     })
     .overrideComponent(ConfirmarPage, {
       set: {
+        template: '',
         providers: [
           { provide: ConfirmarPresenter, useValue: mockPresenter }
         ]

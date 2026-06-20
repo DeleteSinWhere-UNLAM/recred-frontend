@@ -16,6 +16,9 @@ describe('ProductoCardComponent', () => {
       'puedeAgregar',
       'cantidadDe'
     ]);
+    carritoServiceSpy.validarAgregar.and.returnValue({ permitido: true });
+    carritoServiceSpy.puedeAgregar.and.returnValue(true);
+    carritoServiceSpy.cantidadDe.and.returnValue(0);
 
     await TestBed.configureTestingModule({
       imports: [ProductoCardComponent],
@@ -170,13 +173,16 @@ describe('ProductoCardComponent', () => {
       expect(component.superaSaldo()).toBeFalse();
 
       carritoServiceSpy.validarAgregar.and.returnValue({ permitido: false, razon: 'categoria' });
+      component['cantidad'].set(2);
       expect(component.superaPresupuesto()).toBeTrue();
 
       carritoServiceSpy.validarAgregar.and.returnValue({ permitido: false, razon: 'saldo' });
+      component['cantidad'].set(3);
       expect(component.superaPresupuesto()).toBeFalse();
       expect(component.superaSaldo()).toBeTrue();
 
       carritoServiceSpy.validarAgregar.and.returnValue({ permitido: true });
+      component['cantidad'].set(4);
       expect(component.superaPresupuesto()).toBeFalse();
       expect(component.superaSaldo()).toBeFalse();
       expect(component.razonRechazo()).toBeNull();
@@ -191,6 +197,7 @@ describe('ProductoCardComponent', () => {
       expect(component.deshabilitarSumar()).toBeTrue();
       
       carritoServiceSpy.puedeAgregar.and.returnValue(true);
+      component['cantidad'].set(2);
       expect(component.deshabilitarSumar()).toBeFalse();
     });
 

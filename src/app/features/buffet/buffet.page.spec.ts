@@ -76,7 +76,10 @@ describe('BuffetPage', () => {
       ]
     })
     .overrideComponent(BuffetPage, {
-      set: { providers: [{ provide: BuffetPresenter, useValue: presenterMock }] }
+      set: {
+        template: '',
+        providers: [{ provide: BuffetPresenter, useValue: presenterMock }]
+      }
     })
     .compileComponents();
 

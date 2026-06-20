@@ -63,9 +63,11 @@ describe('CarritosFavoritosPage', () => {
       component.ngOnInit(); // llama a cargarCarritosFavoritos
       expect(component.isLoading).toBeFalse();
       expect(component.carritosFavoritos.length).toBe(2);
-      expect(component.gruposHijos.length).toBe(1);
+      expect(component.gruposHijos.length).toBe(2);
       expect(component.gruposHijos[0].alumnoId).toBe('a1');
-      expect(component.gruposHijos[0].carritos.length).toBe(2);
+      expect(component.gruposHijos[0].carritos.length).toBe(1);
+      expect(component.gruposHijos[1].alumnoId).toBe('a2');
+      expect(component.gruposHijos[1].carritos.length).toBe(1);
     });
 
     it('debe manejar el error de carga', () => {

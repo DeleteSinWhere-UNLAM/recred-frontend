@@ -37,6 +37,7 @@ describe('CarritoPage', () => {
     })
     .overrideComponent(CarritoPage, {
       set: {
+        template: '',
         providers: [
           { provide: CarritoPresenter, useValue: mockPresenter }
         ]

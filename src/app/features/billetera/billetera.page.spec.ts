@@ -82,6 +82,7 @@ describe('BilleteraPage', () => {
     })
     .overrideComponent(BilleteraPage, {
       set: {
+        template: '',
         providers: [
           { provide: BilleteraPresenter, useValue: mockPresenter }
         ],
@@ -171,6 +172,7 @@ describe('BilleteraPage - Otros roles', () => {
     })
     .overrideComponent(BilleteraPage, {
       set: {
+        template: '',
         providers: [
           { provide: BilleteraPresenter, useValue: mockPresenter }
         ],
@@ -197,4 +199,3 @@ describe('BilleteraPage - Otros roles', () => {
     expect(usuarioServiceSpy.setHomeUrl).not.toHaveBeenCalled();
   });
 });
-

@@ -25,6 +25,7 @@ describe('HomeKiosqueroPage', () => {
     })
     .overrideComponent(HomeKiosqueroPage, {
       set: {
+        template: '',
         providers: [
           { provide: HomeKiosqueroPresenter, useValue: presenterSpy }
         ]

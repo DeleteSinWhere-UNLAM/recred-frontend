@@ -6,8 +6,14 @@ import { PerfilService } from '../../data-access/services/perfil.service';
 import { CarritoService } from '../compra/services/carrito.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { Producto } from '../buffet/models/producto.model';
+import { AuthService } from '../../core/auth/services/auth.service';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
+import { NotificacionesService } from '../../data-access/services/notificaciones.service';
 
 describe('FavoritosPage', () => {
   let component: FavoritosPage;
@@ -18,17 +24,30 @@ describe('FavoritosPage', () => {
   let carritoSpy: jasmine.SpyObj<CarritoService>;
   let toastSpy: jasmine.SpyObj<ToastService>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let authSpy: jasmine.SpyObj<AuthService>;
+  let alumnosSpy: jasmine.SpyObj<AlumnosService>;
+  let notificacionesSpy: jasmine.SpyObj<NotificacionesService>;
 
   beforeEach(async () => {
     favoritosSpy = jasmine.createSpyObj('FavoritosService', ['getFavoritos', 'removerFavorito']);
-    usuarioSpy = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual', 'getAlumnoActual']);
+    usuarioSpy = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual', 'getAlumnoActual', 'homeUrl']);
     perfilSpy = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);
     carritoSpy = jasmine.createSpyObj('CarritoService', ['agregar']);
     toastSpy = jasmine.createSpyObj('ToastService', ['mostrar']);
     routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    authSpy = jasmine.createSpyObj('AuthService', ['logout']);
+    alumnosSpy = jasmine.createSpyObj('AlumnosService', ['asegurarCargados']);
+    notificacionesSpy = jasmine.createSpyObj('NotificacionesService', ['obtenerNotificaciones']);
 
     usuarioSpy.getUsuarioActual.and.returnValue({ nombre: 'Test User' } as any);
     usuarioSpy.getAlumnoActual.and.returnValue({ id: 'a-fallback' } as any);
+    usuarioSpy.homeUrl.and.returnValue('/alumno');
+    (usuarioSpy as any).esVistaAlumno = signal(true);
+    (usuarioSpy as any).esVistaKiosquero = signal(false);
+    (carritoSpy as any).cantidadTotal = signal(0);
+    (alumnosSpy as any).alumnos = signal([]);
+    (notificacionesSpy as any).notificaciones = signal([]);
+    (notificacionesSpy as any).cantidad = signal(0);
     perfilSpy.obtenerAlumnoId.and.returnValue('a1');
 
     favoritosSpy.getFavoritos.and.returnValue(of([]));
@@ -41,7 +60,12 @@ describe('FavoritosPage', () => {
         { provide: PerfilService, useValue: perfilSpy },
         { provide: CarritoService, useValue: carritoSpy },
         { provide: ToastService, useValue: toastSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: AuthService, useValue: authSpy },
+        { provide: AlumnosService, useValue: alumnosSpy },
+        { provide: NotificacionesService, useValue: notificacionesSpy },
+        provideHttpClient(),
+        provideHttpClientTesting()
       ]
     })
     .compileComponents();

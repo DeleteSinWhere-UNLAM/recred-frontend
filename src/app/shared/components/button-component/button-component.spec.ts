@@ -59,7 +59,6 @@ describe('ButtonComponent', () => {
   });
 
   it('dado que se provee una variante desconocida, deberia retornar las clases base por defecto', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component.variant = 'unknown' as any;
     component.disabled = false;
     const classes = component.getClasses();
