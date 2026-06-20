@@ -912,11 +912,12 @@ export class HomeKiosqueroPresenter {
     },
     {
       id: 'sugerencias',
-      titulo: 'Sugerencias del día',
-      descripcion: 'Recomendaciones inteligentes',
+      titulo: 'Impulsar Baja Rotación',
+      descripcion: 'Armar combos para mover stock estancado',
       icono: 'fa-robot',
       ruta: '/sugerencias',
       color: 'melocoton',
+      destacada: true,
     },
     {
       id: 'recomendaciones',
