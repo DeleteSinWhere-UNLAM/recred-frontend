@@ -869,6 +869,15 @@ export class HomeKiosqueroPresenter {
       destacada: true,
     },
     {
+      id: 'oportunidades-stock',
+      titulo: 'Oportunidades de Stock',
+      descripcion: 'Descubrir nuevos productos',
+      icono: 'fa-rocket',
+      ruta: '/sugerencias-agregar',
+      color: 'menta',
+      destacada: true,
+    },
+    {
       id: 'tracking-pedidos',
       titulo: 'Seguimiento de pedidos',
       descripcion: 'Monitorea y entrega los pedidos recibidos',
