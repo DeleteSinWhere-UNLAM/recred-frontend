@@ -301,6 +301,7 @@ describe('HomeKiosqueroPresenter', () => {
     expect(presenter.featuredActions().map((accion) => accion.id)).toEqual([
       'venta-espontanea',
       'oportunidades-stock',
+      'sugerencias',
       'cargar-productos',
       'cierre-diario',
     ]);
