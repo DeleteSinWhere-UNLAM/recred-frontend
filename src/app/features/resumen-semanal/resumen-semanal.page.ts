@@ -34,16 +34,12 @@ export class ResumenSemanalPage {
   hijos: { nombre: string; datos: HijoResumen }[] = [];
 
   readonly colores = [
-    '#4f46e5',
-    '#22c55e',
-    '#f59e0b',
-    '#ef4444',
-    '#06b6d4',
-    '#8b5cf6',
-    '#84cc16',
-    '#f97316',
-    '#ec4899',
-    '#14b8a6',
+    'var(--color-violeta, #8b5cf6)',
+    'var(--color-menta, #4ade80)',
+    'var(--color-dorado, #fbbf24)',
+    'var(--color-melocoton, #fb923c)',
+    'var(--color-pizarra, #475569)',
+    'var(--color-secundario, #38bdf8)',
   ];
 
   constructor() {
