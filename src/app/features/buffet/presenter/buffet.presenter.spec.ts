@@ -370,6 +370,10 @@ describe('BuffetPresenter', () => {
 
     it('recreosDisponibles bloquea si falta 1 hora o menos para el slot', fakeAsync(() => {
       const now = new Date();
+      // Asegurarnos de que no sea fin de semana para que setFecha() no lo mueva al lunes
+      while (now.getDay() === 0 || now.getDay() === 6) {
+        now.setDate(now.getDate() + 1);
+      }
       now.setHours(10, 0, 0, 0);
       jasmine.clock().install();
       jasmine.clock().mockDate(now);
