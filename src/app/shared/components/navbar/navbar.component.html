@@ -193,15 +193,17 @@
                 </div>
               }
             }
-            <button
-              type="button"
-              class="navbar__menu-item"
-              role="menuitem"
-              (click)="irAPremium()"
-            >
-              <i class="fa-solid fa-star" aria-hidden="true"></i>
-              <span>Premium</span>
-            </button>
+            @if (!esVistaAlumno()) {
+              <button
+                type="button"
+                class="navbar__menu-item"
+                role="menuitem"
+                (click)="irAPremium()"
+              >
+                <i class="fa-solid fa-star" aria-hidden="true"></i>
+                <span>Premium</span>
+              </button>
+            }
             <button
               type="button"
               class="navbar__menu-item"
