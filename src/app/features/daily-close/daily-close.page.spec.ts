@@ -45,6 +45,7 @@ interface DailyClosePageTestApi {
   readonly sortedInventory: () => DailyInventorySnapshot[];
   readonly sortedProducts: () => DailyProductSale[];
   readonly closeStatusErrorMessage: TestSignal<string | null>;
+  readonly errorMessage: TestSignal<string | null>;
   readonly historyErrorMessage: TestSignal<string | null>;
   readonly refreshingAfterClose: TestSignal<boolean>;
   volver: () => void;
@@ -908,7 +909,7 @@ describe('DailyClosePage', () => {
     let onRefresh: ((event: RealtimeInventoryEvent) => void) | undefined;
     const abortController = new AbortController();
     spyOn(abortController, 'abort').and.callThrough();
-    spyOnProperty(document, 'visibilityState', 'get').and.returnValue('visible');
+    spyOnProperty(Document.prototype, 'visibilityState', 'get').and.returnValue('visible');
     inventoryRealtimeService.connect.and.callFake((_buffetId, handlers) => {
       onRefresh = handlers.onRefresh;
       return abortController;
@@ -948,4 +949,93 @@ describe('DailyClosePage', () => {
 
     expect(abortController.abort).toHaveBeenCalled();
   }));
+  describe('Branch Coverage Tests', () => {
+    it('deberia setear error si perfilService.obtenerBuffetId devuelve null en ngOnInit', () => {
+      perfilService.obtenerBuffetId.and.returnValue(null);
+      component.ngOnInit();
+      expect(page().errorMessage()).toBe('No se encontró un buffet asociado a tu perfil.');
+    });
+
+    it('deberia ignorar onDateChange si es la misma fecha', () => {
+      fixture.detectChanges();
+      page().selectedDate.set('2026-06-09');
+      const event = { target: { value: '2026-06-09' } } as unknown as Event;
+      page().onDateChange(event);
+      expect(dailyCloseService.getDailyReport.calls.count()).toBe(1); // Only the initial call, no new call
+    });
+
+    it('deberia manejar error en downloadDailyReportCsv', () => {
+      fixture.detectChanges();
+      dailyCloseService.downloadDailyReportCsv.and.returnValue(throwError(() => new Error('err')));
+      page().downloadCsv();
+      expect(toastService.mostrar).toHaveBeenCalledWith('No se pudo descargar el CSV.', 'error');
+    });
+
+    it('formatInventoryStatus fallback', () => {
+      expect(page().formatInventoryStatus('CUALQUIERA')).toBe('CUALQUIERA');
+    });
+
+    it('formatInventoryMode fallback', () => {
+      expect(page().formatInventoryMode('OTRO')).toBe('OTRO');
+    });
+
+    it('formatMovementType fallback', () => {
+      expect(page().formatMovementType('OTRO_TIPO_MAS')).toBe('Otro tipo mas');
+    });
+
+    it('formatDate fallback', () => {
+      expect(page().formatDate('')).toBe('-');
+      expect(page().formatDate('invalida')).toBe('invalida');
+    });
+
+    it('formatMoney y formatOptionalNumber fallback', () => {
+      expect(page().formatMoney(null)).toBeTruthy(); // It formats 0
+      expect(page().formatOptionalNumber(null)).toBe('Sin mínimo');
+    });
+
+    it('deberia devolver [] en metrics si no hay report o summary', () => {
+      fixture.detectChanges();
+      page().report.set(null);
+      expect(page().summaryMetrics()).toEqual([]);
+      expect(page().orderStatusMetrics()).toEqual([]);
+      page().closeStatus.set(null);
+      page().closeResult.set(null);
+      expect(page().closureMetrics()).toEqual([]);
+    });
+
+    it('deberia abortar early en confirmDailyClose', () => {
+      fixture.detectChanges();
+      page().closeStatus.set({ closed: true } as any);
+      page().confirmDailyClose();
+      // Only the calls from ngOnInit
+      expect(dailyCloseService.closeDaily).not.toHaveBeenCalled();
+    });
+
+    it('deberia atrapar error en confirmDailyClose', () => {
+      fixture.detectChanges();
+      dailyCloseService.closeDaily.and.returnValue(throwError(() => new Error('err')));
+      page().confirmDailyClose();
+      expect(toastService.mostrar).toHaveBeenCalledWith('No se pudo cerrar el día.', 'error');
+    });
+
+    it('deberia atrapar error en refreshAfterClose', () => {
+      fixture.detectChanges();
+      dailyCloseService.refreshAfterClose.and.returnValue(throwError(() => new Error('err')));
+      component['refreshAfterClose']('buffet-123');
+      expect(toastService.mostrar).toHaveBeenCalledWith('El cierre se realizó, pero no se pudo refrescar el reporte.', 'error');
+    });
+
+    it('deberia manejar error al loadCloseHistory', () => {
+      dailyCloseService.getDailyCloses.and.returnValue(throwError(() => new Error('err')));
+      fixture.detectChanges(); // Will trigger loadCloseHistory
+      expect(page().historyErrorMessage()).toBe('No se pudieron cargar los cierres.');
+    });
+
+    it('deberia setear selectedDate si date es falsy pero es today', () => {
+      // Testing isRealtimeEventForSelectedDate fallback to today
+      const spy = spyOn<any>(component, 'isSelectedDateToday').and.returnValue(true);
+      const res = component['isRealtimeEventForSelectedDate']({} as any);
+      expect(res).toBeTrue();
+    });
+  });
 });

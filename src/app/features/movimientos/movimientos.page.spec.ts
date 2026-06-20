@@ -186,6 +186,40 @@ describe('MovimientosPage', () => {
       expect(component.errorMsg()).toBe('No se pudieron obtener los movimientos de la base de datos.');
       expect(console.error).toHaveBeenCalled();
     }));
+
+    it('debería manejar fallback de obtenerAlumnoId nulo y cargar alumno correctamente si existe', fakeAsync(() => {
+      // Setup as vista alumno
+      const usuarioService = TestBed.inject(UsuarioService);
+      usuarioService.setHomeUrl('/alumno');
+      
+      perfilServiceSpy.obtenerAlumnoId.and.returnValue(null as any);
+      spyOn(usuarioService, 'getAlumnoActual').and.returnValue({ id: 'alumno-2' } as any);
+      
+      paramMapSubject.next(convertToParamMap({}));
+      fixture.detectChanges();
+      tick();
+
+      expect(component.selectedAlumnoId()).toBe('alumno-2');
+      expect(component.nombreAlumno()).toBe('Sofía García');
+      
+      usuarioService.setHomeUrl('/tutor');
+    }));
+
+    it('debería setear nombre si el alumno existe con id en parametro', fakeAsync(() => {
+      alumnosServiceSpy.getAlumnoById.and.callFake((id) => id === 'alumno-1' ? mockAlumno1 : undefined);
+      paramMapSubject.next(convertToParamMap({ alumnoId: 'alumno-1' }));
+      fixture.detectChanges();
+      tick();
+      expect(component.nombreAlumno()).toBe('Julián García');
+    }));
+
+    it('no debería setear nombre si el alumno NO existe con id en parametro', fakeAsync(() => {
+      alumnosServiceSpy.getAlumnoById.and.returnValue(undefined);
+      paramMapSubject.next(convertToParamMap({ alumnoId: 'alumno-99' }));
+      fixture.detectChanges();
+      tick();
+      expect(component.nombreAlumno()).toBe(''); // Initially empty, wasn't changed
+    }));
   });
 
   describe('Filtros', () => {
@@ -205,9 +239,19 @@ describe('MovimientosPage', () => {
       expect(component.movimientosFiltrados()[0].id).toBe('mov-2');
     });
 
-    it('debería filtrar por fecha desde/hasta', () => {
+    it('debería filtrar por texto de búsqueda en items', () => {
+      component.filtroBusqueda.set('tostado');
+      expect(component.movimientosFiltrados().length).toBe(1);
+      expect(component.movimientosFiltrados()[0].id).toBe('mov-1');
+    });
 
+    it('debería filtrar por fecha exacta si está seleccionada', () => {
+      component.filtroFecha.set('2026-06-05');
+      expect(component.movimientosFiltrados().length).toBe(1);
+      expect(component.movimientosFiltrados()[0].id).toBe('mov-1');
+    });
 
+    it('debería filtrar por fecha desde/hasta limitando fuera de rango', () => {
       component.filtroFechaDesde.set('2026-06-06');
       expect(component.movimientosFiltrados().length).toBe(2);
 
@@ -215,14 +259,42 @@ describe('MovimientosPage', () => {
       expect(component.movimientosFiltrados().length).toBe(1);
     });
 
-    it('debería filtrar por rango de precios', () => {
+    it('debería excluir movimientos anteriores a desde', () => {
+      component.filtroFechaDesde.set('2026-06-07');
+      const res = component.movimientosFiltrados();
+      expect(res.length).toBe(1); // Only mov-2
+      expect(res[0].id).toBe('mov-2');
+    });
 
+    it('debería excluir movimientos posteriores a hasta', () => {
+      component.filtroFechaHasta.set('2026-06-05');
+      const res = component.movimientosFiltrados();
+      expect(res.length).toBe(1); // Only mov-1
+    });
 
+    it('debería filtrar por rango de precios limitando min y max', () => {
       component.filtroPrecioMin.set(1000);
       expect(component.movimientosFiltrados().length).toBe(2);
 
       component.filtroPrecioMax.set(2000);
       expect(component.movimientosFiltrados().length).toBe(1);
+    });
+
+    it('debería excluir si es menor a minPrice', () => {
+      component.filtroPrecioMin.set(2000);
+      expect(component.movimientosFiltrados().length).toBe(1); // Solo mov-3 (2500)
+    });
+
+    it('debería excluir si es mayor a maxPrice', () => {
+      component.filtroPrecioMax.set(1000);
+      expect(component.movimientosFiltrados().length).toBe(1); // Solo mov-2 (800)
+    });
+
+    it('movimientosAgrupadosPorDia debería agrupar por string de fecha', () => {
+      const groups = component.movimientosAgrupadosPorDia();
+      expect(groups.length).toBe(3); // 5, 6 and 7 of Jun
+      expect(groups[0].fechaStr).toContain('jun');
+      expect(groups[0].movimientos.length).toBe(1);
     });
 
     it('debería limpiar filtros correctamente', () => {
@@ -239,6 +311,62 @@ describe('MovimientosPage', () => {
     });
   });
 
+  describe('Chips (Filtros Activos)', () => {
+    beforeEach(fakeAsync(() => {
+      paramMapSubject.next(convertToParamMap({}));
+      fixture.detectChanges();
+      tick();
+    }));
+
+    it('debería generar los activeChips correctamente', () => {
+      component.selectedAlumnoId.set('alumno-1');
+      component.esVistaIndividual.set(false);
+      component.filtroEstado.set('PENDIENTE');
+      component.filtroPrecioMin.set(100);
+      component.filtroPrecioMax.set(1000);
+      component.filtroFechaDesde.set('2026-01-01');
+      component.filtroFechaHasta.set('2026-12-31');
+
+      const chips = component.activeChips;
+      expect(chips.length).toBe(4);
+      expect(chips.find(c => c.id === 'alumno')).toBeDefined();
+      expect(chips.find(c => c.id === 'estado')).toBeDefined();
+      expect(chips.find(c => c.id === 'rango')).toBeDefined();
+      expect(chips.find(c => c.id === 'fecha')).toBeDefined();
+    });
+
+    it('debería generar fallback de texto para chips', () => {
+      component.filtroEstado.set('DESCONOCIDO');
+      component.filtroPrecioMin.set(100); // trigger the chip
+      component.filtroPrecioMax.set(null); // probamos fallback de Max
+      component.filtroFechaDesde.set(''); // probamos fallback de Inicio
+      component.filtroFechaHasta.set('2026-12-31');
+
+      const chips = component.activeChips;
+      expect(chips.find(c => c.id === 'estado')?.label).toContain('DESCONOCIDO');
+      expect(chips.find(c => c.id === 'rango')?.label).toContain('Max');
+      expect(chips.find(c => c.id === 'fecha')?.label).toContain('Inicio');
+    });
+
+    it('debería eliminar el chip seleccionado por id', () => {
+      component.removeChip('alumno');
+      expect(component.selectedAlumnoId()).toBe('todos');
+      expect(router.navigate).toHaveBeenCalledWith(['/movimientos']);
+
+      component.filtroEstado.set('PENDIENTE');
+      component.removeChip('estado');
+      expect(component.filtroEstado()).toBe('TODOS');
+
+      component.filtroPrecioMin.set(10);
+      component.removeChip('rango');
+      expect(component.filtroPrecioMin()).toBeNull();
+
+      component.filtroFechaDesde.set('2020');
+      component.removeChip('fecha');
+      expect(component.filtroFechaDesde()).toBe('');
+    });
+  });
+
   describe('Modal de detalle', () => {
     it('debería abrir y cerrar el modal de detalle del movimiento', () => {
       expect(component.modalMovimiento()).toBeNull();
@@ -252,6 +380,7 @@ describe('MovimientosPage', () => {
 
     it('debería cancelar el pedido y actualizar el estado a CANCELADO', () => {
       spyOn(window, 'confirm').and.returnValue(true);
+      component.rawMovimientos.set([mockMovimiento2]);
       component.modalMovimiento.set(mockMovimiento2);
       
       component.cancelarPedido('mov-2');
@@ -259,6 +388,24 @@ describe('MovimientosPage', () => {
       expect(movimientosServiceSpy.cancelarCompra).toHaveBeenCalledWith('mov-2');
       expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Pedido cancelado y saldo reembolsado', 'success');
       expect(component.modalMovimiento()?.status).toBe('CANCELADO');
+      expect(component.rawMovimientos()[0].status).toBe('CANCELADO');
+    });
+
+    it('no debería cancelar si se rechaza el confirm', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      component.cancelarPedido('mov-2');
+      expect(movimientosServiceSpy.cancelarCompra).not.toHaveBeenCalled();
+    });
+
+    it('debería mostrar toast de error si cancelarCompra falla', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      movimientosServiceSpy.cancelarCompra.and.returnValue(throwError(() => new Error('error')));
+      spyOn(console, 'error');
+      
+      component.cancelarPedido('mov-2');
+      
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Error al cancelar el pedido', 'error');
+      expect(console.error).toHaveBeenCalled();
     });
   });
 
@@ -279,9 +426,47 @@ describe('MovimientosPage', () => {
       expect(component.getInicialesAlumno('alumno-desconocido')).toBe('AL');
     });
 
+    it('debería retornar la foto del perfil del alumno si existe', () => {
+      alumnosServiceSpy.getAlumnoById.and.callFake((id: string) => {
+        if (id === 'alumno-1') return { ...mockAlumno1, urlFotoPerfil: 'url.jpg' };
+        return undefined;
+      });
+      expect(component.getFotoPerfilAlumno('alumno-1')).toBe('url.jpg');
+      expect(component.getFotoPerfilAlumno('alumno-desconocido')).toBeNull();
+    });
+
+    it('debería formatear precio correctamente', () => {
+      expect(component.formatearPrecio(1500)).toContain('1.500'); // Dependiendo del locale
+    });
+
     it('debería formatear fecha correctamente', () => {
       const fecha = component.formatearFecha('2026-06-07T12:00:00Z');
       expect(fecha).toBeTruthy();
+      expect(component.formatearFecha('')).toBe(''); // Caso vacío
+    });
+
+    it('debería mostrarHoraOMediodia usando pickupSlotDescription si es ANTICIPADA', () => {
+      const mov: any = { tipo: 'ANTICIPADA', pickupSlotDescription: 'Almuerzo' };
+      expect(component.mostrarHoraOMediodia(mov)).toBe('Almuerzo');
+    });
+
+    it('debería mostrarHoraOMediodia parseando fecha normal', () => {
+      const mov: any = { tipo: 'NORMAL', date: '2026-06-07T08:30:00Z' };
+      const res = component.mostrarHoraOMediodia(mov);
+      expect(res).toContain(':'); // Ej: 05:30 hs dependiendo de TimeZone
+    });
+
+    it('debería mostrarFecha especial para ANTICIPADA con pickupDate', () => {
+      const mov: any = { tipo: 'ANTICIPADA', pickupDate: '2026-06-07', pickupSlotDescription: 'Recreo 1' };
+      const res = component.mostrarFecha(mov);
+      expect(res).toContain('7 jun 2026'); // Dependiendo del locale, contiene día/mes/año
+      expect(res).toContain('Recreo 1');
+    });
+
+    it('debería mostrarFecha normal si no es ANTICIPADA o si no tiene pickupDate', () => {
+      const mov: any = { tipo: 'NORMAL', date: '2026-06-07T12:00:00Z' };
+      const res = component.mostrarFecha(mov);
+      expect(res).toBeTruthy();
     });
 
     it('debería navegar a la ruta correspondiente al cambiar de alumno en el select', () => {

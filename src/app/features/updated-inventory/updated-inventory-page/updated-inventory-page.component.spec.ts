@@ -17,6 +17,7 @@ import {
   RealtimeInventoryEvent,
 } from '../models/inventory.interface';
 import { ProductFormData } from '../components/product-form/product-form.component';
+import { BulkUploadService } from '../services/bulk-upload.service';
 
 const ID_SIN_TACC       = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
 const ID_SIN_AZUCAR     = '7e113952-93ca-4797-a80d-54f3a31b2165';
@@ -163,6 +164,7 @@ describe('UpdatedInventoryPageComponent', () => {
       'create',
       'update',
       'delete',
+      'createBulk'
     ]);
     toastServiceMock = jasmine.createSpyObj('ToastService', ['mostrar']);
     perfilServiceMock = jasmine.createSpyObj('PerfilService', [
@@ -200,6 +202,7 @@ describe('UpdatedInventoryPageComponent', () => {
         { provide: ToastService, useValue: toastServiceMock },
         { provide: PerfilService, useValue: perfilServiceMock },
         { provide: InventoryRealtimeService, useValue: realtimeServiceMock },
+        { provide: BulkUploadService, useValue: jasmine.createSpyObj('BulkUploadService', ['uploadFile']) },
         provideRouter([]),
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         provideHttpClient(),
@@ -1043,5 +1046,170 @@ describe('UpdatedInventoryPageComponent', () => {
       expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto eliminado correctamente', 'success');
       expect(component.products.length).toBe(1);
     });
+
+    it('deberia no hacer nada en confirmDelete si deleteTarget es null', () => {
+      component.deleteTarget = null;
+      component.confirmDelete();
+      expect(productServiceMock.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Cobertura de Ramas y Edge Cases', () => {
+    let bulkUploadService: any;
+    beforeEach(() => {
+      bulkUploadService = TestBed.inject(BulkUploadService);
+    });
+
+    it('deberia procesar archivo y popular bulkProductsData exitosamente', () => {
+      bulkUploadService.uploadFile.and.returnValue(of({ products: [{ nombre: 'Prod 1' }] }));
+      const mockFile = new File([''], 'test.csv');
+      component.handleFileUpload(mockFile);
+      expect(component.bulkProductsData.length).toBe(1);
+      expect(component.isProcessingFile).toBeFalse();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Archivo procesado correctamente', 'success');
+    });
+
+    it('deberia mostrar error al procesar archivo', () => {
+      bulkUploadService.uploadFile.and.returnValue(throwError(() => new Error()));
+      const mockFile = new File([''], 'test.csv');
+      component.handleFileUpload(mockFile);
+      expect(component.isProcessingFile).toBeFalse();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al procesar el archivo', 'error');
+    });
+
+    it('handleBulkProductsSave deberia retornar si no hay buffetId', () => {
+      perfilServiceMock.obtenerBuffetId.and.returnValue(null);
+      component.buffetId = null;
+      component.handleBulkProductsSave([]);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/buffet asociado/), 'error');
+    });
+
+    it('handleBulkProductsSave procesa nuevas categorias, unifica nombres y envia batch', () => {
+      component.buffetId = mockBuffetId;
+      const mockBulkProducts = [
+        { nombre: 'Prod A', categoriaId: 'c1', precio: 100, peso: 1, requierePreparacion: false, stockActual: 10 },
+        { nombre: 'Prod B', categoriaId: 'NEW', nuevaCategoriaNombre: '  NuevaCat  ', precio: 200, peso: 2, requierePreparacion: false, stockActual: 20 },
+        { nombre: 'Prod C', categoriaId: 'NEW', nuevaCategoriaNombre: 'nuevacat', precio: 300, peso: 3, requierePreparacion: false, stockActual: 30 },
+      ] as any[];
+      productServiceMock.createBulk.and.returnValue(of({} as any));
+      component.handleBulkProductsSave(mockBulkProducts);
+
+      const reqs = productServiceMock.createBulk.calls.mostRecent().args[0];
+      expect(reqs.length).toBe(3);
+      expect(reqs[0].categoriaId).toBe('c1');
+      expect(reqs[1].categoriaId).toBeNull();
+      expect(reqs[1].nuevaCategoriaNombre).toBe('NuevaCat'); // First cached format
+      expect(reqs[2].categoriaId).toBeNull();
+      expect(reqs[2].nuevaCategoriaNombre).toBe('NuevaCat'); // Unified cached format
+
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Productos cargados exitosamente', 'success');
+      expect(component.isBulkUploadModalVisible).toBeFalse();
+    });
+
+    it('handleBulkProductsSave muestra error si createBulk falla', () => {
+      productServiceMock.createBulk.and.returnValue(throwError(() => new Error()));
+      component.handleBulkProductsSave([{} as any]);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al guardar los productos', 'error');
+    });
+
+    it('handleFormSubmit aborta si no hay buffetId', () => {
+      perfilServiceMock.obtenerBuffetId.and.returnValue(null);
+      component.buffetId = null;
+      component.handleFormSubmit(formDataBase);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/buffet asociado/), 'error');
+    });
+
+    it('createProduct usa categoriaId vacio si es NEW', () => {
+      component.selectedProduct = null;
+      const fd = { ...formDataBase, categoriaId: 'NEW', nuevaCategoriaNombre: 'TestCat' };
+      component.handleFormSubmit(fd);
+      const req = productServiceMock.create.calls.mostRecent().args[0];
+      expect(req.categoriaId).toBeNull();
+      expect(req.nuevaCategoriaNombre).toBe('TestCat');
+    });
+
+    it('updateProduct usa categoriaId vacio si es NEW', () => {
+      component.selectedProduct = mockProducts[0];
+      const fd = { ...formDataBase, categoriaId: 'NEW', nuevaCategoriaNombre: 'TestCat' };
+      component.handleFormSubmit(fd);
+      const req = productServiceMock.update.calls.mostRecent().args[1];
+      expect(req.categoriaId).toBe('');
+    });
+
+    it('openInventoryManagementFromQuery maneja producto no encontrado', () => {
+      router.navigate([], { queryParams: { productId: 'unknown' } });
+      component.ngOnInit();
+      expect(component.inventoryManagementTarget).toBeNull();
+    });
+
+    it('buildInventoryStockPayload cubre CUPO_DIARIO y usuario ausente', () => {
+      component.buffetId = mockBuffetId;
+      perfilServiceMock.getPerfil.and.returnValue(null);
+      component.openInventoryManagement(mockInventory[1]); // CUPO_DIARIO
+      component.inventoryManagementForm.patchValue({ tipoManejoInventario: 'CUPO_DIARIO', cupoMaximoDiario: null, motivo: 'test' });
+      
+      const payload = (component as any).buildInventoryStockPayload();
+      expect(payload.cupoMaximoDiario).toBe(0); // fallback
+      expect(payload.usuarioId).toBeUndefined();
+    });
+
+    it('buildInventoryStockPayload cubre STOCK_EXACTO con fallbacks de null', () => {
+      component.buffetId = mockBuffetId;
+      component.openInventoryManagement(mockInventory[0]); // STOCK_EXACTO
+      component.inventoryManagementForm.patchValue({ tipoManejoInventario: 'STOCK_EXACTO', stockActual: null, stockMinimo: null, motivo: 'test' });
+
+      const payload = (component as any).buildInventoryStockPayload();
+      expect(payload.stockActual).toBe(0);
+      expect(payload.stockMinimo).toBe(0);
+    });
+
+    it('getInventoryErrorMessage mapea todos los errores correctamente', () => {
+      component.buffetId = mockBuffetId;
+      productServiceMock.updateInventoryStock.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })));
+      component.openInventoryManagement(mockInventory[0]);
+      component.inventoryManagementForm.patchValue({ tipoManejoInventario: 'STOCK_EXACTO', stockActual: 10, stockMinimo: 5, motivo: 'test' });
+      
+      component.submitInventoryManagement();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/producto o inventario/), 'error');
+
+      productServiceMock.updateInventoryStock.and.returnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
+      component.submitInventoryManagement();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/datos ingresados/), 'error');
+
+      productServiceMock.updateInventoryStock.and.returnValue(throwError(() => new Error('Unknown')));
+      component.submitInventoryManagement();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/error inesperado/), 'error');
+    });
+
+    it('scheduleRealtimeRefresh limpia el timeout repetido', fakeAsync(() => {
+      component.products = mockInventory;
+      // Triggers scheduleRealtimeRefresh via mock SSE callback in real usage, but we can call it directly for test
+      (component as any).scheduleRealtimeRefresh({ productId: '1' });
+      expect(component.highlightedProductIds.has('1')).toBeTrue();
+      
+      // Call again before timeout fires
+      (component as any).scheduleRealtimeRefresh({ productId: '1' });
+      
+      tick(3000);
+      expect(component.highlightedProductIds.has('1')).toBeFalse();
+      
+      // Cleanup the full refresh debounce
+      tick(5000); 
+    }));
+
+    it('applyInventoryManagementShortcut para SOLD_OUT toma stockMinimo del target si no está en form', () => {
+      component.openInventoryManagement(mockInventory[0]);
+      component.inventoryManagementForm.patchValue({ stockMinimo: null });
+      component.applyInventoryManagementShortcut('SOLD_OUT');
+      expect(component.inventoryManagementForm.value.stockMinimo).toBe(mockInventory[0].stockMinimo); // 5
+    });
+
+    it('applyInventoryManagementShortcut para SOLD_OUT usa 0 si target no tiene stockMinimo', () => {
+      component.openInventoryManagement({ ...mockInventory[0], stockMinimo: null } as any);
+      component.inventoryManagementForm.patchValue({ stockMinimo: null });
+      component.applyInventoryManagementShortcut('SOLD_OUT');
+      expect(component.inventoryManagementForm.value.stockMinimo).toBe(0);
+    });
+
   });
 });

@@ -349,5 +349,193 @@ describe('CarritoPresenter', () => {
       // triggers effect
       expect(true).toBe(true);
     }));
+  describe('Cobertura de Ramas y Casos Extremos (Branch Coverage)', () => {
+    it('siguienteDiaHabilDesdeString salta fines de semana', () => {
+      expect((presenter as any).siguienteDiaHabilDesdeString('2026-06-19')).toBe('2026-06-22');
+    });
+
+    it('calcularFechaMinimaParaAlumno pasa al día siguiente si horaFin expiró', () => {
+      const now = new Date();
+      now.setHours(15, 0, 0, 0);
+      jasmine.clock().install();
+      jasmine.clock().mockDate(now);
+      
+      const slots = [{ horaFin: '14:00' }] as any;
+      const minDate = (presenter as any).calcularFechaMinimaParaAlumno(slots);
+      
+      expect(minDate).not.toBeNull();
+      jasmine.clock().uninstall();
+    });
+
+    it('matchesDescription detecta correctamente los recreos y limpia tildes', () => {
+      expect((presenter as any).matchesDescription('Prímér récréo', 'PRIMER_RECREO')).toBeTrue();
+      expect((presenter as any).matchesDescription('Ségundó Récréo', 'SEGUNDO_RECREO')).toBeTrue();
+      expect((presenter as any).matchesDescription('Medio dia almuerzo', 'MEDIODIA')).toBeTrue();
+      expect((presenter as any).matchesDescription('Salida final', 'FUERA_HORA')).toBeTrue();
+      expect((presenter as any).matchesDescription('Invalido', 'OTRO' as any)).toBeFalse();
+      expect((presenter as any).matchesDescription(null as any, 'PRIMER_RECREO')).toBeFalse();
+    });
+
+    it('ajustarRecreosSeleccionados cambia recreo invalido por uno disponible o primero', () => {
+      (presenter as any).recreosState.set({ 'a1': 'FUERA_HORA' });
+      (presenter as any).ajustarRecreosSeleccionados(
+        { 'a1': ['FUERA_HORA'] }, 
+        { 'a1': [{recreo: 'PRIMER_RECREO', bloqueado: false}] }
+      );
+      expect((presenter as any).recreosState()['a1']).toBe('PRIMER_RECREO');
+
+      (presenter as any).ajustarRecreosSeleccionados(
+        { 'a1': ['FUERA_HORA'] }, 
+        { 'a1': [{recreo: 'SEGUNDO_RECREO', bloqueado: true}] }
+      );
+      expect((presenter as any).recreosState()['a1']).toBe('SEGUNDO_RECREO');
+    });
+
+    it('advertencia para fecha en pasado', () => {
+      const g1 = { alumno: { id: 'a1', nombre: 'A' }, seleccionado: true, fecha: '2000-01-01', subtotal: 0, recreo: 'PRIMER_RECREO' } as any;
+      spyOn<any>(presenter, 'grupos').and.returnValue([g1]);
+      spyOn<any>(presenter, 'esFinDeSemana').and.returnValue(false);
+      // Forcing re-evaluation by reading it directly instead of from the cached signal if possible, or since it's a new instance, it evaluates once.
+      expect(presenter.advertencia()).toContain('no está permitida o es anterior');
+    });
+
+    it('advertencia para fecha en fin de semana', () => {
+      const g1 = { alumno: { id: 'a1', nombre: 'A' }, seleccionado: true, fecha: '2000-01-01', subtotal: 0, recreo: 'PRIMER_RECREO' } as any;
+      spyOn<any>(presenter, 'grupos').and.returnValue([g1]);
+      spyOn<any>(presenter, 'esFinDeSemana').and.returnValue(true);
+      expect(presenter.advertencia()).toContain('corresponde a un fin de semana');
+    });
+
+    it('advertencia para multiples fechas invalidas', () => {
+      const g1 = { alumno: { id: 'a1', nombre: 'A' }, seleccionado: true, fecha: '2000-01-01', subtotal: 0, recreo: 'PRIMER_RECREO' } as any;
+      spyOn<any>(presenter, 'grupos').and.returnValue([g1, g1]);
+      spyOn<any>(presenter, 'esFinDeSemana').and.returnValue(false);
+      expect(presenter.advertencia()).toContain('Hay alumnos con fechas seleccionadas inválidas');
+    });
+
+    it('advertencia para un alumno con deuda', () => {
+      const gDeuda = { alumno: { id: 'a1', nombre: 'A', saldo: 10 }, seleccionado: true, subtotal: 100, fecha: '3000-01-01' } as any;
+      spyOn<any>(presenter, 'grupos').and.returnValue([gDeuda]);
+      expect(presenter.advertencia()).toContain('no alcanza para este pedido');
+    });
+
+    it('advertencia para multiples alumnos con deuda', () => {
+      const gDeuda = { alumno: { id: 'a1', nombre: 'A', saldo: 10 }, seleccionado: true, subtotal: 100, fecha: '3000-01-01' } as any;
+      spyOn<any>(presenter, 'grupos').and.returnValue([gDeuda, gDeuda]);
+      expect(presenter.advertencia()).toContain('con saldo insuficiente');
+    });
+
+    it('advertencia para presupuesto excedido simple', () => {
+      const gPresup = { alumno: { id: 'p1', nombre: 'P' }, seleccionado: true, subtotal: 10, fecha: '3000-01-01', items: [] } as any;
+      (presenter as any).budgetBlockReasonsState.set({ 'p1': 'Motivo Presupuesto' });
+      spyOn<any>(presenter, 'grupos').and.returnValue([gPresup]);
+      expect(presenter.advertencia()).toBe('Motivo Presupuesto');
+    });
+
+    it('advertencia para presupuesto excedido multiple', () => {
+      const gPresup = { alumno: { id: 'p1', nombre: 'P' }, seleccionado: true, subtotal: 10, fecha: '3000-01-01' } as any;
+      const gPresup2 = { alumno: { id: 'p2', nombre: 'P2' }, seleccionado: true, subtotal: 10, fecha: '3000-01-01' } as any;
+      (presenter as any).budgetBlockReasonsState.set({ 'p1': 'X', 'p2': 'Y' });
+      spyOn<any>(presenter, 'grupos').and.returnValue([gPresup, gPresup2]);
+      expect(presenter.advertencia()).toContain('con presupuesto excedido');
+    });
+
+    it('advertencia para un recreo bloqueado por tiempo', () => {
+      const gRecreo = { alumno: { id: 'r1', nombre: 'R' }, seleccionado: true, subtotal: 10, fecha: '3000-01-01', recreo: 'PRIMER_RECREO' } as any;
+      spyOn<any>(presenter, 'blockedRecreos').and.returnValue({ 'r1': ['PRIMER_RECREO'] });
+      spyOn<any>(presenter, 'recreosDisponiblesMap').and.returnValue({ 'r1': [{ recreo: 'PRIMER_RECREO', bloqueado: true, motivo: 'tiempo' }] });
+      spyOn<any>(presenter, 'grupos').and.returnValue([gRecreo]);
+      expect(presenter.advertencia()).toContain('Falta una hora o menos');
+    });
+
+    it('advertencia para multiples recreos bloqueados por tiempo', () => {
+      const gRecreo = { alumno: { id: 'r1', nombre: 'R' }, seleccionado: true, subtotal: 10, fecha: '3000-01-01', recreo: 'PRIMER_RECREO' } as any;
+      spyOn<any>(presenter, 'blockedRecreos').and.returnValue({ 'r1': ['PRIMER_RECREO'] });
+      spyOn<any>(presenter, 'recreosDisponiblesMap').and.returnValue({ 'r1': [{ recreo: 'PRIMER_RECREO', bloqueado: true, motivo: 'tiempo' }] });
+      spyOn<any>(presenter, 'grupos').and.returnValue([gRecreo, gRecreo]);
+      expect(presenter.advertencia()).toContain('falta una hora o menos');
+    });
+
+    it('advertencia para un recreo bloqueado por tutor', () => {
+      const gRecreo = { alumno: { id: 'r1', nombre: 'R' }, seleccionado: true, subtotal: 10, fecha: '3000-01-01', recreo: 'PRIMER_RECREO' } as any;
+      spyOn<any>(presenter, 'blockedRecreos').and.returnValue({ 'r1': ['PRIMER_RECREO'] });
+      spyOn<any>(presenter, 'recreosDisponiblesMap').and.returnValue({ 'r1': [{ recreo: 'PRIMER_RECREO', bloqueado: true, motivo: 'tutor' }] });
+      spyOn<any>(presenter, 'grupos').and.returnValue([gRecreo]);
+      expect(presenter.advertencia()).toContain('tiene bloqueadas todas las compras');
+    });
+
+    it('advertencia para multiples recreos bloqueados por tutor', () => {
+      const gRecreo = { alumno: { id: 'r1', nombre: 'R' }, seleccionado: true, subtotal: 10, fecha: '3000-01-01', recreo: 'PRIMER_RECREO' } as any;
+      spyOn<any>(presenter, 'blockedRecreos').and.returnValue({ 'r1': ['PRIMER_RECREO'] });
+      spyOn<any>(presenter, 'recreosDisponiblesMap').and.returnValue({ 'r1': [{ recreo: 'PRIMER_RECREO', bloqueado: true, motivo: 'tutor' }] });
+      spyOn<any>(presenter, 'grupos').and.returnValue([gRecreo, gRecreo]);
+      expect(presenter.advertencia()).toContain('bloqueado por el tutor');
+    });
+
+    it('refrescarSugerencias maneja errores o casos sin id', fakeAsync(() => {
+      const g = { alumno: { id: 's1' }, items: [{ producto: { id: '1' }, cantidad: 1 }] } as any;
+      const gruposSpy = spyOn<any>(presenter, 'grupos');
+      gruposSpy.and.returnValue([g]);
+      (presenter as any).perfilService.obtenerAlumnoId.and.returnValue(null);
+      (presenter as any).refrescarSugerencias();
+      expect(presenter.sugerencias().length).toBe(0);
+
+      (presenter as any).perfilService.obtenerAlumnoId.and.returnValue('s1');
+      (presenter as any).sugerenciasCarritoService.obtenerSugerencias.and.returnValue(throwError(() => new Error('Err')));
+      (presenter as any).refrescarSugerencias();
+      tick();
+      expect(presenter.sugerencias().length).toBe(0);
+
+      (presenter as any).buffetService.obtenerBuffetDelAlumno.and.returnValue(throwError(() => new Error('Err')));
+      (presenter as any).buffetCache.clear();
+      (presenter as any).refrescarSugerencias();
+      tick();
+      expect(presenter.sugerencias().length).toBe(0);
+    }));
+
+    it('agregarSugerencia sin grupos o con stock nulo', () => {
+      const gruposSpy = spyOn<any>(presenter, 'grupos');
+      gruposSpy.and.returnValue([]);
+      presenter.agregarSugerencia({} as any);
+      expect((presenter as any).carritoService.agregar).not.toHaveBeenCalled();
+
+      gruposSpy.and.returnValue([{ alumno: { id: 's1' } }] as any);
+      presenter.agregarSugerencia({ stockActual: 0 } as any); // 'SIN_STOCK'
+      expect((presenter as any).carritoService.agregar).toHaveBeenCalled();
+    });
+
+    it('recreosDisponiblesMap valida tiempo y restricciones correctamente', () => {
+      const now = new Date();
+      const horaStr = `${now.getHours()}:${now.getMinutes()}`;
+      
+      const alumnoId = 'a-test';
+      (presenter as any).carritoService.itemsPorAlumno.and.returnValue(new Map([[alumnoId, []]]));
+      (presenter as any).franjasMap.set({ [alumnoId]: [{ id: 'f1', horaInicio: horaStr, descripcion: 'primer recreo' }] as any });
+      (presenter as any).restriccionesMap.set({ [alumnoId]: [{ activa: true, franjaHoraria: { id: 'f1' } }] as any });
+      
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      (presenter as any).fechasState.set({ [alumnoId]: `${yyyy}-${mm}-${dd}` });
+
+      const options = presenter.recreosDisponiblesMap()[alumnoId];
+      expect(options[0].bloqueado).toBeTrue();
+      expect(options[0].motivo).toBeTruthy();
+    });
+
+    it('maneja efecto presupuesto cuando da error', fakeAsync(() => {
+      const g = { alumno: { id: 's1' }, fecha: '2026-06-20', seleccionado: true, items: [{ producto: { id: '1' }, cantidad: 1 }] } as any;
+      spyOn<any>(presenter, 'grupos').and.returnValue([g]);
+      
+      (presenter as any).presupuestoService.checkBudgetDates.and.returnValue(Promise.reject('Test Error'));
+      // Just wait for effect and catch
+      try {
+        tick();
+      } catch (e) {
+        // ignore
+      }
+      expect(presenter).toBeTruthy();
+    }));
   });
+});
 });

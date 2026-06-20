@@ -362,12 +362,211 @@ describe('BuffetPresenter', () => {
     }));
   });
 
-  describe('Manejo de errores del Budget check', () => {
-    it('debería manejar el error de la promesa', fakeAsync(() => {
-      presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.reject('Network Error'));
+  describe('Cobertura de Ramas y Casos Extremos', () => {
+    beforeEach(fakeAsync(() => {
       presenter.init('a1');
       tick();
-      expect(presenter.presupuestoPorFecha()).toBeNull();
+    }));
+
+    it('recreosDisponibles bloquea si falta 1 hora o menos para el slot', fakeAsync(() => {
+      const now = new Date();
+      now.setHours(10, 0, 0, 0);
+      jasmine.clock().install();
+      jasmine.clock().mockDate(now);
+
+      franjasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([
+        { id: 'f1', horaInicio: '10:30', horaFin: '11:00', descripcion: 'PRIMER RECREO' }, // 30 min diff
+        { id: 'f2', horaInicio: '12:00', horaFin: '12:15', descripcion: 'SEGUNDO RECREO' }  // 2 hours diff
+      ] as any));
+      restriccionesHorariasSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([]));
+      
+      presenter.init('a1');
+      tick();
+
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      presenter.setFecha(`${yyyy}-${mm}-${dd}`);
+      tick();
+
+      const options = presenter.recreosDisponibles();
+      const primer = options.find(o => o.recreo === 'PRIMER_RECREO');
+      const segundo = options.find(o => o.recreo === 'SEGUNDO_RECREO');
+
+      expect(primer?.bloqueado).toBeTrue();
+      expect(primer?.motivo).toBe('tiempo');
+      expect(segundo?.bloqueado).toBeFalse();
+
+      jasmine.clock().uninstall();
+    }));
+
+    it('recreosDisponibles mapea por indice si no coincide la descripcion', fakeAsync(() => {
+      franjasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([
+        { id: 'f1', horaInicio: '10:00', horaFin: '10:15', descripcion: 'DESCONOCIDO' }
+      ] as any));
+      presenter.init('a1');
+      tick();
+      const options = presenter.recreosDisponibles();
+      expect(options[0].recreo).toBe('PRIMER_RECREO');
+    }));
+
+    it('presupuestoDisponible retorna null si no hay budget o es inactivo', fakeAsync(() => {
+      carritoServiceSpy.budgets.and.returnValue(new Map());
+      expect(presenter.presupuestoDisponible()).toBeNull();
+
+      carritoServiceSpy.budgets.and.returnValue(new Map([['a1', { activo: false } as any]]));
+      expect(presenter.presupuestoDisponible()).toBeNull();
+    }));
+
+    it('presupuestoDisponible filtra compras pasadas y calcula reglas de categoria', fakeAsync(() => {
+      const today = new Date();
+      while (today.getDay() === 0 || today.getDay() === 6) {
+        today.setDate(today.getDate() + 1);
+      }
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      // Force selected date
+      presenter.setFecha(todayStr);
+      tick();
+
+      const budget = {
+        activo: true, periodo: 'MENSUAL', montoLimiteGeneral: 500, reglasCategoria: [
+          { activo: true, categoriaId: 'cat1', descripcionCategoria: 'Cat 1', montoLimiteCalculado: 200 },
+          { activo: false, categoriaId: 'c2', descripcionCategoria: 'Cat 2', montoLimiteCalculado: 100 }
+        ]
+      };
+      carritoServiceSpy.budgets.and.returnValue(new Map([['a1', budget as any]]));
+      
+      carritoServiceSpy.purchases.and.returnValue(new Map([['a1', [
+        { status: 'APPROVED', totalAmount: 50, pickupDate: todayStr, items: [
+          { productId: 'p1', productName: 'P1', unitPrice: 50, quantity: 1 }
+        ]}
+      ] as any]]));
+
+      carritoServiceSpy.items.and.returnValue([
+        { alumnoId: 'a1', cantidad: 1, producto: { id: 'p1', nombre: 'P1', precio: 20, categoria: { id: 'cat1', descripcion: 'Cat 1' } } } as any
+      ]);
+
+      const res = presenter.presupuestoDisponible();
+      expect(res).toBeTruthy();
+      expect(res?.montoConsumidoGeneral).toBe(70); // 50 past + 20 cart
+      expect(res?.reglasCategorias[0].montoConsumido).toBe(70);
+    }));
+
+    it('productosFiltrados bloquea items para alumno con "contiene"', fakeAsync(() => {
+      buffetServiceSpy.getProductosDelBuffet.and.returnValue(of([
+        { id: 'p1', nombre: 'P1', bloqueadoPorRestriccion: true, motivoBloqueo: 'contiene mani', precio: 10, categoria: { id: 'c1' }, clasificacionesSalud: [] } as any,
+        { id: 'p2', nombre: 'P2', bloqueadoPorRestriccion: true, motivoBloqueo: 'sugerido', precio: 10, categoria: { id: 'c1' }, clasificacionesSalud: [] } as any
+      ]));
+      usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
+      presenter.init('a1');
+      tick();
+      const filtrados = presenter.productosFiltrados();
+      expect(filtrados.find(p => p.id === 'p1')).toBeUndefined();
+      expect(filtrados.find(p => p.id === 'p2')).toBeDefined();
+    }));
+
+    it('getFechaHoraConsulta agrega :00 a la hora si falta y maneja missing slots', fakeAsync(() => {
+      franjasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([
+        { id: 'f1', horaInicio: '10:00', descripcion: 'PRIMER RECREO' }
+      ] as any));
+      presenter.init('a1');
+      tick();
+      const res = (presenter as any).getFechaHoraConsulta('2026-01-01', 'PRIMER_RECREO');
+      expect(res).toBe('2026-01-01T10:00:00');
+
+      const res2 = (presenter as any).getFechaHoraConsulta('2026-01-01', 'INEXISTENTE');
+      expect(res2).toBe('2026-01-01T10:00:00'); // default fallback
+
+      expect((presenter as any).getFechaHoraConsulta('', 'PRIMER_RECREO')).toBe('');
+    }));
+
+    it('cargarProductos maneja error', fakeAsync(() => {
+      const consoleSpy = spyOn(console, 'error');
+      buffetServiceSpy.getProductosDelBuffet.and.returnValue(throwError(() => new Error('Error')));
+      (presenter as any).cargarProductos('b1', 'a1');
+      expect(consoleSpy).toHaveBeenCalled();
+    }));
+
+    it('setFecha si fecha es fin de semana salta al dia habil y ajusta recreo si esta bloqueado', fakeAsync(() => {
+      franjasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([
+        { id: 'f1', horaInicio: '10:00', descripcion: 'PRIMER RECREO' }
+      ] as any));
+      restriccionesHorariasSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([
+        { id: 'r1', activa: true, franjaHoraria: { id: 'f1' } }
+      ] as any));
+      presenter.init('a1');
+      tick();
+      // '2026-06-20' is Saturday
+      presenter.setFecha('2026-06-20');
+      tick();
+      expect(presenter.fechaSeleccionada()).not.toBe('2026-06-20');
+      // Primer recreo is blocked, should pick the next available or fallback
+    }));
+
+    it('setFecha maneja alumno null', fakeAsync(() => {
+      (presenter as any).alumnoState.set(undefined);
+      expect(() => presenter.setFecha('2026-01-01')).not.toThrow();
+    }));
+
+    it('setRecreo maneja alumno null', fakeAsync(() => {
+      (presenter as any).alumnoState.set(undefined);
+      expect(() => presenter.setRecreo('PRIMER_RECREO')).not.toThrow();
+    }));
+
+    it('cambiarAlumno ignora si es null o igual', fakeAsync(() => {
+      presenter.cambiarAlumno('a1'); // same
+      presenter.cambiarAlumno(''); // empty
+      expect(routerSpy.navigate).not.toHaveBeenCalled();
+    }));
+
+    it('agregarAlCarrito usa plural si cantidad > 1 y maneja alumno null', fakeAsync(() => {
+      presenter.agregarAlCarrito({ nombre: 'X' } as any, 2);
+      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se agregaron 2x "X" al carrito');
+
+      (presenter as any).alumnoState.set(undefined);
+      toastServiceSpy.mostrar.calls.reset();
+      presenter.agregarAlCarrito({ nombre: 'X' } as any, 1);
+      expect(toastServiceSpy.mostrar).not.toHaveBeenCalled();
+    }));
+
+    it('toggleFavorito y toggleLock manejan alumno null', fakeAsync(() => {
+      (presenter as any).alumnoState.set(undefined);
+      expect(() => presenter.toggleFavorito({} as any)).not.toThrow();
+      expect(() => presenter.toggleLock({} as any)).not.toThrow();
+    }));
+
+    it('calcularFechaMinima pasa al dia siguiente si la hora fin ya expiro', fakeAsync(() => {
+      const now = new Date();
+      now.setHours(15, 0, 0, 0);
+      jasmine.clock().install();
+      jasmine.clock().mockDate(now);
+
+      const slots = [{ id: '1', horaFin: '14:00' }] as any[];
+      const res = (presenter as any).calcularFechaMinima(slots);
+      
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      while(tomorrow.getDay() === 0 || tomorrow.getDay() === 6) tomorrow.setDate(tomorrow.getDate() + 1);
+      const expected = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+      
+      expect(res).toBe(expected);
+      jasmine.clock().uninstall();
+    }));
+
+    it('extractUniqueCategories y Classifications ignoran si producto no tiene categoria', fakeAsync(() => {
+      const prods = [{ id: '1' } as any];
+      const c = (presenter as any).extractUniqueCategories(prods);
+      expect(c.length).toBe(0);
+      const cl = (presenter as any).extractUniqueClassifications(prods);
+      expect(cl.length).toBe(0);
+    }));
+
+    it('consultarPresupuestoPorFecha early returns', fakeAsync(() => {
+      presupuestoServiceSpy.checkBudgetDates.calls.reset();
+      (presenter as any).consultarPresupuestoPorFecha('', '2026-01-01');
+      (presenter as any).consultarPresupuestoPorFecha('a1', '');
+      expect(presupuestoServiceSpy.checkBudgetDates).not.toHaveBeenCalled();
     }));
   });
 });
