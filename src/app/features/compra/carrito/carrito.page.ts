@@ -38,6 +38,7 @@ export class CarritoPage implements OnInit {
 
   cantCarritos = signal(0);
   readonly esPlanGratuito = computed(() => this.perfilService.perfil()?.plan !== 'PREMIUM');
+  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
   readonly limiteCarritosAlcanzado = computed(() => this.esPlanGratuito() && this.cantCarritos() >= 3);
 
   mostrarModalFavorito = false;

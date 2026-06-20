@@ -276,12 +276,16 @@ export class MovimientosPage implements OnInit {
     this.filtroFechaHasta.set('');
     this.filtroPrecioMin.set(null);
     this.filtroPrecioMax.set(null);
+    if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
+      this.selectedAlumnoId.set('todos');
+      void this.router.navigate(['/movimientos']);
+    }
   }
 
   get activeChips(): { id: string; label: string }[] {
     const chips = [];
 
-    if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos' && !this.esVistaIndividual()) {
+    if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
       const alumno = this.alumnosService.getAlumnoById(this.selectedAlumnoId());
       if (alumno) {
         chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre} ${alumno.apellido}` });

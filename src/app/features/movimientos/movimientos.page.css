@@ -231,7 +231,7 @@
 
 .movimientos__filtros-avanzados-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -974,9 +974,11 @@
 }
 
 .movimientos__grouping-btn.active {
-  background-color: var(--color-superficie);
-  color: #1a3b5c;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, #FFFDE7 0%, #FFF59D 50%, #FFE082 100%) !important;
+  color: #1a3b5c !important;
+  box-shadow: 
+    0 2px 8px rgba(212, 175, 55, 0.2),
+    inset 0 0 0 1px rgba(212, 175, 55, 0.35) !important;
 }
 
 .movimientos__grouping-btn i {
