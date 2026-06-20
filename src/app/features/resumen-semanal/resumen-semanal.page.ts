@@ -33,14 +33,7 @@ export class ResumenSemanalPage {
 
   hijos: { nombre: string; datos: HijoResumen }[] = [];
 
-  readonly colores = [
-    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
-    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
-    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
-    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
-    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
-    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
-  ];
+
 
   constructor() {
     const perfilRaw = localStorage.getItem('recred.perfil');
@@ -92,7 +85,6 @@ export class ResumenSemanalPage {
           this.totalFamiliar > 0
             ? ((hijo.datos.totalGastado ?? 0) / this.totalFamiliar) * 100
             : 0,
-        color: this.colores[index % this.colores.length],
       }))
       .sort((a, b) => b.gasto - a.gasto);
   }

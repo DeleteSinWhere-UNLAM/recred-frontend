@@ -14,7 +14,7 @@ describe('ResumenSemanalPage', () => {
 
   beforeEach(async () => {
     mockResumenService = jasmine.createSpyObj('ResumenSemanalService', ['getResumen']);
-    
+
     mockUsuarioService = {
       getUsuarioActual: jasmine.createSpy('getUsuarioActual').and.returnValue({ nombre: 'Test User' }),
       esVistaKiosquero: signal(false),
@@ -41,7 +41,7 @@ describe('ResumenSemanalPage', () => {
 
     beforeEach(() => {
       spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
-      
+
       mockResumenService.getResumen.and.returnValue(of({
         id: '1',
         fechaDesde: '2023-01-01',
@@ -57,7 +57,7 @@ describe('ResumenSemanalPage', () => {
             'Maria': {
               totalGastado: 500,
               LimiteGasto: 1000,
-              porCategoria: undefined // Probando caso cuando no hay categorías
+              porCategoria: undefined
             }
           },
           mensaje: JSON.stringify([{ nombre: 'Ahorro', mensaje: 'Buen ahorro' }])
@@ -92,20 +92,16 @@ describe('ResumenSemanalPage', () => {
     it('debería calcular hijosResumen con ordenamiento y porcentajes', () => {
       const resumen = component.hijosResumen;
       expect(resumen.length).toBe(2);
-      // Juan gastó más (1000 vs 500) así que va primero
       expect(resumen[0].nombre).toBe('Juan');
       expect(resumen[0].gasto).toBe(1000);
       expect(resumen[0].porcentaje).toBeCloseTo(66.66, 1);
-      expect(resumen[0].color).toBeDefined();
       
       expect(resumen[1].nombre).toBe('Maria');
       expect(resumen[1].gasto).toBe(500);
       expect(resumen[1].porcentaje).toBeCloseTo(33.33, 1);
-      expect(resumen[1].color).toBeDefined();
     });
-    
+
     it('debería manejar el caso donde totalFamiliar sea 0 para los porcentajes', () => {
-      // Reemplazamos los hijos para forzar total = 0
       component.hijos = [{ nombre: 'Cero', datos: { totalGastado: 0 } as any }];
       expect(component.hijosResumen[0].porcentaje).toBe(0);
     });
@@ -120,18 +116,18 @@ describe('ResumenSemanalPage', () => {
   describe('cuando el perfil no está en localStorage o el JSON no tiene campos', () => {
     it('no debería llamar al servicio si localStorage devuelve null', () => {
       spyOn(localStorage, 'getItem').and.returnValue(null);
-      
+
       const fixture = TestBed.createComponent(ResumenSemanalPage);
       const component = fixture.componentInstance;
       fixture.detectChanges();
-      
+
       expect(mockResumenService.getResumen).not.toHaveBeenCalled();
       expect(component.resumen).toBeUndefined();
     });
 
     it('debería manejar mensajes nulos de forma segura (fallback a [])', () => {
       spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-456' }));
-      
+
       mockResumenService.getResumen.and.returnValue(of({
         id: '2',
         resumen: JSON.stringify({
@@ -143,7 +139,7 @@ describe('ResumenSemanalPage', () => {
       const fixture = TestBed.createComponent(ResumenSemanalPage);
       const component = fixture.componentInstance;
       fixture.detectChanges();
-      
+
       expect(component.resumenProcesado?.mensajes).toEqual([]);
     });
   });
