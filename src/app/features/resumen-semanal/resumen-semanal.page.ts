@@ -34,12 +34,12 @@ export class ResumenSemanalPage {
   hijos: { nombre: string; datos: HijoResumen }[] = [];
 
   readonly colores = [
-    'var(--color-violeta, #8b5cf6)',
-    'var(--color-menta, #4ade80)',
-    'var(--color-dorado, #fbbf24)',
-    'var(--color-melocoton, #fb923c)',
-    'var(--color-pizarra, #475569)',
-    'var(--color-secundario, #38bdf8)',
+    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
+    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
+    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
+    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
+    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
+    'linear-gradient(180deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569))',
   ];
 
   constructor() {

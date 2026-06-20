@@ -2,10 +2,6 @@
   display: block;
 }
 
-/* =========================
-   DASHBOARD BASE
-========================= */
-
 .rs {
   min-height: calc(100vh - 64px);
   padding: 32px 0 48px;
@@ -20,10 +16,6 @@
   flex-direction: column;
   gap: 32px;
 }
-
-/* =========================
-   HEADER
-========================= */
 
 .rs__header {
   margin-bottom: 8px;
@@ -51,10 +43,6 @@
   border: 1px solid var(--color-borde);
 }
 
-/* =========================
-   MODULES (PANELS)
-========================= */
-
 .rs__module {
   background-color: var(--color-superficie);
   border-radius: 24px;
@@ -73,7 +61,7 @@
   margin-bottom: 8px;
 }
 
-.rs__module-header > span {
+.rs__module-header>span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -93,10 +81,6 @@
   margin: 0;
   letter-spacing: -0.01em;
 }
-
-/* =========================
-   KPI GRID
-========================= */
 
 .rs__summary-grid {
   display: grid;
@@ -164,19 +148,11 @@
   line-height: 1.1;
 }
 
-/* =========================
-   ANALYSIS GRID
-========================= */
-
 .rs__analysis-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 32px;
 }
-
-/* =========================
-   CHART
-========================= */
 
 .rs__chart-bars {
   margin-top: 16px;
@@ -246,10 +222,6 @@
   font-weight: 600;
 }
 
-/* =========================
-   INSIGHTS IA
-========================= */
-
 .rs__insight-list {
   display: flex;
   flex-direction: column;
@@ -261,7 +233,7 @@
   border-radius: 16px;
   background: var(--color-superficie-alt);
   border: 1px solid var(--color-borde);
-  border-left: 4px solid var(--color-melocoton);
+  border-left: 4px solid #1a3b5c;
   transition: transform 0.2s ease;
 }
 
@@ -280,7 +252,7 @@
 }
 
 .rs__insight-item__header i {
-  color: var(--color-melocoton);
+  color: #1a3b5c;
 }
 
 .rs__insight-item p {
@@ -300,10 +272,6 @@
   border: 1px dashed var(--color-borde);
 }
 
-/* =========================
-   CHILDREN SECTION
-========================= */
-
 .rs__children-section {
   display: flex;
   flex-direction: column;
@@ -315,10 +283,6 @@
   grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
   gap: 28px;
 }
-
-/* =========================
-   CHILD CARD
-========================= */
 
 .rs__child-card {
   background-color: var(--color-superficie);
@@ -353,10 +317,6 @@
   color: var(--color-menta);
 }
 
-/* =========================
-   PRESUPUESTO
-========================= */
-
 .rs__budget-section {
   display: flex;
   flex-direction: column;
@@ -386,16 +346,17 @@
 .rs__budget-progress {
   height: 12px;
   border-radius: 999px;
-  background-color: var(--color-superficie-alt);
-  border: 1px solid var(--color-borde);
+  background-color: var(--color-superficie-alt, #f1f5f9);
+  border: 1px solid var(--color-borde, #e2e8f0);
   overflow: hidden;
   position: relative;
+  width: 100%;
 }
 
 .rs__budget-progress__value {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--color-menta), var(--color-secundario));
+  background: linear-gradient(90deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569));
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -406,10 +367,6 @@
   color: var(--color-texto-secundario);
   font-weight: 500;
 }
-
-/* =========================
-   SUMMARY CARDS
-========================= */
 
 .rs__child-summary {
   display: grid;
@@ -449,10 +406,6 @@
   font-size: 13px;
 }
 
-/* =========================
-   CATEGORIAS
-========================= */
-
 .rs__categories {
   display: flex;
   flex-direction: column;
@@ -489,21 +442,18 @@
 .rs__category-progress {
   height: 8px;
   border-radius: 999px;
-  background-color: var(--color-superficie-alt);
-  border: 1px solid var(--color-borde);
+  background-color: var(--color-superficie-alt, #f1f5f9);
+  border: 1px solid var(--color-borde, #e2e8f0);
   overflow: hidden;
+  width: 100%;
 }
 
 .rs__category-progress__value {
   height: 100%;
   border-radius: inherit;
-  background-color: var(--color-violeta);
+  background: linear-gradient(90deg, var(--color-menta, #4ade80), var(--color-pizarra, #475569));
   transition: width 0.4s ease;
 }
-
-/* =========================
-   RESPONSIVE
-========================= */
 
 @media (max-width: 1024px) {
   .rs__summary-grid {
