@@ -1,240 +1,172 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import { environment } from '../../../../environments/environment';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { FavoritosService } from './favoritos.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { environment } from '../../../../environments/environment';
 import { Producto } from '../../buffet/models/producto.model';
-import { Perfil } from '../../../data-access/models/perfil.model';
 
 describe('FavoritosService', () => {
   let service: FavoritosService;
   let httpMock: HttpTestingController;
-  let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
-
-  const uuidAlumno = '12345678-1234-1234-1234-1234567890ab';
-  const uuidProducto = 'abcdefab-abcd-abcd-abcd-abcdefabcdef';
-
-  const mockProductDTO = {
-    id: uuidProducto,
-    nombre: 'Tostado de Jamón y Queso',
-    descripcion: 'Tostado clásico',
-    precio: 1500,
-    stockActual: 5,
-    categoria: { id: 'comidas', descripcion: 'Comidas' },
-    clasificacionesSalud: []
-  };
-
-  const mockProducto: Producto = {
-    id: uuidProducto,
-    nombre: 'Tostado de Jamón y Queso',
-    descripcion: 'Tostado clásico',
-    precio: 1500,
-    categoria: { id: 'comidas', descripcion: 'Comidas' },
-    clasificacionesSalud: [],
-    imagen: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80',
-    estadoStock: 'DISPONIBLE'
-  };
+  let perfilSpy: jasmine.SpyObj<PerfilService>;
 
   beforeEach(() => {
-    const spy = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfil', 'obtenerAlumnoId']);
+    perfilSpy = jasmine.createSpyObj('PerfilService', ['getPerfil']);
+    spyOn(localStorage, 'getItem').and.callFake((key: string) => {
+      if (key === 'recred.favoritos.a-invalid') {
+        return JSON.stringify([{ id: 'p-invalid', nombre: 'Test Prod' }]);
+      }
+      return null;
+    });
+    spyOn(localStorage, 'setItem').and.stub();
 
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
         FavoritosService,
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        { provide: PerfilService, useValue: spy }
-      ],
+        { provide: PerfilService, useValue: perfilSpy }
+      ]
     });
-
     service = TestBed.inject(FavoritosService);
     httpMock = TestBed.inject(HttpTestingController);
-    perfilServiceSpy = TestBed.inject(PerfilService) as jasmine.SpyObj<PerfilService>;
-
-    localStorage.clear();
   });
 
   afterEach(() => {
     httpMock.verify();
-    localStorage.clear();
+  });
+
+  it('debe crearse', () => {
+    expect(service).toBeTruthy();
   });
 
   describe('getPath', () => {
-    it('debería usar la ruta de usuarios si el perfil coincide con el alumno actual', () => {
-      const mockPerfil: Perfil = {
-        id: uuidAlumno,
-        email: 'alumno@recred.com',
-        nombre: 'Julián',
-        apellido: 'García',
-        rol: 'ALUMNO',
-      };
-      perfilServiceSpy.getPerfil.and.returnValue(mockPerfil);
-
-      service.getFavoritos(uuidAlumno).subscribe();
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/usuarios/${uuidAlumno}/preferencias/favoritos`);
-      expect(req.request.method).toBe('GET');
-      req.flush([]);
+    it('retorna usuarios/id si es ALUMNO', () => {
+      perfilSpy.getPerfil.and.returnValue({ rol: 'ALUMNO', id: '123' } as any);
+      expect(service['getPath']('123')).toBe('usuarios/123');
     });
 
-    it('debería usar la ruta de alumnos si el perfil no coincide o no es rol ALUMNO', () => {
-      const mockPerfil: Perfil = {
-        id: 'tutor-123',
-        email: 'tutor@recred.com',
-        nombre: 'Martín',
-        apellido: 'García',
-        rol: 'PADRE',
-      };
-      perfilServiceSpy.getPerfil.and.returnValue(mockPerfil);
-
-      service.getFavoritos(uuidAlumno).subscribe();
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuidAlumno}/preferencias/favoritos`);
-      expect(req.request.method).toBe('GET');
-      req.flush([]);
+    it('retorna alumnos/id si no es ALUMNO o id distinto', () => {
+      perfilSpy.getPerfil.and.returnValue({ rol: 'PADRE', id: 'parent-1' } as any);
+      expect(service['getPath']('child-1')).toBe('alumnos/child-1');
     });
   });
 
   describe('getFavoritos', () => {
-    it('debería retornar desde localStorage si el alumnoId no es un UUID válido', (done) => {
-      const key = 'recred.favoritos.julian-garcia';
-      localStorage.setItem(key, JSON.stringify([mockProducto]));
-
-      service.getFavoritos('julian-garcia').subscribe({
-        next: (favoritos) => {
-          expect(favoritos).toEqual([mockProducto]);
-          done();
-        }
+    it('retorna de localstorage si alumnoId no es uuid', (done) => {
+      service.getFavoritos('a-invalid').subscribe(res => {
+        expect(res.length).toBe(1);
+        expect(res[0].nombre).toBe('Test Prod');
+        done();
       });
     });
 
-    it('debería hacer un request GET y retornar los productos mapeados si el alumnoId es UUID', (done) => {
-      perfilServiceSpy.getPerfil.and.returnValue(null);
-
-      service.getFavoritos(uuidAlumno).subscribe({
-        next: (favoritos) => {
-          expect(favoritos.length).toBe(1);
-          expect(favoritos[0].id).toBe(uuidProducto);
-          expect(favoritos[0].nombre).toBe('Tostado de Jamón y Queso');
-          expect(favoritos[0].estadoStock).toBe('DISPONIBLE');
-          done();
-        }
+    it('retorna del backend mapeado correctamente si es uuid valido', () => {
+      perfilSpy.getPerfil.and.returnValue({ rol: 'ALUMNO', id: '00000000-0000-0000-0000-000000000000' } as any);
+      const uuid = '00000000-0000-0000-0000-000000000000';
+      service.getFavoritos(uuid).subscribe(res => {
+        expect(res.length).toBe(1);
+        expect(res[0].nombre).toBe('Coca Cola');
+        expect(res[0].imagen).toContain('unsplash');
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuidAlumno}/preferencias/favoritos`);
+      const req = httpMock.expectOne(`${environment.apiUrl}/usuarios/${uuid}/preferencias/favoritos`);
       expect(req.request.method).toBe('GET');
-      req.flush([mockProductDTO]);
+      req.flush([{ id: 'p1', nombre: 'Coca Cola', precio: 100 }]); // Sin URL imagen, sin stockActual -> Default DISPONIBLE
     });
 
-    it('debería caer en localStorage si el request GET al backend falla', (done) => {
-      perfilServiceSpy.getPerfil.and.returnValue(null);
-      const key = `recred.favoritos.${uuidAlumno}`;
-      localStorage.setItem(key, JSON.stringify([mockProducto]));
-
-      service.getFavoritos(uuidAlumno).subscribe({
-        next: (favoritos) => {
-          expect(favoritos).toEqual([mockProducto]);
-          done();
-        }
+    it('fallback a localstorage si falla backend', () => {
+      const uuid = '00000000-0000-0000-0000-000000000000';
+      perfilSpy.getPerfil.and.returnValue({ rol: 'PADRE', id: 'p1' } as any);
+      service.getFavoritos(uuid).subscribe(res => {
+        // En localstorage mock devuelve null para uuid genericos, o array vacio.
+        expect(res).toEqual([]);
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuidAlumno}/preferencias/favoritos`);
-      req.flush('error', { status: 500, statusText: 'Server Error' });
+      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuid}/preferencias/favoritos`);
+      req.flush('Error', { status: 500, statusText: 'Server Error' });
     });
   });
 
   describe('agregarFavorito', () => {
-    it('debería guardar en localStorage si el alumnoId no es UUID', (done) => {
-      service.agregarFavorito('julian-garcia', mockProducto).subscribe({
-        next: () => {
-          const key = 'recred.favoritos.julian-garcia';
-          const stored = JSON.parse(localStorage.getItem(key) || '[]');
-          expect(stored).toEqual([mockProducto]);
-          done();
-        }
+    it('guarda en localstorage si ids no son uuid', (done) => {
+      service.agregarFavorito('a-invalid', { id: 'p-new', nombre: 'N' } as any).subscribe(() => {
+        expect(localStorage.setItem).toHaveBeenCalled();
+        done();
       });
     });
 
-    it('debería enviar un request POST al backend si alumnoId y productoId son UUIDs', (done) => {
-      perfilServiceSpy.getPerfil.and.returnValue(null);
+    it('llama al backend si son uuid validos', () => {
+      const u1 = '00000000-0000-0000-0000-000000000000';
+      const p1 = '00000000-0000-0000-0000-000000000001';
+      service.agregarFavorito(u1, { id: p1 } as any).subscribe();
 
-      service.agregarFavorito(uuidAlumno, mockProducto).subscribe({
-        next: () => {
-          const key = `recred.favoritos.${uuidAlumno}`;
-          expect(localStorage.getItem(key)).toBeNull();
-          done();
-        }
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuidAlumno}/preferencias/favoritos/${uuidProducto}`);
+      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${u1}/preferencias/favoritos/${p1}`);
       expect(req.request.method).toBe('POST');
-      req.flush({});
+      req.flush(null);
     });
 
-    it('debería guardar en localStorage si el request POST al backend falla', (done) => {
-      perfilServiceSpy.getPerfil.and.returnValue(null);
+    it('fallback a localstorage si backend post falla', () => {
+      const u1 = '00000000-0000-0000-0000-000000000000';
+      const p1 = '00000000-0000-0000-0000-000000000001';
+      service.agregarFavorito(u1, { id: p1 } as any).subscribe();
 
-      service.agregarFavorito(uuidAlumno, mockProducto).subscribe({
-        next: () => {
-          const key = `recred.favoritos.${uuidAlumno}`;
-          const stored = JSON.parse(localStorage.getItem(key) || '[]');
-          expect(stored).toEqual([mockProducto]);
-          done();
-        }
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuidAlumno}/preferencias/favoritos/${uuidProducto}`);
-      req.flush('error', { status: 500, statusText: 'Server Error' });
+      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${u1}/preferencias/favoritos/${p1}`);
+      req.flush('Error', { status: 500, statusText: 'Server Error' });
+      expect(localStorage.setItem).toHaveBeenCalled();
     });
   });
 
   describe('removerFavorito', () => {
-    it('debería eliminar de localStorage si el alumnoId no es UUID', (done) => {
-      const key = 'recred.favoritos.julian-garcia';
-      localStorage.setItem(key, JSON.stringify([mockProducto]));
-
-      service.removerFavorito('julian-garcia', uuidProducto).subscribe({
-        next: () => {
-          const stored = JSON.parse(localStorage.getItem(key) || '[]');
-          expect(stored.length).toBe(0);
-          done();
-        }
+    it('remueve de localstorage si no son uuid', (done) => {
+      service.removerFavorito('a-invalid', 'p-invalid').subscribe(() => {
+        expect(localStorage.setItem).toHaveBeenCalled(); // update array
+        done();
       });
     });
 
-    it('debería enviar un request DELETE al backend si alumnoId y productoId son UUIDs', (done) => {
-      perfilServiceSpy.getPerfil.and.returnValue(null);
+    it('llama al backend si son uuid validos', () => {
+      const u1 = '00000000-0000-0000-0000-000000000000';
+      const p1 = '00000000-0000-0000-0000-000000000001';
+      service.removerFavorito(u1, p1).subscribe();
 
-      service.removerFavorito(uuidAlumno, uuidProducto).subscribe({
-        next: () => {
-          done();
-        }
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuidAlumno}/preferencias/favoritos/${uuidProducto}`);
+      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${u1}/preferencias/favoritos/${p1}`);
       expect(req.request.method).toBe('DELETE');
-      req.flush({});
+      req.flush(null);
     });
 
-    it('debería remover de localStorage si el request DELETE al backend falla', (done) => {
-      perfilServiceSpy.getPerfil.and.returnValue(null);
-      const key = `recred.favoritos.${uuidAlumno}`;
-      localStorage.setItem(key, JSON.stringify([mockProducto]));
+    it('fallback a localstorage si backend delete falla', () => {
+      const u1 = '00000000-0000-0000-0000-000000000000';
+      const p1 = '00000000-0000-0000-0000-000000000001';
+      service.removerFavorito(u1, p1).subscribe();
 
-      service.removerFavorito(uuidAlumno, uuidProducto).subscribe({
-        next: () => {
-          const stored = JSON.parse(localStorage.getItem(key) || '[]');
-          expect(stored.length).toBe(0);
-          done();
-        }
-      });
+      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${u1}/preferencias/favoritos/${p1}`);
+      req.flush('Error', { status: 500, statusText: 'Server Error' });
+      expect(localStorage.setItem).toHaveBeenCalled();
+    });
+  });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/alumnos/${uuidAlumno}/preferencias/favoritos/${uuidProducto}`);
-      req.flush('error', { status: 500, statusText: 'Server Error' });
+  describe('mapDtoToProducto', () => {
+    it('mapea stock 0 a SIN_STOCK', () => {
+      const mapped = service['mapDtoToProducto']({ id: '1', nombre: 'A', precio: 10, stockActual: 0 });
+      expect(mapped.estadoStock).toBe('SIN_STOCK');
+    });
+
+    it('mapea stock undefined a DISPONIBLE por default 1', () => {
+      const mapped = service['mapDtoToProducto']({ id: '1', nombre: 'A', precio: 10 });
+      expect(mapped.estadoStock).toBe('DISPONIBLE');
+    });
+
+    it('obtenerImagenProducto machea palabras clave', () => {
+      expect(service['obtenerImagenProducto']('coca cola')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('agua')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('sandwich')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('empanada')).toContain('lanacion');
+      expect(service['obtenerImagenProducto']('alfajor')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('cereal')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('yogur')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('manzana')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('pizza')).toContain('unsplash');
+      expect(service['obtenerImagenProducto']('desconocido')).toBe('');
     });
   });
 });

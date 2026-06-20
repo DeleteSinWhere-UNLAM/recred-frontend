@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { InventarioPage } from './inventario.page';
 import { ProductoService } from './services/producto.service';
@@ -17,6 +17,7 @@ import {
   EventoInventarioRealtime,
 } from './models/inventario.model';
 import { DatosFormularioProducto } from './components/formulario-producto/formulario-producto.component';
+import { CargaMasivaService } from './services/carga-masiva.service';
 
 const ID_SIN_TACC       = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
 const ID_SIN_AZUCAR     = '7e113952-93ca-4797-a80d-54f3a31b2165';
@@ -29,6 +30,7 @@ describe('InventarioPage', () => {
   let toastServiceMock: jasmine.SpyObj<ToastService>;
   let perfilServiceMock: jasmine.SpyObj<PerfilService>;
   let realtimeServiceMock: jasmine.SpyObj<InventarioRealtimeService>;
+  let router: Router;
   let activatedRouteMock: {
     snapshot: {
       queryParamMap: ReturnType<typeof convertToParamMap>;
@@ -162,6 +164,7 @@ describe('InventarioPage', () => {
       'create',
       'update',
       'delete',
+      'createBulk'
     ]);
     toastServiceMock = jasmine.createSpyObj('ToastService', ['mostrar']);
     perfilServiceMock = jasmine.createSpyObj('PerfilService', [
@@ -199,6 +202,7 @@ describe('InventarioPage', () => {
         { provide: ToastService, useValue: toastServiceMock },
         { provide: PerfilService, useValue: perfilServiceMock },
         { provide: InventarioRealtimeService, useValue: realtimeServiceMock },
+        { provide: CargaMasivaService, useValue: jasmine.createSpyObj('CargaMasivaService', ['uploadFile']) },
         provideRouter([]),
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         provideHttpClient(),
@@ -208,9 +212,11 @@ describe('InventarioPage', () => {
 
     fixture = TestBed.createComponent(InventarioPage);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigateByUrl').and.resolveTo(true);
   });
 
-  it('should create', () => {
+  it('dado que se inicializa, debe crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 
@@ -347,6 +353,96 @@ describe('InventarioPage', () => {
     expect(component.disponiblesCount).toBe(2);
     expect(component.reservadosCount).toBe(4);
     expect(component.altaReservaCount).toBe(0);
+  });
+
+  it('deberia filtrar disponibles, agotados y limpiar busqueda', () => {
+    const soldOutProduct: ItemInventario = {
+      ...mockInventory[0],
+      productId: 'agotado',
+      nombre: 'Jugo agotado',
+      estadoInventario: 'SIN_STOCK',
+      stockActual: 0,
+      stockDisponible: 0,
+      disponible: true,
+      agotado: true,
+    };
+    component.products = [...mockInventory, soldOutProduct];
+
+    component.setFilter('DISPONIBLE');
+    expect(component.filteredProducts.map((product) => product.productId)).toEqual([
+      '2',
+      '1',
+    ]);
+
+    component.setFilter('AGOTADO');
+    expect(component.filteredProducts).toEqual([soldOutProduct]);
+
+    component.setSearchQuery({
+      target: { value: 'alfajor' },
+    } as unknown as Event);
+    expect(component.searchQuery).toBe('alfajor');
+
+    component.clearSearchQuery();
+    expect(component.searchQuery).toBe('');
+  });
+
+  it('deberia abrir y cerrar modales simples', () => {
+    component.openCreateForm();
+    expect(component.isSelectionModalVisible).toBeTrue();
+
+    component.closeSelectionModal();
+    expect(component.isSelectionModalVisible).toBeFalse();
+
+    component.openBulkUploadModal();
+    expect(component.isSelectionModalVisible).toBeFalse();
+    expect(component.isBulkUploadModalVisible).toBeTrue();
+
+    component.bulkProductsData = [{ nombre: 'Producto' } as never];
+    component.isProcessingFile = true;
+    component.closeBulkUploadModal();
+
+    expect(component.isBulkUploadModalVisible).toBeFalse();
+    expect(component.bulkProductsData).toEqual([]);
+    expect(component.isProcessingFile).toBeFalse();
+
+    component.openIndividualForm();
+    component.closeForm();
+    expect(component.isFormVisible).toBeFalse();
+    expect(component.selectedProduct).toBeNull();
+  });
+
+  it('deberia navegar al volver', () => {
+    component.volver();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+  });
+
+  it('deberia mostrar error si falla la carga de categorias', () => {
+    productServiceMock.getCategories.and.returnValue(
+      throwError(() => new Error('API Error')),
+    );
+
+    component.loadCategories();
+
+    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
+      'Error al cargar las categorÃ­as',
+      'error',
+    );
+  });
+
+  it('deberia manejar carga de productos sin buffet asociado', () => {
+    perfilServiceMock.obtenerBuffetId.and.returnValue(null);
+    component.buffetId = null;
+
+    component.loadProducts();
+
+    expect(component.products).toEqual([]);
+    expect(component.isLoading).toBeFalse();
+    expect(component.isRefreshing).toBeFalse();
+    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
+      'No se encontrÃ³ un buffet asociado a tu perfil',
+      'error',
+    );
   });
 
   it('deberia resaltar temporalmente el producto actualizado por SSE', fakeAsync(() => {
@@ -527,6 +623,75 @@ describe('InventarioPage', () => {
     expect(component.isLoadingStockMovements).toBeFalse();
   });
 
+  it('deberia pedir producto completo al editar desde overview', () => {
+    component.openEditFormFromInventory(mockInventory[0]);
+
+    expect(productServiceMock.getById).toHaveBeenCalledWith(
+      mockInventory[0].productId,
+    );
+    expect(component.selectedProduct).toEqual(
+      jasmine.objectContaining({ id: mockProductos[0].id }),
+    );
+    expect(component.isFormVisible).toBeTrue();
+  });
+
+  it('deberia mostrar error si falla la carga del producto para editar', () => {
+    productServiceMock.getById.and.returnValue(
+      throwError(() => new Error('API Error')),
+    );
+
+    component.openEditFormFromInventory(mockInventory[0]);
+
+    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
+      'Error al cargar el producto',
+      'error',
+    );
+  });
+
+  it('deberia preparar y cancelar eliminacion', () => {
+    component.requestDelete(mockProductos[0]);
+    expect(component.deleteTarget).toEqual(mockProductos[0]);
+
+    component.cancelDelete();
+    expect(component.deleteTarget).toBeNull();
+
+    component.requestDeleteFromInventory(mockInventory[0]);
+    expect(component.deleteTarget).toEqual(
+      jasmine.objectContaining({
+        id: mockInventory[0].productId,
+        nombre: mockInventory[0].nombre,
+      }),
+    );
+  });
+
+  it('deberia mostrar error si falla la eliminacion', () => {
+    productServiceMock.delete.and.returnValue(
+      throwError(() => new Error('API Error')),
+    );
+    component.deleteTarget = mockProductos[0];
+
+    component.confirmDelete();
+
+    expect(component.deleteTarget).toBeNull();
+    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
+      'Error al eliminar el producto',
+      'error',
+    );
+  });
+
+  it('deberia avisar si se intenta abrir historial sin buffet', () => {
+    perfilServiceMock.obtenerBuffetId.and.returnValue(null);
+    component.buffetId = null;
+
+    component.openStockHistory(mockInventory[0]);
+
+    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
+      'No se encontrÃ³ un buffet asociado a tu perfil',
+      'error',
+    );
+    expect(productServiceMock.getProductStockMovements).not.toHaveBeenCalled();
+  });
+
   it('deberia cerrar el historial de stock', () => {
     fixture.detectChanges();
     component.openStockHistory(mockInventory[0]);
@@ -536,6 +701,34 @@ describe('InventarioPage', () => {
     expect(component.stockMovementTarget).toBeNull();
     expect(component.stockMovements).toEqual([]);
     expect(component.isLoadingStockMovements).toBeFalse();
+  });
+
+  it('deberia formatear movimientos de stock', () => {
+    expect(component.getStockMovementTypeLabel('RESERVA')).toBe('Reserva');
+    expect(component.getStockMovementTypeLabel('LIBERACION')).toContain(
+      'Liber',
+    );
+    expect(component.getStockMovementTypeLabel('VENTA')).toBe('Venta');
+    expect(component.getStockMovementTypeLabel('DESCONOCIDO' as never)).toBe(
+      'DESCONOCIDO',
+    );
+    expect(component.getStockMovementTypeIcon('AJUSTE')).toBe('fa-sliders');
+    expect(component.getStockMovementTypeIcon('DESCONOCIDO' as never)).toBe(
+      'fa-clock-rotate-left',
+    );
+    expect(component.formatStockMovementDate('fecha-invalida')).toBe(
+      'fecha-invalida',
+    );
+    expect(component.formatStockMovementNumber(1234)).toContain('1');
+    expect(component.formatStockMovementDelta(mockStockMovements[1])).toBe('+5');
+    expect(component.formatStockMovementDelta(mockStockMovements[0])).toBe('-2');
+    expect(
+      component.formatStockMovementDelta({
+        ...mockStockMovements[0],
+        cantidadAnterior: 8,
+        cantidadNueva: 8,
+      }),
+    ).toBe('0');
   });
 
   it('deberia mostrar error si falla la carga del historial', () => {
@@ -716,6 +909,63 @@ describe('InventarioPage', () => {
     );
   });
 
+  it('deberia cerrar gestion y validar formulario invalido', () => {
+    fixture.detectChanges();
+    component.openInventoryManagement(mockInventory[0]);
+    component.inventoryManagementForm.patchValue({
+      stockActual: null,
+      stockMinimo: null,
+    });
+    productServiceMock.updateInventoryStock.calls.reset();
+
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).not.toHaveBeenCalled();
+    expect(component.hasInventoryManagementError('stockActual')).toBeTrue();
+
+    component.closeInventoryManagement();
+    expect(component.inventoryManagementTarget).toBeNull();
+    expect(component.getInventoryManagementMode()).toBe('STOCK_EXACTO');
+  });
+
+  it('deberia cambiar validadores y motivo al usar cupo diario', () => {
+    fixture.detectChanges();
+    component.openInventoryManagement(mockInventory[0]);
+
+    component.inventoryManagementForm.patchValue({
+      tipoManejoInventario: 'CUPO_DIARIO',
+      cupoMaximoDiario: 12,
+    });
+    component.onInventoryModeChange();
+    component.submitInventoryManagement();
+
+    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
+      mockBuffetId,
+      mockInventory[0].productId,
+      jasmine.objectContaining({
+        tipoManejoInventario: 'CUPO_DIARIO',
+        cupoMaximoDiario: 12,
+        motivo: 'Cambiar a cupo diario',
+      }),
+    );
+  });
+
+  it('deberia mapear errores de gestion por status http', () => {
+    const error = new HttpErrorResponse({ status: 403 });
+    productServiceMock.updateInventoryStock.and.returnValue(
+      throwError(() => error),
+    );
+
+    fixture.detectChanges();
+    component.openInventoryManagement(mockInventory[0]);
+    component.submitInventoryManagement();
+
+    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
+      jasmine.stringMatching(/permisos/),
+      'error',
+    );
+  });
+
   it('deberia mapear errores de gestion por code', () => {
     const error = new HttpErrorResponse({
       status: 409,
@@ -796,5 +1046,170 @@ describe('InventarioPage', () => {
       expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto eliminado correctamente', 'success');
       expect(component.products.length).toBe(1);
     });
+
+    it('deberia no hacer nada en confirmDelete si deleteTarget es null', () => {
+      component.deleteTarget = null;
+      component.confirmDelete();
+      expect(productServiceMock.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Cobertura de Ramas y Edge Cases', () => {
+    let cargaMasivaService: any;
+    beforeEach(() => {
+      cargaMasivaService = TestBed.inject(CargaMasivaService);
+    });
+
+    it('deberia procesar archivo y popular bulkProductsData exitosamente', () => {
+      cargaMasivaService.uploadFile.and.returnValue(of({ products: [{ nombre: 'Prod 1' }] }));
+      const mockFile = new File([''], 'test.csv');
+      component.handleFileUpload(mockFile);
+      expect(component.bulkProductsData.length).toBe(1);
+      expect(component.isProcessingFile).toBeFalse();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Archivo procesado correctamente', 'success');
+    });
+
+    it('deberia mostrar error al procesar archivo', () => {
+      cargaMasivaService.uploadFile.and.returnValue(throwError(() => new Error()));
+      const mockFile = new File([''], 'test.csv');
+      component.handleFileUpload(mockFile);
+      expect(component.isProcessingFile).toBeFalse();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al procesar el archivo', 'error');
+    });
+
+    it('handleBulkProductsSave deberia retornar si no hay buffetId', () => {
+      perfilServiceMock.obtenerBuffetId.and.returnValue(null);
+      component.buffetId = null;
+      component.handleBulkProductsSave([]);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/buffet asociado/), 'error');
+    });
+
+    it('handleBulkProductsSave procesa nuevas categorias, unifica nombres y envia batch', () => {
+      component.buffetId = mockBuffetId;
+      const mockBulkProducts = [
+        { nombre: 'Prod A', categoriaId: 'c1', precio: 100, peso: 1, requierePreparacion: false, stockActual: 10 },
+        { nombre: 'Prod B', categoriaId: 'NEW', nuevaCategoriaNombre: '  NuevaCat  ', precio: 200, peso: 2, requierePreparacion: false, stockActual: 20 },
+        { nombre: 'Prod C', categoriaId: 'NEW', nuevaCategoriaNombre: 'nuevacat', precio: 300, peso: 3, requierePreparacion: false, stockActual: 30 },
+      ] as any[];
+      productServiceMock.createBulk.and.returnValue(of({} as any));
+      component.handleBulkProductsSave(mockBulkProducts);
+
+      const reqs = productServiceMock.createBulk.calls.mostRecent().args[0];
+      expect(reqs.length).toBe(3);
+      expect(reqs[0].categoriaId).toBe('c1');
+      expect(reqs[1].categoriaId).toBeNull();
+      expect(reqs[1].nuevaCategoriaNombre).toBe('NuevaCat'); // First cached format
+      expect(reqs[2].categoriaId).toBeNull();
+      expect(reqs[2].nuevaCategoriaNombre).toBe('NuevaCat'); // Unified cached format
+
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Productos cargados exitosamente', 'success');
+      expect(component.isBulkUploadModalVisible).toBeFalse();
+    });
+
+    it('handleBulkProductsSave muestra error si createBulk falla', () => {
+      productServiceMock.createBulk.and.returnValue(throwError(() => new Error()));
+      component.handleBulkProductsSave([{} as any]);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al guardar los productos', 'error');
+    });
+
+    it('handleFormSubmit aborta si no hay buffetId', () => {
+      perfilServiceMock.obtenerBuffetId.and.returnValue(null);
+      component.buffetId = null;
+      component.handleFormSubmit(formDataBase);
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/buffet asociado/), 'error');
+    });
+
+    it('createProduct usa categoriaId vacio si es NEW', () => {
+      component.selectedProduct = null;
+      const fd = { ...formDataBase, categoriaId: 'NEW', nuevaCategoriaNombre: 'TestCat' };
+      component.handleFormSubmit(fd);
+      const req = productServiceMock.create.calls.mostRecent().args[0];
+      expect(req.categoriaId).toBeNull();
+      expect(req.nuevaCategoriaNombre).toBe('TestCat');
+    });
+
+    it('updateProduct usa categoriaId vacio si es NEW', () => {
+      component.selectedProduct = mockProductos[0];
+      const fd = { ...formDataBase, categoriaId: 'NEW', nuevaCategoriaNombre: 'TestCat' };
+      component.handleFormSubmit(fd);
+      const req = productServiceMock.update.calls.mostRecent().args[1];
+      expect(req.categoriaId).toBe('');
+    });
+
+    it('openInventoryManagementFromQuery maneja producto no encontrado', () => {
+      router.navigate([], { queryParams: { productId: 'unknown' } });
+      component.ngOnInit();
+      expect(component.inventoryManagementTarget).toBeNull();
+    });
+
+    it('buildInventoryStockPayload cubre CUPO_DIARIO y usuario ausente', () => {
+      component.buffetId = mockBuffetId;
+      perfilServiceMock.getPerfil.and.returnValue(null);
+      component.openInventoryManagement(mockInventory[1]); // CUPO_DIARIO
+      component.inventoryManagementForm.patchValue({ tipoManejoInventario: 'CUPO_DIARIO', cupoMaximoDiario: null, motivo: 'test' });
+      
+      const payload = (component as any).buildInventoryStockPayload();
+      expect(payload.cupoMaximoDiario).toBe(0); // fallback
+      expect(payload.usuarioId).toBeUndefined();
+    });
+
+    it('buildInventoryStockPayload cubre STOCK_EXACTO con fallbacks de null', () => {
+      component.buffetId = mockBuffetId;
+      component.openInventoryManagement(mockInventory[0]); // STOCK_EXACTO
+      component.inventoryManagementForm.patchValue({ tipoManejoInventario: 'STOCK_EXACTO', stockActual: null, stockMinimo: null, motivo: 'test' });
+
+      const payload = (component as any).buildInventoryStockPayload();
+      expect(payload.stockActual).toBe(0);
+      expect(payload.stockMinimo).toBe(0);
+    });
+
+    it('getInventoryErrorMessage mapea todos los errores correctamente', () => {
+      component.buffetId = mockBuffetId;
+      productServiceMock.updateInventoryStock.and.returnValue(throwError(() => new HttpErrorResponse({ status: 404 })));
+      component.openInventoryManagement(mockInventory[0]);
+      component.inventoryManagementForm.patchValue({ tipoManejoInventario: 'STOCK_EXACTO', stockActual: 10, stockMinimo: 5, motivo: 'test' });
+      
+      component.submitInventoryManagement();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/producto o inventario/), 'error');
+
+      productServiceMock.updateInventoryStock.and.returnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
+      component.submitInventoryManagement();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/datos ingresados/), 'error');
+
+      productServiceMock.updateInventoryStock.and.returnValue(throwError(() => new Error('Unknown')));
+      component.submitInventoryManagement();
+      expect(toastServiceMock.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/error inesperado/), 'error');
+    });
+
+    it('scheduleRealtimeRefresh limpia el timeout repetido', fakeAsync(() => {
+      component.products = mockInventory;
+      // Triggers scheduleRealtimeRefresh via mock SSE callback in real usage, but we can call it directly for test
+      (component as any).scheduleRealtimeRefresh({ productId: '1' });
+      expect(component.highlightedProductIds.has('1')).toBeTrue();
+      
+      // Call again before timeout fires
+      (component as any).scheduleRealtimeRefresh({ productId: '1' });
+      
+      tick(3000);
+      expect(component.highlightedProductIds.has('1')).toBeFalse();
+      
+      // Cleanup the full refresh debounce
+      tick(5000); 
+    }));
+
+    it('applyInventoryManagementShortcut para SOLD_OUT toma stockMinimo del target si no está en form', () => {
+      component.openInventoryManagement(mockInventory[0]);
+      component.inventoryManagementForm.patchValue({ stockMinimo: null });
+      component.applyInventoryManagementShortcut('SOLD_OUT');
+      expect(component.inventoryManagementForm.value.stockMinimo).toBe(mockInventory[0].stockMinimo); // 5
+    });
+
+    it('applyInventoryManagementShortcut para SOLD_OUT usa 0 si target no tiene stockMinimo', () => {
+      component.openInventoryManagement({ ...mockInventory[0], stockMinimo: null } as any);
+      component.inventoryManagementForm.patchValue({ stockMinimo: null });
+      component.applyInventoryManagementShortcut('SOLD_OUT');
+      expect(component.inventoryManagementForm.value.stockMinimo).toBe(0);
+    });
+
   });
 });

@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
@@ -83,8 +83,24 @@ describe('HomeKiosqueroPresenter', () => {
       ],
     },
     products: {
-      topSoldProducts: [],
-      mostReservedProducts: [],
+      topSoldProducts: [
+        {
+          productId: 'top-1',
+          productName: 'Medialuna',
+          urlImagen: 'medialuna.jpg',
+          quantity: 5,
+          total: 7500,
+        },
+      ],
+      mostReservedProducts: [
+        {
+          productId: 'reserved-1',
+          productName: 'Sandwich',
+          urlImagen: null,
+          quantity: 3,
+          total: 9000,
+        },
+      ],
       productsNeedingRestock: [
         {
           productId: 'low-1',
@@ -118,10 +134,43 @@ describe('HomeKiosqueroPresenter', () => {
       soldOutEvents: 50,
       pendingOrders: 99,
       readyOrders: 3,
-      items: [],
+      items: [
+        {
+          type: 'EXPIRED',
+          label: 'Pedidos vencidos',
+          quantity: 1,
+          amount: 0,
+        },
+        {
+          type: 'REFUND',
+          label: 'Creditos devueltos',
+          quantity: 0,
+          amount: 1250,
+        },
+        {
+          type: 'EMPTY',
+          label: 'Sin impacto',
+          quantity: 0,
+          amount: 0,
+        },
+      ],
     },
     trends: {
-      lastSevenDays: [],
+      lastSevenDays: [
+        {
+          date: '2026-06-10',
+          totalSold: 1000,
+          totalOrders: 2,
+          deliveredOrders: 2,
+        },
+        {
+          date: '2026-06-11',
+          totalSold: 4000,
+          totalOrders: 4,
+          deliveredOrders: 3,
+          expiredOrders: 1,
+        },
+      ],
     },
   };
 
@@ -185,6 +234,40 @@ describe('HomeKiosqueroPresenter', () => {
       ['Ya listos', '3'],
       ['Vencidos', '1'],
     ]);
+  });
+
+  it('expone metricas de resumen y atencion', () => {
+    expect(
+      presenter.summaryMetrics().map((metric) => [
+        metric.label,
+        metric.tone,
+      ]),
+    ).toEqual([
+      ['Total vendido', 'success'],
+      ['Pedidos totales', undefined],
+      ['Entregados', 'success'],
+      ['Venta promedio', undefined],
+      ['A preparar', 'warning'],
+      ['Sin stock', 'danger'],
+    ]);
+
+    expect(presenter.mainSummaryMetrics().map((metric) => metric.label)).toEqual(
+      ['Total vendido hoy', 'Pedidos totales', 'Entregados'],
+    );
+    expect(
+      presenter.reportSummaryMetrics().map((metric) => metric.label),
+    ).toEqual([
+      'Total vendido',
+      'Pedidos totales',
+      'Entregados',
+      'Venta promedio',
+    ]);
+    expect(presenter.attentionItems().map((item) => item.label)).toEqual([
+      'A preparar',
+      'Ya listos',
+      'Vencidos',
+    ]);
+    expect(presenter.hasPanelData()).toBeTrue();
   });
 
   it('se suscribe a realtime del buffet al iniciar', () => {
@@ -350,6 +433,188 @@ describe('HomeKiosqueroPresenter', () => {
     ]);
   });
 
+  it('completa estados operativos y grupos de productos', () => {
+    expect(presenter.ordersByStatus().map((status) => status.status)).toEqual([
+      'EN_PREPARACION',
+      'LISTO',
+    ]);
+    expect(
+      presenter.orderedStatusItems().map((status) => [
+        status.status,
+        status.orders,
+      ]),
+    ).toEqual([
+      ['PENDIENTE', 0],
+      ['EN_PREPARACION', 2],
+      ['LISTO', 3],
+      ['ENTREGADO', 0],
+      ['CANCELADO', 0],
+      ['RECHAZADO', 0],
+      ['VENCIDO', 0],
+    ]);
+
+    expect(presenter.productGroups().map((group) => group.title)).toEqual([
+      'Más vendidos',
+      'Más reservados ahora',
+      'Reposición',
+      'Agotados',
+    ]);
+    expect(presenter.productGroups()[0].items[0]).toEqual(
+      jasmine.objectContaining({
+        id: 'top-1',
+        label: 'Medialuna',
+        detail: '5 unidades',
+      }),
+    );
+    expect(presenter.rankingProductGroups().map((group) => group.title)).toEqual(
+      ['Más vendidos', 'Más reservados ahora'],
+    );
+    expect(presenter.hasCriticalStock()).toBeTrue();
+    expect(presenter.primaryAction()?.id).toBe('ver-pedidos');
+  });
+
+  it('expone alertas visibles y metricas de reporte', () => {
+    const alertLabels = presenter.alertMetrics().map((metric) => metric.label);
+    const visibleAlertLabels = presenter
+      .visibleAlertMetrics()
+      .map((metric) => metric.label);
+
+    expect(alertLabels.length).toBe(6);
+    expect(alertLabels).toContain('Pedidos vencidos');
+    expect(alertLabels).toContain('A preparar');
+    expect(visibleAlertLabels.length).toBe(4);
+    expect(visibleAlertLabels).toContain('Pedidos vencidos');
+    expect(visibleAlertLabels).toContain('A preparar');
+    expect(presenter.reportAlertMetrics().length).toBe(4);
+    expect(presenter.alertItems().map((item) => item.quantityLabel)).toEqual([
+      '1',
+      '0',
+      '0',
+    ]);
+    expect(
+      presenter.visibleAlertItems().map((item) => [item.type, item.amountLabel]),
+    ).toEqual([
+      ['EXPIRED', jasmine.any(String)],
+      ['REFUND', jasmine.any(String)],
+    ]);
+    expect(presenter.hasVisibleAlerts()).toBeTrue();
+    expect(presenter.hasReportAlerts()).toBeTrue();
+  });
+
+  it('actualiza fecha, rango y seleccion de tendencia desde handlers publicos', () => {
+    const initialPanelCalls = homeKiosqueroService.getPanel.calls.count();
+    const initialRangeCalls = homeKiosqueroService.getPanelByRange.calls.count();
+
+    presenter.onDateChange({
+      target: { value: '2026-06-12' },
+    } as unknown as Event);
+    presenter.refrescarPanel();
+
+    expect(presenter.selectedDate()).toBe('2026-06-12');
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(
+      initialPanelCalls + 2,
+    );
+
+    presenter.onReportRangePresetChange({
+      target: { value: 'LAST_7_DAYS' },
+    } as unknown as Event);
+    presenter.onReportRangeFromChange({
+      target: { value: '2026-06-01' },
+    } as unknown as Event);
+    presenter.onReportRangeToChange({
+      target: { value: '2026-06-15' },
+    } as unknown as Event);
+    presenter.refrescarReportes();
+    presenter.selectTrendDay('2026-06-10');
+
+    expect(presenter.selectedRangePreset()).toBe('CUSTOM');
+    expect(presenter.reportRangeFrom()).toBe('2026-06-01');
+    expect(presenter.reportRangeTo()).toBe('2026-06-15');
+    expect(homeKiosqueroService.getPanelByRange.calls.count()).toBeGreaterThan(
+      initialRangeCalls,
+    );
+    expect(presenter.selectedTrendDay()?.date).toBe('2026-06-10');
+  });
+
+  it('ignora cambios invalidos de fecha y rango', () => {
+    const panelCalls = homeKiosqueroService.getPanel.calls.count();
+    const rangeCalls = homeKiosqueroService.getPanelByRange.calls.count();
+
+    presenter.onDateChange({ target: { value: '' } } as unknown as Event);
+    presenter.onDateChange({
+      target: { value: presenter.selectedDate() },
+    } as unknown as Event);
+    presenter.onReportRangePresetChange({
+      target: { value: 'INVALIDO' },
+    } as unknown as Event);
+    presenter.onReportRangeFromChange({
+      target: { value: presenter.reportRangeFrom() },
+    } as unknown as Event);
+    presenter.onReportRangeToChange({
+      target: { value: presenter.reportRangeTo() },
+    } as unknown as Event);
+
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(panelCalls);
+    expect(homeKiosqueroService.getPanelByRange.calls.count()).toBe(rangeCalls);
+  });
+
+  it('devuelve claves de tracking para listas del template', () => {
+    expect(presenter.trackMetric(0, presenter.summaryMetrics()[0])).toBe(
+      'Total vendido',
+    );
+    expect(presenter.trackAttentionItem(0, presenter.attentionItems()[0])).toBe(
+      'A preparar',
+    );
+    expect(presenter.trackTimeSlot(0, presenter.salesByTimeSlot()[0])).toBe(
+      'slot-1',
+    );
+    expect(presenter.trackStatus(0, presenter.orderedStatusItems()[0])).toBe(
+      'PENDIENTE',
+    );
+    expect(
+      presenter.trackPurchaseType(0, presenter.ordersByPurchaseType()[0]),
+    ).toBe('PRESENCIAL');
+    expect(presenter.trackProductGroup(0, presenter.productGroups()[0])).toBe(
+      'Más vendidos',
+    );
+    expect(
+      presenter.trackProductItem(0, presenter.productGroups()[0].items[0]),
+    ).toBe('top-1');
+    expect(presenter.trackAlertItem(0, presenter.alertItems()[0])).toBe(
+      'EXPIRED',
+    );
+    expect(presenter.trackTrendDay(0, presenter.trendDays()[0])).toBe(
+      '2026-06-10',
+    );
+  });
+
+  it('refresca el panel con debounce cuando llega DASHBOARD_CHANGED', fakeAsync(() => {
+    const originalVisibility = document.visibilityState;
+    Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+
+    const handlers = inventoryRealtimeService.connect.calls.mostRecent()
+      .args[1] as {
+      onRefresh: (event: { type: string; buffetId: string; occurredAt: string }) => void;
+    };
+    const initialCalls = homeKiosqueroService.getPanel.calls.count();
+
+    handlers.onRefresh({
+      type: 'DASHBOARD_CHANGED',
+      buffetId: 'buffet-1',
+      occurredAt: new Date().toISOString(),
+    });
+    tick(2499);
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(initialCalls);
+
+    tick(1);
+    expect(inventoryRealtimeService.recordRefetch).toHaveBeenCalledWith(
+      'home-kiosquero-panel',
+    );
+    expect(homeKiosqueroService.getPanel.calls.count()).toBe(initialCalls + 1);
+
+    Object.defineProperty(document, 'visibilityState', { value: originalVisibility, configurable: true });
+  }));
+
   it('navega a pedidos con fecha y estado preparados para filtro', () => {
     presenter.abrirPedidos('LISTO');
 
@@ -395,6 +660,209 @@ describe('HomeKiosqueroPresenter', () => {
     presenter.ejecutarAccion(promociones!);
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/promociones');
+  });
+
+  describe('Cobertura de Ramas y Casos Extremos (Branch Coverage)', () => {
+    it('maneja inicialización sin buffetId', () => {
+      (presenter as any).perfilService.obtenerBuffetId.and.returnValue(null);
+      presenter.init();
+      expect(presenter.errorMessage()).toBe('No se encontró un buffet asociado a tu perfil.');
+      presenter.initReportes();
+      expect(presenter.errorMessage()).toBe('No se encontró un buffet asociado a tu perfil.');
+    });
+
+    it('maneja perfil nulo o incompleto para el kiosquero', () => {
+      (presenter as any).perfilService.getPerfil.and.returnValue(null);
+      (presenter as any).homeKiosqueroService.getNombreKiosquero.and.returnValue('Test User');
+      presenter.init();
+      expect(presenter.nombreKiosquero()).toBe('Test User');
+      expect(presenter.urlFotoPerfil()).toBeNull();
+      expect(presenter.iniciales()).toBe('TU');
+    });
+
+    it('calcula saludo y saludo inicial según la hora y nombre', () => {
+      // Test iniciales only, since saludo uses new Date() which is not reactive in the signal
+      (presenter as any).nombreKiosqueroState.set('A');
+      expect(presenter.iniciales()).toBe('A');
+
+      (presenter as any).nombreKiosqueroState.set('A B C');
+      expect(presenter.iniciales()).toBe('AB');
+    });
+
+    it('maneja errores en cargarPanel y cargarPanelReportes', () => {
+      (presenter as any).homeKiosqueroService.getPanel.and.returnValue(throwError(() => new Error('Error')));
+      presenter.refrescarPanel();
+      expect(presenter.errorMessage()).toBe('No se pudo cargar el estado del buffet.');
+
+      (presenter as any).homeKiosqueroService.getPanelByRange.and.returnValue(throwError(() => new Error('Error')));
+      presenter.refrescarReportes();
+      expect(presenter.errorMessage()).toBe('No se pudo cargar el dashboard del período.');
+    });
+
+    it('maneja valores nulos en el estado del panel para todos los selectores', () => {
+      (presenter as any).panelState.set(null);
+      expect(presenter.summaryMetrics().length).toBe(6);
+      expect(presenter.mainSummaryMetrics().length).toBe(3);
+      expect(presenter.reportSummaryMetrics().length).toBe(4);
+      expect(presenter.operationalCards().length).toBe(3);
+      expect(presenter.attentionItems().length).toBe(3);
+      expect(presenter.salesByTimeSlot().length).toBe(0);
+      expect(presenter.salesByCategory().length).toBe(0);
+      expect(presenter.ordersByStatus().length).toBe(0);
+      expect(presenter.orderedStatusItems().length).toBe(7);
+      expect(presenter.ordersByPurchaseType().length).toBe(0);
+      expect(presenter.productGroups().length).toBe(4);
+      expect(presenter.criticalProductGroups().length).toBe(0);
+      expect(presenter.stockOverview().length).toBe(2);
+      expect(presenter.rankingProductGroups().length).toBe(2);
+      expect(presenter.alertMetrics().length).toBe(6);
+      expect(presenter.visibleAlertMetrics().length).toBe(0);
+      expect(presenter.alertItems().length).toBe(0);
+      expect(presenter.visibleAlertItems().length).toBe(0);
+      expect(presenter.hasVisibleAlerts()).toBeFalse();
+      expect(presenter.trendDays().length).toBe(0);
+      expect(presenter.selectedTrendDay()).toBeNull();
+      expect(presenter.selectedTrendBreakdown().length).toBe(0);
+    });
+
+    it('prueba metodos auxiliares de formato (formatDate, formatClockTime, calculatePercent)', () => {
+      expect((presenter as any).formatDate(null)).toBe('-');
+      expect((presenter as any).formatDate('invalida')).toBe('invalida');
+      expect((presenter as any).formatShortDate('invalida')).toBe('invalida');
+      expect((presenter as any).formatTimeRange(null, null)).toBeNull();
+      expect((presenter as any).formatClockTime('invalida')).toBe('invalida');
+      expect((presenter as any).calculatePercent(10, 0)).toBe(0);
+      expect((presenter as any).formatPurchaseType('NUEVO_TIPO' as any)).toBe('NUEVO_TIPO');
+      expect((presenter as any).formatInventoryStatus('NUEVO_ESTADO' as any)).toBe('NUEVO_ESTADO');
+    });
+
+    it('maneja compareTimeSlots con tiempos mixtos y nulos', () => {
+      const t1 = { timeSlot: 'A', pickupSlotStartTime: null } as any;
+      const t2 = { timeSlot: 'B', pickupSlotStartTime: null } as any;
+      const t3 = { timeSlot: 'C', pickupSlotStartTime: '10:00:00' } as any;
+      const t4 = { timeSlot: 'D', pickupSlotStartTime: '09:00:00' } as any;
+
+      expect((presenter as any).compareTimeSlots(t1, t2)).toBe(-1); // A vs B
+      expect((presenter as any).compareTimeSlots(t2, t1)).toBe(1); // B vs A
+      expect((presenter as any).compareTimeSlots(t1, t3)).toBe(1);  // nulo vs con tiempo
+      expect((presenter as any).compareTimeSlots(t3, t1)).toBe(-1); // con tiempo vs nulo
+      expect((presenter as any).compareTimeSlots(t4, t3)).toBe(-1); // 09:00 vs 10:00
+    });
+
+    it('isReportRangeValid retorna false en rangos invalidos o muy largos', () => {
+      expect((presenter as any).isReportRangeValid({from: null, to: null})).toBeFalse();
+      expect((presenter as any).isReportRangeValid({from: '2026-06-10', to: '2026-06-01'})).toBeFalse();
+      // Un año + 2 días
+      expect((presenter as any).isReportRangeValid({from: '2025-01-01', to: '2026-01-05'})).toBeFalse();
+    });
+
+    it('prueba validacion de eventos realtime (shouldRefreshPanelForRealtimeEvent)', () => {
+      const originalVisibility = document.visibilityState;
+      Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+      
+      const realEvent = { type: 'DASHBOARD_CHANGED', buffetId: 'buffet-1', date: presenter.selectedDate() } as any;
+      expect((presenter as any).isRealtimeEventForCurrentPanel(realEvent)).toBeTrue();
+      
+      const unhandledEvent = { type: 'OTRO_EVENTO', buffetId: 'buffet-1', date: presenter.selectedDate() } as any;
+      expect((presenter as any).shouldRefreshPanelForRealtimeEvent(unhandledEvent)).toBeFalse();
+      
+      Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true });
+      expect((presenter as any).shouldRefreshPanelForRealtimeEvent(realEvent)).toBeFalse();
+      Object.defineProperty(document, 'visibilityState', { value: originalVisibility, configurable: true });
+    });
+
+    it('maneja states vacios/ceros para metrics operativas', () => {
+      const panelZ = {
+        summary: { pendingOrders: 0, soldOutProducts: 0, totalOrders: 0, totalSold: 0 },
+        alerts: { pendingOrders: 0, readyOrders: 0, expiredOrders: 0, soldOutEvents: 0 },
+        products: { productsNeedingRestock: [], soldOutProducts: [] },
+        activity: { salesByCategory: [{ categoryId: '1', quantity: 0, total: 0 }], ordersByPurchaseType: [{ type: 'PRESENCIAL', orders: 0 }] }
+      } as any;
+      (presenter as any).panelState.set(panelZ);
+      
+      expect(presenter.operationalCards()[0].tone).toBe('success');
+      expect(presenter.stockOverview()[0].tone).toBe('success');
+      expect(presenter.alertMetrics().every(m => m.tone !== 'warning' && m.tone !== 'danger')).toBeTrue();
+      expect(presenter.salesByCategory()[0].totalPercent).toBe(0);
+      expect(presenter.ordersByPurchaseType()[0].percent).toBe(0);
+    });
+
+    it('maneja breakdown de trends con valores cero', () => {
+      const reportPanelZero = {
+        trends: {
+          lastSevenDays: [
+            { date: '2026-06-14', totalSold: 0, totalOrders: 0, deliveredOrders: 0, createdOrders: 0, pendingOrders: 0, inPreparationOrders: 0, readyOrders: 0, cancelledOrders: 0, rejectedOrders: 0, expiredOrders: 0 }
+          ]
+        }
+      } as any;
+      (presenter as any).selectedRangePresetState.set('LAST_7_DAYS');
+      (presenter as any).panelState.set(reportPanelZero);
+      (presenter as any).selectedTrendDateState.set('2026-06-14');
+      
+      const day = presenter.selectedTrendDay();
+      expect(day?.createdOrdersLabel).toBe('0 pedidos hechos');
+      const breakdown = presenter.selectedTrendBreakdown();
+      expect(breakdown[0].tone).toBe('success'); // createdOrders not > deliveredOrders
+    });
+
+    it('maneja onDateChange y report ranges invalidos / mismos valores', () => {
+      (presenter as any).selectedDateState.set('2026-06-11');
+      presenter.onDateChange({ target: { value: '2026-06-11' } } as any); // Same date
+      presenter.onDateChange({ target: { value: null } } as any); // Null
+      expect(presenter.selectedDate()).toBe('2026-06-11');
+      
+      (presenter as any).reportRangeFromState.set('2026-06-01');
+      presenter.onReportRangeFromChange({ target: { value: '2026-06-01' } } as any);
+      expect(presenter.reportRangeFrom()).toBe('2026-06-01');
+
+      (presenter as any).reportRangeToState.set('2026-06-15');
+      presenter.onReportRangeToChange({ target: { value: '2026-06-15' } } as any);
+      expect(presenter.reportRangeTo()).toBe('2026-06-15');
+    });
+
+    it('prueba el subtitulo de trendSubtitle para varios dias y CUSTOM', () => {
+      (presenter as any).selectedRangePresetState.set('CUSTOM');
+      (presenter as any).reportRangeFromState.set('2026-06-01');
+      (presenter as any).reportRangeToState.set('2026-06-02');
+      // Set panel data with 2 trend days
+      (presenter as any).panelState.set({
+        trends: {
+          lastSevenDays: [
+            { date: '2026-06-01', totalSold: 0 },
+            { date: '2026-06-02', totalSold: 0 }
+          ]
+        }
+      } as any);
+      
+      expect(presenter.trendSubtitle()).toBe('01/06/2026 al 02/06/2026 · 2 días comparados');
+    });
+    
+    it('ignora preset inválido', () => {
+      (presenter as any).selectedRangePresetState.set('TODAY');
+      presenter.onReportRangePresetChange({ target: { value: 'INVALIDE_PRESET' } } as any);
+      expect(presenter.selectedRangePreset()).toBe('TODAY');
+    });
+    
+    it('filtra correctly en reportAlertMetrics cuando hay alertas no nulas', () => {
+      const panelA = {
+        alerts: {
+          expiredOrders: 1,
+          items: [
+            { type: 'EXPIRED', quantity: 0, amount: 0 },
+            { type: 'REFUND', quantity: 1, amount: 0 }
+          ]
+        }
+      } as any;
+      (presenter as any).panelState.set(panelA);
+      expect(presenter.hasReportAlerts()).toBeTrue(); 
+    });
+
+    it('isRealtimeEventForReportRange devuelve true/false según rango', () => {
+      (presenter as any).reportRangeFromState.set('2026-06-01');
+      (presenter as any).reportRangeToState.set('2026-06-10');
+      expect((presenter as any).isRealtimeEventForReportRange({ date: '2026-06-05' })).toBeTrue();
+      expect((presenter as any).isRealtimeEventForReportRange({ date: '2026-05-30' })).toBeFalse();
+    });
   });
 
   function countInclusiveDays(from: string, to: string): number {

@@ -54,7 +54,6 @@ describe('NavbarComponent', () => {
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
     
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     routerMock = TestBed.inject(Router) as any;
     spyOn(routerMock, 'navigateByUrl').and.returnValue(Promise.resolve(true));
     spyOn(routerMock, 'navigate').and.returnValue(Promise.resolve(true));

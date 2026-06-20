@@ -1,81 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { HabitoAlertCardComponent } from './habito-alert-card.component';
+import { HabitoAlerta } from '../../models/habito-alerta.model';
 
 describe('HabitoAlertCardComponent', () => {
-
-  let component: HabitoAlertCardComponent;
+  let componente: HabitoAlertCardComponent;
   let fixture: ComponentFixture<HabitoAlertCardComponent>;
 
-  beforeEach(async () => {
+  const mockAlerta = {
+    alumno: 'Juanito',
+    mensaje: 'Consumo excesivo de azúcares',
+    categoria: 'Golosinas',
+    porcentajeGasto: 45,
+    sugerencia: 'Intentar cambiar por fruta'
+  } as any;
 
+  beforeEach(async () => {
+    // Si usaba ngModule
     await TestBed.configureTestingModule({
-      imports: [HabitoAlertCardComponent],
+      imports: [HabitoAlertCardComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(HabitoAlertCardComponent);
-
-    component = fixture.componentInstance;
-
-    component.alerta = {
-      alumno: 'Julián García',
-      categoria: 'Golosinas',
-      porcentajeGasto: 40,
-      mensaje: 'Tu hijo gasta 40% en golosinas',
-      sugerencia: '¿Deseas limitar este tipo de productos?',
-    };
-
+    componente = fixture.componentInstance;
+    fixture.componentRef.setInput('alerta', mockAlerta);
     fixture.detectChanges();
-
   });
 
-  it('debería crear el componente', () => {
-    expect(component).toBeTruthy();
+  it('dado que recibe una alerta, debe renderizar correctamente en el DOM', () => {
+    const html = fixture.nativeElement.innerHTML;
+    expect(html).toContain('Juanito');
+    expect(html).toContain('Consumo excesivo de azúcares');
+    expect(html).toContain('Golosinas');
+    expect(html).toContain('45%');
+    expect(html).toContain('Intentar cambiar por fruta');
   });
-
-  it('debería renderizar el nombre del alumno', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('Julián García');
-
-  });
-
-  it('debería mostrar la categoría de consumo', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('Golosinas');
-
-  });
-
-  it('debería mostrar el porcentaje de gasto', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('40%');
-
-  });
-
-  it('debería mostrar el mensaje de alerta', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('Tu hijo gasta 40% en golosinas');
-
-  });
-
-  it('debería mostrar la sugerencia al tutor', () => {
-
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent)
-      .toContain('¿Deseas limitar este tipo de productos?');
-
-  });
-
 });

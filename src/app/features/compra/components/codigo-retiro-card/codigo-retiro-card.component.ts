@@ -41,5 +41,7 @@ export class CodigoRetiroCardComponent {
     return a ? `${a.nombre} ${a.apellido}` : '';
   });
 
-  readonly recreoLabel = computed(() => RECREO_LABELS[this.recreo]);
+  get recreoLabel() {
+    return RECREO_LABELS[this.recreo];
+  }
 }

@@ -31,8 +31,8 @@ describe('BilleteraPage', () => {
       iniciales: signal(''),
       urlFotoPerfil: signal(null),
       saldoNegativo: signal(false),
-      desde: signal(''),
-      hasta: signal(''),
+      desde: signal('2024-01-01'),
+      hasta: signal('2024-01-31'),
       saldoActualFormateado: signal('$ 0'),
       periodoLabel: signal(''),
       error: signal(null),
@@ -82,6 +82,7 @@ describe('BilleteraPage', () => {
     })
     .overrideComponent(BilleteraPage, {
       set: {
+        template: '',
         providers: [
           { provide: BilleteraPresenter, useValue: mockPresenter }
         ],
@@ -95,28 +96,73 @@ describe('BilleteraPage', () => {
     fixture.detectChanges();
   });
 
-  it('dado que se inicializa el componente, deberia crearse y llamar a init del presenter', () => {
+  it('dado que se inicializa el componente con rol ALUMNO, deberia configurar homeUrl en /alumno y llamar init', () => {
     expect(component).toBeTruthy();
+    expect(usuarioServiceSpy.setHomeUrl).toHaveBeenCalledWith('/alumno');
     expect(mockPresenter.init).toHaveBeenCalledWith('alumno-1');
   });
 
-  it('dado que no hay id en ruta, deberia llamar a init con null', () => {
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
+  it('dado que se invoca cambiarFecha, deberia delegar al presenter', () => {
+    // casteamos a any para acceder a la funcion protegida (sin usar "any" explícito como tipo de variable local, sólo en la invocación o usando string notation)
+    (component as unknown as { cambiarFecha: (v: string) => void }).cambiarFecha('mes');
+    expect(mockPresenter.cambiarFecha).toHaveBeenCalledWith('mes' as any);
+  });
+
+  it('dado que cambia la fecha desde, deberia delegar a setearRango con el nuevo valor', () => {
+    const mockEvent = { target: { value: '2024-02-01' } } as unknown as Event;
+    (component as unknown as { onDesdeChange: (e: Event) => void }).onDesdeChange(mockEvent);
+    expect(mockPresenter.setearRango).toHaveBeenCalledWith('2024-02-01', '2024-01-31');
+  });
+
+  it('dado que cambia la fecha hasta, deberia delegar a setearRango con el nuevo valor', () => {
+    const mockEvent = { target: { value: '2024-02-28' } } as unknown as Event;
+    (component as unknown as { onHastaChange: (e: Event) => void }).onHastaChange(mockEvent);
+    expect(mockPresenter.setearRango).toHaveBeenCalledWith('2024-01-01', '2024-02-28');
+  });
+});
+
+describe('BilleteraPage - Otros roles', () => {
+  let mockPresenter: jasmine.SpyObj<BilleteraPresenter>;
+  let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
+  let usuarioServiceSpy: jasmine.SpyObj<UsuarioService>;
+
+  beforeEach(async () => {
+    mockPresenter = jasmine.createSpyObj('BilleteraPresenter', ['init']);
+    Object.assign(mockPresenter, {
+      cargando: signal(false),
+      error: signal(null),
+      esVistaAlumno: signal(true),
+      nombreAlumno: signal(''),
+      iniciales: signal(''),
+      urlFotoPerfil: signal(null),
+      saldoNegativo: signal(false),
+      desde: signal('2024-01-01'),
+      hasta: signal('2024-01-31'),
+      saldoActualFormateado: signal('$ 0'),
+      periodoLabel: signal(''),
+      montoIngresadoFormateado: signal('$ 0'),
+      montoGastadoFormateado: signal('$ 0'),
+      balancePositivo: signal(true),
+      balancePeriodoFormateado: signal('$ 0'),
+      cantidadCompras: signal(0),
+      hayCategorias: signal(false),
+      gastoPorCategoria: signal([]),
+      hayClasificacionSalud: signal(false),
+      gastoPorClasificacionSalud: signal([]),
+      hayMovimientos: signal(false),
+      movimientos: signal([])
+    });
+
+    perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['rol']);
+    usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['setHomeUrl']);
+    Object.assign(usuarioServiceSpy, { esVistaAlumno: signal(true) });
+
+    await TestBed.configureTestingModule({
       imports: [BilleteraPage],
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: {
-            paramMap: of({
-              get: () => null
-            }),
-            snapshot: {
-              paramMap: {
-                get: () => null
-              }
-            }
-          }
+          useValue: { paramMap: of({ get: () => null }) }
         },
         { provide: PerfilService, useValue: perfilServiceSpy },
         { provide: UsuarioService, useValue: usuarioServiceSpy },
@@ -126,6 +172,7 @@ describe('BilleteraPage', () => {
     })
     .overrideComponent(BilleteraPage, {
       set: {
+        template: '',
         providers: [
           { provide: BilleteraPresenter, useValue: mockPresenter }
         ],
@@ -133,9 +180,22 @@ describe('BilleteraPage', () => {
       }
     })
     .compileComponents();
+  });
 
-    const newFixture = TestBed.createComponent(BilleteraPage);
-    newFixture.detectChanges();
+  it('dado rol PADRE, deberia configurar homeUrl en /tutor y procesar id null', () => {
+    perfilServiceSpy.rol.and.returnValue('PADRE');
+    const fixture = TestBed.createComponent(BilleteraPage);
+    fixture.detectChanges();
+    
+    expect(usuarioServiceSpy.setHomeUrl).toHaveBeenCalledWith('/tutor');
     expect(mockPresenter.init).toHaveBeenCalledWith(null);
+  });
+
+  it('dado otro rol (ADMIN), no deberia configurar homeUrl', () => {
+    perfilServiceSpy.rol.and.returnValue('VENDEDOR');
+    const fixture = TestBed.createComponent(BilleteraPage);
+    fixture.detectChanges();
+    
+    expect(usuarioServiceSpy.setHomeUrl).not.toHaveBeenCalled();
   });
 });

@@ -1,14 +1,87 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { ReporteDiario } from './models/cierre-diario.model';
+import {
+  RegistroCierreDiario,
+  ResultadoCierreDiario,
+  EstadoCierreDiario,
+  SnapshotInventarioDiario,
+  VentaProductoDiaria,
+  ReporteDiario,
+} from './models/cierre-diario.model';
 import { CierreDiarioPage } from './cierre-diario.page';
 import { CierreDiarioService } from './services/cierre-diario.service';
 import { InventarioRealtimeService } from '../inventario/services/inventario-realtime.service';
+import { EventoInventarioRealtime } from '../inventario/models/inventario.model';
+
+type TestSignal<T> = {
+  (): T;
+  set: (value: T) => void;
+  update: (updater: (value: T) => T) => void;
+};
+
+interface CierreDiarioPageTestApi {
+  readonly buffetId: TestSignal<string | null>;
+  readonly selectedDate: TestSignal<string>;
+  readonly report: TestSignal<ReporteDiario | null>;
+  readonly closeStatus: TestSignal<EstadoCierreDiario | null>;
+  readonly closeResult: TestSignal<ResultadoCierreDiario | null>;
+  readonly dailyCloses: TestSignal<RegistroCierreDiario[]>;
+  readonly closingDay: TestSignal<boolean>;
+  readonly loadingCloseStatus: TestSignal<boolean>;
+  readonly confirmModalOpen: TestSignal<boolean>;
+  readonly historyModalOpen: TestSignal<boolean>;
+  readonly historyFrom: TestSignal<string>;
+  readonly historyTo: TestSignal<string>;
+  readonly inventoryPage: TestSignal<number>;
+  readonly soldProductsPage: TestSignal<number>;
+  readonly summaryMetrics: () => Array<{ label: string; value: string; tone?: string }>;
+  readonly orderStatusMetrics: () => Array<{ label: string; value: number; icon: string }>;
+  readonly closureMetrics: () => Array<{ label: string; value: string; tone?: string }>;
+  readonly sortedInventory: () => SnapshotInventarioDiario[];
+  readonly sortedProducts: () => VentaProductoDiaria[];
+  readonly closeStatusErrorMessage: TestSignal<string | null>;
+  readonly errorMessage: TestSignal<string | null>;
+  readonly historyErrorMessage: TestSignal<string | null>;
+  readonly refreshingAfterClose: TestSignal<boolean>;
+  volver: () => void;
+  onDateChange: (event: Event) => void;
+  loadCloseStatus: (showLoading?: boolean) => void;
+  loadCloseHistory: () => void;
+  openHistoryModal: () => void;
+  closeHistoryModal: () => void;
+  onHistoryFromChange: (event: Event) => void;
+  onHistoryToChange: (event: Event) => void;
+  selectDailyClose: (close: RegistroCierreDiario) => void;
+  openConfirmModal: () => void;
+  closeConfirmModal: () => void;
+  confirmDailyClose: () => void;
+  downloadCsv: () => void;
+  formatMoney: (value: number | null | undefined) => string;
+  formatNumber: (value: number | null | undefined) => string;
+  formatOptionalNumber: (value: number | null | undefined) => string;
+  formatDate: (value: string | null | undefined) => string;
+  formatInventoryStatus: (status: string) => string;
+  formatInventoryMode: (mode: string) => string;
+  formatMovementType: (movementType: string) => string;
+  soldOutProductName: (product: { productName?: string; nombre?: string }) => string;
+  isInventorySoldOut: (product: SnapshotInventarioDiario) => boolean;
+  isInventoryLowStock: (product: SnapshotInventarioDiario) => boolean;
+  isSoldProductSoldOut: (product: VentaProductoDiaria) => boolean;
+  isSoldProductLowStock: (product: VentaProductoDiaria) => boolean;
+  trackProductSale: (_: number, product: { productId: string }) => string;
+  trackInventory: (_: number, product: SnapshotInventarioDiario) => string;
+  trackDailyClose: (_: number, close: RegistroCierreDiario) => string;
+  isSelectedClose: (close: RegistroCierreDiario) => boolean;
+  previousInventoryPage: () => void;
+  nextInventoryPage: () => void;
+  previousSoldProductsPage: () => void;
+  nextSoldProductsPage: () => void;
+}
 
 describe('CierreDiarioPage', () => {
   let component: CierreDiarioPage;
@@ -17,6 +90,7 @@ describe('CierreDiarioPage', () => {
   let inventoryRealtimeService: jasmine.SpyObj<InventarioRealtimeService>;
   let perfilService: jasmine.SpyObj<PerfilService>;
   let toastService: jasmine.SpyObj<ToastService>;
+  let router: Router;
 
   const buffetId = 'buffet-123';
   const report: ReporteDiario = {
@@ -149,7 +223,24 @@ describe('CierreDiarioPage', () => {
 
     fixture = TestBed.createComponent(CierreDiarioPage);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigateByUrl').and.resolveTo(true);
   });
+
+  function page(): CierreDiarioPageTestApi {
+    return component as unknown as CierreDiarioPageTestApi;
+  }
+
+  function inputEvent(value: string): Event {
+    const input = document.createElement('input');
+    input.value = value;
+    const event = new Event('change');
+    Object.defineProperty(event, 'target', {
+      configurable: true,
+      value: input,
+    });
+    return event;
+  }
 
   it('deberia cargar el reporte diario al iniciar', () => {
     fixture.detectChanges();
@@ -540,5 +631,411 @@ describe('CierreDiarioPage', () => {
     expect(fixture.nativeElement.textContent).toContain(
       'No se pudo cargar el reporte diario.',
     );
+  });
+
+  it('deberia exponer metricas, formateos y trackers del reporte', () => {
+    fixture.detectChanges();
+    const viewModel = page();
+
+    const summaryLabels = viewModel.summaryMetrics().map((metric) => metric.label);
+
+    expect(summaryLabels).toEqual(jasmine.arrayContaining([
+      'Total vendido',
+      'Pedidos totales',
+      'Entregados',
+      'Vencidos',
+      'Reservas liberadas',
+    ]));
+    expect(summaryLabels.some((label) => label.includes('devueltos'))).toBeTrue();
+    expect(viewModel.orderStatusMetrics().map((metric) => metric.value)).toEqual([
+      18,
+      2,
+      1,
+      1,
+      3,
+      0,
+      0,
+    ]);
+    expect(viewModel.closureMetrics()).toEqual([]);
+
+    viewModel.closeStatus.set({
+      buffetId,
+      date: report.date,
+      closed: true,
+      expiredPurchases: 3,
+      releasedReservations: 8,
+      refundedCredits: 150,
+    });
+
+    const closureLabels = viewModel.closureMetrics().map((metric) => metric.label);
+
+    expect(closureLabels).toEqual(jasmine.arrayContaining([
+      'Pedidos vencidos',
+      'Reservas liberadas',
+      'Total vendido',
+    ]));
+    expect(closureLabels.some((label) => label.includes('devueltos'))).toBeTrue();
+    expect(viewModel.formatMoney(null)).toContain('0');
+    expect(viewModel.formatNumber(1234)).toContain('1');
+    expect(viewModel.formatOptionalNumber(undefined)).toMatch(/Sin m.nimo/);
+    expect(viewModel.formatDate('2026-6-9')).toBe('09/06/2026');
+    expect(viewModel.formatDate('sin-fecha')).toBe('sin-fecha');
+    expect(viewModel.formatInventoryStatus('DESCONOCIDO')).toBe('DESCONOCIDO');
+    expect(viewModel.formatInventoryMode('OTRO')).toBe('OTRO');
+    expect(viewModel.formatMovementType('AJUSTE_MANUAL')).toBe('Ajuste manual');
+    expect(viewModel.soldOutProductName({ nombre: 'TurrÃ³n' })).toBe('TurrÃ³n');
+    expect(viewModel.soldOutProductName({})).toBe('Producto agotado');
+    expect(viewModel.trackProductSale(0, { productId: 'product-1' })).toBe(
+      'product-1',
+    );
+    expect(viewModel.trackInventory(0, report.inventory[0])).toBe('product-1');
+    expect(
+      viewModel.trackDailyClose(0, {
+        id: 'close-1',
+        buffetId,
+        date: report.date,
+        expiredPurchases: 0,
+        releasedReservations: 0,
+        refundedCredits: 0,
+      }),
+    ).toBe('close-1');
+  });
+
+  it('deberia cambiar la fecha y resetear estado paginado', () => {
+    fixture.detectChanges();
+    const viewModel = page();
+    const callsBefore = cierreDiarioService.getDailyReport.calls.count();
+
+    viewModel.closeResult.set({
+      alreadyClosed: false,
+      expiredPurchases: 1,
+      releasedReservations: 2,
+      refundedCredits: 3,
+      report,
+    });
+    viewModel.closeStatus.set({
+      buffetId,
+      date: report.date,
+      closed: true,
+      expiredPurchases: 1,
+      releasedReservations: 2,
+      refundedCredits: 3,
+    });
+    viewModel.inventoryPage.set(2);
+    viewModel.soldProductsPage.set(2);
+
+    viewModel.onDateChange(inputEvent('2026-06-10'));
+
+    expect(viewModel.selectedDate()).toBe('2026-06-10');
+    expect(viewModel.closeResult()).toBeNull();
+    expect(viewModel.inventoryPage()).toBe(1);
+    expect(viewModel.soldProductsPage()).toBe(1);
+    expect(cierreDiarioService.getDailyReport.calls.count()).toBe(callsBefore + 1);
+
+    viewModel.onDateChange(inputEvent('2026-06-10'));
+    expect(cierreDiarioService.getDailyReport.calls.count()).toBe(callsBefore + 1);
+  });
+
+  it('deberia manejar errores operativos de estado, historial, cierre y csv', () => {
+    fixture.detectChanges();
+    const viewModel = page();
+
+    cierreDiarioService.getDailyCloseStatus.and.returnValue(
+      throwError(() => new Error('status error')),
+    );
+    viewModel.loadCloseStatus();
+    expect(viewModel.closeStatus()).toBeNull();
+    expect(viewModel.closeStatusErrorMessage()).toContain('No se pudo verificar');
+
+    cierreDiarioService.getDailyCloses.and.returnValue(
+      throwError(() => new Error('history error')),
+    );
+    viewModel.loadCloseHistory();
+    expect(viewModel.dailyCloses()).toEqual([]);
+    expect(viewModel.historyErrorMessage()).toContain('No se pudieron cargar');
+
+    cierreDiarioService.closeDaily.and.returnValue(
+      throwError(() => new Error('close error')),
+    );
+    viewModel.confirmDailyClose();
+    expect(viewModel.closingDay()).toBeFalse();
+    expect(toastService.mostrar).toHaveBeenCalledWith(
+      jasmine.stringMatching(/No se pudo cerrar/),
+      'error',
+    );
+
+    cierreDiarioService.downloadDailyReportCsv.and.returnValue(
+      throwError(() => new Error('csv error')),
+    );
+    viewModel.downloadCsv();
+    expect(toastService.mostrar).toHaveBeenCalledWith(
+      'No se pudo descargar el CSV.',
+      'error',
+    );
+  });
+
+  it('deberia refrescar despues del cierre y avisar si falla ese refresco', () => {
+    fixture.detectChanges();
+    const viewModel = page();
+
+    cierreDiarioService.closeDaily.and.returnValue(
+      of({
+        alreadyClosed: false,
+        expiredPurchases: 3,
+        releasedReservations: 8,
+        refundedCredits: 0,
+        report,
+      }),
+    );
+    cierreDiarioService.refreshAfterClose.and.returnValue(
+      throwError(() => new Error('refresh error')),
+    );
+
+    viewModel.confirmDailyClose();
+
+    expect(viewModel.refreshingAfterClose()).toBeFalse();
+    expect(viewModel.closeResult()).toEqual(
+      jasmine.objectContaining({ expiredPurchases: 3 }),
+    );
+    expect(toastService.mostrar).toHaveBeenCalledWith(
+      jasmine.stringMatching(/refrescar el reporte/),
+      'error',
+    );
+  });
+
+  it('deberia abrir y cerrar modales, seleccionar cierres y navegar', () => {
+    fixture.detectChanges();
+    const viewModel = page();
+
+    viewModel.openConfirmModal();
+    expect(viewModel.confirmModalOpen()).toBeTrue();
+
+    viewModel.closingDay.set(true);
+    viewModel.closeConfirmModal();
+    expect(viewModel.confirmModalOpen()).toBeTrue();
+
+    viewModel.closingDay.set(false);
+    viewModel.closeConfirmModal();
+    expect(viewModel.confirmModalOpen()).toBeFalse();
+
+    viewModel.loadingCloseStatus.set(true);
+    viewModel.openConfirmModal();
+    expect(viewModel.confirmModalOpen()).toBeFalse();
+
+    viewModel.loadingCloseStatus.set(false);
+    viewModel.openHistoryModal();
+    expect(viewModel.historyModalOpen()).toBeTrue();
+
+    viewModel.onHistoryFromChange(inputEvent('2026-06-01'));
+    viewModel.onHistoryToChange(inputEvent('2026-06-09'));
+    expect(viewModel.historyFrom()).toBe('2026-06-01');
+    expect(viewModel.historyTo()).toBe('2026-06-09');
+
+    viewModel.closeHistoryModal();
+    expect(viewModel.historyModalOpen()).toBeFalse();
+
+    viewModel.selectDailyClose({
+      id: 'close-selected',
+      buffetId,
+      date: '2026-06-08',
+      expiredPurchases: 2,
+      releasedReservations: 4,
+      refundedCredits: 100,
+    });
+
+    expect(viewModel.selectedDate()).toBe('2026-06-08');
+    expect(viewModel.isSelectedClose(viewModel.dailyCloses()[0])).toBeFalse();
+    expect(viewModel.historyModalOpen()).toBeFalse();
+
+    viewModel.volver();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+  });
+
+  it('deberia detectar stock operativo y limitar paginaciones', () => {
+    const inventory = Array.from({ length: 6 }, (_, index) => ({
+      productId: `product-${index + 1}`,
+      productName: `Producto ${index + 1}`,
+      stockActual: index === 0 ? 0 : 10,
+      stockReservado: 0,
+      stockDisponible: index === 0 ? 0 : 10,
+      stockMinimo: 3,
+      estadoInventario:
+        index === 0 ? 'SIN_STOCK' : index === 1 ? 'BAJO_STOCK' : 'DISPONIBLE',
+      tipoManejoInventario: 'STOCK_EXACTO',
+    }));
+    const products = Array.from({ length: 6 }, (_, index) => ({
+      productId: `product-${index + 1}`,
+      productName: `Producto ${index + 1}`,
+      quantity: index + 1,
+      total: index + 1,
+    }));
+
+    cierreDiarioService.getDailyReport.and.returnValue(
+      of({
+        ...report,
+        inventory,
+        products,
+      }),
+    );
+
+    fixture.detectChanges();
+    const viewModel = page();
+
+    expect(viewModel.isInventorySoldOut(viewModel.sortedInventory()[0])).toBeTrue();
+    expect(viewModel.isInventoryLowStock(viewModel.sortedInventory()[1])).toBeTrue();
+    expect(viewModel.isSoldProductSoldOut(products[0])).toBeTrue();
+    expect(viewModel.isSoldProductLowStock(products[1])).toBeTrue();
+    expect(viewModel.isSoldProductSoldOut({ ...products[0], productId: 'otro' })).toBeFalse();
+
+    viewModel.nextInventoryPage();
+    viewModel.nextSoldProductsPage();
+    expect(viewModel.inventoryPage()).toBe(2);
+    expect(viewModel.soldProductsPage()).toBe(2);
+
+    viewModel.nextInventoryPage();
+    viewModel.nextSoldProductsPage();
+    expect(viewModel.inventoryPage()).toBe(2);
+    expect(viewModel.soldProductsPage()).toBe(2);
+
+    viewModel.previousInventoryPage();
+    viewModel.previousSoldProductsPage();
+    viewModel.previousInventoryPage();
+    viewModel.previousSoldProductsPage();
+    expect(viewModel.inventoryPage()).toBe(1);
+    expect(viewModel.soldProductsPage()).toBe(1);
+  });
+
+  it('deberia refrescar el reporte por eventos SSE del dia seleccionado', fakeAsync(() => {
+    let onRefresh: ((event: EventoInventarioRealtime) => void) | undefined;
+    const abortController = new AbortController();
+    spyOn(abortController, 'abort').and.callThrough();
+    spyOnProperty(Document.prototype, 'visibilityState', 'get').and.returnValue('visible');
+    inventoryRealtimeService.connect.and.callFake((_buffetId, handlers) => {
+      onRefresh = handlers.onRefresh;
+      return abortController;
+    });
+
+    fixture.detectChanges();
+    const viewModel = page();
+    viewModel.historyModalOpen.set(true);
+    const reportCallsBefore = cierreDiarioService.getDailyReport.calls.count();
+    const historyCallsBefore = cierreDiarioService.getDailyCloses.calls.count();
+
+    onRefresh?.({
+      type: 'DAILY_REPORT_CHANGED',
+      date: viewModel.selectedDate(),
+    } as EventoInventarioRealtime);
+    onRefresh?.({
+      type: 'DAILY_REPORT_CHANGED',
+      date: viewModel.selectedDate(),
+    } as EventoInventarioRealtime);
+
+    tick(2499);
+    expect(inventoryRealtimeService.recordRefetch).not.toHaveBeenCalled();
+
+    tick(1);
+
+    expect(inventoryRealtimeService.recordRefetch).toHaveBeenCalledWith(
+      'daily-close-report',
+    );
+    expect(cierreDiarioService.getDailyReport.calls.count()).toBe(
+      reportCallsBefore + 1,
+    );
+    expect(cierreDiarioService.getDailyCloses.calls.count()).toBe(
+      historyCallsBefore + 1,
+    );
+
+    component.ngOnDestroy();
+
+    expect(abortController.abort).toHaveBeenCalled();
+  }));
+  describe('Branch Coverage Tests', () => {
+    it('deberia setear error si perfilService.obtenerBuffetId devuelve null en ngOnInit', () => {
+      perfilService.obtenerBuffetId.and.returnValue(null);
+      component.ngOnInit();
+      expect(page().errorMessage()).toBe('No se encontró un buffet asociado a tu perfil.');
+    });
+
+    it('deberia ignorar onDateChange si es la misma fecha', () => {
+      fixture.detectChanges();
+      page().selectedDate.set('2026-06-09');
+      const event = { target: { value: '2026-06-09' } } as unknown as Event;
+      page().onDateChange(event);
+      expect(cierreDiarioService.getDailyReport.calls.count()).toBe(1); // Only the initial call, no new call
+    });
+
+    it('deberia manejar error en downloadDailyReportCsv', () => {
+      fixture.detectChanges();
+      cierreDiarioService.downloadDailyReportCsv.and.returnValue(throwError(() => new Error('err')));
+      page().downloadCsv();
+      expect(toastService.mostrar).toHaveBeenCalledWith('No se pudo descargar el CSV.', 'error');
+    });
+
+    it('formatInventoryStatus fallback', () => {
+      expect(page().formatInventoryStatus('CUALQUIERA')).toBe('CUALQUIERA');
+    });
+
+    it('formatInventoryMode fallback', () => {
+      expect(page().formatInventoryMode('OTRO')).toBe('OTRO');
+    });
+
+    it('formatMovementType fallback', () => {
+      expect(page().formatMovementType('OTRO_TIPO_MAS')).toBe('Otro tipo mas');
+    });
+
+    it('formatDate fallback', () => {
+      expect(page().formatDate('')).toBe('-');
+      expect(page().formatDate('invalida')).toBe('invalida');
+    });
+
+    it('formatMoney y formatOptionalNumber fallback', () => {
+      expect(page().formatMoney(null)).toBeTruthy(); // It formats 0
+      expect(page().formatOptionalNumber(null)).toBe('Sin mínimo');
+    });
+
+    it('deberia devolver [] en metrics si no hay report o summary', () => {
+      fixture.detectChanges();
+      page().report.set(null);
+      expect(page().summaryMetrics()).toEqual([]);
+      expect(page().orderStatusMetrics()).toEqual([]);
+      page().closeStatus.set(null);
+      page().closeResult.set(null);
+      expect(page().closureMetrics()).toEqual([]);
+    });
+
+    it('deberia abortar early en confirmDailyClose', () => {
+      fixture.detectChanges();
+      page().closeStatus.set({ closed: true } as any);
+      page().confirmDailyClose();
+      // Only the calls from ngOnInit
+      expect(cierreDiarioService.closeDaily).not.toHaveBeenCalled();
+    });
+
+    it('deberia atrapar error en confirmDailyClose', () => {
+      fixture.detectChanges();
+      cierreDiarioService.closeDaily.and.returnValue(throwError(() => new Error('err')));
+      page().confirmDailyClose();
+      expect(toastService.mostrar).toHaveBeenCalledWith('No se pudo cerrar el día.', 'error');
+    });
+
+    it('deberia atrapar error en refreshAfterClose', () => {
+      fixture.detectChanges();
+      cierreDiarioService.refreshAfterClose.and.returnValue(throwError(() => new Error('err')));
+      component['refreshAfterClose']('buffet-123');
+      expect(toastService.mostrar).toHaveBeenCalledWith('El cierre se realizó, pero no se pudo refrescar el reporte.', 'error');
+    });
+
+    it('deberia manejar error al loadCloseHistory', () => {
+      cierreDiarioService.getDailyCloses.and.returnValue(throwError(() => new Error('err')));
+      fixture.detectChanges(); // Will trigger loadCloseHistory
+      expect(page().historyErrorMessage()).toBe('No se pudieron cargar los cierres.');
+    });
+
+    it('deberia setear selectedDate si date es falsy pero es today', () => {
+      // Testing isRealtimeEventForSelectedDate fallback to today
+      const spy = spyOn<any>(component, 'isSelectedDateToday').and.returnValue(true);
+      const res = component['isRealtimeEventForSelectedDate']({} as any);
+      expect(res).toBeTrue();
+    });
   });
 });

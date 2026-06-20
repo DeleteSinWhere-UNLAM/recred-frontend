@@ -10,11 +10,8 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 describe('RestriccionesHorariasPage', () => {
   let component: RestriccionesHorariasPage;
   let fixture: ComponentFixture<RestriccionesHorariasPage>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let presenterMock: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let locationMock: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let activatedRouteMock: any;
 
   beforeEach(async () => {
@@ -113,9 +110,7 @@ describe('RestriccionesHorariasPage', () => {
 
   it('dado que llamo a quitarBloqueoTotal, deberia buscar y quitar la restriccion sin IDs', () => {
     const item = {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       franja: { id: 'ts1' } as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       restricciones: [{ id: 'rtotal' } as any],
       categoriasDisponibles: [], saludDisponible: [], tieneBloqueoTotal: true
     };

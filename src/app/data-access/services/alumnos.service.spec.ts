@@ -123,6 +123,7 @@ describe('AlumnosService', () => {
     });
 
     it('dado que el endpoint devuelve un error o datos inválidos, debería retornar arreglo vacío o rechazar', (done) => {
+      spyOn(console, 'warn');
       service.cargarHijosDelTutor().then((alumnos) => {
         expect(alumnos).toEqual([]);
         done();
@@ -162,6 +163,7 @@ describe('AlumnosService', () => {
     });
 
     it('dado que ocurre un error en cargarPerfilAlumno, debería devolver el mock', (done) => {
+      spyOn(console, 'error');
       perfilServiceSpy.getPerfil.and.returnValue(mockPerfilAlumno);
       perfilServiceSpy.obtenerAlumnoId.and.returnValue('julian-garcia');
 

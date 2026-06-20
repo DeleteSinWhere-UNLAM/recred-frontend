@@ -122,7 +122,6 @@ describe('NotificationService', () => {
   });
 
   describe('listenToForegroundMessages', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let onMessageCallback: any;
 
     beforeEach(() => {

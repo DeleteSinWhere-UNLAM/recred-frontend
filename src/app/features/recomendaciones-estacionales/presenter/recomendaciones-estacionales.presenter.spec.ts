@@ -85,7 +85,6 @@ describe('RecomendacionesEstacionalesPresenter', () => {
     it('dado que resolveProducts falla para un producto, deberia crear producto dummy no disponible', fakeAsync(() => {
       recomendacionesServiceSpy.getSeasonalRecommendations.and.returnValue(of({
         sugerencias: [],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         promocion_creada: { id: 'promo1', name: 'P', productIds: ['prod-err'] } as any
       }));
       productServiceSpy.getById.and.returnValue(throwError(() => new Error('Error')));
@@ -125,7 +124,6 @@ describe('RecomendacionesEstacionalesPresenter', () => {
   describe('Promotions actions', () => {
     it('dado que se aprueba promocion exitosamente, deberia emitir success y cerrar modal', () => {
       perfilServiceSpy.obtenerBuffetId.and.returnValue('buffet1');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       promotionServiceSpy.approvePromotion.and.returnValue(of({} as any));
       presenter['showModalState'].set(true);
 
