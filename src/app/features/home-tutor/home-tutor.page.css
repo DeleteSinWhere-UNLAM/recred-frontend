@@ -20,64 +20,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #46256f 0%, #68369e 50%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #1a3b5c 0%, #2b5a8e 50%, #4a90e2 100%);
   color: white;
   padding: 24px 28px;
   border-radius: 20px;
   text-decoration: none;
-  box-shadow: 0 8px 20px rgba(104, 54, 158, 0.3);
+  box-shadow: 0 8px 20px rgba(43, 90, 142, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
   position: relative;
 }
 
-.home__resumen-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 30%),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 25%);
-  border-radius: 50%;
-  animation: cosmic-rotate 40s linear infinite;
-  pointer-events: none;
-}
 
-@keyframes cosmic-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.home__resumen-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-  transform: skewX(-20deg);
-  transition: 0.6s ease;
-}
-
-.home__resumen-card:hover::after {
-  left: 150%;
-}
 
 .home__resumen-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(104, 54, 158, 0.4);
+  box-shadow: 0 12px 25px rgba(43, 90, 142, 0.4);
 }
 
 .home__resumen-card:focus-visible {
-  outline: 3px solid #8b5cf6;
+  outline: 3px solid #4a90e2;
   outline-offset: 4px;
 }
 
