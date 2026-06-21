@@ -1,13 +1,18 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+export interface PlanFeature {
+  name: string;
+  included: boolean;
+}
 
 export interface PricingPlan {
   id: string;
   name: string;
-  price: number;
-  period: string;
+  priceMonthly: number;
+  priceAnnual: number;
   description: string;
-  features: string[];
+  features: PlanFeature[];
   isHighlighted?: boolean;
 }
 
@@ -21,72 +26,76 @@ export interface PricingPlan {
 export class PricingPlansComponent {
   userType = input<'padre' | 'kiosquero'>('padre');
 
-  plans = computed<PricingPlan[]>(() => {
-    const isPadre = this.userType() === 'padre';
+  // Estado del Toggle Global
+  isAnnualGlobal = signal<boolean>(false);
 
+  plans = computed<PricingPlan[]>(() => {
     const basicFeatures = [
       'Funciones esenciales',
       'Soporte general',
       'Notificaciones'
     ];
 
-    const premiumFeatures = isPadre
+    const premiumFeatures = this.userType() === 'padre'
       ? [
         'Inteligencia artificial',
-        'Acceso a datos de alto valor',
+        'Panel de control',
         'Promociones exclusivas',
         'Notificaciones personalizadas'
       ]
       : [
         'Inteligencia artificial',
-        'Acceso a datos de alto valor',
+        'Panel de control',
         'Carga de stock masiva',
         'Control de stock inteligente',
-        'Estrategias de venta personalizable'
+        'Estrategias de venta personalizables'
       ];
+
+    const allFeaturesNames = [...basicFeatures, ...premiumFeatures];
+
+    const makeFeatures = (includedCount: number): PlanFeature[] => {
+      return allFeaturesNames.map((name, index) => ({
+        name,
+        included: index < includedCount
+      }));
+    };
 
     return [
       {
-        id: 'basic',
-        name: 'Plan Básico',
-        price: 0,
-        period: 'gratis por siempre',
+        id: 'basico',
+        name: 'Suscripción Básico',
+        priceMonthly: 0,
+        priceAnnual: 0,
         description: 'Ideal para comenzar y conocer la plataforma.',
-        features: [...basicFeatures],
+        features: makeFeatures(3),
         isHighlighted: false
       },
       {
-        id: 'premium-monthly',
-        name: 'Premium Mensual',
-        price: 15,
-        period: 'por mes',
+        id: 'intermedio',
+        name: 'Suscripción Intermedio',
+        priceMonthly: 5500,
+        priceAnnual: 5500 * 12 * 0.8,
         description: 'Flexibilidad total para comenzar a crecer.',
-        features: [...basicFeatures, ...premiumFeatures.slice(0, 1)],
-        isHighlighted: false
-      },
-      {
-        id: 'premium-quarterly',
-        name: 'Premium Trimestral',
-        price: 35,
-        period: 'cada 3 meses',
-        description: 'Paga cada 3 meses y ahorra un 22%.',
-        features: [...basicFeatures, ...premiumFeatures.slice(0, 2)],
-        isHighlighted: false
-      },
-      {
-        id: 'premium-annual',
-        name: 'Premium Anual',
-        price: 120,
-        period: 'por año',
-        description: 'Nuestra mejor oferta. Ahorra un 33%.',
-        features: [...basicFeatures, ...premiumFeatures],
+        features: makeFeatures(5),
         isHighlighted: true
+      },
+      {
+        id: 'avanzado',
+        name: 'Suscripción Avanzado',
+        priceMonthly: 10200,
+        priceAnnual: 10200 * 12 * 0.8,
+        description: 'Nuestra oferta completa con todas las herramientas.',
+        features: makeFeatures(allFeaturesNames.length),
+        isHighlighted: false
       }
     ];
   });
 
+  toggleGlobalPeriod() {
+    this.isAnnualGlobal.update(val => !val);
+  }
+
   selectPlan(planId: string) {
     console.log('Plan seleccionado:', planId, '| Usuario:', this.userType());
-    // Aquí a futuro se puede emitir un evento o conectar al servicio de pagos del backend
   }
 }

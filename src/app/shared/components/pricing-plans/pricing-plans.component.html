@@ -4,14 +4,21 @@
     <p>Elige el plan que mejor se adapte a tus necesidades. Cancela en cualquier momento.</p>
   </div>
 
-  <div class="pricing-grid">
-    @for (plan of plans(); track plan.id) {
-      <div class="pricing-card" [class.highlighted]="plan.isHighlighted">
-        
-        @if (plan.isHighlighted) {
-          <div class="badge-recomendado">Mejor Opción</div>
-        }
+  <div class="variant-section">
+    <div class="variant-header">
+      <div class="toggle-container">
+        <span [class.active]="!isAnnualGlobal()">Mensual</span>
+        <label class="switch">
+          <input type="checkbox" [checked]="isAnnualGlobal()" (change)="toggleGlobalPeriod()">
+          <span class="slider round"></span>
+        </label>
+        <span [class.active]="isAnnualGlobal()">Anual (-20%)</span>
+      </div>
+    </div>
 
+    <div class="pricing-grid">
+      @for (plan of plans(); track plan.id) {
+      <div class="pricing-card" [class.highlighted]="plan.isHighlighted">
         <div class="card-header">
           <h3>{{ plan.name }}</h3>
           <p class="description">{{ plan.description }}</p>
@@ -19,27 +26,45 @@
 
         <div class="card-price">
           <span class="currency">$</span>
-          <span class="amount">{{ plan.price }}</span>
-          <span class="period">/ {{ plan.period }}</span>
+          <span class="amount">{{ isAnnualGlobal() && plan.priceAnnual > 0 ? plan.priceAnnual : plan.priceMonthly
+            }}</span>
+          <span class="period">/ {{ isAnnualGlobal() && plan.priceAnnual > 0 ? 'año' : 'mes' }}</span>
         </div>
+
+        @if (isAnnualGlobal() && plan.priceAnnual > 0) {
+        <div class="saving-banner">
+          Ahorrás <strong>${{ (plan.priceMonthly * 12) - plan.priceAnnual }}</strong> al año -20%
+        </div>
+        } @else {
+        <div class="saving-banner invisible">
+          Espaciador
+        </div>
+        }
 
         <ul class="card-features">
-          @for (feature of plan.features; track feature) {
-            <li>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              {{ feature }}
-            </li>
+          @for (feature of plan.features; track feature.name) {
+          <li [class.feature-disabled]="!feature.included">
+            @if (feature.included) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-cross">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            }
+            <span>{{ feature.name }}</span>
+          </li>
           }
         </ul>
-
         <div class="card-action">
-          <button class="btn-select" (click)="selectPlan(plan.id)">
-            Seleccionar Plan
-          </button>
+          <button class="btn-select" (click)="selectPlan(plan.id)">Seleccionar Plan</button>
         </div>
       </div>
-    }
+      }
+    </div>
   </div>
 </section>

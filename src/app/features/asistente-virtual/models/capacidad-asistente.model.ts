@@ -30,6 +30,7 @@ export interface SugerenciaCapacidad {
   readonly prompt: string;
   readonly tipo?: TipoSugerenciaAsistente;
   readonly tipoAccion?: string | null;
+  readonly premium?: boolean;
 }
 
 export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
@@ -64,6 +65,7 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       label: 'Compra habitual',
       emoji: '*',
       prompt: 'comprame lo de siempre',
+      premium: true,
     },
     {
       id: 'repetir-ultima-compra',
@@ -71,6 +73,7 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       label: 'Repetir ultima compra',
       emoji: 'R',
       prompt: 'repeti mi ultima compra',
+      premium: true,
     },
     {
       id: 'eventos',
