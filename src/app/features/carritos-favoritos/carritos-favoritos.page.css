@@ -137,18 +137,60 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--color-borde);
+  margin: 0;
 }
 
 .grupo-hijo__titulo i {
   color: var(--color-pizarra);
 }
 
+.grupo-hijo__header-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 2px solid var(--color-borde);
+  padding: 0 4px 8px 4px;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.grupo-hijo__header-btn:hover {
+  border-bottom-color: var(--color-borde-fuerte);
+}
+
+.grupo-hijo__header-btn .toggle-icon {
+  font-size: 14px;
+  color: var(--color-texto-claro);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
+}
+
+.grupo-hijo__header-btn:hover .toggle-icon {
+  color: var(--color-texto-oscuro);
+}
+
+.grupo-hijo__header-btn .toggle-icon.collapsed {
+  transform: rotate(180deg);
+}
+
 .grupo-hijo__carritos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
+  overflow: hidden;
+  max-height: 5000px;
+  opacity: 1;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-in-out;
+}
+
+.grupo-hijo__carritos.collapsed {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 /* Cart Card */
@@ -315,4 +357,33 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+/* Premium Gold Metallic style for Cargar al Carrito button */
+.carrito-card__btn-cargar--premium {
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
+  color: #1e293b !important;
+  font-family: var(--font-display) !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  padding: 10px 18px !important;
+  border-radius: 50px !important; /* Perfect capsule */
+  border: none !important;
+  box-shadow: 0 10px 20px rgba(212, 175, 55, 0.35) !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease !important;
+}
+
+.carrito-card__btn-cargar--premium:hover {
+  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
+  box-shadow: 0 12px 25px rgba(212, 175, 55, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+.carrito-card__btn-cargar--premium:active {
+  transform: scale(0.98) !important;
+  box-shadow: 0 8px 15px rgba(212, 175, 55, 0.3) !important;
 }

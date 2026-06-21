@@ -48,12 +48,20 @@
       <div class="carritos-page__grid">
         @for (grupo of gruposHijos; track grupo.alumnoId) {
           <section class="grupo-hijo" [attr.aria-label]="'Carritos para ' + grupo.alumnoNombre">
-            <h3 class="grupo-hijo__titulo">
-              <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
-              <span>{{ grupo.alumnoNombre }} {{ grupo.alumnoApellido }}</span>
-            </h3>
+            <button
+              type="button"
+              class="grupo-hijo__header-btn"
+              (click)="toggleGrupoHijo(grupo.alumnoId)"
+              [attr.aria-expanded]="isGrupoHijoExpanded(grupo.alumnoId)"
+            >
+              <h3 class="grupo-hijo__titulo">
+                <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
+                <span>{{ grupo.alumnoNombre }} {{ grupo.alumnoApellido }}</span>
+              </h3>
+              <i class="fa-solid fa-chevron-up toggle-icon" [class.collapsed]="!isGrupoHijoExpanded(grupo.alumnoId)"></i>
+            </button>
 
-            <div class="grupo-hijo__carritos">
+            <div class="grupo-hijo__carritos" [class.collapsed]="!isGrupoHijoExpanded(grupo.alumnoId)">
               @for (cart of grupo.carritos; track cart.id) {
                 <article class="carrito-card">
                   <header class="carrito-card__header">
@@ -96,6 +104,7 @@
                     <button
                       type="button"
                       class="carrito-card__btn-cargar"
+                      [class.carrito-card__btn-cargar--premium]="esPremium()"
                       (click)="cargarAlCarrito(cart)"
                     >
                       <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
