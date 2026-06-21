@@ -333,7 +333,7 @@ export class HomeKiosqueroPresenter {
       {
         label: 'Total vendido hoy',
         value: this.formatMoney(summary?.totalSold ?? 0),
-        icon: 'fa-dollar-sign',
+        icon: 'fa-money-bill-wave',
         tone: 'success',
       },
       {
