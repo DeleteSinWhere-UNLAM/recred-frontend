@@ -856,7 +856,7 @@ export class HomeKiosqueroPresenter {
       titulo: 'Ver pedidos',
       descripcion: 'Pendientes, preparación y retiros',
       icono: 'fa-list-check',
-      ruta: `/cierre-diario?date=${this.selectedDateState()}&seccion=pedidos`,
+      ruta: `/kiosquero/pedidos-tracking`,
       color: 'pizarra',
     },
     {
