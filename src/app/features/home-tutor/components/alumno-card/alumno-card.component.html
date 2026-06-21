@@ -65,90 +65,90 @@
       <span class="alumno-card__btn-label">Acreditar</span>
     </a>
     
-    
     <a class="alumno-card__btn alumno-card__btn--melocoton" [routerLink]="['/restricciones-nutricionales', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-shield"></i>
       </span>
       <span class="alumno-card__btn-label">Restricciones</span>
     </a>
-    
-    
-    <a class="alumno-card__btn alumno-card__btn--azul" [routerLink]="['/restricciones-horarias', alumno.id]">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-clock"></i>
-      </span>
-      <span class="alumno-card__btn-label">Horarios</span>
-    </a>
-    
-    
-    <a class="alumno-card__btn alumno-card__btn--dorado" [routerLink]="['/presupuesto', alumno.id]">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-piggy-bank"></i>
-      </span>
-      <span class="alumno-card__btn-label">Presupuesto</span>
-    </a>
-    
-    
-    <a class="alumno-card__btn alumno-card__btn--pizarra" [routerLink]="['/estadistica', alumno.id]">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-chart-line"></i>
-      </span>
-      <span class="alumno-card__btn-label">Estadística</span>
-    </a>
-    
-    
-    <a class="alumno-card__btn alumno-card__btn--morado" [routerLink]="['/movimientos-pendientes', alumno.id]">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-        @if (cantidadPendientes > 0) {
-          <span class="alumno-card__btn-badge">{{ cantidadPendientes }}</span>
-        }
-      </span>
-      <span class="alumno-card__btn-label">Pendientes</span>
-    </a>
-    
-    
+
     <a class="alumno-card__btn alumno-card__btn--gris" [routerLink]="['/movimientos', alumno.id]">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-list"></i>
       </span>
       <span class="alumno-card__btn-label">Movimientos</span>
     </a>
-    
-    
-    <a class="alumno-card__btn alumno-card__btn--celeste" [routerLink]="['/prediccion-gasto', alumno.id]">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-compass"></i>
-      </span>
-      <span class="alumno-card__btn-label">Predicción</span>
-    </a>
-    
-    
-    <a class="alumno-card__btn alumno-card__btn--violeta" [routerLink]="['/preferencias']">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-      </span>
-      <span class="alumno-card__btn-label">Preferencias</span>
-    </a>
 
-    
-    @if (esPadre) {
-      <button type="button" 
-              class="alumno-card__btn alumno-card__btn--menta" 
-              [class.btn-disabled]="creditoActivo() !== null"
-              [title]="creditoActivo() !== null ? 'El alumno ya tiene un microcredito aún no saldado' : 'Asignar Microcrédito'"
-              (click)="abrirModalMicrocredito()" 
-              style="border:none; cursor:pointer;">
+    @if (mostrarTodosLosBotones()) {
+      <a class="alumno-card__btn alumno-card__btn--azul" [routerLink]="['/restricciones-horarias', alumno.id]">
         <span class="alumno-card__btn-icono" aria-hidden="true">
-          <i class="fa-solid fa-hand-holding-dollar"></i>
-          @if (creditoActivo()) {
-            <span class="alumno-card__btn-badge alumno-card__btn-badge--info"><i class="fa-solid fa-check"></i></span>
+          <i class="fa-solid fa-clock"></i>
+        </span>
+        <span class="alumno-card__btn-label">Horarios</span>
+      </a>
+      
+      <a class="alumno-card__btn alumno-card__btn--dorado" [routerLink]="['/presupuesto', alumno.id]">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-piggy-bank"></i>
+        </span>
+        <span class="alumno-card__btn-label">Presupuesto</span>
+      </a>
+      
+      <a class="alumno-card__btn alumno-card__btn--pizarra" [routerLink]="['/estadistica', alumno.id]">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-chart-line"></i>
+        </span>
+        <span class="alumno-card__btn-label">Estadística</span>
+      </a>
+      
+      <a class="alumno-card__btn alumno-card__btn--morado" [routerLink]="['/movimientos-pendientes', alumno.id]">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          @if (cantidadPendientes > 0) {
+            <span class="alumno-card__btn-badge">{{ cantidadPendientes }}</span>
           }
         </span>
-        <span class="alumno-card__btn-label">Microcrédito</span>
-      </button>
+        <span class="alumno-card__btn-label">Pendientes</span>
+      </a>
+      
+      <a class="alumno-card__btn alumno-card__btn--celeste" [routerLink]="['/prediccion-gasto', alumno.id]">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-compass"></i>
+        </span>
+        <span class="alumno-card__btn-label">Predicción</span>
+      </a>
+      
+      <a class="alumno-card__btn alumno-card__btn--violeta" [routerLink]="['/preferencias']">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </span>
+        <span class="alumno-card__btn-label">Preferencias</span>
+      </a>
+
+      @if (esPadre) {
+        <button type="button" 
+                class="alumno-card__btn alumno-card__btn--menta" 
+                [class.btn-disabled]="creditoActivo() !== null"
+                [title]="creditoActivo() !== null ? 'El alumno ya tiene un microcredito aún no saldado' : 'Asignar Microcrédito'"
+                (click)="abrirModalMicrocredito()" 
+                style="border:none; cursor:pointer;">
+          <span class="alumno-card__btn-icono" aria-hidden="true">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+            @if (creditoActivo()) {
+              <span class="alumno-card__btn-badge alumno-card__btn-badge--info"><i class="fa-solid fa-check"></i></span>
+            }
+          </span>
+          <span class="alumno-card__btn-label">Microcrédito</span>
+        </button>
+      }
     }
+  </div>
+
+  <div class="alumno-card__toggle-wrapper">
+    <button type="button" class="alumno-card__toggle-btn" (click)="toggleBotones()">
+      <span>{{ mostrarTodosLosBotones() ? 'Ocultar' : 'Ver más' }}</span>
+      <i class="fa-solid" [class.fa-chevron-down]="!mostrarTodosLosBotones()" [class.fa-chevron-up]="mostrarTodosLosBotones()"></i>
+    </button>
   </div>
 
   

@@ -725,3 +725,31 @@
 .alumno-card__cta--premium:active {
   transform: scale(0.98);
 }
+
+.alumno-card__toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.alumno-card__toggle-btn {
+  background: none;
+  border: none;
+  color: var(--color-pizarra, #475569);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.alumno-card__toggle-btn:hover {
+  background-color: rgba(74, 111, 165, 0.08);
+  color: var(--color-pizarra-dark, #1e293b);
+}
+

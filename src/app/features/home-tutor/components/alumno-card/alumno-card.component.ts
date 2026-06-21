@@ -38,8 +38,13 @@ export class AlumnoCardComponent implements OnInit {
   creditoActivo = signal<SchoolCredit | null>(null);
   readonly subiendoFoto = signal(false);
   protected readonly fotoEvent = signal<Event | null>(null);
+  readonly mostrarTodosLosBotones = signal<boolean>(false);
 
   @ViewChild('inputFotoAlumno') private readonly inputFotoAlumno!: ElementRef<HTMLInputElement>;
+
+  protected toggleBotones(): void {
+    this.mostrarTodosLosBotones.update((v) => !v);
+  }
 
   ngOnInit(): void {
     if (this.alumno?.id) {
