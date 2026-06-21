@@ -21,6 +21,7 @@ export class SugerenciasPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly Math = Math;
 
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');

@@ -416,10 +416,17 @@
                     </span>
                     <div>
                       <small>Diferencia stock</small>
-                      <strong>{{
-                        ((presenter.estadisticasSeleccionadas?.stockActual ?? 0) -
-                          (presenter.estadisticasSeleccionadas?.stockPromedioCategoria ?? 0)) | number:'1.0-2'
-                      }}</strong>
+                      <strong>
+                        @if (((presenter.estadisticasSeleccionadas?.stockActual ?? 0) - (presenter.estadisticasSeleccionadas?.stockPromedioCategoria ?? 0)) < 0) {
+                          <span style="color: var(--color-menta); margin-right: 4px; font-size: 14px; vertical-align: middle;">▼ Por debajo:</span>
+                        } @else if (((presenter.estadisticasSeleccionadas?.stockActual ?? 0) - (presenter.estadisticasSeleccionadas?.stockPromedioCategoria ?? 0)) > 0) {
+                          <span style="color: var(--color-melocoton); margin-right: 4px; font-size: 14px; vertical-align: middle;">▲ Por encima:</span>
+                        }
+                        {{
+                          Math.abs((presenter.estadisticasSeleccionadas?.stockActual ?? 0) -
+                            (presenter.estadisticasSeleccionadas?.stockPromedioCategoria ?? 0)) | number:'1.0-2'
+                        }}
+                      </strong>
                     </div>
                   </article>
 
@@ -433,8 +440,13 @@
                         @if (
                           presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria !== null && presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria !== undefined
                         ) {
+                          @if ((presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria ?? 0) < 0) {
+                            <span style="color: var(--color-menta); margin-right: 4px; font-size: 14px; vertical-align: middle;">▼ Por debajo:</span>
+                          } @else if ((presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria ?? 0) > 0) {
+                            <span style="color: var(--color-melocoton); margin-right: 4px; font-size: 14px; vertical-align: middle;">▲ Por encima:</span>
+                          }
                           ${{
-                            presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria | number:'1.0-2'
+                            Math.abs(presenter.estadisticasSeleccionadas?.diferenciaPrecioCategoria ?? 0) | number:'1.0-2'
                           }}
                         } @else {
                           -
