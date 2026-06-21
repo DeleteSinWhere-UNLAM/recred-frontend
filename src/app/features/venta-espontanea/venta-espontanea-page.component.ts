@@ -194,7 +194,7 @@ import { DialogService } from '../../shared/services/dialog.service';
                   >
                     <div class="producto-card__media">
                       <img
-                        [src]="producto.imagen || 'assets/placeholder.png'"
+                        [src]="producto.imagen || 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png'"
                         alt="Producto"
                         class="producto-card__imagen"
                       />

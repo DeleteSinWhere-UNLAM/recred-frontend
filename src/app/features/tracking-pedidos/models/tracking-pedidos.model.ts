@@ -23,6 +23,7 @@ export interface ScheduledPickup {
   pickupSlotDescription: string;
   pickupDate: string;
   items: PurchaseItem[];
+  tipo?: 'ANTICIPADA' | 'PRESENCIAL';
 }
 
 export interface TimeSlotFilter {

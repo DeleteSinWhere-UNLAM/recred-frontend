@@ -1,12 +1,7 @@
 <header class="navbar" [class.navbar--kiosquero]="esVistaKiosquero()">
   <div class="navbar__inner">
     <div class="navbar__brand">
-      <a
-        class="navbar__logo"
-        href="/"
-        (click)="irAInicio($event)"
-        aria-label="RECRED — Inicio"
-      >
+      <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
         <img src="logoHeader.png" alt="" class="navbar__logo-img" />
         <span class="navbar__logo-text">RECRED</span>
       </a>
@@ -14,206 +9,139 @@
 
     <nav class="navbar__actions" aria-label="Acciones principales">
       @if (!esVistaAlumno() && !esVistaKiosquero()) {
-        <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']">
-          <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-          <span>Panel de Control</span>
-        </a>
-        <a class="navbar__movimientos-link" [routerLink]="['/movimientos']">
-          <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-          <span>Ver movimientos</span>
-        </a>
-        <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']">
-          <i class="fa-regular fa-heart" aria-hidden="true"></i>
-          <span>Carritos Favoritos</span>
-        </a>
+      <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']">
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        <span>Panel de Control</span>
+      </a>
+      <a class="navbar__movimientos-link" [routerLink]="['/movimientos']">
+        <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+        <span>Ver movimientos</span>
+      </a>
+      <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']">
+        <i class="fa-regular fa-heart" aria-hidden="true"></i>
+        <span>Carritos Favoritos</span>
+      </a>
       }
 
       @if (esVistaKiosquero()) {
-        <div class="navbar__kiosk-tools-wrap">
-          <button
-            type="button"
-            class="navbar__kiosk-tools"
-            aria-label="Promos"
-            [attr.aria-expanded]="menuKiosqueroAbierto()"
-            aria-haspopup="menu"
-            (click)="toggleMenuKiosquero()"
-          >
-            <i class="fa-solid fa-tags" aria-hidden="true"></i>
-            <span>Promos</span>
-            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+      <div class="navbar__kiosk-tools-wrap">
+        <button type="button" class="navbar__kiosk-tools" aria-label="Promos"
+          [attr.aria-expanded]="menuKiosqueroAbierto()" aria-haspopup="menu" (click)="toggleMenuKiosquero()">
+          <i class="fa-solid fa-tags" aria-hidden="true"></i>
+          <span>Promos</span>
+          <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        @if (menuKiosqueroAbierto()) {
+        <div class="navbar__menu navbar__menu--kiosk-tools" role="menu">
+          <button type="button" class="navbar__menu-item" role="menuitem" (click)="irARecomendacionesEstacionales()">
+            <i class="fa-solid fa-leaf" aria-hidden="true"></i>
+            <span>Recomendaciones estacionales</span>
+            <span class="navbar__premium-badge">PREMIUM</span>
           </button>
-          @if (menuKiosqueroAbierto()) {
-            <div class="navbar__menu navbar__menu--kiosk-tools" role="menu">
-              <button
-                type="button"
-                class="navbar__menu-item"
-                role="menuitem"
-                (click)="irARecomendacionesEstacionales()"
-              >
-                <i class="fa-solid fa-leaf" aria-hidden="true"></i>
-                <span>Recomendaciones estacionales</span>
-              </button>
-              <button
-                type="button"
-                class="navbar__menu-item"
-                role="menuitem"
-                (click)="irAPromociones()"
-              >
-                <i class="fa-solid fa-tags" aria-hidden="true"></i>
-                <span>Promociones</span>
-              </button>
-            </div>
-          }
+          <button type="button" class="navbar__menu-item" role="menuitem" (click)="irAPromociones()">
+            <i class="fa-solid fa-tags" aria-hidden="true"></i>
+            <span>Promociones</span>
+            <span class="navbar__premium-badge">PREMIUM</span>
+          </button>
         </div>
+        }
+      </div>
       }
 
       <div class="navbar__notif-wrap">
-        <button
-          type="button"
-          class="navbar__notif"
-          [class.navbar__notif--wide]="esVistaKiosquero()"
-          [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'"
-          [attr.aria-expanded]="menuNotifAbierto()"
-          aria-haspopup="menu"
-          (click)="toggleNotificaciones()"
-        >
+        <button type="button" class="navbar__notif" [class.navbar__notif--wide]="esVistaKiosquero()"
+          [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'" [attr.aria-expanded]="menuNotifAbierto()"
+          aria-haspopup="menu" (click)="toggleNotificaciones()">
           <i class="fa-solid fa-bell" aria-hidden="true"></i>
           @if (esVistaKiosquero()) {
-            <span>Notificaciones</span>
+          <span>Notificaciones</span>
           }
           @if (notifCount() > 0) {
-            <span class="navbar__notif-badge">{{ notifCount() }}</span>
+          <span class="navbar__notif-badge">{{ notifCount() }}</span>
           }
         </button>
         @if (menuNotifAbierto()) {
-          <div class="navbar__menu navbar__menu--notif" role="menu">
-            <p class="navbar__menu-titulo">Notificaciones</p>
-            @if (notifCount() === 0) {
-              <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
-            } @else {
-              <div class="navbar__notif-list">
-                @for (notif of notificaciones(); track notif.id || $index) {
-                  <button
-                    type="button"
-                    class="navbar__notif-item"
-                    [class.navbar__notif-item--clickable]="notif.tipo === 'RESUMEN_SEMANAL'"
-                    (click)="clickEnNotificacion(notif)"
-                  >
-                    <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
-                    <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>
-                  </button>
-                }
-              </div>
+        <div class="navbar__menu navbar__menu--notif" role="menu">
+          <p class="navbar__menu-titulo">Notificaciones</p>
+          @if (notifCount() === 0) {
+          <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
+          } @else {
+          <div class="navbar__notif-list">
+            @for (notif of notificaciones(); track notif.id || $index) {
+            <button type="button" class="navbar__notif-item"
+              [class.navbar__notif-item--clickable]="notif.tipo === 'RESUMEN_SEMANAL'"
+              (click)="clickEnNotificacion(notif)">
+              <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
+              <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>
+            </button>
             }
           </div>
+          }
+        </div>
         }
       </div>
 
       @if (!esVistaKiosquero()) {
-        <button
-          type="button"
-          class="navbar__cart"
-          (click)="irAlCarrito()"
-          [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'"
-        >
-          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-          @if (cartCount() > 0) {
-            <span class="navbar__cart-badge">{{ cartCount() }}</span>
-          }
-        </button>
+      <button type="button" class="navbar__cart" (click)="irAlCarrito()"
+        [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'">
+        <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+        @if (cartCount() > 0) {
+        <span class="navbar__cart-badge">{{ cartCount() }}</span>
+        }
+      </button>
       }
 
       <div class="navbar__perfil-wrap">
-        <button
-          type="button"
-          class="navbar__perfil"
-          aria-label="Mi perfil"
-          [attr.aria-expanded]="menuAbierto()"
-          aria-haspopup="menu"
-          (click)="toggleMenu()"
-        >
+        <button type="button" class="navbar__perfil" aria-label="Mi perfil" [attr.aria-expanded]="menuAbierto()"
+          aria-haspopup="menu" (click)="toggleMenu()">
           <i class="fa-solid fa-user" aria-hidden="true"></i>
         </button>
         @if (menuAbierto()) {
-          <div class="navbar__menu" role="menu">
-            <button
-              type="button"
-              class="navbar__menu-item"
-              role="menuitem"
-              (click)="irAPerfil()"
-            >
-              <i class="fa-solid fa-id-card" aria-hidden="true"></i>
-              <span>Mi perfil</span>
+        <div class="navbar__menu" role="menu">
+          <button type="button" class="navbar__menu-item" role="menuitem" (click)="irAPerfil()">
+            <i class="fa-solid fa-id-card" aria-hidden="true"></i>
+            <span>Mi perfil</span>
+          </button>
+          @if (esVistaAlumno()) {
+          <button type="button" class="navbar__menu-item" role="menuitem" (click)="irABilletera()">
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Mi billetera</span>
+          </button>
+          } @else if (!esVistaKiosquero()) {
+          <button type="button" class="navbar__menu-item" role="menuitem" [attr.aria-expanded]="menuBilleteraAbierto()"
+            aria-haspopup="menu" (click)="toggleMenuBilletera()">
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Billetera de mis hijos</span>
+            <i class="fa-solid navbar__menu-item-chevron" [class.fa-chevron-up]="menuBilleteraAbierto()"
+              [class.fa-chevron-down]="!menuBilleteraAbierto()" aria-hidden="true"></i>
+          </button>
+          @if (menuBilleteraAbierto()) {
+          <div class="navbar__submenu" role="menu">
+            @if (alumnos().length === 0) {
+            <p class="navbar__submenu-vacio">Cargando hijos…</p>
+            } @else {
+            @for (hijo of alumnos(); track hijo.id) {
+            <button type="button" class="navbar__menu-item navbar__submenu-item" role="menuitem"
+              (click)="irABilleteraDeHijo(hijo.id)">
+              <i class="fa-solid fa-user" aria-hidden="true"></i>
+              <span>{{ hijo.nombre }} {{ hijo.apellido }}</span>
             </button>
-            @if (esVistaAlumno()) {
-              <button
-                type="button"
-                class="navbar__menu-item"
-                role="menuitem"
-                (click)="irABilletera()"
-              >
-                <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-                <span>Mi billetera</span>
-              </button>
-            } @else if (!esVistaKiosquero()) {
-              <button
-                type="button"
-                class="navbar__menu-item"
-                role="menuitem"
-                [attr.aria-expanded]="menuBilleteraAbierto()"
-                aria-haspopup="menu"
-                (click)="toggleMenuBilletera()"
-              >
-                <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-                <span>Billetera de mis hijos</span>
-                <i
-                  class="fa-solid navbar__menu-item-chevron"
-                  [class.fa-chevron-up]="menuBilleteraAbierto()"
-                  [class.fa-chevron-down]="!menuBilleteraAbierto()"
-                  aria-hidden="true"
-                ></i>
-              </button>
-              @if (menuBilleteraAbierto()) {
-                <div class="navbar__submenu" role="menu">
-                  @if (alumnos().length === 0) {
-                    <p class="navbar__submenu-vacio">Cargando hijos…</p>
-                  } @else {
-                    @for (hijo of alumnos(); track hijo.id) {
-                      <button
-                        type="button"
-                        class="navbar__menu-item navbar__submenu-item"
-                        role="menuitem"
-                        (click)="irABilleteraDeHijo(hijo.id)"
-                      >
-                        <i class="fa-solid fa-user" aria-hidden="true"></i>
-                        <span>{{ hijo.nombre }} {{ hijo.apellido }}</span>
-                      </button>
-                    }
-                  }
-                </div>
-              }
             }
-            @if (!esVistaAlumno()) {
-              <button
-                type="button"
-                class="navbar__menu-item"
-                role="menuitem"
-                (click)="irAPremium()"
-              >
-                <i class="fa-solid fa-star" aria-hidden="true"></i>
-                <span>Premium</span>
-              </button>
             }
-            <button
-              type="button"
-              class="navbar__menu-item"
-              role="menuitem"
-              (click)="cerrarSesion()"
-            >
-              <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
-              <span>Cerrar sesión</span>
-            </button>
           </div>
+          }
+          }
+          @if (!esVistaAlumno()) {
+          <button type="button" class="navbar__menu-item" role="menuitem" (click)="irAPremium()">
+            <i class="fa-solid fa-star" aria-hidden="true"></i>
+            <span>Suscripción</span>
+          </button>
+          }
+          <button type="button" class="navbar__menu-item" role="menuitem" (click)="cerrarSesion()">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
         }
       </div>
     </nav>

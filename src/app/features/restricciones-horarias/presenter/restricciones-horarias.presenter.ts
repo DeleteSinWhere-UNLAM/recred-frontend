@@ -31,6 +31,7 @@ export class RestriccionesHorariasPresenter {
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly franjasState = signal<TimeSlot[]>([]);
   private readonly restriccionesState = signal<RestriccionHoraria[]>([]);
+  private readonly draftRestricciones = signal<RestriccionHoraria[]>([]);
   private readonly cargandoState = signal<boolean>(false);
 
   private readonly catalogoSaludState = signal<ClasificacionSaludBackend[]>([]);
@@ -49,7 +50,7 @@ export class RestriccionesHorariasPresenter {
 
   readonly franjasConRestricciones = computed<FranjaConRestricciones[]>(() => {
     const franjas = this.franjasState();
-    const restricciones = this.restriccionesState();
+    const restricciones = this.draftRestricciones();
 
     const activas = restricciones.filter(r => r.activa !== false);
 
@@ -102,6 +103,7 @@ export class RestriccionesHorariasPresenter {
         console.log('Datos cargados (RAW):', restricciones);
         this.franjasState.set(franjas);
         this.restriccionesState.set(restricciones || []);
+        this.draftRestricciones.set(JSON.parse(JSON.stringify(restricciones || [])));
         this.catalogoSaludState.set(catalogo);
         this.saludGlobalAlumnoState.set(globales || []);
         this.categoriasState.set(categorias.map(c => ({ id: c.id, descripcion: c.descripcion })));
@@ -113,37 +115,23 @@ export class RestriccionesHorariasPresenter {
     }
   }
 
-  async agregarRestriccion(franjaId: string, tipo: 'CATEGORIA' | 'SALUD' | 'TOTAL', valorId?: string | null): Promise<void> {
+  agregarRestriccion(franjaId: string, tipo: 'CATEGORIA' | 'SALUD' | 'TOTAL', valorId?: string | null): void {
     const alumno = this.alumnoState();
     if (!alumno) return;
 
-    this.cargandoState.set(true);
-    try {
-      await this.restriccionesService.crearRestriccion({
-        studentId: alumno.id,
-        timeSlotId: franjaId,
-        categoryId: tipo === 'CATEGORIA' ? (valorId || null) : null,
-        classificationId: tipo === 'SALUD' ? (valorId || null) : null
-      });
+    const nuevaId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const nueva: RestriccionHoraria = {
+      id: nuevaId,
+      studentId: alumno.id,
+      timeSlotId: franjaId,
+      categoryId: tipo === 'CATEGORIA' ? (valorId || null) : null,
+      classificationId: tipo === 'SALUD' ? (valorId || null) : null,
+      activa: true,
+      categoria: tipo === 'CATEGORIA' && valorId ? this.categorias().find(c => c.id === valorId) : undefined,
+      clasificacionSalud: tipo === 'SALUD' && valorId ? this.catalogoSaludState().find(s => s.id === valorId) : undefined
+    };
 
-      const actualizadas = await this.restriccionesService.getRestriccionesPorAlumno(alumno.id);
-      this.restriccionesState.set(actualizadas);
-    } catch (err) {
-      const error = err as import('@angular/common/http').HttpErrorResponse;
-      if (error.status === 409) {
-        console.error('Conflicto detectado en el backend:', error.error);
-        const mensajeBack = error.error?.mensaje || 'Una de las restricciones ya existe o hay un problema de integridad.';
-        await this.dialogService.alert(`No se pudo guardar: ${mensajeBack}`, 'Conflicto');
-      } else if (error.status === 400) {
-        const mensajeBack = error.error?.message || 'Error en los datos enviados. Es posible que falten campos obligatorios.';
-        await this.dialogService.alert(`No se pudo guardar: ${mensajeBack}`, 'Error de Datos');
-      } else {
-        console.error('Error al crear restriccion horaria:', error);
-        await this.dialogService.alert('Ocurrió un error inesperado al intentar guardar. Revisá los logs.', 'Error Inesperado');
-      }
-    } finally {
-      this.cargandoState.set(false);
-    }
+    this.draftRestricciones.update(actual => [...actual, nueva]);
   }
 
   getNombreCategoria(id: string): string {
@@ -154,18 +142,81 @@ export class RestriccionesHorariasPresenter {
     return this.catalogoSaludState().find(c => c.id === id)?.descripcion ?? 'Restricción';
   }
 
-  async quitarRestriccion(id: string): Promise<void> {
-    const confirmacion = await this.dialogService.confirm('¿Estás seguro de que deseas eliminar esta restricción?', 'Eliminar Restricción');
-    if (!confirmacion) return;
+  quitarRestriccion(id: string): void {
+    this.draftRestricciones.update(actual => actual.filter(r => r.id !== id));
+  }
+
+  isManageableRestriction(r: RestriccionHoraria): boolean {
+    const categories = this.categorias();
+    const health = this.catalogoSaludState();
+
+    const catBebidas = categories.find(c => c.descripcion.toLowerCase().includes('bebida') || c.descripcion.toLowerCase().includes('gaseosa'));
+    const catSnacks = categories.find(c => c.descripcion.toLowerCase().includes('snack') || c.descripcion.toLowerCase().includes('papa'));
+    const catGolosinas = categories.find(c => c.descripcion.toLowerCase().includes('golosina') || c.descripcion.toLowerCase().includes('dulce') || c.descripcion.toLowerCase().includes('chocolate'));
+
+    const salTacc = health.find(s => s.descripcion.toLowerCase().includes('tacc') || s.descripcion.toLowerCase().includes('gluten'));
+    const salAzucar = health.find(s => s.descripcion.toLowerCase().includes('azucar') || s.descripcion.toLowerCase().includes('diabet'));
+    const salSodio = health.find(s => s.descripcion.toLowerCase().includes('sodio') || s.descripcion.toLowerCase().includes('sal'));
+    const salLacteos = health.find(s => s.descripcion.toLowerCase().includes('lacteo') || s.descripcion.toLowerCase().includes('leche'));
+
+    const manageableIds = new Set<string>();
+    if (catBebidas) manageableIds.add(catBebidas.id);
+    if (catSnacks) manageableIds.add(catSnacks.id);
+    if (catGolosinas) manageableIds.add(catGolosinas.id);
+    if (salTacc) manageableIds.add(salTacc.id);
+    if (salAzucar) manageableIds.add(salAzucar.id);
+    if (salSodio) manageableIds.add(salSodio.id);
+    if (salLacteos) manageableIds.add(salLacteos.id);
+
+    const valId = r.categoryId || r.classificationId || r.categoria?.id || r.clasificacionSalud?.id;
+    return !!valId && manageableIds.has(valId);
+  }
+
+  async guardarCambios(): Promise<boolean> {
+    const alumno = this.alumnoState();
+    if (!alumno) return false;
 
     this.cargandoState.set(true);
     try {
-      await this.restriccionesService.deshabilitarRestriccion(id);
-      this.restriccionesState.update(actual => actual.filter(r => r.id !== id));
-      await this.dialogService.alert('Restricción eliminada con éxito.', 'Éxito');
+      const originales = this.restriccionesState();
+      const actual = this.draftRestricciones();
+
+      // Find deleted manageable restrictions
+      const eliminadas = originales.filter(orig => 
+        this.isManageableRestriction(orig) && !actual.some(act => act.id === orig.id)
+      );
+
+      // Find added restrictions
+      const agregadas = actual.filter(act => 
+        act.id.startsWith('temp-') || !originales.some(orig => orig.id === act.id)
+      );
+
+      // Execute deletions
+      for (const r of eliminadas) {
+        await this.restriccionesService.deshabilitarRestriccion(r.id);
+      }
+
+      // Execute additions
+      for (const r of agregadas) {
+        await this.restriccionesService.crearRestriccion({
+          studentId: alumno.id,
+          timeSlotId: r.timeSlotId!,
+          categoryId: r.categoryId,
+          classificationId: r.classificationId
+        });
+      }
+
+      // Reload
+      const actualizadas = await this.restriccionesService.getRestriccionesPorAlumno(alumno.id);
+      this.restriccionesState.set(actualizadas);
+      this.draftRestricciones.set(JSON.parse(JSON.stringify(actualizadas)));
+
+      await this.dialogService.alert('Configuración guardada con éxito.', 'Éxito');
+      return true;
     } catch (error) {
-      console.error('Error al eliminar restricción:', error);
-      await this.dialogService.alert('No se pudo eliminar la restricción. Intentá de nuevo más tarde.', 'Error');
+      console.error('Error al guardar cambios de restricciones horarias:', error);
+      await this.dialogService.alert('Ocurrió un error al intentar guardar los cambios. Intentá de nuevo más tarde.', 'Error');
+      return false;
     } finally {
       this.cargandoState.set(false);
     }

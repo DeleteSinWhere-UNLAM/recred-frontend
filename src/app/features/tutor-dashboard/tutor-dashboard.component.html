@@ -55,7 +55,7 @@
             
             <div class="alumno-card__identidad">
               <div class="alumno-card__avatar-wrap">
-                <div class="alumno-card__avatar">
+                <div class="alumno-card__avatar" [class.alumno-card__avatar--premium]="esPremium">
                   @if (child.urlFotoPerfil) {
                     <img [src]="child.urlFotoPerfil" [alt]="'Foto de ' + child.studentName" class="alumno-card__avatar--foto" />
                   } @else {

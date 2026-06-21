@@ -38,7 +38,10 @@
               <i class="fa-solid fa-chart-pie"></i>
             </span>
             <div>
-              <h2 id="kr-title">Resumen comercial</h2>
+              <div class="kr__title-container">
+                <h2 id="kr-title">Resumen comercial</h2>
+                <span class="kr__premium-badge">PREMIUM</span>
+              </div>
             </div>
 
             <div class="kr__summary-actions">
@@ -546,7 +549,11 @@
               </div>
             </div>
 
-            <div class="kr__trend-cards" aria-label="Detalle diario de ventas">
+            <div
+              class="kr__trend-cards"
+              [class.kr__trend-cards--scroll]="presenter.trendDays().length > 7"
+              aria-label="Detalle diario de ventas"
+            >
               @for (day of presenter.trendDays(); track day.date) {
                 <article
                   class="kr__trend-card"

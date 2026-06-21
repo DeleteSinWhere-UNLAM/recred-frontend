@@ -400,3 +400,18 @@
     max-height: calc(100vh - 32px - 84px);
   }
 }
+
+.asistente-panel__opcion--premium {
+  background: linear-gradient(135deg, #FFFDF0 0%, #FFF9D4 100%);
+  border-color: #D4AF37;
+  color: #856404;
+  box-shadow: 0 2px 5px rgba(212, 175, 55, 0.15);
+}
+
+.asistente-panel__opcion--premium:hover:not(:disabled) {
+  background: linear-gradient(135deg, #FFF9D4 0%, #FFEFA3 100%);
+  border-color: #B8860B;
+  box-shadow: 0 6px 14px rgba(212, 175, 55, 0.3);
+}
+
+
