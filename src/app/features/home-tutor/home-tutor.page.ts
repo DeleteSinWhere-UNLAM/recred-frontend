@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { signal } from '@angular/core';
 import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
@@ -42,6 +43,9 @@ export class HomeTutorPage implements OnInit {
   private readonly alumnosService = inject(AlumnosService);
 
   private readonly alumnos = this.alumnosService.alumnos;
+
+  readonly cargando = signal(false);
+  readonly error = signal<string | null>(null);
 
   readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
   
@@ -95,6 +99,16 @@ export class HomeTutorPage implements OnInit {
   }
 
   ngOnInit(): void {
-    void this.alumnosService.asegurarCargados(true);
+    this.cargando.set(true);
+    this.alumnosService.asegurarCargados(true).then(() => {
+      this.cargando.set(false);
+    }).catch(err => {
+      this.error.set('Error al cargar alumnos');
+      this.cargando.set(false);
+    });
+  }
+
+  manejarMicrocredito(event: any): void {
+    console.log('manejarMicrocredito', event);
   }
 }

@@ -12,23 +12,6 @@
       [saldoTotalNegativo]="saldoTotalNegativo()"
     />
 
-    <a routerLink="/resumen-semanal" class="home__resumen-card">
-      <div class="home__resumen-card-content">
-        <div class="home__resumen-card-icon" aria-hidden="true">
-          <i class="fa-solid fa-chart-pie"></i>
-        </div>
-        <span>Conoce tu resumen semanal</span>
-      </div>
-      <i class="fa-solid fa-arrow-right home__resumen-card-arrow" aria-hidden="true"></i>
-    </a>
-
-    <div class="home__subtitulo-row">
-      <h2 class="home__subtitulo">Alumnos asignados</h2>
-      <button class="btn-secundario" (click)="irACrearHijo()">
-        <i class="fa-solid fa-plus" aria-hidden="true"></i>
-        Agregar Alumno
-      </button>
-    </div>
 
     @if (cargando()) {
       <div class="home__estado">
@@ -40,7 +23,7 @@
         <i class="fa-solid fa-triangle-exclamation"></i>
         <p>{{ error() }}</p>
       </div>
-    } @else if (colegios().length === 0) {
+    } @else if (grupos().length === 0) {
       <div class="home__estado">
         <i class="fa-solid fa-graduation-cap"></i>
         <p>Aún no tienes alumnos asignados a tu cuenta.</p>
@@ -48,10 +31,10 @@
     } @else {
       <div class="home__master-detail">
         <div class="home__sidebar">
-          @for (col of colegios(); track col.colegioId) {
+          @for (grupo of grupos(); track grupo.colegio.id) {
             <app-colegio-section
-              [colegioNombre]="col.colegioNombre"
-              [alumnos]="col.alumnos"
+              [colegio]="grupo.colegio"
+              [alumnos]="grupo.alumnos"
               (onAdelanto)="manejarMicrocredito($event)"
             />
           }
