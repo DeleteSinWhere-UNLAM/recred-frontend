@@ -11,193 +11,149 @@
   </button>
 
   <div class="restricciones__container">
-    
-    
-    <header class="restricciones__header">
-      <h1 class="restricciones__titulo">Límites y Horarios</h1>
-      <p class="restricciones__subtitulo">
-        Configurá qué puede comprar <strong>{{ presenter.alumno()?.nombre }}</strong> en cada recreo.
-      </p>
-    </header>
-
     @if (presenter.cargando()) {
       <div class="restricciones__loading">
         <i class="fa-solid fa-circle-notch fa-spin"></i>
         <span>Cargando configuración...</span>
       </div>
     } @else {
-      
-      @if (activeItem(); as item) {
-        <article class="franja-card">
-          
-          
-          <nav class="restricciones__tabs" aria-label="Recreos de compra">
-            @for (slot of presenter.franjasConRestricciones(); track slot.franja.id) {
+      <!-- Main layout card -->
+      <div class="restricciones-card">
+        
+        <!-- Profile Header -->
+        <header class="alumno-header">
+          <div class="alumno-header__avatar" [class.alumno-header__avatar--premium]="esPremium()">
+            @if (presenter.alumno()?.urlFotoPerfil) {
+              <img [src]="presenter.alumno()?.urlFotoPerfil" [alt]="'Foto de ' + presenter.alumno()?.nombre" class="alumno-header__avatar-img" />
+            } @else {
+              <span class="alumno-header__avatar-placeholder">
+                <i class="fa-solid fa-user"></i>
+              </span>
+            }
+          </div>
+          <div class="alumno-header__identidad">
+            <h2 class="alumno-header__nombre">
+              {{ presenter.alumno()?.nombre }} {{ presenter.alumno()?.apellido }}
+            </h2>
+            @if (presenter.alumno()?.grado) {
+              <p class="alumno-header__grado">
+                <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+                <span>{{ presenter.alumno()?.grado }}</span>
+              </p>
+            }
+          </div>
+        </header>
+
+        <h1 class="restricciones-titulo">Configuración de Recreos y Restricciones</h1>
+
+        <!-- Accordions List -->
+        <div class="recreos-accordions">
+          @for (slot of presenter.franjasConRestricciones(); track slot.franja.id) {
+            <div class="accordion-item" [class.accordion-item--expanded]="selectedFranjaId() === slot.franja.id">
+              
+              <!-- Accordion Header -->
               <button
                 type="button"
-                class="tab-btn"
-                [class.tab-btn--active]="selectedFranjaId() === slot.franja.id"
-                (click)="selectedFranjaId.set(slot.franja.id)"
+                class="accordion-header"
+                (click)="toggleAccordion(slot.franja.id)"
+                [attr.aria-expanded]="selectedFranjaId() === slot.franja.id"
               >
-                {{ slot.franja.descripcion }}
+                <span class="accordion-header__title">{{ slot.franja.descripcion }}</span>
+                <div class="accordion-header__right">
+                  @if (selectedFranjaId() !== slot.franja.id) {
+                    <span class="accordion-header__summary" [class.accordion-header__summary--active]="slot.restricciones.length > 0">
+                      @if (slot.restricciones.length > 0) {
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                      }
+                      <span>{{ getRestriccionesSummaryText(slot) }}</span>
+                    </span>
+                  }
+                  <i class="fa-solid fa-chevron-down accordion-header__arrow"></i>
+                </div>
               </button>
-            }
-          </nav>
 
-          
-          <header class="franja-card__header">
-            <div class="franja-card__info">
-              <h2 class="franja-card__nombre">{{ item.franja.descripcion }}</h2>
-              <p class="franja-card__horario">
-                <i class="fa-regular fa-clock" aria-hidden="true"></i>
-                <span>{{ item.franja.horaInicio }} - {{ item.franja.horaFin }}</span>
-              </p>
-            </div>
-            
-            <span class="franja-card__badge" 
-                  [class.franja-card__badge--activo]="item.restricciones.length > 0"
-                  [class.franja-card__badge--libre]="item.restricciones.length === 0">
-              @if (item.restricciones.length === 0) {
-                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                <span>0 restricciones</span>
-              } @else {
-                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                <span>{{ item.restricciones.length }} {{ item.restricciones.length === 1 ? 'restricción' : 'restricciones' }}</span>
-              }
-            </span>
-          </header>
-
-          <div class="franja-card__contenido">
-            
-            
-            @if (item.restricciones.length === 0) {
-              <div class="franja-card__libertad" role="status">
-                <div class="libertad-circle" aria-hidden="true">
-                  <i class="fa-solid fa-check"></i>
-                </div>
-                <p class="libertad-text">
-                  {{ presenter.alumno()?.nombre }} tiene total libertad de compra en este recreo.
-                </p>
-              </div>
-            }
-
-            
-            <section class="quick-blocks-section" aria-label="Bloqueos rápidos">
-              <h3 class="quick-blocks-titulo">Bloquear compra de:</h3>
-              <div class="quick-blocks-grid">
-                @for (toggle of quickToggles(); track toggle.id) {
-                  <div class="quick-block-card" [class.quick-block-card--checked]="toggle.checked">
-                    <div class="quick-block-card__icono-container" [class]="'quick-block-card__icono-container--' + toggle.color" aria-hidden="true">
-                      <i class="fa-solid {{ toggle.icon }}"></i>
-                    </div>
-                    <span class="quick-block-card__titulo">{{ toggle.titulo }}</span>
-                    <label class="toggle">
-                      <input
-                        type="checkbox"
-                        class="toggle__input"
-                        [checked]="toggle.checked"
-                        (change)="alternarToggle(toggle)"
-                        [attr.aria-label]="'Bloquear ' + toggle.titulo"
-                      />
-                      <span class="toggle__slider" aria-hidden="true"></span>
-                    </label>
+              <!-- Accordion Body -->
+              @if (selectedFranjaId() === slot.franja.id) {
+                <div class="accordion-body">
+                  <div class="franja-card__horario">
+                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                    <span>{{ slot.franja.horaInicio }} - {{ slot.franja.horaFin }}</span>
                   </div>
-                }
-              </div>
-            </section>
 
-            
-            @if (item.restricciones.length > 0) {
-              <section class="restricciones-lista" aria-label="Restricciones activas">
-                <h3 class="restricciones-lista__titulo">Restricciones activas:</h3>
-                <div class="restricciones-lista__grid">
-                  @if (item.tieneBloqueoTotal) {
-                    <div class="restriccion-item-card restriccion-item-card--total">
-                      <div class="restriccion-item-card__info">
-                        <i class="fa-solid fa-ban" aria-hidden="true"></i>
-                        <span>Bloqueo total de compras</span>
-                      </div>
-                      <button 
-                        type="button" 
-                        class="restriccion-item-card__btn-quitar" 
-                        (click)="quitarBloqueoTotal(item)"
-                        title="Quitar bloqueo total"
-                      >
-                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  }
-                  
-                  @for (res of item.restricciones; track res.id) {
-                    @if (res.categoria || res.clasificacionSalud || res.categoryId || res.classificationId) {
-                      <div class="restriccion-item-card">
-                        <div class="restriccion-item-card__info">
-                          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                          <span>
-                            {{ res.categoria ? res.categoria.descripcion : (res.categoryId ? presenter.getNombreCategoria(res.categoryId) : (res.clasificacionSalud ? res.clasificacionSalud.descripcion : (res.classificationId ? presenter.getNombreSalud(res.classificationId) : 'Restricción'))) }}
-                          </span>
+                  <!-- Nivel 1: Categorías de Productos a Bloquear -->
+                  <section class="quick-blocks-section">
+                    <h3 class="quick-blocks-titulo">1. Categorías de Productos a Bloquear (Nivel 1):</h3>
+                    <div class="quick-blocks-grid">
+                      @for (toggle of getNivel1Toggles(slot); track toggle.id) {
+                        <div class="quick-block-card" [class.quick-block-card--checked]="toggle.checked">
+                          <div class="quick-block-card__icono-container" [class]="'quick-block-card__icono-container--' + toggle.color" aria-hidden="true">
+                            <i class="fa-solid {{ toggle.icon }}"></i>
+                          </div>
+                          <span class="quick-block-card__titulo">{{ toggle.titulo }}</span>
+                          <label class="toggle">
+                            <input
+                              type="checkbox"
+                              class="toggle__input"
+                              [checked]="toggle.checked"
+                              (change)="alternarToggle(toggle, slot.franja.id)"
+                              [attr.aria-label]="'Bloquear ' + toggle.titulo"
+                            />
+                            <span class="toggle__slider" aria-hidden="true"></span>
+                          </label>
                         </div>
-                        <button 
-                          type="button" 
-                          class="restriccion-item-card__btn-quitar" 
-                          (click)="presenter.quitarRestriccion(res.id)"
-                          title="Quitar restricción"
-                        >
-                          <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-                        </button>
-                      </div>
-                    }
-                  }
-                </div>
-              </section>
-            }
+                      }
+                    </div>
+                  </section>
 
-            
-            <footer class="franja-card__acciones">
-              <div class="add-restriction">
-                <div class="add-restriction__controles">
-                  <select 
-                    #selectTipo 
-                    class="add-restriction__select" 
-                    [id]="'selectTipo-' + item.franja.id"
-                    [disabled]="item.tieneBloqueoTotal"
-                    aria-label="Seleccionar bloqueo"
-                  >
-                    @if (item.tieneBloqueoTotal) {
-                      <option value="">Todas las compras están bloqueadas</option>
-                    } @else {
-                      <option value="">-- Seleccionar bloqueo --</option>
-                      <option value="ALL:all">🚫 Bloquear todas las compras</option>
-                      <optgroup label="Categorías">
-                        @for (cat of item.categoriasDisponibles; track cat.id) {
-                          <option [value]="'CAT:' + cat.id">{{ cat.descripcion }}</option>
-                        }
-                      </optgroup>
-                      <optgroup label="Salud">
-                        @for (salud of item.saludDisponible; track salud.id) {
-                          <option [value]="'SAL:' + salud.id">{{ salud.descripcion }}</option>
-                        }
-                      </optgroup>
-                    }
-                  </select>
-                  
-                  <button 
-                    type="button"
-                    class="add-restriction__btn" 
-                    [disabled]="item.tieneBloqueoTotal || !selectTipo.value"
-                    (click)="agregar(item.franja.id, selectTipo.value); selectTipo.value = ''"
-                  >
-                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                    <span>Agregar</span>
-                  </button>
+                  <!-- Nivel 2: Restricciones de Ingredientes -->
+                  <section class="nivel2-section">
+                    <h3 class="quick-blocks-titulo">2. Restricciones de Ingredientes (Nivel 2):</h3>
+                    <div class="nivel2-grid">
+                      @for (toggle of getNivel2Toggles(slot); track toggle.id) {
+                        <div class="nivel2-card" [class.nivel2-card--checked]="toggle.checked">
+                          <div class="nivel2-card__left">
+                            <div class="quick-block-card__icono-container" [class]="'quick-block-card__icono-container--' + toggle.color" aria-hidden="true">
+                              <i class="fa-solid {{ toggle.icon }}"></i>
+                            </div>
+                            <div class="nivel2-card__info">
+                              <span class="nivel2-card__titulo">{{ toggle.titulo }}</span>
+                              <span class="nivel2-card__desc">{{ toggle.descripcion }}</span>
+                            </div>
+                          </div>
+                          <label class="toggle">
+                            <input
+                              type="checkbox"
+                              class="toggle__input"
+                              [checked]="toggle.checked"
+                              (change)="alternarToggle(toggle, slot.franja.id)"
+                              [attr.aria-label]="'Bloquear ' + toggle.titulo"
+                            />
+                            <span class="toggle__slider" aria-hidden="true"></span>
+                          </label>
+                        </div>
+                      }
+                    </div>
+                  </section>
                 </div>
-              </div>
-            </footer>
+              }
+            </div>
+          }
+        </div>
 
-          </div>
-        </article>
-      }
+        <!-- Single Save Changes Button -->
+        <div class="restricciones-card__acciones">
+          <button
+            type="button"
+            class="btn-guardar-cambios"
+            [class.btn-guardar-cambios--premium]="esPremium()"
+            (click)="guardarCambios()"
+            [disabled]="presenter.cargando()"
+          >
+            Guardar Cambios
+          </button>
+        </div>
+
+      </div>
     }
-
   </div>
 </main>

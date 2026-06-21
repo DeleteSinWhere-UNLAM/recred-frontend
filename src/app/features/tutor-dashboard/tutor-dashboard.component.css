@@ -779,9 +779,15 @@
   letter-spacing: 0.5px;
   box-shadow:
     0 0 0 3px #ffffff,
-    0 0 0 5px var(--color-dorado, #f2b705),
     0 8px 16px rgba(74, 111, 165, 0.1);
   overflow: hidden;
+}
+
+.alumno-card__avatar--premium {
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 5px var(--color-dorado, #f2b705),
+    0 8px 16px rgba(74, 111, 165, 0.1) !important;
 }
 
 .alumno-card__avatar--foto {

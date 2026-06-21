@@ -46,8 +46,14 @@
   overflow: hidden;
   box-shadow:
     0 0 0 3px #ffffff,
-    0 0 0 5px var(--color-dorado),
     0 8px 16px rgba(74, 111, 165, 0.1);
+}
+
+.alumno-card__avatar--premium {
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 5px var(--color-dorado),
+    0 8px 16px rgba(74, 111, 165, 0.1) !important;
 }
 
 .alumno-card__avatar--foto {
@@ -180,6 +186,27 @@
 
 /* 3x3 Actions Grid */
 .alumno-card__acciones-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.alumno-card__extra-wrapper {
+  overflow: hidden;
+  max-height: 500px;
+  opacity: 1;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-in-out, margin-top 0.3s ease;
+  margin-top: 10px;
+}
+
+.alumno-card__extra-wrapper.collapsed {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  margin-top: 0 !important;
+  pointer-events: none;
+}
+
+.alumno-card__extra-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
@@ -345,7 +372,8 @@
     padding: 20px;
   }
   
-  .alumno-card__acciones-grid {
+  .alumno-card__acciones-grid,
+  .alumno-card__extra-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 

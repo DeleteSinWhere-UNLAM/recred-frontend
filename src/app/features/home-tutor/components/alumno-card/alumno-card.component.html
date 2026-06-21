@@ -6,11 +6,12 @@
         @if (fotoPerfil) {
           <img
             class="alumno-card__avatar alumno-card__avatar--foto"
+            [class.alumno-card__avatar--premium]="esPremium"
             [src]="fotoPerfil"
             [alt]="nombreCompleto"
           />
         } @else {
-          <div class="alumno-card__avatar">
+          <div class="alumno-card__avatar" [class.alumno-card__avatar--premium]="esPremium">
             <span>{{ iniciales }}</span>
           </div>
         }
@@ -79,7 +80,10 @@
       <span class="alumno-card__btn-label">Movimientos</span>
     </a>
 
-    @if (mostrarTodosLosBotones()) {
+  </div>
+
+  <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
+    <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
       <a class="alumno-card__btn alumno-card__btn--azul" [routerLink]="['/restricciones-horarias', alumno.id]">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-clock"></i>
@@ -141,7 +145,7 @@
           <span class="alumno-card__btn-label">Microcrédito</span>
         </button>
       }
-    }
+    </div>
   </div>
 
   <div class="alumno-card__toggle-wrapper">
