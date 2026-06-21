@@ -3211,3 +3211,25 @@ strong.kr__purchase-percent {
     min-width: 0;
   }
 }
+
+.kr__title-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.kr__premium-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  color: #1e293b;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
+}
