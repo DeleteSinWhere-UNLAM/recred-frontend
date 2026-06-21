@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
@@ -95,6 +95,26 @@ export class HomeTutorPage implements OnInit {
   readonly saldoTotal = computed(() => this.alumnos().reduce((sum, a) => sum + a.saldo, 0));
   readonly saldoTotalFormateado = computed(() => formateadorSaldo.format(this.saldoTotal()));
   readonly saldoTotalNegativo = computed(() => this.saldoTotal() < 0);
+
+  readonly colegiosColapsados = signal<Record<string, boolean>>({});
+
+  isColegioExpandido(colegioId: string): boolean {
+    return !this.colegiosColapsados()[colegioId];
+  }
+
+  toggleColegio(colegioId: string): void {
+    this.colegiosColapsados.update(map => ({
+      ...map,
+      [colegioId]: !map[colegioId]
+    }));
+  }
+
+  readonly todosColegiosCerrados = computed(() => {
+    const gruposList = this.grupos();
+    if (gruposList.length === 0) return false;
+    const colapsados = this.colegiosColapsados();
+    return gruposList.every(g => colapsados[g.colegio.id] === true);
+  });
 
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
