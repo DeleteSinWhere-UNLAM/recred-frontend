@@ -154,6 +154,10 @@ export class BuffetPresenter {
     });
   });
 
+  readonly tieneRestriccionesHorarias = computed(() => {
+    return this.restriccionesHorariasInformativas().some((h) => h.bloqueado);
+  });
+
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
     return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';

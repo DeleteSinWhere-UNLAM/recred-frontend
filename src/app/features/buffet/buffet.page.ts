@@ -73,6 +73,57 @@ export class BuffetPage implements OnInit {
   protected readonly panelLateralCerrado = signal<boolean>(false);
   protected readonly diasCalendario = signal<DateCell[]>([]);
 
+  protected readonly presupuestoColapsado = signal(false);
+  protected readonly categoriasColapsado = signal(false);
+  protected readonly otrosLimitesColapsado = signal(true);
+
+  readonly presupuestoInfo = computed(() => {
+    const pres = this.presenter.presupuestoDisponible();
+    const saldoVal = this.presenter.saldo();
+
+    if (pres) {
+      const porcentajeDisponible = Math.max(0, 100 - pres.porcentajeConsumidoGeneral);
+      return {
+        hasBudget: true,
+        periodo: pres.periodo,
+        montoLimite: pres.montoLimiteGeneral,
+        montoDisponible: pres.montoDisponibleGeneral,
+        montoConsumido: pres.montoConsumidoGeneral,
+        porcentajeDisponible,
+        porcentajeConsumido: pres.porcentajeConsumidoGeneral,
+        reglasCategorias: pres.reglasCategorias,
+      };
+    } else {
+      return {
+        hasBudget: false,
+        periodo: 'General',
+        montoLimite: saldoVal,
+        montoDisponible: saldoVal,
+        montoConsumido: 0,
+        porcentajeDisponible: 100,
+        porcentajeConsumido: 0,
+        reglasCategorias: [] as any[],
+      };
+    }
+  });
+
+  protected getCategoryIcon(descripcion: string): string {
+    const desc = (descripcion || '').toLowerCase();
+    if (desc.includes('bebida') || desc.includes('infusion') || desc.includes('jugo') || desc.includes('agua')) {
+      return 'fa-solid fa-bottle-water';
+    }
+    if (desc.includes('snack') || desc.includes('galletita') || desc.includes('papa')) {
+      return 'fa-solid fa-cookie-bite';
+    }
+    if (desc.includes('golosina') || desc.includes('dulce') || desc.includes('chocolate') || desc.includes('caramelo')) {
+      return 'fa-solid fa-candy-cane';
+    }
+    if (desc.includes('comida') || desc.includes('almuerzo') || desc.includes('plato') || desc.includes('sandwich')) {
+      return 'fa-solid fa-hamburger';
+    }
+    return 'fa-solid fa-utensils';
+  }
+
   // Carrusel de Promociones
   @ViewChild('promosContainer') promosContainer!: ElementRef<HTMLDivElement>;
   protected readonly activeSlideIndex = signal(0);

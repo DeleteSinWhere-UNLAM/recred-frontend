@@ -4,9 +4,9 @@
   <div class="buffet__container">
     <div class="buffet__layout-wrapper">
 
-      
+
       <div class="buffet__main-content">
-        
+
         <header class="buffet__cabecera">
           <button type="button" class="buffet__volver" (click)="presenter.volver()">
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -29,9 +29,10 @@
           <div class="buffet__alumno">
             <div class="buffet__avatar" aria-hidden="true">
               @if (presenter.urlFotoPerfil()) {
-                <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="buffet__avatar-img" />
+              <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()"
+                class="buffet__avatar-img" />
               } @else {
-                <span>{{ presenter.iniciales() }}</span>
+              <span>{{ presenter.iniciales() }}</span>
               }
             </div>
             <div class="buffet__alumno-textos">
@@ -56,17 +57,17 @@
           }
         </header>
 
-        
+
         <section class="buffet__filtros-container" aria-label="Filtros del menú">
           <div class="buffet__filtros-row">
-            
+
             <div class="buffet__filtro-item buffet__filtro-item--search">
               <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
               <input type="search" class="buffet__search-input" placeholder="Buscar por nombre..."
                 [value]="presenter.filtros().busqueda" (input)="onBusqueda($event)" aria-label="Buscar productos" />
             </div>
 
-            
+
             <div class="buffet__filtro-item buffet__filtro-item--price">
               <span class="price-prefix">$</span>
               <input type="number" class="buffet__price-input" placeholder="Mín"
@@ -83,7 +84,7 @@
                 aria-label="Precio máximo" />
             </div>
 
-            
+
             <div class="buffet__filtro-item buffet__filtro-item--select">
               <select class="buffet__select" [value]="presenter.filtros().categoriaId" (change)="onCategoria($event)"
                 aria-label="Filtrar por categoría">
@@ -94,14 +95,14 @@
               </select>
             </div>
 
-            
+
             <button type="button" class="buffet__favoritos-toggle" [class.active]="presenter.filtros().soloFavoritos"
               (click)="onToggleSoloFavoritos()" aria-label="Filtrar solo favoritos">
               <i class="fa-solid fa-heart" aria-hidden="true"></i>
               <span>FAVORITOS</span>
             </button>
 
-            
+
             <button type="button" class="buffet__limpiar-btn-inline" (click)="presenter.limpiarFiltros()"
               aria-label="Limpiar filtros">
               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
@@ -110,7 +111,49 @@
           </div>
         </section>
 
-        
+        @if (!esVistaAlumno() && presenter.alumno(); as alumno) {
+        <section class="buffet__restricciones-barra" aria-label="Restricciones del alumno">
+          <div class="buffet__restricciones-header">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+            <span class="buffet__restricciones-titulo">RESTRICCIONES DEL ALUMNO</span>
+          </div>
+          <div class="buffet__restricciones-badges">
+            <!-- Nutricionales -->
+            @if (presenter.restriccionesNutricionales().length > 0) {
+            @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
+            <span class="restriccion-pill-card restriccion-pill-card--danger">
+              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+              {{ rest.descripcion }}
+            </span>
+            }
+            } @else {
+            <span class="restriccion-pill-card restriccion-pill-card--success">
+              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+              Sin restricciones alimenticias
+            </span>
+            }
+
+            <!-- Horarias -->
+            @if (presenter.tieneRestriccionesHorarias()) {
+            @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
+            <span class="restriccion-pill-card" [class.restriccion-pill-card--success]="!horario.bloqueado"
+              [class.restriccion-pill-card--muted]="horario.bloqueado">
+              <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado"
+                [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
+              {{ horario.descripcion }}
+            </span>
+            }
+            } @else {
+            <span class="restriccion-pill-card restriccion-pill-card--success">
+              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+              Sin restricciones horarias
+            </span>
+            }
+          </div>
+        </section>
+        }
+
+
         <!-- Carrusel de Promociones Destacadas -->
         @if (promocionesDestacadasFiltradas().length > 0) {
         <section class="promos-seccion" aria-label="Promociones Destacadas">
@@ -120,8 +163,9 @@
           </div>
 
           <div class="promos-carousel-wrapper">
-            <button type="button" class="promos-carousel__nav promos-carousel__nav--left" 
-                    [disabled]="promocionesDestacadasFiltradas().length <= 1" (click)="scrollCarousel(-1)" aria-label="Anterior promoción">
+            <button type="button" class="promos-carousel__nav promos-carousel__nav--left"
+              [disabled]="promocionesDestacadasFiltradas().length <= 1" (click)="scrollCarousel(-1)"
+              aria-label="Anterior promoción">
               <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
             </button>
 
@@ -129,12 +173,13 @@
               @for (promo of promocionesDestacadasFiltradas(); track promo.id) {
               <article class="promo-card">
                 <!-- Color vertical banner / Left side -->
-                <div class="promo-card__banner" [class]="'promo-card__banner--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
+                <div class="promo-card__banner"
+                  [class]="'promo-card__banner--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
                   <span class="promo-card__badge-promo">PROMO</span>
                   <h4 class="promo-card__banner-title">{{ promo.nombre }}</h4>
                   <p class="promo-card__banner-desc">
                     @for (item of promo.itemsList; track $index) {
-                      + {{ item }}<br>
+                    + {{ item }}<br>
                     }
                   </p>
                 </div>
@@ -144,32 +189,33 @@
                   <div class="promo-card__media">
                     <img [src]="promo.imagen" [alt]="promo.nombre" class="promo-card__image" loading="lazy" />
                   </div>
-                  
+
                   <div class="promo-card__content">
                     <h4 class="promo-card__title">{{ promo.nombre }}</h4>
-                    
+
                     <div class="promo-card__footer">
                       <div class="promo-card__price-info">
                         <span class="promo-card__price-label">SALDO</span>
                         <div class="promo-card__price-value-container">
                           @if (promo.precioOriginal && promo.precioOriginal !== promo.precio) {
-                            <span class="promo-card__price-original">{{ formatARS(promo.precioOriginal) }}</span>
+                          <span class="promo-card__price-original">{{ formatARS(promo.precioOriginal) }}</span>
                           }
                           <span class="promo-card__price-value">{{ formatARS(promo.precio) }}</span>
                           @if (promo.descuento) {
-                            <span class="promo-card__discount-tag">{{ promo.descuento }}</span>
+                          <span class="promo-card__discount-tag">{{ promo.descuento }}</span>
                           }
                         </div>
                       </div>
 
                       @if (puedeComprarPromo(promo)) {
-                        <button type="button" class="promo-card__btn-agregar" [class.promo-card__btn-agregar--premium]="esPremium()" (click)="agregarPromoAlCarrito(promo)">
-                          Agregar Promo
-                        </button>
+                      <button type="button" class="promo-card__btn-agregar"
+                        [class.promo-card__btn-agregar--premium]="esPremium()" (click)="agregarPromoAlCarrito(promo)">
+                        Agregar Promo
+                      </button>
                       } @else {
-                        <button type="button" class="promo-card__btn-insuficiente" disabled>
-                          Saldo insuficiente
-                        </button>
+                      <button type="button" class="promo-card__btn-insuficiente" disabled>
+                        Saldo insuficiente
+                      </button>
                       }
                     </div>
                   </div>
@@ -178,8 +224,9 @@
               }
             </div>
 
-            <button type="button" class="promos-carousel__nav promos-carousel__nav--right" 
-                    [disabled]="promocionesDestacadasFiltradas().length <= 1" (click)="scrollCarousel(1)" aria-label="Siguiente promoción">
+            <button type="button" class="promos-carousel__nav promos-carousel__nav--right"
+              [disabled]="promocionesDestacadasFiltradas().length <= 1" (click)="scrollCarousel(1)"
+              aria-label="Siguiente promoción">
               <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
             </button>
           </div>
@@ -187,7 +234,7 @@
           <div class="promos-carousel__dots">
             @for (dot of promocionesDestacadasFiltradas(); track $index) {
             <button type="button" class="promos-carousel__dot" [class.active]="$index === activeSlideIndex()"
-                    (click)="scrollToSlide($index)" [attr.aria-label]="'Ir a la promoción ' + ($index + 1)"></button>
+              (click)="scrollToSlide($index)" [attr.aria-label]="'Ir a la promoción ' + ($index + 1)"></button>
             }
           </div>
         </section>
@@ -216,10 +263,11 @@
         }
       </div>
 
-      
+
       @if (presenter.alumno(); as alumno) {
       <aside class="buffet__sidebar" [class.closed]="panelLateralCerrado()">
-        <button type="button" class="buffet__sidebar-toggle-header" (click)="panelLateralCerrado.set(!panelLateralCerrado())">
+        <button type="button" class="buffet__sidebar-toggle-header"
+          (click)="panelLateralCerrado.set(!panelLateralCerrado())">
           <div class="buffet__sidebar-toggle-title">
             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
             <span>Ocultar</span>
@@ -229,120 +277,139 @@
         </button>
 
         <div class="buffet__sidebar-content">
-          
-          @if (presenter.presupuestoDisponible(); as presupuesto) {
-          <div class="buffet__sidebar-section">
-            <h3 class="buffet__sidebar-section-title">
-              <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-              Saldo Disponible
-            </h3>
-            <p class="buffet__sidebar-section-subtitle">
-              Período: <strong>{{ presupuesto.periodo }}</strong> (Límite total: {{
-              formatARS(presupuesto.montoLimiteGeneral) }})
-            </p>
 
-            <div class="buffet__sidebar-saldo-gauge-row">
-              <div class="buffet__sidebar-circle-gauge">
-                <svg class="circle-gauge-svg" viewBox="0 0 100 100">
-                  <circle class="circle-gauge-bg" cx="50" cy="50" r="42" stroke-width="8"></circle>
-                  <circle class="circle-gauge-fill" cx="50" cy="50" r="42" stroke-width="8"
-                    [style.strokeDashoffset]="263.89 - (263.89 * (presupuesto.porcentajeConsumidoGeneral || 0)) / 100"
-                    stroke-dasharray="263.89"
-                    [class.circle-gauge-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"
-                    transform="rotate(-90 50 50)"></circle>
-                </svg>
-                <div class="circle-gauge-text">
-                  <span class="circle-gauge-label">SALDO</span>
-                  <span class="circle-gauge-amount">{{ presenter.saldo() }}</span>
-                </div>
-              </div>
-
-              <div class="buffet__sidebar-saldo-detalles">
-                <div class="saldo-detalle-item">
-                  <span class="saldo-detalle-label">DISPONIBLE GENERAL</span>
-                  <span class="saldo-detalle-value"
-                    [class.saldo-detalle-value--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85">
-                    {{ formatARS(presupuesto.montoDisponibleGeneral) }}
-                  </span>
-                </div>
-                <div class="saldo-mini-bar-container">
-                  <div class="saldo-mini-bar">
-                    <div class="saldo-mini-bar-fill" [style.width.%]="presupuesto.porcentajeConsumidoGeneral"
-                      [class.saldo-mini-bar-fill--alerta]="presupuesto.porcentajeConsumidoGeneral >= 85"></div>
+          <!-- SECCIÓN 1: PRESUPUESTO DISPONIBLE (Acordeón) -->
+          @if (presupuestoInfo(); as info) {
+          <div class="buffet__sidebar-section-new">
+            <!-- Encabezado Acordeón -->
+            <button type="button" class="buffet__sidebar-section-header" 
+              (click)="presupuestoColapsado.set(!presupuestoColapsado())"
+              [attr.aria-expanded]="!presupuestoColapsado()">
+              <div class="header-left">
+                <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+                <div class="header-title-container">
+                  <div class="header-title-row">
+                    <span class="header-title">Presupuesto Disponible</span>
+                    <i class="fa-solid fa-circle-info info-icon" aria-hidden="true" title="Información sobre tu presupuesto"></i>
                   </div>
-                  <span class="saldo-mini-bar-text">
-                    Consumido: {{ formatARS(presupuesto.montoConsumidoGeneral) }} ({{
-                    presupuesto.porcentajeConsumidoGeneral }}%)
+                  @if (presupuestoColapsado()) {
+                  <span class="compact-info">
+                    {{ formatARS(info.montoDisponible) }} de {{ formatARS(info.montoLimite) }} disponibles ({{ info.porcentajeDisponible }}%)
                   </span>
+                  }
                 </div>
               </div>
+              <i class="fa-solid fa-chevron-down accordion-arrow" [class.collapsed]="presupuestoColapsado()" aria-hidden="true"></i>
+            </button>
+
+            <!-- Contenido Acordeón (con animación de colapso) -->
+            <div class="buffet__sidebar-section-body" [class.collapsed]="presupuestoColapsado()">
+              <p class="buffet__sidebar-section-subtitle-new">
+                @if (info.hasBudget) {
+                Período: <strong>{{ info.periodo }}</strong> (Límite total: {{ formatARS(info.montoLimite) }})
+                } @else {
+                Saldo general de la cuenta del alumno
+                }
+              </p>
+
+              <div class="buffet__sidebar-saldo-gauge-row-new">
+                <!-- Gráfico circular principal de resumen -->
+                <div class="buffet__sidebar-circle-gauge-new">
+                  <svg class="circle-gauge-svg-new" viewBox="0 0 100 100">
+                    <circle class="circle-gauge-bg-new" cx="50" cy="50" r="42" stroke-width="8"></circle>
+                    <circle class="circle-gauge-fill-new" cx="50" cy="50" r="42" stroke-width="8"
+                      [style.strokeDashoffset]="263.89 - (263.89 * (info.porcentajeDisponible || 0)) / 100"
+                      stroke-dasharray="263.89"
+                      transform="rotate(-90 50 50)"></circle>
+                  </svg>
+                  <div class="circle-gauge-text-new">
+                    <span class="circle-gauge-label-new">DISPONIBLE</span>
+                    <span class="circle-gauge-amount-new">{{ formatARS(info.montoDisponible) }}</span>
+                    <span class="circle-gauge-subtext-new">de {{ formatARS(info.montoLimite) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Resumen secundario debajo del gráfico, centrado horizontalmente -->
+              @if (info.hasBudget) {
+              <div class="buffet__sidebar-resumen-secundario">
+                <span>Consumido: <strong>{{ formatARS(info.montoConsumido) }} ({{ info.porcentajeConsumido }}%)</strong></span>
+              </div>
+              } @else {
+              <div class="buffet__sidebar-resumen-secundario">
+                <span>Sin límites de presupuesto diarios</span>
+              </div>
+              }
             </div>
+          </div>
 
-            @if (presupuesto.reglasCategorias.length > 0) {
-            <div class="buffet__sidebar-categorias-list">
-              <span class="buffet__sidebar-sublabel">Límites por Categoría</span>
-              <div class="buffet__sidebar-categoria-items">
-                @for (regla of presupuesto.reglasCategorias; track regla.categoriaId) {
-                <div class="buffet__sidebar-categoria-item">
-                  <div class="categoria-item-header">
-                    <span class="categoria-item-name">{{ regla.descripcionCategoria }}</span>
-                    <span class="categoria-item-disponible"
-                      [class.categoria-item-disponible--alerta]="regla.porcentajeConsumido >= 85">
-                      {{ formatARS(regla.montoDisponible) }} disp.
-                    </span>
-                  </div>
-                  <div class="categoria-item-bar">
-                    <div class="categoria-item-bar-fill" [style.width.%]="regla.porcentajeConsumido"
-                      [class.categoria-item-bar-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
-                  </div>
-                  <div class="categoria-item-footer">
-                    <span>Límite: {{ formatARS(regla.montoLimite) }}</span>
-                    <span>Consumido: {{ regla.porcentajeConsumido }}%</span>
+          <!-- SECCIÓN 2: LÍMITES POR CATEGORÍA (Acordeón independiente) -->
+          @if (info.hasBudget && info.reglasCategorias.length > 0) {
+          <div class="buffet__sidebar-section-new">
+            <!-- Encabezado Acordeón -->
+            <button type="button" class="buffet__sidebar-section-header" 
+              (click)="categoriasColapsado.set(!categoriasColapsado())"
+              [attr.aria-expanded]="!categoriasColapsado()">
+              <div class="header-left">
+                <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+                <span class="header-title">Límites por Categoría</span>
+              </div>
+              <i class="fa-solid fa-chevron-down accordion-arrow" [class.collapsed]="categoriasColapsado()" aria-hidden="true"></i>
+            </button>
+
+            <!-- Contenido Acordeón -->
+            <div class="buffet__sidebar-section-body" [class.collapsed]="categoriasColapsado()">
+              <div class="buffet__sidebar-categoria-items-new">
+                @for (regla of info.reglasCategorias; track regla.categoriaId) {
+                <div class="buffet__sidebar-categoria-card">
+                  <div class="categoria-card-main">
+                    <!-- Icono dinámico según la categoría -->
+                    <div class="categoria-card-icon-wrapper">
+                      <i [class]="getCategoryIcon(regla.descripcionCategoria)" aria-hidden="true"></i>
+                    </div>
+                    <div class="categoria-card-details">
+                      <div class="categoria-card-row-top">
+                        <span class="categoria-card-name">{{ regla.descripcionCategoria }}</span>
+                        <span class="categoria-card-monto">{{ formatARS(regla.montoDisponible) }}</span>
+                      </div>
+                      
+                      <!-- Barra de progreso -->
+                      <div class="categoria-card-progress-bar">
+                        <div class="categoria-card-progress-fill" [style.width.%]="regla.porcentajeConsumido"
+                          [class.categoria-card-progress-fill--alerta]="regla.porcentajeConsumido >= 85"></div>
+                      </div>
+
+                      <div class="categoria-card-row-bottom">
+                        <span>Límite: {{ formatARS(regla.montoLimite) }}</span>
+                        <span>Consumido: {{ regla.porcentajeConsumido }}%</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 }
               </div>
             </div>
-            }
           </div>
-          } @else {
-          <div class="buffet__sidebar-section">
-            <h3 class="buffet__sidebar-section-title">
-              <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-              Saldo Disponible
-            </h3>
-            <p class="buffet__sidebar-section-subtitle">Saldo general de la cuenta del alumno</p>
+          }
 
-            <div class="buffet__sidebar-saldo-gauge-row">
-              <div class="buffet__sidebar-circle-gauge">
-                <svg class="circle-gauge-svg" viewBox="0 0 100 100">
-                  <circle class="circle-gauge-bg" cx="50" cy="50" r="42" stroke-width="8"></circle>
-                  <circle class="circle-gauge-fill" cx="50" cy="50" r="42" stroke-width="8" stroke-dashoffset="0"
-                    stroke-dasharray="263.89" transform="rotate(-90 50 50)"></circle>
-                </svg>
-                <div class="circle-gauge-text">
-                  <span class="circle-gauge-label">SALDO</span>
-                  <span class="circle-gauge-amount">{{ formatARS(presenter.saldo()) }}</span>
-                </div>
+          <!-- SECCIÓN 3: OTROS LÍMITES (Acordeón independiente, colapsado por defecto) -->
+          <div class="buffet__sidebar-section-new">
+            <button type="button" class="buffet__sidebar-section-header" 
+              (click)="otrosLimitesColapsado.set(!otrosLimitesColapsado())"
+              [attr.aria-expanded]="!otrosLimitesColapsado()">
+              <div class="header-left">
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                <span class="header-title">Otros límites</span>
               </div>
-
-              <div class="buffet__sidebar-saldo-detalles">
-                <div class="saldo-detalle-item">
-                  <span class="saldo-detalle-label">DISPONIBLE GENERAL</span>
-                  <span class="saldo-detalle-value">{{ formatARS(presenter.saldo()) }}</span>
-                </div>
-                <div class="saldo-mini-bar-container">
-                  <div class="saldo-mini-bar">
-                    <div class="saldo-mini-bar-fill" style="width: 0%"></div>
-                  </div>
-                  <span class="saldo-mini-bar-text">Sin límites de presupuesto diarios</span>
-                </div>
-              </div>
+              <i class="fa-solid fa-chevron-down accordion-arrow" [class.collapsed]="otrosLimitesColapsado()" aria-hidden="true"></i>
+            </button>
+            <div class="buffet__sidebar-section-body" [class.collapsed]="otrosLimitesColapsado()">
+              <p class="otros-limites-vacio">No hay otros límites adicionales configurados.</p>
             </div>
           </div>
           }
 
-          
+
           <div class="buffet__sidebar-section">
             <h3 class="buffet__sidebar-section-title">
               <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
@@ -351,7 +418,7 @@
             <p class="buffet__sidebar-section-subtitle">Elegí cuándo retirará el pedido el alumno.</p>
 
             <div class="buffet__sidebar-retiro-layout">
-              
+
               <div class="buffet__calendar-widget">
                 <div class="calendar-widget-header">
                   <span class="calendar-current-month">{{ nombreMesCalendario() }}</span>
@@ -377,7 +444,7 @@
                 </div>
               </div>
 
-              
+
               <div class="buffet__sidebar-recreos">
                 <span class="recreo-section-label">FRANJA HORARIA</span>
                 <div class="recreos-btn-stack">
@@ -396,7 +463,7 @@
               </div>
             </div>
 
-            
+
             @if (presenter.cargandoPresupuestoPorFecha()) {
             <div class="buffet__sidebar-budget-status budget-status--cargando">
               <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
@@ -421,53 +488,6 @@
             }
             }
           </div>
-
-          
-          @if (!esVistaAlumno()) {
-          <div class="buffet__sidebar-section">
-            <h3 class="buffet__sidebar-section-title">
-              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-              Restricciones del Alumno
-            </h3>
-
-            <div class="buffet__sidebar-restricciones-content">
-              
-              <div class="restricciones-sidebar-group">
-                <span class="restricciones-group-label">Restricciones Alimenticias</span>
-                <div class="restricciones-pills-container">
-                  @if (presenter.restriccionesNutricionales().length > 0) {
-                  @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
-                  <span class="restriccion-pill-card restriccion-pill-card--danger">
-                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-                    {{ rest.descripcion }}
-                  </span>
-                  }
-                  } @else {
-                  <span class="restriccion-pill-card restriccion-pill-card--success">
-                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                    Sin restricciones alimenticias
-                  </span>
-                  }
-                </div>
-              </div>
-
-              
-              <div class="restricciones-sidebar-group">
-                <span class="restricciones-group-label">Horarios Permitidos</span>
-                <div class="restricciones-pills-container">
-                  @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
-                  <span class="restriccion-pill-card" [class.restriccion-pill-card--success]="!horario.bloqueado"
-                    [class.restriccion-pill-card--muted]="horario.bloqueado">
-                    <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado"
-                      [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
-                    {{ horario.descripcion }}
-                  </span>
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-          }
         </div>
       </aside>
       }
@@ -493,24 +513,25 @@
 
 
 @if (presenter.alumno(); as alumno) {
-  @if (presenter.totalCarrito() > 0) {
-    <div class="buffet__footer-cart">
-      <div class="buffet__footer-cart-container">
-        <div class="buffet__footer-cart-info">
-          <div class="buffet__footer-cart-icon">
-            <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-            <span class="buffet__footer-cart-badge">{{ presenter.cantidadItemsCarrito() }}</span>
-          </div>
-          <div class="buffet__footer-cart-text">
-            <span class="buffet__footer-cart-label">Subtotal del carrito</span>
-            <span class="buffet__footer-cart-total">{{ formatARS(presenter.totalCarrito()) }}</span>
-          </div>
-        </div>
-        <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()" (click)="presenter.irAlCarrito()">
-          <span>Ver Carrito y Pagar</span>
-          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-        </button>
+@if (presenter.totalCarrito() > 0) {
+<div class="buffet__footer-cart">
+  <div class="buffet__footer-cart-container">
+    <div class="buffet__footer-cart-info">
+      <div class="buffet__footer-cart-icon">
+        <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+        <span class="buffet__footer-cart-badge">{{ presenter.cantidadItemsCarrito() }}</span>
+      </div>
+      <div class="buffet__footer-cart-text">
+        <span class="buffet__footer-cart-label">Subtotal del carrito</span>
+        <span class="buffet__footer-cart-total">{{ formatARS(presenter.totalCarrito()) }}</span>
       </div>
     </div>
-  }
+    <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()"
+      (click)="presenter.irAlCarrito()">
+      <span>Ver Carrito y Pagar</span>
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>
+}
 }
