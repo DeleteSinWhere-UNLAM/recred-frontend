@@ -23,26 +23,43 @@
     </a>
 
     <div class="home__subtitulo-row">
-      <h2 class="home__subtitulo">
-        <span class="home__subtitulo-icono" aria-hidden="true">
-          <i class="fa-solid fa-user-group"></i>
-        </span>
-        <span>Mis hijos</span>
-      </h2>
-      <a
-        routerLink="/crear-hijo"
-        class="home__agregar-hijo"
-        aria-label="Agregar un nuevo hijo"
-      >
-        <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-        <span>Agregar hijo</span>
-      </a>
+      <h2 class="home__subtitulo">Alumnos asignados</h2>
+      <button class="btn-secundario" (click)="irACrearHijo()">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        Agregar Alumno
+      </button>
     </div>
 
-    <div class="home__sections">
-      @for (grupo of grupos(); track grupo.colegio.id) {
-        <app-colegio-section [colegio]="grupo.colegio" [alumnos]="grupo.alumnos" />
-      }
-    </div>
+    @if (cargando()) {
+      <div class="home__estado">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <p>Cargando información...</p>
+      </div>
+    } @else if (error()) {
+      <div class="home__estado">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p>{{ error() }}</p>
+      </div>
+    } @else if (colegios().length === 0) {
+      <div class="home__estado">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <p>Aún no tienes alumnos asignados a tu cuenta.</p>
+      </div>
+    } @else {
+      <div class="home__master-detail">
+        <div class="home__sidebar">
+          @for (col of colegios(); track col.colegioId) {
+            <app-colegio-section
+              [colegioNombre]="col.colegioNombre"
+              [alumnos]="col.alumnos"
+              (onAdelanto)="manejarMicrocredito($event)"
+            />
+          }
+        </div>
+        <div class="home__content">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    }
   </div>
 </main>

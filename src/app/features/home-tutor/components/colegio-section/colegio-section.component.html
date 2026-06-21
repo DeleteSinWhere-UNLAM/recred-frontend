@@ -1,99 +1,43 @@
 <section class="colegio-section" [attr.aria-label]="colegio.nombre">
-  <div class="colegio-section__layout">
-    
-    
-    <div class="colegio-section__sidebar" [class.colegio-section__sidebar--colapsado]="!expandido()">
-      <button 
-        type="button"
-        class="colegio-section__sidebar-header" 
-        (click)="toggle()"
-        [attr.aria-expanded]="expandido()"
-        [attr.aria-controls]="'colegio-' + colegio.id + '-content'"
-      >
-        <span class="colegio-section__icono" aria-hidden="true">
-          <i class="fa-solid fa-school"></i>
-        </span>
-        <h2 class="colegio-section__nombre">{{ colegio.nombre }}</h2>
-        <span class="colegio-section__chevron" aria-hidden="true" [class.colegio-section__chevron--rotado]="expandido()">
-          <i class="fa-solid fa-chevron-down"></i>
-        </span>
-      </button>
-      
-      @if (expandido()) {
-        <div class="colegio-section__sidebar-body">
-          <div class="colegio-section__info-row">
-            <i class="fa-solid fa-users-line" aria-hidden="true"></i>
-            <span>{{ alumnos.length }} {{ alumnos.length === 1 ? 'alumno' : 'alumnos' }}</span>
-          </div>
-          
-          <hr class="colegio-section__divider">
-          
-          <div class="colegio-section__saldo-row">
-            <span class="colegio-section__saldo-label">Saldo total</span>
-            <span class="colegio-section__saldo-valor">{{ totalSaldoFormateado }}</span>
-          </div>
-          
-          
-          <div class="colegio-section__ilustracion" aria-hidden="true">
-            <svg viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-              
-              <path d="M20 45c-2.2 0-4-1.8-4-4s1.8-4 4-4c.4-1.6 1.8-2.8 3.5-2.8s3.1 1.2 3.5 2.8c.4 0 .7-.1 1-.1 1.7 0 3 1.3 3 3s-1.3 3-3 3H20z" fill="#E2E8F0" opacity="0.6"/>
-              <path d="M175 35c-2.2 0-4-1.8-4-4s1.8-4 4-4c.4-1.6 1.8-2.8 3.5-2.8s3.1 1.2 3.5 2.8c.4 0 .7-.1 1-.1 1.7 0 3 1.3 3 3s-1.3 3-3 3h-9z" fill="#E2E8F0" opacity="0.6"/>
-              
-              
-              <path d="M10 115h180v10H10v-10z" fill="#CBD5E1" opacity="0.7"/>
-              <path d="M15 118h170v4H15v-4z" fill="#94A3B8" opacity="0.3"/>
-              
-              
-              <rect x="35" y="65" width="130" height="50" rx="4" fill="#E2E8F0"/>
-              <rect x="35" y="65" width="130" height="50" rx="4" stroke="#94A3B8" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
-              <rect x="85" y="50" width="30" height="65" rx="3" fill="#D1FAE5"/>
-              <rect x="85" y="50" width="30" height="65" rx="3" stroke="#81B29A" stroke-width="1" opacity="0.6"/>
-              
-              
-              <path d="M92 115v-22h16v22H92z" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.5"/>
-              <line x1="100" y1="93" x2="100" y2="115" stroke="#94A3B8" stroke-width="1.5"/>
-              <circle cx="97" cy="104" r="1" fill="#475569"/>
-              <circle cx="103" cy="104" r="1" fill="#475569"/>
-              
-              
-              <rect x="47" y="75" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              <rect x="67" y="75" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              <rect x="119" y="75" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              <rect x="139" y="75" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              
-              <rect x="47" y="94" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              <rect x="67" y="94" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              <rect x="119" y="94" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              <rect x="139" y="94" width="14" height="14" rx="2" fill="#B9CDE5" stroke="#94A3B8" stroke-width="1"/>
-              
-              
-              <path d="M30 65l70-22 70 22v4H30v-4z" fill="#94A3B8"/>
-              
-              
-              <circle cx="100" cy="67" r="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
-              <line x1="100" y1="67" x2="100" y2="62" stroke="#475569" stroke-width="1"/>
-              <line x1="100" y1="67" x2="104" y2="67" stroke="#475569" stroke-width="1"/>
-              
-              
-              <line x1="100" y1="43" x2="100" y2="22" stroke="#64748B" stroke-width="1.5"/>
-              <path d="M100 22l18 6-18 6V22z" fill="#F2B705"/>
-            </svg>
-          </div>
-        </div>
-      }
-    </div>
-    
+  <div class="colegio-section__sidebar" [class.colegio-section__sidebar--colapsado]="!expandido()">
+    <button 
+      type="button"
+      class="colegio-section__sidebar-header" 
+      (click)="toggle()"
+      [attr.aria-expanded]="expandido()"
+      [attr.aria-controls]="'colegio-' + colegio.id + '-content'"
+    >
+      <span class="colegio-section__icono" aria-hidden="true">
+        <i class="fa-solid fa-school"></i>
+      </span>
+      <h2 class="colegio-section__nombre">{{ colegio.nombre }}</h2>
+      <span class="colegio-section__chevron" aria-hidden="true" [class.colegio-section__chevron--rotado]="expandido()">
+        <i class="fa-solid fa-chevron-down"></i>
+      </span>
+    </button>
     
     @if (expandido()) {
-      <div class="colegio-section__content" [id]="'colegio-' + colegio.id + '-content'">
-        <div class="colegio-section__grid">
-          @for (alumno of alumnos; track alumno.id) {
-            <app-alumno-card [alumno]="alumno" />
-          }
+      <div class="colegio-section__sidebar-body" [id]="'colegio-' + colegio.id + '-content'">
+        <div class="colegio-section__info-row">
+          <i class="fa-solid fa-users-line" aria-hidden="true"></i>
+          <span>{{ alumnos.length }} {{ alumnos.length === 1 ? 'alumno' : 'alumnos' }}</span>
+        </div>
+        
+        <hr class="colegio-section__divider">
+        
+        <div class="colegio-section__saldo-row">
+          <span class="colegio-section__saldo-label">Saldo total</span>
+          <span class="colegio-section__saldo-valor">{{ totalSaldoFormateado }}</span>
+        </div>
+        
+        <div class="colegio-section__content">
+          <div class="colegio-section__grid">
+            @for (alumno of alumnos; track alumno.id) {
+              <app-alumno-card [alumno]="alumno" />
+            }
+          </div>
         </div>
       </div>
     }
-    
   </div>
 </section>

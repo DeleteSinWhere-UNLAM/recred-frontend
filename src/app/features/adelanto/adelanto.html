@@ -1,0 +1,73 @@
+<div class="adelanto-page">
+  <header class="adelanto-page__header">
+    <button class="btn-back" (click)="volver()" aria-label="Volver">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="adelanto-page__title-wrap">
+      <h1 class="adelanto-page__title">Adelanto</h1>
+      @if (alumno()) {
+        <p class="adelanto-page__subtitle">Asignar saldo anticipado a {{ alumno()?.nombre }}</p>
+      }
+    </div>
+  </header>
+
+  @if (cargando()) {
+    <div class="adelanto-page__loading">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Cargando información...</p>
+    </div>
+  } @else {
+    @if (creditoActivo()) {
+      <div class="adelanto-page__alert">
+        <i class="fa-solid fa-circle-info"></i>
+        <div class="adelanto-page__alert-content">
+          <strong>{{ alumno()?.nombre }} ya posee un adelanto en curso.</strong>
+          <p>Monto original: ${{ creditoActivo()?.amount }}</p>
+          <p>Cuotas asignadas: {{ creditoActivo()?.installments }}</p>
+          <p>Fecha: {{ creditoActivo()?.createdAt | date:'dd/MM/yyyy' }}</p>
+          <p class="adelanto-page__alert-hint">
+            No es posible asignar un nuevo adelanto hasta que el actual haya sido saldado.
+          </p>
+        </div>
+      </div>
+    } @else {
+      <div class="adelanto-page__card">
+        <div class="adelanto-page__field">
+          <label for="input-monto" class="adelanto-page__label">Monto a Asignar ($)</label>
+          <div class="adelanto-page__input-wrap">
+            <span class="adelanto-page__prefix">$</span>
+            <input id="input-monto" type="number" [(ngModel)]="montoFijo" class="adelanto-page__input" min="1">
+          </div>
+          <div class="adelanto-page__quick-btns">
+            <button (click)="setMontoRapidoFijo(2000)" class="btn-quick">$2000</button>
+            <button (click)="setMontoRapidoFijo(5000)" class="btn-quick">$5000</button>
+            <button (click)="setMontoRapidoFijo(10000)" class="btn-quick">$10000</button>
+          </div>
+        </div>
+
+        <div class="adelanto-page__field mt-24">
+          <label for="input-cuotas" class="adelanto-page__label">Cuotas (Meses)</label>
+          <input id="input-cuotas" type="number" [(ngModel)]="cuotas" class="adelanto-page__input" min="1" max="24">
+          <div class="adelanto-page__quick-btns mt-8">
+            <button (click)="setCuotas(1)" [class.active]="cuotas() === 1" class="btn-quick">1</button>
+            <button (click)="setCuotas(3)" [class.active]="cuotas() === 3" class="btn-quick">3</button>
+            <button (click)="setCuotas(6)" [class.active]="cuotas() === 6" class="btn-quick">6</button>
+          </div>
+          
+          @if (cuotas() > 1) {
+            <div class="adelanto-page__info mt-16">
+              <i class="fa-solid fa-calendar-check"></i>
+              <p>Las cuotas vencen el día <strong>10 de cada mes</strong>.</p>
+            </div>
+          }
+        </div>
+
+        <div class="adelanto-page__actions">
+          <button (click)="confirmarMicrocredito()" class="btn-confirm">
+            Habilitar Adelanto
+          </button>
+        </div>
+      </div>
+    }
+  }
+</div>
