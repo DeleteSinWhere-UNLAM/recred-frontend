@@ -3,7 +3,6 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { RestriccionesHorariasPresenter, FranjaConRestricciones } from './presenter/restricciones-horarias.presenter';
-import { RestriccionHoraria } from './models/restriccion-horaria.model';
 import { PerfilService } from '../../data-access/services/perfil.service';
 
 export interface QuickToggleItem {

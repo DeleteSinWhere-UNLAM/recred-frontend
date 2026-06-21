@@ -17,7 +17,7 @@ import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ProductoCardComponent } from './components/producto-card/producto-card.component';
 import { SeleccionarAlumnoModalComponent } from './components/seleccionar-alumno-modal/seleccionar-alumno-modal.component';
-import { BuffetPresenter } from './presenter/buffet.presenter';
+import { BuffetPresenter, PresupuestoDisponibleCategoria } from './presenter/buffet.presenter';
 import { Recreo } from '../compra/models/orden-compra.model';
 import { Producto, CategoriaProducto, ClasificacionSalud } from './models/producto.model';
 import { CarritoService } from '../compra/services/carrito.service';
@@ -102,7 +102,7 @@ export class BuffetPage implements OnInit {
         montoConsumido: 0,
         porcentajeDisponible: 100,
         porcentajeConsumido: 0,
-        reglasCategorias: [] as any[],
+        reglasCategorias: [] as PresupuestoDisponibleCategoria[],
       };
     }
   });
