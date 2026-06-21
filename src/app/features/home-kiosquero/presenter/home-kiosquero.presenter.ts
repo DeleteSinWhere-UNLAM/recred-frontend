@@ -890,10 +890,11 @@ export class HomeKiosqueroPresenter {
     {
       id: 'cargar-productos',
       titulo: 'Cargar producto',
-      descripcion: 'Funcionalidad premium',
+      descripcion: 'Agregar productos con asistencia IA',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
+      premium: true,
     },
     {
       id: 'stock',
@@ -977,10 +978,11 @@ export class HomeKiosqueroPresenter {
     {
       id: 'cargar-productos',
       titulo: 'Cargar producto',
-      descripcion: 'Funcionalidad premium',
+      descripcion: 'Agregar productos con asistencia IA',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
+      premium: true,
     },
     {
       id: 'cierre-diario',
