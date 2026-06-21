@@ -8,6 +8,7 @@
           class="sugerencias-chips__chip"
           [class.sugerencias-chips__chip--confirmar]="s.tipo === 'confirmacion'"
           [class.sugerencias-chips__chip--cancelar]="s.tipo === 'cancelacion'"
+          [class.sugerencias-chips__chip--premium]="s.premium"
           role="listitem"
           [disabled]="deshabilitado"
           (click)="onClick(s)"

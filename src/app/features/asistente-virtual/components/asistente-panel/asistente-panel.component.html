@@ -89,6 +89,7 @@
                 <button
                   type="button"
                   class="asistente-panel__opcion"
+                  [class.asistente-panel__opcion--premium]="opcion.premium"
                   [disabled]="deshabilitado_()"
                   (click)="onOpcion(opcion)"
                 >
