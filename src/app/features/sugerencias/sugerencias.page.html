@@ -52,7 +52,7 @@
               </span>
               <div>
                 <small>Promedio sin venta</small>
-                <strong>{{ presenter.promedioDiasSinVenta }}d</strong>
+                <strong>{{ presenter.promedioDiasSinVenta }} {{ presenter.promedioDiasSinVenta === 1 ? 'Día' : 'Días' }}</strong>
               </div>
             </article>
 
@@ -447,17 +447,7 @@
 
               
 
-              <div class="sg__detail-footer">
-                <span class="sg__footer-badge">
-                  <i class="fa-solid fa-brain" aria-hidden="true"></i>
-                  {{ sugerenciaSeleccionada.motivoIA }}
-                </span>
 
-                <span class="sg__footer-badge">
-                  <i class="fa-solid fa-microchip" aria-hidden="true"></i>
-                  {{ sugerenciaSeleccionada.modeloIA }}
-                </span>
-              </div>
             } @else {
               <div class="sg__detail-empty">
                 <span aria-hidden="true">
