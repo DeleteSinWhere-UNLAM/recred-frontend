@@ -7,7 +7,7 @@
 
   <header class="page-header">
     <div class="header-content">
-      <h1><i class="fa-solid fa-tags header-icon"></i> Promociones Activas</h1>
+      <h1><i class="fa-solid fa-tags header-icon"></i> Promociones</h1>
       <p>Visualiza y gestiona las promociones creadas en tu kiosco.</p>
     </div>
     <div class="header-actions">
@@ -40,40 +40,62 @@
       @for (promo of presenter.promotions(); track promo.id) {
         <div class="promotion-card" [class.draft]="promo.status === 'DRAFT'" [class.active]="promo.status === 'ACTIVE'">
           <div class="promo-header">
-            <span class="status-badge" [ngClass]="promo.status | lowercase">{{ promo.status }}</span>
+            <div class="promo-badges">
+              <span class="status-badge" [ngClass]="promo.status | lowercase">{{ presenter.getStatusLabel(promo.status) }}</span>
+              <span class="discount-badge">Descuento {{ promo.discountPercentage }}%</span>
+            </div>
             <button class="delete-btn" (click)="presenter.deletePromotion(promo.id)" title="Descartar promoción">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
           
           <div class="promo-body">
-            <div class="discount-circle">
-              <span>-{{ promo.discountPercentage }}%</span>
-            </div>
             <h3 class="promo-title">{{ promo.name }}</h3>
             
-            <div class="promo-dates">
-              <div class="date-row">
-                <i class="fa-regular fa-calendar"></i>
-                <div class="date-col">
-                  <span class="date-label">Inicia</span>
-                  <span class="date-value">{{ promo.startDate | date:'medium' }}</span>
-                </div>
+            <div class="promo-products" aria-label="Productos incluidos">
+              <div class="promo-products__header">
+                <i class="fa-solid fa-basket-shopping"></i>
+                <span>Productos incluidos</span>
               </div>
-              <div class="date-row">
-                <i class="fa-regular fa-calendar-check"></i>
-                <div class="date-col">
-                  <span class="date-label">Finaliza</span>
-                  <span class="date-value">{{ promo.endDate | date:'medium' }}</span>
-                </div>
-              </div>
+
+              @if (promo.products.length > 0) {
+                <ul class="promo-products__list">
+                  @for (product of presenter.getVisibleProducts(promo); track product.id) {
+                    <li class="promo-products__item">
+                      <span class="promo-products__name">{{ product.nombre }}</span>
+                      @if (product.precio > 0) {
+                        <span class="promo-products__price promo-products__price--original">{{ product.precio | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+                      }
+                    </li>
+                  }
+                  @if (presenter.getHiddenProductsCount(promo) > 0) {
+                    <li class="promo-products__more">
+                      +{{ presenter.getHiddenProductsCount(promo) }} productos mas
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="promo-products__empty">Sin productos cargados.</p>
+              }
             </div>
-            
-            <div class="promo-stats">
-              <div class="stat">
-                <i class="fa-solid fa-boxes-stacked"></i>
-                <span>{{ promo.productIds.length }} productos incluidos</span>
+
+            @if (promo.products.length > 0) {
+              <div class="promo-total">
+                <div class="promo-total__row">
+                  <span>Total original</span>
+                  <span class="promo-total__original">{{ presenter.getOriginalTotal(promo) | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+                </div>
+                <div class="promo-total__row promo-total__row--final">
+                  <span>Precio promo</span>
+                  <span>{{ presenter.getDiscountedTotal(promo) | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+                </div>
               </div>
+            }
+
+            <div class="promo-validity">
+              <i class="fa-regular fa-calendar"></i>
+              <span>Vigencia</span>
+              <strong>{{ promo.startDate | date:'dd/MM' }} &rarr; {{ promo.endDate | date:'dd/MM' }}</strong>
             </div>
           </div>
         </div>
