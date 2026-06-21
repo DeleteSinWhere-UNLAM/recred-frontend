@@ -33,14 +33,16 @@
 }
 
 .global-header .amount-debt {
-  color: #fca5a5; /* soft red for debt */
+  color: #fca5a5;
+  /* soft red for debt */
 }
 
 .global-header .currency {
   color: #94a3b8;
 }
 
-.global-balance-info, .global-debt-info {
+.global-balance-info,
+.global-debt-info {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -101,7 +103,9 @@
   .dashboard-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .smart-action-card, .transactions-card {
+
+  .smart-action-card,
+  .transactions-card {
     grid-column: span 2;
   }
 }
@@ -222,9 +226,17 @@
   transition: width 1s ease, background-color 0.5s ease;
 }
 
-.budget-green { background: #10b981; }
-.budget-yellow { background: #f59e0b; }
-.budget-red { background: #ef4444; }
+.budget-green {
+  background: #10b981;
+}
+
+.budget-yellow {
+  background: #f59e0b;
+}
+
+.budget-red {
+  background: #ef4444;
+}
 
 .spent-text {
   color: #64748b;
@@ -248,7 +260,8 @@
 }
 
 .level-badge i {
-  color: #f59e0b; /* Gold medal color */
+  color: #f59e0b;
+  /* Gold medal color */
 }
 
 .points-info {
@@ -425,7 +438,9 @@
   transition: background 0.2s, transform 0.1s;
 }
 
-.primary-btn:hover { background: #2a5282; }
+.primary-btn:hover {
+  background: #2a5282;
+}
 
 .secondary-btn {
   background: white;
@@ -438,7 +453,9 @@
   transition: background 0.2s;
 }
 
-.secondary-btn:hover { background: #f8fafc; }
+.secondary-btn:hover {
+  background: #f8fafc;
+}
 
 .badge {
   padding: 0.25rem 0.75rem;
@@ -457,7 +474,10 @@
 /* Modals */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -480,8 +500,15 @@
 }
 
 @keyframes modalEnter {
-  from { opacity: 0; transform: translateY(20px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-close {
@@ -515,13 +542,26 @@
 }
 
 .modal-title i {
-  color: #3b82f6; /* default icon color */
+  color: #3b82f6;
+  /* default icon color */
 }
 
 .modal-body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.alumno-card__saldo-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.alumno-card__saldo-valor {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
 .modal-field {
@@ -561,6 +601,16 @@
   outline: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
+}
+
+.alumno-card__nombre {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .modal-input:focus {
@@ -660,11 +710,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background-color: rgba(74, 111, 165, 0.08);
-  color: var(--color-pizarra);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #10b981;
+  color: white;
   font-size: 18px;
 }
 
@@ -672,7 +722,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -696,17 +746,20 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Quick Transfer Drag & Drop */
 .quick-transfer {
   margin-bottom: 1.5rem;
-  background: #ffffff;
+  background: radial-gradient(circle at 82% 8%, rgba(129, 178, 154, 0.22), transparent 30%), linear-gradient(135deg, var(--color-pizarra), var(--color-pizarra-dark));
+  border: none;
 }
 
 .quick-transfer .subtitle {
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.95rem;
   margin-top: -0.5rem;
   margin-bottom: 1.5rem;
@@ -721,8 +774,8 @@
 .child-transfer-card {
   flex: 1;
   min-width: 320px;
-  background: var(--color-superficie, #ffffff);
-  border: 1px solid var(--color-borde, #e2e8f0);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
   border-radius: 24px;
   padding: 24px;
   display: flex;
@@ -731,7 +784,8 @@
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  color: white;
 }
 
 .child-transfer-card:hover {
@@ -740,8 +794,8 @@
 }
 
 .child-transfer-card.selected {
-  border: 2px solid #3b82f6;
-  background: #eff6ff;
+  border: 2px solid #60a5fa;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .child-transfer-card.drag-over {
@@ -801,7 +855,7 @@
   font-family: var(--font-display, 'Inter');
   font-size: 19px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: #ffffff;
   line-height: 1.2;
   margin: 0;
   word-break: break-word;
@@ -813,10 +867,10 @@
   align-items: flex-end;
   gap: 2px;
   padding: 8px 16px;
-  background-color: rgba(74, 111, 165, 0.05);
-  border: 1px solid rgba(74, 111, 165, 0.08);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  color: #1a3b5c;
+  color: #ffffff;
   flex-shrink: 0;
 }
 
@@ -830,7 +884,7 @@
   font-family: var(--font-body, 'Inter');
   font-size: 12px;
   font-weight: 600;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .alumno-card__saldo-valor {
@@ -841,17 +895,15 @@
 }
 
 .draggable-cash {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   background: #10b981;
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
   cursor: grab;
-  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
 }
@@ -923,6 +975,7 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
 .quick-transfer-input[type=number] {
   appearance: textfield;
 }
@@ -930,7 +983,8 @@
 /* Dashboard Gridster Styles */
 .dashboard-gridster {
   width: 100%;
-  height: 800px; /* Or min-height based on content */
+  height: 800px;
+  /* Or min-height based on content */
   background-color: transparent;
 }
 
@@ -945,13 +999,13 @@
 }
 
 /* Remove internal shadow and radii from nested cards */
-.grid-card > .card,
-.grid-card > .finance-card,
-.grid-card > .health-card,
-.grid-card > .logistics-card,
-.grid-card > .transactions-card,
-.grid-card > .smart-action-card,
-.grid-card > .smart-card {
+.grid-card>.card,
+.grid-card>.finance-card,
+.grid-card>.health-card,
+.grid-card>.logistics-card,
+.grid-card>.transactions-card,
+.grid-card>.smart-action-card,
+.grid-card>.smart-card {
   margin-bottom: 0;
   box-shadow: none !important;
   border-radius: 0 !important;
@@ -994,8 +1048,9 @@
     text-align: center;
     padding: 1.5rem;
   }
-  
-  .global-balance-info, .global-debt-info {
+
+  .global-balance-info,
+  .global-debt-info {
     align-items: center;
     text-align: center;
   }
@@ -1019,7 +1074,7 @@
     flex-wrap: wrap;
     gap: 12px;
   }
-  
+
   .transfer-input-wrapper {
     width: 80px;
   }

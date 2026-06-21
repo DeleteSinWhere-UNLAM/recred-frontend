@@ -33,7 +33,17 @@ export class SmartChartWidget implements OnInit, OnChanges {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: true, position: 'bottom' }
+      legend: { display: false }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false }
+      },
+      y: {
+        display: false,
+        grid: { display: false }
+      }
     }
   };
 
@@ -62,6 +72,18 @@ export class SmartChartWidget implements OnInit, OnChanges {
     this.closeCard.emit();
   }
 
+  getBarGradient(context: any, colorStart: string, colorEnd: string) {
+    const chart = context.chart;
+    const {ctx, chartArea} = chart;
+    if (!chartArea) {
+      return colorEnd;
+    }
+    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+    gradient.addColorStop(0, colorStart);
+    gradient.addColorStop(1, colorEnd);
+    return gradient;
+  }
+
   updateChart() {
     const child = this.children.find(c => c.studentId === this.selectedChildId);
     if (!child) return;
@@ -76,7 +98,10 @@ export class SmartChartWidget implements OnInit, OnChanges {
             child.balance || 0
           ],
           label: 'Finanzas ($)',
-          backgroundColor: ['#e2e8f0', '#f43f5e', '#10b981']
+          backgroundColor: (context: any) => this.getBarGradient(context, '#4A6FA5', '#81B29A'), // pizarra to menta
+          borderRadius: 16,
+          borderSkipped: false,
+          barPercentage: 0.6
         }]
       };
     } else if (this.selectedDataSource === 'health') {
@@ -88,7 +113,10 @@ export class SmartChartWidget implements OnInit, OnChanges {
             child.health?.pointsToNextLevel || 0
           ],
           label: 'Salud y Gamificación (Pts)',
-          backgroundColor: ['#3b82f6', '#cbd5e1']
+          backgroundColor: (context: any) => this.getBarGradient(context, '#4A6FA5', '#81B29A'), // pizarra to menta
+          borderRadius: 16,
+          borderSkipped: false,
+          barPercentage: 0.6
         }]
       };
     } else if (this.selectedDataSource === 'logistics') {
@@ -97,7 +125,10 @@ export class SmartChartWidget implements OnInit, OnChanges {
         datasets: [{
           data: [child.todayPickups?.length || 0, 0],
           label: 'Logística de Entregas',
-          backgroundColor: ['#f59e0b', '#10b981']
+          backgroundColor: (context: any) => this.getBarGradient(context, '#4A6FA5', '#81B29A'), // pizarra to menta
+          borderRadius: 16,
+          borderSkipped: false,
+          barPercentage: 0.6
         }]
       };
     }
