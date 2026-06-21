@@ -876,6 +876,7 @@ export class HomeKiosqueroPresenter {
       ruta: '/sugerencias-agregar',
       color: 'menta',
       destacada: true,
+      premium: true,
     },
     {
       id: 'tracking-pedidos',
@@ -918,6 +919,7 @@ export class HomeKiosqueroPresenter {
       ruta: '/sugerencias',
       color: 'melocoton',
       destacada: true,
+      premium: true,
     },
     {
       id: 'recomendaciones',
