@@ -84,9 +84,57 @@ export class SmartChartWidget implements OnInit, OnChanges {
     return gradient;
   }
 
+  getBackgroundColors(context: any, type: string) {
+    if (this.selectedChartType !== 'pie' && this.selectedChartType !== 'doughnut') {
+      return this.getBarGradient(context, '#4A6FA5', '#81B29A');
+    }
+    
+    const index = context.dataIndex;
+    if (type === 'finance') {
+      if (index === 0) return '#e2e8f0'; // Presupuesto
+      if (index === 1) return '#ef4444'; // Gastado
+      if (index === 2) return this.getBarGradient(context, '#4A6FA5', '#81B29A'); // Saldo Disponible
+    } else if (type === 'health') {
+      if (index === 0) return this.getBarGradient(context, '#4A6FA5', '#81B29A');
+      if (index === 1) return '#e2e8f0';
+    } else if (type === 'logistics') {
+      if (index === 0) return '#f59e0b';
+      if (index === 1) return this.getBarGradient(context, '#4A6FA5', '#81B29A');
+    }
+    return this.getBarGradient(context, '#4A6FA5', '#81B29A');
+  }
+
   updateChart() {
     const child = this.children.find(c => c.studentId === this.selectedChildId);
     if (!child) return;
+
+    const isPieOrDoughnut = this.selectedChartType === 'pie' || this.selectedChartType === 'doughnut';
+
+    this.chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          display: isPieOrDoughnut,
+          position: 'bottom',
+          labels: {
+            usePointStyle: false,
+            boxWidth: 20,
+            padding: 20
+          }
+        }
+      },
+      scales: isPieOrDoughnut ? undefined : {
+        x: {
+          grid: { display: false },
+          border: { display: false }
+        },
+        y: {
+          display: false,
+          grid: { display: false }
+        }
+      }
+    };
 
     if (this.selectedDataSource === 'finance') {
       this.chartData = {
@@ -98,8 +146,8 @@ export class SmartChartWidget implements OnInit, OnChanges {
             child.balance || 0
           ],
           label: 'Finanzas ($)',
-          backgroundColor: (context: any) => this.getBarGradient(context, '#4A6FA5', '#81B29A'), // pizarra to menta
-          borderRadius: 16,
+          backgroundColor: (context: any) => this.getBackgroundColors(context, 'finance'),
+          borderRadius: isPieOrDoughnut ? 0 : 16,
           borderSkipped: false,
           barPercentage: 0.6
         }]
@@ -113,8 +161,8 @@ export class SmartChartWidget implements OnInit, OnChanges {
             child.health?.pointsToNextLevel || 0
           ],
           label: 'Salud y Gamificación (Pts)',
-          backgroundColor: (context: any) => this.getBarGradient(context, '#4A6FA5', '#81B29A'), // pizarra to menta
-          borderRadius: 16,
+          backgroundColor: (context: any) => this.getBackgroundColors(context, 'health'),
+          borderRadius: isPieOrDoughnut ? 0 : 16,
           borderSkipped: false,
           barPercentage: 0.6
         }]
@@ -125,8 +173,8 @@ export class SmartChartWidget implements OnInit, OnChanges {
         datasets: [{
           data: [child.todayPickups?.length || 0, 0],
           label: 'Logística de Entregas',
-          backgroundColor: (context: any) => this.getBarGradient(context, '#4A6FA5', '#81B29A'), // pizarra to menta
-          borderRadius: 16,
+          backgroundColor: (context: any) => this.getBackgroundColors(context, 'logistics'),
+          borderRadius: isPieOrDoughnut ? 0 : 16,
           borderSkipped: false,
           barPercentage: 0.6
         }]

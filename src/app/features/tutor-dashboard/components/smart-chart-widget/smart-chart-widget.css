@@ -17,6 +17,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
 .smart-card-header:active {
@@ -25,7 +26,7 @@
 
 .header-controls {
   display: flex;
-  gap: 12px;
+  gap: 4px;
   align-items: center;
   margin-left: auto;
 }
@@ -36,8 +37,8 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 1.1rem;
   cursor: pointer;
-  padding: 8px;
-  margin-left: 12px;
+  padding: 4px;
+  margin-left: 4px;
   transition: color 0.2s;
   display: flex;
   align-items: center;
@@ -49,12 +50,10 @@
 }
 
 .custom-select {
-  flex: 1;
-  min-width: 80px;
-  padding: 6px 12px;
+  padding: 4px 8px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #334155;
   background-color: white;

@@ -355,8 +355,8 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 1.1rem;
   cursor: pointer;
-  padding: 8px;
-  margin-left: 12px;
+  padding: 4px;
+  margin-left: 4px;
   transition: color 0.2s;
   display: flex;
   align-items: center;
@@ -404,12 +404,10 @@
 
 /* Buttons & Badges */
 .custom-select {
-  flex: 1;
-  min-width: 80px;
-  padding: 6px 12px;
+  padding: 4px 8px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #334155;
   background-color: white;
@@ -425,6 +423,10 @@
 .child-select {
   font-weight: 600;
   color: #0f172a;
+}
+
+.card-header .child-select {
+  margin-left: auto;
 }
 
 .primary-btn {
@@ -773,11 +775,11 @@
 
 .child-transfer-card {
   flex: 1;
-  min-width: 320px;
+  min-width: 250px;
   background: rgba(255, 255, 255, 0.15);
   border: none;
-  border-radius: 24px;
-  padding: 24px;
+  border-radius: 20px;
+  padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -809,7 +811,7 @@
 .alumno-card__identidad {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
   flex: 1;
 }
@@ -819,8 +821,8 @@
 }
 
 .alumno-card__avatar {
-  width: 64px;
-  height: 64px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-color: #1a3b5c;
   color: #ffffff;
@@ -829,7 +831,7 @@
   justify-content: center;
   font-family: var(--font-display, 'Inter');
   font-weight: 700;
-  font-size: 24px;
+  font-size: 16px;
   letter-spacing: 0.5px;
   box-shadow:
     0 0 0 3px #ffffff,
@@ -866,10 +868,10 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
-  padding: 8px 16px;
+  padding: 4px 8px;
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 8px;
   color: #ffffff;
   flex-shrink: 0;
 }
@@ -882,21 +884,21 @@
 
 .alumno-card__saldo-label {
   font-family: var(--font-body, 'Inter');
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .alumno-card__saldo-valor {
   font-family: var(--font-display, 'Inter');
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.1;
 }
 
 .draggable-cash {
-  width: 60px;
-  height: 60px;
+  width: 44px;
+  height: 44px;
   background: #10b981;
   color: white;
   border-radius: 50%;
@@ -924,13 +926,13 @@
 .transfer-actions-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
 /* Inline Quick Transfer Input */
 .transfer-input-wrapper {
   position: relative;
-  width: 100px;
+  width: 80px;
 }
 
 .transfer-prefix {
