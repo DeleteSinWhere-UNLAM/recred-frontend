@@ -14,7 +14,7 @@
     <section class="restricciones__panel" aria-labelledby="restricciones-titulo">
       
       <header class="restricciones__cabecera">
-        <div class="restricciones__avatar" aria-hidden="true">
+        <div class="restricciones__avatar" [class.restricciones__avatar--premium]="esPremium()" aria-hidden="true">
           @if (presenter.urlFotoPerfil()) {
             <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="restricciones__avatar-img" />
           } @else {

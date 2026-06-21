@@ -126,6 +126,9 @@ export class HomeAlumnoPresenter {
   ]);
 
   init(): void {
+    if (typeof this.colegiosService.obtenerColegios === 'function') {
+      void this.colegiosService.obtenerColegios();
+    }
     void this.alumnosService.asegurarCargados(true).then((alumnos) => {
       const alumnoMock = this.usuarioService.getAlumnoActual();
       const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;

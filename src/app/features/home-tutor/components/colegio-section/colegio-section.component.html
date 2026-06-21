@@ -2,24 +2,24 @@
   <div class="colegio-section__layout">
     
     
-    <div class="colegio-section__sidebar" [class.colegio-section__sidebar--colapsado]="!expandido()">
+    <div class="colegio-section__sidebar" [class.colegio-section__sidebar--colapsado]="!expandido">
       <button 
         type="button"
         class="colegio-section__sidebar-header" 
         (click)="toggle()"
-        [attr.aria-expanded]="expandido()"
+        [attr.aria-expanded]="expandido"
         [attr.aria-controls]="'colegio-' + colegio.id + '-content'"
       >
         <span class="colegio-section__icono" aria-hidden="true">
           <i class="fa-solid fa-school"></i>
         </span>
         <h2 class="colegio-section__nombre">{{ colegio.nombre }}</h2>
-        <span class="colegio-section__chevron" aria-hidden="true" [class.colegio-section__chevron--rotado]="expandido()">
+        <span class="colegio-section__chevron" aria-hidden="true" [class.colegio-section__chevron--rotado]="expandido">
           <i class="fa-solid fa-chevron-down"></i>
         </span>
       </button>
       
-      @if (expandido()) {
+      @if (expandido) {
         <div class="colegio-section__sidebar-body">
           <div class="colegio-section__info-row">
             <i class="fa-solid fa-users-line" aria-hidden="true"></i>
@@ -85,7 +85,7 @@
     </div>
     
     
-    @if (expandido()) {
+    @if (expandido) {
       <div class="colegio-section__content" [id]="'colegio-' + colegio.id + '-content'">
         <div class="colegio-section__grid">
           @for (alumno of alumnos; track alumno.id) {

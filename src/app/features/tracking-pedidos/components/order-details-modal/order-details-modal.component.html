@@ -21,17 +21,25 @@
             <strong class="info-item__value">{{ order.studentName }}</strong>
           </div>
           <div class="info-item">
-            <span class="info-item__label">Fecha Programada</span>
-            <strong class="info-item__value">{{ order.pickupDate | date: 'dd-MM-yyyy' }}</strong>
+            <span class="info-item__label">Tipo de Compra</span>
+            <strong class="info-item__value">{{ order.tipo === 'PRESENCIAL' ? 'Compra espontánea' : 'Compra anticipada' }}</strong>
           </div>
-          <div class="info-item">
-            <span class="info-item__label">Franja Horaria</span>
-            <strong class="info-item__value">{{ order.pickupSlotDescription || 'Por definir' }}</strong>
-          </div>
-          <div class="info-item">
-            <span class="info-item__label">Método de Pago</span>
-            <strong class="info-item__value">{{ order.paymentMethod }}</strong>
-          </div>
+          @if (order.tipo !== 'PRESENCIAL') {
+            <div class="info-item">
+              <span class="info-item__label">Fecha Programada</span>
+              <strong class="info-item__value">{{ order.pickupDate | date: 'dd-MM-yyyy' }}</strong>
+            </div>
+            <div class="info-item">
+              <span class="info-item__label">Franja Horaria</span>
+              <strong class="info-item__value">{{ order.pickupSlotDescription || 'Por definir' }}</strong>
+            </div>
+          }
+          @if (order.paymentMethod && order.paymentMethod.toUpperCase() !== 'CREDITOS' && order.paymentMethod.toUpperCase() !== 'CREDIT') {
+            <div class="info-item">
+              <span class="info-item__label">Método de Pago</span>
+              <strong class="info-item__value">{{ order.paymentMethod }}</strong>
+            </div>
+          }
         </div>
       </section>
 

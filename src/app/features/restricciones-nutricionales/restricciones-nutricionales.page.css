@@ -83,7 +83,7 @@
   height: 64px;
   border-radius: 50%;
   background-color: #1a3b5c; /* Dark blue */
-  border: 3.5px solid var(--color-dorado); /* Gold border */
+  border: 3.5px solid #cbd5e1; /* Neutral border by default */
   color: #fff;
   display: flex;
   align-items: center;
@@ -94,6 +94,10 @@
   box-shadow: 0 8px 20px rgba(26, 59, 92, 0.15);
   flex-shrink: 0;
   overflow: hidden;
+}
+
+.restricciones__avatar--premium {
+  border: 3.5px solid var(--color-dorado) !important; /* Gold border for premium only */
 }
 
 .restricciones__avatar-img {

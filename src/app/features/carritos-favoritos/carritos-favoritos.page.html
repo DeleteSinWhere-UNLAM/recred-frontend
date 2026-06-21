@@ -3,131 +3,116 @@
 <main class="carritos-page">
   <div class="carritos-page__container">
     <header class="carritos-page__cabecera">
-      <button
-        type="button"
-        class="carritos-page__volver"
-        (click)="volver()"
-      >
+      <button type="button" class="carritos-page__volver" (click)="volver()">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
         <span>Volver</span>
       </button>
       <div class="carritos-page__titulo-bloque">
-        <h2 class="carritos-page__titulo">Carritos Favoritos</h2>
-        <p class="carritos-page__subtitulo">
-          Tus combinaciones de productos guardadas para compras rápidas.
-        </p>
+        <h2 class="carritos-page__titulo">
+          <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+          Carritos Favoritos
+        </h2>
       </div>
     </header>
 
     @if (!isLoading && esPlanGratuito() && carritosFavoritos.length >= 3) {
-      <div class="dashboard-limit-alert">
-        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-        <span>Límite de 3 carritos favoritos alcanzado para cuenta gratuita. Pasate a Premium para agregar más.</span>
-      </div>
+    <div class="dashboard-limit-alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      <span>Límite de 3 carritos favoritos alcanzado para cuenta gratuita. Pasate a Premium para agregar más.</span>
+    </div>
     }
 
     @if (isLoading) {
-      <div class="carritos-page__loading" role="status">
-        <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
-        <span>Cargando carritos favoritos...</span>
-      </div>
-    } @else if (gruposHijos.length === 0) {
-      <section class="carritos-page__vacio" role="status">
-        <i class="fa-solid fa-heart-crack" aria-hidden="true"></i>
-        <h3>No tenés carritos favoritos guardados</h3>
-        <p>Podés guardar un carrito como favorito al armar tu pedido en la pantalla del carrito.</p>
-        <button
-          type="button"
-          class="carritos-page__vacio-cta"
-          (click)="volver()"
-        >
-          Ir al inicio
-        </button>
-      </section>
+    <div class="carritos-page__loading" role="status">
+      <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+      <span>Cargando carritos favoritos...</span>
+    </div>
+    } @else if (gruposHijos().length === 0) {
+    <section class="carritos-page__vacio" role="status">
+      <i class="fa-solid fa-heart-crack" aria-hidden="true"></i>
+      <h3>No tenés carritos favoritos guardados</h3>
+      <p>Podés guardar un carrito como favorito al armar tu pedido en la pantalla del carrito.</p>
+      <button type="button" class="carritos-page__vacio-cta" (click)="volver()">
+        Ir al inicio
+      </button>
+    </section>
     } @else {
-      <div class="carritos-page__grid">
-        @for (grupo of gruposHijos; track grupo.alumnoId) {
-          <section class="grupo-hijo" [attr.aria-label]="'Carritos para ' + grupo.alumnoNombre">
-            <button
-              type="button"
-              class="grupo-hijo__header-btn"
-              (click)="toggleGrupoHijo(grupo.alumnoId)"
-              [attr.aria-expanded]="isGrupoHijoExpanded(grupo.alumnoId)"
-            >
-              <h3 class="grupo-hijo__titulo">
-                <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
-                <span>{{ grupo.alumnoNombre }} {{ grupo.alumnoApellido }}</span>
-              </h3>
-              <i class="fa-solid fa-chevron-up toggle-icon" [class.collapsed]="!isGrupoHijoExpanded(grupo.alumnoId)"></i>
-            </button>
-
-            <div class="grupo-hijo__carritos" [class.collapsed]="!isGrupoHijoExpanded(grupo.alumnoId)">
-              @for (cart of grupo.carritos; track cart.id) {
-                <article class="carrito-card">
-                  <header class="carrito-card__header">
-                    <h4 class="carrito-card__nombre">{{ cart.nombre }}</h4>
-                    <div class="carrito-card__acciones-top">
-                      <button
-                        type="button"
-                        class="carrito-card__btn-icon"
-                        (click)="abrirEditarModal(cart)"
-                        title="Editar nombre o hijo asignado"
-                      >
-                        <i class="fa-solid fa-pencil" aria-hidden="true"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="carrito-card__btn-icon carrito-card__btn-icon--danger"
-                        (click)="eliminarCarrito(cart.id)"
-                        title="Eliminar"
-                      >
-                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  </header>
-
-                  <div class="carrito-card__body">
-                    <ul class="carrito-card__items">
-                      @for (item of cart.items; track item.productId) {
-                        <li class="carrito-card__item">
-                          <span class="carrito-card__item-qty">{{ item.quantity }}x</span>
-                          <span class="carrito-card__item-name">{{ item.productName }}</span>
-                          <span class="carrito-card__item-price">
-                            {{ formatearPrecio(item.unitPrice * item.quantity) }}
-                          </span>
-                        </li>
-                      }
-                    </ul>
-                  </div>
-
-                  <footer class="carrito-card__footer">
-                    <button
-                      type="button"
-                      class="carrito-card__btn-cargar"
-                      [class.carrito-card__btn-cargar--premium]="esPremium()"
-                      (click)="cargarAlCarrito(cart)"
-                    >
-                      <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
-                      Cargar al Carrito
-                    </button>
-                  </footer>
-                </article>
+    <div class="carritos-page__grid" [class.carritos-page__grid--horizontal]="todosHijosColapsados()">
+      @for (grupo of gruposHijos(); track grupo.alumnoId) {
+      <section class="grupo-hijo-card" [attr.aria-label]="'Carritos para ' + grupo.alumnoNombre">
+        <button type="button" class="grupo-hijo-card__header-btn" (click)="toggleGrupoHijo(grupo.alumnoId)"
+          [attr.aria-expanded]="isGrupoHijoExpanded(grupo.alumnoId)">
+          <div class="grupo-hijo-card__perfil">
+            <div class="grupo-hijo-card__avatar-container">
+              @if (grupo.urlFotoPerfil) {
+              <img [src]="grupo.urlFotoPerfil" [alt]="'Foto de ' + grupo.alumnoNombre"
+                class="grupo-hijo-card__avatar-img" />
+              } @else {
+              <div class="grupo-hijo-card__avatar-initials">
+                {{ getInitials(grupo.alumnoNombre + ' ' + grupo.alumnoApellido) }}
+              </div>
               }
             </div>
-          </section>
-        }
-      </div>
+            <div class="grupo-hijo-card__info">
+              <span class="grupo-hijo-card__nombre">{{ grupo.alumnoNombre }} {{ grupo.alumnoApellido }}</span>
+              <span class="grupo-hijo-card__total">Total Carritos: {{ grupo.carritos.length }}</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-up toggle-icon" [class.collapsed]="!isGrupoHijoExpanded(grupo.alumnoId)"></i>
+        </button>
+
+        <div class="grupo-hijo-card__body" [class.collapsed]="!isGrupoHijoExpanded(grupo.alumnoId)">
+          <hr class="grupo-hijo-card__divider" />
+          <div class="grupo-hijo-card__carritos-grid">
+            @for (cart of grupo.carritos; track cart.id) {
+            <article class="carrito-card">
+              <header class="carrito-card__header">
+                <h4 class="carrito-card__nombre">{{ cart.nombre }}</h4>
+                <div class="carrito-card__acciones-top">
+                  <button type="button" class="carrito-card__btn-icon" (click)="abrirEditarModal(cart)"
+                    title="Editar nombre o hijo asignado">
+                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="carrito-card__btn-icon carrito-card__btn-icon--danger"
+                    (click)="eliminarCarrito(cart.id)" title="Eliminar">
+                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </header>
+
+              <div class="carrito-card__body">
+                <ul class="carrito-card__items">
+                  @for (item of cart.items; track item.productId) {
+                  <li class="carrito-card__item">
+                    <span class="carrito-card__item-name">{{ item.productName }}{{ item.quantity > 1 ? ' (' +
+                      item.quantity + ')' : '' }}</span>
+                    <span class="carrito-card__item-price">
+                      {{ formatearPrecio(item.unitPrice * item.quantity) }}
+                    </span>
+                  </li>
+                  }
+                </ul>
+              </div>
+
+              <footer class="carrito-card__footer">
+                <button type="button" class="carrito-card__btn-cargar" (click)="cargarAlCarrito(cart)">
+                  <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+                  Cargar
+                </button>
+              </footer>
+            </article>
+            }
+          </div>
+        </div>
+      </section>
+      }
+    </div>
     }
   </div>
 </main>
 
 @if (mostrarModalEditar) {
-  <app-guardar-favorito-modal
-    [cartId]="editarCartId"
-    [initialNombre]="editarInitialNombre"
-    [initialAlumnoId]="editarInitialAlumnoId"
-    [items]="editarItems"
-    (closeModal)="cerrarEditarModal()"
-    (saveSuccess)="cargarCarritosFavoritos()"
-  />
+<app-guardar-favorito-modal [cartId]="editarCartId" [initialNombre]="editarInitialNombre"
+  [initialAlumnoId]="editarInitialAlumnoId" [items]="editarItems" (closeModal)="cerrarEditarModal()"
+  (saveSuccess)="cargarCarritosFavoritos()" />
 }

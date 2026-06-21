@@ -11,11 +11,13 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { GuardarFavoritoModalComponent } from '../compra/components/guardar-favorito-modal/guardar-favorito-modal.component';
 import { DialogService } from '../../shared/services/dialog.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
 
 interface GrupoHijo {
   alumnoId: string;
   alumnoNombre: string;
   alumnoApellido: string;
+  urlFotoPerfil: string | null;
   carritos: CarritoFavoritoResponse[];
 }
 
@@ -34,6 +36,7 @@ export class CarritosFavoritosPage implements OnInit {
   private readonly router = inject(Router);
   private readonly dialogService = inject(DialogService);
   private readonly perfilService = inject(PerfilService);
+  private readonly alumnosService = inject(AlumnosService);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
   readonly esPlanGratuito = this.perfilService.esPlanGratuito;
@@ -54,7 +57,13 @@ export class CarritosFavoritosPage implements OnInit {
   }
 
   carritosFavoritos: CarritoFavoritoResponse[] = [];
-  gruposHijos: GrupoHijo[] = [];
+  readonly gruposHijos = signal<GrupoHijo[]>([]);
+  readonly todosHijosColapsados = computed(() => {
+    const hijos = this.gruposHijos();
+    const colapsados = this.hijosColapsados();
+    if (hijos.length === 0) return false;
+    return hijos.every(h => colapsados[h.alumnoId] === true);
+  });
   isLoading = false;
 
   mostrarModalEditar = false;
@@ -68,7 +77,14 @@ export class CarritosFavoritosPage implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarCarritosFavoritos();
+    this.alumnosService.asegurarCargados()
+      .then(() => {
+        this.cargarCarritosFavoritos();
+      })
+      .catch((err) => {
+        console.error('Error al asegurar cargados alumnos:', err);
+        this.cargarCarritosFavoritos();
+      });
   }
 
   cargarCarritosFavoritos(): void {
@@ -88,19 +104,37 @@ export class CarritosFavoritosPage implements OnInit {
   }
 
   agruparCarritosPorHijo(): void {
-    const mapa = new Map<string, { alumnoNombre: string; alumnoApellido: string; carritos: CarritoFavoritoResponse[] }>();
+    const mapa = new Map<string, { alumnoNombre: string; alumnoApellido: string; urlFotoPerfil: string | null; carritos: CarritoFavoritoResponse[] }>();
     for (const c of this.carritosFavoritos) {
       const key = c.alumnoId;
-      const grupo = mapa.get(key) ?? { alumnoNombre: c.alumnoNombre, alumnoApellido: c.alumnoApellido, carritos: [] };
+      const alumno = this.alumnosService.getAlumnoById(key);
+      const urlFotoPerfil = alumno?.urlFotoPerfil ?? null;
+      
+      const grupo = mapa.get(key) ?? { 
+        alumnoNombre: c.alumnoNombre, 
+        alumnoApellido: c.alumnoApellido, 
+        urlFotoPerfil,
+        carritos: [] 
+      };
       grupo.carritos.push(c);
       mapa.set(key, grupo);
     }
-    this.gruposHijos = Array.from(mapa.entries()).map(([alumnoId, data]) => ({
+    this.gruposHijos.set(Array.from(mapa.entries()).map(([alumnoId, data]) => ({
       alumnoId,
       alumnoNombre: data.alumnoNombre,
       alumnoApellido: data.alumnoApellido,
+      urlFotoPerfil: data.urlFotoPerfil,
       carritos: data.carritos
-    }));
+    })));
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
   }
 
   cargarAlCarrito(carrito: CarritoFavoritoResponse): void {
