@@ -4,14 +4,14 @@
       Resumen del período {{ periodo }}
     </h3>
     <span class="prediction-summary__fecha">
-      Calculado: {{ fechaCalculo | date:'dd/MM/yyyy' }}
+      Calculado: {{ fechaCalculo | date:'dd-MM-yyyy' }}
     </span>
   </header>
 
   <div class="prediction-summary__rango">
-    <span><i class="fa-solid fa-flag" aria-hidden="true"></i> {{ fechaInicio | date:'dd/MM/yyyy' }}</span>
+    <span><i class="fa-solid fa-flag" aria-hidden="true"></i> {{ fechaInicio | date:'dd-MM-yyyy' }}</span>
     <span class="prediction-summary__rango-sep" aria-hidden="true">→</span>
-    <span><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> {{ fechaFin | date:'dd/MM/yyyy' }}</span>
+    <span><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> {{ fechaFin | date:'dd-MM-yyyy' }}</span>
   </div>
 
   <div class="prediction-summary__grid">

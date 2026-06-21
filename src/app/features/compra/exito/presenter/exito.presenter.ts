@@ -25,6 +25,8 @@ export class ExitoPresenter {
   }
 
   verPendientes(): void {
-    this.router.navigateByUrl(this.usuarioService.homeUrl());
+    this.router.navigate(['/movimientos'], {
+      queryParams: { estado: 'PENDIENTE,EN_PREPARACION' },
+    });
   }
 }

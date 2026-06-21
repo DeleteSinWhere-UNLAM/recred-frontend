@@ -189,7 +189,7 @@
             <p class="mt-2" style="font-size: 0.9rem;">
               Monto original: ${{ creditoActivo()?.amount }} <br/>
               Cuotas asignadas: {{ creditoActivo()?.installments }} <br/>
-              Fecha: {{ creditoActivo()?.createdAt | date:'dd/MM/yyyy' }}
+              Fecha: {{ creditoActivo()?.createdAt | date:'dd-MM-yyyy' }}
             </p>
             <p class="mt-2 text-sm text-gray-600" style="font-size: 0.85rem;">
               No es posible asignar un nuevo crédito hasta que el actual haya sido saldado.
