@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TutorDashboardService } from './services/tutor-dashboard.service';
 import { TutorGlobalDashboardSummary, ChildDashboardSummary } from './models/tutor-dashboard.model';
 import { GridsterConfig, GridsterItemConfig, Gridster, GridsterItem } from 'angular-gridster2';
@@ -29,6 +30,7 @@ export class TutorDashboardComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly dialogService = inject(DialogService);
+  private readonly router = inject(Router);
 
   readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
 
@@ -55,6 +57,10 @@ export class TutorDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.initGrid();
     this.loadDashboardData();
+  }
+
+  volver(): void {
+    this.router.navigate(['/tutor']);
   }
 
   loadDashboardData() {

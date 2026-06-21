@@ -29,16 +29,24 @@ export class AdelantoPage implements OnInit {
   creditoActivo = signal<SchoolCredit | null>(null);
   cargando = signal<boolean>(true);
   
+  historialSaldados = signal<SchoolCredit[]>([]);
+  
   montoFijo = signal<number>(5000);
   cuotas = signal<number>(1);
 
   ngOnInit(): void {
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId');
-    if (!alumnoId) {
-      this.volver();
-      return;
-    }
+    this.route.paramMap.subscribe(params => {
+      const alumnoId = params.get('alumnoId');
+      if (!alumnoId) {
+        this.volver();
+        return;
+      }
+      this.cargarAlumno(alumnoId);
+    });
+  }
 
+  cargarAlumno(alumnoId: string): void {
+    this.cargando.set(true);
     this.alumnosService.asegurarCargados().then(() => {
       const al = this.alumnosService.getAlumnoById(alumnoId);
       if (!al) {
@@ -51,16 +59,29 @@ export class AdelantoPage implements OnInit {
       this.microcreditosService.getActiveCredit(al.id).subscribe({
         next: (credito) => {
           this.creditoActivo.set(credito);
-          this.cargando.set(false);
+          this.cargarHistorial(al.id);
         },
         error: () => {
           this.creditoActivo.set(null);
-          this.cargando.set(false);
+          this.cargarHistorial(al.id);
         }
       });
     }).catch(() => {
       this.toastService.mostrar('Error al cargar alumno', 'error');
       this.volver();
+    });
+  }
+
+  cargarHistorial(studentId: string): void {
+    this.microcreditosService.getHistory(studentId).subscribe({
+      next: (historial) => {
+        const saldados = historial.filter(c => c.status === 'PAID');
+        this.historialSaldados.set(saldados);
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.cargando.set(false);
+      }
     });
   }
 
@@ -106,5 +127,33 @@ export class AdelantoPage implements OnInit {
           }
         }
       });
+  }
+
+  async pagarAdelanto(): Promise<void> {
+    const al = this.alumno();
+    const credito = this.creditoActivo();
+    if (!al || !credito) return;
+    
+    if (al.saldo < credito.amount) {
+      await this.dialogService.alert('Saldo insuficiente para pagar el adelanto.', 'Saldo Insuficiente');
+      return;
+    }
+
+    const confirm = await this.dialogService.confirm(`¿Estás seguro de que deseas saldar el adelanto de $${credito.amount}?`, 'Pagar Adelanto');
+    if (!confirm) return;
+
+    this.cargando.set(true);
+    this.microcreditosService.payCredit(credito.id).subscribe({
+      next: async () => {
+        await this.dialogService.alert('El adelanto ha sido saldado exitosamente.', 'Adelanto Saldado');
+        this.creditoActivo.set(null);
+        al.saldo -= credito.amount;
+        this.cargarHistorial(al.id);
+      },
+      error: async (err) => {
+        this.cargando.set(false);
+        await this.dialogService.alert('Error al pagar el adelanto: ' + (err.error || err.message), 'Error');
+      }
+    });
   }
 }

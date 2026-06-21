@@ -41,4 +41,12 @@ export class MicrocreditosService {
   getActiveCredit(studentId: string): Observable<SchoolCredit | null> {
     return this.http.get<SchoolCredit | null>(`${this.apiUrl}/alumno/${studentId}/active`);
   }
+
+  payCredit(creditId: string): Observable<SchoolCredit> {
+    return this.http.post<SchoolCredit>(`${this.apiUrl}/${creditId}/pay`, {});
+  }
+
+  getHistory(studentId: string): Observable<SchoolCredit[]> {
+    return this.http.get<SchoolCredit[]>(`${this.apiUrl}/alumno/${studentId}`);
+  }
 }
