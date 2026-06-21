@@ -72,13 +72,36 @@
   flex-shrink: 0;
 }
 
+.carga-producto__titulo-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
 .carga-producto__titulo {
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
   color: var(--color-pizarra);
   line-height: 1.2;
-  margin: 0 0 2px;
+  margin: 0;
+}
+
+.carga-producto__premium-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  color: #1e293b;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
 }
 
 .carga-producto__subtitulo {

@@ -31,6 +31,7 @@
         >
           <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
           <span>Panel de control</span>
+          <span class="pv__premium-badge">PREMIUM</span>
         </button>
       </header>
 
@@ -153,7 +154,12 @@
                   </span>
 
                   <span>
-                    <strong>{{ action.titulo }}</strong>
+                    <span class="pv__action-title-container">
+                      <strong>{{ action.titulo }}</strong>
+                      @if (action.premium) {
+                        <span class="pv__premium-badge">PREMIUM</span>
+                      }
+                    </span>
                     <small>{{ action.descripcion }}</small>
                   </span>
 
@@ -185,7 +191,12 @@
                   </span>
 
                   <span>
-                    <strong>{{ action.titulo }}</strong>
+                    <span class="pv__action-title-container">
+                      <strong>{{ action.titulo }}</strong>
+                      @if (action.premium) {
+                        <span class="pv__premium-badge">PREMIUM</span>
+                      }
+                    </span>
                     <small>{{ action.descripcion }}</small>
                   </span>
 
