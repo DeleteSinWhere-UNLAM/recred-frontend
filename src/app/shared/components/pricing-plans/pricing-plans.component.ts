@@ -24,20 +24,26 @@ export class PricingPlansComponent {
   plans = computed<PricingPlan[]>(() => {
     const isPadre = this.userType() === 'padre';
 
+    const basicFeatures = [
+      'Funciones esenciales',
+      'Soporte general',
+      'Notificaciones'
+    ];
+
     const premiumFeatures = isPadre
       ? [
-          'Inteligencia artificial',
-          'Acceso a datos de alto valor',
-          'Promociones exclusivas',
-          'Notificaciones personalizadas'
-        ]
+        'Inteligencia artificial',
+        'Acceso a datos de alto valor',
+        'Promociones exclusivas',
+        'Notificaciones personalizadas'
+      ]
       : [
-          'Inteligencia artificial',
-          'Acceso a datos de alto valor',
-          'Carga de stock masiva',
-          'Control de stock inteligente',
-          'Estrategia de venta personalizable'
-        ];
+        'Inteligencia artificial',
+        'Acceso a datos de alto valor',
+        'Carga de stock masiva',
+        'Control de stock inteligente',
+        'Estrategias de venta personalizable'
+      ];
 
     return [
       {
@@ -46,11 +52,7 @@ export class PricingPlansComponent {
         price: 0,
         period: 'gratis por siempre',
         description: 'Ideal para comenzar y conocer la plataforma.',
-        features: [
-          'Acceso a funciones esenciales',
-          'Soporte comunitario',
-          'Límite de proyectos'
-        ],
+        features: [...basicFeatures],
         isHighlighted: false
       },
       {
@@ -59,7 +61,7 @@ export class PricingPlansComponent {
         price: 15,
         period: 'por mes',
         description: 'Flexibilidad total para comenzar a crecer.',
-        features: premiumFeatures,
+        features: [...basicFeatures, ...premiumFeatures.slice(0, 1)],
         isHighlighted: false
       },
       {
@@ -68,7 +70,7 @@ export class PricingPlansComponent {
         price: 35,
         period: 'cada 3 meses',
         description: 'Paga cada 3 meses y ahorra un 22%.',
-        features: premiumFeatures,
+        features: [...basicFeatures, ...premiumFeatures.slice(0, 2)],
         isHighlighted: false
       },
       {
@@ -77,7 +79,7 @@ export class PricingPlansComponent {
         price: 120,
         period: 'por año',
         description: 'Nuestra mejor oferta. Ahorra un 33%.',
-        features: premiumFeatures,
+        features: [...basicFeatures, ...premiumFeatures],
         isHighlighted: true
       }
     ];

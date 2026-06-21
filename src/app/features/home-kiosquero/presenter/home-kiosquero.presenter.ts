@@ -869,6 +869,15 @@ export class HomeKiosqueroPresenter {
       destacada: true,
     },
     {
+      id: 'oportunidades-stock',
+      titulo: 'Oportunidades de Stock',
+      descripcion: 'Descubrir nuevos productos',
+      icono: 'fa-rocket',
+      ruta: '/sugerencias-agregar',
+      color: 'menta',
+      destacada: true,
+    },
+    {
       id: 'tracking-pedidos',
       titulo: 'Seguimiento de pedidos',
       descripcion: 'Monitorea y entrega los pedidos recibidos',
@@ -903,11 +912,12 @@ export class HomeKiosqueroPresenter {
     },
     {
       id: 'sugerencias',
-      titulo: 'Sugerencias del día',
-      descripcion: 'Recomendaciones inteligentes',
+      titulo: 'Impulsar Baja Rotación',
+      descripcion: 'Armar combos para mover stock estancado',
       icono: 'fa-robot',
       ruta: '/sugerencias',
       color: 'melocoton',
+      destacada: true,
     },
     {
       id: 'recomendaciones',

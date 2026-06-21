@@ -38,6 +38,7 @@
         <button
           type="button"
           class="carrito-page__vacio-cta"
+          [class.carrito-page__vacio-cta--premium]="esPremium()"
           (click)="presenter.volverAlBuffet()"
         >
           Ir al inicio

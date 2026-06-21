@@ -62,6 +62,15 @@ export class ConfirmarPresenter {
     });
   }
 
+  formatearFecha(fecha: string): string {
+    if (!fecha) return '';
+    const parts = fecha.split('T')[0].split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return fecha;
+  }
+
   cancelar(): void {
     this.compraService.cancelarOrden();
     this.router.navigateByUrl('/compra');

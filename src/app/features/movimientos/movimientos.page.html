@@ -305,7 +305,7 @@
                       <div class="movimientos__fila-monto">
                         {{ formatearPrecio(mov.totalAmount) }}
                       </div>
-                      <button type="button" class="movimientos__fila-detalles-btn" (click)="abrirDetalle(mov)" [id]="'detalles-' + mov.id">
+                      <button type="button" class="movimientos__fila-detalles-btn" [class.movimientos__fila-detalles-btn--premium]="esPremium()" (click)="abrirDetalle(mov)" [id]="'detalles-' + mov.id">
                         <i class="fa-solid fa-utensils" aria-hidden="true" style="margin-right: 6px;"></i>
                         <span>Ver detalles</span>
                       </button>

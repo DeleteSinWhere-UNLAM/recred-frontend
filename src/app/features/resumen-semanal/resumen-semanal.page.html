@@ -1,192 +1,198 @@
 <app-navbar [userName]="nombreUsuario" />
 
 @if (resumen && resumenProcesado) {
-  <main class="dashboard">
-    <header class="dashboard__header">
-      <h1>Resumen semanal</h1>
-      <p>{{ resumen.fechaDesde }} - {{ resumen.fechaHasta }}</p>
-    </header>
+  <main class="rs">
+    <div class="rs__container">
+      <header class="rs__header">
+        <h1>Resumen semanal</h1>
+        <p>
+          <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+          {{ formatearFechaString(resumen.fechaDesde) }} - {{ formatearFechaString(resumen.fechaHasta) }}
+        </p>
+      </header>
 
-    <section class="kpi-grid">
-      <div class="stat-card highlight">
-        <div class="stat-card__icon">💰</div>
-
-        <div>
-          <span>Gasto total</span>
-          <h3>${{ totalFamiliar }}</h3>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card__icon">🏆</div>
-
-        <div>
-          <span>Mayor consumo</span>
-          <h3>{{ hijosResumen[0]?.nombre ?? "-" }}</h3>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-card__icon">👨‍👩‍👧‍👦</div>
-
-        <div>
-          <span>Integrantes</span>
-          <h3>{{ hijos.length }}</h3>
-        </div>
-      </div>
-    </section>
-
-    <section class="analysis-grid">
-      <section class="chart-card">
-        <h2>Distribución familiar</h2>
-
-        <div class="chart-bars">
-          @for (item of hijosResumen; track item.nombre; let i = $index) {
-            <div class="bar-item">
-              <div class="ranking">
-                @if (i === 0) {
-                  🥇
-                } @else if (i === 1) {
-                  🥈
-                } @else if (i === 2) {
-                  🥉
-                }
-              </div>
-
-              <div class="bar-wrapper">
-                <div
-                  class="bar"
-                  [style.height.%]="item.porcentaje"
-                  [style.background]="item.color"
-                ></div>
-              </div>
-
-              <span class="bar-name">
-                {{ item.nombre }}
-              </span>
-
-              <small class="bar-percent">
-                {{ item.porcentaje.toFixed(0) }}%
-              </small>
-            </div>
-          }
-        </div>
-      </section>
-
-      <section class="insight-card">
-        <h2>🧠 Análisis IA</h2>
-
-        @if (resumenProcesado.mensajes.length) {
-          <div class="insight-list">
-            @for (mensaje of resumenProcesado.mensajes; track mensaje.nombre) {
-              <div class="insight-item">
-                <div class="insight-item__header">💡 {{ mensaje.nombre }}</div>
-
-                <p>{{ mensaje.mensaje }}</p>
-              </div>
-            }
+      <section class="rs__module" aria-label="Resumen comercial del período">
+        <div class="rs__module-header">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-chart-pie"></i>
+          </span>
+          <div>
+            <h2>Métricas generales</h2>
           </div>
-        } @else {
-          <p>No hay análisis disponible.</p>
-        }
+        </div>
+
+        <div class="rs__summary-grid">
+          <article class="rs__metric">
+            <span class="rs__metric-icon" aria-hidden="true">
+              <i class="fa-solid fa-wallet"></i>
+            </span>
+            <div>
+              <small>Gasto total</small>
+              <strong>${{ totalFamiliar }}</strong>
+            </div>
+          </article>
+
+          <article class="rs__metric">
+            <span class="rs__metric-icon" aria-hidden="true">
+              <i class="fa-solid fa-trophy"></i>
+            </span>
+            <div>
+              <small>Mayor consumo</small>
+              <strong>{{ hijosResumen[0]?.nombre ?? "-" }}</strong>
+            </div>
+          </article>
+
+          <article class="rs__metric">
+            <span class="rs__metric-icon" aria-hidden="true">
+              <i class="fa-solid fa-users"></i>
+            </span>
+            <div>
+              <small>Integrantes</small>
+              <strong>{{ hijos.length }}</strong>
+            </div>
+          </article>
+        </div>
       </section>
-    </section>
 
-    <section class="children-section">
-      <h2>Detalle por hijo</h2>
+      <div class="rs__analysis-grid">
+        <section class="rs__module" aria-label="Distribución familiar">
+          <div class="rs__module-header">
+            <span aria-hidden="true">
+              <i class="fa-solid fa-chart-column"></i>
+            </span>
+            <div>
+              <h2>Distribución familiar</h2>
+            </div>
+          </div>
 
-      <div class="children-grid">
-        @for (hijo of hijos; track hijo.nombre) {
-          <article class="child-card">
-            <header class="child-card__header">
-              <h3>{{ hijo.nombre }}</h3>
-
-              <span>${{ hijo.datos.totalGastado }}</span>
-            </header>
-
-            @if (hijo.datos.LimiteGasto) {
-              <div class="budget-section">
-                <div class="budget-section__header">
-                  <span>Presupuesto semanal</span>
-
-                  <strong>
-                    ${{ hijo.datos.totalGastado }} / ${{
-                      hijo.datos.LimiteGasto
-                    }}
-                  </strong>
+          <div class="rs__chart-bars">
+            @for (item of hijosResumen; track item.nombre; let i = $index) {
+              <article class="rs__bar-item">
+                <div class="rs__ranking">
+                  @if (i === 0) {
+                    <i class="fa-solid fa-medal" style="color: var(--color-dorado)" aria-hidden="true"></i>
+                  } @else if (i === 1) {
+                    <i class="fa-solid fa-medal" style="color: #94a3b8" aria-hidden="true"></i>
+                  } @else if (i === 2) {
+                    <i class="fa-solid fa-medal" style="color: #b45309" aria-hidden="true"></i>
+                  }
                 </div>
 
-                <div class="budget-progress">
+                <div class="rs__bar-wrapper">
                   <div
-                    class="budget-progress__value"
-                    [style.width.%]="
-                      (hijo.datos.totalGastado / hijo.datos.LimiteGasto) * 100
-                    "
+                    class="rs__bar"
+                    [style.height.%]="item.porcentaje"
                   ></div>
                 </div>
 
-                <small>
-                  {{
-                    (
-                      (hijo.datos.totalGastado / hijo.datos.LimiteGasto) *
-                      100
-                    ).toFixed(0)
-                  }}% utilizado
-                </small>
-              </div>
+                <span class="rs__bar-name">{{ item.nombre }}</span>
+                <small class="rs__bar-percent">{{ item.porcentaje.toFixed(0) }}%</small>
+              </article>
             }
+          </div>
+        </section>
 
-            <div class="child-summary">
-              @if (hijo.datos.LimiteGasto) {
-                <div class="summary-card">
-                  <span>Disponible</span>
-
-                  <strong>
-                    ${{ hijo.datos.LimiteGasto - hijo.datos.totalGastado }}
-                  </strong>
-                </div>
-              }
-
-              <div class="summary-card">
-                <span>Producto favorito</span>
-
-                <strong>
-                  {{
-                    hijo.datos.productoMasConsumido?.nombre ?? "Sin consumos"
-                  }}
-                </strong>
-
-                <small>
-                  {{ hijo.datos.productoMasConsumido?.cantidad ?? 0 }}
-                  unidades
-                </small>
-              </div>
+        <section class="rs__module" aria-label="Análisis Inteligente">
+          <div class="rs__module-header">
+            <span aria-hidden="true">
+              <i class="fa-solid fa-robot"></i>
+            </span>
+            <div>
+              <h2>Análisis IA</h2>
             </div>
+          </div>
 
-            <div class="categories">
-              @for (
-                categoria of getCategorias(hijo.datos);
-                track categoria[0]
-              ) {
-                <div class="category">
-                  <div class="category__header">
-                    <span>{{ categoria[0] }}</span>
+          @if (resumenProcesado.mensajes.length) {
+            <div class="rs__insight-list">
+              @for (mensaje of resumenProcesado.mensajes; track mensaje.nombre) {
+                <article class="rs__insight-item">
+                  <div class="rs__insight-item__header">
+                    <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+                    {{ mensaje.nombre }}
+                  </div>
+                  <p>{{ mensaje.mensaje }}</p>
+                </article>
+              }
+            </div>
+          } @else {
+            <p class="rs__empty">No hay análisis disponible para este período.</p>
+          }
+        </section>
+      </div>
 
-                    <span>{{ categoria[1] }}%</span>
+      <section class="rs__children-section" aria-label="Detalle por hijo">
+        <div class="rs__module-header">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-children"></i>
+          </span>
+          <div>
+            <h2>Detalle por hijo</h2>
+          </div>
+        </div>
+
+        <div class="rs__children-grid">
+          @for (hijo of hijos; track hijo.nombre) {
+            <article class="rs__child-card">
+              <header class="rs__child-card__header">
+                <h3>{{ hijo.nombre }}</h3>
+                <span>${{ hijo.datos.totalGastado }}</span>
+              </header>
+
+              @if (hijo.datos.LimiteGasto) {
+                <div class="rs__budget-section">
+                  <div class="rs__budget-header">
+                    <span>Presupuesto semanal</span>
+                    <strong>${{ hijo.datos.totalGastado }} / ${{ hijo.datos.LimiteGasto }}</strong>
                   </div>
 
-                  <div class="progress">
+                  <div class="rs__budget-progress">
                     <div
-                      class="progress__value"
-                      [style.width.%]="categoria[1]"
+                      class="rs__budget-progress__value"
+                      [style.width.%]="(hijo.datos.totalGastado / hijo.datos.LimiteGasto) * 100"
                     ></div>
                   </div>
+
+                  <div class="rs__budget-info">
+                    <span>{{ ((hijo.datos.totalGastado / hijo.datos.LimiteGasto) * 100).toFixed(0) }}% utilizado</span>
+                  </div>
                 </div>
               }
-            </div>
-          </article>
-        }
-      </div>
-    </section>
+
+              <div class="rs__child-summary">
+                @if (hijo.datos.LimiteGasto) {
+                  <article class="rs__summary-card">
+                    <span>Disponible</span>
+                    <strong>${{ hijo.datos.LimiteGasto - hijo.datos.totalGastado }}</strong>
+                  </article>
+                }
+
+                <article class="rs__summary-card">
+                  <span>Producto favorito</span>
+                  <strong>{{ hijo.datos.productoMasConsumido?.nombre ?? "Sin consumos" }}</strong>
+                  <small>{{ hijo.datos.productoMasConsumido?.cantidad ?? 0 }} unidades</small>
+                </article>
+              </div>
+
+              @if (getCategorias(hijo.datos).length > 0) {
+                <div class="rs__categories">
+                  <h4 class="rs__categories-title">Gastos por categoría</h4>
+                  @for (categoria of getCategorias(hijo.datos); track categoria[0]) {
+                    <div class="rs__category">
+                      <div class="rs__category-header">
+                        <span>{{ categoria[0] }}</span>
+                        <span>{{ categoria[1] }}%</span>
+                      </div>
+                      <div class="rs__category-progress">
+                        <div class="rs__category-progress__value" [style.width.%]="categoria[1]"></div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    </div>
   </main>
 }

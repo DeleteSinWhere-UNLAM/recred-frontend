@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CarritosFavoritosService } from './services/carritos-favoritos.service';
@@ -37,6 +37,21 @@ export class CarritosFavoritosPage implements OnInit {
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
   readonly esPlanGratuito = this.perfilService.esPlanGratuito;
+  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
+
+  readonly hijosColapsados = signal<Record<string, boolean>>({});
+
+  toggleGrupoHijo(alumnoId: string): void {
+    const current = this.hijosColapsados();
+    this.hijosColapsados.set({
+      ...current,
+      [alumnoId]: !current[alumnoId]
+    });
+  }
+
+  isGrupoHijoExpanded(alumnoId: string): boolean {
+    return this.hijosColapsados()[alumnoId] !== true;
+  }
 
   carritosFavoritos: CarritoFavoritoResponse[] = [];
   gruposHijos: GrupoHijo[] = [];

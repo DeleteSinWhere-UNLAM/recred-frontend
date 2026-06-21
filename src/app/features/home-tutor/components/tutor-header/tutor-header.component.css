@@ -158,10 +158,11 @@
   width: 100%;
   max-width: 340px;
   padding: 24px 28px;
-  background-color: var(--color-dorado);
+  background: linear-gradient(135deg, #FFE082 0%, #F2B705 50%, #E5A93B 100%);
   border-radius: 18px;
-  box-shadow: 0 8px 20px rgba(242, 183, 5, 0.15);
+  box-shadow: 0 8px 24px rgba(242, 183, 5, 0.22);
   color: #1a3b5c;
+  border: 1px solid rgba(255, 255, 255, 0.45);
 }
 
 .tutor-header__saldo-content {

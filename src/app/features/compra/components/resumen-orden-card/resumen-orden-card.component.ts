@@ -6,7 +6,9 @@ import {
   Output,
   computed,
   signal,
+  inject,
 } from '@angular/core';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -26,9 +28,13 @@ export interface ResumenLinea {
   selector: 'app-resumen-orden-card',
   templateUrl: './resumen-orden-card.component.html',
   styleUrl: './resumen-orden-card.component.css',
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResumenOrdenCardComponent {
+  private readonly perfilService = inject(PerfilService);
+  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
+
   private readonly lineasState = signal<ResumenLinea[]>([]);
   private readonly totalState = signal<number>(0);
 
