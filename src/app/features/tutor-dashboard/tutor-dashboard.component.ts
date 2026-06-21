@@ -75,6 +75,9 @@ export class TutorDashboardComponent implements OnInit {
         }
 
         if (data.children && data.children.length > 0) {
+          // Sort children alphabetically
+          data.children.sort((a, b) => a.studentName.localeCompare(b.studentName));
+
           // Keep the previous selection if it exists
           if (this.selectedChild) {
             this.selectedChild = data.children.find(c => c.studentId === this.selectedChild?.studentId) || data.children[0];

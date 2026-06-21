@@ -79,7 +79,15 @@ export class HomeTutorPage implements OnInit {
       }
       grupo.alumnos.push(alumno);
     }
-    return Array.from(porColegio.values());
+    const result = Array.from(porColegio.values());
+    for (const g of result) {
+      g.alumnos.sort((a, b) => {
+        const nameA = `${a.nombre} ${a.apellido}`.trim().toLowerCase();
+        const nameB = `${b.nombre} ${b.apellido}`.trim().toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+    }
+    return result;
   });
 
   readonly cantidadHijos = computed(() => this.alumnos().length);
