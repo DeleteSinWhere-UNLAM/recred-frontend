@@ -215,6 +215,16 @@
   background-color: rgba(129, 178, 154, 0.28);
 }
 
+.sg__metric--success strong {
+  font-size: 22px;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.2;
+}
+
 /* =========================
    DASHBOARD GRID
 ========================= */
