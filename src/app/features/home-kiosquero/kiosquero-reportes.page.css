@@ -1705,6 +1705,20 @@ strong.kr__purchase-percent {
    Rankings: Más vendidos / Más reservados ahora
    ========================================================= */
 
+.kr__trend-cards--scroll {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kr__trend-cards--scroll .kr__trend-card {
+  flex: 0 0 max(172px, calc((100% - 72px) / 7));
+  scroll-snap-align: start;
+}
+
 .kr__grid--rankings {
   align-items: stretch;
 }

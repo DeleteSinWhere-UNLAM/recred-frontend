@@ -549,7 +549,11 @@
               </div>
             </div>
 
-            <div class="kr__trend-cards" aria-label="Detalle diario de ventas">
+            <div
+              class="kr__trend-cards"
+              [class.kr__trend-cards--scroll]="presenter.trendDays().length > 7"
+              aria-label="Detalle diario de ventas"
+            >
               @for (day of presenter.trendDays(); track day.date) {
                 <article
                   class="kr__trend-card"
