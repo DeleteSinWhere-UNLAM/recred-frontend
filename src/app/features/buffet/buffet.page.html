@@ -478,7 +478,7 @@
 </main>
 
 @if (mostrarSelector()) {
-<app-seleccionar-alumno-modal [alumnos]="todosLosAlumnos()" [colegios]="todosLosColegios"
+<app-seleccionar-alumno-modal [alumnos]="todosLosAlumnos()" [colegios]="todosLosColegios()"
   [alumnoActualId]="presenter.alumno()?.id ?? ''" (seleccionar)="onAlumnoSeleccionado($event)"
   (cerrar)="cerrarSelector()" />
 }

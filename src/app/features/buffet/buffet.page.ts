@@ -67,7 +67,7 @@ export class BuffetPage implements OnInit {
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
   readonly todosLosAlumnos = this.alumnosService.alumnos;
-  readonly todosLosColegios = this.colegiosService.getColegios();
+  readonly todosLosColegios = computed(() => this.colegiosService.getColegios());
 
   protected readonly mostrarSelector = signal(false);
   protected readonly panelLateralCerrado = signal<boolean>(false);

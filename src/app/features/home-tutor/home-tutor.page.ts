@@ -103,5 +103,8 @@ export class HomeTutorPage implements OnInit {
 
   ngOnInit(): void {
     void this.alumnosService.asegurarCargados(true);
+    if (typeof this.colegiosService.obtenerColegios === 'function') {
+      void this.colegiosService.obtenerColegios();
+    }
   }
 }
