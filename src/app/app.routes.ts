@@ -45,11 +45,7 @@ export const routes: Routes = [
             (m) => m.RestriccionesNutricionalesPage,
           ),
       },
-          {
-        path: 'buffet/:alumnoId',
-        loadComponent: () =>
-          import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
-      },
+
           {
         path: 'acreditar-mercado-pago/:alumnoId',
         loadComponent: () =>
@@ -121,6 +117,11 @@ export const routes: Routes = [
           import('./features/tutor-dashboard/tutor-dashboard.component').then(
             (m) => m.TutorDashboardComponent,
           ),
+      },
+      {
+        path: 'buffet/:alumnoId',
+        loadComponent: () =>
+          import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
       },
       {
         path: 'crear-hijo',

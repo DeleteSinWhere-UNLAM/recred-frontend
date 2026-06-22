@@ -5,15 +5,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { RestriccionesHorariasPresenter, FranjaConRestricciones } from './presenter/restricciones-horarias.presenter';
 import { RestriccionHoraria } from './models/restriccion-horaria.model';
 
-export interface QuickToggleItem {
-  id: string;
-  titulo: string;
-  tipo: 'CATEGORIA' | 'SALUD';
-  icon: string;
-  color: string;
-  checked: boolean;
-  restrictionId?: string;
-}
+
 
 
 @Component({
@@ -32,106 +24,40 @@ export class RestriccionesHorariasPage implements OnInit {
 
   protected readonly selectedFranjaId = signal<string>('');
 
-  protected readonly activeItem = computed(() => {
+  protected  readonly activeItem = computed(() => {
     const franjas = this.presenter.franjasConRestricciones();
+    if (franjas.length === 0) return undefined;
     return franjas.find(item => item.franja.id === this.selectedFranjaId()) || franjas[0];
   });
 
-  protected readonly quickToggles = computed(() => {
-    const active = this.activeItem();
-    if (!active) return [];
-
-    const categories = this.presenter.categorias();
-    const health = this.presenter.catalogoSaludDisponible();
-
-    const toggles: QuickToggleItem[] = [];
-
-    const catBebidas = categories.find(c => c.descripcion.toLowerCase().includes('bebida') || c.descripcion.toLowerCase().includes('gaseosa'));
-    if (catBebidas) {
-      const rest = active.restricciones.find(r => r.categoryId === catBebidas.id || r.categoria?.id === catBebidas.id);
-      toggles.push({
-        id: catBebidas.id,
-        titulo: 'Bebidas',
-        tipo: 'CATEGORIA',
-        icon: 'fa-glass-water',
-        color: 'blue',
-        checked: !!rest,
-        restrictionId: rest?.id
-      });
-    }
-
-    const catSnacks = categories.find(c => c.descripcion.toLowerCase().includes('snack') || c.descripcion.toLowerCase().includes('papa'));
-    if (catSnacks) {
-      const rest = active.restricciones.find(r => r.categoryId === catSnacks.id || r.categoria?.id === catSnacks.id);
-      toggles.push({
-        id: catSnacks.id,
-        titulo: 'Snacks',
-        tipo: 'CATEGORIA',
-        icon: 'fa-cookie',
-        color: 'yellow',
-        checked: !!rest,
-        restrictionId: rest?.id
-      });
-    }
-
-    const catGolosinas = categories.find(c => c.descripcion.toLowerCase().includes('golosina') || c.descripcion.toLowerCase().includes('dulce') || c.descripcion.toLowerCase().includes('chocolate'));
-    if (catGolosinas) {
-      const rest = active.restricciones.find(r => r.categoryId === catGolosinas.id || r.categoria?.id === catGolosinas.id);
-      toggles.push({
-        id: catGolosinas.id,
-        titulo: 'Golosinas',
-        tipo: 'CATEGORIA',
-        icon: 'fa-candy-cane',
-        color: 'orange',
-        checked: !!rest,
-        restrictionId: rest?.id
-      });
-    }
-
-    const salTacc = health.find(s => s.descripcion.toLowerCase().includes('tacc') || s.descripcion.toLowerCase().includes('gluten'));
-    if (salTacc) {
-      const rest = active.restricciones.find(r => r.classificationId === salTacc.id || r.clasificacionSalud?.id === salTacc.id);
-      toggles.push({
-        id: salTacc.id,
-        titulo: 'Gluten / TACC',
-        tipo: 'SALUD',
-        icon: 'fa-wheat-awn',
-        color: 'red',
-        checked: !!rest,
-        restrictionId: rest?.id
-      });
-    }
-
-    const salAzucar = health.find(s => s.descripcion.toLowerCase().includes('azucar') || s.descripcion.toLowerCase().includes('diabet'));
-    if (salAzucar) {
-      const rest = active.restricciones.find(r => r.classificationId === salAzucar.id || r.clasificacionSalud?.id === salAzucar.id);
-      toggles.push({
-        id: salAzucar.id,
-        titulo: 'Azúcar',
-        tipo: 'SALUD',
-        icon: 'fa-cubes-stacked',
-        color: 'blue-dark',
-        checked: !!rest,
-        restrictionId: rest?.id
-      });
-    }
-
-    const salLacteos = health.find(s => s.descripcion.toLowerCase().includes('lacteo') || s.descripcion.toLowerCase().includes('leche'));
-    if (salLacteos) {
-      const rest = active.restricciones.find(r => r.classificationId === salLacteos.id || r.clasificacionSalud?.id === salLacteos.id);
-      toggles.push({
-        id: salLacteos.id,
-        titulo: 'Lácteos',
-        tipo: 'SALUD',
-        icon: 'fa-cow',
-        color: 'orange-dark',
-        checked: !!rest,
-        restrictionId: rest?.id
-      });
-    }
-
-    return toggles;
+  readonly currentIndex = computed(() => {
+    const franjas = this.presenter.franjasConRestricciones();
+    const id = this.selectedFranjaId() || franjas[0]?.franja.id;
+    return franjas.findIndex(f => f.franja.id === id);
   });
+
+  readonly puedeAnterior = computed(() => this.currentIndex() > 0);
+  
+  readonly puedeSiguiente = computed(() => {
+    const franjas = this.presenter.franjasConRestricciones();
+    return this.currentIndex() >= 0 && this.currentIndex() < franjas.length - 1;
+  });
+
+  anteriorFranja(): void {
+    if (this.puedeAnterior()) {
+      const franjas = this.presenter.franjasConRestricciones();
+      this.selectedFranjaId.set(franjas[this.currentIndex() - 1].franja.id);
+    }
+  }
+
+  siguienteFranja(): void {
+    if (this.puedeSiguiente()) {
+      const franjas = this.presenter.franjasConRestricciones();
+      this.selectedFranjaId.set(franjas[this.currentIndex() + 1].franja.id);
+    }
+  }
+
+
 
   constructor() {
     effect(() => {
@@ -155,23 +81,7 @@ export class RestriccionesHorariasPage implements OnInit {
     this.location.back();
   }
 
-  protected isQuickToggle(res: RestriccionHoraria): boolean {
-    const toggles = this.quickToggles();
-    const id = res.categoryId || res.classificationId || res.categoria?.id || res.clasificacionSalud?.id;
-    return toggles.some(t => t.id === id);
-  }
 
-  protected alternarToggle(toggle: QuickToggleItem): void {
-    const active = this.activeItem();
-    if (!active) return;
-
-    if (toggle.checked && toggle.restrictionId) {
-      void this.presenter.quitarRestriccion(toggle.restrictionId);
-    } else {
-      const tipo = toggle.tipo === 'CATEGORIA' ? 'CATEGORIA' : 'SALUD';
-      void this.presenter.agregarRestriccion(active.franja.id, tipo, toggle.id);
-    }
-  }
 
   protected quitarBloqueoTotal(item: any): void {
     const resTotal = item.restricciones.find((r: any) => !r.categoria && !r.clasificacionSalud && !r.categoryId && !r.classificationId);

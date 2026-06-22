@@ -1,37 +1,12 @@
 <main class="presupuesto">
-  <button
-    type="button"
-    class="presupuesto__volver"
-    (click)="presenter.volver()"
-  >
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    <span>Volver</span>
-  </button>
+
 
   <div class="presupuesto__container">
-    <header class="presupuesto__cabecera">
-      <div class="presupuesto__avatar" aria-hidden="true">
-        @if (presenter.urlFotoPerfil()) {
-          <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="presupuesto__avatar-img" />
-        } @else {
-          <span>{{ presenter.iniciales() }}</span>
-        }
-      </div>
-      <div class="presupuesto__identidad">
-        <h2 class="presupuesto__titulo">Presupuesto</h2>
-        <p class="presupuesto__subtitulo">
-          {{ presenter.nombreCompleto() }}
-          @if (presenter.grado()) {
-            <span aria-hidden="true"> · </span>{{ presenter.grado() }}
-          }
-        </p>
-      </div>
-    </header>
+    <h2 class="presupuesto__titulo-principal">
+      Presupuestos para {{ presenter.nombreCompleto() }}
+    </h2>
 
-    <section class="presupuesto__panel" aria-labelledby="general-titulo">
-      <h3 id="general-titulo" class="presupuesto__panel-titulo">
-        Configuración general
-      </h3>
+    <section class="presupuesto__seccion" aria-label="Configuración general">
 
       <div class="presupuesto__grid">
         <label class="campo">
@@ -74,10 +49,7 @@
       </div>
     </section>
 
-    <section class="presupuesto__panel" aria-labelledby="reglas-titulo">
-      <h3 id="reglas-titulo" class="presupuesto__panel-titulo">
-        Reglas por categoría
-      </h3>
+    <section class="presupuesto__seccion" aria-label="Reglas por categoría">
 
       @if (presenter.reglas().length) {
         <ul class="presupuesto__reglas" role="list">
