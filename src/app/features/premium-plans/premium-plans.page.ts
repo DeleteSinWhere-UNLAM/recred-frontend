@@ -1,13 +1,14 @@
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { } from '../../shared/components/navbar/navbar.component';
+
 import { PricingPlansComponent } from '../../shared/components/pricing-plans/pricing-plans.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 
 @Component({
   selector: 'app-premium-plans-page',
   standalone: true,
-  imports: [CommonModule, PricingPlansComponent],
+  imports: [NavbarComponent, CommonModule, PricingPlansComponent],
   template: `
     <app-navbar />
     <main style="padding-top: 80px; min-height: 100vh; background-color: var(--color-fondo);">

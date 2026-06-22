@@ -1,3 +1,4 @@
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 import {  RouterOutlet } from '@angular/router';
 import { signal } from '@angular/core';
@@ -7,7 +8,7 @@ import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { } from '../../shared/components/navbar/navbar.component';
+
 import { ColegioSectionComponent } from './components/colegio-section/colegio-section.component';
 import { TutorHeaderComponent } from './components/tutor-header/tutor-header.component';
 
@@ -27,7 +28,7 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   selector: 'app-home-tutor-page',
   templateUrl: './home-tutor.page.html',
   styleUrl: './home-tutor.page.css',
-  imports: [
+  imports: [NavbarComponent, 
     
     ColegioSectionComponent,
     TutorHeaderComponent,
