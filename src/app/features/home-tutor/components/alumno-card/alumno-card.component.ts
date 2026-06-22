@@ -20,9 +20,10 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
 
 @Component({
   selector: 'app-alumno-card',
+  standalone: true,
   templateUrl: './alumno-card.component.html',
   styleUrl: './alumno-card.component.css',
-  imports: [RouterLink, FormsModule, CropModalComponent],
+  imports: [RouterLink, FormsModule, DatePipe, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlumnoCardComponent implements OnInit {

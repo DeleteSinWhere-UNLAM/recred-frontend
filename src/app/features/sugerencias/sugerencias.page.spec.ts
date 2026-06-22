@@ -65,7 +65,7 @@ describe('SugerenciasPage', () => {
     })
       .overrideComponent(SugerenciasPage, {
         set: {
-          imports: [CommonModule, Mock MockComboPromotionModalComponent],
+          imports: [CommonModule, Mock, MockComboPromotionModalComponent],
           providers: [
             { provide: SugerenciasPresenter, useValue: mockPresenter }
           ]

@@ -6,7 +6,6 @@ import { MovimientosService } from '../../../movimientos/services/movimientos.se
 import { BuffetService } from '../../../buffet/services/buffet.service';
 import { PromotionService, Promotion } from '../../../../data-access/services/promociones/promotion.service';
 import { Movimiento } from '../../../movimientos/models/movimiento.model';
-import { ColegiosService } from '../../../../data-access/services/colegios.service';
 
 @Component({
   selector: 'app-tutor-welcome',

@@ -102,13 +102,13 @@ export class HomeTutorPage implements OnInit {
     this.cargando.set(true);
     this.alumnosService.asegurarCargados(true).then(() => {
       this.cargando.set(false);
-    }).catch(err => {
+    }).catch(() => {
       this.error.set('Error al cargar alumnos');
       this.cargando.set(false);
     });
   }
 
-  manejarMicrocredito(event: any): void {
+  manejarMicrocredito(event: unknown): void {
     console.log('manejarMicrocredito', event);
   }
 }

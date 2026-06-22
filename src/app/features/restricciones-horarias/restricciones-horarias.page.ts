@@ -83,8 +83,8 @@ export class RestriccionesHorariasPage implements OnInit {
 
 
 
-  protected quitarBloqueoTotal(item: any): void {
-    const resTotal = item.restricciones.find((r: any) => !r.categoria && !r.clasificacionSalud && !r.categoryId && !r.classificationId);
+  protected quitarBloqueoTotal(item: FranjaConRestricciones): void {
+    const resTotal = item.restricciones.find((r: RestriccionHoraria) => !r.categoria && !r.clasificacionSalud && !r.categoryId && !r.classificationId);
     if (resTotal) {
       void this.presenter.quitarRestriccion(resTotal.id);
     }

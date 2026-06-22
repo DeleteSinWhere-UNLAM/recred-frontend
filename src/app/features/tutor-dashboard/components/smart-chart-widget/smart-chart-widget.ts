@@ -5,6 +5,19 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { ChildDashboardSummary } from '../../models/tutor-dashboard.model';
 
+interface ScriptContext {
+  chart: {
+    ctx: CanvasRenderingContext2D;
+    chartArea?: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+  };
+  dataIndex?: number;
+}
+
 export interface ChartWidgetConfig {
   childId?: string;
   chartType?: ChartType;
@@ -72,7 +85,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
     this.closeCard.emit();
   }
 
-  getBarGradient(context: any, colorStart: string, colorEnd: string) {
+  getBarGradient(context: ScriptContext, colorStart: string, colorEnd: string) {
     const chart = context.chart;
     const {ctx, chartArea} = chart;
     if (!chartArea) {
@@ -84,7 +97,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
     return gradient;
   }
 
-  getBackgroundColors(context: any, type: string) {
+  getBackgroundColors(context: ScriptContext, type: string) {
     if (this.selectedChartType !== 'pie' && this.selectedChartType !== 'doughnut') {
       return this.getBarGradient(context, '#4A6FA5', '#81B29A');
     }
@@ -146,7 +159,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
             child.balance || 0
           ],
           label: 'Finanzas ($)',
-          backgroundColor: (context: any) => this.getBackgroundColors(context, 'finance'),
+          backgroundColor: (context: ScriptContext) => this.getBackgroundColors(context, 'finance'),
           borderRadius: isPieOrDoughnut ? 0 : 16,
           borderSkipped: false,
           barPercentage: 0.6
@@ -161,7 +174,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
             child.health?.pointsToNextLevel || 0
           ],
           label: 'Salud y Gamificación (Pts)',
-          backgroundColor: (context: any) => this.getBackgroundColors(context, 'health'),
+          backgroundColor: (context: ScriptContext) => this.getBackgroundColors(context, 'health'),
           borderRadius: isPieOrDoughnut ? 0 : 16,
           borderSkipped: false,
           barPercentage: 0.6
@@ -173,7 +186,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
         datasets: [{
           data: [child.todayPickups?.length || 0, 0],
           label: 'Logística de Entregas',
-          backgroundColor: (context: any) => this.getBackgroundColors(context, 'logistics'),
+          backgroundColor: (context: ScriptContext) => this.getBackgroundColors(context, 'logistics'),
           borderRadius: isPieOrDoughnut ? 0 : 16,
           borderSkipped: false,
           barPercentage: 0.6
