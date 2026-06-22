@@ -7,8 +7,13 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { HomeAlumnoService } from '../services/home-alumno.service';
 import { AccionRapida } from '../models/accion-rapida.model';
+import { FondoPerfil } from '../models/fondo-perfil.model';
 import { PedidoEnCurso } from '../models/pedido-en-curso.model';
 import { Recreo } from '../models/recreo.model';
+
+const FONDOS_VALIDOS: readonly FondoPerfil[] = ['nubes', 'minecraft', 'dragonballz', 'gato', 'messi'];
+const FONDOS_LEGADOS_A_MINECRAFT: readonly string[] = ['bee', 'creeper'];
+const STORAGE_KEY_FONDO = 'home-alumno:fondo-perfil';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -27,12 +32,17 @@ export class HomeAlumnoPresenter {
   private readonly router = inject(Router);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
-  private readonly pedidoState = signal<PedidoEnCurso | undefined>(undefined);
-  private readonly recreoState = signal<Recreo | undefined>(undefined);
+  private readonly fondoPerfilState = signal<FondoPerfil>('nubes');
 
   readonly alumno: Signal<Alumno | undefined> = this.alumnoState.asReadonly();
-  readonly pedidoEnCurso: Signal<PedidoEnCurso | undefined> = this.pedidoState.asReadonly();
-  readonly proximoRecreo: Signal<Recreo | undefined> = this.recreoState.asReadonly();
+  readonly fondoPerfil: Signal<FondoPerfil> = this.fondoPerfilState.asReadonly();
+  readonly pedidoEnCurso: Signal<PedidoEnCurso | undefined> = computed(() => {
+    const id = this.alumnoState()?.id;
+    return id ? this.homeAlumnoService.getPedidoEnCurso(id) : undefined;
+  });
+  readonly proximoRecreo: Signal<Recreo | undefined> = computed(() =>
+    this.homeAlumnoService.getProximoRecreo(this.alumnoState()?.colegioId),
+  );
 
   readonly nombreAlumno = computed(() => this.alumnoState()?.nombre ?? '');
 
@@ -63,10 +73,10 @@ export class HomeAlumnoPresenter {
   readonly saldoFormateado = computed(() => formateadorSaldo.format(this.saldo()));
   readonly saldoNegativo = computed(() => this.saldo() < 0);
 
-  readonly tienePedidoEnCurso = computed(() => this.pedidoState() !== undefined);
+  readonly tienePedidoEnCurso = computed(() => this.pedidoEnCurso() !== undefined);
 
   readonly estadoPedidoLabel = computed(() => {
-    const p = this.pedidoState();
+    const p = this.pedidoEnCurso();
     if (!p) return 'Sin pedido para hoy';
     switch (p.estado) {
       case 'PREPARANDO':
@@ -81,7 +91,7 @@ export class HomeAlumnoPresenter {
   });
 
   readonly iconoEstadoPedido = computed(() => {
-    const p = this.pedidoState();
+    const p = this.pedidoEnCurso();
     if (!p) return 'fa-utensils';
     switch (p.estado) {
       case 'PREPARANDO':
@@ -126,6 +136,7 @@ export class HomeAlumnoPresenter {
   ]);
 
   init(): void {
+    this.fondoPerfilState.set(this.leerFondoGuardado());
     void this.alumnosService.asegurarCargados(true).then((alumnos) => {
       const alumnoMock = this.usuarioService.getAlumnoActual();
       const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;
@@ -134,8 +145,10 @@ export class HomeAlumnoPresenter {
       
       if (alumno) {
         this.alumnoState.set(alumno);
-        this.pedidoState.set(this.homeAlumnoService.getPedidoEnCurso(alumno.id));
-        this.recreoState.set(this.homeAlumnoService.getProximoRecreo(alumno.id));
+        void this.homeAlumnoService.cargarPedidoEnCurso(alumno.id);
+        if (alumno.colegioId) {
+          void this.homeAlumnoService.cargarRecreos(alumno.colegioId);
+        }
       }
     });
   }
@@ -163,5 +176,29 @@ export class HomeAlumnoPresenter {
     } else {
       this.irAlBuffet();
     }
+  }
+
+  cambiarFondoPerfil(fondo: FondoPerfil): void {
+    if (!FONDOS_VALIDOS.includes(fondo)) return;
+    this.fondoPerfilState.set(fondo);
+    try {
+      localStorage.setItem(STORAGE_KEY_FONDO, fondo);
+    } catch {
+    }
+  }
+
+  private leerFondoGuardado(): FondoPerfil {
+    try {
+      const guardado = localStorage.getItem(STORAGE_KEY_FONDO);
+      if (guardado && (FONDOS_VALIDOS as readonly string[]).includes(guardado)) {
+        return guardado as FondoPerfil;
+      }
+      if (guardado && FONDOS_LEGADOS_A_MINECRAFT.includes(guardado)) {
+        localStorage.setItem(STORAGE_KEY_FONDO, 'minecraft');
+        return 'minecraft';
+      }
+    } catch {
+    }
+    return 'nubes';
   }
 }

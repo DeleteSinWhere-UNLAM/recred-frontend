@@ -1,6 +1,7 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { HomeAlumnoService } from '../../home-alumno/services/home-alumno.service';
 import {
   SUGERENCIAS_ASISTENTE_POR_ROL,
   SUGERENCIAS_COMPRA_PENDIENTE,
@@ -34,11 +35,13 @@ const MENSAJE_ERROR =
   'No pude responder en este momento. Proba de nuevo en unos minutos.';
 const ESTADO_ESPERANDO_RECREO = 'ESPERANDO_RECREO';
 const ESTADO_ESPERANDO_CONFIRMACION = 'ESPERANDO_CONFIRMACION';
+const ESTADO_EJECUTADA = 'EJECUTADA';
 
 @Injectable()
 export class AsistenteVirtualPresenter {
   private readonly perfilService = inject(PerfilService);
   private readonly asistenteService = inject(AsistenteVirtualService);
+  private readonly homeAlumnoService = inject(HomeAlumnoService);
 
   private readonly abiertoState = signal(false);
   private readonly mensajesState = signal<MensajeAsistente[]>([]);
@@ -302,6 +305,26 @@ export class AsistenteVirtualPresenter {
     }
 
     this.sugerenciasBackendState.set(sugerenciasBackend);
+
+    if (accion?.estado === ESTADO_EJECUTADA) {
+      this.refrescarPedidoAlumnoSiAplica();
+      if (accion.compraId) {
+        this.reproducirSonidoExito();
+      }
+    }
+  }
+
+  private reproducirSonidoExito(): void {
+    const audio = new Audio('exito.mp3');
+    audio.volume = 0.6;
+    void audio.play().catch(() => {});
+  }
+
+  private refrescarPedidoAlumnoSiAplica(): void {
+    if (this.perfilService.rol() !== 'ALUMNO') return;
+    const alumnoId = this.perfilService.obtenerAlumnoId();
+    if (!alumnoId) return;
+    void this.homeAlumnoService.cargarPedidoEnCurso(alumnoId);
   }
 
   private mapearSugerenciasBackend(

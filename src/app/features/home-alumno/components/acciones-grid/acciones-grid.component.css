@@ -16,10 +16,6 @@
   margin: 0;
 }
 
-.acciones-grid__titulo i {
-  color: var(--color-dorado);
-}
-
 .acciones-grid__items {
   display: grid;
   grid-template-columns: 1fr;
