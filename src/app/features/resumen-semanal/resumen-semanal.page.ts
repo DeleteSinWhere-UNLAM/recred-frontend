@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
 
@@ -18,7 +18,7 @@ import { ResumenSemanalService } from './services/resumen-semanal.service';
   standalone: true,
   templateUrl: './resumen-semanal.page.html',
   styleUrl: './resumen-semanal.page.css',
-  imports: [NavbarComponent],
+  imports: [],
 })
 export class ResumenSemanalPage {
   private readonly usuarioService = inject(UsuarioService);

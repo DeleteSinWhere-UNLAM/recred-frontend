@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import {  RouterOutlet } from '@angular/router';
 import { signal } from '@angular/core';
 import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
@@ -7,7 +7,7 @@ import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { ColegioSectionComponent } from './components/colegio-section/colegio-section.component';
 import { TutorHeaderComponent } from './components/tutor-header/tutor-header.component';
 
@@ -28,10 +28,9 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   templateUrl: './home-tutor.page.html',
   styleUrl: './home-tutor.page.css',
   imports: [
-    NavbarComponent,
+    
     ColegioSectionComponent,
     TutorHeaderComponent,
-    RouterLink,
     RouterOutlet,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

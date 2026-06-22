@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
 import { UploadSelectionModalComponent } from '../updated-inventory/components/upload-selection-modal/upload-selection-modal.component';
 import { BulkUploadTableModalComponent } from '../updated-inventory/components/bulk-upload-table-modal/bulk-upload-table-modal.component';
@@ -36,7 +36,7 @@ const IMAGEN_FALLBACK =
   selector: 'app-home-kiosquero-page',
   templateUrl: './home-kiosquero.page.html',
   styleUrl: './home-kiosquero.page.css',
-  imports: [NavbarComponent, UploadSelectionModalComponent, BulkUploadTableModalComponent],
+  imports: [ UploadSelectionModalComponent, BulkUploadTableModalComponent],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

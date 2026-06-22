@@ -3,7 +3,7 @@ import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { TrackingPedidosService } from './services/tracking-pedidos.service';
 import { ScheduledPickup, EstadoCompra, TimeSlotFilter } from './models/tracking-pedidos.model';
 import { OrderDetailsModalComponent } from './components/order-details-modal/order-details-modal.component';
@@ -18,7 +18,6 @@ import { ToastService } from '../../shared/services/toast.service';
     FormsModule,
     CurrencyPipe,
     DatePipe,
-    NavbarComponent,
     OrderDetailsModalComponent,
   ],
   templateUrl: './tracking-pedidos.page.html',

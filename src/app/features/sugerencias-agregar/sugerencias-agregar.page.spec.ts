@@ -8,14 +8,14 @@ import { SugerenciasAgregarPresenter } from './presenter/sugerencias-agregar.pre
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { Component, Input } from '@angular/core';
 
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-navbar',
   template: '',
   standalone: true
 })
-class MockNavbarComponent {
+class Mock{
   @Input() userName = '';
 }
 
@@ -46,7 +46,7 @@ describe('SugerenciasAgregarPage', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [SugerenciasAgregarPage, MockNavbarComponent],
+      imports: [SugerenciasAgregarPage, Mock],
       providers: [
         { provide: Router, useValue: mockRouter },
         { provide: UsuarioService, useValue: mockUsuarioService },
@@ -56,10 +56,10 @@ describe('SugerenciasAgregarPage', () => {
     })
       .overrideComponent(SugerenciasAgregarPage, {
         remove: {
-          imports: [NavbarComponent]
+          imports: []
         },
         add: {
-          imports: [MockNavbarComponent],
+          imports: [Mock],
           providers: [
             { provide: SugerenciasAgregarPresenter, useValue: mockPresenter }
           ]

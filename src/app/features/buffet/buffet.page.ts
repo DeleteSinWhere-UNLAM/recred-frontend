@@ -10,7 +10,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
@@ -50,7 +50,7 @@ export interface MappedPromotion {
   selector: 'app-buffet-page',
   templateUrl: './buffet.page.html',
   styleUrl: './buffet.page.css',
-  imports: [NavbarComponent, ProductoCardComponent, SeleccionarAlumnoModalComponent],
+  imports: [ ProductoCardComponent, SeleccionarAlumnoModalComponent],
   providers: [BuffetPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { CrearHijoPresenter } from './presenter/crear-hijo.presenter';
 
 type CrearHijoForm = FormGroup<{
@@ -44,7 +44,7 @@ function usernameSinFormatoEmail(
   selector: 'app-crear-hijo-page',
   templateUrl: './crear-hijo.page.html',
   styleUrl: './crear-hijo.page.css',
-  imports: [NavbarComponent, ReactiveFormsModule],
+  imports: [ ReactiveFormsModule],
   providers: [CrearHijoPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

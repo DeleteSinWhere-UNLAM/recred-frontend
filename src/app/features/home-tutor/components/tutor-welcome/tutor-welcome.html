@@ -78,7 +78,7 @@
                 <div class="pedido-item__avatar">{{ pedido.alumnoNombre.charAt(0) }}</div>
                 <div class="pedido-item__info">
                   <span class="pedido-item__name">Para {{ pedido.alumnoNombre }}</span>
-                  <span class="pedido-item__desc">{{ pedido.items?.[0]?.productName || 'Varios ítems' }}</span>
+                  <span class="pedido-item__desc">{{ pedido.items[0]?.productName || 'Varios ítems' }}</span>
                 </div>
                 <div class="pedido-item__status">
                   <span class="status-badge" 
@@ -118,7 +118,7 @@
                 </div>
                 <div class="mov-item__info">
                   <span class="mov-item__title">
-                    {{ mov.paymentMethod === 'MERCADO_PAGO' ? 'Recarga de Saldo' : (mov.items?.[0]?.productName || 'Compra Buffet') }}
+                    {{ mov.paymentMethod === 'MERCADO_PAGO' ? 'Recarga de Saldo' : (mov.items[0]?.productName || 'Compra Buffet') }}
                   </span>
                   <span class="mov-item__date">{{ formatDate(mov.date) }}</span>
                 </div>

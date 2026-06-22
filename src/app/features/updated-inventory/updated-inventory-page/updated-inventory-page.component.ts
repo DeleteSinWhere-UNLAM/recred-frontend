@@ -10,7 +10,7 @@ import { Category } from '../models/category.interface';
 import { ToastService } from '../../../shared/services/toast.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { } from '../../../shared/components/navbar/navbar.component';
 import { ProductTableComponent } from '../components/product-table/product-table.component';
 import { ProductFormComponent, ProductFormData } from '../components/product-form/product-form.component';
 import { ConfirmDeleteModalComponent } from '../components/confirm-delete-modal/confirm-delete-modal.component';
@@ -88,7 +88,7 @@ type InventoryManagementShortcut = 'MAKE_AVAILABLE' | 'PAUSE' | 'SOLD_OUT';
   selector: 'app-updated-inventory-page',
   standalone: true,
   imports: [
-    NavbarComponent,
+    
     ProductTableComponent,
     ProductFormComponent,
     ConfirmDeleteModalComponent,

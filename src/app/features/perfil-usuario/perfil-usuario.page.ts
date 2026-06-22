@@ -11,7 +11,7 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { PayoutConfigService } from '../../data-access/services/payout-config.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { PayoutConfig } from '../../data-access/models/payout-config.model';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../shared/services/toast.service';
 import { CropModalComponent } from './components/crop-modal/crop-modal.component';
 
@@ -26,7 +26,7 @@ type PerfilUsuarioForm = FormGroup<{
   selector: 'app-perfil-usuario-page',
   templateUrl: './perfil-usuario.page.html',
   styleUrl: './perfil-usuario.page.css',
-  imports: [NavbarComponent, ReactiveFormsModule, CropModalComponent],
+  imports: [ ReactiveFormsModule, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PerfilUsuarioPage implements OnInit {

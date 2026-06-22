@@ -6,7 +6,7 @@ import { TutorDashboardService } from './services/tutor-dashboard.service';
 import { TutorGlobalDashboardSummary, ChildDashboardSummary } from './models/tutor-dashboard.model';
 import { GridsterConfig, GridsterItemConfig, Gridster, GridsterItem } from 'angular-gridster2';
 import { SmartChartWidget, ChartWidgetConfig } from './components/smart-chart-widget/smart-chart-widget';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { DialogService } from '../../shared/services/dialog.service';
@@ -21,7 +21,7 @@ export interface DashboardWidget extends GridsterItemConfig {
 @Component({
   selector: 'app-tutor-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, Gridster, GridsterItem, SmartChartWidget, NavbarComponent],
+  imports: [CommonModule, FormsModule, Gridster, GridsterItem, SmartChartWidget],
   templateUrl: './tutor-dashboard.component.html',
   styleUrls: ['./tutor-dashboard.component.css']
 })

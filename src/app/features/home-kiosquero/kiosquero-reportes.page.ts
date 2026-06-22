@@ -7,14 +7,14 @@ import {
 import { Router } from '@angular/router';
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
 
 @Component({
   selector: 'app-kiosquero-reportes-page',
   templateUrl: './kiosquero-reportes.page.html',
   styleUrl: './kiosquero-reportes.page.css',
-  imports: [NavbarComponent],
+  imports: [],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

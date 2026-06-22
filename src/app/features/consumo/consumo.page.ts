@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ConsumoService } from './services/consumo.service';
@@ -13,7 +13,7 @@ import { ConsumoCardComponent } from './components/consumo-card/consumo-card.com
   selector: 'app-consumo-page',
   templateUrl: './consumo.page.html',
   styleUrl: './consumo.page.css',
-  imports: [NavbarComponent, ConsumoCardComponent]
+  imports: [ ConsumoCardComponent]
 })
 export class ConsumoPage {
 

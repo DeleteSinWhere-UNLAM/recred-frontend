@@ -9,14 +9,14 @@ import {
   AlumnoResumen,
   ProductoVenta,
 } from './services/venta-espontanea';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { FeriadosService } from '../../shared/services/feriados.service';
 import { DialogService } from '../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-venta-espontanea-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ZXingScannerModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, ZXingScannerModule],
   styleUrl: './venta-espontanea-page.component.css',
   template: `
     <app-navbar [userName]="'Kiosquero'" />

@@ -7,7 +7,7 @@ import { Movimiento } from '../movimientos/models/movimiento.model';
 import { MovimientosService } from '../movimientos/services/movimientos.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { MovimientoDetalleModalComponent } from '../movimientos/components/movimiento-detalle-modal/movimiento-detalle-modal.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -17,7 +17,7 @@ import { DialogService } from '../../shared/services/dialog.service';
   selector: 'app-movimientos-pendientes-page',
   templateUrl: './movimientos-pendientes.page.html',
   styleUrl: './movimientos-pendientes.page.css',
-  imports: [CommonModule, FormsModule, NavbarComponent, MovimientoDetalleModalComponent],
+  imports: [CommonModule, FormsModule, MovimientoDetalleModalComponent],
   standalone: true,
 })
 export class MovimientosPendientesPage implements OnInit {

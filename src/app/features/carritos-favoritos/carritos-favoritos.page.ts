@@ -7,7 +7,7 @@ import { ToastService } from '../../shared/services/toast.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { CarritoFavoritoResponse } from './models/carritos-favoritos.model';
 import { Producto } from '../buffet/models/producto.model';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { GuardarFavoritoModalComponent } from '../compra/components/guardar-favorito-modal/guardar-favorito-modal.component';
 import { DialogService } from '../../shared/services/dialog.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
@@ -22,7 +22,7 @@ interface GrupoHijo {
 @Component({
   selector: 'app-carritos-favoritos-page',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, GuardarFavoritoModalComponent],
+  imports: [CommonModule, GuardarFavoritoModalComponent],
   templateUrl: './carritos-favoritos.page.html',
   styleUrl: './carritos-favoritos.page.css'
 })

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { } from '../../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { OrdenAlumnoCardComponent } from '../components/orden-alumno-card/orden-alumno-card.component';
 import {
@@ -18,7 +18,7 @@ import { CarritosFavoritosService } from '../../carritos-favoritos/services/carr
   templateUrl: './carrito.page.html',
   styleUrl: './carrito.page.css',
   imports: [
-    NavbarComponent,
+    
     OrdenAlumnoCardComponent,
     ResumenOrdenCardComponent,
     SugerenciasCarritoComponent,

@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { AcreditarMercadoPagoPresenter } from './presenter/acreditar-mercado-pago.presenter';
 
 @Component({
   selector: 'app-acreditar-mercado-pago-page',
   templateUrl: './acreditar-mercado-pago.page.html',
   styleUrl: './acreditar-mercado-pago.page.css',
-  imports: [NavbarComponent],
+  imports: [],
   providers: [AcreditarMercadoPagoPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

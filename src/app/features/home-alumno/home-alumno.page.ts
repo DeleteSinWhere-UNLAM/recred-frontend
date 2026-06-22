@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { AccionesGridComponent } from './components/acciones-grid/acciones-grid.component';
 import { PedidoRecreoCardComponent } from './components/pedido-recreo-card/pedido-recreo-card.component';
@@ -11,7 +11,7 @@ import { HomeAlumnoPresenter } from './presenter/home-alumno.presenter';
   templateUrl: './home-alumno.page.html',
   styleUrl: './home-alumno.page.css',
   imports: [
-    NavbarComponent,
+    
     PerfilHeaderComponent,
     AccionesGridComponent,
     PedidoRecreoCardComponent,

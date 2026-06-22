@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { RestriccionesHorariasPresenter, FranjaConRestricciones } from './presenter/restricciones-horarias.presenter';
 import { RestriccionHoraria } from './models/restriccion-horaria.model';
 
@@ -11,7 +11,7 @@ import { RestriccionHoraria } from './models/restriccion-horaria.model';
 @Component({
   selector: 'app-restricciones-horarias-page',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule],
   templateUrl: './restricciones-horarias.page.html',
   styleUrl: './restricciones-horarias.page.css',
   providers: [RestriccionesHorariasPresenter],

@@ -7,7 +7,7 @@ import { Movimiento } from './models/movimiento.model';
 import { MovimientosService } from './services/movimientos.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -17,7 +17,7 @@ import { DialogService } from '../../shared/services/dialog.service';
   selector: 'app-movimientos-page',
   templateUrl: './movimientos.page.html',
   styleUrl: './movimientos.page.css',
-  imports: [CommonModule, FormsModule, NavbarComponent, MovimientoDetalleModalComponent],
+  imports: [CommonModule, FormsModule, MovimientoDetalleModalComponent],
 })
 export class MovimientosPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
