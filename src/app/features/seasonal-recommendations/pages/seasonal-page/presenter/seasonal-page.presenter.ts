@@ -6,7 +6,7 @@ import { ProductService } from '../../../../updated-inventory/services/product.s
 import { PromotionService } from '../../../../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../../../../shared/services/toast.service';
 import { PerfilService } from '../../../../../data-access/services/perfil.service';
-import { Sugerencia, PromocionCreada, PromocionSugerida, SeasonInfo, WeatherInfo } from '../../../models/recomendacion.model';
+import { Sugerencia, PromocionSugerida, SeasonInfo, WeatherInfo } from '../../../models/recomendacion.model';
 import { Product } from '../../../../updated-inventory/models/product.interface';
 
 @Injectable()

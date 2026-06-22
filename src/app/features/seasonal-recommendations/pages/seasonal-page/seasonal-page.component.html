@@ -24,33 +24,48 @@
           Basadas en tu ubicación y el clima del entorno escolar
         </p>
       </div>
-      <div class="seasonal-page__acciones" *ngIf="presenter.suggestedPromotion() && !presenter.isLoading()">
-        <button type="button" class="seasonal-page__btn-promocion" (click)="presenter.abrirModalPromocion()">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> Generar promoción
-        </button>
-      </div>
     </header>
 
     @if (presenter.seasonInfo() || presenter.weatherInfo()) {
-      <div class="seasonal-page__context-banner">
+      <div class="seasonal-page__metrics-grid">
         @if (presenter.seasonInfo()) {
-          <div class="context-banner__item">
-            <i class="fa-solid fa-calendar-day context-banner__icon"></i>
-            <span class="context-banner__text">
-              <strong>Estación:</strong> {{ presenter.seasonInfo()?.estacion_actual }} |
-              Faltan {{ presenter.seasonInfo()?.dias_restantes }} días para {{ presenter.seasonInfo()?.proxima_estacion }}
-            </span>
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--blue">
+              <i class="fa-regular fa-calendar-days"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Estación</span>
+              <strong class="metric-card__value">{{ presenter.seasonInfo()?.estacion_actual }}</strong>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--green">
+              <i class="fa-solid fa-leaf"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Faltan para {{ presenter.seasonInfo()?.proxima_estacion }}</span>
+              <strong class="metric-card__value">{{ presenter.seasonInfo()?.dias_restantes }} días</strong>
+            </div>
           </div>
         }
         @if (presenter.weatherInfo()) {
-          <div class="context-banner__item">
-            <i class="fa-solid fa-cloud-sun context-banner__icon"></i>
-            <span class="context-banner__text">
-              <strong>Clima actual:</strong> {{ presenter.weatherInfo()?.condition }}, {{ presenter.weatherInfo()?.temperature }}°C 
-              @if (presenter.weatherInfo()?.ciudad && presenter.weatherInfo()?.provincia) {
-                | {{ presenter.weatherInfo()?.ciudad }}, {{ presenter.weatherInfo()?.provincia }}
-              }
-            </span>
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--blue-light">
+              <i class="fa-solid fa-cloud"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Clima actual</span>
+              <strong class="metric-card__value">{{ presenter.weatherInfo()?.condition }}, {{ presenter.weatherInfo()?.temperature }}°C</strong>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--indigo">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Ubicación</span>
+              <strong class="metric-card__value">{{ presenter.weatherInfo()?.ciudad }}, {{ presenter.weatherInfo()?.provincia }}</strong>
+            </div>
           </div>
         }
       </div>
@@ -78,7 +93,11 @@
     } @else {
       <app-seasonal-list
         [sugerencias]="presenter.sugerencias()"
-        [tipPromocional]="presenter.tipPromocional()">
+        [tipPromocional]="presenter.tipPromocional()"
+        [hasTipAction]="!!presenter.suggestedPromotion() && !presenter.isLoading()"
+        tipActionText="Generar promoción"
+        tipActionIcon="fa-solid fa-wand-magic-sparkles"
+        (tipActionClick)="presenter.abrirModalPromocion()">
       </app-seasonal-list>
     }
   </div>

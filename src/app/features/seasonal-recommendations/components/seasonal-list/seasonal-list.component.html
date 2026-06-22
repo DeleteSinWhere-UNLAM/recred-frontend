@@ -1,19 +1,68 @@
 <div class="seasonal-list">
   @if (tipPromocional) {
-    <app-tip-card [tipPromocional]="tipPromocional"></app-tip-card>
+    <app-tip-card 
+      [tipPromocional]="tipPromocional"
+      [hasAction]="hasTipAction"
+      [actionText]="tipActionText"
+      [actionIcon]="tipActionIcon"
+      (actionClick)="onTipActionClick()">
+    </app-tip-card>
   }
 
   @if (sugerencias.length > 0) {
-    <section class="seasonal-list__panel" aria-labelledby="sugerencias-titulo">
-      <h3 id="sugerencias-titulo" class="seasonal-list__titulo">
-        Sugerencias de stock
-      </h3>
-      <div class="seasonal-list__grid">
-        @for (item of sugerencias; track item.categoria) {
-          <app-recommendation-card [item]="item"></app-recommendation-card>
-        }
-      </div>
-    </section>
+    <div class="seasonal-list__layout">
+      <section class="seasonal-list__main" aria-labelledby="sugerencias-titulo">
+        <h3 id="sugerencias-titulo" class="seasonal-list__titulo">
+          Sugerencias de stock
+        </h3>
+        <div class="seasonal-list__grid">
+          @for (item of sugerencias; track item.categoria) {
+            <app-recommendation-card [item]="item"></app-recommendation-card>
+          }
+        </div>
+      </section>
+
+      <aside class="seasonal-list__sidebar">
+        <div class="resumen-inteligente">
+          <div class="resumen-inteligente__header">
+            <div class="resumen-inteligente__icon">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="resumen-inteligente__title-wrapper">
+              <h4 class="resumen-inteligente__title">Resumen inteligente</h4>
+              <span class="resumen-inteligente__subtitle">Estadisticas clave para esta estación</span>
+            </div>
+          </div>
+          <ul class="resumen-inteligente__list">
+            @for (item of sugerencias; track item.categoria) {
+              <li class="resumen-inteligente__item">
+                <div class="resumen-inteligente__item-icon" 
+                     [class.icon-blue]="$first"
+                     [class.icon-green]="item.accion === 'AUMENTAR' && !$first"
+                     [class.icon-red]="item.accion === 'REDUCIR'">
+                  <i class="fa-solid" 
+                     [class.fa-temperature-half]="$first"
+                     [class.fa-arrow-trend-up]="item.accion === 'AUMENTAR' && !$first"
+                     [class.fa-arrow-trend-down]="item.accion === 'REDUCIR'"></i>
+                </div>
+                <div class="resumen-inteligente__item-content">
+                  <strong class="resumen-inteligente__item-title">
+                    {{ $first ? 'Priorizar combos de invierno' : (item.accion === 'AUMENTAR' ? 'Reforzar stock de ' + item.categoria.toLowerCase() : 'Reducir ' + item.categoria.toLowerCase()) }}
+                  </strong>
+                  <span class="resumen-inteligente__item-desc">
+                    {{ $first ? 'Infusiones + panadería caliente' : (item.accion === 'AUMENTAR' ? 'Aumenta la demanda en esta época' : 'Menor rotación por clima frío') }}
+                  </span>
+                </div>
+              </li>
+            }
+          </ul>
+          <div class="resumen-inteligente__footer">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Recomendaciones basadas en datos de ventas, clima y estacionalidad escolar.</span>
+          </div>
+        </div>
+      </aside>
+    </div>
   } @else {
     <p class="seasonal-list__vacio">
       No hay sugerencias disponibles en tu zona para esta temporada.

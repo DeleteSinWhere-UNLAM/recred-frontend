@@ -53,6 +53,7 @@ describe('SeasonalPagePresenter', () => {
 
   describe('abrirModalPromocion', () => {
     it('Dado que hay una promoción sugerida, cuando se llama a abrirModalPromocion, entonces debe abrir el modal', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (presenter as any).suggestedPromotionState.set({ nombre: 'Promo', descuento: 10, categorias_destino: [] } as any);
       presenter.abrirModalPromocion();
       expect(presenter.showModal()).toBeTrue();
@@ -73,7 +74,9 @@ describe('SeasonalPagePresenter', () => {
 
   describe('confirmPromotion', () => {
     it('Dado que la promoción se crea exitosamente, debe mostrar toast de éxito y cerrar el modal', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockPromotionService.createPromotion.and.returnValue(of({} as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (presenter as any).suggestedPromotionState.set({ nombre: 'Promo Fria', descuento: 10, categorias_destino: [] });
       
       const formData = {
@@ -92,6 +95,7 @@ describe('SeasonalPagePresenter', () => {
 
     it('Dado que falla al crear, debe mostrar toast de error', () => {
       mockPromotionService.createPromotion.and.returnValue(throwError(() => new Error('error')));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (presenter as any).suggestedPromotionState.set({ nombre: 'Promo Fria', descuento: 10, categorias_destino: [] });
       
       const formData = {

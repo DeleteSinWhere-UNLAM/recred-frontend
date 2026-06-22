@@ -51,9 +51,14 @@
             <div class="checkbox-container">
               <i class="fa-regular" [class.fa-square-check]="isProductSelected(product.id)" [class.fa-square]="!isProductSelected(product.id)"></i>
             </div>
-            <div class="product-image-container" *ngIf="product.urlImagen">
-              <img *ngIf="product.urlImagen.length > 2" [src]="product.urlImagen" [alt]="product.nombre" class="product-mini-image">
-              <span *ngIf="product.urlImagen.length <= 2" class="product-emoji">{{ product.urlImagen }}</span>
+            <div class="product-image-container">
+              @if (product.urlImagen && product.urlImagen.length > 2) {
+                <img [src]="product.urlImagen" [alt]="product.nombre" class="product-mini-image">
+              } @else if (product.urlImagen && product.urlImagen.length <= 2) {
+                <span class="product-emoji">{{ product.urlImagen }}</span>
+              } @else {
+                <img src="https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png" [alt]="product.nombre" class="product-mini-image">
+              }
             </div>
             <div class="product-info">
               <span class="product-name">{{ product.nombre }}</span>
