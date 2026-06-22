@@ -330,6 +330,7 @@
 @if (isUploadModalVisible) {
   <app-upload-selection-modal
     (iaUpload)="goToIaUpload()"
+    (manualUpload)="goToManualUpload()"
     (bulkUpload)="goToBulkUpload()"
     (closeModal)="closeUploadModal()"
   />
@@ -343,5 +344,15 @@
     (fileSelected)="handleFileUpload($event)"
     (saveProducts)="handleBulkProductsSave($event)"
     (closeModal)="closeBulkUploadModal()"
+  />
+}
+
+@if (isManualProductFormVisible) {
+  <app-product-form
+    [categories]="categories"
+    [isSaving]="isSavingManualProduct"
+    [buffetId]="buffetId"
+    (formSubmit)="handleManualProductSubmit($event)"
+    (formCancel)="isManualProductFormVisible = false"
   />
 }

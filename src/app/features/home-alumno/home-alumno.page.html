@@ -10,6 +10,8 @@
       [colegio]="presenter.nombreColegio()"
       [saldoFormateado]="presenter.saldoFormateado()"
       [saldoNegativo]="presenter.saldoNegativo()"
+      [fondo]="presenter.fondoPerfil()"
+      (cambioFondo)="presenter.cambiarFondoPerfil($event)"
     />
 
     <app-acciones-grid

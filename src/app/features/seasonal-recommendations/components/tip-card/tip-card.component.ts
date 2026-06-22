@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,4 +10,13 @@ import { CommonModule } from '@angular/common';
 })
 export class TipCardComponent {
   @Input({ required: true }) tipPromocional!: string;
+  @Input() hasAction = false;
+  @Input() actionText = '';
+  @Input() actionIcon = '';
+  
+  @Output() actionClick = new EventEmitter<void>();
+
+  onActionClick(): void {
+    this.actionClick.emit();
+  }
 }
