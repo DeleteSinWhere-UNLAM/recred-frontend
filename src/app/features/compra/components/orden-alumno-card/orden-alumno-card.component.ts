@@ -6,12 +6,14 @@ import {
   Output,
   computed,
   signal,
+  inject,
 } from '@angular/core';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { ItemCarrito } from '../../models/carrito.model';
 import { Recreo, RECREO_LABELS } from '../../models/orden-compra.model';
 import { CarritoItemComponent } from '../carrito-item/carrito-item.component';
 import { RecreoOpcion } from '../../carrito/presenter/carrito.presenter';
+import { UsuarioService } from '../../../../data-access/services/usuario.service';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -28,6 +30,7 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdenAlumnoCardComponent {
+  private readonly usuarioService = inject(UsuarioService);
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly itemsState = signal<ItemCarrito[]>([]);
 
@@ -67,12 +70,19 @@ export class OrdenAlumnoCardComponent {
   readonly iniciales = computed(() => {
     const a = this.alumnoState();
     if (!a) return '';
-    return ((a.nombre[0] ?? '') + (a.apellido[0] ?? '')).toUpperCase();
+    if (this.usuarioService.esVistaAlumno()) {
+      return ((a.nombre[0] ?? '') + (a.apellido[0] ?? '')).toUpperCase();
+    }
+    return (a.nombre[0] ?? '').toUpperCase();
   });
 
   readonly nombreCompleto = computed(() => {
     const a = this.alumnoState();
-    return a ? `${a.nombre} ${a.apellido}` : '';
+    if (!a) return '';
+    if (this.usuarioService.esVistaAlumno()) {
+      return `${a.nombre} ${a.apellido}`;
+    }
+    return `${a.nombre}`;
   });
 
   readonly subtotal = computed(() =>

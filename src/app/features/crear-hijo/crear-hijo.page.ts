@@ -44,7 +44,7 @@ function usernameSinFormatoEmail(
   selector: 'app-crear-hijo-page',
   templateUrl: './crear-hijo.page.html',
   styleUrl: './crear-hijo.page.css',
-  imports: [NavbarComponent, ReactiveFormsModule],
+  imports: [ NavbarComponent, ReactiveFormsModule],
   providers: [CrearHijoPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -34,10 +34,6 @@
               <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
             </div>
             <div>
-              <span class="mov-modal__label">Tipo de Compra</span>
-              <span class="mov-modal__value">Compra anticipada</span>
-            </div>
-            <div>
               <span class="mov-modal__label">Fecha Programada</span>
               <span class="mov-modal__value">{{ formatearFechaProgramada(movimiento.pickupDate) }}</span>
             </div>
@@ -45,12 +41,10 @@
               <span class="mov-modal__label">Franja Horaria</span>
               <span class="mov-modal__value">{{ movimiento.pickupSlotDescription || 'Por definir' }}</span>
             </div>
-            @if (movimiento.paymentMethod && movimiento.paymentMethod.toUpperCase() !== 'CREDITOS' && movimiento.paymentMethod.toUpperCase() !== 'CREDIT') {
-              <div>
-                <span class="mov-modal__label">Método de Pago</span>
-                <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
-              </div>
-            }
+            <div>
+              <span class="mov-modal__label">Método de Pago</span>
+              <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
+            </div>
           </div>
         </section>
 
@@ -154,11 +148,7 @@
               <span class="mov-modal__label">Alumno</span>
               <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
             </div>
-            <div>
-              <span class="mov-modal__label">Tipo de Compra</span>
-              <span class="mov-modal__value">Compra espontánea</span>
-            </div>
-            @if (esVistaAlumno && movimiento.paymentMethod && movimiento.paymentMethod.toUpperCase() !== 'CREDITOS' && movimiento.paymentMethod.toUpperCase() !== 'CREDIT') {
+            @if (esVistaAlumno) {
               <div>
                 <span class="mov-modal__label">Medio de Pago</span>
                 <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>

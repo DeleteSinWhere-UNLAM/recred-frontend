@@ -1,11 +1,13 @@
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TutorDashboardService } from './services/tutor-dashboard.service';
 import { TutorGlobalDashboardSummary, ChildDashboardSummary } from './models/tutor-dashboard.model';
 import { GridsterConfig, GridsterItemConfig, Gridster, GridsterItem } from 'angular-gridster2';
 import { SmartChartWidget, ChartWidgetConfig } from './components/smart-chart-widget/smart-chart-widget';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { DialogService } from '../../shared/services/dialog.service';
@@ -20,7 +22,7 @@ export interface DashboardWidget extends GridsterItemConfig {
 @Component({
   selector: 'app-tutor-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, Gridster, GridsterItem, SmartChartWidget, NavbarComponent],
+  imports: [NavbarComponent, CommonModule, FormsModule, Gridster, GridsterItem, SmartChartWidget],
   templateUrl: './tutor-dashboard.component.html',
   styleUrls: ['./tutor-dashboard.component.css']
 })
@@ -29,6 +31,7 @@ export class TutorDashboardComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly dialogService = inject(DialogService);
+  private readonly router = inject(Router);
 
   readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
 
@@ -57,6 +60,10 @@ export class TutorDashboardComponent implements OnInit {
     this.loadDashboardData();
   }
 
+  volver(): void {
+    this.router.navigate(['/tutor']);
+  }
+
   loadDashboardData() {
     this.dashboardService.getGlobalDashboard().subscribe({
       next: (data) => {
@@ -76,8 +83,8 @@ export class TutorDashboardComponent implements OnInit {
 
         if (data.children && data.children.length > 0) {
           // Sort children alphabetically
-          data.children.sort((a, b) => a.studentName.localeCompare(b.studentName));
-
+          data.children.sort((a, b) => (a.studentName || '').localeCompare(b.studentName || ''));
+          
           // Keep the previous selection if it exists
           if (this.selectedChild) {
             this.selectedChild = data.children.find(c => c.studentId === this.selectedChild?.studentId) || data.children[0];
@@ -226,10 +233,11 @@ export class TutorDashboardComponent implements OnInit {
       compactType: 'none',
       margin: 16,
       outerMargin: true,
-      minCols: 1,
-      maxCols: 12,
-      minItemCols: 3,
-      minItemRows: 3,
+      minCols: 3,
+      maxCols: 3,
+      maxItemCols: 3,
+      minItemCols: 1,
+      minItemRows: 1,
       minRows: 1,
       maxRows: 100,
       draggable: {
@@ -240,6 +248,7 @@ export class TutorDashboardComponent implements OnInit {
       resizable: {
         enabled: true
       },
+      pushResizeItems: false,
       displayGrid: 'onDrag&Resize',
       pushItems: true,
       swap: true,
@@ -263,11 +272,11 @@ export class TutorDashboardComponent implements OnInit {
 
     // Default layout
     this.dashboardItems = [
-      { id: 'smart-1', type: 'smart-chart', cols: 4, rows: 3, y: 0, x: 0, widgetConfig: { chartType: 'bar', dataSource: 'finance' } },
-      { id: 'finance', type: 'finance', cols: 3, rows: 3, y: 0, x: 4 },
-      { id: 'health', type: 'health', cols: 3, rows: 3, y: 0, x: 7 },
-      { id: 'logistics', type: 'logistics', cols: 4, rows: 3, y: 3, x: 0 },
-      { id: 'transactions', type: 'transactions', cols: 6, rows: 3, y: 3, x: 4 }
+      { id: 'smart-1', type: 'smart-chart', cols: 1, rows: 3, y: 0, x: 0, widgetConfig: { chartType: 'bar', dataSource: 'finance' } },
+      { id: 'finance', type: 'finance', cols: 1, rows: 3, y: 0, x: 1 },
+      { id: 'health', type: 'health', cols: 1, rows: 3, y: 0, x: 2 },
+      { id: 'logistics', type: 'logistics', cols: 1, rows: 3, y: 3, x: 0 },
+      { id: 'transactions', type: 'transactions', cols: 1, rows: 3, y: 3, x: 1 }
     ];
   }
 
@@ -304,7 +313,7 @@ export class TutorDashboardComponent implements OnInit {
     this.dashboardItems.push({
       id: 'smart-' + Date.now(),
       type: 'smart-chart',
-      cols: 4,
+      cols: 1,
       rows: 3,
       x: pos.x,
       y: pos.y,
@@ -318,7 +327,7 @@ export class TutorDashboardComponent implements OnInit {
     this.dashboardItems.push({
       id: 'finance-' + Date.now(),
       type: 'finance',
-      cols: 3,
+      cols: 1,
       rows: 3,
       x: pos.x,
       y: pos.y,
@@ -332,7 +341,7 @@ export class TutorDashboardComponent implements OnInit {
     this.dashboardItems.push({
       id: 'health-' + Date.now(),
       type: 'health',
-      cols: 3,
+      cols: 1,
       rows: 3,
       x: pos.x,
       y: pos.y,
@@ -346,7 +355,7 @@ export class TutorDashboardComponent implements OnInit {
     this.dashboardItems.push({
       id: 'logistics-' + Date.now(),
       type: 'logistics',
-      cols: 4,
+      cols: 1,
       rows: 3,
       x: pos.x,
       y: pos.y,
@@ -360,7 +369,7 @@ export class TutorDashboardComponent implements OnInit {
     this.dashboardItems.push({
       id: 'transactions-' + Date.now(),
       type: 'transactions',
-      cols: 4,
+      cols: 1,
       rows: 3,
       x: pos.x,
       y: pos.y,

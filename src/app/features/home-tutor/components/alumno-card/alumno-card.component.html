@@ -6,12 +6,11 @@
         @if (fotoPerfil) {
           <img
             class="alumno-card__avatar alumno-card__avatar--foto"
-            [class.alumno-card__avatar--premium]="esPremium"
             [src]="fotoPerfil"
             [alt]="nombreCompleto"
           />
         } @else {
-          <div class="alumno-card__avatar" [class.alumno-card__avatar--premium]="esPremium">
+          <div class="alumno-card__avatar">
             <span>{{ iniciales }}</span>
           </div>
         }
@@ -57,55 +56,54 @@
   </header>
 
   
-  <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones de alumno">
+  <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
     
-    <a class="alumno-card__btn alumno-card__btn--menta" [routerLink]="['/acreditar-mercado-pago', alumno.id]">
+    <a class="alumno-card__btn alumno-card__btn--menta" [routerLink]="['/acreditar-mercado-pago', alumno.id]" routerLinkActive="active">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-plus"></i>
       </span>
       <span class="alumno-card__btn-label">Acreditar</span>
     </a>
     
-    <a class="alumno-card__btn alumno-card__btn--melocoton" [routerLink]="['/restricciones-nutricionales', alumno.id]">
+    <a class="alumno-card__btn alumno-card__btn--melocoton" [routerLink]="['/restricciones-nutricionales', alumno.id]" routerLinkActive="active">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-shield"></i>
       </span>
       <span class="alumno-card__btn-label">Restricciones</span>
     </a>
 
-    <a class="alumno-card__btn alumno-card__btn--gris" [routerLink]="['/movimientos', alumno.id]">
+    <a class="alumno-card__btn alumno-card__btn--gris" [routerLink]="['/movimientos', alumno.id]" routerLinkActive="active">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-list"></i>
       </span>
       <span class="alumno-card__btn-label">Movimientos</span>
     </a>
-
   </div>
 
   <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
     <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
-      <a class="alumno-card__btn alumno-card__btn--azul" [routerLink]="['/restricciones-horarias', alumno.id]">
+      <a class="alumno-card__btn alumno-card__btn--azul" [routerLink]="['/restricciones-horarias', alumno.id]" routerLinkActive="active">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-clock"></i>
         </span>
         <span class="alumno-card__btn-label">Horarios</span>
       </a>
       
-      <a class="alumno-card__btn alumno-card__btn--dorado" [routerLink]="['/presupuesto', alumno.id]">
+      <a class="alumno-card__btn alumno-card__btn--dorado" [routerLink]="['/presupuesto', alumno.id]" routerLinkActive="active">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-piggy-bank"></i>
         </span>
         <span class="alumno-card__btn-label">Presupuesto</span>
       </a>
       
-      <a class="alumno-card__btn alumno-card__btn--pizarra" [routerLink]="['/estadistica', alumno.id]">
+      <a class="alumno-card__btn alumno-card__btn--pizarra" [routerLink]="['/estadistica', alumno.id]" routerLinkActive="active">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-chart-line"></i>
         </span>
         <span class="alumno-card__btn-label">Estadística</span>
       </a>
       
-      <a class="alumno-card__btn alumno-card__btn--morado" [routerLink]="['/movimientos-pendientes', alumno.id]">
+      <a class="alumno-card__btn alumno-card__btn--morado" [routerLink]="['/movimientos-pendientes', alumno.id]" routerLinkActive="active">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-clock-rotate-left"></i>
           @if (cantidadPendientes > 0) {
@@ -115,14 +113,14 @@
         <span class="alumno-card__btn-label">Pendientes</span>
       </a>
       
-      <a class="alumno-card__btn alumno-card__btn--celeste" [routerLink]="['/prediccion-gasto', alumno.id]">
+      <a class="alumno-card__btn alumno-card__btn--celeste" [routerLink]="['/prediccion-gasto', alumno.id]" routerLinkActive="active">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-compass"></i>
         </span>
         <span class="alumno-card__btn-label">Predicción</span>
       </a>
       
-      <a class="alumno-card__btn alumno-card__btn--violeta" [routerLink]="['/preferencias']">
+      <a class="alumno-card__btn alumno-card__btn--violeta" [routerLink]="['/preferencias']" routerLinkActive="active">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </span>
@@ -130,20 +128,15 @@
       </a>
 
       @if (esPadre) {
-        <button type="button" 
-                class="alumno-card__btn alumno-card__btn--menta" 
-                [class.btn-disabled]="creditoActivo() !== null"
-                [title]="creditoActivo() !== null ? 'El alumno ya tiene un microcredito aún no saldado' : 'Asignar Microcrédito'"
-                (click)="abrirModalMicrocredito()" 
-                style="border:none; cursor:pointer;">
+        <a class="alumno-card__btn alumno-card__btn--menta" 
+           title="Microcrédito"
+           [routerLink]="['/adelanto', alumno.id]"
+           routerLinkActive="active">
           <span class="alumno-card__btn-icono" aria-hidden="true">
             <i class="fa-solid fa-hand-holding-dollar"></i>
-            @if (creditoActivo()) {
-              <span class="alumno-card__btn-badge alumno-card__btn-badge--info"><i class="fa-solid fa-check"></i></span>
-            }
           </span>
           <span class="alumno-card__btn-label">Microcrédito</span>
-        </button>
+        </a>
       }
     </div>
   </div>
@@ -155,7 +148,6 @@
     </button>
   </div>
 
-  
   <div class="alumno-card__budget">
     <span class="alumno-card__budget-label">Presupuesto</span>
     <div class="alumno-card__budget-bar">
@@ -170,137 +162,6 @@
     Ir al Buffet
   </a>
 </article>
-
-@if (showMicrocreditoModal()) {
-  <div class="modal-overlay">
-    <div class="modal-content">
-      <button class="modal-close" (click)="cerrarModalMicrocredito()">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      
-      <h2 class="modal-title">
-        <i class="fa-solid fa-hand-holding-dollar"></i>
-        Microcrédito para {{ alumno.nombre }}
-      </h2>
-
-      @if (creditoActivo()) {
-        <div class="modal-body">
-          <div class="modal-alert modal-alert--info">
-            <p>
-              <i class="fa-solid fa-circle-info"></i>
-              <strong>{{ alumno.nombre }} ya posee un microcrédito en curso.</strong>
-            </p>
-            <p class="mt-2" style="font-size: 0.9rem;">
-              Monto original: ${{ creditoActivo()?.amount }} <br/>
-              Cuotas asignadas: {{ creditoActivo()?.installments }} <br/>
-              Fecha: {{ creditoActivo()?.createdAt | date:'dd-MM-yyyy' }}
-            </p>
-            <p class="mt-2 text-sm text-gray-600" style="font-size: 0.85rem;">
-              No es posible asignar un nuevo crédito hasta que el actual haya sido saldado.
-            </p>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button (click)="cerrarModalMicrocredito()" class="modal-btn-confirmar">
-            Entendido
-          </button>
-        </div>
-      } @else if (calculandoRecarga()) {
-        <div class="modal-loading">
-          <i class="fa-solid fa-circle-notch fa-spin"></i>
-          <p>Calculando referencia...</p>
-        </div>
-      } @else {
-        <div class="modal-body">
-          
-          
-          <div class="modal-field">
-            <span class="modal-label">Modalidad</span>
-            <div class="modal-radio-group">
-              <label class="modal-radio">
-                <input type="radio" name="tipoMonto" value="porcentaje" [(ngModel)]="tipoMonto">
-                <span>Porcentaje de Recarga</span>
-              </label>
-              <label class="modal-radio">
-                <input type="radio" name="tipoMonto" value="fijo" [(ngModel)]="tipoMonto">
-                <span>Monto Fijo</span>
-              </label>
-            </div>
-          </div>
-
-          
-          @if (tipoMonto() === 'porcentaje' && ultimaRecarga() === 0) {
-            <div class="modal-alert">
-              <p>
-                <i class="fa-solid fa-circle-info"></i>
-                No se encontraron recargas previas. <strong>¿El porcentaje de cuánto?</strong>
-              </p>
-              <div class="modal-input-wrap">
-                <span class="modal-input-prefix">$</span>
-                <input type="number" [(ngModel)]="baseRecargaManual" class="modal-input" min="1">
-              </div>
-            </div>
-          }
-
-          
-          @if (tipoMonto() === 'porcentaje') {
-            <div class="modal-field">
-              <div class="modal-flex-between">
-                <label for="slider-porcentaje" class="modal-label">Porcentaje: {{ porcentaje() }}%</label>
-                <span class="modal-monto-resaltado">${{ montoCalculado }}</span>
-              </div>
-              <input id="slider-porcentaje" type="range" [(ngModel)]="porcentaje" min="1" max="100" class="modal-slider">
-              <p class="modal-hint">Base de referencia: ${{ baseCalculo }}</p>
-            </div>
-          }
-
-          
-          @if (tipoMonto() === 'fijo') {
-            <div class="modal-field">
-              <label for="input-monto-fijo" class="modal-label">Monto ($)</label>
-              <div class="modal-input-wrap">
-                <span class="modal-input-prefix">$</span>
-                <input id="input-monto-fijo" type="number" [(ngModel)]="montoFijo" class="modal-input" min="1">
-              </div>
-              <div class="modal-quick-buttons">
-                <button (click)="setMontoRapido(25)" class="modal-btn-quick">25%</button>
-                <button (click)="setMontoRapido(50)" class="modal-btn-quick">50%</button>
-                <button (click)="setMontoRapido(75)" class="modal-btn-quick">75%</button>
-              </div>
-            </div>
-          }
-
-          
-          <div class="modal-field">
-            <label for="input-cuotas" class="modal-label">Cuotas (Meses)</label>
-            <input id="input-cuotas" type="number" [(ngModel)]="cuotas" class="modal-input mb-2" min="1" max="24" placeholder="Otras...">
-            <div class="modal-quick-buttons">
-              <button (click)="setCuotas(1)" [class.active]="cuotas() === 1" class="modal-btn-quick">1</button>
-              <button (click)="setCuotas(3)" [class.active]="cuotas() === 3" class="modal-btn-quick">3</button>
-              <button (click)="setCuotas(6)" [class.active]="cuotas() === 6" class="modal-btn-quick">6</button>
-            </div>
-            @if (cuotas() > 1) {
-              <div class="modal-info">
-                <i class="fa-solid fa-calendar-check"></i>
-                <p>Las cuotas vencen el día <strong>10 de cada mes</strong>.</p>
-              </div>
-            }
-          </div>
-
-        </div>
-
-        <div class="modal-actions">
-          <button (click)="cerrarModalMicrocredito()" class="modal-btn-cancelar">
-            Cancelar
-          </button>
-          <button (click)="confirmarMicrocredito()" class="modal-btn-confirmar">
-            Habilitar
-          </button>
-        </div>
-      }
-    </div>
-  </div>
-}
 
 @if (fotoEvent()) {
   <app-crop-modal

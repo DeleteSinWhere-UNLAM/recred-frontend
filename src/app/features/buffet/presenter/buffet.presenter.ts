@@ -160,7 +160,8 @@ export class BuffetPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
-    return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
+    if (!alumno) return '';
+    return this.usuarioService.esVistaAlumno() ? `${alumno.nombre} ${alumno.apellido}` : alumno.nombre;
   });
 
   readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
@@ -168,7 +169,10 @@ export class BuffetPresenter {
   readonly iniciales = computed(() => {
     const alumno = this.alumnoState();
     if (!alumno) return '';
-    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    if (this.usuarioService.esVistaAlumno()) {
+      return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    }
+    return (alumno.nombre[0] ?? '').toUpperCase();
   });
 
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');

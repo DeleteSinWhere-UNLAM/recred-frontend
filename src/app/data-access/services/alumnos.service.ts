@@ -52,7 +52,10 @@ export class AlumnosService {
       ),
     );
     const alumno = this.fromDto(dto);
-    this.alumnosState.update((actuales) => [...actuales, alumno]);
+    this.alumnosState.update((actuales) => {
+      const actualizados = [...actuales, alumno];
+      return actualizados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+    });
     return alumno;
   }
 
@@ -70,8 +73,9 @@ export class AlumnosService {
       }
 
       const alumnos = dtos.map((dto) => this.fromDto(dto));
+      alumnos.sort((a, b) => a.nombre.localeCompare(b.nombre));
       this.alumnosState.set(alumnos);
-      console.log('Alumnos procesados y guardados en el estado:', alumnos);
+      console.log('Alumnos procesados, ordenados y guardados en el estado:', alumnos);
       return alumnos;
     } catch (error) {
       console.error('Error al cargar hijos del tutor:', error);

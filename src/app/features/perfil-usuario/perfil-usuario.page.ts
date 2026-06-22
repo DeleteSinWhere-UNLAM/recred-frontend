@@ -26,7 +26,7 @@ type PerfilUsuarioForm = FormGroup<{
   selector: 'app-perfil-usuario-page',
   templateUrl: './perfil-usuario.page.html',
   styleUrl: './perfil-usuario.page.css',
-  imports: [NavbarComponent, ReactiveFormsModule, CropModalComponent],
+  imports: [ NavbarComponent, ReactiveFormsModule, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PerfilUsuarioPage implements OnInit {

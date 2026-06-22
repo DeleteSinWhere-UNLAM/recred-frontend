@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../shared/services/toast.service';
 import { InventoryRealtimeService } from '../updated-inventory/services/inventory-realtime.service';
 import { RealtimeInventoryEvent } from '../updated-inventory/models/inventory.interface';
@@ -51,7 +51,7 @@ const DAILY_CLOSE_REALTIME_REFRESH_TYPES = new Set([
   selector: 'app-daily-close-page',
   templateUrl: './daily-close.page.html',
   styleUrl: './daily-close.page.css',
-  imports: [NavbarComponent, NgClass],
+  imports: [ NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DailyClosePage implements OnInit, OnDestroy {

@@ -5,18 +5,24 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { ToastService } from '../../../shared/services/toast.service';
 import { AcreditarMercadoPagoService } from '../services/acreditar-mercado-pago.service';
+import { BilleteraService } from '../../billetera/services/billetera.service';
+import { BilleteraResumen } from '../../billetera/models/billetera.model';
 import { DOCUMENT } from '@angular/common';
+import { of } from 'rxjs';
 
 describe('AcreditarMercadoPagoPresenter', () => {
   let presenter: AcreditarMercadoPagoPresenter;
   let mockAlumnosService: jasmine.SpyObj<AlumnosService>;
   let mockMercadoPagoService: jasmine.SpyObj<AcreditarMercadoPagoService>;
+  let mockBilleteraService: jasmine.SpyObj<BilleteraService>;
   let mockToastService: jasmine.SpyObj<ToastService>;
   let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
     mockAlumnosService = jasmine.createSpyObj('AlumnosService', ['asegurarCargados', 'getAlumnoById']);
     mockMercadoPagoService = jasmine.createSpyObj('AcreditarMercadoPagoService', ['generarLinkPago']);
+    mockBilleteraService = jasmine.createSpyObj('BilleteraService', ['getResumen']);
+    mockBilleteraService.getResumen.and.returnValue(of({ saldo: 0, movimientos: [] } as unknown as BilleteraResumen));
     mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
@@ -25,6 +31,7 @@ describe('AcreditarMercadoPagoPresenter', () => {
         AcreditarMercadoPagoPresenter,
         { provide: AlumnosService, useValue: mockAlumnosService },
         { provide: AcreditarMercadoPagoService, useValue: mockMercadoPagoService },
+        { provide: BilleteraService, useValue: mockBilleteraService },
         { provide: ToastService, useValue: mockToastService },
         { provide: Router, useValue: mockRouter },
         { provide: DOCUMENT, useValue: { location: { href: '' } } }

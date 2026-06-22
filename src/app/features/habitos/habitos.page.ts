@@ -1,12 +1,9 @@
 import { Component, inject } from '@angular/core';
 
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { HabitosService } from './services/habitos.service';
-
 import { HabitoAlerta } from './models/habito-alerta.model';
-
 import { HabitoAlertCardComponent } from './components/habito-alert-card/habito-alert-card.component';
 
 @Component({

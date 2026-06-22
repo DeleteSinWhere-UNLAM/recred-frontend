@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { PrediccionCardComponent } from './components/prediccion-card/prediccion-card.component';
 import { EstadisticaPresenter } from './presenter/estadistica.presenter';
 
@@ -9,7 +9,7 @@ import { EstadisticaPresenter } from './presenter/estadistica.presenter';
   selector: 'app-estadistica-page',
   templateUrl: './estadistica.page.html',
   styleUrl: './estadistica.page.css',
-  imports: [NavbarComponent, PrediccionCardComponent],
+  imports: [ PrediccionCardComponent],
   providers: [EstadisticaPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -56,7 +56,7 @@ export class CarritoPage implements OnInit {
   protected readonly lineasResumen = computed<ResumenLinea[]>(() =>
     this.presenter.grupos().map((g) => ({
       alumnoId: g.alumno.id,
-      nombre: `${g.alumno.nombre} ${g.alumno.apellido}`,
+      nombre: this.esVistaAlumno() ? `${g.alumno.nombre} ${g.alumno.apellido}` : g.alumno.nombre,
       subtotal: g.subtotal,
       incluido: g.seleccionado,
     })),

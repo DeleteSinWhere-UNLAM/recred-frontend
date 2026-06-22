@@ -48,7 +48,7 @@
             <option value="" disabled selected>Seleccioná un hijo</option>
             @for (hijo of hijos(); track hijo.id) {
               <option [value]="hijo.id">
-                {{ hijo.nombre }} {{ hijo.apellido }}
+                {{ hijo.nombre }}
               </option>
             }
           </select>

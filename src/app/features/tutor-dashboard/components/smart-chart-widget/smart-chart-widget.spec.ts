@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { SmartChartWidget } from './smart-chart-widget';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 describe('SmartChartWidget', () => {
   let component: SmartChartWidget;
@@ -8,7 +8,10 @@ describe('SmartChartWidget', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SmartChartWidget]
+      imports: [SmartChartWidget],
+      providers: [
+        provideCharts(withDefaultRegisterables())
+      ]
     })
     .compileComponents();
 

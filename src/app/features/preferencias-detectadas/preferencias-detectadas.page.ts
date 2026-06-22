@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 
 import { UsuarioService } from '../../data-access/services/usuario.service';
 
@@ -14,7 +14,7 @@ import { PreferenciaDetectadaCardComponent } from './components/preferencia-dete
   standalone: true,
   templateUrl: './preferencias-detectadas.page.html',
   styleUrl: './preferencias-detectadas.page.css',
-  imports: [NavbarComponent, PreferenciaDetectadaCardComponent],
+  imports: [ PreferenciaDetectadaCardComponent],
 })
 export class PreferenciasDetectadasPage {
   private readonly usuarioService = inject(UsuarioService);
