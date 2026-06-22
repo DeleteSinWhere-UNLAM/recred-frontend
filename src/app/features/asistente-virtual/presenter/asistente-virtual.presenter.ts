@@ -317,7 +317,7 @@ export class AsistenteVirtualPresenter {
   private reproducirSonidoExito(): void {
     const audio = new Audio('exito.mp3');
     audio.volume = 0.6;
-    void audio.play().catch(() => {});
+    void audio.play().catch(() => undefined);
   }
 
   private refrescarPedidoAlumnoSiAplica(): void {

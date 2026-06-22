@@ -43,12 +43,35 @@
   flex-shrink: 0;
 }
 
+.bulk-upload-modal__titulo-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .bulk-upload-modal__titulo {
   margin: 0;
   font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--color-pizarra);
+}
+
+.bulk-upload-modal__premium-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  color: #1e293b;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
+  line-height: 1;
 }
 
 .bulk-upload-modal__subtitle {
@@ -126,6 +149,24 @@
   font-size: 0.875rem;
 }
 
+.bulk-upload-modal__product-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.2rem;
+  background-color: color-mix(in srgb, var(--color-menta) 15%, var(--color-fondo));
+  color: var(--color-menta);
+  border: 1px solid color-mix(in srgb, var(--color-menta) 30%, transparent);
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.bulk-upload-modal__product-count strong {
+  font-weight: 800;
+}
+
 .bulk-upload-modal__form {
   display: flex;
   flex-direction: column;
@@ -149,13 +190,13 @@
   position: sticky;
   top: -1px; /* To cover the border or slight gaps */
   z-index: 10;
-  background-color: var(--color-fondo);
-  color: var(--color-texto-claro);
+  background-color: color-mix(in srgb, var(--color-pizarra) 6%, var(--color-fondo));
+  color: var(--color-pizarra);
   font-weight: 600;
   font-size: 0.875rem;
   text-align: left;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--color-borde);
+  border-bottom: 2px solid rgba(74, 111, 165, 0.3);
   white-space: nowrap;
 }
 
@@ -163,6 +204,14 @@
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--color-borde);
   transition: background-color 0.2s ease;
+}
+
+.bulk-upload-modal__table th:nth-child(even) {
+  background-color: color-mix(in srgb, var(--color-pizarra) 15%, var(--color-fondo));
+}
+
+.bulk-upload-modal__table td:nth-child(even) {
+  background-color: rgba(74, 111, 165, 0.02);
 }
 
 .bulk-upload-modal__row--invalid {
@@ -212,6 +261,25 @@
   margin-top: 0.25rem;
 }
 
+.bulk-upload-modal__currency-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.bulk-upload-modal__currency-symbol {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--color-texto-claro);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.bulk-upload-modal__currency-input {
+  padding-left: 1.75rem !important;
+}
+
 .bulk-upload-modal__table td input[type="text"],
 .bulk-upload-modal__table td input[type="number"],
 .bulk-upload-modal__table td select {
@@ -222,8 +290,8 @@
   font-family: inherit;
   font-size: 0.875rem;
   color: var(--color-texto-oscuro);
-  background-color: var(--color-superficie);
-  transition: border-color 0.2s ease;
+  background-color: transparent;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 
@@ -234,6 +302,7 @@
 
 .bulk-upload-modal__table td input:focus,
 .bulk-upload-modal__table td select:focus {
+  background-color: var(--color-superficie);
   border-color: var(--color-pizarra);
   outline: none;
 }

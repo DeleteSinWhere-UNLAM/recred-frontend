@@ -142,6 +142,18 @@
   gap: 30px;
 }
 
+.home__sections--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.home__sections--horizontal app-colegio-section {
+  display: block;
+  width: 320px;
+  max-width: 100%;
+}
+
 @media (max-width: 640px) {
   .home {
     padding: 20px 0 32px;

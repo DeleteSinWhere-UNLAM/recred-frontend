@@ -333,7 +333,7 @@ export class HomeKiosqueroPresenter {
       {
         label: 'Total vendido hoy',
         value: this.formatMoney(summary?.totalSold ?? 0),
-        icon: 'fa-dollar-sign',
+        icon: 'fa-money-bill-wave',
         tone: 'success',
       },
       {
@@ -856,7 +856,7 @@ export class HomeKiosqueroPresenter {
       titulo: 'Ver pedidos',
       descripcion: 'Pendientes, preparación y retiros',
       icono: 'fa-list-check',
-      ruta: `/cierre-diario?date=${this.selectedDateState()}&seccion=pedidos`,
+      ruta: `/kiosquero/pedidos-tracking`,
       color: 'pizarra',
     },
     {
@@ -876,6 +876,7 @@ export class HomeKiosqueroPresenter {
       ruta: '/sugerencias-agregar',
       color: 'menta',
       destacada: true,
+      premium: true,
     },
     {
       id: 'tracking-pedidos',
@@ -889,10 +890,11 @@ export class HomeKiosqueroPresenter {
     {
       id: 'cargar-productos',
       titulo: 'Cargar producto',
-      descripcion: 'Funcionalidad premium',
+      descripcion: 'Agregar productos con asistencia IA',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
+      premium: true,
     },
     {
       id: 'stock',
@@ -918,6 +920,7 @@ export class HomeKiosqueroPresenter {
       ruta: '/sugerencias',
       color: 'melocoton',
       destacada: true,
+      premium: true,
     },
     {
       id: 'recomendaciones',
@@ -975,10 +978,11 @@ export class HomeKiosqueroPresenter {
     {
       id: 'cargar-productos',
       titulo: 'Cargar producto',
-      descripcion: 'Funcionalidad premium',
+      descripcion: 'Agregar productos con asistencia IA',
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
+      premium: true,
     },
     {
       id: 'cierre-diario',

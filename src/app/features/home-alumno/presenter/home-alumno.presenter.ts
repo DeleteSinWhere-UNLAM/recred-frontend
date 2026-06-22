@@ -137,12 +137,11 @@ export class HomeAlumnoPresenter {
 
   init(): void {
     this.fondoPerfilState.set(this.leerFondoGuardado());
+    void this.colegiosService.obtenerColegios();
     void this.alumnosService.asegurarCargados(true).then((alumnos) => {
       const alumnoMock = this.usuarioService.getAlumnoActual();
       const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;
-      
-      const alumno = alumnos.find(a => a.id === alumnoId) || alumnos[0];
-      
+      const alumno = alumnos.find((a) => a.id === alumnoId) ?? alumnos[0];
       if (alumno) {
         this.alumnoState.set(alumno);
         void this.homeAlumnoService.cargarPedidoEnCurso(alumno.id);
@@ -184,6 +183,7 @@ export class HomeAlumnoPresenter {
     try {
       localStorage.setItem(STORAGE_KEY_FONDO, fondo);
     } catch {
+      /* noop */
     }
   }
 
@@ -198,6 +198,7 @@ export class HomeAlumnoPresenter {
         return 'minecraft';
       }
     } catch {
+      /* noop */
     }
     return 'nubes';
   }

@@ -39,9 +39,14 @@
       </a>
     </div>
 
-    <div class="home__sections">
+    <div class="home__sections" [class.home__sections--horizontal]="todosColegiosCerrados()">
       @for (grupo of grupos(); track grupo.colegio.id) {
-        <app-colegio-section [colegio]="grupo.colegio" [alumnos]="grupo.alumnos" />
+        <app-colegio-section
+          [colegio]="grupo.colegio"
+          [alumnos]="grupo.alumnos"
+          [expandido]="isColegioExpandido(grupo.colegio.id)"
+          (toggleExpandido)="toggleColegio(grupo.colegio.id)"
+        />
       }
     </div>
   </div>

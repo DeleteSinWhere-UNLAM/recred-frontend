@@ -1,11 +1,7 @@
 <app-navbar />
 
 <main class="carga-producto">
-  <button
-    type="button"
-    class="carga-producto__volver"
-    (click)="volver()"
-  >
+  <button type="button" class="carga-producto__volver" (click)="volver()">
     <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
     <span>Volver</span>
   </button>
@@ -16,47 +12,42 @@
         <i class="fa-solid fa-camera"></i>
       </div>
       <div class="carga-producto__identidad">
-        <h2 class="carga-producto__titulo">Carga de producto</h2>
+        <div class="carga-producto__titulo-container">
+          <h2 class="carga-producto__titulo">Carga de producto</h2>
+          <span class="carga-producto__premium-badge">PREMIUM</span>
+        </div>
         <p class="carga-producto__subtitulo">
           Cargá los datos a mano o tomá una foto del envase para autocompletar
         </p>
       </div>
     </header>
 
-    <app-camera-capture
-      [isScanning]="isLoading"
-      (photoTaken)="handlePhoto($event)"
-    />
+    <app-camera-capture [isScanning]="isLoading" (photoTaken)="handlePhoto($event)" />
 
     <app-scanner-loader [isScanning]="isLoading" />
 
     @if (saveSuccess) {
-      <div class="carga-producto__feedback carga-producto__feedback--success">
-        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-        <p>¡Producto guardado exitosamente!</p>
-      </div>
+    <div class="carga-producto__feedback carga-producto__feedback--success">
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      <p>¡Producto guardado exitosamente!</p>
+    </div>
     }
 
     @if (saveError) {
-      <div class="carga-producto__feedback carga-producto__feedback--error">
-        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-        <p>{{ saveError }}</p>
-      </div>
+    <div class="carga-producto__feedback carga-producto__feedback--error">
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      <p>{{ saveError }}</p>
+    </div>
     }
 
     @if (scannedProductData) {
-      <div class="carga-producto__feedback carga-producto__feedback--info">
-        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-        <p>¡Datos detectados! Verificá y corregí la información antes de guardar.</p>
-      </div>
+    <div class="carga-producto__feedback carga-producto__feedback--info">
+      <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+      <p>¡Datos detectados! Verificá y corregí la información antes de guardar.</p>
+    </div>
     }
 
-    <app-ai-product-form
-      [prefillData]="scannedProductData"
-      [categories]="categories"
-      [isSaving]="isSaving"
-      [buffetId]="buffetId"
-      (save)="saveProduct($event)"
-    />
+    <app-ai-product-form [prefillData]="scannedProductData" [categories]="categories" [isSaving]="isSaving"
+      [buffetId]="buffetId" (save)="saveProduct($event)" />
   </div>
 </main>

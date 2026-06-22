@@ -17,7 +17,7 @@ import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ProductoCardComponent } from './components/producto-card/producto-card.component';
 import { SeleccionarAlumnoModalComponent } from './components/seleccionar-alumno-modal/seleccionar-alumno-modal.component';
-import { BuffetPresenter } from './presenter/buffet.presenter';
+import { BuffetPresenter, PresupuestoDisponibleCategoria } from './presenter/buffet.presenter';
 import { Recreo } from '../compra/models/orden-compra.model';
 import { Producto, CategoriaProducto, ClasificacionSalud } from './models/producto.model';
 import { CarritoService } from '../compra/services/carrito.service';
@@ -67,11 +67,62 @@ export class BuffetPage implements OnInit {
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
   readonly todosLosAlumnos = this.alumnosService.alumnos;
-  readonly todosLosColegios = this.colegiosService.getColegios();
+  readonly todosLosColegios = computed(() => this.colegiosService.getColegios());
 
   protected readonly mostrarSelector = signal(false);
   protected readonly panelLateralCerrado = signal<boolean>(false);
   protected readonly diasCalendario = signal<DateCell[]>([]);
+
+  protected readonly presupuestoColapsado = signal(false);
+  protected readonly categoriasColapsado = signal(false);
+  protected readonly otrosLimitesColapsado = signal(true);
+
+  readonly presupuestoInfo = computed(() => {
+    const pres = this.presenter.presupuestoDisponible();
+    const saldoVal = this.presenter.saldo();
+
+    if (pres) {
+      const porcentajeDisponible = Math.max(0, 100 - pres.porcentajeConsumidoGeneral);
+      return {
+        hasBudget: true,
+        periodo: pres.periodo,
+        montoLimite: pres.montoLimiteGeneral,
+        montoDisponible: pres.montoDisponibleGeneral,
+        montoConsumido: pres.montoConsumidoGeneral,
+        porcentajeDisponible,
+        porcentajeConsumido: pres.porcentajeConsumidoGeneral,
+        reglasCategorias: pres.reglasCategorias,
+      };
+    } else {
+      return {
+        hasBudget: false,
+        periodo: 'General',
+        montoLimite: saldoVal,
+        montoDisponible: saldoVal,
+        montoConsumido: 0,
+        porcentajeDisponible: 100,
+        porcentajeConsumido: 0,
+        reglasCategorias: [] as PresupuestoDisponibleCategoria[],
+      };
+    }
+  });
+
+  protected getCategoryIcon(descripcion: string): string {
+    const desc = (descripcion || '').toLowerCase();
+    if (desc.includes('bebida') || desc.includes('infusion') || desc.includes('jugo') || desc.includes('agua')) {
+      return 'fa-solid fa-bottle-water';
+    }
+    if (desc.includes('snack') || desc.includes('galletita') || desc.includes('papa')) {
+      return 'fa-solid fa-cookie-bite';
+    }
+    if (desc.includes('golosina') || desc.includes('dulce') || desc.includes('chocolate') || desc.includes('caramelo')) {
+      return 'fa-solid fa-candy-cane';
+    }
+    if (desc.includes('comida') || desc.includes('almuerzo') || desc.includes('plato') || desc.includes('sandwich')) {
+      return 'fa-solid fa-hamburger';
+    }
+    return 'fa-solid fa-utensils';
+  }
 
   // Carrusel de Promociones
   @ViewChild('promosContainer') promosContainer!: ElementRef<HTMLDivElement>;
@@ -156,19 +207,31 @@ export class BuffetPage implements OnInit {
     return this.presenter.productosFiltrados().filter(p => !this.esPromocion(p));
   });
 
+  private getMaxSlideIndex(): number {
+    if (!this.promosContainer) return 0;
+    const container = this.promosContainer.nativeElement;
+    const card = container.querySelector('.promo-card');
+    const cardWidth = card ? card.getBoundingClientRect().width : 340;
+    const gap = 24;
+    const step = cardWidth + gap;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    return Math.max(0, Math.round(maxScroll / step));
+  }
+
   protected scrollCarousel(direction: number): void {
     if (!this.promosContainer) return;
     const total = this.promocionesDestacadasFiltradas().length;
     if (total <= 1) return;
 
     const currentIndex = this.activeSlideIndex();
+    const maxIndex = this.getMaxSlideIndex();
 
-    if (direction === 1 && currentIndex >= total - 1) {
+    if (direction === 1 && currentIndex >= maxIndex) {
       this.scrollToSlide(0);
       return;
     }
     if (direction === -1 && currentIndex <= 0) {
-      this.scrollToSlide(total - 1);
+      this.scrollToSlide(maxIndex);
       return;
     }
 

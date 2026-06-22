@@ -27,4 +27,5 @@ export interface AccionKiosquero {
   ruta: string;
   color?: AccionKiosqueroColor;
   destacada?: boolean;
+  premium?: boolean;
 }
