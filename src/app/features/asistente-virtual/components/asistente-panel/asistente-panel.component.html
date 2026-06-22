@@ -93,7 +93,11 @@
                   [disabled]="deshabilitado_()"
                   (click)="onOpcion(opcion)"
                 >
-                  @if (opcion.emoji) {
+                  @if (opcion.premium) {
+                    <span class="asistente-panel__opcion-icono" aria-hidden="true">
+                      <i class="fa-solid fa-crown"></i>
+                    </span>
+                  } @else if (opcion.emoji) {
                     <span class="asistente-panel__opcion-icono" aria-hidden="true">
                       {{ opcion.emoji }}
                     </span>
