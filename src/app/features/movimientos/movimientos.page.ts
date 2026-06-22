@@ -228,7 +228,7 @@ export class MovimientosPage implements OnInit {
           this.esVistaIndividual.set(true);
           const alumno = this.alumnosService.getAlumnoById(alumnoId);
           if (alumno) {
-            this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
+            this.nombreAlumno.set(`${alumno.nombre}`);
           }
         } else {
           this.selectedAlumnoId.set('todos');
@@ -299,7 +299,8 @@ export class MovimientosPage implements OnInit {
     if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
       const alumno = this.alumnosService.getAlumnoById(this.selectedAlumnoId());
       if (alumno) {
-        chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre} ${alumno.apellido}` });
+        const name = this.esVistaAlumno() ? `${alumno.nombre} ${alumno.apellido}` : alumno.nombre;
+        chips.push({ id: 'alumno', label: `Hijo: ${name}` });
       }
     }
 
@@ -369,13 +370,17 @@ export class MovimientosPage implements OnInit {
 
   getNombreAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
-    return alumno ? `${alumno.nombre} ${alumno.apellido}` : 'Alumno';
+    if (!alumno) return 'Alumno';
+    return this.esVistaAlumno() ? `${alumno.nombre} ${alumno.apellido}` : alumno.nombre;
   }
 
   getInicialesAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
     if (!alumno) return 'AL';
-    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    if (this.esVistaAlumno()) {
+      return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    }
+    return (alumno.nombre[0] ?? '').toUpperCase();
   }
 
   getFotoPerfilAlumno(studentId: string): string | null {

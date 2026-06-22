@@ -54,7 +54,7 @@ export class RestriccionesNutricionalesPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
-    return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
+    return alumno ? `${alumno.nombre}` : '';
   });
 
   readonly urlFotoPerfil = computed<string | null>(() => this.alumnoState()?.urlFotoPerfil ?? null);
@@ -64,7 +64,7 @@ export class RestriccionesNutricionalesPresenter {
   readonly iniciales = computed(() => {
     const alumno = this.alumnoState();
     if (!alumno) return '';
-    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    return (alumno.nombre[0] ?? '').toUpperCase();
   });
 
   async init(alumnoId: string): Promise<void> {

@@ -29,7 +29,7 @@
           <article class="confirmar-page__orden">
             <header class="confirmar-page__orden-cabecera">
               <div class="confirmar-page__orden-alumno">
-                <h4>{{ orden.alumno.nombre }} {{ orden.alumno.apellido }}</h4>
+                <h4>{{ orden.alumno.nombre }}{{ esVistaAlumno() ? ' ' + orden.alumno.apellido : '' }}</h4>
                 <p>{{ orden.alumno.grado }}</p>
               </div>
               <div class="confirmar-page__orden-meta">

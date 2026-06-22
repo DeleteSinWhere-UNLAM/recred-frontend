@@ -64,12 +64,11 @@ export class AlumnoCardComponent implements OnInit {
   }
 
   get nombreCompleto(): string {
-    return `${this.alumno.nombre} ${this.alumno.apellido}`;
+    return this.alumno.nombre;
   }
 
   get iniciales(): string {
-    const ini = (this.alumno.nombre[0] ?? '') + (this.alumno.apellido[0] ?? '');
-    return ini.toUpperCase();
+    return (this.alumno.nombre[0] ?? '').toUpperCase();
   }
 
   get fotoPerfil(): string | null {

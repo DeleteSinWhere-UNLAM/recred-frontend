@@ -134,7 +134,7 @@ export class MovimientosPendientesPage implements OnInit {
 
         const alumno = this.alumnosService.getAlumnoById(id);
         if (alumno) {
-          this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
+          this.nombreAlumno.set(`${alumno.nombre}`);
         } else {
           this.nombreAlumno.set('Alumno');
         }
@@ -232,7 +232,7 @@ export class MovimientosPendientesPage implements OnInit {
   getInicialesAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
     if (!alumno) return 'AL';
-    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    return (alumno.nombre[0] ?? '').toUpperCase();
   }
 
   getFotoPerfilAlumno(studentId: string): string | null {

@@ -49,12 +49,12 @@
                 class="grupo-hijo-card__avatar-img" />
               } @else {
               <div class="grupo-hijo-card__avatar-initials">
-                {{ getInitials(grupo.alumnoNombre + ' ' + grupo.alumnoApellido) }}
+                {{ getInitials(grupo.alumnoNombre) }}
               </div>
               }
             </div>
             <div class="grupo-hijo-card__info">
-              <span class="grupo-hijo-card__nombre">{{ grupo.alumnoNombre }} {{ grupo.alumnoApellido }}</span>
+              <span class="grupo-hijo-card__nombre">{{ grupo.alumnoNombre }}</span>
               <span class="grupo-hijo-card__total">Total Carritos: {{ grupo.carritos.length }}</span>
             </div>
           </div>

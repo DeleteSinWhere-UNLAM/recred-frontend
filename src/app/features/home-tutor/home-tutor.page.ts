@@ -82,8 +82,8 @@ export class HomeTutorPage implements OnInit {
     const result = Array.from(porColegio.values());
     for (const g of result) {
       g.alumnos.sort((a, b) => {
-        const nameA = `${a.nombre} ${a.apellido}`.trim().toLowerCase();
-        const nameB = `${b.nombre} ${b.apellido}`.trim().toLowerCase();
+        const nameA = a.nombre.trim().toLowerCase();
+        const nameB = b.nombre.trim().toLowerCase();
         return nameA.localeCompare(nameB);
       });
     }
