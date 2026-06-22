@@ -1,21 +1,8 @@
-<div
-  class="upload-selection-modal__backdrop"
-  tabindex="0"
-  role="button"
-  (click)="onCancel()"
-  (keydown.enter)="onCancel()"
-  (keydown.space)="onCancel()"
->
-  <section
-    class="upload-selection-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="upload-selection-title"
-    tabindex="-1"
-    (click)="$event.stopPropagation()"
-    (keydown.enter)="$event.stopPropagation()"
-    (keydown.space)="$event.stopPropagation()"
-  >
+<div class="upload-selection-modal__backdrop" tabindex="0" role="button" (click)="onCancel()"
+  (keydown.enter)="onCancel()" (keydown.space)="onCancel()">
+  <section class="upload-selection-modal" role="dialog" aria-modal="true" aria-labelledby="upload-selection-title"
+    tabindex="-1" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+    (keydown.space)="$event.stopPropagation()">
     <header class="upload-selection-modal__header">
       <div>
         <h3 id="upload-selection-title" class="upload-selection-modal__titulo">
@@ -25,22 +12,13 @@
           Elige cómo deseas agregar productos
         </p>
       </div>
-      <button
-        type="button"
-        class="upload-selection-modal__close"
-        (click)="onCancel()"
-        aria-label="Cerrar"
-      >
+      <button type="button" class="upload-selection-modal__close" (click)="onCancel()" aria-label="Cerrar">
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </header>
 
     <div class="upload-selection-modal__body">
-      <button
-        type="button"
-        class="upload-selection-modal__option"
-        (click)="onIaUpload()"
-      >
+      <button type="button" class="upload-selection-modal__option" (click)="onIaUpload()">
         <div class="upload-selection-modal__icon" aria-hidden="true">
           <i class="fa-solid fa-cloud-arrow-up"></i>
         </div>
@@ -54,11 +32,7 @@
         <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
       </button>
 
-      <button
-        type="button"
-        class="upload-selection-modal__option"
-        (click)="onBulkUpload()"
-      >
+      <button type="button" class="upload-selection-modal__option" (click)="onBulkUpload()">
         <div class="upload-selection-modal__icon" aria-hidden="true">
           <i class="fa-solid fa-boxes-stacked"></i>
         </div>
@@ -67,7 +41,8 @@
             Carga masiva
             <span class="upload-selection-modal__premium-badge">PREMIUM</span>
           </strong>
-          <span class="upload-selection-modal__option-desc">Sube un archivo PDF o Excel para procesar múltiples productos a la vez</span>
+          <span class="upload-selection-modal__option-desc">Sube un archivo PDF para procesar múltiples productos a la
+            vez</span>
         </div>
         <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
       </button>
