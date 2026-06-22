@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TutorWelcome } from './tutor-welcome';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 describe('TutorWelcome', () => {
   let component: TutorWelcome;
@@ -8,7 +10,12 @@ describe('TutorWelcome', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TutorWelcome]
+      imports: [TutorWelcome],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([])
+      ]
     })
     .compileComponents();
 
