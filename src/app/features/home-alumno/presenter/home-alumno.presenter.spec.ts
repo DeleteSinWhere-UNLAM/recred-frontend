@@ -35,8 +35,9 @@ describe('HomeAlumnoPresenter', () => {
     const perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);
     perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-1');
 
-    const colegiosServiceSpy = jasmine.createSpyObj('ColegiosService', ['getColegios']);
+    const colegiosServiceSpy = jasmine.createSpyObj('ColegiosService', ['getColegios', 'obtenerColegios']);
     colegiosServiceSpy.getColegios.and.returnValue([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
+    colegiosServiceSpy.obtenerColegios.and.resolveTo([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
 
     TestBed.configureTestingModule({
       providers: [
