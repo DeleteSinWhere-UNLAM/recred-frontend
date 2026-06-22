@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
 import { MovimientosService } from '../../../movimientos/services/movimientos.service';
@@ -23,7 +22,7 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   standalone: true,
   templateUrl: './alumno-card.component.html',
   styleUrl: './alumno-card.component.css',
-  imports: [RouterLink, FormsModule, DatePipe, CropModalComponent],
+  imports: [RouterLink, RouterLinkActive, FormsModule, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlumnoCardComponent implements OnInit {
