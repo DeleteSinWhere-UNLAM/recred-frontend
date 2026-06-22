@@ -6,45 +6,11 @@
         <p>Cargando información...</p>
       </div>
     } @else {
-            <header class="acreditar-page__alumno">
-        <div class="acreditar-page__alumno-left">
-          <div class="acreditar-page__avatar-wrap">
-            <div class="acreditar-page__avatar">
-              @if (presenter.urlFotoPerfil()) {
-                <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="acreditar-page__avatar-img" />
-              } @else {
-                <span>{{ presenter.iniciales() }}</span>
-              }
-            </div>
-          </div>
-          <div class="acreditar-page__alumno-info">
-            <h2>{{ presenter.nombreCompleto() }}</h2>
-            <p>
-              <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
-              {{ presenter.grado() }}
-            </p>
-          </div>
-        </div>
-        
-        <div class="acreditar-page__alumno-saldo">
-          <div class="acreditar-page__saldo-content">
-            <span class="acreditar-page__saldo-label">Saldo total</span>
-            <span class="acreditar-page__saldo-valor">{{ saldoFormateado }}</span>
-          </div>
-          <div class="acreditar-page__saldo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="acreditar-page__card-svg">
-              <rect x="2" y="5" width="20" height="14" rx="2"/>
-              <line x1="2" y1="10" x2="22" y2="10"/>
-              <line x1="6" y1="15" x2="10" y2="15"/>
-            </svg>
-          </div>
-        </div>
-      </header>
       <div class="acreditar-page__grid">
                 <section class="acreditar-page__form-section">
-          <h3>¿Cuánto querés acreditar?</h3>
+          <h3>¿Cuánto querés acreditarle a {{ presenter.alumno()?.nombre }}?</h3>
           <p class="acreditar-page__description">
-            Ingresá el monto y te redirigiremos a Mercado Pago para completar la operación.
+            Saldo actual: <strong>{{ saldoFormateado }}</strong>. Ingresá el monto y te redirigiremos a Mercado Pago para completar la operación.
           </p>
 
           <form class="acreditar-page__form" (submit)="onSubmit($event)">
@@ -148,16 +114,16 @@
 
         
         <section class="acreditar-page__history-section">
-          <h3>Historial de recargas</h3>
+          <h3>Historial de recargas de {{ presenter.alumno()?.nombre }}</h3>
           <p class="acreditar-page__history-description">
-            Últimas recargas acreditadas para este alumno.
+            Últimas recargas acreditadas para {{ presenter.nombreCompleto() }}.
           </p>
 
           <div class="acreditar-page__history-container">
             @if (recargas.length === 0) {
               <div class="acreditar-page__history-empty">
                 <i class="fa-solid fa-receipt" aria-hidden="true"></i>
-                <p>No se registran recargas recientes para este alumno.</p>
+                <p>No se registran recargas recientes para {{ presenter.alumno()?.nombre }}.</p>
               </div>
             } @else {
               <div class="acreditar-page__history-list">

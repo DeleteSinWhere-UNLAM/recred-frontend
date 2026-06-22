@@ -18,8 +18,10 @@ export class AcreditarMercadoPagoPage implements OnInit {
   montoIngresado = 0;
 
   ngOnInit(): void {
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
-    void this.presenter.init(alumnoId);
+    this.route.paramMap.subscribe(params => {
+      const alumnoId = params.get('alumnoId') ?? '';
+      void this.presenter.init(alumnoId);
+    });
   }
 
   protected onMontoChange(event: Event): void {
@@ -40,26 +42,8 @@ export class AcreditarMercadoPagoPage implements OnInit {
     }).format(saldo);
   }
 
-  protected get recargas(): { id: string; montoFormateado: string; fechaFormateada: string; estado: string }[] {
-    const nombre = this.presenter.alumno()?.nombre.toLowerCase() ?? '';
-    if (nombre.includes('rocio')) {
-      return [
-        { id: 'rec-1', montoFormateado: '$3.000', fechaFormateada: '12 Jun, 15:30', estado: 'APROBADO' },
-        { id: 'rec-2', montoFormateado: '$1.500', fechaFormateada: '05 Jun, 18:22', estado: 'APROBADO' },
-        { id: 'rec-3', montoFormateado: '$2.000', fechaFormateada: '28 May, 10:05', estado: 'APROBADO' },
-      ];
-    }
-    if (nombre.includes('emmanuel')) {
-      return [
-        { id: 'rec-1', montoFormateado: '$5.000', fechaFormateada: '13 Jun, 11:45', estado: 'APROBADO' },
-        { id: 'rec-2', montoFormateado: '$2.000', fechaFormateada: '09 Jun, 14:10', estado: 'APROBADO' },
-        { id: 'rec-3', montoFormateado: '$5.000', fechaFormateada: '01 Jun, 09:30', estado: 'APROBADO' },
-      ];
-    }
-    return [
-      { id: 'rec-1', montoFormateado: '$2.000', fechaFormateada: '10 Jun, 12:00', estado: 'APROBADO' },
-      { id: 'rec-2', montoFormateado: '$1.000', fechaFormateada: '04 Jun, 16:30', estado: 'APROBADO' },
-    ];
+  protected get recargas() {
+    return this.presenter.historialRecargas();
   }
 
   protected onSubmit(event: Event): void {
