@@ -8,13 +8,13 @@ import { CarritoService } from '../compra/services/carrito.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { Producto } from '../buffet/models/producto.model';
 
-import { } from '../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-favoritos-page',
   templateUrl: './favoritos.page.html',
   styleUrl: './favoritos.page.css',
-  imports: [],
+  imports: [NavbarComponent],
 })
 export class FavoritosPage {
   private readonly favoritosService = inject(FavoritosService);

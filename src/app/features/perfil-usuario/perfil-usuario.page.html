@@ -1,3 +1,5 @@
+<app-navbar [userName]="nombreNavbar()" />
+
 <main class="perfil-usuario">
   <div class="perfil-usuario__container">
     <button type="button" class="perfil-usuario__volver" [class.perfil-usuario__volver--premium]="esPremium()" (click)="volver()">

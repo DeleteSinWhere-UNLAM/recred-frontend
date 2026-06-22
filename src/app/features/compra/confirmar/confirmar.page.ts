@@ -6,7 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { } from '../../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import {
   ResumenLinea,
@@ -25,7 +25,7 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   selector: 'app-confirmar-page',
   templateUrl: './confirmar.page.html',
   styleUrl: './confirmar.page.css',
-  imports: [ ResumenOrdenCardComponent],
+  imports: [NavbarComponent, ResumenOrdenCardComponent],
   providers: [ConfirmarPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { } from '../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { BilleteraPresenter, RangoFecha } from './presenter/billetera.presenter';
@@ -11,7 +11,7 @@ import { BilleteraPresenter, RangoFecha } from './presenter/billetera.presenter'
   selector: 'app-billetera-page',
   templateUrl: './billetera.page.html',
   styleUrl: './billetera.page.css',
-  imports: [CommonModule],
+  imports: [CommonModule, NavbarComponent],
   providers: [BilleteraPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,6 +22,7 @@ export class BilleteraPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   protected readonly presenter = inject(BilleteraPresenter);
 
+  readonly nombreUsuario = this.usuarioService.nombreNavbar;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   ngOnInit(): void {
