@@ -5,7 +5,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { } from '../../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { CodigoRetiroCardComponent } from '../components/codigo-retiro-card/codigo-retiro-card.component';
 import { ExitoPresenter } from './presenter/exito.presenter';
@@ -21,7 +21,7 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   selector: 'app-exito-page',
   templateUrl: './exito.page.html',
   styleUrl: './exito.page.css',
-  imports: [NavbarComponent, CodigoRetiroCardComponent],
+  imports: [ CodigoRetiroCardComponent],
   providers: [ExitoPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

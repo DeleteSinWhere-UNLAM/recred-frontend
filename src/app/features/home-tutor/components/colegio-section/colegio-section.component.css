@@ -1,25 +1,33 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .colegio-section {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .colegio-section__layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* Sidebar: Colegio Info Card */
 .colegio-section__sidebar {
   background-color: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: 24px;
-  padding: 24px;
+  padding: 16px;
   box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   transition: all 0.2s ease;
 }
 
@@ -53,14 +61,37 @@
   flex-shrink: 0;
 }
 
-.colegio-section__nombre {
+.colegio-section__header-text {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.colegio-section__nombre {
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
   color: #1a3b5c;
   margin: 0;
   min-width: 0;
+}
+
+.colegio-section__alumnos-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.colegio-section__alumnos-count i {
+  color: #1a3b5c;
+  font-size: 13px;
 }
 
 .colegio-section__chevron {
@@ -86,34 +117,11 @@
 .colegio-section__sidebar-body {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 24px;
-  flex: 1;
-  animation: colegio-fade-in 0.25s ease;
-}
-
-.colegio-section__info-row {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  color: #64748b;
-}
-
-.colegio-section__info-row i {
-  font-size: 16px;
-  color: #1a3b5c;
-  width: 20px;
-  text-align: center;
-}
-
-.colegio-section__divider {
-  border: none;
-  height: 1px;
-  background-color: var(--color-borde);
-  margin: 4px 0;
+  margin-top: 16px;
+  flex: 1;
+  min-height: 0;
+  animation: colegio-fade-in 0.25s ease;
 }
 
 .colegio-section__saldo-row {
@@ -158,9 +166,30 @@
   display: block;
 }
 
-/* Content Column (Grid) */
 .colegio-section__content {
   width: 100%;
+  margin-top: 0px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+.colegio-section__content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.colegio-section__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.colegio-section__content::-webkit-scrollbar-thumb {
+  background: #1a3b5c;
+  border-radius: 6px;
+}
+
+.colegio-section__content::-webkit-scrollbar-thumb:hover {
+  background: #2b5a8e;
 }
 
 .colegio-section__grid {
@@ -183,19 +212,14 @@
 
 /* Responsive Rules for Desktop */
 @media (min-width: 900px) {
-  .colegio-section__layout {
-    grid-template-columns: 280px 1fr;
-    gap: 30px;
-  }
-  
   .colegio-section__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 
 @media (min-width: 1280px) {
   .colegio-section__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 

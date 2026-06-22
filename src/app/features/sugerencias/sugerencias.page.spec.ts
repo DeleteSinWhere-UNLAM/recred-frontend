@@ -27,7 +27,7 @@ class MockComboPromotionModalComponent {
   standalone: true,
   template: ''
 })
-class MockNavbarComponent {
+class Mock{
   @Input() userName!: string;
 }
 
@@ -65,7 +65,7 @@ describe('SugerenciasPage', () => {
     })
       .overrideComponent(SugerenciasPage, {
         set: {
-          imports: [CommonModule, MockNavbarComponent, MockComboPromotionModalComponent],
+          imports: [CommonModule, Mock, MockComboPromotionModalComponent],
           providers: [
             { provide: SugerenciasPresenter, useValue: mockPresenter }
           ]

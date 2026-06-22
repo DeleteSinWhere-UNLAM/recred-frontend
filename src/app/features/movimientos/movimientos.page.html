@@ -1,13 +1,8 @@
-<app-navbar [userName]="nombreNavbar()" />
-
 <main class="movimientos">
   <div class="movimientos__container">
     
     <header class="movimientos__header">
-      <button type="button" class="movimientos__volver" (click)="volver()" aria-label="Volver al panel">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        <span>Volver</span>
-      </button>
+
       <div class="movimientos__titulo-area" [class.movimientos__titulo-area--alumno]="esVistaAlumno()">
         <div class="movimientos__icono">
           <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>

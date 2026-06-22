@@ -1,3 +1,4 @@
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,14 +10,14 @@ import {
   AlumnoResumen,
   ProductoVenta,
 } from './services/venta-espontanea';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+
 import { FeriadosService } from '../../shared/services/feriados.service';
 import { DialogService } from '../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-venta-espontanea-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ZXingScannerModule, NavbarComponent],
+  imports: [NavbarComponent, CommonModule, FormsModule, ZXingScannerModule],
   styleUrl: './venta-espontanea-page.component.css',
   template: `
     <app-navbar [userName]="'Kiosquero'" />

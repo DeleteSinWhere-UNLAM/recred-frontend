@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 
 import { NotificacionesPrecioService } from './services/notificaciones-precio.service';
@@ -13,7 +13,7 @@ import { NotificacionPrecioCardComponent } from './components/notificacion-preci
   standalone: true,
   templateUrl: './notificaciones-precio.page.html',
   styleUrl: './notificaciones-precio.page.css',
-  imports: [NavbarComponent, NotificacionPrecioCardComponent],
+  imports: [ NotificacionPrecioCardComponent],
 })
 export class NotificacionesPrecioPage {
   private readonly usuarioService = inject(UsuarioService);
