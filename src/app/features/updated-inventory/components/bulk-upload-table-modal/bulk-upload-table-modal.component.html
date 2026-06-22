@@ -1,21 +1,8 @@
-<div
-  class="bulk-upload-modal__backdrop"
-  tabindex="0"
-  role="button"
-  (click)="onCancel()"
-  (keydown.enter)="onCancel()"
-  (keydown.space)="onCancel()"
->
-  <section
-    class="bulk-upload-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="bulk-upload-title"
-    tabindex="-1"
-    (click)="$event.stopPropagation()"
-    (keydown.enter)="$event.stopPropagation()"
-    (keydown.space)="$event.stopPropagation()"
-  >
+<div class="bulk-upload-modal__backdrop" tabindex="0" role="button" (click)="onCancel()" (keydown.enter)="onCancel()"
+  (keydown.space)="onCancel()">
+  <section class="bulk-upload-modal" role="dialog" aria-modal="true" aria-labelledby="bulk-upload-title" tabindex="-1"
+    (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+    (keydown.space)="$event.stopPropagation()">
     <header class="bulk-upload-modal__header">
       <div>
         <div class="bulk-upload-modal__titulo-container">
@@ -28,12 +15,7 @@
           Sube tu archivo y edita los datos antes de guardarlos
         </p>
       </div>
-      <button
-        type="button"
-        class="bulk-upload-modal__close"
-        (click)="onCancel()"
-        aria-label="Cerrar"
-      >
+      <button type="button" class="bulk-upload-modal__close" (click)="onCancel()" aria-label="Cerrar">
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </header>
@@ -42,20 +24,21 @@
       <div class="bulk-upload-modal__file-section">
         <label class="bulk-upload-modal__file-label">
           <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
-          <span>Subir archivo PDF o Excel</span>
-          <input
-            type="file"
-            class="bulk-upload-modal__file-input"
-            accept=".pdf,.xlsx,.xls,.csv"
-            (change)="onFileChange($event)"
-            [disabled]="isProcessingFile"
-          >
+          <span>Subir archivo PDF</span>
+          <input type="file" class="bulk-upload-modal__file-input" accept=".pdf,.xlsx,.xls,.csv"
+            (change)="onFileChange($event)" [disabled]="isProcessingFile">
         </label>
         @if (isProcessingFile) {
-          <span class="bulk-upload-modal__processing">
-            <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
-            Procesando archivo...
-          </span>
+        <span class="bulk-upload-modal__processing">
+          <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+          Procesando archivo...
+        </span>
+        }
+        @if (productsArray.length > 0 && !isProcessingFile) {
+        <span class="bulk-upload-modal__product-count">
+          <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+          Total <strong>{{ productsArray.length }}</strong> productos
+        </span>
         }
       </div>
 
@@ -77,78 +60,71 @@
             </thead>
             <tbody formArrayName="products">
               @for (control of productsArray.controls; track control) {
-                <tr
-                  [class.bulk-upload-modal__row--invalid]="control.invalid && control.touched"
-                >
-                  <td>
-                    <input type="text" [formControl]="asFormControl(asFormGroup(control).get('nombre'))" placeholder="Nombre">
-                  </td>
-                  <td>
-                    <input type="text" [formControl]="asFormControl(asFormGroup(control).get('descripcion'))" placeholder="Descripción">
-                  </td>
-                  <td>
-                    <input type="number" [formControl]="asFormControl(asFormGroup(control).get('precio'))" min="0" step="10">
-                  </td>
-                  <td>
-                    <input type="number" [formControl]="asFormControl(asFormGroup(control).get('stockActual'))" min="0" step="1">
-                  </td>
-                  <td>
-                    <input type="number" [formControl]="asFormControl(asFormGroup(control).get('peso'))" min="0" step="0.1">
-                  </td>
-                  <td>
-                    <select [formControl]="asFormControl(asFormGroup(control).get('unidadMedida'))">
-                      @for (unidad of obtenerUnidadesPorCategoria(asFormGroup(control).get('categoriaId')?.value); track unidad) {
-                        <option [value]="unidad">{{ unidad }}</option>
+              <tr [class.bulk-upload-modal__row--invalid]="control.invalid && control.touched">
+                <td>
+                  <input type="text" [formControl]="asFormControl(asFormGroup(control).get('nombre'))"
+                    placeholder="Nombre">
+                </td>
+                <td>
+                  <input type="text" [formControl]="asFormControl(asFormGroup(control).get('descripcion'))"
+                    placeholder="Descripción">
+                </td>
+                <td>
+                  <div class="bulk-upload-modal__currency-wrapper">
+                    <span class="bulk-upload-modal__currency-symbol">$</span>
+                    <input type="number" [formControl]="asFormControl(asFormGroup(control).get('precio'))" min="0"
+                      step="10" class="bulk-upload-modal__currency-input">
+                  </div>
+                </td>
+                <td>
+                  <input type="number" [formControl]="asFormControl(asFormGroup(control).get('stockActual'))" min="0"
+                    step="1">
+                </td>
+                <td>
+                  <input type="number" [formControl]="asFormControl(asFormGroup(control).get('peso'))" min="0"
+                    step="0.1">
+                </td>
+                <td>
+                  <select [formControl]="asFormControl(asFormGroup(control).get('unidadMedida'))">
+                    @for (unidad of obtenerUnidadesPorCategoria(asFormGroup(control).get('categoriaId')?.value); track
+                    unidad) {
+                    <option [value]="unidad">{{ unidad }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <div class="bulk-upload-modal__category-cell">
+                    <select [formControl]="asFormControl(asFormGroup(control).get('categoriaId'))"
+                      [class.ng-invalid]="asFormGroup(control).get('categoriaId')?.invalid && asFormGroup(control).get('categoriaId')?.touched">
+                      <option value="" disabled selected>Seleccionar...</option>
+                      @for (cat of categories; track cat.id) {
+                      <option [value]="cat.id">{{ cat.descripcion }}</option>
                       }
+                      <option value="NEW">+ Nueva categoría...</option>
                     </select>
-                  </td>
-                  <td>
-                    <div class="bulk-upload-modal__category-cell">
-                      <select
-                        [formControl]="asFormControl(asFormGroup(control).get('categoriaId'))"
-                        [class.ng-invalid]="asFormGroup(control).get('categoriaId')?.invalid && asFormGroup(control).get('categoriaId')?.touched"
-                      >
-                        <option value="" disabled selected>Seleccionar...</option>
-                        @for (cat of categories; track cat.id) {
-                          <option [value]="cat.id">{{ cat.descripcion }}</option>
-                        }
-                        <option value="NEW">+ Nueva categoría...</option>
-                      </select>
 
-                      @if (asFormGroup(control).get('categoriaId')?.value === 'NEW') {
-                        <input
-                          type="text"
-                          [formControl]="asFormControl(asFormGroup(control).get('nuevaCategoriaNombre'))"
-                          placeholder="Nombre de la categoría"
-                          class="bulk-upload-modal__new-category-input"
-                          [class.ng-invalid]="asFormGroup(control).get('nuevaCategoriaNombre')?.invalid && asFormGroup(control).get('nuevaCategoriaNombre')?.touched"
-                        >
-                      }
-                    </div>
-                  </td>
-                  <td>
-                    <input type="checkbox" [formControl]="asFormControl(asFormGroup(control).get('requierePreparacion'))">
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      class="bulk-upload-modal__btn-delete"
-                      (click)="removeProductRow($index)"
-                      aria-label="Eliminar fila"
-                    >
-                      <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-                    </button>
-                  </td>
-                </tr>
+                    @if (asFormGroup(control).get('categoriaId')?.value === 'NEW') {
+                    <input type="text" [formControl]="asFormControl(asFormGroup(control).get('nuevaCategoriaNombre'))"
+                      placeholder="Nombre de la categoría" class="bulk-upload-modal__new-category-input"
+                      [class.ng-invalid]="asFormGroup(control).get('nuevaCategoriaNombre')?.invalid && asFormGroup(control).get('nuevaCategoriaNombre')?.touched">
+                    }
+                  </div>
+                </td>
+                <td>
+                  <input type="checkbox" [formControl]="asFormControl(asFormGroup(control).get('requierePreparacion'))">
+                </td>
+                <td>
+                  <button type="button" class="bulk-upload-modal__btn-delete" (click)="removeProductRow($index)"
+                    aria-label="Eliminar fila">
+                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
               }
             </tbody>
           </table>
         </div>
-        <button
-          type="button"
-          class="bulk-upload-modal__btn-add"
-          (click)="addProductRow()"
-        >
+        <button type="button" class="bulk-upload-modal__btn-add" (click)="addProductRow()">
           <i class="fa-solid fa-plus" aria-hidden="true"></i>
           Agregar fila
         </button>
@@ -156,19 +132,11 @@
     </div>
 
     <footer class="bulk-upload-modal__footer">
-      <button
-        type="button"
-        class="bulk-upload-modal__btn bulk-upload-modal__btn--cancel"
-        (click)="onCancel()"
-      >
+      <button type="button" class="bulk-upload-modal__btn bulk-upload-modal__btn--cancel" (click)="onCancel()">
         Cancelar
       </button>
-      <button
-        type="button"
-        class="bulk-upload-modal__btn bulk-upload-modal__btn--submit"
-        (click)="onSave()"
-        [disabled]="isProcessingFile || productsArray.length === 0"
-      >
+      <button type="button" class="bulk-upload-modal__btn bulk-upload-modal__btn--submit" (click)="onSave()"
+        [disabled]="isProcessingFile || productsArray.length === 0">
         Guardar productos
       </button>
     </footer>
