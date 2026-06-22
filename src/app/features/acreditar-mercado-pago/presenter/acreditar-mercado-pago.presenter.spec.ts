@@ -6,6 +6,7 @@ import { Alumno } from '../../../data-access/models/alumno.model';
 import { ToastService } from '../../../shared/services/toast.service';
 import { AcreditarMercadoPagoService } from '../services/acreditar-mercado-pago.service';
 import { BilleteraService } from '../../billetera/services/billetera.service';
+import { BilleteraResumen } from '../../billetera/models/billetera.model';
 import { DOCUMENT } from '@angular/common';
 import { of } from 'rxjs';
 
@@ -21,7 +22,7 @@ describe('AcreditarMercadoPagoPresenter', () => {
     mockAlumnosService = jasmine.createSpyObj('AlumnosService', ['asegurarCargados', 'getAlumnoById']);
     mockMercadoPagoService = jasmine.createSpyObj('AcreditarMercadoPagoService', ['generarLinkPago']);
     mockBilleteraService = jasmine.createSpyObj('BilleteraService', ['getResumen']);
-    mockBilleteraService.getResumen.and.returnValue(of({ saldo: 0, movimientos: [] } as any));
+    mockBilleteraService.getResumen.and.returnValue(of({ saldo: 0, movimientos: [] } as unknown as BilleteraResumen));
     mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
