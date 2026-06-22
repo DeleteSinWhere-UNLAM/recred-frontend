@@ -1,5 +1,12 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .home {
-  height: calc(100vh - 64px);
+  flex: 1;
   padding: 20px 0;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(240, 244, 248, 0) 260px),
@@ -64,6 +71,23 @@
   padding: 16px 16px 16px 24px;
   display: flex;
   flex-direction: column;
+}
+
+.home__content-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.home__content-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.home__content-scroll::-webkit-scrollbar-thumb {
+  background: #1a3b5c;
+  border-radius: 6px;
+}
+
+.home__content-scroll::-webkit-scrollbar-thumb:hover {
+  background: #2b5a8e;
 }
 
 
