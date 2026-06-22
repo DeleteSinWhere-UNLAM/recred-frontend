@@ -19,6 +19,7 @@ import { ToastService } from '../../shared/services/toast.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { Category } from '../updated-inventory/models/category.interface';
 import { CreateProductRequest } from '../updated-inventory/models/requests/create-product-request.interface';
+import { ProductFormComponent, ProductFormData } from '../updated-inventory/components/product-form/product-form.component';
 
 const IMAGEN_FALLBACK =
   'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
@@ -27,7 +28,7 @@ const IMAGEN_FALLBACK =
   selector: 'app-home-kiosquero-page',
   templateUrl: './home-kiosquero.page.html',
   styleUrl: './home-kiosquero.page.css',
-  imports: [NavbarComponent, UploadSelectionModalComponent, BulkUploadTableModalComponent],
+  imports: [NavbarComponent, UploadSelectionModalComponent, BulkUploadTableModalComponent, ProductFormComponent],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -46,6 +47,8 @@ export class HomeKiosqueroPage implements OnInit {
   isUploadModalVisible = false;
   isBulkUploadModalVisible = false;
   isProcessingFile = false;
+  isManualProductFormVisible = false;
+  isSavingManualProduct = false;
   bulkProductsData: BulkProductResponse[] = [];
   categories: Category[] = [];
 
@@ -85,6 +88,11 @@ export class HomeKiosqueroPage implements OnInit {
     this.router.navigateByUrl('/cargar-producto-ia');
   }
 
+  goToManualUpload(): void {
+    this.isUploadModalVisible = false;
+    this.isManualProductFormVisible = true;
+  }
+
   goToBulkUpload(): void {
     this.isUploadModalVisible = false;
     this.isBulkUploadModalVisible = true;
@@ -93,6 +101,10 @@ export class HomeKiosqueroPage implements OnInit {
 
   closeUploadModal(): void {
     this.isUploadModalVisible = false;
+  }
+
+  get buffetId(): string | null {
+    return this.perfilService.obtenerBuffetId();
   }
 
   closeBulkUploadModal(): void {
@@ -169,6 +181,59 @@ export class HomeKiosqueroPage implements OnInit {
       error: () => {
         this.isProcessingFile = false;
         this.toastService.mostrar('Error al guardar los productos', 'error');
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  handleManualProductSubmit(data: ProductFormData): void {
+    const currentBuffetId = this.perfilService.obtenerBuffetId();
+    if (!currentBuffetId) {
+      this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
+      return;
+    }
+
+    this.isSavingManualProduct = true;
+    
+    const CLASIFICACION_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
+    const CLASIFICACION_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
+    const CLASIFICACION_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+
+    const buildHealthClassificationIds = (formData: ProductFormData): string[] => {
+      const ids: string[] = [];
+      if (!formData.contiene_tacc) ids.push(CLASIFICACION_SIN_TACC);
+      if (!formData.contiene_azucar) ids.push(CLASIFICACION_SIN_AZUCAR);
+      if (formData.contiene_lactosa) ids.push(CLASIFICACION_CONTIENE_LACTEOS);
+      return ids;
+    };
+
+    const isNewCategory = data.categoriaId === "NEW";
+    const payload: CreateProductRequest = {
+      nombre: data.nombre,
+      descripcion: data.descripcion,
+      precio: data.precio,
+      peso: data.peso,
+      requierePreparacion: data.requierePreparacion,
+      categoriaId: isNewCategory ? null : data.categoriaId,
+      nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : "",
+      buffetId: currentBuffetId,
+      stockActual: data.stockActual,
+      clasificacionesSaludIds: buildHealthClassificationIds(data),
+      tiposIds: null,
+      urlImagen: data.urlImagen
+    };
+
+    this.productService.create(payload).subscribe({
+      next: () => {
+        this.isSavingManualProduct = false;
+        this.isManualProductFormVisible = false;
+        this.toastService.mostrar("Producto creado exitosamente", "success");
+        this.cdr.markForCheck();
+        this.router.navigateByUrl('/admin-productos');
+      },
+      error: () => {
+        this.isSavingManualProduct = false;
+        this.toastService.mostrar("Error al crear el producto", "error");
         this.cdr.markForCheck();
       },
     });

@@ -301,18 +301,18 @@
 }
 
 .product-form__btn--submit {
-  background-color: var(--color-dorado);
-  color: var(--color-texto-oscuro);
-  box-shadow: 0 4px 12px rgba(242, 183, 5, 0.32);
+  background-color: var(--color-pizarra);
+  color: white;
+  box-shadow: 0 4px 12px rgba(74, 111, 165, 0.32);
 }
 
 .product-form__btn--submit:hover:not(:disabled) {
-  background-color: var(--color-dorado-dark);
+  transform: translateY(-1px);
+  background-color: var(--color-pizarra-dark);
 }
 
 .product-form__btn--submit:disabled {
-  background-color: color-mix(in srgb, var(--color-dorado) 50%, var(--color-fondo));
-  color: var(--color-texto-claro);
+  opacity: 0.6;
   box-shadow: none;
   cursor: not-allowed;
 }

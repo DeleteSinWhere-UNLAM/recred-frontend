@@ -31,7 +31,6 @@
         </div>
         <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
       </button>
-
       <button type="button" class="upload-selection-modal__option" (click)="onBulkUpload()">
         <div class="upload-selection-modal__icon" aria-hidden="true">
           <i class="fa-solid fa-boxes-stacked"></i>
@@ -43,6 +42,18 @@
           </strong>
           <span class="upload-selection-modal__option-desc">Sube un archivo PDF para procesar múltiples productos a la
             vez</span>
+        </div>
+        <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="upload-selection-modal__option" (click)="onManualUpload()">
+        <div class="upload-selection-modal__icon" aria-hidden="true">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+        <div class="upload-selection-modal__text">
+          <strong class="upload-selection-modal__option-title">
+            Carga de producto
+          </strong>
+          <span class="upload-selection-modal__option-desc">Alta manual completando el formulario del producto</span>
         </div>
         <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
       </button>
