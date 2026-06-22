@@ -1,4 +1,4 @@
-﻿<div class="product-form-backdrop" tabindex="0" role="button" (click)="formCancel.emit()" (keydown.enter)="formCancel.emit()" (keydown.space)="formCancel.emit()">
+<div class="product-form-backdrop" tabindex="0" role="button" (click)="formCancel.emit()" (keydown.enter)="formCancel.emit()" (keydown.space)="formCancel.emit()">
   <form
     [formGroup]="productForm"
     tabindex="-1"
@@ -185,7 +185,7 @@
         } @else if (isEditing) {
           Actualizar producto
         } @else {
-          Crear producto
+          Guardar producto
         }
       </button>
     </footer>

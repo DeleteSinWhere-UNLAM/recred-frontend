@@ -20,7 +20,14 @@ describe('HomeAlumnoPresenter', () => {
       { id: 'alumno-1', nombre: 'Test', apellido: 'Apellido', grado: '4to', colegioId: 'col-1', saldo: 1500 }
     ]);
 
-    homeAlumnoServiceSpy = jasmine.createSpyObj('HomeAlumnoService', ['getPedidoEnCurso', 'getProximoRecreo']);
+    homeAlumnoServiceSpy = jasmine.createSpyObj('HomeAlumnoService', [
+      'getPedidoEnCurso',
+      'getProximoRecreo',
+      'cargarPedidoEnCurso',
+      'cargarRecreos',
+    ]);
+    homeAlumnoServiceSpy.cargarPedidoEnCurso.and.resolveTo();
+    homeAlumnoServiceSpy.cargarRecreos.and.resolveTo();
 
     const usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['getAlumnoActual']);
     usuarioServiceSpy.getAlumnoActual.and.returnValue({ id: 'alumno-1' });
@@ -28,8 +35,9 @@ describe('HomeAlumnoPresenter', () => {
     const perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);
     perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-1');
 
-    const colegiosServiceSpy = jasmine.createSpyObj('ColegiosService', ['getColegios']);
+    const colegiosServiceSpy = jasmine.createSpyObj('ColegiosService', ['getColegios', 'obtenerColegios']);
     colegiosServiceSpy.getColegios.and.returnValue([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
+    colegiosServiceSpy.obtenerColegios.and.resolveTo([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -44,10 +52,60 @@ describe('HomeAlumnoPresenter', () => {
     });
 
     presenter = TestBed.inject(HomeAlumnoPresenter);
+    localStorage.removeItem('home-alumno:fondo-perfil');
+  });
+
+  afterEach(() => {
+    localStorage.removeItem('home-alumno:fondo-perfil');
   });
 
   it('debería crearse', () => {
     expect(presenter).toBeTruthy();
+  });
+
+  it('debería defaultear a fondo "nubes" si no hay nada guardado', () => {
+    presenter.init();
+    expect(presenter.fondoPerfil()).toBe('nubes');
+  });
+
+  it('debería leer el fondo guardado en localStorage al init', () => {
+    localStorage.setItem('home-alumno:fondo-perfil', 'minecraft');
+    presenter.init();
+    expect(presenter.fondoPerfil()).toBe('minecraft');
+  });
+
+  it('debería migrar valores legados ("bee", "creeper") a "minecraft"', () => {
+    localStorage.setItem('home-alumno:fondo-perfil', 'creeper');
+    presenter.init();
+    expect(presenter.fondoPerfil()).toBe('minecraft');
+    expect(localStorage.getItem('home-alumno:fondo-perfil')).toBe('minecraft');
+  });
+
+  it('debería ignorar valores guardados inválidos', () => {
+    localStorage.setItem('home-alumno:fondo-perfil', 'arcoiris');
+    presenter.init();
+    expect(presenter.fondoPerfil()).toBe('nubes');
+  });
+
+  it('debería actualizar y persistir el fondo elegido', () => {
+    presenter.init();
+    presenter.cambiarFondoPerfil('minecraft');
+    expect(presenter.fondoPerfil()).toBe('minecraft');
+    expect(localStorage.getItem('home-alumno:fondo-perfil')).toBe('minecraft');
+  });
+
+  it('debería aceptar "dragonballz" como fondo válido', () => {
+    presenter.init();
+    presenter.cambiarFondoPerfil('dragonballz');
+    expect(presenter.fondoPerfil()).toBe('dragonballz');
+    expect(localStorage.getItem('home-alumno:fondo-perfil')).toBe('dragonballz');
+  });
+
+  it('debería ignorar un valor inválido al cambiar', () => {
+    presenter.init();
+    presenter.cambiarFondoPerfil('nubes');
+    presenter.cambiarFondoPerfil('cualquiercosa' as unknown as 'nubes');
+    expect(presenter.fondoPerfil()).toBe('nubes');
   });
 
   it('debería inicializar el estado cargando datos del alumno', async () => {
