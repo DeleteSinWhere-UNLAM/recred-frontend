@@ -6,7 +6,7 @@ import { ProductService } from '../../../../updated-inventory/services/product.s
 import { PromotionService } from '../../../../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../../../../shared/services/toast.service';
 import { PerfilService } from '../../../../../data-access/services/perfil.service';
-import { Sugerencia, PromocionCreada } from '../../../models/recomendacion.model';
+import { Sugerencia, PromocionCreada, PromocionSugerida, SeasonInfo, WeatherInfo } from '../../../models/recomendacion.model';
 import { Product } from '../../../../updated-inventory/models/product.interface';
 
 @Injectable()
@@ -23,7 +23,10 @@ export class SeasonalPagePresenter {
   private readonly sugerenciasState = signal<Sugerencia[]>([]);
   private readonly tipPromocionalState = signal<string | null>(null);
 
-  private readonly promotionState = signal<PromocionCreada | null>(null);
+
+  private readonly suggestedPromotionState = signal<PromocionSugerida | null>(null);
+  private readonly seasonInfoState = signal<SeasonInfo | null>(null);
+  private readonly weatherInfoState = signal<WeatherInfo | null>(null);
   private readonly resolvedProductsState = signal<Product[]>([]);
   private readonly showModalState = signal<boolean>(false);
 
@@ -31,12 +34,15 @@ export class SeasonalPagePresenter {
   readonly error: Signal<string | null> = this.errorState.asReadonly();
   readonly sugerencias: Signal<Sugerencia[]> = this.sugerenciasState.asReadonly();
   readonly tipPromocional: Signal<string | null> = this.tipPromocionalState.asReadonly();
-  readonly promotion: Signal<PromocionCreada | null> = this.promotionState.asReadonly();
+
+  readonly suggestedPromotion: Signal<PromocionSugerida | null> = this.suggestedPromotionState.asReadonly();
+  readonly seasonInfo: Signal<SeasonInfo | null> = this.seasonInfoState.asReadonly();
+  readonly weatherInfo: Signal<WeatherInfo | null> = this.weatherInfoState.asReadonly();
   readonly resolvedProducts: Signal<Product[]> = this.resolvedProductsState.asReadonly();
   readonly showModal: Signal<boolean> = this.showModalState.asReadonly();
 
   readonly shouldShowPromotionModal = computed(() => {
-    return this.showModalState() && this.promotionState() !== null;
+    return this.showModalState() && this.suggestedPromotionState() !== null;
   });
 
   volver(): void {
@@ -59,24 +65,12 @@ export class SeasonalPagePresenter {
 
         this.sugerenciasState.set(response.sugerencias || []);
         this.tipPromocionalState.set(response.tip_promocional || null);
+        this.seasonInfoState.set(response.info_estacion || null);
+        this.weatherInfoState.set(response.clima_actual || null);
+        this.suggestedPromotionState.set(response.promocion_sugerida || null);
 
-        const sanitizeDate = (d?: string) => {
-          if (!d) return '';
-          return d.split('.')[0] + 'Z';
-        };
-
-        let promo: PromocionCreada | null = null;
-        if (response.promocion_creada) {
-          promo = {
-            ...response.promocion_creada,
-            startDate: sanitizeDate(response.promocion_creada.startDate),
-            endDate: sanitizeDate(response.promocion_creada.endDate)
-          };
-        }
-
-        if (promo) {
-          this.promotionState.set(promo);
-          return this.resolveProducts(promo.productIds);
+        if (response.promocion_sugerida && response.promocion_sugerida.productIds) {
+          return this.resolveProducts(response.promocion_sugerida.productIds);
         }
         return of([]);
       }),
@@ -95,10 +89,15 @@ export class SeasonalPagePresenter {
       next: (products) => {
         if (products) {
           this.resolvedProductsState.set(products);
-          this.showModalState.set(true);
         }
       }
     });
+  }
+
+  abrirModalPromocion(): void {
+    if (this.suggestedPromotionState()) {
+      this.showModalState.set(true);
+    }
   }
 
   private resolveProducts(productIds: string[]): Observable<Product[]> {
@@ -135,40 +134,32 @@ export class SeasonalPagePresenter {
     });
   }
 
-  approvePromotion(id: string): void {
+  confirmPromotion(formData: { discountPercentage: number, startDate: string, endDate: string, productIds: string[] }): void {
     this.isLoadingState.set(true);
     const buffetId = this.perfilService.obtenerBuffetId() ?? '';
-    this.promotionService.approvePromotion(id, buffetId).pipe(
+    const suggested = this.suggestedPromotionState();
+    
+    const request = {
+      name: suggested?.nombre || 'Promoción Estacional',
+      discountPercentage: formData.discountPercentage,
+      startDate: new Date(formData.startDate).toISOString(),
+      endDate: new Date(formData.endDate).toISOString(),
+      productIds: formData.productIds,
+      buffetId: buffetId,
+      isActive: true
+    };
+
+    this.promotionService.createPromotion(request).pipe(
       finalize(() => this.isLoadingState.set(false))
     ).subscribe({
       next: () => {
-        this.toastService.mostrar('Promoción aprobada exitosamente', 'success');
+        this.toastService.mostrar('Promoción creada exitosamente', 'success');
         this.closeModal();
       },
       error: () => {
-        this.toastService.mostrar('Error al aprobar la promoción', 'error');
+        this.toastService.mostrar('Error al crear la promoción', 'error');
       }
     });
-  }
-
-  discardPromotion(id: string): void {
-    this.isLoadingState.set(true);
-    this.promotionService.discardPromotion(id).pipe(
-      finalize(() => this.isLoadingState.set(false))
-    ).subscribe({
-      next: () => {
-        this.toastService.mostrar('Promoción descartada', 'success');
-        this.closeModal();
-      },
-      error: () => {
-        this.toastService.mostrar('Error al descartar la promoción', 'error');
-      }
-    });
-  }
-
-  editPromotion(id: string): void {
-    this.closeModal();
-    this.router.navigate(['/promociones/editar', id]);
   }
 
   closeModal(): void {

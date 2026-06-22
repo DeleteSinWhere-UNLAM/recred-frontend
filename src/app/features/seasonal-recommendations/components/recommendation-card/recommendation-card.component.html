@@ -1,15 +1,39 @@
 <article class="recommendation-card" [ngClass]="'recommendation-card--' + item.accion.toLowerCase()">
   <header class="recommendation-card__header">
-    <h4 class="recommendation-card__titulo">{{ item.categoria }}</h4>
-    <span class="recommendation-card__badge" [ngClass]="'recommendation-card__badge--' + item.accion.toLowerCase()">
-      @if (item.accion === 'AUMENTAR') {
-        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i> Aumentar
-      } @else if (item.accion === 'REDUCIR') {
-        <i class="fa-solid fa-arrow-down" aria-hidden="true"></i> Reducir
-      } @else {
-        <i class="fa-solid fa-minus" aria-hidden="true"></i> {{ item.accion }}
-      }
-    </span>
+    <div class="recommendation-card__header-left">
+      <div class="recommendation-card__icono" *ngIf="item.icono">{{ item.icono }}</div>
+      <h4 class="recommendation-card__titulo">{{ item.categoria }}</h4>
+    </div>
+    <div class="recommendation-card__badges">
+      <span class="recommendation-card__badge" [ngClass]="'recommendation-card__badge--' + item.accion.toLowerCase()">
+        @if (item.accion === 'AUMENTAR') {
+          <i class="fa-solid fa-arrow-up" aria-hidden="true"></i> Aumentar
+        } @else if (item.accion === 'REDUCIR') {
+          <i class="fa-solid fa-arrow-down" aria-hidden="true"></i> Reducir
+        } @else {
+          <i class="fa-solid fa-minus" aria-hidden="true"></i> {{ item.accion }}
+        }
+      </span>
+    </div>
   </header>
   <p class="recommendation-card__motivo">{{ item.motivo }}</p>
+  @if (item.top_productos && item.top_productos.length > 0) {
+    <div class="recommendation-card__top-products">
+      <h5 class="recommendation-card__top-products-title">Productos en stock sugeridos:</h5>
+      <ul class="recommendation-card__top-products-list">
+        @for (prod of item.top_productos; track prod.id) {
+          <li class="product-list-item">
+            <div class="product-image-container" *ngIf="prod.urlImagen">
+              <img *ngIf="prod.urlImagen.length > 2" [src]="prod.urlImagen" [alt]="prod.nombre" class="product-mini-image">
+              <span *ngIf="prod.urlImagen.length <= 2" class="product-emoji">{{ prod.urlImagen }}</span>
+            </div>
+            <div class="product-info-mini">
+              <span class="product-name-mini">{{ prod.nombre }}</span>
+              <span class="product-price-mini">{{ prod.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  }
 </article>

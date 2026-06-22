@@ -111,6 +111,64 @@
   margin: 0;
 }
 
+.seasonal-page__acciones {
+  margin-left: auto;
+}
+
+.seasonal-page__btn-promocion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: var(--color-menta);
+  color: var(--color-fondo);
+  border: none;
+  border-radius: var(--radius-button);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(129, 178, 154, 0.3);
+}
+
+.seasonal-page__btn-promocion:hover {
+  background-color: color-mix(in srgb, var(--color-menta) 85%, black);
+  transform: translateY(-1px);
+}
+
+.seasonal-page__context-banner {
+  background: linear-gradient(135deg, rgba(129, 178, 154, 0.1) 0%, rgba(242, 183, 5, 0.1) 100%);
+  border: 1px solid color-mix(in srgb, var(--color-menta) 30%, transparent);
+  border-radius: 16px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.context-banner__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.context-banner__icon {
+  font-size: 20px;
+  color: var(--color-pizarra);
+}
+
+.context-banner__text {
+  font-size: 14px;
+  color: var(--color-texto-oscuro);
+}
+
+.context-banner__text strong {
+  color: var(--color-pizarra);
+}
+
 .seasonal-page__estado {
   display: flex;
   flex-direction: column;

@@ -24,7 +24,37 @@
           Basadas en tu ubicación y el clima del entorno escolar
         </p>
       </div>
+      <div class="seasonal-page__acciones" *ngIf="presenter.suggestedPromotion() && !presenter.isLoading()">
+        <button type="button" class="seasonal-page__btn-promocion" (click)="presenter.abrirModalPromocion()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Generar promoción
+        </button>
+      </div>
     </header>
+
+    @if (presenter.seasonInfo() || presenter.weatherInfo()) {
+      <div class="seasonal-page__context-banner">
+        @if (presenter.seasonInfo()) {
+          <div class="context-banner__item">
+            <i class="fa-solid fa-calendar-day context-banner__icon"></i>
+            <span class="context-banner__text">
+              <strong>Estación:</strong> {{ presenter.seasonInfo()?.estacion_actual }} |
+              Faltan {{ presenter.seasonInfo()?.dias_restantes }} días para {{ presenter.seasonInfo()?.proxima_estacion }}
+            </span>
+          </div>
+        }
+        @if (presenter.weatherInfo()) {
+          <div class="context-banner__item">
+            <i class="fa-solid fa-cloud-sun context-banner__icon"></i>
+            <span class="context-banner__text">
+              <strong>Clima actual:</strong> {{ presenter.weatherInfo()?.condition }}, {{ presenter.weatherInfo()?.temperature }}°C 
+              @if (presenter.weatherInfo()?.ciudad && presenter.weatherInfo()?.provincia) {
+                | {{ presenter.weatherInfo()?.ciudad }}, {{ presenter.weatherInfo()?.provincia }}
+              }
+            </span>
+          </div>
+        }
+      </div>
+    }
 
     @if (presenter.isLoading()) {
       <div class="seasonal-page__estado">
@@ -56,11 +86,9 @@
 
 @if (presenter.shouldShowPromotionModal()) {
   <app-ia-promotion-approval-modal
-    [promotion]="presenter.promotion()!"
+    [suggestedPromotion]="presenter.suggestedPromotion()!"
     [resolvedProducts]="presenter.resolvedProducts()"
-    (approve)="presenter.approvePromotion($event)"
-    (edit)="presenter.editPromotion($event)"
-    (discard)="presenter.discardPromotion($event)"
+    (confirmPromotion)="presenter.confirmPromotion($event)"
     (closeModal)="presenter.closeModal()">
   </app-ia-promotion-approval-modal>
 }
