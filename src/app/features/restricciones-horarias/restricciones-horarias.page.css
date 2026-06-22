@@ -2,9 +2,15 @@
    VISTA DE LÍMITES Y HORARIOS POR RECREO (TUTOR) - REDISEÑO NEUMÓRFICO
    ========================================================================== */
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .restricciones {
   width: 100%;
-  height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;

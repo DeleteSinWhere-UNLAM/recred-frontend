@@ -1,5 +1,20 @@
-<main class="movimientos">
+@if (!esNested()) {
+  <app-navbar [userName]="nombreNavbar()" />
+}
+
+<main class="movimientos" [class.movimientos--nested]="esNested()">
   <div class="movimientos__container">
+    
+    @if (!esNested()) {
+      <button 
+        type="button" 
+        class="movimientos__volver" 
+        (click)="volver()" 
+        aria-label="Volver al inicio"
+      >
+        <i class="fa-solid fa-arrow-left"></i> Volver al Inicio
+      </button>
+    }
     
     <header class="movimientos__header">
 

@@ -5,11 +5,22 @@
   min-height: 0;
 }
 
+:host.colegio-section-colapsado {
+  flex: 0 0 auto;
+  min-height: auto;
+}
+
 .colegio-section {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
+}
+
+:host.colegio-section-colapsado .colegio-section,
+:host.colegio-section-colapsado .colegio-section__sidebar {
+  flex: 0 0 auto;
+  min-height: auto;
 }
 
 .colegio-section__layout {

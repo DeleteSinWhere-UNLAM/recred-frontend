@@ -7,7 +7,7 @@ import { Movimiento } from './models/movimiento.model';
 import { MovimientosService } from './services/movimientos.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { } from '../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -17,7 +17,7 @@ import { DialogService } from '../../shared/services/dialog.service';
   selector: 'app-movimientos-page',
   templateUrl: './movimientos.page.html',
   styleUrl: './movimientos.page.css',
-  imports: [CommonModule, FormsModule, MovimientoDetalleModalComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, MovimientoDetalleModalComponent],
 })
 export class MovimientosPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -33,6 +33,7 @@ export class MovimientosPage implements OnInit {
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly esVistaIndividual = signal<boolean>(false);
   readonly nombreAlumno = signal<string>('');
+  readonly esNested = signal<boolean>(false);
 
   readonly nombreNavbar = this.usuarioService.nombreNavbar;
   readonly alumnos = this.alumnosService.alumnos;
@@ -210,6 +211,7 @@ export class MovimientosPage implements OnInit {
       this.route.paramMap.subscribe((params) => {
         const alumnoId = params.get('alumnoId');
         if (this.esVistaAlumno()) {
+          this.esNested.set(false);
           const currentAlumnoId = this.perfilService.obtenerAlumnoId() ?? this.usuarioService.getAlumnoActual().id;
           this.selectedAlumnoId.set(currentAlumnoId);
           this.esVistaIndividual.set(true);
@@ -218,6 +220,7 @@ export class MovimientosPage implements OnInit {
             this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
           }
         } else if (alumnoId) {
+          this.esNested.set(true);
           this.selectedAlumnoId.set(alumnoId);
           this.esVistaIndividual.set(true);
           const alumno = this.alumnosService.getAlumnoById(alumnoId);
@@ -225,6 +228,7 @@ export class MovimientosPage implements OnInit {
             this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
           }
         } else {
+          this.esNested.set(false);
           this.selectedAlumnoId.set('todos');
           this.esVistaIndividual.set(false);
           this.nombreAlumno.set('');

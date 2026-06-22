@@ -9,6 +9,9 @@ import { AlumnoCardComponent } from '../alumno-card/alumno-card.component';
   styleUrl: './colegio-section.component.css',
   imports: [AlumnoCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.colegio-section-colapsado]': '!expandido()',
+  },
 })
 export class ColegioSectionComponent {
   @Input({ required: true }) colegio!: Colegio;

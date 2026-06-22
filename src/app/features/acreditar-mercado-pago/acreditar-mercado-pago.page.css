@@ -179,6 +179,7 @@
 .acreditar-page__form-section {
   overflow-y: auto;
   scrollbar-width: none;
+  justify-content: center;
 }
 
 .acreditar-page__form-section::-webkit-scrollbar {
