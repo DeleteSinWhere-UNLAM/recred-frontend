@@ -143,10 +143,12 @@ export class RestriccionesHorariasPage implements OnInit {
   }
 
   ngOnInit(): void {
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId');
-    if (alumnoId) {
-      void this.presenter.init(alumnoId);
-    }
+    this.route.paramMap.subscribe(params => {
+      const alumnoId = params.get('alumnoId');
+      if (alumnoId) {
+        void this.presenter.init(alumnoId);
+      }
+    });
   }
 
   volver(): void {
@@ -171,10 +173,21 @@ export class RestriccionesHorariasPage implements OnInit {
     }
   }
 
-  protected quitarBloqueoTotal(item: FranjaConRestricciones): void {
-    const rTotal = item.restricciones.find((r: RestriccionHoraria) => !r.categoryId && !r.classificationId && !r.categoria && !r.clasificacionSalud);
-    if (rTotal) {
-      void this.presenter.quitarRestriccion(rTotal.id);
+  protected quitarBloqueoTotal(item: any): void {
+    const resTotal = item.restricciones.find((r: any) => !r.categoria && !r.clasificacionSalud && !r.categoryId && !r.classificationId);
+    if (resTotal) {
+      void this.presenter.quitarRestriccion(resTotal.id);
+    }
+  }
+
+  async alternarBloqueoTotal(slot: FranjaConRestricciones): Promise<void> {
+    if (slot.tieneBloqueoTotal) {
+      const resTotal = slot.restricciones.find(r => !r.categoryId && !r.classificationId && !r.categoria && !r.clasificacionSalud);
+      if (resTotal) {
+        await this.presenter.quitarRestriccion(resTotal.id);
+      }
+    } else {
+      await this.presenter.agregarRestriccion(slot.franja.id, 'TOTAL');
     }
   }
 

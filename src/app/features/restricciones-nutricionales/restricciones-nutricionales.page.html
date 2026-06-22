@@ -1,134 +1,10 @@
 <main class="restricciones">
-  <button
-    type="button"
-    class="restricciones__volver"
-    (click)="presenter.volver()"
-    aria-label="Volver"
-  >
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-  </button>
-
   <div class="restricciones__container">
-    <section class="restricciones__panel" aria-labelledby="restricciones-titulo">
-      
-      <header class="restricciones__cabecera">
-        <div class="restricciones__avatar" aria-hidden="true">
-          @if (presenter.urlFotoPerfil()) {
-            <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="restricciones__avatar-img" />
-          } @else {
-            <span>{{ presenter.iniciales() }}</span>
-          }
-        </div>
-        <div class="restricciones__identidad">
-          <h2 id="restricciones-titulo" class="restricciones__nombre">
-            {{ presenter.nombreCompleto() }}
-          </h2>
-          @if (presenter.grado()) {
-            <p class="restricciones__grado">
-              <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
-              <span>{{ presenter.grado() }}</span>
-            </p>
-          }
-        </div>
-      </header>
+    <header class="restricciones__header">
+      <h1 id="restricciones-titulo" class="restricciones__titulo">Restricciones alimentarias de {{ presenter.alumno()?.nombre || presenter.nombreCompleto() }}</h1>
+    </header>
 
-      @if (presenter.horariosCompra().length > 0) {
-        <div class="restricciones__horarios-seccion">
-          <h3 class="restricciones__horarios-titulo">Horarios de Compra</h3>
-          
-          <div class="restricciones__horarios-grid">
-            @for (horario of presenter.horariosCompra(); track horario.franjaId; let i = $index) {
-              <button
-                type="button"
-                class="horario-card"
-                [class.horario-card--bloqueado]="horario.bloqueado"
-                (click)="presenter.alternarHorario(horario.franjaId)"
-              >
-                <div class="horario-card__clock-wrapper">
-                  @if (horario.bloqueado) {
-                    @if (i === 0) {
-                      <svg class="clock-svg clock-svg--green" viewBox="0 0 100 100" aria-hidden="true">
-                        <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" />
-                        <circle cx="50" cy="50" r="41" fill="#ecfdf5" />
-                        <line x1="50" y1="14" x2="50" y2="20" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="86" y1="50" x2="80" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="86" x2="50" y2="80" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="14" y1="50" x2="20" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="34" y2="34" stroke="#047857" stroke-width="5" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="62" y2="28" stroke="#065f46" stroke-width="5" stroke-linecap="round" />
-                        <circle cx="50" cy="50" r="5" fill="#064e3b" />
-                      </svg>
-                    } @else if (i === 1) {
-                      <svg class="clock-svg clock-svg--green" viewBox="0 0 100 100" aria-hidden="true">
-                        <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" />
-                        <circle cx="50" cy="50" r="41" fill="#ecfdf5" />
-                        <line x1="50" y1="14" x2="50" y2="20" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="86" y1="50" x2="80" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="86" x2="50" y2="80" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="14" y1="50" x2="20" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="50" y2="26" stroke="#047857" stroke-width="5" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="22" y2="50" stroke="#065f46" stroke-width="5" stroke-linecap="round" />
-                        <circle cx="50" cy="50" r="5" fill="#064e3b" />
-                      </svg>
-                    } @else {
-                      <svg class="clock-svg clock-svg--green" viewBox="0 0 100 100" aria-hidden="true">
-                        <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" />
-                        <circle cx="50" cy="50" r="41" fill="#ecfdf5" />
-                        <line x1="50" y1="14" x2="50" y2="20" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="86" y1="50" x2="80" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="86" x2="50" y2="80" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="14" y1="50" x2="20" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="68" y2="60" stroke="#047857" stroke-width="5" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="50" y2="76" stroke="#065f46" stroke-width="5" stroke-linecap="round" />
-                        <circle cx="50" cy="50" r="5" fill="#064e3b" />
-                      </svg>
-                    }
-                  } @else {
-                    @if (i === 0) {
-                      <svg class="clock-svg clock-svg--gray" viewBox="0 0 100 100" aria-hidden="true">
-                        <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#cbd5e1" stroke-width="6" />
-                        <circle cx="50" cy="50" r="41" fill="#f8fafc" />
-                        <line x1="50" y1="14" x2="50" y2="20" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="86" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="86" x2="50" y2="80" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="14" y1="50" x2="20" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="34" y2="34" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="62" y2="28" stroke="#64748b" stroke-width="5" stroke-linecap="round" />
-                        <circle cx="50" cy="50" r="5" fill="#475569" />
-                      </svg>
-                    } @else if (i === 1) {
-                      <svg class="clock-svg clock-svg--gray" viewBox="0 0 100 100" aria-hidden="true">
-                        <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#cbd5e1" stroke-width="6" />
-                        <circle cx="50" cy="50" r="41" fill="#f8fafc" />
-                        <line x1="50" y1="14" x2="50" y2="20" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="86" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="86" x2="50" y2="80" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="14" y1="50" x2="20" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="50" y2="26" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="22" y2="50" stroke="#64748b" stroke-width="5" stroke-linecap="round" />
-                        <circle cx="50" cy="50" r="5" fill="#475569" />
-                      </svg>
-                    } @else {
-                      <svg class="clock-svg clock-svg--gray" viewBox="0 0 100 100" aria-hidden="true">
-                        <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#cbd5e1" stroke-width="6" />
-                        <circle cx="50" cy="50" r="41" fill="#f8fafc" />
-                        <line x1="50" y1="14" x2="50" y2="20" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="86" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="86" x2="50" y2="80" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="14" y1="50" x2="20" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="68" y2="60" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
-                        <line x1="50" y1="50" x2="50" y2="76" stroke="#64748b" stroke-width="5" stroke-linecap="round" />
-                        <circle cx="50" cy="50" r="5" fill="#475569" />
-                      </svg>
-                    }
-                  }
-                </div>
-                <span class="horario-card__nombre">{{ horario.descripcion }}</span>
-              </button>
-            }
-          </div>
-        </div>
-      }
+
 
       <ul class="restricciones__lista" role="list">
         @for (descriptor of presenter.catalogo; track descriptor.clave) {
@@ -160,19 +36,18 @@
         }
       </ul>
 
-      <button
-        type="button"
-        class="restricciones__guardar"
-        [class.restricciones__guardar--premium]="esPremium()"
-        (click)="presenter.guardar()"
-        [disabled]="presenter.cargando() || presenter.guardando()"
-      >
-        @if (presenter.guardando()) {
-          Guardando...
-        } @else {
-          Guardar Cambios
-        }
-      </button>
-    </section>
+    <button
+      type="button"
+      class="restricciones__guardar"
+      [class.restricciones__guardar--premium]="esPremium()"
+      (click)="presenter.guardar()"
+      [disabled]="presenter.cargando() || presenter.guardando()"
+    >
+      @if (presenter.guardando()) {
+        Guardando...
+      } @else {
+        Guardar Cambios
+      }
+    </button>
   </div>
 </main>

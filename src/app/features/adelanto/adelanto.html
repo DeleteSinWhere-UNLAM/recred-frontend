@@ -81,7 +81,8 @@
 
       <div class="adelanto-page__history-col">
         <h2 class="adelanto-page__history-title">Historial de Adelantos</h2>
-        <div class="adelanto-page__history-list">
+        <div class="adelanto-page__history-list-container">
+          <div class="adelanto-page__history-list">
           @if (creditoActivo()) {
             <div class="adelanto-page__history-item active-item">
               <div class="history-item__header">
@@ -106,6 +107,7 @@
               </div>
             </div>
           }
+          </div>
         </div>
       </div>
     </div>

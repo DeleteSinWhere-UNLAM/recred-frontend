@@ -36,6 +36,7 @@ export class AlumnoCardComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly _cantidadPendientes = signal<number>(0);
   creditoActivo = signal<SchoolCredit | null>(null);
+  mostrarTodosLosBotones = signal<boolean>(false);
   readonly subiendoFoto = signal(false);
   protected readonly fotoEvent = signal<Event | null>(null);
 
@@ -59,12 +60,15 @@ export class AlumnoCardComponent implements OnInit {
   }
 
   get nombreCompleto(): string {
-    return `${this.alumno.nombre} ${this.alumno.apellido}`;
+    return this.alumno.nombre;
   }
 
   get iniciales(): string {
-    const ini = (this.alumno.nombre[0] ?? '') + (this.alumno.apellido[0] ?? '');
-    return ini.toUpperCase();
+    return (this.alumno.nombre[0] ?? '').toUpperCase();
+  }
+
+  toggleBotones(): void {
+    this.mostrarTodosLosBotones.update(v => !v);
   }
 
   get fotoPerfil(): string | null {

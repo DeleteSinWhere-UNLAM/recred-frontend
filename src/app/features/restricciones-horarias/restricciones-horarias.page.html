@@ -1,21 +1,8 @@
 <main class="restricciones">
-  <button
-    type="button"
-    class="restricciones__volver"
-    (click)="volver()"
-    aria-label="Volver"
-  >
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-  </button>
-
   <div class="restricciones__container">
     
-    
     <header class="restricciones__header">
-      <h1 class="restricciones__titulo">Límites y Horarios</h1>
-      <p class="restricciones__subtitulo">
-        Configurá qué puede comprar <strong>{{ presenter.alumno()?.nombre }}</strong> en cada recreo.
-      </p>
+      <h1 class="restricciones__titulo">Horarios de compra de {{ presenter.alumno()?.nombre }}</h1>
     </header>
 
     @if (presenter.cargando()) {
@@ -24,7 +11,100 @@
         <span>Cargando configuración...</span>
       </div>
     } @else {
-      
+      <div class="restricciones__horarios-seccion">
+        <div class="restricciones__horarios-grid">
+          @for (slot of presenter.franjasConRestricciones(); track slot.franja.id; let i = $index) {
+            <button
+              type="button"
+              class="horario-card"
+              [class.horario-card--bloqueado]="slot.tieneBloqueoTotal"
+              (click)="alternarBloqueoTotal(slot)"
+            >
+              <div class="horario-card__clock-wrapper">
+                @if (slot.tieneBloqueoTotal) {
+                  @if (i === 0) {
+                    <svg class="clock-svg clock-svg--green" viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" />
+                      <circle cx="50" cy="50" r="41" fill="#ecfdf5" />
+                      <line x1="50" y1="14" x2="50" y2="20" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="86" y1="50" x2="80" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="86" x2="50" y2="80" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="14" y1="50" x2="20" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="34" y2="34" stroke="#047857" stroke-width="5" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="62" y2="28" stroke="#065f46" stroke-width="5" stroke-linecap="round" />
+                      <circle cx="50" cy="50" r="5" fill="#064e3b" />
+                    </svg>
+                  } @else if (i === 1) {
+                    <svg class="clock-svg clock-svg--green" viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" />
+                      <circle cx="50" cy="50" r="41" fill="#ecfdf5" />
+                      <line x1="50" y1="14" x2="50" y2="20" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="86" y1="50" x2="80" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="86" x2="50" y2="80" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="14" y1="50" x2="20" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="50" y2="26" stroke="#047857" stroke-width="5" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="22" y2="50" stroke="#065f46" stroke-width="5" stroke-linecap="round" />
+                      <circle cx="50" cy="50" r="5" fill="#064e3b" />
+                    </svg>
+                  } @else {
+                    <svg class="clock-svg clock-svg--green" viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="6" />
+                      <circle cx="50" cy="50" r="41" fill="#ecfdf5" />
+                      <line x1="50" y1="14" x2="50" y2="20" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="86" y1="50" x2="80" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="86" x2="50" y2="80" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="14" y1="50" x2="20" y2="50" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="68" y2="60" stroke="#047857" stroke-width="5" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="50" y2="76" stroke="#065f46" stroke-width="5" stroke-linecap="round" />
+                      <circle cx="50" cy="50" r="5" fill="#064e3b" />
+                    </svg>
+                  }
+                } @else {
+                  @if (i === 0) {
+                    <svg class="clock-svg clock-svg--gray" viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#cbd5e1" stroke-width="6" />
+                      <circle cx="50" cy="50" r="41" fill="#f8fafc" />
+                      <line x1="50" y1="14" x2="50" y2="20" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="86" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="86" x2="50" y2="80" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="14" y1="50" x2="20" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="34" y2="34" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="62" y2="28" stroke="#64748b" stroke-width="5" stroke-linecap="round" />
+                      <circle cx="50" cy="50" r="5" fill="#475569" />
+                    </svg>
+                  } @else if (i === 1) {
+                    <svg class="clock-svg clock-svg--gray" viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#cbd5e1" stroke-width="6" />
+                      <circle cx="50" cy="50" r="41" fill="#f8fafc" />
+                      <line x1="50" y1="14" x2="50" y2="20" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="86" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="86" x2="50" y2="80" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="14" y1="50" x2="20" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="50" y2="26" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="22" y2="50" stroke="#64748b" stroke-width="5" stroke-linecap="round" />
+                      <circle cx="50" cy="50" r="5" fill="#475569" />
+                    </svg>
+                  } @else {
+                    <svg class="clock-svg clock-svg--gray" viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="clock-ring" cx="50" cy="50" r="45" fill="none" stroke="#cbd5e1" stroke-width="6" />
+                      <circle cx="50" cy="50" r="41" fill="#f8fafc" />
+                      <line x1="50" y1="14" x2="50" y2="20" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="86" y1="50" x2="80" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="86" x2="50" y2="80" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="14" y1="50" x2="20" y2="50" stroke="#94a3b8" stroke-width="4" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="68" y2="60" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
+                      <line x1="50" y1="50" x2="50" y2="76" stroke="#64748b" stroke-width="5" stroke-linecap="round" />
+                      <circle cx="50" cy="50" r="5" fill="#475569" />
+                    </svg>
+                  }
+                }
+              </div>
+              <span class="horario-card__nombre">{{ slot.franja.descripcion }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
       @if (activeItem(); as item) {
         <article class="franja-card">
           

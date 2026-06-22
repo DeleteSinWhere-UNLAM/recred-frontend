@@ -23,7 +23,9 @@ export class RestriccionesNutricionalesPage implements OnInit {
   protected readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
 
   ngOnInit(): void {
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
-    void this.presenter.init(alumnoId);
+    this.route.paramMap.subscribe(params => {
+      const alumnoId = params.get('alumnoId') ?? '';
+      void this.presenter.init(alumnoId);
+    });
   }
 }
