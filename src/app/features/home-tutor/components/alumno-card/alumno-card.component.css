@@ -46,14 +46,8 @@
   overflow: hidden;
   box-shadow:
     0 0 0 3px #ffffff,
-    0 8px 16px rgba(74, 111, 165, 0.1);
-}
-
-.alumno-card__avatar--premium {
-  box-shadow:
-    0 0 0 3px #ffffff,
     0 0 0 5px var(--color-dorado),
-    0 8px 16px rgba(74, 111, 165, 0.1) !important;
+    0 8px 16px rgba(74, 111, 165, 0.1);
 }
 
 .alumno-card__avatar--foto {
@@ -191,27 +185,6 @@
   gap: 10px;
 }
 
-.alumno-card__extra-wrapper {
-  overflow: hidden;
-  max-height: 500px;
-  opacity: 1;
-  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-in-out, margin-top 0.3s ease;
-  margin-top: 10px;
-}
-
-.alumno-card__extra-wrapper.collapsed {
-  max-height: 0 !important;
-  opacity: 0 !important;
-  margin-top: 0 !important;
-  pointer-events: none;
-}
-
-.alumno-card__extra-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
 .alumno-card__btn {
   display: inline-flex;
   flex-direction: column;
@@ -219,19 +192,18 @@
   justify-content: center;
   gap: 6px;
   padding: 8px 4px;
-  background-color: transparent;
-  border: 1px solid transparent;
+  background-color: #f8fafc;
+  border: 1px solid rgba(74, 111, 165, 0.05);
   border-radius: 12px;
   cursor: pointer;
   text-decoration: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .alumno-card__btn:hover {
   transform: translateY(-2px);
-  background-color: var(--color-pizarra);
-  border-color: var(--color-pizarra-dark);
-  box-shadow: 0 4px 10px rgba(74, 111, 165, 0.12);
+  border-color: rgba(74, 111, 165, 0.15);
+  box-shadow: 0 4px 10px rgba(74, 111, 165, 0.04);
 }
 
 .alumno-card__btn-icono {
@@ -244,15 +216,8 @@
   border-radius: 50%;
   font-size: 13px;
   color: #ffffff;
-  background-color: #cbd5e1;
   flex-shrink: 0;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.alumno-card__btn:hover .alumno-card__btn-icono {
-  background-color: #ffffff;
-  color: var(--color-pizarra-dark);
 }
 
 .alumno-card__btn-label {
@@ -263,11 +228,6 @@
   text-align: center;
   line-height: 1.1;
   word-break: break-word;
-  transition: color 0.15s ease;
-}
-
-.alumno-card__btn:hover .alumno-card__btn-label {
-  color: #ffffff;
 }
 
 /* Badge count inside the icon circle */
@@ -289,6 +249,42 @@
   border: 1px solid #ffffff;
 }
 
+/* Color schemes for the 9 buttons */
+.alumno-card__btn--menta .alumno-card__btn-icono {
+  background-color: #22c55e; /* Green - Acreditar */
+}
+
+.alumno-card__btn--melocoton .alumno-card__btn-icono {
+  background-color: #ef4444; /* Red - Restricciones */
+}
+
+.alumno-card__btn--azul .alumno-card__btn-icono {
+  background-color: #3b82f6; /* Blue - Horarios */
+}
+
+.alumno-card__btn--dorado .alumno-card__btn-icono {
+  background-color: #f59e0b; /* Yellow - Presupuesto */
+}
+
+.alumno-card__btn--pizarra .alumno-card__btn-icono {
+  background-color: #64748b; /* Slate - Estadística */
+}
+
+.alumno-card__btn--morado .alumno-card__btn-icono {
+  background-color: #a855f7; /* Purple - Pendientes */
+}
+
+.alumno-card__btn--gris .alumno-card__btn-icono {
+  background-color: #475569; /* Dark Grey - Movimientos */
+}
+
+.alumno-card__btn--celeste .alumno-card__btn-icono {
+  background-color: #06b6d4; /* Light Blue - Predicción */
+}
+
+.alumno-card__btn--violeta .alumno-card__btn-icono {
+  background-color: #8b5cf6; /* Violet - Preferencias */
+}
 
 /* Budget Row Style */
 .alumno-card__budget {
@@ -416,8 +412,7 @@
     padding: 20px;
   }
   
-  .alumno-card__acciones-grid,
-  .alumno-card__extra-grid {
+  .alumno-card__acciones-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -774,31 +769,3 @@
 .alumno-card__cta--premium:active {
   transform: scale(0.98);
 }
-
-.alumno-card__toggle-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: 4px;
-}
-
-.alumno-card__toggle-btn {
-  background: none;
-  border: none;
-  color: var(--color-pizarra, #475569);
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.alumno-card__toggle-btn:hover {
-  background-color: rgba(74, 111, 165, 0.08);
-  color: var(--color-pizarra-dark, #1e293b);
-}
-

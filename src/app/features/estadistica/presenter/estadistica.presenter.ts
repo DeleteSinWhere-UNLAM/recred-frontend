@@ -23,7 +23,7 @@ export class EstadisticaPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
-    return alumno ? `${alumno.nombre}` : '';
+    return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
   });
 
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');
@@ -33,7 +33,7 @@ export class EstadisticaPresenter {
   readonly iniciales = computed(() => {
     const alumno = this.alumnoState();
     if (!alumno) return '';
-    return (alumno.nombre[0] ?? '').toUpperCase();
+    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
   });
 
   readonly nivelAlerta: Signal<NivelAlerta> = computed(() => {

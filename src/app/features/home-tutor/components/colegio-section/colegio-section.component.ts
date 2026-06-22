@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { Colegio } from '../../../../data-access/models/colegio.model';
 import { AlumnoCardComponent } from '../alumno-card/alumno-card.component';
@@ -13,11 +13,11 @@ import { AlumnoCardComponent } from '../alumno-card/alumno-card.component';
 export class ColegioSectionComponent {
   @Input({ required: true }) colegio!: Colegio;
   @Input({ required: true }) alumnos!: Alumno[];
-  @Input() expandido = true;
-  @Output() toggleExpandido = new EventEmitter<void>();
+
+  readonly expandido = signal(true);
 
   toggle(): void {
-    this.toggleExpandido.emit();
+    this.expandido.update((v) => !v);
   }
 
   get totalSaldo(): number {

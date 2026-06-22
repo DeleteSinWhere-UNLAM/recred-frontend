@@ -82,11 +82,8 @@ export class MovimientosPage implements OnInit {
     }
 
     return filtered.filter((m) => {
-      if (estado !== 'TODOS') {
-        const allowedStates = estado.split(',');
-        if (!allowedStates.includes(m.status)) {
-          return false;
-        }
+      if (estado !== 'TODOS' && m.status !== estado) {
+        return false;
       }
 
       if (desde) {
@@ -132,10 +129,13 @@ export class MovimientosPage implements OnInit {
         if (m.tipo === 'ANTICIPADA' && m.pickupDate) {
           const parts = m.pickupDate.split('-');
           if (parts.length === 3) {
-            const year = parts[0];
-            const month = parts[1];
-            const day = parts[2];
-            key = `${day}-${month}-${year}`;
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const day = parseInt(parts[2], 10);
+            const d = new Date(year, month, day);
+            const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const mes = meses[d.getMonth()];
+            key = `${day} ${mes} ${year}`;
           } else {
             key = m.pickupDate;
           }
@@ -152,10 +152,11 @@ export class MovimientosPage implements OnInit {
         if (b === fallbackKey) return -1;
         
         const parseKey = (k: string) => {
-          const parts = k.split('-');
+          const parts = k.split(' ');
           if (parts.length === 3) {
             const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1;
+            const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            const month = meses.indexOf(parts[1]);
             const year = parseInt(parts[2], 10);
             return new Date(year, month, day).getTime();
           }
@@ -168,10 +169,11 @@ export class MovimientosPage implements OnInit {
       // Default: FECHA_COMPRA
       for (const m of list) {
         const d = new Date(m.date);
-        const dia = String(d.getDate()).padStart(2, '0');
-        const mes = String(d.getMonth() + 1).padStart(2, '0');
+        const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+        const dia = d.getDate();
+        const mes = meses[d.getMonth()];
         const anio = d.getFullYear();
-        const dateStr = `${dia}-${mes}-${anio}`;
+        const dateStr = `${dia} ${mes} ${anio}`;
 
         if (!groupsMap.has(dateStr)) {
           groupsMap.set(dateStr, []);
@@ -205,14 +207,6 @@ export class MovimientosPage implements OnInit {
 
   ngOnInit(): void {
     void this.alumnosService.asegurarCargados().then(() => {
-      this.route.queryParams?.subscribe((queryParams) => {
-        if (queryParams['estado']) {
-          this.filtroEstado.set(queryParams['estado']);
-        } else {
-          this.filtroEstado.set('TODOS');
-        }
-      });
-
       this.route.paramMap.subscribe((params) => {
         const alumnoId = params.get('alumnoId');
         if (this.esVistaAlumno()) {
@@ -228,7 +222,7 @@ export class MovimientosPage implements OnInit {
           this.esVistaIndividual.set(true);
           const alumno = this.alumnosService.getAlumnoById(alumnoId);
           if (alumno) {
-            this.nombreAlumno.set(`${alumno.nombre}`);
+            this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
           }
         } else {
           this.selectedAlumnoId.set('todos');
@@ -282,11 +276,6 @@ export class MovimientosPage implements OnInit {
     this.filtroFechaHasta.set('');
     this.filtroPrecioMin.set(null);
     this.filtroPrecioMax.set(null);
-    void this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { estado: null },
-      queryParamsHandling: 'merge',
-    });
     if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
       this.selectedAlumnoId.set('todos');
       void this.router.navigate(['/movimientos']);
@@ -299,8 +288,7 @@ export class MovimientosPage implements OnInit {
     if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
       const alumno = this.alumnosService.getAlumnoById(this.selectedAlumnoId());
       if (alumno) {
-        const name = this.esVistaAlumno() ? `${alumno.nombre} ${alumno.apellido}` : alumno.nombre;
-        chips.push({ id: 'alumno', label: `Hijo: ${name}` });
+        chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre} ${alumno.apellido}` });
       }
     }
 
@@ -313,10 +301,7 @@ export class MovimientosPage implements OnInit {
         CANCELADO: 'Cancelado',
         NO_RETIRADO: 'No entregado',
       };
-      const label = this.filtroEstado()
-        .split(',')
-        .map((s) => map[s] || s)
-        .join(', ');
+      const label = map[this.filtroEstado()] || this.filtroEstado();
       chips.push({ id: 'estado', label: `Estado: ${label}` });
     }
 
@@ -370,17 +355,13 @@ export class MovimientosPage implements OnInit {
 
   getNombreAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
-    if (!alumno) return 'Alumno';
-    return this.esVistaAlumno() ? `${alumno.nombre} ${alumno.apellido}` : alumno.nombre;
+    return alumno ? `${alumno.nombre} ${alumno.apellido}` : 'Alumno';
   }
 
   getInicialesAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
     if (!alumno) return 'AL';
-    if (this.esVistaAlumno()) {
-      return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
-    }
-    return (alumno.nombre[0] ?? '').toUpperCase();
+    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
   }
 
   getFotoPerfilAlumno(studentId: string): string | null {
@@ -400,10 +381,10 @@ export class MovimientosPage implements OnInit {
   formatearFecha(fechaStr: string): string {
     if (!fechaStr) return '';
     const date = new Date(fechaStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return new Intl.DateTimeFormat('es-AR', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(date);
   }
 
   mostrarFecha(mov: Movimiento): string {
@@ -411,10 +392,11 @@ export class MovimientosPage implements OnInit {
       const parts = mov.pickupDate.split('-');
       let dateStr = mov.pickupDate;
       if (parts.length === 3) {
-        const year = parts[0];
-        const month = parts[1];
-        const day = parts[2];
-        dateStr = `${day}-${month}-${year}`;
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const d = new Date(year, month, day);
+        dateStr = new Intl.DateTimeFormat('es-AR', { dateStyle: 'medium' }).format(d);
       }
       const slot = mov.pickupSlotDescription ? ` - ${mov.pickupSlotDescription}` : '';
       return `${dateStr}${slot}`;

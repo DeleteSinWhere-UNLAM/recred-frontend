@@ -69,7 +69,7 @@ export class CrearHijoPresenter {
     try {
       const alumno = await this.alumnosService.crearHijo(req);
       this.toastService.mostrar(
-        `${alumno.nombre} fue agregado como hijo`,
+        `${alumno.nombre} ${alumno.apellido} fue agregado como hijo`,
         'success',
       );
       await this.router.navigateByUrl('/tutor');
