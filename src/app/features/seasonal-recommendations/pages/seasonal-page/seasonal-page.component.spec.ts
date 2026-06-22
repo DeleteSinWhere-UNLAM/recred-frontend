@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SeasonalPageComponent } from './seasonal-page.component';
 import { SeasonalPagePresenter } from './presenter/seasonal-page.presenter';
 import { signal } from '@angular/core';
-import { Sugerencia, PromocionCreada } from '../../models/recomendacion.model';
+import { Sugerencia, PromocionCreada, PromocionSugerida, SeasonInfo, WeatherInfo } from '../../models/recomendacion.model';
 import { Product } from '../../../updated-inventory/models/product.interface';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
@@ -28,6 +28,9 @@ describe('SeasonalPageComponent', () => {
       tipPromocional: signal<string | null>(null),
       shouldShowPromotionModal: signal(false),
       promotion: signal<PromocionCreada | null>(null),
+      suggestedPromotion: signal<PromocionSugerida | null>(null),
+      seasonInfo: signal<SeasonInfo | null>(null),
+      weatherInfo: signal<WeatherInfo | null>(null),
       resolvedProducts: signal<Product[]>([])
     });
 
