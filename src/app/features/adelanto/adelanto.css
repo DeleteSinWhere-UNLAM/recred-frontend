@@ -156,9 +156,9 @@
 }
 
 .btn-quick.active {
-  background-color: #22c55e;
-  color: #ffffff;
-  border-color: #22c55e;
+  background-color: #dcfce7;
+  color: #166534;
+  border-color: #dcfce7;
 }
 
 .adelanto-page__info {
@@ -226,7 +226,7 @@
 
 .adelanto-page__loading i {
   font-size: 32px;
-  color: #22c55e;
+  color: #166534;
 }
 
 .adelanto-page__alert {
@@ -276,8 +276,8 @@
 }
 
 .btn-pay {
-  background-color: #22c55e;
-  color: white;
+  background-color: #dcfce7;
+  color: #166534;
   border: none;
   border-radius: 12px;
   padding: 10px 16px;
@@ -289,7 +289,7 @@
 }
 
 .btn-pay:hover:not(:disabled) {
-  background-color: #16a34a;
+  background-color: #bbf7d0;
   transform: translateY(-1px);
 }
 

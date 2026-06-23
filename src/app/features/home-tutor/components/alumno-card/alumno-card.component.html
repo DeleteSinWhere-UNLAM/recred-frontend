@@ -129,13 +129,13 @@
 
       @if (esPadre) {
         <a class="alumno-card__btn alumno-card__btn--menta" 
-           title="Microcrédito"
+           title="Adelanto"
            [routerLink]="['/adelanto', alumno.id]"
            routerLinkActive="active">
           <span class="alumno-card__btn-icono" aria-hidden="true">
             <i class="fa-solid fa-hand-holding-dollar"></i>
           </span>
-          <span class="alumno-card__btn-label">Microcrédito</span>
+          <span class="alumno-card__btn-label">Adelanto</span>
         </a>
       }
     </div>
@@ -157,9 +157,9 @@
     <span class="alumno-card__budget-fraction">{{ budgetSpentFormateado }} / {{ budgetLimitFormateado }}</span>
   </div>
 
-  <a class="alumno-card__cta" [class.alumno-card__cta--premium]="esPremium" [routerLink]="['/buffet', alumno.id]">
+  <a class="alumno-card__cta" [routerLink]="['/buffet', alumno.id]">
     <i class="fa-solid fa-utensils" aria-hidden="true"></i>
-    Ir al Buffet
+    Ir al bufet
   </a>
 </article>
 

@@ -8,10 +8,7 @@
 .home {
   flex: 1;
   padding: 20px 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(240, 244, 248, 0) 260px),
-    linear-gradient(135deg, rgba(74, 111, 165, 0.08), rgba(242, 183, 5, 0.06)),
-    var(--color-fondo);
+  background-color: var(--color-fondo);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -60,14 +57,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 8px 8px 8px 0;
-
-  border: 2.5px solid transparent !important;
-  background-color: transparent !important;
-  background-image: linear-gradient(var(--color-superficie, #ffffff), var(--color-superficie, #ffffff)), 
-                    linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
-  background-origin: border-box !important;
-  background-clip: padding-box, border-box !important;
+  padding: 8px 8px 8px 0;  background-color: var(--color-superficie);
 }
 
 .home__content-scroll {

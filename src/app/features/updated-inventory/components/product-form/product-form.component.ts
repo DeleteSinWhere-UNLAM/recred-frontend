@@ -1,4 +1,4 @@
-﻿import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject, signal } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Product } from "../../models/product.interface";
 import { Category } from "../../models/category.interface";
@@ -58,17 +58,38 @@ export class ProductFormComponent implements OnInit, OnChanges {
     urlImagen: [null],
   });
 
+  isBeverage = signal(false);
+
   ngOnInit(): void {
     this.productForm.get("categoriaId")?.valueChanges.subscribe(value => {
       const nuevaCategoriaCtrl = this.productForm.get("nuevaCategoriaNombre");
       if (value === "NEW") {
         nuevaCategoriaCtrl?.setValidators([Validators.required]);
+        this.isBeverage.set(this.checkIfBeverageName(nuevaCategoriaCtrl?.value));
       } else {
         nuevaCategoriaCtrl?.clearValidators();
         nuevaCategoriaCtrl?.setValue("");
+        this.isBeverage.set(this.checkIfBeverage(value));
       }
       nuevaCategoriaCtrl?.updateValueAndValidity();
     });
+
+    this.productForm.get("nuevaCategoriaNombre")?.valueChanges.subscribe(value => {
+      if (this.productForm.get("categoriaId")?.value === "NEW") {
+        this.isBeverage.set(this.checkIfBeverageName(value));
+      }
+    });
+  }
+
+  private checkIfBeverage(categoryId: string | null): boolean {
+    if (!categoryId || categoryId === "NEW") return false;
+    const cat = this.categories.find(c => c.id === categoryId);
+    return cat ? this.checkIfBeverageName(cat.descripcion) : false;
+  }
+
+  private checkIfBeverageName(name: string | null | undefined): boolean {
+    if (!name) return false;
+    return name.toLowerCase().includes("bebida") || name.toLowerCase().includes("infusión") || name.toLowerCase().includes("infusion");
   }
 
   get isEditing(): boolean {
@@ -93,6 +114,12 @@ export class ProductFormComponent implements OnInit, OnChanges {
         urlImagen: this.product.urlImagen
       });
       this.imagePreview.set(this.product.urlImagen || null);
+      
+      if (this.product.categoriaId) {
+        this.isBeverage.set(this.checkIfBeverage(this.product.categoriaId));
+      } else {
+        this.isBeverage.set(this.checkIfBeverageName(this.product.categoriaNombre));
+      }
     }
 
     if (changes["product"] && !this.product) {
