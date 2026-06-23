@@ -279,9 +279,6 @@
                           <small>
                             <i class="fa-solid fa-users" aria-hidden="true"></i>
                             {{ slot.ordersLabel }}
-                            @if (slot.timeRangeLabel) {
-                              <span>{{ slot.timeRangeLabel }}</span>
-                            }
                           </small>
                         </div>
 
@@ -429,7 +426,7 @@
                           <strong>{{
                             item.detail.replace(" unidades", "")
                           }}</strong>
-                          <span>reservado</span>
+                          <span>Reservado</span>
                         </div>
                       } @else if (item.amount) {
                         <strong class="kr__rank-amount">{{
@@ -472,11 +469,9 @@
                   </span>
                   <div>
                     <small>Mejor día</small>
-                    @for (day of presenter.trendDays(); track day.date) {
-                      @if (day.percent === 100) {
-                        <strong>{{ day.dateLabel }}</strong>
-                        <em>{{ day.totalSoldLabel }}</em>
-                      }
+                    @if (presenter.bestTrendDay(); as day) {
+                      <strong>{{ day.dateLabel }}</strong>
+                      <em>{{ day.totalSoldLabel }}</em>
                     }
                   </div>
                 </article>
@@ -509,7 +504,7 @@
                   <div>
                     <small>Referencia</small>
                     <strong>Período</strong>
-                    <em>{{ presenter.trendDays().length }} días comparados</em>
+                    <em>{{ presenter.trendDays().length }} días</em>
                   </div>
                 </article>
               </aside>

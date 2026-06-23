@@ -426,9 +426,9 @@ export class HomeKiosqueroPresenter {
   });
 
   readonly salesByTimeSlot = computed<TimeSlotView[]>(() => {
-    const slots = [
+    const slots = this.redistributeUnassignedTimeSlotSales([
       ...(this.panelState()?.activity.salesByTimeSlot ?? []),
-    ].sort((left, right) => this.compareTimeSlots(left, right));
+    ]).sort((left, right) => this.compareTimeSlots(left, right));
     const maxSold = Math.max(1, ...slots.map((slot) => slot.totalSold));
 
     return slots.map((slot) => ({
@@ -795,6 +795,16 @@ export class HomeKiosqueroPresenter {
     );
   });
 
+  readonly bestTrendDay = computed<TrendDayView | null>(() => {
+    return this.trendDays().reduce<TrendDayView | null>((bestDay, day) => {
+      if (!bestDay || day.totalSold > bestDay.totalSold) {
+        return day;
+      }
+
+      return bestDay;
+    }, null);
+  });
+
   readonly selectedTrendBreakdown = computed<TrendBreakdownItem[]>(() => {
     const day = this.selectedTrendDay();
 
@@ -861,12 +871,21 @@ export class HomeKiosqueroPresenter {
     },
     {
       id: 'venta-espontanea',
-      titulo: 'Venta espontánea',
+      titulo: 'Venta',
       descripcion: 'Registra una venta presencial a un alumno',
       icono: 'fa-cash-register',
       ruta: '/kiosquero/venta-espontanea',
       color: 'pizarra',
       destacada: true,
+    },
+    {
+      id: 'cargar-productos',
+      titulo: 'Cargar producto',
+      descripcion: 'Elige un método para agregar productos',
+      icono: 'fa-cloud-arrow-up',
+      ruta: '/cargar-producto-ia',
+      color: 'dorado',
+
     },
     {
       id: 'oportunidades-stock',
@@ -886,15 +905,6 @@ export class HomeKiosqueroPresenter {
       ruta: '/kiosquero/pedidos-tracking',
       color: 'menta',
       destacada: true,
-    },
-    {
-      id: 'cargar-productos',
-      titulo: 'Cargar producto',
-      descripcion: 'Elige un método para agregar productos',
-      icono: 'fa-cloud-arrow-up',
-      ruta: '/cargar-producto-ia',
-      color: 'dorado',
-
     },
     {
       id: 'stock',
@@ -971,28 +981,54 @@ export class HomeKiosqueroPresenter {
     );
   });
 
-  readonly featuredActions: Signal<AccionKiosquero[]> = computed(() => [
-    ...this.acciones().filter(
-      (accion) => accion.destacada && accion.id !== 'tracking-pedidos',
-    ),
-    {
-      id: 'cargar-productos',
-      titulo: 'Cargar producto',
-      descripcion: 'Elige un método para agregar productos',
-      icono: 'fa-cloud-arrow-up',
-      ruta: '/cargar-producto-ia',
-      color: 'dorado',
+  readonly featuredActions: Signal<AccionKiosquero[]> = computed(() =>
+    this.ordenarAccionesDestacadas([
+      ...this.acciones().filter(
+        (accion) => accion.destacada && accion.id !== 'tracking-pedidos',
+      ),
+      {
+        id: 'cargar-productos',
+        titulo: 'Cargar producto',
+        descripcion: 'Elige un método para agregar productos',
+        icono: 'fa-cloud-arrow-up',
+        ruta: '/cargar-producto-ia',
+        color: 'dorado',
+      },
+      {
+        id: 'cierre-diario',
+        titulo: 'Cierre diario',
+        descripcion: 'Cerrar día y liberar reservas',
+        icono: 'fa-clipboard-check',
+        ruta: '/cierre-diario',
+        color: 'menta',
+      },
+    ]),
+  );
 
-    },
-    {
-      id: 'cierre-diario',
-      titulo: 'Cierre diario',
-      descripcion: 'Cerrar día y liberar reservas',
-      icono: 'fa-clipboard-check',
-      ruta: '/cierre-diario',
-      color: 'menta',
-    },
-  ]);
+  private ordenarAccionesDestacadas(
+    actions: AccionKiosquero[],
+  ): AccionKiosquero[] {
+    const ventaAction = actions.find(
+      (action) => action.id === 'venta-espontanea',
+    );
+    const cargarProductoAction = actions.find(
+      (action) => action.id === 'cargar-productos',
+    );
+
+    if (!ventaAction || !cargarProductoAction) {
+      return actions;
+    }
+
+    return [
+      ventaAction,
+      cargarProductoAction,
+      ...actions.filter(
+        (action) =>
+          action.id !== 'venta-espontanea' &&
+          action.id !== 'cargar-productos',
+      ),
+    ];
+  }
 
   init(): void {
     this.panelModeState.set('home');
@@ -1499,6 +1535,54 @@ export class HomeKiosqueroPresenter {
     }
 
     return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+  }
+
+  private redistributeUnassignedTimeSlotSales(
+    slots: PanelKiosqueroTimeSlotSale[],
+  ): PanelKiosqueroTimeSlotSale[] {
+    const assignedSlots = slots.filter((slot) => this.hasTimeSlotRange(slot));
+    const unassignedSlots = slots.filter((slot) => !this.hasTimeSlotRange(slot));
+
+    if (!assignedSlots.length || !unassignedSlots.length) {
+      return slots;
+    }
+
+    const unassignedOrders = unassignedSlots.reduce(
+      (total, slot) => total + slot.orders,
+      0,
+    );
+    const unassignedTotalSold = unassignedSlots.reduce(
+      (total, slot) => total + slot.totalSold,
+      0,
+    );
+    const ordersShares = this.splitInteger(unassignedOrders, assignedSlots.length);
+    const totalSoldShares = this.splitInteger(
+      unassignedTotalSold,
+      assignedSlots.length,
+    );
+
+    return assignedSlots.map((slot, index) => ({
+      ...slot,
+      orders: slot.orders + ordersShares[index],
+      totalSold: slot.totalSold + totalSoldShares[index],
+    }));
+  }
+
+  private hasTimeSlotRange(slot: PanelKiosqueroTimeSlotSale): boolean {
+    return Boolean(slot.pickupSlotStartTime && slot.pickupSlotEndTime);
+  }
+
+  private splitInteger(total: number, parts: number): number[] {
+    if (parts <= 0) {
+      return [];
+    }
+
+    const base = Math.floor(total / parts);
+    const remainder = total % parts;
+
+    return Array.from({ length: parts }, (_, index) =>
+      base + (index < remainder ? 1 : 0),
+    );
   }
 
   private compareTimeSlots(

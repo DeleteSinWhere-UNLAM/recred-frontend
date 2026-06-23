@@ -1174,6 +1174,7 @@ strong.kr__purchase-percent {
   align-items: center;
   gap: 14px;
 
+  flex: 1 1 0;
   min-height: 116px;
   padding: 18px;
 }
@@ -1219,9 +1220,14 @@ strong.kr__purchase-percent {
 
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
-  font-size: 25px;
+  font-size: 22px;
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.kr__trend-summary-item > div {
+  min-width: 0;
 }
 
 .kr__trend-summary-item em {
@@ -1229,9 +1235,10 @@ strong.kr__purchase-percent {
   margin-top: 4px;
 
   color: #3f7a5d;
-  font-size: 13px;
+  font-size: 22px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 900;
+  line-height: 1.15;
 }
 
 .kr__trend-chart {
@@ -2148,12 +2155,12 @@ strong.kr__purchase-percent {
 
 .kr__sales-total-card {
   min-height: 150px;
-  padding: 24px;
+  padding: 22px;
 
   display: grid;
-  grid-template-columns: 66px minmax(0, 1fr);
+  grid-template-columns: 58px minmax(0, 1fr);
   align-items: center;
-  gap: 20px;
+  gap: 18px;
 
   border: 1px solid rgba(129, 178, 154, 0.22);
   border-radius: 22px;
@@ -2161,9 +2168,13 @@ strong.kr__purchase-percent {
     linear-gradient(135deg, rgba(129, 178, 154, 0.12), rgba(255, 255, 255, 0.86));
 }
 
+.kr__sales-total-card > div {
+  min-width: 0;
+}
+
 .kr__sales-total-card > span {
-  width: 66px;
-  height: 66px;
+  width: 58px;
+  height: 58px;
 
   display: inline-flex;
   align-items: center;
@@ -2172,7 +2183,7 @@ strong.kr__purchase-percent {
   border-radius: 20px;
   background-color: rgba(129, 178, 154, 0.18);
   color: #3f7a5d;
-  font-size: 28px;
+  font-size: 24px;
 }
 
 .kr__sales-total-card small {
@@ -2185,11 +2196,14 @@ strong.kr__purchase-percent {
 .kr__sales-total-card strong {
   display: block;
   margin-top: 8px;
+  max-width: 100%;
 
   color: var(--color-texto-oscuro);
   font-family: var(--font-display);
-  font-size: 43px;
-  line-height: 1;
+  font-size: 32px;
+  line-height: 1.05;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .kr__sales-slot-list {
@@ -3028,12 +3042,13 @@ strong.kr__purchase-percent {
   grid-area: amount;
   justify-self: end;
 
-  min-width: auto;
+  min-width: 0;
   max-width: 100%;
 
-  white-space: nowrap;
+  white-space: normal;
   text-align: right;
   overflow: visible;
+  overflow-wrap: anywhere;
 
   font-size: 18px;
 }
