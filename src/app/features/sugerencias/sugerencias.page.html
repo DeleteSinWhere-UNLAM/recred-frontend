@@ -280,7 +280,7 @@
                 </article>
 
                 <article class="sg__stat-item">
-                  <small>Participación</small>
+                  <small>Participación de total de ventas</small>
                   <strong>
                     {{ presenter.estadisticasSeleccionadas?.participacionVentas | number:'1.0-2' }}%
                   </strong>
@@ -341,7 +341,7 @@
               <div class="sg__section sg__section--recommendations">
                 <h3 class="sg__section-title">
                   <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
-                  Recomendaciones IA
+                  Recomendaciones
                 </h3>
 
                 <ul class="sg__section-list">
@@ -462,17 +462,7 @@
 
               
 
-              <div class="sg__detail-footer">
-                <span class="sg__footer-badge">
-                  <i class="fa-solid fa-brain" aria-hidden="true"></i>
-                  {{ sugerenciaSeleccionada.motivoIA }}
-                </span>
 
-                <span class="sg__footer-badge">
-                  <i class="fa-solid fa-microchip" aria-hidden="true"></i>
-                  {{ sugerenciaSeleccionada.modeloIA }}
-                </span>
-              </div>
             } @else {
               <div class="sg__detail-empty">
                 <span aria-hidden="true">
