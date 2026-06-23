@@ -43,7 +43,7 @@
               </div>
               <div class="product-details">
                 <span class="product-name-mini">{{ prod.nombre }}</span>
-                <span class="product-price-mini">{{ prod.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="product-price-mini">${{ prod.precio | number:'1.0-0' }}</span>
               </div>
             </div>
           </li>

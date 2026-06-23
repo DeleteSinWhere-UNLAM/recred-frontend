@@ -26,8 +26,8 @@ describe('ComboPromotionModalComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería iniciar con el formulario inválido', () => {
-    expect(component.promotionForm.invalid).toBeTrue();
+  it('debería iniciar con el formulario válido por sus valores por defecto', () => {
+    expect(component.promotionForm.valid).toBeTrue();
   });
 
   it('debería permitir togglear la selección de un producto', () => {

@@ -1,7 +1,9 @@
 import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { SugerenciasPresenter } from './sugerencias.presenter';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
+import { ToastService } from '../../../shared/services/toast.service';
 import { of } from 'rxjs';
 import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 import { Promotion } from '../../../data-access/services/promociones/promotion.service';
@@ -10,16 +12,22 @@ describe('SugerenciasPresenter', () => {
   let presenter: SugerenciasPresenter;
   let mockSugerenciasService: jasmine.SpyObj<SugerenciasService>;
   let mockPromotionService: jasmine.SpyObj<PromotionService>;
+  let mockRouter: jasmine.SpyObj<Router>;
+  let mockToastService: jasmine.SpyObj<ToastService>;
 
   beforeEach(() => {
     mockSugerenciasService = jasmine.createSpyObj('SugerenciasService', ['getSugerencias', 'getComboSuggestions']);
     mockPromotionService = jasmine.createSpyObj('PromotionService', ['createPromotion']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
 
     TestBed.configureTestingModule({
       providers: [
         SugerenciasPresenter,
         { provide: SugerenciasService, useValue: mockSugerenciasService },
-        { provide: PromotionService, useValue: mockPromotionService }
+        { provide: PromotionService, useValue: mockPromotionService },
+        { provide: Router, useValue: mockRouter },
+        { provide: ToastService, useValue: mockToastService }
       ]
     });
 
@@ -119,6 +127,9 @@ describe('SugerenciasPresenter', () => {
       let isModalOpen = true;
       presenter.isComboModalOpen$.subscribe(v => isModalOpen = v);
       expect(isModalOpen).toBeFalse();
+
+      expect(mockToastService.mostrar).toHaveBeenCalledWith('Combo creado exitosamente', 'success');
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/promociones');
     });
   });
 });
