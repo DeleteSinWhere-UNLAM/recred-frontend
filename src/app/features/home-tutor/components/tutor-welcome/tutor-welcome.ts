@@ -49,7 +49,7 @@ export class TutorWelcome implements OnInit {
           const alumno = alumnosActuales.find(a => a.id === mov.studentId);
           return {
             ...mov,
-            alumnoNombre: alumno ? alumno.nombre : (mov as any).studentName || undefined
+            alumnoNombre: alumno ? alumno.nombre : (mov as Movimiento & { studentName?: string }).studentName || undefined
           };
         });
         this.ultimosMovimientos.set(mapeados.slice(0, 4));

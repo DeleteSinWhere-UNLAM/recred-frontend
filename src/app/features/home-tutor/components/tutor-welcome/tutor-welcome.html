@@ -104,7 +104,7 @@
     <div class="welcome__side-col">
       <!-- Últimos movimientos -->
       <section class="welcome__widget">
-        <div class="widget__header" (click)="irAMovimientos()" style="cursor: pointer;" title="Ir a Movimientos">
+        <div class="widget__header" tabindex="0" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" style="cursor: pointer;" title="Ir a Movimientos">
           <i class="fa-solid fa-receipt"></i>
           <h3>Últimos Movimientos</h3>
         </div>
