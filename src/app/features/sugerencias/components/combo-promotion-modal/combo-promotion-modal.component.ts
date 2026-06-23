@@ -36,7 +36,7 @@ export class ComboPromotionModalComponent {
     const format = (d: Date) => d.toISOString().split('T')[0];
 
     this.promotionForm = this.formBuilder.group({
-      discountPercentage: [1, [Validators.required, Validators.min(1), Validators.max(100)]],
+      discountPercentage: [10, [Validators.required, Validators.min(1), Validators.max(100)]],
       startDate: [format(today), Validators.required],
       endDate: [format(nextWeek), Validators.required]
     });
