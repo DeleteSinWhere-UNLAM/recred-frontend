@@ -1,9 +1,11 @@
 import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { SugerenciaProducto, EstadisticasVenta, SuggestedProduct } from '../models/sugerencia-producto.model';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
 import { PromotionFormData } from '../components/combo-promotion-modal/combo-promotion-modal.component';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Injectable()
 export class SugerenciasPresenter {
@@ -23,6 +25,8 @@ export class SugerenciasPresenter {
 
   private readonly sugerenciasService = inject(SugerenciasService);
   private readonly promotionService = inject(PromotionService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   initialize(userId: string): void {
     this.userId = userId;
@@ -67,8 +71,15 @@ export class SugerenciasPresenter {
         productIds: [selected.estadisticasVenta.productoId, ...formData.productIds]
       };
       console.log(promotionData)
-      this.promotionService.createPromotion(promotionData).subscribe(() => {
-        this.closeComboPromotionModal();
+      this.promotionService.createPromotion(promotionData).subscribe({
+        next: () => {
+          this.closeComboPromotionModal();
+          this.toastService.mostrar("Combo creado exitosamente", "success");
+          this.router.navigateByUrl('/promociones');
+        },
+        error: () => {
+          this.toastService.mostrar("Error al crear el combo", "error");
+        }
       });
     }
   }
