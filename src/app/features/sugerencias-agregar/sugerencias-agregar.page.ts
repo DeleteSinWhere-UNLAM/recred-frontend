@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { } from '../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { SugerenciasAgregarPresenter } from './presenter/sugerencias-agregar.presenter';
 
@@ -10,7 +10,7 @@ import { SugerenciasAgregarPresenter } from './presenter/sugerencias-agregar.pre
   standalone: true,
   templateUrl: './sugerencias-agregar.page.html',
   styleUrl: './sugerencias-agregar.page.css',
-  imports: [CommonModule],
+  imports: [CommonModule, NavbarComponent],
   providers: [SugerenciasAgregarPresenter],
 })
 export class SugerenciasAgregarPage implements OnInit {

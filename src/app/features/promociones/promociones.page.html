@@ -1,3 +1,5 @@
+<app-navbar [userName]="nombreUsuario" />
+
 <main class="promociones-page">
   <button type="button" class="btn-volver" (click)="presenter.volver()">
     <i class="fa-solid fa-arrow-left"></i> Volver al panel
@@ -9,7 +11,7 @@
       <p>Visualiza y gestiona las promociones creadas en tu kiosco.</p>
     </div>
     <div class="header-actions">
-      <button class="btn btn-primary" disabled>
+      <button class="btn btn-primary">
         <i class="fa-solid fa-plus"></i> Nueva Promoción
       </button>
     </div>
