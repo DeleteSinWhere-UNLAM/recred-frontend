@@ -100,7 +100,7 @@
 }
 
 .acreditar-page__alumno-info p i {
-  color: #10b981;
+  color: #166534;
 }
 
 /* Yellow Saldo total display */
@@ -315,7 +315,8 @@
 
 /* Presets colors */
 .acreditar-page__preset-btn--menta .acreditar-page__preset-icono {
-  background-color: #22c55e;
+  background-color: #dcfce7;
+  color: #166534;
 }
 
 .acreditar-page__preset-btn--melocoton .acreditar-page__preset-icono {
@@ -446,14 +447,14 @@
 }
 
 .acreditar-page__history-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background-color: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
+  background-color: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #166534;
   font-size: 14px;
 }
 

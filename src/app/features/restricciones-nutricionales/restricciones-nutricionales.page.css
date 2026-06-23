@@ -110,8 +110,8 @@
 }
 
 .restriccion-item__icono--vegano {
-  background-color: #f0fdf4;
-  color: #22c55e; /* Green vegan */
+  background-color: #dcfce7;
+  color: #166534; /* Green vegan matching SALDADO */
 }
 
 .restriccion-item__icono--contieneLacteos {
@@ -179,11 +179,12 @@
 }
 
 .toggle__input:checked + .toggle__slider {
-  background-color: #10b981; /* Premium Green */
+  background-color: #dcfce7;
 }
 
 .toggle__input:checked + .toggle__slider::after {
   transform: translateX(20px);
+  background-color: #166534;
 }
 
 .toggle__input:focus-visible + .toggle__slider {
@@ -258,16 +259,3 @@
   }
 }
 
-/* Premium Gold Metallic style for Nutritional Restrictions save button */
-.restricciones__guardar--premium {
-  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
-  color: #1e293b !important;
-  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35) !important;
-  border: none !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.restricciones__guardar--premium:hover:not(:disabled) {
-  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
-  box-shadow: 0 10px 28px rgba(212, 175, 55, 0.5) !important;
-}
