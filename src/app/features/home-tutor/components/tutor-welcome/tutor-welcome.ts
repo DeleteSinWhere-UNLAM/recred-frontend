@@ -29,7 +29,7 @@ export class TutorWelcome implements OnInit {
   });
 
   // Datos
-  readonly ultimosMovimientos = signal<Movimiento[]>([]);
+  readonly ultimosMovimientos = signal<(Movimiento & { alumnoNombre?: string })[]>([]);
   readonly pedidosPendientes = signal<(Movimiento & { alumnoNombre: string })[]>([]);
   readonly promociones = signal<Promotion[]>([]);
   readonly cargando = signal(true);
@@ -41,13 +41,21 @@ export class TutorWelcome implements OnInit {
   private async cargarDatosDashboard() {
     this.cargando.set(true);
     try {
+      const alumnosActuales = this.alumnos();
+
       // 1. Movimientos globales del tutor (historial general)
       this.movimientosService.getHistorialTutor().subscribe(movs => {
-        this.ultimosMovimientos.set((movs || []).slice(0, 4));
+        const mapeados = (movs || []).map(mov => {
+          const alumno = alumnosActuales.find(a => a.id === mov.studentId);
+          return {
+            ...mov,
+            alumnoNombre: alumno ? alumno.nombre : (mov as any).studentName || undefined
+          };
+        });
+        this.ultimosMovimientos.set(mapeados.slice(0, 4));
       });
 
       // 2. Pedidos pendientes (consolidados de todos los alumnos)
-      const alumnosActuales = this.alumnos();
       const todosPendientes: (Movimiento & { alumnoNombre: string })[] = [];
       
       for (const alumno of alumnosActuales) {
@@ -89,6 +97,10 @@ export class TutorWelcome implements OnInit {
 
   irAcreditar(alumnoId: string) {
     this.router.navigate(['/tutor/acreditar', alumnoId]);
+  }
+
+  irAMovimientos() {
+    this.router.navigate(['/movimientos']);
   }
 
   formatDate(dateStr: string): string {

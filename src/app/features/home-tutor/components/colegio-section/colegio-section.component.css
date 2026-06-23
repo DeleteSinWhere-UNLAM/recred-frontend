@@ -37,14 +37,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  transition: all 0.2s ease;
-
-  border: 2.5px solid transparent !important;
-  background-color: transparent !important;
-  background-image: linear-gradient(var(--color-superficie, #ffffff), var(--color-superficie, #ffffff)), 
-                    linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
-  background-origin: border-box !important;
-  background-clip: padding-box, border-box !important;
+  transition: all 0.2s ease;  background-color: var(--color-superficie);
 }
 
 .colegio-section__sidebar--colapsado {
