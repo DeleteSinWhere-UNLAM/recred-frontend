@@ -8,8 +8,6 @@ import { SugerenciasAgregarPresenter } from './presenter/sugerencias-agregar.pre
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { Component, Input } from '@angular/core';
 
-import { } from '../../shared/components/navbar/navbar.component';
-
 @Component({
   selector: 'app-navbar',
   template: '',
