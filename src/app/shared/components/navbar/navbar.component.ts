@@ -122,7 +122,7 @@ export class NavbarComponent {
 
   protected irAPremium(): void {
     this.menuAbierto.set(false);
-    this.router.navigateByUrl('/premium');
+    this.router.navigateByUrl('/suscripcion');
   }
 
   protected async cerrarSesion(): Promise<void> {

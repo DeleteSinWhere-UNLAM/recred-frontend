@@ -291,7 +291,7 @@ export const routes: Routes = [
       },
       
       {
-        path: 'premium',
+        path: 'suscripcion',
         loadComponent: () =>
           import('./features/premium-plans/premium-plans.page').then(
             (m) => m.PremiumPlansPage,
