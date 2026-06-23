@@ -26,7 +26,7 @@ type PerfilUsuarioForm = FormGroup<{
   selector: 'app-perfil-usuario-page',
   templateUrl: './perfil-usuario.page.html',
   styleUrl: './perfil-usuario.page.css',
-  imports: [ NavbarComponent, ReactiveFormsModule, CropModalComponent],
+  imports: [NavbarComponent, ReactiveFormsModule, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PerfilUsuarioPage implements OnInit {
@@ -67,7 +67,13 @@ export class PerfilUsuarioPage implements OnInit {
   });
 
   protected readonly esPremium = computed(() => {
-    return this.planUsuario() === 'PREMIUM';
+    const plan = this.planUsuario();
+    return plan === 'PREMIUM' || plan === 'AVANZADO';
+  });
+
+  protected readonly vigenciaPlan = computed(() => {
+    // Retornamos la fecha por defecto según lo solicitado, idealmente vendrá de this.perfil()
+    return '19/12/2026';
   });
 
   protected readonly payoutForm = new FormGroup({
@@ -412,15 +418,15 @@ export class PerfilUsuarioPage implements OnInit {
 
     try {
       const response = await this.payoutConfigService.guardarConfiguracion(kiosqueroId, data);
-      
+
       const proxima = response?.proximaEjecucion;
       this.proximaEjecucion.set(proxima || null);
-      
+
       let mensajeExito = 'Vinculación exitosa y configuración guardada correctamente.';
       if (proxima) {
         mensajeExito += ` Próximo pago programado para: ${proxima}`;
       }
-      
+
       this.toastService.mostrar(mensajeExito, 'success');
       this.payoutForm.markAsPristine();
       this.tienePayoutExistente.set(true);
