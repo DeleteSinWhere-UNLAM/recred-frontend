@@ -63,7 +63,7 @@ export class PricingPlansComponent {
     return [
       {
         id: 'basico',
-        name: 'Suscripción Básico',
+        name: 'Básico',
         priceMonthly: 0,
         priceAnnual: 0,
         description: 'Ideal para comenzar y conocer la plataforma.',
@@ -72,7 +72,7 @@ export class PricingPlansComponent {
       },
       {
         id: 'intermedio',
-        name: 'Suscripción Intermedio',
+        name: 'Intermedio',
         priceMonthly: 5500,
         priceAnnual: 5500 * 12 * 0.8,
         description: 'Flexibilidad total para comenzar a crecer.',
@@ -81,7 +81,7 @@ export class PricingPlansComponent {
       },
       {
         id: 'avanzado',
-        name: 'Suscripción Avanzado',
+        name: 'Avanzado',
         priceMonthly: 10200,
         priceAnnual: 10200 * 12 * 0.8,
         description: 'Nuestra oferta completa con todas las herramientas.',

@@ -1,13 +1,8 @@
-<div class="product-form-backdrop" tabindex="0" role="button" (click)="formCancel.emit()" (keydown.enter)="formCancel.emit()" (keydown.space)="formCancel.emit()">
-  <form
-    [formGroup]="productForm"
-    tabindex="-1"
-    (ngSubmit)="submitForm()"
-    class="product-form"
-    (click)="$event.stopPropagation()"
-    (keydown.enter)="$event.stopPropagation()"
-    (keydown.space)="$event.stopPropagation()"
-  >
+<div class="product-form-backdrop" tabindex="0" role="button" (click)="formCancel.emit()"
+  (keydown.enter)="formCancel.emit()" (keydown.space)="formCancel.emit()">
+  <form [formGroup]="productForm" tabindex="-1" (ngSubmit)="submitForm()" class="product-form"
+    (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+    (keydown.space)="$event.stopPropagation()">
     <header class="product-form__header">
       <div class="product-form__header-icono" aria-hidden="true">
         <i class="fa-solid" [class.fa-pen]="isEditing" [class.fa-plus]="!isEditing"></i>
@@ -15,25 +10,20 @@
       <div class="product-form__header-texto">
         <h3 class="product-form__titulo">
           @if (isEditing) {
-            Editar producto
+          Editar producto
           } @else {
-            Nuevo producto
+          Nuevo producto
           }
         </h3>
         <p class="product-form__subtitulo">
           @if (isEditing) {
-            Actualizá los datos del producto
+          Actualizá los datos del producto
           } @else {
-            Cargá un nuevo producto al inventario
+          Cargá un nuevo producto al inventario
           }
         </p>
       </div>
-      <button
-        type="button"
-        class="product-form__close"
-        (click)="formCancel.emit()"
-        aria-label="Cerrar"
-      >
+      <button type="button" class="product-form__close" (click)="formCancel.emit()" aria-label="Cerrar">
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </header>
@@ -42,19 +32,23 @@
       <!-- Sección de Imagen -->
       <div class="product-form__seccion product-form__seccion--imagen" style="margin-bottom: 1.5rem;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-          <div class="product-form__image-preview" style="width: 150px; height: 150px; border-radius: 12px; overflow: hidden; background: #f3f4f6; border: 2px dashed #d1d5db; display: flex; align-items: center; justify-content: center; position: relative;">
+          <div class="product-form__image-preview"
+            style="width: 150px; height: 150px; border-radius: 12px; overflow: hidden; background: #f3f4f6; border: 2px dashed #d1d5db; display: flex; align-items: center; justify-content: center; position: relative;">
             @if (imagePreview()) {
-              <img [src]="imagePreview()" alt="Vista previa del producto" style="width: 100%; height: 100%; object-fit: cover;">
+            <img [src]="imagePreview()" alt="Vista previa del producto"
+              style="width: 100%; height: 100%; object-fit: cover;">
             } @else {
-              <i class="fa-solid fa-camera" style="font-size: 2rem; color: #9ca3af;"></i>
+            <i class="fa-solid fa-camera" style="font-size: 2rem; color: #9ca3af;"></i>
             }
             @if (isUploadingImage()) {
-              <div style="position: absolute; inset: 0; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center;">
-                <span class="product-form__btn-spinner"></span>
-              </div>
+            <div
+              style="position: absolute; inset: 0; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center;">
+              <span class="product-form__btn-spinner"></span>
+            </div>
             }
           </div>
-          <label class="product-form__btn product-form__btn--submit" style="cursor: pointer; font-size: 0.875rem; padding: 0.5rem 1rem;">
+          <label class="product-form__btn product-form__btn--submit"
+            style="cursor: pointer; font-size: 0.875rem; padding: 0.5rem 1rem;">
             <i class="fa-solid fa-upload" style="margin-right: 0.5rem;"></i>
             {{ imagePreview() ? 'Cambiar foto' : 'Subir foto' }}
             <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
@@ -65,67 +59,80 @@
       <div class="product-form__grid">
         <div class="product-form__group" [class.product-form__group--error]="hasError('nombre')">
           <label for="prod-nombre" class="product-form__label">Nombre del producto</label>
-          <input id="prod-nombre" class="product-form__input" formControlName="nombre" type="text" placeholder="Ej: Manzana Roja">
+          <input id="prod-nombre" class="product-form__input" formControlName="nombre" type="text"
+            placeholder="Ej: Manzana Roja">
           @if (hasError('nombre')) {
-            <span class="product-form__error">{{ getErrorMessage('nombre') }}</span>
+          <span class="product-form__error">{{ getErrorMessage('nombre') }}</span>
           }
         </div>
 
         <div class="product-form__group" [class.product-form__group--error]="hasError('categoriaId')">
           <label for="prod-categoria" class="product-form__label">Categoría</label>
-          <select id="prod-categoria" class="product-form__input product-form__input--select" formControlName="categoriaId">
+          <select id="prod-categoria" class="product-form__input product-form__input--select"
+            formControlName="categoriaId">
             <option [ngValue]="null" disabled selected>Selecciona una categoría</option>
             @for (cat of categories; track cat.id) {
-              <option [value]="cat.id">{{ cat.descripcion }}</option>
+            <option [value]="cat.id">{{ cat.descripcion }}</option>
             }
             <option value="NEW">+ Crear nueva categoría</option>
           </select>
           @if (hasError('categoriaId')) {
-            <span class="product-form__error">{{ getErrorMessage('categoriaId') }}</span>
+          <span class="product-form__error">{{ getErrorMessage('categoriaId') }}</span>
           }
         </div>
       </div>
 
       @if (productForm.get('categoriaId')?.value === 'NEW') {
-        <div class="product-form__group" [class.product-form__group--error]="hasError('nuevaCategoriaNombre')">        
-          <label for="prod-nueva-categoria" class="product-form__label">Nombre de la nueva categoría</label>
-          <input id="prod-nueva-categoria" class="product-form__input" formControlName="nuevaCategoriaNombre" type="text" placeholder="Ej: Frutas y Verduras">
-          @if (hasError('nuevaCategoriaNombre')) {
-            <span class="product-form__error">{{ getErrorMessage('nuevaCategoriaNombre') }}</span>
-          }
-        </div>
+      <div class="product-form__group" [class.product-form__group--error]="hasError('nuevaCategoriaNombre')">
+        <label for="prod-nueva-categoria" class="product-form__label">Nombre de la nueva categoría</label>
+        <input id="prod-nueva-categoria" class="product-form__input" formControlName="nuevaCategoriaNombre" type="text"
+          placeholder="Ej: Frutas y Verduras">
+        @if (hasError('nuevaCategoriaNombre')) {
+        <span class="product-form__error">{{ getErrorMessage('nuevaCategoriaNombre') }}</span>
+        }
+      </div>
       }
 
       <div class="product-form__group" [class.product-form__group--error]="hasError('descripcion')">
         <label for="prod-descripcion" class="product-form__label">Descripción</label>
-        <input id="prod-descripcion" class="product-form__input" formControlName="descripcion" type="text" placeholder="Ej: Manzana roja fresca por unidad">
+        <input id="prod-descripcion" class="product-form__input" formControlName="descripcion" type="text"
+          placeholder="Ej: Manzana roja fresca por unidad">
         @if (hasError('descripcion')) {
-          <span class="product-form__error">{{ getErrorMessage('descripcion') }}</span>
+        <span class="product-form__error">{{ getErrorMessage('descripcion') }}</span>
         }
       </div>
 
       <div class="product-form__grid product-form__grid--three">
         <div class="product-form__group" [class.product-form__group--error]="hasError('precio')">
           <label for="prod-precio" class="product-form__label">Precio ($)</label>
-          <input id="prod-precio" class="product-form__input" formControlName="precio" type="number" step="0.01" min="0" placeholder="800.00">
+          <input id="prod-precio" class="product-form__input" formControlName="precio" type="number" step="0.01" min="0"
+            placeholder="800.00">
           @if (hasError('precio')) {
-            <span class="product-form__error">{{ getErrorMessage('precio') }}</span>
+          <span class="product-form__error">{{ getErrorMessage('precio') }}</span>
           }
         </div>
 
         <div class="product-form__group" [class.product-form__group--error]="hasError('peso')">
-          <label for="prod-peso" class="product-form__label">Peso (kg)</label>
-          <input id="prod-peso" class="product-form__input" formControlName="peso" type="number" step="0.001" min="0" placeholder="0.150">
+          <label for="prod-peso" class="product-form__label">
+            @if (isBeverage()) {
+              Volumen (L)
+            } @else {
+              Peso (kg)
+            }
+          </label>
+          <input id="prod-peso" class="product-form__input" formControlName="peso" type="number" step="0.001" min="0"
+            [placeholder]="isBeverage() ? '1.5' : '0.150'">
           @if (hasError('peso')) {
-            <span class="product-form__error">{{ getErrorMessage('peso') }}</span>
+          <span class="product-form__error">{{ getErrorMessage('peso') }}</span>
           }
         </div>
 
         <div class="product-form__group" [class.product-form__group--error]="hasError('stockActual')">
-          <label for="prod-stock" class="product-form__label">Stock actual</label>
-          <input id="prod-stock" class="product-form__input" formControlName="stockActual" type="number" min="0" placeholder="120">
+          <label for="prod-stock" class="product-form__label">Unidades</label>
+          <input id="prod-stock" class="product-form__input" formControlName="stockActual" type="number" min="0"
+            placeholder="120">
           @if (hasError('stockActual')) {
-            <span class="product-form__error">{{ getErrorMessage('stockActual') }}</span>
+          <span class="product-form__error">{{ getErrorMessage('stockActual') }}</span>
           }
         </div>
       </div>
@@ -167,25 +174,18 @@
     </div>
 
     <footer class="product-form__footer">
-      <button
-        type="button"
-        class="product-form__btn product-form__btn--cancel"
-        (click)="formCancel.emit()"
-      >
+      <button type="button" class="product-form__btn product-form__btn--cancel" (click)="formCancel.emit()">
         Cancelar
       </button>
-      <button
-        type="submit"
-        class="product-form__btn product-form__btn--submit"
-        [disabled]="isSaving || isUploadingImage()"
-      >
+      <button type="submit" class="product-form__btn product-form__btn--submit"
+        [disabled]="isSaving || isUploadingImage()">
         @if (isSaving) {
-          <span class="product-form__btn-spinner"></span>
-          Guardando...
+        <span class="product-form__btn-spinner"></span>
+        Guardando...
         } @else if (isEditing) {
-          Actualizar producto
+        Actualizar producto
         } @else {
-          Guardar producto
+        Guardar producto
         }
       </button>
     </footer>

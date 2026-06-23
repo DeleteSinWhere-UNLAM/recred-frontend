@@ -12,7 +12,7 @@
           <span class="bulk-upload-modal__premium-badge">PREMIUM</span>
         </div>
         <p class="bulk-upload-modal__subtitle">
-          Sube tu archivo y edita los datos antes de guardarlos
+          Subí tu archivo y edita los datos antes de guardarlos
         </p>
       </div>
       <button type="button" class="bulk-upload-modal__close" (click)="onCancel()" aria-label="Cerrar">
@@ -24,7 +24,7 @@
       <div class="bulk-upload-modal__file-section">
         <label class="bulk-upload-modal__file-label">
           <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
-          <span>Subir archivo PDF</span>
+          <span>Subí tu archivo PDF o Excel</span>
           <input type="file" class="bulk-upload-modal__file-input" accept=".pdf,.xlsx,.xls,.csv"
             (change)="onFileChange($event)" [disabled]="isProcessingFile">
         </label>
