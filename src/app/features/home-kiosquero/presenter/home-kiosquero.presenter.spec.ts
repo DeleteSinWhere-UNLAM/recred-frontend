@@ -288,9 +288,9 @@ describe('HomeKiosqueroPresenter', () => {
     expect(presenter.acciones().map((accion) => accion.id)).toEqual([
       'ver-pedidos',
       'venta-espontanea',
+      'cargar-productos',
       'oportunidades-stock',
       'tracking-pedidos',
-      'cargar-productos',
       'stock',
       'reportes',
       'sugerencias',
@@ -300,9 +300,9 @@ describe('HomeKiosqueroPresenter', () => {
     ]);
     expect(presenter.featuredActions().map((accion) => accion.id)).toEqual([
       'venta-espontanea',
+      'cargar-productos',
       'oportunidades-stock',
       'sugerencias',
-      'cargar-productos',
       'cierre-diario',
     ]);
     expect(presenter.secondaryActions().map((accion) => accion.id)).toEqual([]);
@@ -325,17 +325,16 @@ describe('HomeKiosqueroPresenter', () => {
     expect(categories[1].totalPercentLabel).toBe('21,1%');
   });
 
-  it('ordena ventas por recreo por horario y deja compras espontaneas al final', () => {
+  it('redistribuye visualmente compras espontaneas en franjas con horario', () => {
     const slots = presenter.salesByTimeSlot();
 
-    expect(slots.map((slot) => slot.timeSlot)).toEqual([
-      'Primer recreo',
-      'Compra espontanea',
-    ]);
+    expect(slots.map((slot) => slot.timeSlot)).toEqual(['Primer recreo']);
     expect(slots[0].timeRangeLabel).toBe('09:30 - 09:45');
-    expect(slots[0].percent).toBe(60);
-    expect(slots[1].timeRangeLabel).toBeNull();
-    expect(slots[1].percent).toBe(100);
+    expect(slots[0].orders).toBe(5);
+    expect(slots[0].ordersLabel).toBe('5 pedidos');
+    expect(slots[0].totalSold).toBe(8000);
+    expect(slots[0].totalSoldLabel).toBe('$ 8.000');
+    expect(slots[0].percent).toBe(100);
   });
 
   it('formatea tipos de compra con cantidad sobre total y porcentaje', () => {

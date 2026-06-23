@@ -833,6 +833,15 @@
   padding: 0 18px;
 }
 
+.navbar--kiosquero .navbar__kiosk-link--premium {
+  border-color: rgba(242, 183, 5, 0.32);
+}
+
+.navbar--kiosquero .navbar__kiosk-link .navbar__premium-badge {
+  margin-left: 2px;
+  flex: 0 0 auto;
+}
+
 /* Notificaciones y escáner más anchos */
 .navbar--kiosquero .navbar__notif--wide,
 .navbar--kiosquero .navbar__scan,
@@ -926,5 +935,4 @@
   line-height: 1;
   margin-left: auto;
 }
-
 

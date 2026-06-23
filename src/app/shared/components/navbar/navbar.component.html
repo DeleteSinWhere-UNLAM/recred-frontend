@@ -24,6 +24,11 @@
       }
 
       @if (esVistaKiosquero()) {
+      <a class="navbar__kiosk-link navbar__kiosk-link--premium" [routerLink]="['/kiosquero/reportes']">
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        <span>Panel de control</span>
+        <span class="navbar__premium-badge">PREMIUM</span>
+      </a>
       <div class="navbar__kiosk-tools-wrap">
         <button type="button" class="navbar__kiosk-tools" aria-label="Promos"
           [attr.aria-expanded]="menuKiosqueroAbierto()" aria-haspopup="menu" (click)="toggleMenuKiosquero()">
