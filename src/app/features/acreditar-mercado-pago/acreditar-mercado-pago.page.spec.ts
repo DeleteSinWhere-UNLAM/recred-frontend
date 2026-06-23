@@ -5,6 +5,7 @@ import { AcreditarMercadoPagoPresenter } from './presenter/acreditar-mercado-pag
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
 describe('AcreditarMercadoPagoPage', () => {
   let component: AcreditarMercadoPagoPage;
@@ -22,7 +23,8 @@ describe('AcreditarMercadoPagoPage', () => {
       nombreCompleto: signal(''),
       grado: signal(''),
       iniciales: signal(''),
-      urlFotoPerfil: signal(null)
+      urlFotoPerfil: signal(null),
+      historialRecargas: signal([])
     });
 
     await TestBed.configureTestingModule({
@@ -31,6 +33,9 @@ describe('AcreditarMercadoPagoPage', () => {
         {
           provide: ActivatedRoute,
           useValue: {
+            paramMap: of({
+              get: (key: string) => key === 'alumnoId' ? '123' : null
+            }),
             snapshot: {
               paramMap: {
                 get: (key: string) => key === 'alumnoId' ? '123' : null
@@ -69,6 +74,9 @@ describe('AcreditarMercadoPagoPage', () => {
         {
           provide: ActivatedRoute,
           useValue: {
+            paramMap: of({
+              get: () => null
+            }),
             snapshot: {
               paramMap: {
                 get: () => null

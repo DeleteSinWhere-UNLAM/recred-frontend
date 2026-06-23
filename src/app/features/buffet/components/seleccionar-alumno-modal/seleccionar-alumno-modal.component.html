@@ -41,7 +41,7 @@
             </span>
             <span class="modal-alumno__datos">
               <span class="modal-alumno__nombre">
-                {{ alumno.nombre }} {{ alumno.apellido }}
+                {{ alumno.nombre }}{{ esVistaAlumno() ? ' ' + alumno.apellido : '' }}
               </span>
               <span class="modal-alumno__colegio">
                 {{ nombreColegio(alumno.colegioId) }}

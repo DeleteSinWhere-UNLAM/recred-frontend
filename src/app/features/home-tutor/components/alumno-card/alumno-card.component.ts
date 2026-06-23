@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
 import { MovimientosService } from '../../../movimientos/services/movimientos.service';
@@ -20,9 +19,10 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
 
 @Component({
   selector: 'app-alumno-card',
+  standalone: true,
   templateUrl: './alumno-card.component.html',
   styleUrl: './alumno-card.component.css',
-  imports: [RouterLink, FormsModule, DatePipe, CropModalComponent],
+  imports: [RouterLink, RouterLinkActive, FormsModule, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlumnoCardComponent implements OnInit {
@@ -36,15 +36,11 @@ export class AlumnoCardComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly _cantidadPendientes = signal<number>(0);
   creditoActivo = signal<SchoolCredit | null>(null);
+  mostrarTodosLosBotones = signal<boolean>(false);
   readonly subiendoFoto = signal(false);
   protected readonly fotoEvent = signal<Event | null>(null);
-  readonly mostrarTodosLosBotones = signal<boolean>(false);
 
   @ViewChild('inputFotoAlumno') private readonly inputFotoAlumno!: ElementRef<HTMLInputElement>;
-
-  protected toggleBotones(): void {
-    this.mostrarTodosLosBotones.update((v) => !v);
-  }
 
   ngOnInit(): void {
     if (this.alumno?.id) {
@@ -64,12 +60,15 @@ export class AlumnoCardComponent implements OnInit {
   }
 
   get nombreCompleto(): string {
-    return `${this.alumno.nombre} ${this.alumno.apellido}`;
+    return this.alumno.nombre;
   }
 
   get iniciales(): string {
-    const ini = (this.alumno.nombre[0] ?? '') + (this.alumno.apellido[0] ?? '');
-    return ini.toUpperCase();
+    return (this.alumno.nombre[0] ?? '').toUpperCase();
+  }
+
+  toggleBotones(): void {
+    this.mostrarTodosLosBotones.update(v => !v);
   }
 
   get fotoPerfil(): string | null {
@@ -178,89 +177,4 @@ export class AlumnoCardComponent implements OnInit {
     return this.perfilService.perfil()?.plan === 'PREMIUM';
   }
 
-  showMicrocreditoModal = signal<boolean>(false);
-  tipoMonto = signal<'fijo' | 'porcentaje'>('porcentaje');
-  montoFijo = signal<number>(5000);
-  porcentaje = signal<number>(50);
-  cuotas = signal<number>(1);
-  ultimaRecarga = signal<number>(0);
-  baseRecargaManual = signal<number>(10000);
-  calculandoRecarga = signal<boolean>(false);
-
-  abrirModalMicrocredito(): void {
-    this.showMicrocreditoModal.set(true);
-    
-    if (this.creditoActivo()) {
-      return;
-    }
-
-    this.tipoMonto.set('porcentaje');
-    this.porcentaje.set(50);
-    this.cuotas.set(1);
-    this.calculandoRecarga.set(true);
-    
-    if (this.alumno?.id) {
-      this.microcreditosService.getLastRecharge(this.alumno.id).subscribe({
-        next: (res) => {
-          this.ultimaRecarga.set(res || 0);
-          this.calculandoRecarga.set(false);
-        },
-        error: () => {
-          this.ultimaRecarga.set(0);
-          this.calculandoRecarga.set(false);
-        }
-      });
-    }
-  }
-
-  cerrarModalMicrocredito(): void {
-    this.showMicrocreditoModal.set(false);
-  }
-
-  get baseCalculo(): number {
-    return this.ultimaRecarga() > 0 ? this.ultimaRecarga() : this.baseRecargaManual();
-  }
-
-  get montoCalculado(): number {
-    if (this.tipoMonto() === 'fijo') {
-      return this.montoFijo();
-    }
-    return (this.baseCalculo * this.porcentaje()) / 100;
-  }
-
-  setMontoRapido(porc: number): void {
-    this.montoFijo.set((this.baseCalculo * porc) / 100);
-  }
-
-  setCuotas(c: number): void {
-    this.cuotas.set(c);
-  }
-
-  async confirmarMicrocredito(): Promise<void> {
-    const parentId = this.perfilService.perfil()?.id;
-    if (!parentId || !this.alumno?.id) return;
-    
-    const finalAmount = this.montoCalculado;
-    if (finalAmount <= 0) {
-      await this.dialogService.alert('El monto debe ser mayor a cero.', 'Monto Inválido');
-      return;
-    }
-
-    this.microcreditosService.requestCredit(this.alumno.id, parentId, finalAmount, this.cuotas())
-      .subscribe({
-        next: async (res) => {
-          await this.dialogService.alert('Microcrédito habilitado exitosamente por: $' + res.amount, 'Microcrédito Habilitado');
-          this.creditoActivo.set(res);
-          this.cerrarModalMicrocredito();
-        },
-        error: async (err) => {
-          console.error('Error HTTP:', err);
-          if (err.status === 409) {
-            await this.dialogService.alert('El alumno ya tiene un microcrédito activo.', 'Crédito Activo');
-          } else {
-            await this.dialogService.alert('Error al solicitar microcrédito: ' + (err.error || err.message), 'Error');
-          }
-        }
-      });
-  }
 }

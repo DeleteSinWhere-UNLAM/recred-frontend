@@ -1,7 +1,7 @@
 <section class="tutor-header" [class.tutor-header--premium]="esPremium()" [attr.aria-label]="'Perfil de ' + nombreCompleto">
   <div class="tutor-header__profile-container">
     <div class="tutor-header__avatar-wrap">
-      <div class="tutor-header__avatar" [class.tutor-header__avatar--premium]="esPremium()">
+      <div class="tutor-header__avatar">
         @if (urlFotoPerfil) {
           <img [src]="urlFotoPerfil" [alt]="'Foto de ' + nombreCompleto" class="tutor-header__avatar-img" />
         } @else {
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <div class="tutor-header__saldo-card" [class.tutor-header__saldo-card--premium]="esPremium()">
+  <div class="tutor-header__saldo-card">
     <div class="tutor-header__saldo-content">
       <span class="tutor-header__saldo-label">Saldo total</span>
       <span class="tutor-header__saldo-valor">{{ saldoTotalFormateado }}</span>

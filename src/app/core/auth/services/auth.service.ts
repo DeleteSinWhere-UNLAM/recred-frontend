@@ -14,11 +14,7 @@ export class AuthService {
     }
 
     this.perfilService.limpiar();
-    await signInWithRedirect({
-      options: {
-        lang: 'es',
-      },
-    });
+    await signInWithRedirect();
   }
 
   async logout(): Promise<void> {

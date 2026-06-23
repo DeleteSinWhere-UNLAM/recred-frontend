@@ -513,6 +513,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
+
   border: 1px solid rgba(74, 111, 165, 0.1);
   border-radius: 12px;
   background-color: rgba(248, 251, 255, 0.72);
@@ -522,6 +523,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   width: 28px;
   height: 28px;
   border-radius: 10px;

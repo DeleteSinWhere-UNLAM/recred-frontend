@@ -22,6 +22,7 @@ export class BilleteraPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   protected readonly presenter = inject(BilleteraPresenter);
 
+  readonly nombreUsuario = this.usuarioService.nombreNavbar;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   ngOnInit(): void {

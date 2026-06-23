@@ -1,12 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import {  RouterOutlet } from '@angular/router';
+import { signal } from '@angular/core';
 import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+
 import { ColegioSectionComponent } from './components/colegio-section/colegio-section.component';
 import { TutorHeaderComponent } from './components/tutor-header/tutor-header.component';
 
@@ -26,11 +28,11 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   selector: 'app-home-tutor-page',
   templateUrl: './home-tutor.page.html',
   styleUrl: './home-tutor.page.css',
-  imports: [
-    NavbarComponent,
+  imports: [NavbarComponent, 
+    
     ColegioSectionComponent,
     TutorHeaderComponent,
-    RouterLink,
+    RouterOutlet,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -41,6 +43,9 @@ export class HomeTutorPage implements OnInit {
   private readonly alumnosService = inject(AlumnosService);
 
   private readonly alumnos = this.alumnosService.alumnos;
+
+  readonly cargando = signal(false);
+  readonly error = signal<string | null>(null);
 
   readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
   
@@ -79,15 +84,7 @@ export class HomeTutorPage implements OnInit {
       }
       grupo.alumnos.push(alumno);
     }
-    const result = Array.from(porColegio.values());
-    for (const g of result) {
-      g.alumnos.sort((a, b) => {
-        const nameA = `${a.nombre} ${a.apellido}`.trim().toLowerCase();
-        const nameB = `${b.nombre} ${b.apellido}`.trim().toLowerCase();
-        return nameA.localeCompare(nameB);
-      });
-    }
-    return result;
+    return Array.from(porColegio.values());
   });
 
   readonly cantidadHijos = computed(() => this.alumnos().length);
@@ -96,35 +93,22 @@ export class HomeTutorPage implements OnInit {
   readonly saldoTotalFormateado = computed(() => formateadorSaldo.format(this.saldoTotal()));
   readonly saldoTotalNegativo = computed(() => this.saldoTotal() < 0);
 
-  readonly colegiosColapsados = signal<Record<string, boolean>>({});
-
-  isColegioExpandido(colegioId: string): boolean {
-    return !this.colegiosColapsados()[colegioId];
-  }
-
-  toggleColegio(colegioId: string): void {
-    this.colegiosColapsados.update(map => ({
-      ...map,
-      [colegioId]: !map[colegioId]
-    }));
-  }
-
-  readonly todosColegiosCerrados = computed(() => {
-    const gruposList = this.grupos();
-    if (gruposList.length === 0) return false;
-    const colapsados = this.colegiosColapsados();
-    return gruposList.every(g => colapsados[g.colegio.id] === true);
-  });
-
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
     this.usuarioService.setNombreNavbar(this.nombreUsuario());
   }
 
   ngOnInit(): void {
-    void this.alumnosService.asegurarCargados(true);
-    if (typeof this.colegiosService.obtenerColegios === 'function') {
-      void this.colegiosService.obtenerColegios();
-    }
+    this.cargando.set(true);
+    this.alumnosService.asegurarCargados(true).then(() => {
+      this.cargando.set(false);
+    }).catch(() => {
+      this.error.set('Error al cargar alumnos');
+      this.cargando.set(false);
+    });
+  }
+
+  manejarMicrocredito(event: unknown): void {
+    console.log('manejarMicrocredito', event);
   }
 }

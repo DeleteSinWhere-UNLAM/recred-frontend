@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { } from '../../../shared/components/navbar/navbar.component';
 import { PredictionAnalysisComponent } from '../components/prediction-analysis/prediction-analysis.component';
 import { PredictionSummaryComponent } from '../components/prediction-summary/prediction-summary.component';
 import { SpendingPrediction } from '../models/spending-prediction.interface';
@@ -12,7 +12,6 @@ import { SpendingPredictionService } from '../services/spending-prediction.servi
   standalone: true,
   imports: [
     CommonModule,
-    NavbarComponent,
     PredictionSummaryComponent,
     PredictionAnalysisComponent,
   ],
