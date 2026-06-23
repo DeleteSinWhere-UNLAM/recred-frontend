@@ -54,9 +54,9 @@
             <div class="product-info">
               <span class="product-name">{{ product.nombre }}</span>
               <div class="product-prices">
-                <span class="original-price">{{ product.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+                <span class="original-price">${{ product.precio | number:'1.0-0' }}</span>
                 @if (promotionForm.get('discountPercentage')?.value) {
-                  <span class="discounted-price">{{ getDiscountedPrice(product.precio) | currency:'ARS':'symbol':'1.0-0' }}</span>
+                  <span class="discounted-price">${{ getDiscountedPrice(product.precio) | number:'1.0-0' }}</span>
                 }
               </div>
             </div>
