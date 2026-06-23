@@ -115,9 +115,9 @@
         <div class="product-form__group" [class.product-form__group--error]="hasError('peso')">
           <label for="prod-peso" class="product-form__label">
             @if (isBeverage()) {
-              Volumen (L)
+            Volumen (L)
             } @else {
-              Peso (kg)
+            Peso (kg)
             }
           </label>
           <input id="prod-peso" class="product-form__input" formControlName="peso" type="number" step="0.001" min="0"
