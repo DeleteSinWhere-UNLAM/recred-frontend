@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { } from '../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { SugerenciaProducto } from '../../features/sugerencias/models/sugerencia-producto.model';
 import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
@@ -12,7 +12,7 @@ import { ComboPromotionModalComponent } from './components/combo-promotion-modal
   standalone: true,
   templateUrl: './sugerencias.page.html',
   styleUrl: './sugerencias.page.css',
-  imports: [CommonModule, ComboPromotionModalComponent],
+  imports: [CommonModule, NavbarComponent, ComboPromotionModalComponent],
   providers: [SugerenciasPresenter]
 })
 export class SugerenciasPage implements OnInit {
@@ -21,6 +21,7 @@ export class SugerenciasPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly Math = Math;
 
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
