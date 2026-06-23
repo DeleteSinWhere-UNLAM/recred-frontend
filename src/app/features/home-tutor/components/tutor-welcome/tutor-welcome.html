@@ -2,7 +2,7 @@
   <div class="welcome__header">
     <div class="welcome__title-block">
       <h2 class="welcome__title">Resumen de tu cuenta familiar</h2>
-      <p class="welcome__subtitle">Todo lo que necesitás saber de tus alumnos hoy.</p>
+      <p class="welcome__subtitle">Todo lo que necesitás saber de tus hijos hoy.</p>
     </div>
   </div>
 
@@ -18,7 +18,7 @@
         </div>
         
         @if (alumnosConSaldoBajo().length > 0) {
-          <p class="widget-alert__desc">Algunos alumnos tienen poco dinero en su cuenta. Te sugerimos recargar para evitar inconvenientes en el buffet.</p>
+          <p class="widget-alert__desc">Algunos hijos tienen poco dinero en su cuenta. Te sugerimos recargar para evitar inconvenientes en el buffet.</p>
           <div class="widget-alert__list">
             @for (al of alumnosConSaldoBajo(); track al.id) {
               <div class="widget-alert__item">
@@ -31,7 +31,7 @@
             }
           </div>
         } @else {
-          <p class="widget-alert__desc">Todos tus alumnos tienen saldo suficiente por el momento.</p>
+          <p class="widget-alert__desc">Todos tus hijos tienen saldo suficiente por el momento.</p>
         }
       </section>
 
@@ -68,7 +68,7 @@
       <section class="welcome__widget">
         <div class="widget__header">
           <i class="fa-solid fa-clock-rotate-left"></i>
-          <h3>Pedidos pendientes (Todos los alumnos)</h3>
+          <h3>Pedidos pendientes (Todos los hijos)</h3>
         </div>
         
         @if (pedidosPendientes().length > 0) {
