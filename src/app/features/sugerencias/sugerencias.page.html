@@ -116,7 +116,7 @@
                     ></span>
                   </div>
 
-                  <strong class="sg__hbar-value">{{ item.dias }}d</strong>
+                  <strong class="sg__hbar-value">{{ item.dias }} {{ item.dias === 1 ? 'día' : 'días' }}</strong>
                 </article>
               }
             </div>
@@ -217,7 +217,7 @@
                   </div>
 
                   <span class="sg__product-days">
-                    {{ sugerencia.estadisticasVenta.diasSinVenta }}d
+                    {{ sugerencia.estadisticasVenta.diasSinVenta }} {{ sugerencia.estadisticasVenta.diasSinVenta === 1 ? 'día' : 'días' }}
                   </span>
                 </button>
               }
