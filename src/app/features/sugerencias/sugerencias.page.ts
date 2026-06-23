@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { SugerenciaProducto } from '../../features/sugerencias/models/sugerencia-producto.model';
 import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
@@ -21,6 +20,7 @@ export class SugerenciasPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  readonly Math = Math;
 
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
