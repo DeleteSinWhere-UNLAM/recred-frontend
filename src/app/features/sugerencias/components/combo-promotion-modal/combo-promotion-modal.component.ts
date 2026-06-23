@@ -29,10 +29,16 @@ export class ComboPromotionModalComponent {
   private readonly formBuilder = inject(FormBuilder);
 
   constructor() {
+    const today = new Date();
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
+
+    const format = (d: Date) => d.toISOString().split('T')[0];
+
     this.promotionForm = this.formBuilder.group({
       discountPercentage: [1, [Validators.required, Validators.min(1), Validators.max(100)]],
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required]
+      startDate: [format(today), Validators.required],
+      endDate: [format(nextWeek), Validators.required]
     });
   }
 
