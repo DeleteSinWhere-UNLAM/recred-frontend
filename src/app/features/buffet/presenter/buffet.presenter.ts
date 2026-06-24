@@ -661,8 +661,9 @@ export class BuffetPresenter {
 
   cambiarAlumno(nuevoAlumnoId: string): void {
     if (!nuevoAlumnoId || nuevoAlumnoId === this.alumnoState()?.id) return;
+    this.init(nuevoAlumnoId);
     this.contextoService.setAlumnoId(nuevoAlumnoId);
-    this.router.navigateByUrl('/buffet');
+    void this.router.navigateByUrl('/buffet');
   }
 
   agregarAlCarrito(producto: Producto, cantidad = 1): void {

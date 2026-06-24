@@ -159,15 +159,19 @@ export class HomeAlumnoPresenter {
     if (!accion.ruta) return;
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
-    this.contextoService.setAlumnoId(alumnoId);
-    this.router.navigateByUrl(accion.ruta);
+    if (accion.id === 'buffet') {
+      this.contextoService.setAlumnoId(alumnoId);
+      void this.router.navigateByUrl(accion.ruta);
+      return;
+    }
+    void this.router.navigateByUrl(accion.ruta);
   }
 
   irAlBuffet(): void {
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
     this.contextoService.setAlumnoId(alumnoId);
-    this.router.navigateByUrl('/buffet');
+    void this.router.navigateByUrl('/buffet');
   }
 
   verPedido(): void {

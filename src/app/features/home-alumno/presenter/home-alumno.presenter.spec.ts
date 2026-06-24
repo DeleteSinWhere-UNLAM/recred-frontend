@@ -30,7 +30,7 @@ describe('HomeAlumnoPresenter', () => {
     ]);
     homeAlumnoServiceSpy.cargarPedidoEnCurso.and.resolveTo();
     homeAlumnoServiceSpy.cargarRecreos.and.resolveTo();
-    contextoServiceSpy = jasmine.createSpyObj<AlumnoContextoService>('AlumnoContextoService', ['setAlumnoId']);
+    contextoServiceSpy = jasmine.createSpyObj<AlumnoContextoService>('AlumnoContextoService', ['setAlumnoId', 'limpiar']);
 
     const usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['getAlumnoActual']);
     usuarioServiceSpy.getAlumnoActual.and.returnValue({ id: 'alumno-1' });

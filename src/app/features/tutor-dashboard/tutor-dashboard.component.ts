@@ -415,4 +415,19 @@ export class TutorDashboardComponent implements OnInit {
     
     return null;
   }
+
+  getPickupType(time: string): string {
+    if (!time) return '';
+    const parts = time.split('(');
+    return parts[0].trim();
+  }
+
+  getPickupTimeRange(time: string): string {
+    if (!time) return '';
+    const parts = time.split('(');
+    if (parts.length > 1) {
+      return parts[1].replace(')', '').trim();
+    }
+    return '';
+  }
 }

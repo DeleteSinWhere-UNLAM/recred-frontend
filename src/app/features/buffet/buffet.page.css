@@ -2554,12 +2554,6 @@
   gap: 2px;
 }
 
-.promo-card__price-label {
-  font-size: 9px;
-  font-weight: 800;
-  color: var(--color-texto-claro);
-  letter-spacing: 0.6px;
-}
 
 .promo-card__price-value-container {
   display: flex;

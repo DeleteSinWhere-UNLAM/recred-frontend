@@ -540,7 +540,7 @@ export class CarritoPresenter {
 
   irAEditarRetiro(alumnoId: string): void {
     this.contextoService.setAlumnoId(alumnoId);
-    this.router.navigateByUrl('/buffet');
+    void this.router.navigateByUrl('/buffet');
   }
 
   private calcularFechaMinima(): string {
