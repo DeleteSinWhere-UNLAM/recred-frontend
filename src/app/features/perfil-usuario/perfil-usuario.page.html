@@ -62,10 +62,11 @@
             <dt>Email</dt>
             <dd>{{ usuario()?.email || perfil()?.email || '-' }}</dd>
           </div>
-          <div>
+          <!-- Ocultamos el rol a pedido del usuario -->
+          <!-- <div>
             <dt>Rol</dt>
             <dd>{{ rolLabel(usuario()?.role || perfil()?.role) }}</dd>
-          </div>
+          </div> -->
           @if (esTutor() || esKiosquero()) {
           <div>
             <dt>Plan</dt>
@@ -87,7 +88,7 @@
           }
         </div>
 
-        <label class="perfil-usuario__campo">
+        <label class="perfil-usuario__campo perfil-usuario__campo--full">
           <span>Nombre</span>
           <input type="text" formControlName="firstName" autocomplete="given-name"
             [class.perfil-usuario__input--error]="campoInvalido('firstName')" />
@@ -96,7 +97,7 @@
           }
         </label>
 
-        <label class="perfil-usuario__campo">
+        <label class="perfil-usuario__campo perfil-usuario__campo--full">
           <span>Apellido</span>
           <input type="text" formControlName="lastName" autocomplete="family-name"
             [class.perfil-usuario__input--error]="campoInvalido('lastName')" />
@@ -105,7 +106,7 @@
           }
         </label>
 
-        <label class="perfil-usuario__campo">
+        <label class="perfil-usuario__campo perfil-usuario__campo--full">
           <span>Teléfono</span>
           <input type="tel" formControlName="phone" autocomplete="tel" placeholder="1122334455"
             [class.perfil-usuario__input--error]="campoInvalido('phone')" />
@@ -114,14 +115,15 @@
           }
         </label>
 
-        <label class="perfil-usuario__campo">
+        <!-- Ocultamos el documento a pedido del usuario -->
+        <!-- <label class="perfil-usuario__campo">
           <span>DNI / documento</span>
           <input type="text" formControlName="documentNumber" autocomplete="off" placeholder="40111222"
             [class.perfil-usuario__input--error]="campoInvalido('documentNumber')" />
           @if (campoInvalido('documentNumber')) {
           <small>El documento es demasiado largo.</small>
           }
-        </label>
+        </label> -->
 
         <div class="perfil-usuario__acciones">
           <button type="button" class="perfil-usuario__boton perfil-usuario__boton--secundario"

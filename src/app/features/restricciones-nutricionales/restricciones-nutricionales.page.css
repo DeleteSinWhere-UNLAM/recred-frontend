@@ -39,7 +39,7 @@
   font-family: var(--font-display);
   font-size: 28px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   margin: 0;
   line-height: 1.15;
 }
@@ -57,10 +57,7 @@
   width: 100%;
 }
 
-/* 5th element spans full width on desktop or centers */
-.restricciones__lista .restriccion-item:last-child {
-  grid-column: span 2;
-}
+/* Con 10 elementos el grid de 2 columnas queda siempre pareado */
 
 .restriccion-item {
   display: grid;
@@ -68,17 +65,17 @@
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  background-color: #f8fafc;
-  border: 1px solid rgba(74, 111, 165, 0.06);
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
   border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(51, 65, 85, 0.02);
+  box-shadow: var(--shadow-neu-concave);
   transition: all 0.2s ease;
 }
 
 .restriccion-item:hover {
-  background-color: #fff;
-  border-color: rgba(74, 111, 165, 0.12);
-  box-shadow: 0 10px 20px rgba(51, 65, 85, 0.06);
+  background-color: var(--color-superficie);
+  border-color: var(--color-borde-fuerte);
+  box-shadow: var(--shadow-card);
 }
 
 /* Icon Container per Restriction */
@@ -95,28 +92,53 @@
 
 /* Specific colors matching the icons in the reference screenshot */
 .restriccion-item__icono--sinTacc {
-  background-color: #fff5f5;
+  background-color: color-mix(in srgb, #e63946 15%, transparent);
   color: #e63946; /* Orange-red TACC */
 }
 
 .restriccion-item__icono--sinAzucar {
-  background-color: #eff6ff;
+  background-color: color-mix(in srgb, #3b82f6 15%, transparent);
   color: #3b82f6; /* Blue sugar */
 }
 
 .restriccion-item__icono--sinSodio {
-  background-color: #fffbeb;
+  background-color: color-mix(in srgb, #d97706 15%, transparent);
   color: #d97706; /* Yellow-orange sodium */
 }
 
 .restriccion-item__icono--vegano {
-  background-color: #dcfce7;
-  color: #166534; /* Green vegan matching SALDADO */
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  color: var(--color-menta); /* Green vegan matching SALDADO */
 }
 
 .restriccion-item__icono--contieneLacteos {
-  background-color: #fff7ed;
+  background-color: color-mix(in srgb, #ea580c 15%, transparent);
   color: #ea580c; /* Orange lacteos */
+}
+
+.restriccion-item__icono--tieneMani {
+  background-color: color-mix(in srgb, #92400e 15%, transparent);
+  color: color-mix(in srgb, #92400e 80%, var(--color-texto-oscuro)); /* Brown maní */
+}
+
+.restriccion-item__icono--contieneHuevo {
+  background-color: color-mix(in srgb, #a16207 15%, transparent);
+  color: color-mix(in srgb, #a16207 80%, var(--color-texto-oscuro)); /* Yellow-amber huevo */
+}
+
+.restriccion-item__icono--contienePescado {
+  background-color: color-mix(in srgb, #0369a1 15%, transparent);
+  color: #0369a1; /* Blue pescado */
+}
+
+.restriccion-item__icono--contieneSoja {
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  color: var(--color-menta); /* Green soja */
+}
+
+.restriccion-item__icono--aptoVegetariano {
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  color: var(--color-menta); /* Fresh green vegetariano */
 }
 
 .restriccion-item__texto {
@@ -130,7 +152,7 @@
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   line-height: 1.25;
 }
 
@@ -160,7 +182,7 @@
 .toggle__slider {
   position: absolute;
   inset: 0;
-  background-color: #cbd5e1;
+  background-color: var(--color-borde-fuerte);
   border-radius: 9999px;
   transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -172,19 +194,19 @@
   left: 3px;
   width: 18px;
   height: 18px;
-  background-color: #fff;
+  background-color: var(--color-superficie);
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toggle__input:checked + .toggle__slider {
-  background-color: #dcfce7;
+  background-color: color-mix(in srgb, var(--color-menta) 30%, transparent);
 }
 
 .toggle__input:checked + .toggle__slider::after {
   transform: translateX(20px);
-  background-color: #166534;
+  background-color: var(--color-menta);
 }
 
 .toggle__input:focus-visible + .toggle__slider {
@@ -249,9 +271,7 @@
     gap: 12px;
   }
   
-  .restricciones__lista .restriccion-item:last-child {
-    grid-column: auto;
-  }
+  /* Sin regla especial para last-child: 10 items en 2 columnas quedan parejos */
   
   .restriccion-item {
     padding: 14px 16px;

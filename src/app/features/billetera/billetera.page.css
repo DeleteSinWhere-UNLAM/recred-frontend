@@ -1,8 +1,39 @@
+:host {
+  --header-bg-gradient: linear-gradient(180deg, #eaf4fb 0%, #ffffff 70%);
+  --header-border: rgba(135, 206, 235, 0.28);
+  --header-wave: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%2387CEEB' fill-opacity='0.6'/></svg>");
+  
+  --saldo-card-bg: linear-gradient(135deg, #ffffff 0%, #eaf4fb 100%);
+  --saldo-card-border: rgba(135, 206, 235, 0.4);
+  --saldo-card-shadow: 0 8px 16px rgba(135, 206, 235, 0.18);
+  --saldo-card-text: var(--color-pizarra);
+
+  --saldo-negativo-bg: linear-gradient(135deg, #ffffff 0%, #fdecea 100%);
+  --saldo-negativo-border: rgba(231, 111, 81, 0.4);
+  --saldo-negativo-shadow: 0 16px 30px rgba(231, 111, 81, 0.2);
+}
+
+[data-theme="dark"] :host,
+:host-context([data-theme="dark"]) {
+  --header-bg-gradient: var(--color-superficie);
+  --header-border: var(--color-borde);
+  --header-wave: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%236C8EBF' fill-opacity='0.15'/></svg>");
+  
+  --saldo-card-bg: var(--color-superficie-alt);
+  --saldo-card-border: var(--color-borde);
+  --saldo-card-shadow: var(--shadow-card);
+  --saldo-card-text: var(--color-texto-oscuro);
+
+  --saldo-negativo-bg: rgba(231, 111, 81, 0.12);
+  --saldo-negativo-border: rgba(231, 111, 81, 0.3);
+  --saldo-negativo-shadow: var(--shadow-card);
+}
+
 .billetera {
   min-height: calc(100vh - 64px);
   padding: 32px 0 60px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(240, 244, 248, 0) 280px),
+    var(--body-gradient),
     var(--color-fondo);
 }
 
@@ -48,8 +79,8 @@
   grid-template-columns: 1fr;
   gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(180deg, #eaf4fb 0%, #ffffff 70%);
-  border: 1px solid rgba(135, 206, 235, 0.28);
+  background: var(--header-bg-gradient);
+  border: 1px solid var(--header-border);
   border-radius: 20px;
   box-shadow: var(--shadow-card);
   overflow: hidden;
@@ -58,8 +89,8 @@
 .billetera__header--alumno {
   padding: 14px 16px 30px;
   background:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%2387CEEB' fill-opacity='0.6'/></svg>") no-repeat bottom center / 100% 30px,
-    linear-gradient(180deg, #eaf4fb 0%, #ffffff 70%);
+    var(--header-wave) no-repeat bottom center / 100% 30px,
+    var(--header-bg-gradient);
 }
 
 @media (min-width: 720px) {
@@ -137,21 +168,21 @@
 .billetera__saldo-card {
   position: relative;
   z-index: 1;
-  background: linear-gradient(135deg, #ffffff 0%, #eaf4fb 100%);
-  border: 1px solid rgba(135, 206, 235, 0.4);
+  background: var(--saldo-card-bg);
+  border: 1px solid var(--saldo-card-border);
   border-radius: 12px;
   padding: 10px 14px;
-  box-shadow: 0 8px 16px rgba(135, 206, 235, 0.18);
-  color: var(--color-pizarra);
+  box-shadow: var(--saldo-card-shadow);
+  color: var(--saldo-card-text);
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
 .billetera__saldo-card--negativo {
-  background: linear-gradient(135deg, #ffffff 0%, #fdecea 100%);
-  border-color: rgba(231, 111, 81, 0.4);
-  box-shadow: 0 16px 30px rgba(231, 111, 81, 0.2);
+  background: var(--saldo-negativo-bg);
+  border-color: var(--saldo-negativo-border);
+  box-shadow: var(--saldo-negativo-shadow);
   color: var(--color-melocoton);
 }
 

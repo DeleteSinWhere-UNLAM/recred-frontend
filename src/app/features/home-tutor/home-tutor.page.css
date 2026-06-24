@@ -77,12 +77,12 @@
 }
 
 .home__content-scroll::-webkit-scrollbar-thumb {
-  background: #1a3b5c;
+  background: var(--color-pizarra);
   border-radius: 6px;
 }
 
 .home__content-scroll::-webkit-scrollbar-thumb:hover {
-  background: #2b5a8e;
+  background: var(--color-pizarra-dark);
 }
 
 

@@ -48,7 +48,10 @@ export class ResumenSemanalPage {
 
         const mensajes: MensajeHijo[] = JSON.parse(
           resumenInterno.mensaje ?? '[]',
-        );
+        ).map((m: MensajeHijo) => ({
+          ...m,
+          nombre: m.nombre ? m.nombre.split(' ')[0] : ''
+        }));
 
         this.resumenProcesado = {
           hijos: resumenInterno.hijos,
@@ -57,7 +60,7 @@ export class ResumenSemanalPage {
 
         this.hijos = Object.entries(resumenInterno.hijos).map(
           ([nombre, datos]) => ({
-            nombre,
+            nombre: nombre.split(' ')[0],
             datos: datos as HijoResumen,
           }),
         );

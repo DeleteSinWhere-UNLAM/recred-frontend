@@ -27,7 +27,7 @@
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  background-color: #1a3b5c; /* Deep slate blue */
+  background-color: var(--color-pizarra); /* Deep slate blue variable */
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -37,7 +37,7 @@
   font-size: 28px;
   letter-spacing: 0.5px;
   box-shadow:
-    0 0 0 4px #ffffff,
+    0 0 0 4px var(--color-superficie),
     0 0 0 6px var(--color-dorado),
     0 12px 24px rgba(74, 111, 165, 0.12);
   transition: transform 0.2s ease;
@@ -120,7 +120,7 @@
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 500;
-  color: #64748b;
+  color: var(--color-texto-claro);
   margin: 0;
   line-height: 1.2;
 }
@@ -129,7 +129,7 @@
   font-family: var(--font-display);
   font-size: 32px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   line-height: 1.1;
   margin: 0;
   word-break: break-word;
@@ -142,7 +142,7 @@
   font-family: var(--font-body);
   font-size: 15px;
   font-weight: 600;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   margin: 4px 0 0 0;
 }
 
@@ -234,4 +234,23 @@
     font-size: 28px;
   }
 }
+
+.pv__premium-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  margin-left: 10px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  color: #1e293b;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 5px rgba(212, 175, 55, 0.35);
+  text-transform: uppercase;
+}
+
 

@@ -170,3 +170,23 @@
     justify-self: end;
   }
 }
+
+/* Dark mode overrides */
+[data-theme="dark"] .regla-item {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .regla-item__slider {
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .regla-item__slider::-webkit-slider-thumb {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-superficie);
+}
+
+[data-theme="dark"] .regla-item__slider::-moz-range-thumb {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border-color: var(--color-superficie);
+}
+

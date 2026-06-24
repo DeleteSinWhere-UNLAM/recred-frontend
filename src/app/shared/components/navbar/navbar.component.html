@@ -4,6 +4,9 @@
       <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
         <img src="logoHeader.png" alt="" class="navbar__logo-img" />
         <span class="navbar__logo-text">RECRED</span>
+        @if (esPremium()) {
+        <span class="navbar__premium-badge" style="margin-left: 8px;">PREMIUM</span>
+        }
       </a>
     </div>
 
@@ -12,6 +15,9 @@
       <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span>Panel de Control</span>
+        @if (esPremium()) {
+        <span class="pv__premium-badge">PREMIUM</span>
+        }
       </a>
       <a class="navbar__movimientos-link" [routerLink]="['/movimientos']">
         <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
@@ -96,6 +102,16 @@
       </button>
       }
 
+      <!-- Ocultado momentáneamente a pedido del usuario -->
+      <!-- <button type="button" class="navbar__theme-toggle" (click)="toggleTema()"
+        [attr.aria-label]="temaActivo() === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'">
+        @if (temaActivo() === 'light') {
+        <i class="fa-solid fa-moon" aria-hidden="true"></i>
+        } @else {
+        <i class="fa-solid fa-sun" aria-hidden="true"></i>
+        }
+      </button> -->
+
       <div class="navbar__perfil-wrap">
         <button type="button" class="navbar__perfil" aria-label="Mi perfil" [attr.aria-expanded]="menuAbierto()"
           aria-haspopup="menu" (click)="toggleMenu()">
@@ -129,7 +145,7 @@
             <button type="button" class="navbar__menu-item navbar__submenu-item" role="menuitem"
               (click)="irABilleteraDeHijo(hijo.id)">
               <i class="fa-solid fa-user" aria-hidden="true"></i>
-              <span>{{ hijo.nombre }} {{ hijo.apellido }}</span>
+              <span>{{ hijo.nombre.split(' ')[0] }}</span>
             </button>
             }
             }

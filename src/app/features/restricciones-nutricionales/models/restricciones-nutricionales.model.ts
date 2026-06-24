@@ -3,7 +3,12 @@ export type ClaveRestriccion =
   | 'sinAzucar'
   | 'sinSodio'
   | 'vegano'
-  | 'contieneLacteos';
+  | 'contieneLacteos'
+  | 'tieneMani'
+  | 'contieneHuevo'
+  | 'contienePescado'
+  | 'contieneSoja'
+  | 'aptoVegetariano';
 
 export interface RestriccionesNutricionales {
   sinTacc: boolean;
@@ -11,6 +16,11 @@ export interface RestriccionesNutricionales {
   sinSodio: boolean;
   vegano: boolean;
   contieneLacteos: boolean;
+  tieneMani: boolean;
+  contieneHuevo: boolean;
+  contienePescado: boolean;
+  contieneSoja: boolean;
+  aptoVegetariano: boolean;
 }
 
 export type ColorIcono = 'melocoton' | 'pizarra' | 'dorado' | 'menta';
@@ -51,7 +61,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   },
   {
     clave: 'vegano',
-    titulo: 'Vegano',
+    titulo: 'Apto Vegano',
     descripcion: 'Libre de productos animales.',
     icono: 'fa-leaf',
     colorIcono: 'menta',
@@ -65,6 +75,46 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
     colorIcono: 'melocoton',
     palabrasClave: ['lacteo'],
   },
+  {
+    clave: 'tieneMani',
+    titulo: 'Tiene Maní',
+    descripcion: 'Alerta para alergia al maní.',
+    icono: 'fa-circle-exclamation',
+    colorIcono: 'dorado',
+    palabrasClave: ['mani'],
+  },
+  {
+    clave: 'contieneHuevo',
+    titulo: 'Contiene Huevo',
+    descripcion: 'Alerta para alergia al huevo.',
+    icono: 'fa-egg',
+    colorIcono: 'dorado',
+    palabrasClave: ['huevo'],
+  },
+  {
+    clave: 'contienePescado',
+    titulo: 'Contiene Pescado',
+    descripcion: 'Alerta para alergia a pescados y mariscos.',
+    icono: 'fa-fish',
+    colorIcono: 'pizarra',
+    palabrasClave: ['pescado', 'marisco'],
+  },
+  {
+    clave: 'contieneSoja',
+    titulo: 'Contiene Soja',
+    descripcion: 'Alerta para alergia a la soja.',
+    icono: 'fa-seedling',
+    colorIcono: 'menta',
+    palabrasClave: ['soja'],
+  },
+  {
+    clave: 'aptoVegetariano',
+    titulo: 'Apto Vegetariano',
+    descripcion: 'Sin carne, permite lácteos y huevo.',
+    icono: 'fa-carrot',
+    colorIcono: 'menta',
+    palabrasClave: ['vegetarian'],
+  },
 ] as const;
 
 export function restriccionesPorDefecto(): RestriccionesNutricionales {
@@ -74,6 +124,11 @@ export function restriccionesPorDefecto(): RestriccionesNutricionales {
     sinSodio: false,
     vegano: false,
     contieneLacteos: false,
+    tieneMani: false,
+    contieneHuevo: false,
+    contienePescado: false,
+    contieneSoja: false,
+    aptoVegetariano: false,
   };
 }
 

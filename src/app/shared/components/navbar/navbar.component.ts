@@ -4,6 +4,7 @@ import {
   ElementRef,
   HostListener,
   Input,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -11,8 +12,10 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 import { NotificacionesService, Notificacion } from '../../../data-access/services/notificaciones.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-navbar',
@@ -27,10 +30,20 @@ export class NavbarComponent {
   private readonly carritoService = inject(CarritoService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly alumnosService = inject(AlumnosService);
+  private readonly perfilService = inject(PerfilService);
   private readonly notificacionesService = inject(NotificacionesService);
   private readonly host = inject(ElementRef<HTMLElement>);
+  protected readonly themeService = inject(ThemeService);
 
   @Input() userName = '';
+
+  protected readonly esPremium = computed(() => {
+    if (typeof this.perfilService?.perfil !== 'function') {
+      return false;
+    }
+    const plan = this.perfilService.perfil()?.plan;
+    return plan === 'PREMIUM' || plan === 'AVANZADO';
+  });
 
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
@@ -42,6 +55,11 @@ export class NavbarComponent {
   protected readonly menuNotifAbierto = signal(false);
   protected readonly menuKiosqueroAbierto = signal(false);
   protected readonly menuBilleteraAbierto = signal(false);
+  protected readonly temaActivo = this.themeService.theme;
+
+  protected toggleTema(): void {
+    this.themeService.toggleTheme();
+  }
 
   protected irAlCarrito(): void {
     this.router.navigateByUrl('/compra');

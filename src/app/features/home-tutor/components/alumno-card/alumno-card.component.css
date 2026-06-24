@@ -34,7 +34,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #1a3b5c;
+  background-color: var(--color-pizarra);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -45,7 +45,7 @@
   letter-spacing: 0.5px;
   overflow: hidden;
   box-shadow:
-    0 0 0 3px #ffffff,
+    0 0 0 3px var(--color-superficie),
     0 0 0 5px var(--color-dorado),
     0 8px 16px rgba(74, 111, 165, 0.1);
 }
@@ -118,7 +118,7 @@
   font-family: var(--font-display);
   font-size: 19px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   line-height: 1.2;
   margin: 0;
 }
@@ -130,11 +130,11 @@
   margin: 0;
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-texto-claro);
 }
 
 .alumno-card__grado i {
-  color: #166534; /* Green cap matching SALDADO */
+  color: var(--color-menta); /* Green cap matching SALDADO */
   font-size: 14px;
 }
 
@@ -145,30 +145,30 @@
   align-items: flex-end;
   gap: 2px;
   padding: 8px 16px;
-  background-color: rgba(74, 111, 165, 0.05);
-  border: 1px solid rgba(74, 111, 165, 0.08);
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
   border-radius: 12px;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   flex-shrink: 0;
 }
 
 .alumno-card__saldo--negativo {
-  background-color: #fef2f2;
-  border-color: #fecaca;
+  background-color: color-mix(in srgb, var(--color-melocoton) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-melocoton) 25%, transparent);
   color: var(--color-melocoton);
 }
 
 .alumno-card__saldo--bajo {
-  background-color: #fef2f2;
-  border-color: #ef4444; /* red frame border */
-  color: #ef4444;
+  background-color: color-mix(in srgb, var(--color-melocoton) 12%, transparent);
+  border-color: var(--color-melocoton); /* red frame border */
+  color: var(--color-melocoton);
 }
 
 .alumno-card__saldo-label {
   font-family: var(--font-body);
   font-size: 12px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-texto-claro);
 }
 
 .alumno-card__saldo-valor {
@@ -224,7 +224,7 @@
 }
 
 .alumno-card__btn-icono i {
-  color: #1a3b5c;
+  color: var(--color-pizarra-dark);
   transition: color 0.15s ease;
 }
 
@@ -232,7 +232,7 @@
   font-family: var(--font-body);
   font-size: 10.5px;
   font-weight: 700;
-  color: #475569;
+  color: var(--color-texto-claro);
   text-align: center;
   line-height: 1.1;
   word-break: break-word;
@@ -286,18 +286,18 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 700;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
 }
 
 .alumno-card__budget-label {
-  color: #64748b;
+  color: var(--color-texto-claro);
   flex-shrink: 0;
 }
 
 .alumno-card__budget-bar {
   flex: 1;
   height: 8px;
-  background-color: #f1f5f9;
+  background-color: var(--color-superficie-alt);
   border-radius: 999px;
   overflow: hidden;
   position: relative;
@@ -305,22 +305,22 @@
 
 .alumno-card__budget-progress {
   height: 100%;
-  background-color: #166534; /* dark green progress matching SALDADO */
+  background-color: var(--color-menta); /* dark green progress matching SALDADO */
   border-radius: 999px;
 }
 
 .alumno-card__budget-percentage {
-  color: #64748b;
+  color: var(--color-texto-claro);
   font-weight: 800;
   flex-shrink: 0;
 }
 
 .alumno-card__budget-fraction {
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   font-weight: 800;
   flex-shrink: 0;
   font-size: 12px;
-  background-color: #f1f5f9;
+  background-color: var(--color-superficie-alt);
   padding: 3px 8px;
   border-radius: 6px;
 }
@@ -433,9 +433,9 @@
 }
 
 .modal-content {
-  background-color: #ffffff;
+  background-color: var(--color-superficie);
   border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-elevated);
   max-width: 400px;
   width: 100%;
   padding: 32px 24px;
@@ -455,7 +455,7 @@
   right: 16px;
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--color-texto-claro);
   font-size: 20px;
   cursor: pointer;
   transition: color 0.2s;
@@ -464,15 +464,15 @@
 }
 
 .modal-close:hover {
-  color: #0f172a;
-  background-color: #f1f5f9;
+  color: var(--color-texto-oscuro);
+  background-color: var(--color-superficie-alt);
 }
 
 .modal-title {
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--color-texto-oscuro);
   margin: 0 0 24px 0;
   display: flex;
   align-items: center;
@@ -480,18 +480,18 @@
 }
 
 .modal-title i {
-  color: #22c55e;
+  color: var(--color-menta);
 }
 
 .modal-loading {
   text-align: center;
   padding: 32px 0;
-  color: #64748b;
+  color: var(--color-texto-claro);
 }
 
 .modal-loading i {
   font-size: 32px;
-  color: #22c55e;
+  color: var(--color-menta);
   margin-bottom: 12px;
 }
 
@@ -510,7 +510,7 @@
 .modal-label {
   font-size: 14px;
   font-weight: 700;
-  color: #334155;
+  color: var(--color-texto-oscuro);
   margin: 0;
 }
 
@@ -525,18 +525,18 @@
   gap: 6px;
   cursor: pointer;
   font-size: 14px;
-  color: #475569;
+  color: var(--color-texto-claro);
 }
 
 .modal-radio input {
-  accent-color: #22c55e;
+  accent-color: var(--color-menta);
   width: 16px;
   height: 16px;
 }
 
 .modal-alert {
-  background-color: #fff7ed;
-  border: 1px solid #fed7aa;
+  background-color: color-mix(in srgb, var(--color-dorado) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-dorado) 30%, var(--color-borde-fuerte));
   border-radius: 12px;
   padding: 12px;
 }
@@ -544,7 +544,7 @@
 .modal-alert p {
   margin: 0 0 12px 0;
   font-size: 13px;
-  color: #9a3412;
+  color: color-mix(in srgb, var(--color-dorado) 90%, var(--color-texto-oscuro));
   line-height: 1.4;
 }
 
@@ -557,25 +557,26 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748b;
+  color: var(--color-texto-claro);
   font-weight: 600;
 }
 
 .modal-input {
   width: 100%;
   padding: 12px 12px 12px 28px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-borde-fuerte);
+  background-color: var(--color-superficie-alt);
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-texto-oscuro);
   outline: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
 }
 
 .modal-input:focus {
-  border-color: #22c55e;
+  border-color: var(--color-menta);
 }
 
 .mt-2 {
@@ -587,8 +588,8 @@
 }
 
 .modal-info {
-  background-color: #f0f9ff;
-  border: 1px solid #bae6fd;
+  background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-pizarra) 30%, var(--color-borde-fuerte));
   border-radius: 10px;
   padding: 10px 12px;
   display: flex;
@@ -598,14 +599,14 @@
 }
 
 .modal-info i {
-  color: #0284c7;
+  color: var(--color-pizarra);
   margin-top: 2px;
 }
 
 .modal-info p {
   margin: 0;
   font-size: 12.5px;
-  color: #0369a1;
+  color: var(--color-texto-oscuro);
   line-height: 1.4;
 }
 
@@ -619,23 +620,23 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  color: #22c55e;
+  color: var(--color-menta);
 }
 
 .modal-slider {
   width: 100%;
   height: 6px;
-  background-color: #e2e8f0;
+  background-color: var(--color-superficie-alt);
   border-radius: 4px;
   appearance: none;
   outline: none;
-  accent-color: #22c55e;
+  accent-color: var(--color-menta);
 }
 
 .modal-hint {
   margin: 4px 0 0 0;
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-texto-claro);
   text-align: right;
 }
 
@@ -647,10 +648,10 @@
 .modal-btn-quick {
   flex: 1;
   padding: 8px;
-  background-color: #f1f5f9;
+  background-color: var(--color-superficie-alt);
   border: none;
   border-radius: 8px;
-  color: #475569;
+  color: var(--color-texto-claro);
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -658,11 +659,11 @@
 }
 
 .modal-btn-quick:hover {
-  background-color: #e2e8f0;
+  background-color: var(--color-borde-fuerte);
 }
 
 .modal-btn-quick.active {
-  background-color: #22c55e;
+  background-color: var(--color-menta);
   color: #ffffff;
 }
 
@@ -675,8 +676,8 @@
 .modal-btn-cancelar {
   flex: 1;
   padding: 14px;
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: var(--color-superficie-alt);
+  color: var(--color-texto-claro);
   border: none;
   border-radius: 14px;
   font-weight: 700;
@@ -686,7 +687,7 @@
 }
 
 .modal-btn-cancelar:hover {
-  background-color: #e2e8f0;
+  background-color: var(--color-borde-fuerte);
 }
 
 .modal-btn-confirmar {
@@ -712,11 +713,11 @@
 }
 
 .modal-alert {
-  background-color: #fffbeb;
-  border: 1px solid #fde68a;
+  background-color: color-mix(in srgb, var(--color-dorado) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-dorado) 30%, var(--color-borde-fuerte));
   border-radius: 10px;
   padding: 12px;
-  color: #b45309;
+  color: color-mix(in srgb, var(--color-dorado) 90%, var(--color-texto-oscuro));
   font-size: 14px;
 }
 
@@ -728,9 +729,9 @@
 }
 
 .modal-alert--info {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
+  background-color: color-mix(in srgb, var(--color-menta) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-menta) 30%, var(--color-borde-fuerte));
+  color: var(--color-menta);
 }
 
 .alumno-card__btn-badge--info {
