@@ -102,14 +102,15 @@
       </button>
       }
 
-      <button type="button" class="navbar__theme-toggle" (click)="toggleTema()"
+      <!-- Ocultado momentáneamente a pedido del usuario -->
+      <!-- <button type="button" class="navbar__theme-toggle" (click)="toggleTema()"
         [attr.aria-label]="temaActivo() === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'">
         @if (temaActivo() === 'light') {
         <i class="fa-solid fa-moon" aria-hidden="true"></i>
         } @else {
         <i class="fa-solid fa-sun" aria-hidden="true"></i>
         }
-      </button>
+      </button> -->
 
       <div class="navbar__perfil-wrap">
         <button type="button" class="navbar__perfil" aria-label="Mi perfil" [attr.aria-expanded]="menuAbierto()"
