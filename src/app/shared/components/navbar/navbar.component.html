@@ -4,6 +4,9 @@
       <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
         <img src="logoHeader.png" alt="" class="navbar__logo-img" />
         <span class="navbar__logo-text">RECRED</span>
+        @if (esPremium()) {
+        <span class="navbar__premium-badge" style="margin-left: 8px;">PREMIUM</span>
+        }
       </a>
     </div>
 
@@ -138,7 +141,7 @@
             <button type="button" class="navbar__menu-item navbar__submenu-item" role="menuitem"
               (click)="irABilleteraDeHijo(hijo.id)">
               <i class="fa-solid fa-user" aria-hidden="true"></i>
-              <span>{{ hijo.nombre }} {{ hijo.apellido }}</span>
+              <span>{{ hijo.nombre.split(' ')[0] }}</span>
             </button>
             }
             }

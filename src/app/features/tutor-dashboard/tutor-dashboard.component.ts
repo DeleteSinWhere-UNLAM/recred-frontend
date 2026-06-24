@@ -82,6 +82,12 @@ export class TutorDashboardComponent implements OnInit {
         }
 
         if (data.children && data.children.length > 0) {
+          // Clean children names to only show first name
+          data.children = data.children.map(c => ({
+            ...c,
+            studentName: c.studentName ? c.studentName.split(' ')[0] : ''
+          }));
+
           // Sort children alphabetically
           data.children.sort((a, b) => (a.studentName || '').localeCompare(b.studentName || ''));
           

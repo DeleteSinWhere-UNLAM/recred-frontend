@@ -52,7 +52,7 @@ export class HomeTutorPage implements OnInit {
   readonly nombreCompletoTutor = computed(() => {
     const perfil = this.perfilService.perfil();
     if (perfil) {
-      return `${perfil.nombre} ${perfil.apellido}`.trim();
+      return perfil.nombre.split(' ')[0];
     }
     return this.nombreUsuario();
   });
@@ -100,12 +100,18 @@ export class HomeTutorPage implements OnInit {
 
   ngOnInit(): void {
     this.cargando.set(true);
-    this.alumnosService.asegurarCargados(true).then(() => {
-      this.cargando.set(false);
-    }).catch(() => {
-      this.error.set('Error al cargar alumnos');
-      this.cargando.set(false);
-    });
+    Promise.all([
+      this.alumnosService.asegurarCargados(true),
+      this.colegiosService.obtenerColegios(),
+    ])
+      .then(() => {
+        this.cargando.set(false);
+      })
+      .catch((err) => {
+        console.error('Error al cargar datos en HomeTutor:', err);
+        this.error.set('Error al cargar alumnos');
+        this.cargando.set(false);
+      });
   }
 
   manejarMicrocredito(event: unknown): void {

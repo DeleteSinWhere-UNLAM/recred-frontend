@@ -217,7 +217,7 @@ export class MovimientosPage implements OnInit {
           this.esVistaIndividual.set(true);
           const alumno = this.alumnosService.getAlumnoById(currentAlumnoId);
           if (alumno) {
-            this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
+            this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
           }
         } else if (alumnoId) {
           this.esNested.set(true);
@@ -225,7 +225,7 @@ export class MovimientosPage implements OnInit {
           this.esVistaIndividual.set(true);
           const alumno = this.alumnosService.getAlumnoById(alumnoId);
           if (alumno) {
-            this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
+            this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
           }
         } else {
           this.esNested.set(false);
@@ -359,7 +359,7 @@ export class MovimientosPage implements OnInit {
 
   getNombreAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
-    return alumno ? `${alumno.nombre} ${alumno.apellido}` : 'Alumno';
+    return alumno ? alumno.nombre.split(' ')[0] : 'Alumno';
   }
 
   getInicialesAlumno(studentId: string): string {
