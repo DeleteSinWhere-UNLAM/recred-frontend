@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authChildGuard } from './core/auth/guards/auth.guard';
+import { alumnoContextoGuard } from './core/guards/alumno-contexto.guard';
 
 export const routes: Routes = [
   {
@@ -28,18 +29,21 @@ export const routes: Routes = [
             loadComponent: () => import('./features/home-tutor/components/tutor-welcome/tutor-welcome').then((m) => m.TutorWelcome),
           },
           {
-            path: 'adelanto/:alumnoId',
+            path: 'adelanto',
+            canActivate: [alumnoContextoGuard],
             loadComponent: () => import('./features/adelanto/adelanto').then((m) => m.AdelantoPage),
           },
           {
-        path: 'restricciones-horarias/:alumnoId',
+        path: 'restricciones-horarias',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import('./features/restricciones-horarias/restricciones-horarias.page').then(
             (m) => m.RestriccionesHorariasPage,
           ),
       },
           {
-        path: 'restricciones-nutricionales/:alumnoId',
+        path: 'restricciones-nutricionales',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import('./features/restricciones-nutricionales/restricciones-nutricionales.page').then(
             (m) => m.RestriccionesNutricionalesPage,
@@ -47,14 +51,16 @@ export const routes: Routes = [
       },
 
           {
-        path: 'acreditar-mercado-pago/:alumnoId',
+        path: 'acreditar-mercado-pago',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import('./features/acreditar-mercado-pago/acreditar-mercado-pago.page').then(
             (m) => m.AcreditarMercadoPagoPage,
           ),
       },
           {
-        path: 'presupuesto/:alumnoId',
+        path: 'presupuesto',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import('./features/presupuesto/presupuesto.page').then(
             (m) => m.PresupuestoPage,
@@ -75,21 +81,31 @@ export const routes: Routes = [
           ),
       },
           {
-        path: 'estadistica/:alumnoId',
+        path: 'estadistica',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import('./features/estadistica/estadistica.page').then(
             (m) => m.EstadisticaPage,
           ),
       },
           {
-        path: 'movimientos/:alumnoId',
+        path: 'tutor-movimientos/:alumnoId',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import('./features/movimientos/movimientos.page').then(
             (m) => m.MovimientosPage,
           ),
       },
           {
-        path: 'movimientos-pendientes/:alumnoId',
+        path: 'tutor-movimientos',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
+          {
+        path: 'movimientos-pendientes',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import(
             './features/movimientos-pendientes/movimientos-pendientes.page'
@@ -112,6 +128,21 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'movimientos/:alumnoId',
+        canActivate: [alumnoContextoGuard],
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
+      {
+        path: 'movimientos',
+        loadComponent: () =>
+          import('./features/movimientos/movimientos.page').then(
+            (m) => m.MovimientosPage,
+          ),
+      },
+      {
         path: 'tutor-dashboard',
         loadComponent: () =>
           import('./features/tutor-dashboard/tutor-dashboard.component').then(
@@ -119,7 +150,8 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'buffet/:alumnoId',
+        path: 'buffet',
+        canActivate: [alumnoContextoGuard],
         loadComponent: () =>
           import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
       },
@@ -258,20 +290,7 @@ export const routes: Routes = [
             (m) => m.BilleteraPage,
           ),
       },
-      {
-        path: 'billetera/:alumnoId',
-        loadComponent: () =>
-          import('./features/billetera/billetera.page').then(
-            (m) => m.BilleteraPage,
-          ),
-      },
-      {
-        path: 'movimientos',
-        loadComponent: () =>
-          import('./features/movimientos/movimientos.page').then(
-            (m) => m.MovimientosPage,
-          ),
-      },
+      // billetera/:alumnoId eliminado: billetera usa AlumnoContextoService
       
       
       {

@@ -2,15 +2,17 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { AcreditarMercadoPagoPage } from './acreditar-mercado-pago.page';
 import { AcreditarMercadoPagoPresenter } from './presenter/acreditar-mercado-pago.presenter';
-import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
+import { NO_ERRORS_SCHEMA, signal, WritableSignal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 
 describe('AcreditarMercadoPagoPage', () => {
   let component: AcreditarMercadoPagoPage;
   let fixture: ComponentFixture<AcreditarMercadoPagoPage>;
   let mockPresenter: jasmine.SpyObj<AcreditarMercadoPagoPresenter>;
+  let mockContextoService: jasmine.SpyObj<AlumnoContextoService>;
 
   beforeEach(async () => {
     mockPresenter = jasmine.createSpyObj('AcreditarMercadoPagoPresenter', ['init', 'acreditar', 'volver']);
@@ -25,6 +27,12 @@ describe('AcreditarMercadoPagoPage', () => {
       iniciales: signal(''),
       urlFotoPerfil: signal(null),
       historialRecargas: signal([])
+    });
+
+    mockContextoService = jasmine.createSpyObj('AlumnoContextoService', ['setAlumnoId', 'limpiar']);
+    Object.defineProperty(mockContextoService, 'alumnoId', {
+      value: signal('123'),
+      writable: true,
     });
 
     await TestBed.configureTestingModule({
@@ -43,6 +51,7 @@ describe('AcreditarMercadoPagoPage', () => {
             }
           }
         },
+        { provide: AlumnoContextoService, useValue: mockContextoService },
         provideHttpClient(),
         provideHttpClientTesting()
       ]
@@ -68,6 +77,7 @@ describe('AcreditarMercadoPagoPage', () => {
 
   it('Dado que el paramMap no tiene alumnoId, debería llamar al presenter.init con un string vacío', () => {
     TestBed.resetTestingModule();
+    (mockContextoService.alumnoId as any).set('');
     TestBed.configureTestingModule({
       imports: [AcreditarMercadoPagoPage],
       providers: [
@@ -84,6 +94,7 @@ describe('AcreditarMercadoPagoPage', () => {
             }
           }
         },
+        { provide: AlumnoContextoService, useValue: mockContextoService },
         provideHttpClient(),
         provideHttpClientTesting()
       ]

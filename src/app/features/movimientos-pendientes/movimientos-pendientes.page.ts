@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -22,6 +23,7 @@ import { DialogService } from '../../shared/services/dialog.service';
 })
 export class MovimientosPendientesPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
   private readonly movimientosService = inject(MovimientosService);
   private readonly alumnosService = inject(AlumnosService);
@@ -128,19 +130,17 @@ export class MovimientosPendientesPage implements OnInit {
 
   ngOnInit(): void {
     void this.alumnosService.asegurarCargados().then(() => {
-      this.route.paramMap.subscribe((params) => {
-        const id = params.get('alumnoId') || '';
-        this.alumnoId.set(id);
+      const id = this.contextoService.alumnoId();
+      this.alumnoId.set(id);
 
-        const alumno = this.alumnosService.getAlumnoById(id);
-        if (alumno) {
-          this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
-        } else {
-          this.nombreAlumno.set('Alumno');
-        }
+      const alumno = this.alumnosService.getAlumnoById(id);
+      if (alumno) {
+        this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
+      } else {
+        this.nombreAlumno.set('Alumno');
+      }
 
-        this.cargarHistorial();
-      });
+      this.cargarHistorial();
     });
   }
 

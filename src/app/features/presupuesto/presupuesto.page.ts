@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import {
@@ -22,13 +23,14 @@ import { PresupuestoPresenter } from './presenter/presupuesto.presenter';
 })
 export class PresupuestoPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly usuarioService = inject(UsuarioService);
   protected readonly presenter = inject(PresupuestoPresenter);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
   ngOnInit(): void {
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
+    const alumnoId = this.contextoService.alumnoId();
     void this.presenter.init(alumnoId);
   }
 

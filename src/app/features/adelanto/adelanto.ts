@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { MicrocreditosService, SchoolCredit } from '../../data-access/services/microcreditos.service';
 import { DialogService } from '../../shared/services/dialog.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
@@ -18,6 +19,7 @@ import { ToastService } from '../../shared/services/toast.service';
 })
 export class AdelantoPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly location = inject(Location);
   private readonly microcreditosService = inject(MicrocreditosService);
   private readonly dialogService = inject(DialogService);
@@ -35,14 +37,12 @@ export class AdelantoPage implements OnInit {
   cuotas = signal<number>(1);
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const alumnoId = params.get('alumnoId');
-      if (!alumnoId) {
-        this.volver();
-        return;
-      }
-      this.cargarAlumno(alumnoId);
-    });
+    const alumnoId = this.contextoService.alumnoId();
+    if (!alumnoId) {
+      this.volver();
+      return;
+    }
+    this.cargarAlumno(alumnoId);
   }
 
   cargarAlumno(alumnoId: string): void {

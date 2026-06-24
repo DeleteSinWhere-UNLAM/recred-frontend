@@ -6,6 +6,7 @@ import { MovimientosService } from '../../../movimientos/services/movimientos.se
 import { BuffetService } from '../../../buffet/services/buffet.service';
 import { PromotionService, Promotion } from '../../../../data-access/services/promociones/promotion.service';
 import { Movimiento } from '../../../movimientos/models/movimiento.model';
+import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
 
 @Component({
   selector: 'app-tutor-welcome',
@@ -20,6 +21,7 @@ export class TutorWelcome implements OnInit {
   private movimientosService = inject(MovimientosService);
   private buffetService = inject(BuffetService);
   private promosService = inject(PromotionService);
+  private contextoService = inject(AlumnoContextoService);
 
   readonly alumnos = this.alumnosService.alumnos;
   
@@ -100,6 +102,7 @@ export class TutorWelcome implements OnInit {
   }
 
   irAMovimientos() {
+    this.contextoService.limpiar();
     this.router.navigate(['/movimientos']);
   }
 

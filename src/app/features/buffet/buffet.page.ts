@@ -10,6 +10,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
@@ -62,6 +63,7 @@ export interface MappedPromotion {
 })
 export class BuffetPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly alumnosService = inject(AlumnosService);
@@ -356,7 +358,7 @@ export class BuffetPage implements OnInit {
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl(this.homeUrlPorRol());
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
+    const alumnoId = this.contextoService.alumnoId();
     void this.inicializarBuffet(alumnoId);
   }
 

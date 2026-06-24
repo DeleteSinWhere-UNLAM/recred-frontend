@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
@@ -17,6 +18,7 @@ import { BilleteraPresenter, RangoFecha } from './presenter/billetera.presenter'
 })
 export class BilleteraPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
@@ -27,11 +29,7 @@ export class BilleteraPage implements OnInit {
 
   ngOnInit(): void {
     this.sincronizarVistaActual();
-    this.route.paramMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        this.presenter.init(params.get('alumnoId'));
-      });
+    this.presenter.init(this.contextoService.alumnoId() || null);
   }
 
   protected cambiarFecha(rango: RangoFecha): void {

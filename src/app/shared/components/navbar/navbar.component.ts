@@ -16,6 +16,7 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 import { NotificacionesService, Notificacion } from '../../../data-access/services/notificaciones.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 
 @Component({
   selector: 'app-navbar',
@@ -34,6 +35,7 @@ export class NavbarComponent {
   private readonly notificacionesService = inject(NotificacionesService);
   private readonly host = inject(ElementRef<HTMLElement>);
   protected readonly themeService = inject(ThemeService);
+  private readonly contextoService = inject(AlumnoContextoService);
 
   @Input() userName = '';
 
@@ -63,6 +65,11 @@ export class NavbarComponent {
 
   protected irAlCarrito(): void {
     this.router.navigateByUrl('/compra');
+  }
+
+  protected irAMovimientos(): void {
+    this.contextoService.limpiar();
+    void this.router.navigateByUrl('/movimientos');
   }
 
   protected irAInicio(event: Event): void {
