@@ -77,7 +77,7 @@ describe('AcreditarMercadoPagoPage', () => {
 
   it('Dado que el paramMap no tiene alumnoId, debería llamar al presenter.init con un string vacío', () => {
     TestBed.resetTestingModule();
-    (mockContextoService.alumnoId as any).set('');
+    (mockContextoService.alumnoId as unknown as WritableSignal<string>).set('');
     TestBed.configureTestingModule({
       imports: [AcreditarMercadoPagoPage],
       providers: [
