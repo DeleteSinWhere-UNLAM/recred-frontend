@@ -114,6 +114,11 @@ describe('RestriccionesNutricionalesPresenter', () => {
         sinSodio: true,
         vegano: false,
         contieneLacteos: false,
+        tieneMani: false,
+        contieneHuevo: false,
+        contienePescado: false,
+        contieneSoja: false,
+        aptoVegetariano: false,
       });
       expect(presenter.cargando()).toBeFalse();
     });
