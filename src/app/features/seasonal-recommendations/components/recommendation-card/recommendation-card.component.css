@@ -23,10 +23,7 @@
   gap: 8px;
 }
 
-.recommendation-card__icono {
-  font-size: 24px;
-  line-height: 1;
-}
+
 
 .recommendation-card__badges {
   display: flex;
@@ -150,21 +147,10 @@
   border: 1px solid #bbf7d0;
 }
 
-.recommendation-card__motivo {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--color-texto-oscuro);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+
 
 .recommendation-card__top-products {
-  margin-top: auto;
+  margin-top: 8px;
   padding-top: 8px;
   border-top: 1px dashed var(--color-borde);
 }
@@ -267,7 +253,5 @@
     font-size: 13px;
   }
 
-  .recommendation-card__motivo {
-    font-size: 12px;
-  }
+
 }

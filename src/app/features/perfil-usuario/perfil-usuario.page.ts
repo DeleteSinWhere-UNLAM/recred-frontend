@@ -173,7 +173,16 @@ export class PerfilUsuarioPage implements OnInit {
       this.aplicarPerfil(perfil);
       this.usuarioService.setNombreNavbar(perfil.firstName || usuario.firstName);
 
-      if (usuario.role === 'VENDEDOR' || perfil.role === 'VENDEDOR') {
+      const role = usuario.role || perfil.role;
+      if (role === 'ALUMNO') {
+        this.usuarioService.setHomeUrl('/alumno');
+      } else if (role === 'VENDEDOR') {
+        this.usuarioService.setHomeUrl('/kiosquero');
+      } else if (role === 'PADRE') {
+        this.usuarioService.setHomeUrl('/tutor');
+      }
+
+      if (role === 'VENDEDOR') {
         await this.cargarConfiguracionPayout();
       }
     } catch (err) {

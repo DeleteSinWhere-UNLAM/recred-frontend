@@ -147,6 +147,8 @@ export class PerfilService {
     this.syncPerfilEnCurso = null;
     this.perfilState.set(null);
     localStorage.removeItem(PERFIL_STORAGE_KEY);
+    localStorage.removeItem('recreopago_homeUrl');
+    localStorage.removeItem('recreopago_nombreNavbar');
   }
 
   private async sincronizarPerfil(versionSolicitud: number): Promise<Perfil> {
