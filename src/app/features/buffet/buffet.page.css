@@ -2425,6 +2425,53 @@
   letter-spacing: 1px;
 }
 
+/* Estado bloqueada (visible solo en vista tutor) */
+.promo-card--bloqueada {
+  opacity: 0.72;
+  border-color: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.15), var(--shadow-card);
+}
+
+.promo-card--bloqueada:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* Badge "Bloqueada por tutor" */
+.promo-card__badge-bloqueado {
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  background-color: rgba(239, 68, 68, 0.85);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(4px);
+}
+
+/* Badge "Restringida por restricción nutricional" */
+.promo-card__badge-restriccion {
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  background-color: rgba(234, 179, 8, 0.9);
+  color: #1c1917;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(4px);
+}
+
 .promo-card__banner-title {
   font-family: var(--font-display);
   font-size: 20px;
@@ -2584,6 +2631,63 @@
   font-size: 13px;
   font-weight: 800;
   cursor: not-allowed;
+}
+
+/* Botón "No apto: X" para promos restringidas */
+.promo-card__btn-restringido {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: #fef9ee;
+  color: #92400e;
+  border: 1.5px solid rgba(217, 119, 6, 0.25);
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: not-allowed;
+  text-align: center;
+}
+
+.promo-card__btn-restringido i {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+/* Footer en columna cuando hay restricción (botón a ancho completo) */
+.promo-card--restringida .promo-card__footer {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* Estado restringida (visible en cualquier rol) */
+.promo-card--restringida {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.promo-card--restringida:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.promo-card--restringida .promo-card__image {
+  filter: grayscale(0.6) sepia(0.2);
+  opacity: 0.65;
+}
+
+.promo-card--restringida .promo-card__title,
+.promo-card--restringida .promo-card__price-value,
+.promo-card--restringida .promo-card__price-original {
+  opacity: 0.55;
+}
+
+.promo-card--restringida .promo-card__banner {
+  filter: grayscale(0.4);
+  opacity: 0.75;
 }
 
 /* Responsivo para Carrusel */
