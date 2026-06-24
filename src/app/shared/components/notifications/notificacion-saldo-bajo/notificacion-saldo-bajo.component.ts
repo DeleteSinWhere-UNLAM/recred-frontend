@@ -23,7 +23,6 @@ export class NotificacionSaldoBajoComponent {
   comprarSaldo() {
     this.cerrar();
     const alumnoId = this.notificacionService.state$().alumnoId;
-    console.log(alumnoId);
     if (!alumnoId) {
       console.error('No se pudo obtener el ID del alumno');
       return;
