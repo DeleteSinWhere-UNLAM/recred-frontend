@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, SimpleChanges, OnInit, OnChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { ChildDashboardSummary } from '../../models/tutor-dashboard.model';
 
 interface ScriptContext {
@@ -68,7 +68,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
   chartPlugins = [
     {
       id: 'valueLabels',
-      afterDatasetsDraw: (chart: any) => {
+      afterDatasetsDraw: (chart: Chart) => {
         const { ctx, data } = chart;
         ctx.save();
         ctx.font = 'bold 11px Inter, sans-serif';
@@ -77,12 +77,13 @@ export class SmartChartWidget implements OnInit, OnChanges {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
 
-        data.datasets.forEach((dataset: any, datasetIndex: number) => {
+        data.datasets.forEach((dataset, datasetIndex: number) => {
           const meta = chart.getDatasetMeta(datasetIndex);
-          meta.data.forEach((element: any, index: number) => {
+          meta.data.forEach((element, index: number) => {
             const val = dataset.data[index];
             if (val !== undefined && val !== null) {
-              const isPieOrDoughnut = chart.config.type === 'pie' || chart.config.type === 'doughnut';
+              const config = chart.config as ChartConfiguration;
+              const isPieOrDoughnut = config.type === 'pie' || config.type === 'doughnut';
               if (isPieOrDoughnut) return;
 
               let displayVal = val.toString();
@@ -95,8 +96,10 @@ export class SmartChartWidget implements OnInit, OnChanges {
                 displayVal = `${val.toLocaleString('es-AR')}`;
               }
 
-              const position = element.tooltipPosition();
-              ctx.fillText(displayVal, position.x, position.y - 6);
+              const position = element.tooltipPosition(false);
+              if (position && typeof position.x === 'number' && typeof position.y === 'number') {
+                ctx.fillText(displayVal, position.x, position.y - 6);
+              }
             }
           });
         });
