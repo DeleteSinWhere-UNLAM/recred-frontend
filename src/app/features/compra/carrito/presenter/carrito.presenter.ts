@@ -1,6 +1,7 @@
 import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { of, tap } from 'rxjs';
+import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { ItemCarrito } from '../../models/carrito.model';
@@ -54,6 +55,7 @@ export class CarritoPresenter {
   private readonly restriccionesService = inject(RestriccionesHorariasService);
   private readonly franjasService = inject(FranjasHorariasService);
   private readonly presupuestoService = inject(PresupuestoService);
+  private readonly contextoService = inject(AlumnoContextoService);
 
   private readonly seleccionState = signal<Record<string, boolean>>({});
   private readonly fechasState = signal<Record<string, string>>({});
@@ -537,7 +539,8 @@ export class CarritoPresenter {
   }
 
   irAEditarRetiro(alumnoId: string): void {
-    this.router.navigate(['/buffet', alumnoId]);
+    this.contextoService.setAlumnoId(alumnoId);
+    void this.router.navigateByUrl('/buffet');
   }
 
   private calcularFechaMinima(): string {

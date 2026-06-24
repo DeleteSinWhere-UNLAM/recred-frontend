@@ -6,6 +6,7 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { HomeAlumnoService } from '../services/home-alumno.service';
+import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 
 describe('HomeAlumnoPresenter', () => {
   let presenter: HomeAlumnoPresenter;
@@ -39,6 +40,8 @@ describe('HomeAlumnoPresenter', () => {
     colegiosServiceSpy.getColegios.and.returnValue([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
     colegiosServiceSpy.obtenerColegios.and.resolveTo([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
 
+    const contextoServiceSpy = jasmine.createSpyObj('AlumnoContextoService', ['setAlumnoId', 'limpiar']);
+
     TestBed.configureTestingModule({
       providers: [
         HomeAlumnoPresenter,
@@ -48,6 +51,7 @@ describe('HomeAlumnoPresenter', () => {
         { provide: ColegiosService, useValue: colegiosServiceSpy },
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: HomeAlumnoService, useValue: homeAlumnoServiceSpy },
+        { provide: AlumnoContextoService, useValue: contextoServiceSpy },
       ]
     });
 
@@ -128,7 +132,7 @@ describe('HomeAlumnoPresenter', () => {
     await new Promise(r => setTimeout(r, 0));
 
     presenter.ejecutarAccion(presenter.acciones()[0]);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/buffet', 'alumno-1']);
+    expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/buffet');
 
     presenter.ejecutarAccion(presenter.acciones()[2]);
     expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/favoritos');

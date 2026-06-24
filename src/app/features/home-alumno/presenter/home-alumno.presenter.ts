@@ -1,5 +1,6 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
@@ -30,6 +31,7 @@ export class HomeAlumnoPresenter {
   private readonly alumnosService = inject(AlumnosService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
   private readonly router = inject(Router);
+  private readonly contextoService = inject(AlumnoContextoService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly fondoPerfilState = signal<FondoPerfil>('nubes');
@@ -156,17 +158,19 @@ export class HomeAlumnoPresenter {
     if (!accion.ruta) return;
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
-    if (accion.id === 'buffet' || accion.id === 'pedidos') {
-      this.router.navigate([accion.ruta, alumnoId]);
+    if (accion.id === 'buffet') {
+      this.contextoService.setAlumnoId(alumnoId);
+      void this.router.navigateByUrl(accion.ruta);
       return;
     }
-    this.router.navigateByUrl(accion.ruta);
+    void this.router.navigateByUrl(accion.ruta);
   }
 
   irAlBuffet(): void {
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
-    this.router.navigate(['/buffet', alumnoId]);
+    this.contextoService.setAlumnoId(alumnoId);
+    void this.router.navigateByUrl('/buffet');
   }
 
   verPedido(): void {

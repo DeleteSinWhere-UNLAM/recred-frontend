@@ -1,5 +1,6 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { CarritoService } from '../../compra/services/carrito.service';
@@ -92,6 +93,7 @@ export class BuffetPresenter {
   private readonly presupuestoService = inject(PresupuestoService);
   private readonly restriccionesNutricionalesService = inject(RestriccionesNutricionalesService);
   private readonly promotionService = inject(PromotionService);
+  private readonly contextoService = inject(AlumnoContextoService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly buffetState = signal<Buffet | undefined>(undefined);
@@ -660,7 +662,8 @@ export class BuffetPresenter {
   cambiarAlumno(nuevoAlumnoId: string): void {
     if (!nuevoAlumnoId || nuevoAlumnoId === this.alumnoState()?.id) return;
     this.init(nuevoAlumnoId);
-    this.router.navigate(['/buffet', nuevoAlumnoId]);
+    this.contextoService.setAlumnoId(nuevoAlumnoId);
+    void this.router.navigateByUrl('/buffet');
   }
 
   agregarAlCarrito(producto: Producto, cantidad = 1): void {
