@@ -5,7 +5,7 @@
         <img src="logoHeader.png" alt="" class="navbar__logo-img" />
         <span class="navbar__logo-text">RECRED</span>
         @if (esPremium()) {
-        <span class="navbar__premium-badge" style="margin-left: 8px;">PREMIUM</span>
+        <span class="navbar__premium-badge" style="margin-left: 8px;">AVANZADO</span>
         }
       </a>
     </div>
@@ -16,7 +16,7 @@
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span>Panel de Control</span>
         @if (esPremium()) {
-        <span class="pv__premium-badge">PREMIUM</span>
+        <span class="pv__premium-badge">AVANZADO</span>
         }
       </a>
       <a class="navbar__movimientos-link" [routerLink]="['/movimientos']">
