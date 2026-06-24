@@ -30,7 +30,7 @@ describe('HomeAlumnoPresenter', () => {
     ]);
     homeAlumnoServiceSpy.cargarPedidoEnCurso.and.resolveTo();
     homeAlumnoServiceSpy.cargarRecreos.and.resolveTo();
-    contextoServiceSpy = jasmine.createSpyObj<AlumnoContextoService>('AlumnoContextoService', ['setAlumnoId']);
+    contextoServiceSpy = jasmine.createSpyObj<AlumnoContextoService>('AlumnoContextoService', ['setAlumnoId', 'limpiar']);
 
     const usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['getAlumnoActual']);
     usuarioServiceSpy.getAlumnoActual.and.returnValue({ id: 'alumno-1' });
@@ -41,8 +41,6 @@ describe('HomeAlumnoPresenter', () => {
     const colegiosServiceSpy = jasmine.createSpyObj('ColegiosService', ['getColegios', 'obtenerColegios']);
     colegiosServiceSpy.getColegios.and.returnValue([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
     colegiosServiceSpy.obtenerColegios.and.resolveTo([{ id: 'col-1', nombre: 'Colegio Test', direccion: '' }]);
-
-    const contextoServiceSpy = jasmine.createSpyObj('AlumnoContextoService', ['setAlumnoId', 'limpiar']);
 
     TestBed.configureTestingModule({
       providers: [
