@@ -134,7 +134,7 @@ export class MovimientosPendientesPage implements OnInit {
 
         const alumno = this.alumnosService.getAlumnoById(id);
         if (alumno) {
-          this.nombreAlumno.set(`${alumno.nombre} ${alumno.apellido}`);
+          this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
         } else {
           this.nombreAlumno.set('Alumno');
         }

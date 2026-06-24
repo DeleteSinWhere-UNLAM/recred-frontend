@@ -1,8 +1,21 @@
+:host {
+  --saldo-bg: linear-gradient(180deg, rgba(255, 248, 224, 0.95), rgba(242, 183, 5, 0.12)), var(--color-superficie);
+  --saldo-border: rgba(242, 183, 5, 0.24);
+  --saldo-text: var(--color-pizarra);
+}
+
+[data-theme="dark"] :host,
+:host-context([data-theme="dark"]) {
+  --saldo-bg: linear-gradient(180deg, rgba(242, 183, 5, 0.15), rgba(242, 183, 5, 0.04)), var(--color-superficie-alt);
+  --saldo-border: rgba(242, 183, 5, 0.4);
+  --saldo-text: var(--color-dorado);
+}
+
 .buffet {
   min-height: calc(100vh - 64px);
   padding: 26px 0 120px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 244, 248, 0.7) 360px),
+    var(--body-gradient),
     var(--color-fondo);
 }
 
@@ -28,14 +41,14 @@
   gap: 10px;
   min-height: 44px;
   padding: 0 18px;
-  background-color: rgba(255, 255, 255, 0.86);
+  background-color: var(--color-superficie-alt);
   border: 1px solid var(--color-borde);
   color: var(--color-pizarra);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 13px;
   border-radius: var(--radius-button);
-  box-shadow: 0 10px 26px rgba(51, 65, 85, 0.08);
+  box-shadow: var(--shadow-card);
   transition:
     background-color var(--transition-ui),
     border-color var(--transition-ui),
@@ -105,10 +118,10 @@
   gap: 12px;
   max-width: 100%;
   padding: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: var(--color-superficie-alt);
   border: 1px solid var(--color-borde);
   border-radius: var(--radius-card);
-  box-shadow: 0 16px 36px rgba(51, 65, 85, 0.1);
+  box-shadow: var(--shadow-card);
 }
 
 .buffet__avatar {
@@ -211,10 +224,8 @@
   justify-content: center;
   min-height: 52px;
   padding: 8px 15px;
-  background:
-    linear-gradient(180deg, rgba(255, 248, 224, 0.95), rgba(242, 183, 5, 0.12)),
-    var(--color-superficie);
-  border: 1px solid rgba(242, 183, 5, 0.24);
+  background: var(--saldo-bg);
+  border: 1px solid var(--saldo-border);
   border-radius: 14px;
 }
 
@@ -228,7 +239,7 @@
 }
 
 .buffet__saldo-valor {
-  color: var(--color-pizarra);
+  color: var(--saldo-text);
   font-family: var(--font-display);
   font-size: 17px;
   font-weight: 800;
@@ -242,12 +253,10 @@
   gap: 14px;
   margin-bottom: 28px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: var(--radius-card);
-  box-shadow:
-    0 18px 44px rgba(51, 65, 85, 0.09),
-    inset 0 1px 0 rgba(255, 255, 255, 0.76);
+  box-shadow: var(--shadow-card);
 }
 
 .buffet__filtro {
@@ -306,7 +315,7 @@
 
 .buffet__busqueda:focus,
 .buffet__select:focus {
-  background-color: #fff;
+  background-color: var(--color-superficie);
   border-color: var(--color-pizarra);
   box-shadow: 0 0 0 4px var(--color-foco);
 }
@@ -461,7 +470,7 @@
   align-items: center;
   gap: 14px;
   padding: 58px 24px;
-  background-color: rgba(255, 255, 255, 0.88);
+  background-color: var(--color-superficie);
   border: 1px dashed var(--color-borde-fuerte);
   border-radius: var(--radius-card);
   color: var(--color-texto-claro);
@@ -970,7 +979,7 @@
 .buffet__retiro-select:focus {
   border-color: var(--color-pizarra);
   box-shadow: 0 0 0 4px var(--color-foco);
-  background-color: #fff;
+  background-color: var(--color-superficie);
 }
 
 /* Budget status feedback */
@@ -1207,7 +1216,7 @@
   align-items: center;
   width: 100%;
   padding: 16px 20px;
-  background-color: #f8fafc;
+  background-color: var(--color-superficie-alt);
   border: none;
   border-bottom: 1px solid var(--color-borde);
   font: inherit;
@@ -1218,7 +1227,7 @@
 }
 
 .buffet__sidebar-toggle-header:hover {
-  background-color: #f1f5f9;
+  background-color: var(--color-borde-fuerte);
 }
 
 .buffet__sidebar-toggle-title {
@@ -1508,7 +1517,7 @@
 
 /* Calendar Widget */
 .buffet__calendar-widget {
-  background-color: #f8fafc;
+  background-color: var(--color-superficie-alt);
   border: 1px solid var(--color-borde);
   border-radius: 16px;
   padding: 12px;
@@ -1613,7 +1622,7 @@
 }
 
 .recreo-option-btn:hover:not(:disabled) {
-  background-color: #f8fafc;
+  background-color: var(--color-superficie-alt);
   border-color: var(--color-borde-fuerte);
 }
 
@@ -1629,7 +1638,7 @@
 }
 
 .recreo-option-btn:disabled {
-  background-color: #f1f5f9;
+  background-color: var(--color-superficie-alt);
   border-style: dashed;
   opacity: 0.5;
   cursor: not-allowed;
@@ -1801,7 +1810,7 @@
   gap: 12px;
   margin-bottom: 24px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--color-superficie);
   border: 1px solid var(--color-borde);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
@@ -2367,10 +2376,10 @@
   flex: 0 0 calc(50% - 12px);
   min-width: 480px;
   display: flex;
-  background-color: #fff;
+  background-color: var(--color-superficie);
   border: 1px solid rgba(74, 111, 165, 0.08);
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.06);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
@@ -2440,7 +2449,7 @@
   display: flex;
   flex-direction: column;
   padding: 16px 20px;
-  background-color: #fff;
+  background-color: var(--color-superficie);
 }
 
 .promo-card__media {
@@ -2542,22 +2551,22 @@
 .promo-card__btn-agregar {
   min-height: 40px;
   padding: 0 20px;
-  background-color: #facc15;
+  background-color: var(--color-dorado);
   color: #1a3b5c;
   border: none;
   border-radius: 20px;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 800;
-  box-shadow: 0 8px 16px rgba(250, 204, 21, 0.25);
+  box-shadow: 0 8px 16px rgba(242, 183, 5, 0.25);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .promo-card__btn-agregar:hover {
   transform: translateY(-2px);
-  background-color: #fde047;
-  box-shadow: 0 10px 20px rgba(250, 204, 21, 0.35);
+  background-color: var(--color-dorado-dark);
+  box-shadow: 0 10px 20px rgba(242, 183, 5, 0.35);
 }
 
 .promo-card__btn-agregar:active {
@@ -2604,16 +2613,15 @@
 
 /* Premium Gold Metallic styles for Buffet Promo and Footer Cart buttons */
 .promo-card__btn-agregar--premium {
-  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%) !important;
-  color: #1e293b !important;
-  box-shadow: 0 8px 16px rgba(212, 175, 55, 0.35) !important;
+  background: var(--color-dorado) !important;
+  color: #1a3b5c !important;
+  box-shadow: 0 8px 16px rgba(242, 183, 5, 0.35) !important;
   border: none !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .promo-card__btn-agregar--premium:hover {
-  background: linear-gradient(135deg, #FFE4B5 0%, #D4AF37 50%, #AA7C11 100%) !important;
-  box-shadow: 0 10px 20px rgba(212, 175, 55, 0.5) !important;
+  background: var(--color-dorado-dark) !important;
+  box-shadow: 0 10px 20px rgba(242, 183, 5, 0.5) !important;
   transform: translateY(-2px);
 }
 
@@ -2973,5 +2981,99 @@
   font-style: italic;
   padding: 4px 0;
 }
+
+/* Dark mode overrides for Buffet Page */
+[data-theme="dark"] .buffet__filtros {
+  background: var(--color-superficie);
+  box-shadow: var(--shadow-card);
+}
+
+[data-theme="dark"] .buffet__filtros-container {
+  background: var(--color-superficie);
+}
+
+[data-theme="dark"] .buffet__busqueda,
+[data-theme="dark"] .buffet__select {
+  background-color: var(--color-superficie-alt);
+  box-shadow: none;
+  border-color: var(--color-borde);
+}
+
+
+
+[data-theme="dark"] .buffet__select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236C8EBF' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+
+[data-theme="dark"] .buffet__volver {
+  background-color: var(--color-superficie-alt);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .buffet__alumno {
+  background-color: var(--color-superficie-alt);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .buffet__alumno-editar {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+
+
+[data-theme="dark"] .buffet__limpiar,
+[data-theme="dark"] .buffet__filtro-favoritos {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .buffet__restricciones-barra {
+  background-color: rgba(242, 183, 5, 0.12);
+  border-color: rgba(242, 183, 5, 0.3);
+}
+
+[data-theme="dark"] .buffet__restricciones-header {
+  color: var(--color-dorado);
+}
+
+[data-theme="dark"] .buffet__sidebar-toggle-header {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .buffet__sidebar-toggle-header:hover {
+  background-color: var(--color-borde-fuerte);
+}
+
+[data-theme="dark"] .buffet__calendar-widget {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .calendar-day-btn--selected {
+  background-color: var(--color-pizarra) !important;
+  color: var(--color-superficie) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .recreo-option-btn:hover:not(:disabled) {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .recreo-option-btn:disabled {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .promo-card__btn-insuficiente {
+  background-color: rgba(217, 119, 6, 0.15);
+  color: var(--color-dorado);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+[data-theme="dark"] .promo-card__btn-agregar:hover {
+  background-color: var(--color-dorado-dark);
+}
+
+[data-theme="dark"] .buffet__vacio {
+  background-color: var(--color-superficie);
+}
+
 
 

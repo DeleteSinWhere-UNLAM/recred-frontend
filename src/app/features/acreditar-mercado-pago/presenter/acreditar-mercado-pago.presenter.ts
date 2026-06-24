@@ -34,7 +34,7 @@ export class AcreditarMercadoPagoPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
-    return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
+    return alumno ? `${alumno.nombre} ${alumno.apellido}`.trim() : '';
   });
 
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');
