@@ -1,9 +1,6 @@
 <article class="recommendation-card" [ngClass]="'recommendation-card--' + item.accion.toLowerCase()">
   <header class="recommendation-card__header">
     <div class="recommendation-card__header-left">
-      @if (item.icono) {
-        <div class="recommendation-card__icono">{{ item.icono }}</div>
-      }
       <h4 class="recommendation-card__titulo">{{ item.categoria }}</h4>
     </div>
     <div class="recommendation-card__badges">
@@ -18,7 +15,6 @@
       </span>
     </div>
   </header>
-  <p class="recommendation-card__motivo">{{ item.motivo }}</p>
   @if (item.top_productos && item.top_productos.length > 0) {
     <div class="recommendation-card__top-products">
       <div class="recommendation-card__top-products-header">
