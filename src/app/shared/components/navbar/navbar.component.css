@@ -104,6 +104,7 @@
 .navbar__cart,
 .navbar__perfil,
 .navbar__notif,
+.navbar__theme-toggle,
 .navbar__kiosk-tools {
   position: relative;
   display: inline-flex;
@@ -136,6 +137,7 @@
 .navbar__cart:hover,
 .navbar__perfil:hover,
 .navbar__notif:hover,
+.navbar__theme-toggle:hover,
 .navbar__kiosk-tools:hover {
   background-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
@@ -147,6 +149,7 @@
 .navbar__cart:active,
 .navbar__perfil:active,
 .navbar__notif:active,
+.navbar__theme-toggle:active,
 .navbar__kiosk-link:active,
 .navbar__movimientos-link:active,
 .navbar__scan:active,
@@ -595,6 +598,7 @@
 .navbar:not(.navbar--kiosquero) .navbar__cart,
 .navbar:not(.navbar--kiosquero) .navbar__perfil,
 .navbar:not(.navbar--kiosquero) .navbar__notif,
+.navbar:not(.navbar--kiosquero) .navbar__theme-toggle,
 .navbar:not(.navbar--kiosquero) .navbar__kiosk-tools {
   width: 40px;
   height: 40px;
@@ -636,6 +640,7 @@
 .navbar--kiosquero .navbar__cart,
 .navbar--kiosquero .navbar__perfil,
 .navbar--kiosquero .navbar__notif,
+.navbar--kiosquero .navbar__theme-toggle,
 .navbar--kiosquero .navbar__kiosk-tools {
   width: 42px;
   height: 42px;
@@ -779,6 +784,7 @@
 .navbar--kiosquero .navbar__notif--wide,
 .navbar--kiosquero .navbar__scan,
 .navbar--kiosquero .navbar__perfil,
+.navbar--kiosquero .navbar__theme-toggle,
 .navbar--kiosquero .navbar__kiosk-tools {
   min-height: 42px;
 
@@ -805,6 +811,7 @@
 .navbar--kiosquero .navbar__notif--wide:hover,
 .navbar--kiosquero .navbar__scan:hover,
 .navbar--kiosquero .navbar__perfil:hover,
+.navbar--kiosquero .navbar__theme-toggle:hover,
 .navbar--kiosquero .navbar__kiosk-tools:hover {
   transform: translateY(-1px);
   border-color: rgba(255, 255, 255, 0.24);
@@ -819,6 +826,7 @@
 .navbar--kiosquero .navbar__notif--wide:active,
 .navbar--kiosquero .navbar__scan:active,
 .navbar--kiosquero .navbar__perfil:active,
+.navbar--kiosquero .navbar__theme-toggle:active,
 .navbar--kiosquero .navbar__kiosk-tools:active {
   transform: translateY(0);
 }
@@ -899,6 +907,7 @@
   .navbar:not(.navbar--kiosquero) .navbar__cart,
   .navbar:not(.navbar--kiosquero) .navbar__perfil,
   .navbar:not(.navbar--kiosquero) .navbar__notif,
+  .navbar:not(.navbar--kiosquero) .navbar__theme-toggle,
   .navbar:not(.navbar--kiosquero) .navbar__kiosk-tools,
   .navbar__dashboard-link,
   .navbar__movimientos-link,

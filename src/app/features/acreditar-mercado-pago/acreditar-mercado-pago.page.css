@@ -37,10 +37,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background: white;
+  background: var(--color-superficie);
   padding: 24px 32px;
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
+  box-shadow: var(--shadow-card);
   border: 1px solid var(--color-borde);
   margin-bottom: 16px;
 }
@@ -59,7 +59,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #1a3b5c; /* Deep slate blue */
+  background-color: var(--color-pizarra); /* Deep slate blue */
   color: white;
   display: flex;
   align-items: center;
@@ -68,7 +68,7 @@
   font-size: 24px;
   font-weight: 700;
   box-shadow:
-    0 0 0 3px #ffffff,
+    0 0 0 3px var(--color-superficie),
     0 0 0 5px var(--color-dorado),
     0 8px 16px rgba(74, 111, 165, 0.08);
   overflow: hidden;
@@ -85,13 +85,13 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   line-height: 1.2;
 }
 
 .acreditar-page__alumno-info p {
   margin: 4px 0 0 0;
-  color: #64748b;
+  color: var(--color-texto-claro);
   font-size: 14px;
   font-weight: 600;
   display: flex;
@@ -100,7 +100,7 @@
 }
 
 .acreditar-page__alumno-info p i {
-  color: #166534;
+  color: var(--color-menta);
 }
 
 /* Yellow Saldo total display */
@@ -166,10 +166,10 @@
 /* Left Form & Right History Cards (equal look and feel) */
 .acreditar-page__form-section,
 .acreditar-page__history-section {
-  background: white;
+  background: var(--color-superficie);
   padding: 20px 24px;
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
+  box-shadow: var(--shadow-card);
   border: 1px solid var(--color-borde);
   display: flex;
   flex-direction: column;
@@ -193,12 +193,12 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
 }
 
 .acreditar-page__description,
 .acreditar-page__history-description {
-  color: #64748b;
+  color: var(--color-texto-claro);
   margin-bottom: 12px;
   font-size: 14px;
   line-height: 1.4;
@@ -213,7 +213,7 @@
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 700;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
 }
 
 /* Input Wrapper & Mercado Pago Badge decoration */
@@ -229,17 +229,17 @@
   padding: 14px 48px 14px 16px;
   font-size: 18px;
   font-weight: 700;
-  color: #1a3b5c;
-  border: 1px solid var(--color-borde);
+  color: var(--color-texto-oscuro);
+  border: 1px solid var(--color-borde-fuerte);
   border-radius: 12px;
-  background-color: #f8fafc;
+  background-color: var(--color-superficie-alt);
   transition: border-color 0.15s, background-color 0.15s;
 }
 
 .acreditar-page__input-group input:focus {
   outline: none;
-  border-color: #3b82f6;
-  background-color: white;
+  border-color: var(--color-pizarra);
+  background-color: var(--color-superficie);
 }
 
 .acreditar-page__mp-logo {
@@ -263,7 +263,7 @@
 .acreditar-page__presets-title {
   font-size: 14px;
   font-weight: 700;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   margin-bottom: 10px;
 }
 
@@ -280,8 +280,8 @@
   justify-content: center;
   gap: 6px;
   padding: 8px 4px;
-  background-color: #f8fafc;
-  border: 1px solid rgba(74, 111, 165, 0.05);
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
   border-radius: 12px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
@@ -310,21 +310,23 @@
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
-  color: #475569;
+  color: var(--color-texto-claro);
 }
 
 /* Presets colors */
 .acreditar-page__preset-btn--menta .acreditar-page__preset-icono {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  color: var(--color-menta);
 }
 
 .acreditar-page__preset-btn--melocoton .acreditar-page__preset-icono {
-  background-color: #ef4444;
+  background-color: color-mix(in srgb, var(--color-melocoton) 15%, transparent);
+  color: var(--color-melocoton);
 }
 
 .acreditar-page__preset-btn--azul .acreditar-page__preset-icono {
-  background-color: #3b82f6;
+  background-color: color-mix(in srgb, var(--color-pizarra) 15%, transparent);
+  color: var(--color-pizarra);
 }
 
 .acreditar-page__preset-btn--morado .acreditar-page__preset-icono {
@@ -386,13 +388,13 @@
 }
 
 .acreditar-page__btn--secondary {
-  background-color: #cbd5e1;
-  color: #475569;
+  background-color: var(--color-superficie-alt);
+  color: var(--color-texto-claro);
 }
 
 .acreditar-page__btn--secondary:not(:disabled):hover {
-  background-color: #94a3b8;
-  color: #1e293b;
+  background-color: var(--color-borde-fuerte);
+  color: var(--color-texto-oscuro);
 }
 
 /* History list & Items */
@@ -426,7 +428,7 @@
 }
 
 .acreditar-page__history-list::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: var(--color-borde-fuerte);
   border-radius: 8px;
 }
 
@@ -435,8 +437,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px;
-  background-color: #f8fafc;
-  border: 1px solid rgba(74, 111, 165, 0.05);
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
   border-radius: 16px;
 }
 
@@ -450,11 +452,11 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #f1f5f9;
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #166534;
+  color: var(--color-menta);
   font-size: 14px;
 }
 
@@ -467,18 +469,18 @@
 .acreditar-page__history-monto {
   font-size: 15px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
 }
 
 .acreditar-page__history-fecha {
   font-size: 11px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-texto-claro);
 }
 
 .acreditar-page__history-status {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  color: var(--color-menta);
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 10px;
@@ -493,14 +495,14 @@
   justify-content: center;
   padding: 64px 24px;
   text-align: center;
-  color: #64748b;
+  color: var(--color-texto-claro);
   gap: 12px;
   flex: 1;
 }
 
 .acreditar-page__history-empty i {
   font-size: 36px;
-  color: #cbd5e1;
+  color: var(--color-borde-fuerte);
 }
 
 .acreditar-page__history-empty p {

@@ -377,3 +377,17 @@
   }
 }
 
+/* Dark mode overrides */
+[data-theme="dark"] .presupuesto__total {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .presupuesto__agregar {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .campo__select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236C8EBF' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+}
+
+

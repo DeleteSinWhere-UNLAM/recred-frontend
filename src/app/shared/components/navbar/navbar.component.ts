@@ -13,6 +13,7 @@ import { CarritoService } from '../../../features/compra/services/carrito.servic
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { NotificacionesService, Notificacion } from '../../../data-access/services/notificaciones.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-navbar',
@@ -29,6 +30,7 @@ export class NavbarComponent {
   private readonly alumnosService = inject(AlumnosService);
   private readonly notificacionesService = inject(NotificacionesService);
   private readonly host = inject(ElementRef<HTMLElement>);
+  protected readonly themeService = inject(ThemeService);
 
   @Input() userName = '';
 
@@ -42,6 +44,11 @@ export class NavbarComponent {
   protected readonly menuNotifAbierto = signal(false);
   protected readonly menuKiosqueroAbierto = signal(false);
   protected readonly menuBilleteraAbierto = signal(false);
+  protected readonly temaActivo = this.themeService.theme;
+
+  protected toggleTema(): void {
+    this.themeService.toggleTheme();
+  }
 
   protected irAlCarrito(): void {
     this.router.navigateByUrl('/compra');

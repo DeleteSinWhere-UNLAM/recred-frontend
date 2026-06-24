@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --color-pizarra: #4A6FA5;
   --color-pizarra-dark: #3a5a8a;
   --color-dorado: #F2B705;
@@ -34,7 +35,37 @@
 
   --font-display: 'Montserrat', 'Inter', sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
-  --transition-ui: 160ms ease;
+  --transition-ui: 200ms ease;
+  --body-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 260px);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-fondo: #0F172A;
+  --color-superficie: #1E293B;
+  --color-superficie-alt: #334155;
+  --color-texto-oscuro: #F8FAFC;
+  --color-texto-claro: #94A3B8;
+  --color-pizarra: #6C8EBF;
+  --color-pizarra-dark: #8FB4E6;
+  --color-borde: rgba(255, 255, 255, 0.08);
+  --color-borde-fuerte: rgba(255, 255, 255, 0.16);
+  --color-foco: rgba(108, 142, 191, 0.4);
+
+  --shadow-neu-convex:
+    0 18px 44px rgba(0, 0, 0, 0.3),
+    0 6px 18px rgba(0, 0, 0, 0.2);
+  --shadow-neu-concave:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-card:
+    0 14px 34px rgba(0, 0, 0, 0.25),
+    0 3px 10px rgba(0, 0, 0, 0.15);
+  --shadow-elevated:
+    0 24px 60px rgba(0, 0, 0, 0.4),
+    0 8px 20px rgba(0, 0, 0, 0.3);
+
+  --body-gradient: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0) 260px);
 }
 
 * {
@@ -58,13 +89,14 @@ html, body {
 body {
   font-family: var(--font-body);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 260px),
+    var(--body-gradient),
     var(--color-fondo);
   color: var(--color-texto-oscuro);
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-ui), color var(--transition-ui);
 }
 
 button {

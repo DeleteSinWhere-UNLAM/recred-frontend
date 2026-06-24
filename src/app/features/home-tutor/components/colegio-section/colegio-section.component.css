@@ -83,7 +83,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   margin: 0;
   min-width: 0;
 }
@@ -95,11 +95,11 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-texto-claro);
 }
 
 .colegio-section__alumnos-count i {
-  color: #1a3b5c;
+  color: var(--color-pizarra);
   font-size: 13px;
 }
 
@@ -111,7 +111,7 @@
   height: 32px;
   border-radius: 50%;
   background-color: rgba(74, 111, 165, 0.05);
-  color: #64748b;
+  color: var(--color-texto-claro);
   font-size: 13px;
   transition: transform 0.25s ease;
   flex-shrink: 0;
@@ -119,7 +119,7 @@
 
 .colegio-section__chevron--rotado {
   transform: rotate(180deg);
-  color: #1a3b5c;
+  color: var(--color-pizarra);
 }
 
 /* Sidebar Body */
@@ -143,14 +143,14 @@
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-texto-claro);
 }
 
 .colegio-section__saldo-valor {
   font-family: var(--font-display);
   font-size: 28px;
   font-weight: 800;
-  color: #1a3b5c;
+  color: var(--color-texto-oscuro);
   line-height: 1.1;
 }
 
@@ -158,7 +158,7 @@
 .colegio-section__ilustracion {
   margin: 16px -24px -24px -24px;
   padding: 16px 24px 0 24px;
-  background: linear-gradient(180deg, rgba(240, 244, 248, 0) 0%, rgba(226, 232, 240, 0.4) 100%);
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--color-fondo) 40%, transparent) 100%);
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
   display: flex;
@@ -193,12 +193,12 @@
 }
 
 .colegio-section__content::-webkit-scrollbar-thumb {
-  background: #1a3b5c;
+  background: var(--color-pizarra);
   border-radius: 6px;
 }
 
 .colegio-section__content::-webkit-scrollbar-thumb:hover {
-  background: #2b5a8e;
+  background: var(--color-pizarra-dark);
 }
 
 .colegio-section__grid {
