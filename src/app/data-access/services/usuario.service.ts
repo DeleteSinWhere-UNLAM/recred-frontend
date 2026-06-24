@@ -16,7 +16,9 @@ function obtenerHomeUrlInicial(): string {
       if (perfil.rol === 'VENDEDOR') return '/kiosquero';
       if (perfil.rol === 'PADRE') return '/tutor';
     }
-  } catch (e) {}
+  } catch {
+    // Ignorar errores de parseo si el localStorage está corrupto
+  }
 
   return '/tutor';
 }
