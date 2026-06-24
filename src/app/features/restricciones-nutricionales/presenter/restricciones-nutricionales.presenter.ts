@@ -44,7 +44,7 @@ export class RestriccionesNutricionalesPresenter {
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
     if (!alumno) return '';
-    return alumno.nombre.split(' ')[0];
+    return `${alumno.nombre} ${alumno.apellido}`.trim();
   });
 
   readonly urlFotoPerfil = computed<string | null>(() => this.alumnoState()?.urlFotoPerfil ?? null);

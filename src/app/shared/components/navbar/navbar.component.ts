@@ -38,6 +38,9 @@ export class NavbarComponent {
   @Input() userName = '';
 
   protected readonly esPremium = computed(() => {
+    if (typeof this.perfilService?.perfil !== 'function') {
+      return false;
+    }
     const plan = this.perfilService.perfil()?.plan;
     return plan === 'PREMIUM' || plan === 'AVANZADO';
   });

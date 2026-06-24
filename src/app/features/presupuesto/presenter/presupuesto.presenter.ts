@@ -48,7 +48,7 @@ export class PresupuestoPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
-    return alumno ? alumno.nombre.split(' ')[0] : '';
+    return alumno ? `${alumno.nombre} ${alumno.apellido}`.trim() : '';
   });
 
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');
