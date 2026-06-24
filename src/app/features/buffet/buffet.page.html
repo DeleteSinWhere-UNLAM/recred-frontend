@@ -171,11 +171,17 @@
 
             <div #promosContainer class="promos-carousel__container" (scroll)="onCarouselScroll($event)">
               @for (promo of promocionesDestacadasFiltradas(); track promo.id) {
-              <article class="promo-card">
+              <article class="promo-card" [class.promo-card--bloqueada]="!esVistaAlumno() && promo.bloqueada"
+                [class.promo-card--restringida]="promo.bloqueadaPorRestriccion">
                 <!-- Color vertical banner / Left side -->
                 <div class="promo-card__banner"
                   [class]="'promo-card__banner--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
                   <span class="promo-card__badge-promo">PROMO</span>
+                  @if (!esVistaAlumno() && promo.bloqueada) {
+                  <span class="promo-card__badge-bloqueado" [title]="promo.motivoBloqueo || 'Bloqueado por el tutor'">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i> Bloqueada
+                  </span>
+                  }
                   <h4 class="promo-card__banner-title">{{ promo.nombre }}</h4>
                   <p class="promo-card__banner-desc">
                     @for (item of promo.itemsList; track $index) {
@@ -207,7 +213,13 @@
                         </div>
                       </div>
 
-                      @if (puedeComprarPromo(promo)) {
+                      @if (promo.bloqueadaPorRestriccion) {
+                      <!-- Restricción nutricional: botón deshabilitado con motivo -->
+                      <button type="button" class="promo-card__btn-restringido" disabled>
+                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                        {{ getMensajeRestriccionPromo(promo) }}
+                      </button>
+                      } @else if (puedeComprarPromo(promo)) {
                       <button type="button" class="promo-card__btn-agregar"
                         [class.promo-card__btn-agregar--premium]="esPremium()" (click)="agregarPromoAlCarrito(promo)">
                         Agregar Promo
@@ -222,6 +234,7 @@
                 </div>
               </article>
               }
+
             </div>
 
             <button type="button" class="promos-carousel__nav promos-carousel__nav--right"
