@@ -145,6 +145,41 @@
         </div>
         }
       </section>
+
+      <!-- Productos Favoritos -->
+      <section class="welcome__widget">
+        <div class="widget__header">
+          <i class="fa-solid fa-heart"></i>
+          <h3>Productos Favoritos</h3>
+        </div>
+
+        @if (productosFavoritos().length > 0) {
+        <div class="welcome__favorites-list">
+          @for (item of productosFavoritos(); track item.producto.id) {
+          <div class="mov-item">
+            <div class="mov-item__icon mov-item__icon--fav">
+              <i class="fa-solid fa-heart"></i>
+            </div>
+            <div class="mov-item__info">
+              <span class="mov-item__title">
+                {{ item.producto.nombre }}
+              </span>
+              <span class="mov-item__date">
+                Favorito de {{ item.alumnoNombre }}
+              </span>
+            </div>
+            <div class="mov-item__amount">
+              {{ formatARS(item.producto.precio) }}
+            </div>
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="welcome__empty welcome__empty--small">
+          <p>No hay productos favoritos registrados.</p>
+        </div>
+        }
+      </section>
     </div>
   </div>
 </div>

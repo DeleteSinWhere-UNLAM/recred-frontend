@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { } from '../../shared/components/navbar/navbar.component';
 import { PrediccionCardComponent } from './components/prediccion-card/prediccion-card.component';
@@ -15,13 +16,14 @@ import { EstadisticaPresenter } from './presenter/estadistica.presenter';
 })
 export class EstadisticaPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly usuarioService = inject(UsuarioService);
   protected readonly presenter = inject(EstadisticaPresenter);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
   ngOnInit(): void {
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
+    const alumnoId = this.contextoService.alumnoId();
     this.presenter.init(alumnoId);
   }
 }
