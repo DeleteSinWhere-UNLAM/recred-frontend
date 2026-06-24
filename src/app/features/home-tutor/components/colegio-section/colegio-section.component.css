@@ -122,7 +122,19 @@
   color: var(--color-pizarra);
 }
 
-/* Sidebar Body */
+/* Sidebar Body Wrapper & Animation */
+.colegio-section__sidebar-body-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  width: 100%;
+}
+
+.colegio-section__sidebar-body-wrapper--expandido {
+  grid-template-rows: 1fr;
+}
+
 .colegio-section__sidebar-body {
   display: flex;
   flex-direction: column;
@@ -130,7 +142,13 @@
   margin-top: 16px;
   flex: 1;
   min-height: 0;
-  animation: colegio-fade-in 0.25s ease;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.colegio-section__sidebar-body-wrapper--expandido .colegio-section__sidebar-body {
+  opacity: 1;
+  transition: opacity 0.25s ease-out 0.05s;
 }
 
 .colegio-section__saldo-row {

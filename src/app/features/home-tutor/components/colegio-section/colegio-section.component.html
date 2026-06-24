@@ -22,10 +22,12 @@
       </span>
     </button>
     
-    @if (expandido()) {
-      <div class="colegio-section__sidebar-body" [id]="'colegio-' + colegio.id + '-content'">
-        
-
+    <div
+      class="colegio-section__sidebar-body-wrapper"
+      [class.colegio-section__sidebar-body-wrapper--expandido]="expandido()"
+      [id]="'colegio-' + colegio.id + '-content'"
+    >
+      <div class="colegio-section__sidebar-body">
         <div class="colegio-section__content">
           <div class="colegio-section__grid">
             @for (alumno of alumnos; track alumno.id) {
@@ -34,6 +36,6 @@
           </div>
         </div>
       </div>
-    }
+    </div>
   </div>
 </section>
