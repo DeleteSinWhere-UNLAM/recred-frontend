@@ -339,6 +339,11 @@
   padding: 24px 16px;
 }
 
+.mov-item__icon--fav {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
 /* Responsive */
 @media (max-width: 992px) {
   .welcome__grid {
