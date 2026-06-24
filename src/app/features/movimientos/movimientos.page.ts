@@ -359,7 +359,7 @@ export class MovimientosPage implements OnInit {
 
   getNombreAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
-    return alumno ? alumno.nombre.split(' ')[0] : 'Alumno';
+    return alumno ? `${alumno.nombre} ${alumno.apellido}`.trim() : 'Alumno';
   }
 
   getInicialesAlumno(studentId: string): string {
