@@ -45,7 +45,7 @@ describe('SeasonalPageComponent', () => {
       weatherInfo: signal<WeatherInfo | null>(null),
       resolvedProducts: signal<Product[]>([])
     });
-    mockUsuarioService = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual']);
+    mockUsuarioService = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual', 'setHomeUrl']);
     mockUsuarioService.getUsuarioActual.and.returnValue({ id: 'user-1', nombre: 'Test Kiosquero', rol: 'KIOSQUERO' } as ReturnType<UsuarioService['getUsuarioActual']>);
 
     await TestBed.configureTestingModule({
