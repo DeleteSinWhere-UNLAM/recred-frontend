@@ -155,9 +155,11 @@ export class SeasonalPagePresenter {
       next: () => {
         this.toastService.mostrar('Promoción creada exitosamente', 'success');
         this.closeModal();
+        this.router.navigateByUrl('/promociones');
       },
       error: () => {
         this.toastService.mostrar('Error al crear la promoción', 'error');
+        this.router.navigateByUrl('/promociones');
       }
     });
   }

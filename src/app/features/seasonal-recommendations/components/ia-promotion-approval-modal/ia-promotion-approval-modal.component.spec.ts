@@ -34,11 +34,12 @@ describe('IaPromotionApprovalModalComponent', () => {
   it('Dado que se crea el componente, debería inicializarse correctamente', () => {
     expect(component).toBeTruthy();
     expect(component.promotionForm).toBeDefined();
-    expect(component.selectedProductIds.size).toBe(2);
+    expect(component.selectedProductIds.size).toBe(0);
   });
 
   it('Dado que se hace click en confirmar, debería emitir los datos del formulario si es valido', () => {
     spyOn(component.confirmPromotion, 'emit');
+    component.selectedProductIds.add('prod-1'); // Simulamos selección de producto
     component.onConfirm();
     expect(component.confirmPromotion.emit).toHaveBeenCalled();
   });

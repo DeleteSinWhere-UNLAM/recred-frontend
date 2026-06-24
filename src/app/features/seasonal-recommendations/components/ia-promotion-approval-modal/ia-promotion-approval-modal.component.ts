@@ -35,12 +35,8 @@ export class IaPromotionApprovalModalComponent implements OnInit {
       endDate: [format(nextWeek), Validators.required]
     });
 
-    // Auto-select the products that are in suggestedPromotion target
-    if (this.suggestedPromotion?.productIds) {
-      this.suggestedPromotion.productIds.forEach(id => this.selectedProductIds.add(id));
-    } else {
-      this.resolvedProducts.forEach(p => this.selectedProductIds.add(p.id));
-    }
+    // Por requerimiento, los productos ya no se seleccionan por defecto.
+    // El usuario deberá elegir manualmente cuáles desea incluir en la promoción.
   }
 
   toggleProductSelection(productId: string): void {
