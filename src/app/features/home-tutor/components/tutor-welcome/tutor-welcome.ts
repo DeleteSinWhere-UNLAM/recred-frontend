@@ -121,14 +121,14 @@ export class TutorWelcome implements OnInit {
                     uniqueFavoritos.push({ ...item });
                   }
                 }
-                this.productosFavoritos.set(uniqueFavoritos.slice(0, 5));
+                this.productosFavoritos.set(uniqueFavoritos);
               }
             },
             error: (err) => {
               console.error('Error fetching favorites for dashboard:', err);
               pendingFavorites--;
               if (pendingFavorites === 0) {
-                this.productosFavoritos.set(todosFavoritos.slice(0, 5));
+                this.productosFavoritos.set(todosFavoritos);
               }
             }
           });
