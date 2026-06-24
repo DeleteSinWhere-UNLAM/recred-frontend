@@ -258,9 +258,21 @@
                       <ul class="pickup-list">
                         @for (pickup of cardChild.todayPickups; track pickup.id) {
                           <li class="pickup-item">
-                            <i class="fa-solid fa-box-open"></i>
-                            <span>{{ pickup.menuName }}</span>
-                            <span class="pickup-time">{{ pickup.pickupTime }}</span>
+                            <div class="pickup-icon-wrapper">
+                              <i class="fa-solid fa-box-open"></i>
+                            </div>
+                            <div class="pickup-details">
+                              <span class="pickup-name" [title]="pickup.menuName">{{ pickup.menuName }}</span>
+                              <div class="pickup-meta">
+                                <span class="pickup-type" [class.pickup-type--after-hours]="getPickupType(pickup.pickupTime).includes('después')">
+                                  <i class="fa-regular fa-clock"></i>
+                                  {{ getPickupType(pickup.pickupTime) }}
+                                </span>
+                                @if (getPickupTimeRange(pickup.pickupTime); as range) {
+                                  <span class="pickup-range-badge">{{ range }}</span>
+                                }
+                              </div>
+                            </div>
                           </li>
                         }
                       </ul>
@@ -300,7 +312,7 @@
                             <span class="tx-name">{{ tx.name }}</span>
                             <span class="tx-date">{{ tx.date | date:'dd MMM, HH:mm' }}</span>
                           </div>
-                          <div class="tx-amount negative">{{ tx.amount | number:'1.2-2' }}</div>
+                          <div class="tx-amount negative">-$ {{ tx.amount | number:'1.2-2' }}</div>
                         </li>
                       }
                     </ul>

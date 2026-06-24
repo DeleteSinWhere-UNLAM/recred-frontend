@@ -326,32 +326,94 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .pickup-item {
   display: flex;
   align-items: center;
-  padding: 1rem;
+  gap: 14px;
+  padding: 12px 14px;
   background: var(--color-superficie-alt);
-  border-radius: 12px;
-  margin-bottom: 0.5rem;
-  color: var(--color-texto-oscuro);
+  border: 1px solid var(--color-borde);
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
 }
 
-.pickup-item i {
-  color: var(--color-texto-claro);
-  margin-right: 1rem;
+.pickup-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -2px rgba(51, 65, 85, 0.05);
+  border-color: var(--color-borde-fuerte);
 }
 
-.pickup-item span {
-  flex-grow: 1;
-  font-weight: 500;
+.pickup-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: rgba(74, 111, 165, 0.1);
+  color: var(--color-pizarra);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(74, 111, 165, 0.12);
 }
 
-.pickup-time {
+.pickup-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pickup-name {
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
+  font-size: 13.5px;
   color: var(--color-texto-oscuro);
+  line-height: 1.25;
 }
+
+.pickup-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pickup-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+}
+
+.pickup-type i {
+  font-size: 10px;
+}
+
+.pickup-type--after-hours {
+  color: #d97706;
+}
+
+.pickup-range-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  background-color: var(--color-pizarra);
+  color: white;
+  font-size: 10.5px;
+  font-weight: 700;
+  border-radius: 12px;
+}
+
 
 .empty-state {
   color: #94a3b8;
@@ -367,15 +429,25 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 10px;
 }
 
 .transaction-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem;
-  border-radius: 12px;
-  background-color: transparent;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+}
+
+.transaction-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -2px rgba(51, 65, 85, 0.05);
+  border-color: var(--color-borde-fuerte);
 }
 
 .close-btn {
@@ -395,41 +467,52 @@
 .tx-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background-color: var(--color-superficie-alt);
+  border-radius: 10px;
+  background-color: rgba(74, 111, 165, 0.1);
+  color: var(--color-pizarra);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  margin-right: 1rem;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(74, 111, 165, 0.12);
+  margin-right: 0;
 }
 
 .tx-details {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .tx-name {
-  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
   color: var(--color-texto-oscuro);
-  font-size: 0.9rem;
+  line-height: 1.25;
 }
 
 .tx-date {
-  font-size: 0.75rem;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--color-texto-claro);
-  margin-top: 0.25rem;
+  margin-top: 0;
 }
 
 .tx-amount {
-  font-weight: 700;
-  font-size: 1rem;
+  font-family: var(--font-display, 'Inter');
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .tx-amount.negative {
   color: #ef4444;
 }
+
 
 /* Buttons & Badges */
 .custom-select {
@@ -1209,4 +1292,34 @@
 :host-context([data-theme="dark"]) .global-header {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+:host-context([data-theme="dark"]) .pickup-item {
+  background: var(--color-superficie-alt) !important;
+  border-color: var(--color-borde) !important;
+}
+
+:host-context([data-theme="dark"]) .pickup-icon-wrapper {
+  background-color: rgba(242, 183, 5, 0.1) !important;
+  color: var(--color-dorado) !important;
+  border-color: rgba(242, 183, 5, 0.2) !important;
+}
+
+:host-context([data-theme="dark"]) .pickup-type--after-hours {
+  color: var(--color-dorado) !important;
+}
+
+:host-context([data-theme="dark"]) .pickup-range-badge {
+  background-color: var(--color-pizarra-dark, #1a3b5c) !important;
+}
+
+:host-context([data-theme="dark"]) .transaction-item {
+  background: var(--color-superficie-alt) !important;
+  border-color: var(--color-borde) !important;
+}
+
+:host-context([data-theme="dark"]) .tx-icon {
+  background-color: rgba(242, 183, 5, 0.1) !important;
+  color: var(--color-dorado) !important;
+  border-color: rgba(242, 183, 5, 0.2) !important;
 }
