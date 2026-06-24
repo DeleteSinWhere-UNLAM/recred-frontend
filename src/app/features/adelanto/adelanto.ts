@@ -1,7 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { MicrocreditosService, SchoolCredit } from '../../data-access/services/microcreditos.service';
 import { DialogService } from '../../shared/services/dialog.service';
@@ -17,8 +16,7 @@ import { ToastService } from '../../shared/services/toast.service';
   templateUrl: './adelanto.html',
   styleUrl: './adelanto.css'
 })
-export class AdelantoPage implements OnInit {
-  private readonly route = inject(ActivatedRoute);
+export class AdelantoPage {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly location = inject(Location);
   private readonly microcreditosService = inject(MicrocreditosService);
@@ -36,13 +34,15 @@ export class AdelantoPage implements OnInit {
   montoFijo = signal<number>(5000);
   cuotas = signal<number>(1);
 
-  ngOnInit(): void {
-    const alumnoId = this.contextoService.alumnoId();
-    if (!alumnoId) {
-      this.volver();
-      return;
-    }
-    this.cargarAlumno(alumnoId);
+  constructor() {
+    effect(() => {
+      const alumnoId = this.contextoService.alumnoId();
+      if (!alumnoId) {
+        this.volver();
+        return;
+      }
+      this.cargarAlumno(alumnoId);
+    });
   }
 
   cargarAlumno(alumnoId: string): void {

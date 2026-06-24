@@ -30,8 +30,8 @@ export class HomeAlumnoPresenter {
   private readonly colegiosService = inject(ColegiosService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
-  private readonly router = inject(Router);
   private readonly contextoService = inject(AlumnoContextoService);
+  private readonly router = inject(Router);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly fondoPerfilState = signal<FondoPerfil>('nubes');
@@ -146,6 +146,7 @@ export class HomeAlumnoPresenter {
       const alumno = alumnos.find((a) => a.id === alumnoId) ?? alumnos[0];
       if (alumno) {
         this.alumnoState.set(alumno);
+        this.contextoService.setAlumnoId(alumno.id);
         void this.homeAlumnoService.cargarPedidoEnCurso(alumno.id);
         if (alumno.colegioId) {
           void this.homeAlumnoService.cargarRecreos(alumno.colegioId);

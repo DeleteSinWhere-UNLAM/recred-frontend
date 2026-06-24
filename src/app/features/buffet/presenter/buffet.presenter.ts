@@ -85,6 +85,7 @@ export class BuffetPresenter {
   private readonly colegiosService = inject(ColegiosService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly restriccionProductoService = inject(RestriccionProductoService);
@@ -93,7 +94,6 @@ export class BuffetPresenter {
   private readonly presupuestoService = inject(PresupuestoService);
   private readonly restriccionesNutricionalesService = inject(RestriccionesNutricionalesService);
   private readonly promotionService = inject(PromotionService);
-  private readonly contextoService = inject(AlumnoContextoService);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly buffetState = signal<Buffet | undefined>(undefined);

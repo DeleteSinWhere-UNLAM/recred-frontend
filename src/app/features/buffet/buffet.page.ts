@@ -9,7 +9,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
@@ -62,7 +61,6 @@ export interface MappedPromotion {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BuffetPage implements OnInit {
-  private readonly route = inject(ActivatedRoute);
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
@@ -349,6 +347,13 @@ export class BuffetPage implements OnInit {
 
   constructor() {
     effect(() => {
+      const alumnoId = this.contextoService.alumnoId();
+      if (!alumnoId) return;
+      this.usuarioService.setHomeUrl(this.homeUrlPorRol());
+      void this.inicializarBuffet(alumnoId);
+    });
+
+    effect(() => {
       const selectedDate = this.presenter.fechaSeleccionada();
       if (selectedDate) {
         this.generateCalendar(selectedDate);
@@ -358,8 +363,6 @@ export class BuffetPage implements OnInit {
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl(this.homeUrlPorRol());
-    const alumnoId = this.contextoService.alumnoId();
-    void this.inicializarBuffet(alumnoId);
   }
 
   private async inicializarBuffet(alumnoId: string): Promise<void> {

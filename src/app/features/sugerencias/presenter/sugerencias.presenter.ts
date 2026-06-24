@@ -79,6 +79,7 @@ export class SugerenciasPresenter {
         },
         error: () => {
           this.toastService.mostrar("Error al crear el combo", "error");
+          this.router.navigateByUrl('/promociones');
         }
       });
     }

@@ -13,6 +13,7 @@ describe('HomeAlumnoPresenter', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let homeAlumnoServiceSpy: jasmine.SpyObj<HomeAlumnoService>;
+  let contextoServiceSpy: jasmine.SpyObj<AlumnoContextoService>;
 
   beforeEach(() => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
@@ -29,6 +30,7 @@ describe('HomeAlumnoPresenter', () => {
     ]);
     homeAlumnoServiceSpy.cargarPedidoEnCurso.and.resolveTo();
     homeAlumnoServiceSpy.cargarRecreos.and.resolveTo();
+    contextoServiceSpy = jasmine.createSpyObj<AlumnoContextoService>('AlumnoContextoService', ['setAlumnoId']);
 
     const usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['getAlumnoActual']);
     usuarioServiceSpy.getAlumnoActual.and.returnValue({ id: 'alumno-1' });
@@ -125,6 +127,7 @@ describe('HomeAlumnoPresenter', () => {
     expect(presenter.nombreColegio()).toBe('Colegio Test');
     expect(presenter.tienePedidoEnCurso()).toBeTrue();
     expect(presenter.estadoPedidoLabel()).toBe('Preparando tu pedido');
+    expect(contextoServiceSpy.setAlumnoId).toHaveBeenCalledWith('alumno-1');
   });
 
   it('debería navegar correctamente al ejecutar acciones', async () => {
@@ -132,6 +135,7 @@ describe('HomeAlumnoPresenter', () => {
     await new Promise(r => setTimeout(r, 0));
 
     presenter.ejecutarAccion(presenter.acciones()[0]);
+    expect(contextoServiceSpy.setAlumnoId).toHaveBeenCalledWith('alumno-1');
     expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/buffet');
 
     presenter.ejecutarAccion(presenter.acciones()[2]);
