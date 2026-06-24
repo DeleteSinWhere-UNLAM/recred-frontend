@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
 import { FormsModule } from '@angular/forms';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
@@ -34,6 +35,8 @@ export class AlumnoCardComponent implements OnInit {
   private readonly microcreditosService = inject(MicrocreditosService);
   private readonly toastService = inject(ToastService);
   private readonly dialogService = inject(DialogService);
+  private readonly router = inject(Router);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly _cantidadPendientes = signal<number>(0);
   creditoActivo = signal<SchoolCredit | null>(null);
   mostrarTodosLosBotones = signal<boolean>(false);
@@ -69,6 +72,15 @@ export class AlumnoCardComponent implements OnInit {
 
   toggleBotones(): void {
     this.mostrarTodosLosBotones.update(v => !v);
+  }
+
+  /**
+   * Establece el alumno activo en el servicio de contexto y navega a la ruta.
+   * Esto permite URLs limpias (sin UUID) en todas las rutas de alumno.
+   */
+  navegar(ruta: string): void {
+    this.contextoService.setAlumnoId(this.alumno.id);
+    void this.router.navigate([ruta]);
   }
 
   get fotoPerfil(): string | null {

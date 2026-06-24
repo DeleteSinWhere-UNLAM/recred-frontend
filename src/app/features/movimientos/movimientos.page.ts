@@ -1,5 +1,8 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { combineLatest } from 'rxjs';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -21,6 +24,7 @@ import { DialogService } from '../../shared/services/dialog.service';
 })
 export class MovimientosPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
   private readonly movimientosService = inject(MovimientosService);
   private readonly alumnosService = inject(AlumnosService);
@@ -28,6 +32,7 @@ export class MovimientosPage implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly toastService = inject(ToastService);
   private readonly dialogService = inject(DialogService);
+  private readonly alumnoId$ = toObservable(this.contextoService.alumnoId);
 
   readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
@@ -208,8 +213,18 @@ export class MovimientosPage implements OnInit {
 
   ngOnInit(): void {
     void this.alumnosService.asegurarCargados().then(() => {
-      this.route.paramMap.subscribe((params) => {
-        const alumnoId = params.get('alumnoId');
+      combineLatest([
+        this.route.paramMap,
+        this.alumnoId$
+      ]).subscribe(([params, ctxAlumnoId]) => {
+        const isNestedRoute = !this.esVistaAlumno() && this.router.url.includes('tutor-movimientos');
+        this.esNested.set(isNestedRoute);
+
+        let alumnoId = params.get('alumnoId');
+        if (!alumnoId && isNestedRoute) {
+          alumnoId = ctxAlumnoId;
+        }
+
         if (this.esVistaAlumno()) {
           this.esNested.set(false);
           const currentAlumnoId = this.perfilService.obtenerAlumnoId() ?? this.usuarioService.getAlumnoActual().id;
@@ -220,7 +235,6 @@ export class MovimientosPage implements OnInit {
             this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
           }
         } else if (alumnoId) {
-          this.esNested.set(true);
           this.selectedAlumnoId.set(alumnoId);
           this.esVistaIndividual.set(true);
           const alumno = this.alumnosService.getAlumnoById(alumnoId);
@@ -228,7 +242,6 @@ export class MovimientosPage implements OnInit {
             this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
           }
         } else {
-          this.esNested.set(false);
           this.selectedAlumnoId.set('todos');
           this.esVistaIndividual.set(false);
           this.nombreAlumno.set('');
@@ -265,10 +278,13 @@ export class MovimientosPage implements OnInit {
   onAlumnoChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const val = target.value;
+    const pathPrefix = this.esNested() ? 'tutor-movimientos' : 'movimientos';
     if (val === 'todos') {
-      this.router.navigate(['/movimientos']);
+      this.contextoService.limpiar();
+      this.router.navigate([`/${pathPrefix}`]);
     } else {
-      this.router.navigate(['/movimientos', val]);
+      this.contextoService.setAlumnoId(val);
+      this.router.navigate([`/${pathPrefix}`, val]);
     }
   }
 
@@ -282,7 +298,9 @@ export class MovimientosPage implements OnInit {
     this.filtroPrecioMax.set(null);
     if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
       this.selectedAlumnoId.set('todos');
-      void this.router.navigate(['/movimientos']);
+      this.contextoService.limpiar();
+      const pathPrefix = this.esNested() ? 'tutor-movimientos' : 'movimientos';
+      void this.router.navigate([`/${pathPrefix}`]);
     }
   }
 
@@ -327,7 +345,9 @@ export class MovimientosPage implements OnInit {
   removeChip(id: string): void {
     if (id === 'alumno') {
       this.selectedAlumnoId.set('todos');
-      void this.router.navigate(['/movimientos']);
+      this.contextoService.limpiar();
+      const pathPrefix = this.esNested() ? 'tutor-movimientos' : 'movimientos';
+      void this.router.navigate([`/${pathPrefix}`]);
     } else if (id === 'estado') {
       this.filtroEstado.set('TODOS');
     } else if (id === 'rango') {

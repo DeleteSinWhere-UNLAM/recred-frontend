@@ -6,6 +6,9 @@ import { MovimientosService } from '../../../movimientos/services/movimientos.se
 import { BuffetService } from '../../../buffet/services/buffet.service';
 import { PromotionService, Promotion } from '../../../../data-access/services/promociones/promotion.service';
 import { Movimiento } from '../../../movimientos/models/movimiento.model';
+import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
+import { FavoritosService } from '../../../../features/favoritos/services/favoritos.service';
+import { Producto } from '../../../buffet/models/producto.model';
 
 @Component({
   selector: 'app-tutor-welcome',
@@ -20,6 +23,8 @@ export class TutorWelcome implements OnInit {
   private movimientosService = inject(MovimientosService);
   private buffetService = inject(BuffetService);
   private promosService = inject(PromotionService);
+  private contextoService = inject(AlumnoContextoService);
+  private favoritosService = inject(FavoritosService);
 
   readonly alumnos = this.alumnosService.alumnos;
   
@@ -32,6 +37,7 @@ export class TutorWelcome implements OnInit {
   readonly ultimosMovimientos = signal<(Movimiento & { alumnoNombre?: string })[]>([]);
   readonly pedidosPendientes = signal<(Movimiento & { alumnoNombre: string })[]>([]);
   readonly promociones = signal<Promotion[]>([]);
+  readonly productosFavoritos = signal<{ producto: Producto; alumnoNombre: string }[]>([]);
   readonly cargando = signal(true);
 
   ngOnInit() {
@@ -88,6 +94,46 @@ export class TutorWelcome implements OnInit {
           error: (e) => console.error('Error al obtener buffet:', e)
         });
       }
+
+      // 4. Productos favoritos de los hijos
+      const todosFavoritos: { producto: Producto; alumnoNombre: string }[] = [];
+      let pendingFavorites = alumnosActuales.length;
+
+      if (pendingFavorites === 0) {
+        this.productosFavoritos.set([]);
+      } else {
+        for (const alumno of alumnosActuales) {
+          this.favoritosService.getFavoritos(alumno.id).subscribe({
+            next: (favs) => {
+              const mapeados = (favs || []).map(p => ({
+                producto: p,
+                alumnoNombre: alumno.nombre.split(' ')[0]
+              }));
+              todosFavoritos.push(...mapeados);
+              pendingFavorites--;
+              if (pendingFavorites === 0) {
+                const uniqueFavoritos: { producto: Producto; alumnoNombre: string }[] = [];
+                for (const item of todosFavoritos) {
+                  const existing = uniqueFavoritos.find(x => x.producto.id === item.producto.id);
+                  if (existing) {
+                    existing.alumnoNombre += `, ${item.alumnoNombre}`;
+                  } else {
+                    uniqueFavoritos.push({ ...item });
+                  }
+                }
+                this.productosFavoritos.set(uniqueFavoritos);
+              }
+            },
+            error: (err) => {
+              console.error('Error fetching favorites for dashboard:', err);
+              pendingFavorites--;
+              if (pendingFavorites === 0) {
+                this.productosFavoritos.set(todosFavoritos);
+              }
+            }
+          });
+        }
+      }
     } catch (e) {
       console.error('Error cargando dashboard', e);
     } finally {
@@ -100,6 +146,7 @@ export class TutorWelcome implements OnInit {
   }
 
   irAMovimientos() {
+    this.contextoService.limpiar();
     this.router.navigate(['/movimientos']);
   }
 

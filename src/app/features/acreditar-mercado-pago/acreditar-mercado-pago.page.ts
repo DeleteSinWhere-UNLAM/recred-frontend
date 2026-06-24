@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { } from '../../shared/components/navbar/navbar.component';
 import { AcreditarMercadoPagoPresenter } from './presenter/acreditar-mercado-pago.presenter';
 
@@ -13,15 +14,14 @@ import { AcreditarMercadoPagoPresenter } from './presenter/acreditar-mercado-pag
 })
 export class AcreditarMercadoPagoPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly contextoService = inject(AlumnoContextoService);
   protected readonly presenter = inject(AcreditarMercadoPagoPresenter);
 
   montoIngresado = 0;
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const alumnoId = params.get('alumnoId') ?? '';
-      void this.presenter.init(alumnoId);
-    });
+    const alumnoId = this.contextoService.alumnoId();
+    void this.presenter.init(alumnoId);
   }
 
   protected onMontoChange(event: Event): void {
