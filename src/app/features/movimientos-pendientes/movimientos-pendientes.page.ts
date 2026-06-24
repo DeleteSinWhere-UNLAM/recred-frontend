@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -21,8 +21,7 @@ import { DialogService } from '../../shared/services/dialog.service';
   imports: [CommonModule, FormsModule, MovimientoDetalleModalComponent],
   standalone: true,
 })
-export class MovimientosPendientesPage implements OnInit {
-  private readonly route = inject(ActivatedRoute);
+export class MovimientosPendientesPage {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
   private readonly movimientosService = inject(MovimientosService);
@@ -128,20 +127,27 @@ export class MovimientosPendientesPage implements OnInit {
     }));
   });
 
-  ngOnInit(): void {
-    void this.alumnosService.asegurarCargados().then(() => {
+  constructor() {
+    effect(() => {
       const id = this.contextoService.alumnoId();
-      this.alumnoId.set(id);
-
-      const alumno = this.alumnosService.getAlumnoById(id);
-      if (alumno) {
-        this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
-      } else {
-        this.nombreAlumno.set('Alumno');
-      }
-
-      this.cargarHistorial();
+      if (!id) return;
+      void this.cargarAlumno(id);
     });
+  }
+
+  private async cargarAlumno(id: string): Promise<void> {
+    await this.alumnosService.asegurarCargados();
+    this.alumnoId.set(id);
+    this.modalMovimiento.set(null);
+
+    const alumno = this.alumnosService.getAlumnoById(id);
+    if (alumno) {
+      this.nombreAlumno.set(alumno.nombre.split(' ')[0]);
+    } else {
+      this.nombreAlumno.set('Alumno');
+    }
+
+    this.cargarHistorial();
   }
 
   cargarHistorial(): void {

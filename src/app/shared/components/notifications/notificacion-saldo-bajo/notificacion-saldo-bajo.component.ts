@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificacionSaldoBajoService } from './notificacion-saldo-bajo.service';
 import { Router } from '@angular/router';
+import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
 
 @Component({
   selector: 'app-notificacion-saldo-bajo',
@@ -12,6 +13,7 @@ import { Router } from '@angular/router';
 })
 export class NotificacionSaldoBajoComponent {
   protected notificacionService = inject(NotificacionSaldoBajoService);
+  private contextoService = inject(AlumnoContextoService);
   private router = inject(Router);
 
   cerrar() {
@@ -26,6 +28,7 @@ export class NotificacionSaldoBajoComponent {
       console.error('No se pudo obtener el ID del alumno');
       return;
     }
-    this.router.navigate(['/acreditar-mercado-pago', alumnoId]);
+    this.contextoService.setAlumnoId(alumnoId);
+    this.router.navigateByUrl('/acreditar-mercado-pago');
   }
 }

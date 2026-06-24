@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { } from '../../shared/components/navbar/navbar.component';
 import { RestriccionesHorariasPresenter, FranjaConRestricciones } from './presenter/restricciones-horarias.presenter';
@@ -18,8 +17,7 @@ import { RestriccionHoraria } from './models/restriccion-horaria.model';
   providers: [RestriccionesHorariasPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RestriccionesHorariasPage implements OnInit {
-  private readonly route = inject(ActivatedRoute);
+export class RestriccionesHorariasPage {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly location = inject(Location);
   protected readonly presenter = inject(RestriccionesHorariasPresenter);
@@ -63,18 +61,19 @@ export class RestriccionesHorariasPage implements OnInit {
 
   constructor() {
     effect(() => {
+      const alumnoId = this.contextoService.alumnoId();
+      if (alumnoId) {
+        this.selectedFranjaId.set('');
+        void this.presenter.init(alumnoId);
+      }
+    });
+
+    effect(() => {
       const slots = this.presenter.franjasConRestricciones();
       if (slots.length > 0 && !this.selectedFranjaId()) {
         this.selectedFranjaId.set(slots[0].franja.id);
       }
     });
-  }
-
-  ngOnInit(): void {
-    const alumnoId = this.contextoService.alumnoId();
-    if (alumnoId) {
-      void this.presenter.init(alumnoId);
-    }
   }
 
   volver(): void {
