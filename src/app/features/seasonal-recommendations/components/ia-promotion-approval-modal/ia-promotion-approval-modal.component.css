@@ -457,6 +457,24 @@
   box-shadow: 0 6px 16px rgba(74, 111, 165, 0.1);
 }
 
+.btn-primary {
+  background-color: var(--color-pizarra);
+  color: white;
+  box-shadow: 0 4px 12px rgba(74, 111, 165, 0.32);
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  min-height: auto;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background-color: var(--color-pizarra-dark);
+}
+
 .btn-success {
   background-color: var(--color-pizarra, #4a6fa5);
   color: #fff;

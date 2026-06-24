@@ -18,6 +18,10 @@ export class PromocionesPageComponent implements OnInit {
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
+  constructor() {
+    this.usuarioService.setHomeUrl('/kiosquero');
+  }
+
   ngOnInit() {
     this.presenter.loadPromotions();
   }
