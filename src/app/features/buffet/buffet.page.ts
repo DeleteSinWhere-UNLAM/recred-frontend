@@ -44,6 +44,12 @@ export interface MappedPromotion {
   esPromoReal: boolean;
   categoria: CategoriaProducto;
   clasificacionesSalud: ClasificacionSalud[];
+  /** Bloqueada explícitamente por el tutor (se oculta en vista alumno) */
+  bloqueada?: boolean;
+  /** Bloqueada por restricción nutricional o alérgeno (se oculta en vista alumno) */
+  bloqueadaPorRestriccion?: boolean;
+  /** Motivo de bloqueo derivado del primer producto afectado */
+  motivoBloqueo?: string;
 }
 
 @Component({
@@ -169,6 +175,15 @@ export class BuffetPage implements OnInit {
         ).values()
       );
 
+      // Derivar bloqueo desde los productos que componen la promo
+      const productoBloqueadoPorTutor = products.find(p => p.bloqueado);
+      const productoBloqueadoPorRestriccion = products.find(p => p.bloqueadoPorRestriccion);
+      const bloqueada = !!productoBloqueadoPorTutor;
+      const bloqueadaPorRestriccion = !bloqueada && !!productoBloqueadoPorRestriccion;
+      const motivoBloqueo =
+        productoBloqueadoPorTutor?.motivoBloqueo ??
+        productoBloqueadoPorRestriccion?.motivoBloqueo;
+
       return {
         id: promo.id,
         nombre: promo.name,
@@ -180,7 +195,10 @@ export class BuffetPage implements OnInit {
         imagen,
         esPromoReal: true,
         categoria: products[0]?.categoria || { id: 'promociones', descripcion: 'Promociones' },
-        clasificacionesSalud: uniqueClasificaciones
+        clasificacionesSalud: uniqueClasificaciones,
+        bloqueada,
+        bloqueadaPorRestriccion,
+        motivoBloqueo,
       };
     });
   });
@@ -189,8 +207,14 @@ export class BuffetPage implements OnInit {
     const promos = this.promocionesDestacadas();
     const { busqueda, categoriaId, precioMin, precioMax } = this.presenter.filtros();
     const texto = busqueda.trim().toLowerCase();
-    
+    const esAlumno = this.esVistaAlumno();
+
     return promos.filter(p => {
+      // En la vista del alumno, ocultar solo las bloqueadas por el tutor
+      if (esAlumno) {
+        if (p.bloqueada) return false;
+        // Las restringidas se muestran pero con botón deshabilitado (como los productos)
+      }
       if (texto && !p.nombre.toLowerCase().includes(texto) && !p.descripcion.toLowerCase().includes(texto)) {
         return false;
       }
@@ -283,6 +307,22 @@ export class BuffetPage implements OnInit {
     };
 
     return this.carritoService.puedeAgregar(pTemp, alumno.id, 1);
+  }
+
+  protected getMensajeRestriccionPromo(promo: MappedPromotion): string {
+    const motivo = promo.motivoBloqueo ?? '';
+    if (!motivo) return 'No apto';
+    const MAPA: Record<string, string> = {
+      'Gluten (TACC)':                 'Contiene TACC',
+      'Az\u00facar':                   'Contiene Az\u00facar',
+      'L\u00e1cteos':                  'Contiene L\u00e1cteos',
+      'Alto Sodio':                    'Contiene Sodio',
+      'Ingredientes de origen animal': 'No Vegano',
+    };
+    const contenido = motivo.replace(/^Contiene:\s*/i, '');
+    const partes = contenido.split(',').map((p: string) => p.trim());
+    const etiquetas = partes.map((p: string) => MAPA[p] ?? p);
+    return 'No apto: ' + etiquetas.join(' \u00b7 ');
   }
 
   protected agregarPromoAlCarrito(promo: MappedPromotion): void {
