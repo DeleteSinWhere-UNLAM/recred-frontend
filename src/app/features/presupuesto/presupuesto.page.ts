@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
+import { } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import {
   CambioPorcentaje,
@@ -14,22 +14,24 @@ import { PresupuestoPresenter } from './presenter/presupuesto.presenter';
   templateUrl: './presupuesto.page.html',
   styleUrl: './presupuesto.page.css',
   imports: [
-    NavbarComponent,
+    
     ReglaCategoriaItemComponent,
   ],
   providers: [PresupuestoPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PresupuestoPage implements OnInit {
-  private readonly route = inject(ActivatedRoute);
+export class PresupuestoPage {
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly usuarioService = inject(UsuarioService);
   protected readonly presenter = inject(PresupuestoPresenter);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
-  ngOnInit(): void {
-    const alumnoId = this.route.snapshot.paramMap.get('alumnoId') ?? '';
-    this.presenter.init(alumnoId);
+  constructor() {
+    effect(() => {
+      const alumnoId = this.contextoService.alumnoId();
+      void this.presenter.init(alumnoId);
+    });
   }
 
   protected etiquetaPeriodo(periodo: Periodo): string {

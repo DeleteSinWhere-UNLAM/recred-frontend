@@ -2,20 +2,31 @@
 
 <main class="carrito-page">
   <div class="carrito-page__container">
+    <button
+      type="button"
+      class="carrito-page__volver"
+      (click)="presenter.volverAlBuffet()"
+    >
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
     <header class="carrito-page__cabecera">
-      <button
-        type="button"
-        class="carrito-page__volver"
-        (click)="presenter.volverAlBuffet()"
-      >
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        <span>Volver</span>
-      </button>
-      <div class="carrito-page__titulo-bloque">
-        <h2 class="carrito-page__titulo">Mi Carrito</h2>
-        <p class="carrito-page__subtitulo">
-          Revisá lo que pediste y elegí cuándo retirarlo.
-        </p>
+      <div class="carrito-page__titulo-bloque" [class.carrito-page__titulo-bloque--alumno]="esVistaAlumno()">
+        @if (esVistaAlumno()) {
+          <div class="carrito-page__titulo-icono" aria-hidden="true">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </div>
+        }
+        <div class="carrito-page__titulo-texto">
+          <h2 class="carrito-page__titulo">Mi Carrito</h2>
+          <p class="carrito-page__subtitulo">
+            Revisá lo que pediste y elegí cuándo retirarlo.
+          </p>
+        </div>
+        @if (esVistaAlumno()) {
+          <span class="carrito-page__ola" aria-hidden="true"></span>
+        }
       </div>
     </header>
 
@@ -27,6 +38,7 @@
         <button
           type="button"
           class="carrito-page__vacio-cta"
+          [class.carrito-page__vacio-cta--premium]="esPremium()"
           (click)="presenter.volverAlBuffet()"
         >
           Ir al inicio
@@ -42,13 +54,27 @@
               [seleccionado]="grupo.seleccionado"
               [fecha]="grupo.fecha"
               [recreo]="grupo.recreo"
-              [fechaMinima]="presenter.fechaMinima"
+              [recreosDisponibles]="presenter.recreosDisponiblesMap()[grupo.alumno.id] || []"
+              [fechaMinima]="presenter.fechaMinimaMap()[grupo.alumno.id] || presenter.fechaMinima"
+              [motivoBloqueoPresupuesto]="presenter.budgetBlockReasons()[grupo.alumno.id]"
+              [modoSoloLectura]="presenter.esModoSoloLectura()"
+              [favoritoDeshabilitado]="limiteCarritosAlcanzado()"
               (toggleSeleccion)="presenter.toggleSeleccion(grupo.alumno.id)"
               (fechaCambia)="presenter.setFecha(grupo.alumno.id, $event)"
               (recreoCambia)="presenter.setRecreo(grupo.alumno.id, $event)"
               (sumarItem)="presenter.sumarItem($event)"
               (restarItem)="presenter.restarItem($event)"
               (eliminarItem)="presenter.eliminarItem($event)"
+              (guardarFavorito)="abrirModalFavorito(grupo.alumno.id, grupo.items)"
+              (editarRetiro)="presenter.irAEditarRetiro(grupo.alumno.id)"
+            />
+          }
+
+          @if (presenter.mostrarSugerencias()) {
+            <app-sugerencias-carrito
+              [sugerencias]="presenter.sugerencias()"
+              [cargando]="presenter.cargandoSugerencias()"
+              (agregar)="presenter.agregarSugerencia($event)"
             />
           }
         </section>
@@ -65,3 +91,11 @@
     }
   </div>
 </main>
+
+@if (mostrarModalFavorito) {
+  <app-guardar-favorito-modal
+    [initialAlumnoId]="favoritoModalAlumnoId"
+    [items]="favoritoModalItems"
+    (closeModal)="cerrarModalFavorito()"
+  />
+}

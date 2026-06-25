@@ -1,7 +1,68 @@
-<section class="perfil-header" [attr.aria-label]="'Perfil de ' + nombreCompleto">
+<section
+  class="perfil-header"
+  [class.perfil-header--fondo-nubes]="fondo === 'nubes'"
+  [class.perfil-header--fondo-minecraft]="fondo === 'minecraft'"
+  [class.perfil-header--fondo-dragonballz]="fondo === 'dragonballz'"
+  [class.perfil-header--fondo-gato]="fondo === 'gato'"
+  [class.perfil-header--fondo-messi]="fondo === 'messi'"
+  [attr.aria-label]="'Perfil de ' + nombreCompleto"
+>
+  @if (fondo === 'nubes') {
+    <img class="perfil-header__deco perfil-header__deco--uno"   src="/nube.png" alt="" aria-hidden="true" />
+    <img class="perfil-header__deco perfil-header__deco--dos"   src="/nube.png" alt="" aria-hidden="true" />
+    <img class="perfil-header__deco perfil-header__deco--tres"  src="/nube.png" alt="" aria-hidden="true" />
+  } @else if (fondo === 'minecraft') {
+    <img class="perfil-header__deco perfil-header__deco--uno"   src="/bee.png"     alt="" aria-hidden="true" />
+    <img class="perfil-header__deco perfil-header__deco--dos"   src="/creeper.png" alt="" aria-hidden="true" />
+    <img class="perfil-header__deco perfil-header__deco--tres"  src="/bee.png"     alt="" aria-hidden="true" />
+  } @else if (fondo === 'dragonballz') {
+    <img class="perfil-header__deco perfil-header__deco--goku" src="/dragonballz.png" alt="" aria-hidden="true" />
+  } @else if (fondo === 'gato') {
+    <img class="perfil-header__deco perfil-header__deco--gato" src="/gato.png" alt="" aria-hidden="true" />
+  } @else {
+    <img class="perfil-header__deco perfil-header__deco--messi" src="/messi.png" alt="" aria-hidden="true" />
+  }
+
+  <button
+    type="button"
+    class="perfil-header__editar"
+    (click)="alternarMenu()"
+    [attr.aria-expanded]="menuAbierto()"
+    aria-label="Cambiar fondo del perfil"
+  >
+    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+  </button>
+
+  @if (menuAbierto()) {
+    <div class="perfil-header__menu" role="menu" aria-label="Fondos disponibles">
+      <p class="perfil-header__menu-titulo">Elegí un fondo</p>
+      <div class="perfil-header__menu-opciones">
+        @for (opcion of opciones; track opcion.id) {
+          <button
+            type="button"
+            class="perfil-header__opcion"
+            [class.perfil-header__opcion--activa]="fondo === opcion.id"
+            (click)="elegirFondo(opcion.id)"
+            role="menuitemradio"
+            [attr.aria-checked]="fondo === opcion.id"
+          >
+            <span class="perfil-header__opcion-preview">
+              <img [src]="opcion.preview" [alt]="opcion.label" />
+            </span>
+            <span class="perfil-header__opcion-label">{{ opcion.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
   <div class="perfil-header__avatar-wrap">
     <div class="perfil-header__avatar">
-      <span>{{ iniciales }}</span>
+      @if (urlFotoPerfil) {
+        <img [src]="urlFotoPerfil" [alt]="'Foto de ' + nombreCompleto" class="perfil-header__avatar-img" />
+      } @else {
+        <span>{{ iniciales }}</span>
+      }
     </div>
   </div>
 

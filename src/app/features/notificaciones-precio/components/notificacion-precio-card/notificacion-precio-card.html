@@ -1,0 +1,24 @@
+<article class="card">
+  <h3 class="card__titulo">
+    {{ notificacion.titulo }}
+  </h3>
+
+  <p class="card__mensaje">
+    {{ notificacion.mensaje }}
+  </p>
+
+  <div class="card__footer">
+    <span class="card__producto">
+      Producto:
+      {{ notificacion.productoId }}
+    </span>
+  </div>
+
+  <div class="card__razon">
+    <strong>Motivo IA:</strong>
+
+    <p>
+      {{ notificacion.razonIA }}
+    </p>
+  </div>
+</article>

@@ -7,15 +7,16 @@ import { ProductService } from '../../updated-inventory/services/product.service
 import { Category } from '../../updated-inventory/models/category.interface';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
-import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { } from '../../../shared/components/navbar/navbar.component';
 import { CameraCapture } from '../components/camera-capture/camera-capture';
 import { ScannerLoader } from '../components/scanner-loader/scanner-loader';
 import { AiProductForm } from '../components/ai-product-form/ai-product-form';
+import { DialogService } from '../../../shared/services/dialog.service';
 
 @Component({
     selector: 'app-ai-product-upload-page',
     standalone: true,
-    imports: [NavbarComponent, CameraCapture, ScannerLoader, AiProductForm],
+    imports: [ CameraCapture, ScannerLoader, AiProductForm],
     templateUrl: './ai-product-upload-page.component.html',
     styleUrl: './ai-product-upload-page.component.css'
 })
@@ -25,6 +26,7 @@ export class AiProductUploadPageComponent implements OnInit {
     private router = inject(Router);
     private usuarioService = inject(UsuarioService);
     private perfilService = inject(PerfilService);
+    private dialogService = inject(DialogService);
 
     categories: Category[] = [];
     buffetId = '';
@@ -67,10 +69,10 @@ export class AiProductUploadPageComponent implements OnInit {
                 this.scannedProductData = data;
                 this.isLoading = false;
             },
-            error: (err) => {
+            error: async (err) => {
                 console.error('Error analyzing image', err);
                 this.isLoading = false;
-                alert('Hubo un error al procesar la imagen.');
+                await this.dialogService.alert('Hubo un error al procesar la imagen.', 'Error de Análisis');
             }
         });
     }

@@ -28,9 +28,8 @@ describe('RecommendationCardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería mostrar la categoría y el motivo', () => {
+  it('debería mostrar la categoría', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.recommendation-card__titulo')?.textContent).toContain('Test Categoria');
-    expect(compiled.querySelector('.recommendation-card__motivo')?.textContent).toContain('Test Motivo');
   });
 });

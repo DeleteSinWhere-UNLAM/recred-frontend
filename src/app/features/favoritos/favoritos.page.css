@@ -1,0 +1,383 @@
+.favoritos {
+  min-height: calc(100vh - 64px);
+  padding: 32px 0 60px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 240px),
+    var(--color-fondo);
+}
+
+.favoritos__container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.favoritos__volver {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.favoritos__volver:hover {
+  background-color: var(--color-superficie-alt);
+  color: var(--color-pizarra-dark);
+}
+
+.favoritos__volver:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-neu-concave);
+}
+
+.favoritos__cabecera {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(180deg, #fdecea 0%, #ffffff 70%);
+  border: 1px solid rgba(231, 111, 81, 0.28);
+  border-radius: 20px;
+  padding: 16px 20px 30px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.favoritos__icono {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-melocoton) 0%, #c75a3f 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 8px 18px rgba(231, 111, 81, 0.22);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.favoritos__identidad {
+  position: relative;
+  z-index: 1;
+}
+
+.favoritos__ola {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%23E76F51' fill-opacity='0.5'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: bottom center;
+  pointer-events: none;
+}
+
+.favoritos__titulo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-melocoton);
+  line-height: 1.2;
+  margin: 0 0 2px;
+}
+
+.favoritos__subtitulo {
+  font-size: 13px;
+  color: var(--color-texto-claro);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Secciones de la página */
+.favoritos__seccion {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Grid de favoritos */
+.favoritos__favoritos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .favoritos__favoritos-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Tarjeta de favorito */
+.favoritos-fav-card {
+  display: flex;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  min-height: 164px;
+  transition: all var(--transition-ui);
+}
+
+.favoritos-fav-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-borde-fuerte);
+  box-shadow: var(--shadow-neu-convex);
+}
+
+.favoritos-fav-card--sin-stock {
+  filter: grayscale(0.5);
+  opacity: 0.8;
+}
+
+.favoritos-fav-card__media {
+  position: relative;
+  width: 140px;
+  flex-shrink: 0;
+  background-color: var(--color-superficie-alt);
+}
+
+.favoritos-fav-card__imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.favoritos-fav-card__quitar-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  color: var(--color-menta);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all var(--transition-ui);
+}
+
+.favoritos-fav-card__quitar-btn:hover {
+  transform: scale(1.1);
+  color: var(--color-pizarra);
+  background: #fff;
+}
+
+.favoritos-fav-card__quitar-btn:active {
+  transform: scale(0.92);
+}
+
+.favoritos-fav-card__cuerpo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 14px;
+  min-width: 0;
+}
+
+.favoritos-fav-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.favoritos-fav-card__categoria {
+  color: var(--color-texto-claro);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.favoritos-fav-card__precio {
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.favoritos-fav-card__nombre {
+  color: var(--color-texto-oscuro);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favoritos-fav-card__descripcion {
+  color: var(--color-texto-claro);
+  font-size: 11px;
+  line-height: 1.3;
+  margin-bottom: auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 30px;
+}
+
+.favoritos-fav-card__comprar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 36px;
+  margin-top: 10px;
+  padding: 0 12px;
+  background: linear-gradient(180deg, var(--color-menta), #6da085);
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(109, 160, 133, 0.16);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  transition: all var(--transition-ui);
+}
+
+.favoritos-fav-card__comprar-btn:hover:not(:disabled) {
+  filter: saturate(1.05) brightness(1.02);
+  box-shadow: 0 10px 20px rgba(109, 160, 133, 0.22);
+}
+
+.favoritos-fav-card__comprar-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.favoritos-fav-card__comprar-btn:disabled {
+  background: var(--color-superficie-alt);
+  color: var(--color-texto-claro);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Vacío de favoritos */
+.favoritos__favoritos-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 34px 20px;
+  background-color: var(--color-superficie);
+  border: 1.5px dashed var(--color-borde-fuerte);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  color: var(--color-texto-claro);
+}
+
+.favoritos__favoritos-vacio i {
+  font-size: 26px;
+  margin-bottom: 8px;
+  opacity: 0.65;
+}
+
+.favoritos__favoritos-vacio p {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--color-texto-oscuro);
+}
+
+.favoritos__favoritos-vacio-sub {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  max-width: 320px;
+  margin: 0;
+  line-height: 1.3;
+}
+
+@media (max-width: 960px) {
+  .favoritos__container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .favoritos {
+    padding: 24px 0 24px;
+  }
+
+  .favoritos__container {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .favoritos__cabecera {
+    padding: 14px 16px 28px;
+    gap: 12px;
+  }
+
+  .favoritos__icono {
+    width: 46px;
+    height: 46px;
+    font-size: 19px;
+  }
+
+  .favoritos__titulo {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .favoritos {
+    padding: 20px 0 20px;
+  }
+
+  .favoritos__container {
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .favoritos__cabecera {
+    padding: 12px 14px 26px;
+    gap: 10px;
+    border-radius: 16px;
+  }
+
+  .favoritos__icono {
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
+  }
+
+  .favoritos__titulo {
+    font-size: 17px;
+  }
+
+  .favoritos__subtitulo {
+    font-size: 12px;
+  }
+}

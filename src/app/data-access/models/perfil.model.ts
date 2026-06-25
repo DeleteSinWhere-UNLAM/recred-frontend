@@ -7,6 +7,7 @@ export interface ReferenciaPerfil {
 export interface Perfil {
   readonly id: string;
   readonly email: string;
+  readonly plan?: string;
   readonly nombre: string;
   readonly apellido: string;
   readonly rol: RolUsuario;
@@ -22,4 +23,7 @@ export interface Perfil {
   readonly alumnoEntity?: ReferenciaPerfil | null;
   readonly studentId?: string | null;
   readonly student?: ReferenciaPerfil | null;
+  readonly phone?: string | null;
+  readonly documentNumber?: string | null;
+  readonly urlFotoPerfil?: string | null;
 }

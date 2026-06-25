@@ -1,12 +1,14 @@
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
+import {  RouterOutlet } from '@angular/router';
+import { signal } from '@angular/core';
 import { Alumno } from '../../data-access/models/alumno.model';
 import { Colegio } from '../../data-access/models/colegio.model';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { AsistenteVirtualComponent } from '../asistente-virtual/asistente-virtual.component';
+
 import { ColegioSectionComponent } from './components/colegio-section/colegio-section.component';
 import { TutorHeaderComponent } from './components/tutor-header/tutor-header.component';
 
@@ -18,6 +20,7 @@ interface GrupoColegio {
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 
@@ -25,11 +28,11 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   selector: 'app-home-tutor-page',
   templateUrl: './home-tutor.page.html',
   styleUrl: './home-tutor.page.css',
-  imports: [
-    NavbarComponent,
+  imports: [NavbarComponent, 
+    
     ColegioSectionComponent,
     TutorHeaderComponent,
-    AsistenteVirtualComponent,
+    RouterOutlet,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,12 +42,30 @@ export class HomeTutorPage implements OnInit {
   private readonly colegiosService = inject(ColegiosService);
   private readonly alumnosService = inject(AlumnosService);
 
-  private readonly perfil = this.perfilService.getPerfil();
   private readonly alumnos = this.alumnosService.alumnos;
 
-  readonly nombreUsuario = this.perfil?.nombre ?? this.usuarioService.getUsuarioActual().nombre;
-  readonly nombreCompletoTutor = this.armarNombreCompleto();
-  readonly inicialesTutor = this.armarIniciales();
+  readonly cargando = signal(false);
+  readonly error = signal<string | null>(null);
+
+  readonly nombreUsuario = computed(() => this.perfilService.perfil()?.nombre ?? this.usuarioService.getUsuarioActual().nombre);
+  
+  readonly nombreCompletoTutor = computed(() => {
+    const perfil = this.perfilService.perfil();
+    if (perfil) {
+      return perfil.nombre.split(' ')[0];
+    }
+    return this.nombreUsuario();
+  });
+
+  readonly inicialesTutor = computed(() => {
+    const perfil = this.perfilService.perfil();
+    const nombre = perfil?.nombre ?? this.usuarioService.getUsuarioActual().nombre;
+    const apellido = perfil?.apellido ?? '';
+    const ini = (nombre[0] ?? '') + (apellido[0] ?? '');
+    return ini.toUpperCase();
+  });
+
+  readonly urlFotoPerfilTutor = computed(() => this.perfilService.perfil()?.urlFotoPerfil ?? null);
 
   readonly grupos = computed<GrupoColegio[]>(() => {
     const alumnos = this.alumnos();
@@ -74,24 +95,26 @@ export class HomeTutorPage implements OnInit {
 
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
-    this.usuarioService.setNombreNavbar(this.nombreUsuario);
+    this.usuarioService.setNombreNavbar(this.nombreUsuario());
   }
 
   ngOnInit(): void {
-    void this.alumnosService.asegurarCargados();
+    this.cargando.set(true);
+    Promise.all([
+      this.alumnosService.asegurarCargados(true),
+      this.colegiosService.obtenerColegios(),
+    ])
+      .then(() => {
+        this.cargando.set(false);
+      })
+      .catch((err) => {
+        console.error('Error al cargar datos en HomeTutor:', err);
+        this.error.set('Error al cargar alumnos');
+        this.cargando.set(false);
+      });
   }
 
-  private armarNombreCompleto(): string {
-    if (this.perfil) {
-      return `${this.perfil.nombre} ${this.perfil.apellido}`.trim();
-    }
-    return this.nombreUsuario;
-  }
-
-  private armarIniciales(): string {
-    const nombre = this.perfil?.nombre ?? this.nombreUsuario;
-    const apellido = this.perfil?.apellido ?? '';
-    const ini = (nombre[0] ?? '') + (apellido[0] ?? '');
-    return ini.toUpperCase();
+  manejarMicrocredito(event: unknown): void {
+    console.log('manejarMicrocredito', event);
   }
 }

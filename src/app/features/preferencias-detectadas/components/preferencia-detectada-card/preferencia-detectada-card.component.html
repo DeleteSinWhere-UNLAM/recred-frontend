@@ -1,0 +1,23 @@
+<article class="card">
+  <h3 class="card__titulo">
+    {{ preferencia.titulo }}
+  </h3>
+
+  <p class="card__mensaje">
+    {{ preferencia.mensaje }}
+  </p>
+
+  <button type="button" class="card__btn" (click)="toggleDetalle()">
+    {{ expandido ? "Ocultar detalle" : "Ver detalle" }}
+  </button>
+
+  @if (expandido) {
+    <div class="card__detalle">
+      <h4>Explicación IA</h4>
+
+      <p>
+        {{ preferencia.razonIA }}
+      </p>
+    </div>
+  }
+</article>

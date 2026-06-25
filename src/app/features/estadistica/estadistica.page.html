@@ -1,19 +1,14 @@
-<app-navbar [userName]="nombreUsuario" />
-
 <main class="estadistica">
-  <button
-    type="button"
-    class="estadistica__volver"
-    (click)="presenter.volver()"
-  >
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    <span>Volver</span>
-  </button>
+
 
   <div class="estadistica__container">
     <header class="estadistica__cabecera">
       <div class="estadistica__avatar" aria-hidden="true">
-        <span>{{ presenter.iniciales() }}</span>
+        @if (presenter.urlFotoPerfil()) {
+          <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="estadistica__avatar-img" />
+        } @else {
+          <span>{{ presenter.iniciales() }}</span>
+        }
       </div>
       <div class="estadistica__identidad">
         <h2 class="estadistica__titulo">Estadística</h2>

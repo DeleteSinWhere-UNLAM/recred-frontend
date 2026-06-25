@@ -1,16 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .estadistica {
   position: relative;
-  min-height: calc(100vh - 64px);
-  padding: 32px 0 48px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 240px),
-    var(--color-fondo);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
 }
 
 .estadistica__container {
   max-width: 720px;
   margin: 0 auto;
-  padding: 0 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -73,6 +78,13 @@
   letter-spacing: 1px;
   box-shadow: 0 12px 24px rgba(74, 111, 165, 0.18);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.estadistica__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .estadistica__titulo {

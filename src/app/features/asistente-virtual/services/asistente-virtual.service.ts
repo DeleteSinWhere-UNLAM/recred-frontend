@@ -10,26 +10,27 @@ import {
 } from '../models/sesion-asistente.model';
 
 interface SchoolAssistantRequest {
-  readonly sesionId: string | null;
+  readonly sesionId?: string;
   readonly mensaje: string;
 }
 
 export interface ContextoAsistente {
   readonly rol: RolUsuario;
-  readonly alumnoId?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AsistenteVirtualService {
   private readonly http = inject(HttpClient);
-  private readonly iaBase = environment.apiUrl.replace(/\/api\/v\d+\/?$/, '') + '/ia';
+  private readonly iaBase = `${environment.apiUrl.replace(/\/$/, '')}/ia`;
 
   enviarMensaje(
     contexto: ContextoAsistente,
     mensaje: string,
     sesionId: string | null,
   ): Promise<RespuestaAsistente> {
-    const body: SchoolAssistantRequest = { sesionId, mensaje };
+    const body: SchoolAssistantRequest = sesionId
+      ? { sesionId, mensaje }
+      : { mensaje };
     return firstValueFrom(
       this.http.post<RespuestaAsistente>(
         `${this.getBasePath(contexto)}/mensajes`,
@@ -82,13 +83,8 @@ export class AsistenteVirtualService {
         return `${this.iaBase}/tutores/me/asistente`;
       case 'VENDEDOR':
         return `${this.iaBase}/kiosqueros/me/asistente`;
-      case 'ALUMNO': {
-        const alumnoId = contexto.alumnoId?.trim();
-        if (!alumnoId) {
-          throw new Error('No se pudo resolver el alumno para usar el asistente.');
-        }
-        return `${this.iaBase}/alumnos/${encodeURIComponent(alumnoId)}/asistente`;
-      }
+      case 'ALUMNO':
+        return `${this.iaBase}/alumnos/me/asistente`;
     }
   }
 }

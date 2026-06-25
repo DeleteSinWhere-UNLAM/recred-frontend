@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
@@ -6,6 +6,7 @@ import { AiProductUploadPageComponent } from './ai-product-upload-page.component
 import { AiVisionService } from '../services/ia-vision-service/ai-vision-service';
 import { ProductService } from '../../updated-inventory/services/product.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { DialogService } from '../../../shared/services/dialog.service';
 import { SaveProductRequest } from '../models/save-product-request.interface';
 import { of, throwError } from 'rxjs';
 
@@ -15,15 +16,18 @@ describe('AiProductUploadPageComponent', () => {
   let aiVisionServiceMock: jasmine.SpyObj<AiVisionService>;
   let productServiceMock: jasmine.SpyObj<ProductService>;
   let perfilServiceMock: jasmine.SpyObj<PerfilService>;
+  let dialogServiceMock: jasmine.SpyObj<DialogService>;
   const mockBuffetId = 'buffet-test-123';
 
   beforeEach(async () => {
     aiVisionServiceMock = jasmine.createSpyObj('AiVisionService', ['analyzeImage', 'saveProduct']);
     productServiceMock = jasmine.createSpyObj('ProductService', ['getCategories']);
     perfilServiceMock = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
+    dialogServiceMock = jasmine.createSpyObj('DialogService', ['alert', 'confirm']);
 
     productServiceMock.getCategories.and.returnValue(of([]));
     perfilServiceMock.obtenerBuffetId.and.returnValue(mockBuffetId);
+    dialogServiceMock.alert.and.returnValue(Promise.resolve(true));
 
     aiVisionServiceMock.analyzeImage.and.returnValue(of(
       {
@@ -42,6 +46,7 @@ describe('AiProductUploadPageComponent', () => {
         { provide: AiVisionService, useValue: aiVisionServiceMock },
         { provide: ProductService, useValue: productServiceMock },
         { provide: PerfilService, useValue: perfilServiceMock },
+        { provide: DialogService, useValue: dialogServiceMock },
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -61,23 +66,23 @@ describe('AiProductUploadPageComponent', () => {
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
     component.handlePhoto(file);
 
-    expect(component.isLoading).toBeFalse(); // After subscribe it becomes false
+    expect(component.isLoading).toBeFalse();
     expect(aiVisionServiceMock.analyzeImage).toHaveBeenCalledWith(file);
     expect(component.scannedProductData?.nombre).toBe('Galletas de arroz integral');
   });
 
-  it('debería manejar errores al fallar el análisis de la imagen', () => {
+  it('debería manejar errores al fallar el análisis de la imagen', fakeAsync(() => {
     spyOn(console, 'error');
-    spyOn(window, 'alert');
     aiVisionServiceMock.analyzeImage.and.returnValue(throwError(() => new Error('API Error')));
 
     const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
     component.handlePhoto(file);
+    tick();
 
     expect(component.isLoading).toBeFalse();
     expect(console.error).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Hubo un error al procesar la imagen.');
-  });
+    expect(dialogServiceMock.alert).toHaveBeenCalledWith('Hubo un error al procesar la imagen.', 'Error de Análisis');
+  }));
 
   it('deberia guardar el producto usando el buffet del perfil', () => {
     const request: SaveProductRequest = {

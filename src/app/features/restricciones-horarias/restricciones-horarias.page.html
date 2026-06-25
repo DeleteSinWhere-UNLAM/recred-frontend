@@ -1,0 +1,163 @@
+<main class="restricciones">
+  <div class="restricciones__container">
+    
+    <header class="restricciones__header">
+      <h1 class="restricciones__titulo">Horarios de compra de {{ presenter.alumno()?.nombre }}</h1>
+    </header>
+
+    @if (presenter.cargando()) {
+      <div class="restricciones__loading">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Cargando configuración...</span>
+      </div>
+    } @else {
+
+
+      @if (activeItem(); as item) {
+        <article class="franja-card">
+          
+
+          
+          <header class="franja-card__header">
+            <button class="carousel-btn" (click)="anteriorFranja()" [disabled]="!puedeAnterior()" aria-label="Recreo anterior">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="franja-card__info">
+              <h2 class="franja-card__nombre">{{ item.franja.descripcion }}</h2>
+              <p class="franja-card__horario">
+                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                <span>{{ item.franja.horaInicio }} - {{ item.franja.horaFin }}</span>
+              </p>
+            </div>
+            <button class="carousel-btn" (click)="siguienteFranja()" [disabled]="!puedeSiguiente()" aria-label="Siguiente recreo">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </header>
+
+          <div class="franja-card__contenido">
+            
+            <div class="total-block-card" [class.total-block-card--checked]="item.tieneBloqueoTotal">
+              <div class="total-block-card__icono-container" [class]="item.tieneBloqueoTotal ? 'total-block-card__icono-container--red' : 'total-block-card__icono-container--gray'" aria-hidden="true">
+                <i class="fa-solid fa-ban"></i>
+              </div>
+              <div class="total-block-card__textos">
+                <span class="total-block-card__titulo">Bloquear compra</span>
+                <span class="total-block-card__sub">No podrá realizar ninguna compra en este recreo.</span>
+              </div>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  class="toggle__input"
+                  [checked]="item.tieneBloqueoTotal"
+                  (change)="alternarBloqueoTotal(item)"
+                  aria-label="Bloquear compras en este recreo"
+                />
+                <span class="toggle__slider" aria-hidden="true"></span>
+              </label>
+            </div>
+            
+            @if (!item.tieneBloqueoTotal) {
+              @if (item.restricciones.length === 0) {
+                <div class="franja-card__libertad" role="status">
+                  <div class="libertad-circle" aria-hidden="true">
+                    <i class="fa-solid fa-check"></i>
+                  </div>
+                  <p class="libertad-text">
+                    {{ presenter.alumno()?.nombre }} tiene total libertad de compra en este recreo.
+                  </p>
+                </div>
+              }
+
+            
+
+
+            
+            @if (item.restricciones.length > 0) {
+              <section class="restricciones-lista" aria-label="Restricciones activas">
+                <h3 class="restricciones-lista__titulo">Restricciones activas:</h3>
+                <div class="restricciones-lista__grid">
+                  @if (item.tieneBloqueoTotal) {
+                    <div class="restriccion-item-card restriccion-item-card--total">
+                      <div class="restriccion-item-card__info">
+                        <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                        <span>Bloqueo total de compras</span>
+                      </div>
+                      <button 
+                        type="button" 
+                        class="restriccion-item-card__btn-quitar" 
+                        (click)="quitarBloqueoTotal(item)"
+                        title="Quitar bloqueo total"
+                      >
+                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  }
+                  
+                  @for (res of item.restricciones; track res.id) {
+                    @if (res.categoria || res.clasificacionSalud || res.categoryId || res.classificationId) {
+                      <div class="restriccion-item-card">
+                        <div class="restriccion-item-card__info">
+                          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                          <span>
+                            {{ res.categoria ? res.categoria.descripcion : (res.categoryId ? presenter.getNombreCategoria(res.categoryId) : (res.clasificacionSalud ? res.clasificacionSalud.descripcion : (res.classificationId ? presenter.getNombreSalud(res.classificationId) : 'Restricción'))) }}
+                          </span>
+                        </div>
+                        <button 
+                          type="button" 
+                          class="restriccion-item-card__btn-quitar" 
+                          (click)="presenter.quitarRestriccion(res.id)"
+                          title="Quitar restricción"
+                        >
+                          <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    }
+                  }
+                </div>
+              </section>
+            }
+
+                        <footer class="franja-card__acciones">
+                <div class="add-restriction">
+                  <div class="add-restriction__controles">
+                    <select 
+                      #selectTipo 
+                      class="add-restriction__select" 
+                      [id]="'selectTipo-' + item.franja.id"
+                      aria-label="Seleccionar bloqueo"
+                      (change)="0"
+                    >
+                      <option value="">-- Seleccionar bloqueo --</option>
+                      <optgroup label="Categorías">
+                        @for (cat of item.categoriasDisponibles; track cat.id) {
+                          <option [value]="'CAT:' + cat.id">{{ cat.descripcion }}</option>
+                        }
+                      </optgroup>
+                      <optgroup label="Salud">
+                        @for (salud of item.saludDisponible; track salud.id) {
+                          <option [value]="'SAL:' + salud.id">{{ salud.descripcion }}</option>
+                        }
+                      </optgroup>
+                    </select>
+                    
+                    <button 
+                      type="button"
+                      class="add-restriction__btn" 
+                      [disabled]="!selectTipo.value"
+                      (click)="agregar(item.franja.id, selectTipo.value); selectTipo.value = ''"
+                    >
+                      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                      <span>Agregar</span>
+                    </button>
+                  </div>
+                </div>
+              </footer>
+            }
+
+          </div>
+        </article>
+      }
+    }
+
+  </div>
+</main>

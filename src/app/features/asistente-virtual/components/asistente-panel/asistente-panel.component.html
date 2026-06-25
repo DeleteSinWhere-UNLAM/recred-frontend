@@ -10,14 +10,14 @@
       <span class="asistente-panel__status" aria-hidden="true"></span>
     </div>
     <div class="asistente-panel__identidad">
-      <h2 id="asistente-panel-titulo" class="asistente-panel__nombre">Cred</h2>
+      <h2 id="asistente-panel-titulo" class="asistente-panel__nombre">Recredito</h2>
       <span class="asistente-panel__subtitulo">Tu ayudante en RECRED</span>
     </div>
     <button
       type="button"
       class="asistente-panel__accion"
       (click)="onNuevaConversacion()"
-      [disabled]="enviando_()"
+      [disabled]="deshabilitado_()"
       aria-label="Nueva conversación"
       title="Nueva conversación"
     >
@@ -35,10 +35,16 @@
 
   <div #scroll class="asistente-panel__mensajes" aria-live="polite">
     @for (m of mensajes_(); track trackById($index, m)) {
-      <app-mensaje-burbuja [mensaje]="m" />
+      @if (m.rol === 'separador') {
+        <div class="asistente-panel__separador" role="separator">
+          <span>{{ m.texto }}</span>
+        </div>
+      } @else {
+        <app-mensaje-burbuja [mensaje]="m" />
+      }
     }
     @if (enviando_()) {
-      <div class="asistente-panel__typing" aria-label="Cred está escribiendo">
+      <div class="asistente-panel__typing" aria-label="Recredito está escribiendo">
         <span class="asistente-panel__typing-avatar" aria-hidden="true">🤖</span>
         <div class="asistente-panel__typing-burbuja" aria-hidden="true">
           <span class="asistente-panel__typing-dot"></span>
@@ -49,14 +55,68 @@
     }
   </div>
 
+  @if (mostrarHistorial_()) {
+    <div class="asistente-panel__historial">
+      <button
+        type="button"
+        class="asistente-panel__historial-boton"
+        [disabled]="deshabilitado_()"
+        (click)="onVerHistorial()"
+      >
+        Ver mensajes anteriores
+      </button>
+    </div>
+  }
+
   <app-sugerencias-chips
     [sugerencias]="sugerencias_()"
-    [deshabilitado]="enviando_()"
+    [deshabilitado]="deshabilitado_()"
     (elegir)="onSugerencia($event)"
   />
 
+  @if (accionesAbiertas_() && gruposOpciones().length > 0) {
+    <section
+      id="asistente-panel-acciones"
+      class="asistente-panel__acciones"
+      aria-label="Opciones del asistente"
+    >
+      <div class="asistente-panel__acciones-scroll">
+        @for (grupo of gruposOpciones(); track trackByGrupo($index, grupo)) {
+          <div class="asistente-panel__acciones-grupo">
+            <h3 class="asistente-panel__acciones-titulo">{{ grupo.label }}</h3>
+            <div class="asistente-panel__acciones-grid">
+              @for (opcion of grupo.opciones; track trackByOpcion($index, opcion)) {
+                <button
+                  type="button"
+                  class="asistente-panel__opcion"
+                  [class.asistente-panel__opcion--premium]="opcion.premium"
+                  [disabled]="deshabilitado_()"
+                  (click)="onOpcion(opcion)"
+                >
+                  @if (opcion.premium) {
+                    <span class="asistente-panel__opcion-icono" aria-hidden="true">
+                      <i class="fa-solid fa-crown"></i>
+                    </span>
+                  } @else if (opcion.emoji) {
+                    <span class="asistente-panel__opcion-icono" aria-hidden="true">
+                      {{ opcion.emoji }}
+                    </span>
+                  }
+                  <span class="asistente-panel__opcion-label">{{ opcion.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
   <app-input-mensaje
-    [deshabilitado]="enviando_()"
+    [deshabilitado]="deshabilitado_()"
+    [mostrarAcciones]="opciones_().length > 0"
+    [accionesAbiertas]="accionesAbiertas_()"
+    (alternarAcciones)="onToggleAcciones()"
     (enviar)="onEnviar($event)"
   />
 </section>

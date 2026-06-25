@@ -6,12 +6,15 @@ import {
   Output,
   computed,
   signal,
+  inject,
 } from '@angular/core';
 import { ItemCarrito } from '../../models/carrito.model';
+import { CarritoService } from '../../services/carrito.service';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 
@@ -22,6 +25,8 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CarritoItemComponent {
+  private readonly carritoService = inject(CarritoService);
+
   private readonly itemState = signal<ItemCarrito | undefined>(undefined);
 
   @Input({ required: true })
@@ -34,6 +39,12 @@ export class CarritoItemComponent {
   @Output() eliminar = new EventEmitter<string>();
 
   readonly itemActual = computed(() => this.itemState());
+
+  readonly deshabilitarSumar = computed(() => {
+    const i = this.itemState();
+    if (!i) return true;
+    return !this.carritoService.puedeAgregar(i.producto, i.alumnoId, 1);
+  });
 
   readonly precioFormateado = computed(() => {
     const i = this.itemState();
@@ -53,10 +64,4 @@ export class CarritoItemComponent {
 }
 
 const IMAGEN_FALLBACK =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'>
-      <rect width='80' height='80' fill='#E8EDF3'/>
-      <text x='40' y='44' text-anchor='middle' font-family='sans-serif' font-size='10' fill='#94A3B8'>Sin imagen</text>
-    </svg>`,
-  );
+  'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';

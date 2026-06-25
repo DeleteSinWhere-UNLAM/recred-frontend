@@ -1,14 +1,5 @@
-<app-navbar />
-
 <main class="prediction-page">
-  <button
-    type="button"
-    class="prediction-page__volver"
-    (click)="volver()"
-  >
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    <span>Volver</span>
-  </button>
+
 
   <div class="prediction-page__container">
     <header class="prediction-page__cabecera">
@@ -36,7 +27,7 @@
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
         <p>{{ errorMessage }}</p>
-        <button type="button" class="prediction-page__reintentar" (click)="ngOnInit()">
+        <button type="button" class="prediction-page__reintentar" (click)="recargar()">
           Reintentar
         </button>
       </section>

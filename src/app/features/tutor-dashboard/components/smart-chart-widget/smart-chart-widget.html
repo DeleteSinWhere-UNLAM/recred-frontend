@@ -1,0 +1,43 @@
+<div class="smart-card">
+  <div class="smart-card-header">
+    <div class="header-title" style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+      <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
+      <h3 style="margin:0; font-size: 1.17em; color: white; white-space: nowrap;">Gráficos</h3>
+    </div>
+    <div class="header-controls">
+      <select class="custom-select child-select" [(ngModel)]="selectedChildId" (change)="onConfigChange()">
+        @for (child of children; track child.studentId) {
+          <option [value]="child.studentId">
+            {{ child.studentName }}
+          </option>
+        }
+      </select>
+
+      <select class="custom-select metric-select" [(ngModel)]="selectedDataSource" (change)="onConfigChange()">
+        <option value="finance">Finanzas</option>
+        <option value="health">Salud</option>
+        <option value="logistics">Logística</option>
+      </select>
+
+      <select class="custom-select type-select" [(ngModel)]="selectedChartType" (change)="onConfigChange()">
+        <option value="bar">Barras</option>
+        <option value="line">Línea</option>
+        <option value="pie">Torta</option>
+        <option value="doughnut">Rosca</option>
+      </select>
+      
+      <button class="close-btn" (click)="onClose()" title="Cerrar tarjeta">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="smart-card-body">
+    <canvas baseChart
+      [data]="chartData"
+      [options]="chartOptions"
+      [plugins]="chartPlugins"
+      [type]="selectedChartType">
+    </canvas>
+  </div>
+</div>

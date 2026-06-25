@@ -70,6 +70,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.orden-alumno__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .orden-alumno__identidad {
@@ -203,5 +210,122 @@
   }
   .orden-alumno__saldo {
     display: none;
+  }
+}
+
+.orden-alumno__pie-resumen {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.orden-alumno__favorito-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-button);
+  border: 1px solid rgba(74, 111, 165, 0.3);
+  color: var(--color-pizarra);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  background-color: transparent;
+  transition: var(--transition-ui);
+}
+
+.orden-alumno__favorito-btn:hover {
+  background-color: rgba(74, 111, 165, 0.06);
+  border-color: var(--color-pizarra);
+  color: var(--color-pizarra-dark);
+}
+
+.orden-alumno__favorito-btn i {
+  font-size: 14px;
+  color: var(--color-melocoton);
+}
+
+.orden-alumno__favorito-btn:disabled {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+.orden-alumno__favorito-btn:disabled i {
+  color: #94a3b8 !important;
+}
+
+/* Read-only retiro display */
+.orden-alumno__retiro-lectura {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.orden-alumno__retiro-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 14px;
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid rgba(74, 111, 165, 0.12);
+  border-radius: var(--radius-button);
+}
+
+.orden-alumno__retiro-dato-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__retiro-dato-label i {
+  color: var(--color-pizarra);
+  font-size: 11px;
+}
+
+.orden-alumno__retiro-dato-valor {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+.orden-alumno__retiro-editar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 16px;
+  background-color: rgba(74, 111, 165, 0.07);
+  border: 1px solid rgba(74, 111, 165, 0.2);
+  border-radius: var(--radius-button);
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  grid-column: 1 / -1;
+  transition: background-color var(--transition-ui), border-color var(--transition-ui);
+}
+
+.orden-alumno__retiro-editar:hover {
+  background-color: rgba(74, 111, 165, 0.12);
+  border-color: var(--color-pizarra);
+}
+
+.orden-alumno__retiro-editar i {
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .orden-alumno__retiro-lectura {
+    grid-template-columns: 1fr;
   }
 }

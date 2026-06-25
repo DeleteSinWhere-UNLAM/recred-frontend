@@ -2,13 +2,17 @@
 @if (alumno) {
   <article class="codigo-retiro">
     <div class="codigo-retiro__avatar" aria-hidden="true">
-      <span>{{ iniciales() }}</span>
+      @if (urlFotoPerfil()) {
+        <img [src]="urlFotoPerfil()" [alt]="'Foto de ' + nombreCompleto()" class="codigo-retiro__avatar-img" />
+      } @else {
+        <span>{{ iniciales() }}</span>
+      }
     </div>
 
     <div class="codigo-retiro__info">
       <p class="codigo-retiro__nombre">{{ nombreCompleto() }}</p>
       <p class="codigo-retiro__meta">
-        {{ fecha }} · {{ recreoLabel() }}
+        {{ fechaFormateada() }} · {{ recreoLabel() }}
       </p>
     </div>
 

@@ -2,9 +2,34 @@
 @if (producto) {
   <article
     class="producto-card"
-    [class.producto-card--sin-stock]="!disponible()"
+    [class.producto-card--sin-stock]="!disponible() && !producto.bloqueado && !bloqueadoPorRestriccion() && !superaPresupuesto() && !superaSaldo()"
+    [class.producto-card--bloqueado]="producto.bloqueado"
+    [class.producto-card--restringido]="bloqueadoPorRestriccion()"
+    [class.producto-card--supera-presupuesto]="superaPresupuesto() || superaSaldo()"
   >
     <div class="producto-card__media">
+      <button
+        type="button"
+        class="producto-card__favorito-btn"
+        [class.producto-card__favorito-btn--activo]="esFavorito"
+        (click)="onToggleFavorito($event)"
+        [attr.aria-label]="esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+      >
+        <i class="fa-heart" [class.fa-solid]="esFavorito" [class.fa-regular]="!esFavorito" aria-hidden="true"></i>
+      </button>
+
+      @if (mostrarCandado) {
+        <button
+          type="button"
+          class="producto-card__lock-btn"
+          [class.producto-card__lock-btn--bloqueado]="producto.bloqueado"
+          (click)="onToggleLock($event)"
+          [attr.aria-label]="producto.bloqueado ? 'Desbloquear producto' : 'Bloquear producto'"
+        >
+          <i class="fa-solid" [class.fa-lock]="producto.bloqueado" [class.fa-lock-open]="!producto.bloqueado" aria-hidden="true"></i>
+        </button>
+      }
+
       <img
         class="producto-card__imagen"
         [src]="producto.imagen"
@@ -13,7 +38,10 @@
         (error)="onImagenError($event)"
       />
       @if (producto.clasificacionesSalud.length > 0) {
-        <span class="producto-card__badge">
+        <span
+          class="producto-card__badge"
+          [class.producto-card__badge--shifted]="mostrarCandado"
+        >
           {{ producto.clasificacionesSalud[0].descripcion }}
         </span>
       }
@@ -25,6 +53,9 @@
         <p class="producto-card__precio">{{ precioFormateado() }}</p>
       </div>
       <h3 class="producto-card__nombre">{{ producto.nombre }}</h3>
+      @if (producto.descripcion) {
+        <p class="producto-card__descripcion">{{ producto.descripcion }}</p>
+      }
 
       @if (disponible()) {
         <div class="producto-card__cantidad">
@@ -42,6 +73,7 @@
             type="button"
             class="producto-card__cantidad-btn"
             (click)="sumar()"
+            [disabled]="deshabilitarSumar()"
             aria-label="Sumar uno"
           >
             <i class="fa-solid fa-plus" aria-hidden="true"></i>
@@ -50,11 +82,20 @@
 
         <button
           type="button"
-          class="producto-card__cta"
+          [class]="(superaPresupuesto() || superaSaldo()) ? 'producto-card__cta producto-card__cta--presupuesto' : (esPremium() ? 'producto-card__cta producto-card__cta--premium' : 'producto-card__cta')"
+          [disabled]="superaPresupuesto() || superaSaldo()"
           (click)="onAgregar()"
         >
-          <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
-          <span>Agregar</span>
+          @if (superaSaldo()) {
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Saldo insuficiente</span>
+          } @else if (superaPresupuesto()) {
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Supera presupuesto</span>
+          } @else {
+            <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+            <span>Agregar</span>
+          }
         </button>
 
         @if (estaEnCarrito()) {
@@ -64,14 +105,48 @@
           </p>
         }
       } @else {
-        <button
-          type="button"
-          class="producto-card__cta producto-card__cta--bloqueado"
-          disabled
-        >
-          <i class="fa-solid fa-ban" aria-hidden="true"></i>
-          <span>Sin stock</span>
-        </button>
+        @if (superaSaldo()) {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--presupuesto"
+            disabled
+          >
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Saldo insuficiente</span>
+          </button>
+        } @else if (superaPresupuesto()) {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--presupuesto"
+            disabled
+          >
+            <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+            <span>Supera presupuesto</span>
+          </button>
+        } @else if (bloqueadoPorRestriccion()) {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--restringido"
+            disabled
+          >
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+            <span>{{ mensajeRestriccion() }}</span>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="producto-card__cta producto-card__cta--bloqueado"
+            disabled
+          >
+            @if (producto.bloqueado) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              <span>Bloqueado por el tutor</span>
+            } @else {
+              <i class="fa-solid fa-ban" aria-hidden="true"></i>
+              <span>Sin stock</span>
+            }
+          </button>
+        }
       }
     </div>
   </article>

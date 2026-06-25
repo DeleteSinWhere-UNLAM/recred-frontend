@@ -1,11 +1,11 @@
 <button
   type="button"
   class="accion-card"
-  [class.accion-card--destacada]="destacada"
   [class.accion-card--pizarra]="accion.color === 'pizarra'"
   [class.accion-card--menta]="accion.color === 'menta'"
   [class.accion-card--dorado]="accion.color === 'dorado'"
   [class.accion-card--melocoton]="accion.color === 'melocoton'"
+  [class.accion-card--violeta]="accion.color === 'violeta'"
   [attr.aria-label]="accion.titulo + ': ' + accion.descripcion"
   (click)="onClick()"
 >
@@ -14,7 +14,12 @@
   </span>
 
   <span class="accion-card__contenido">
-    <strong class="accion-card__titulo">{{ accion.titulo }}</strong>
+    <span class="accion-card__titulo-container">
+      <strong class="accion-card__titulo">{{ accion.titulo }}</strong>
+      @if (accion.premium) {
+        <span class="accion-card__premium-badge">AVANZADO</span>
+      }
+    </span>
     <span class="accion-card__descripcion">{{ accion.descripcion }}</span>
   </span>
 

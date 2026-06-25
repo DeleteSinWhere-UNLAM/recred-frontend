@@ -5,4 +5,5 @@ export interface Alumno {
   grado: string;
   colegioId: string;
   saldo: number;
+  urlFotoPerfil?: string | null;
 }

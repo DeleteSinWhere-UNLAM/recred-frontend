@@ -1,16 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .presupuesto {
   position: relative;
-  min-height: calc(100vh - 64px);
-  padding: 24px 0 32px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 240px),
-    var(--color-fondo);
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .presupuesto__container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 0 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -45,65 +51,21 @@
   box-shadow: var(--shadow-neu-concave);
 }
 
-.presupuesto__cabecera {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: 20px;
-  padding: 16px 20px;
-  box-shadow: var(--shadow-card);
-}
 
-.presupuesto__avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background-color: var(--color-pizarra);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 1px;
-  box-shadow: 0 10px 22px rgba(74, 111, 165, 0.16);
-  flex-shrink: 0;
-}
 
-.presupuesto__titulo {
+.presupuesto__titulo-principal {
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--color-pizarra);
-  line-height: 1.2;
-  margin-bottom: 2px;
+  margin: 0 0 16px;
+  text-align: center;
 }
 
-.presupuesto__subtitulo {
-  font-size: 13px;
-  color: var(--color-texto-claro);
-  font-weight: 500;
-}
-
-.presupuesto__panel {
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: 20px;
-  padding: 18px 20px;
-  box-shadow: var(--shadow-card);
+.presupuesto__seccion {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.presupuesto__panel-titulo {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--color-pizarra);
 }
 
 .presupuesto__grid {
@@ -247,11 +209,32 @@
   background-color: var(--color-melocoton);
 }
 
+.presupuesto__total--completo .presupuesto__total-info strong {
+  color: var(--color-menta);
+}
+
+.presupuesto__total--completo .presupuesto__barra-fill {
+  background-color: var(--color-menta);
+}
+
 .presupuesto__error {
   font-size: 12px;
   color: var(--color-melocoton);
   font-weight: 600;
   margin-top: 4px;
+}
+
+.presupuesto__ok {
+  font-size: 12px;
+  color: var(--color-menta);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.presupuesto__ayuda {
+  font-size: 12px;
+  color: var(--color-texto-secundario, #6b7280);
+  margin-top: 6px;
 }
 
 .presupuesto__agregar {
@@ -341,25 +324,7 @@
     gap: 12px;
   }
 
-  .presupuesto__cabecera {
-    padding: 14px 16px;
-    gap: 12px;
-  }
 
-  .presupuesto__avatar {
-    width: 48px;
-    height: 48px;
-    font-size: 17px;
-  }
-
-  .presupuesto__titulo {
-    font-size: 18px;
-  }
-
-  .presupuesto__panel {
-    padding: 16px;
-    border-radius: 18px;
-  }
 
   .presupuesto__grid {
     grid-template-columns: 1fr;
@@ -392,35 +357,7 @@
     gap: 10px;
   }
 
-  .presupuesto__cabecera {
-    padding: 12px 14px;
-    gap: 10px;
-    border-radius: 16px;
-  }
 
-  .presupuesto__avatar {
-    width: 42px;
-    height: 42px;
-    font-size: 15px;
-  }
-
-  .presupuesto__titulo {
-    font-size: 17px;
-  }
-
-  .presupuesto__subtitulo {
-    font-size: 12px;
-  }
-
-  .presupuesto__panel {
-    padding: 14px;
-    border-radius: 16px;
-    gap: 12px;
-  }
-
-  .presupuesto__panel-titulo {
-    font-size: 15px;
-  }
 
   .campo__input-prefijo input {
     font-size: 15px;
@@ -440,10 +377,17 @@
   }
 }
 
-@media (max-width: 360px) {
-  .presupuesto__cabecera {
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-  }
+/* Dark mode overrides */
+[data-theme="dark"] .presupuesto__total {
+  background-color: var(--color-superficie-alt);
 }
+
+[data-theme="dark"] .presupuesto__agregar {
+  background-color: var(--color-superficie-alt);
+}
+
+[data-theme="dark"] .campo__select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236C8EBF' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+}
+
+

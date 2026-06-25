@@ -1,12 +1,18 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { HomeAlumnoService } from '../../home-alumno/services/home-alumno.service';
 import {
-  CapacidadAsistente,
   SUGERENCIAS_ASISTENTE_POR_ROL,
+  SUGERENCIAS_COMPRA_PENDIENTE,
   SugerenciaCapacidad,
 } from '../models/capacidad-asistente.model';
 import { MensajeAsistente } from '../models/mensaje-asistente.model';
+import {
+  AccionAsistente,
+  RespuestaAsistente,
+  SugerenciaRespuestaAsistente,
+} from '../models/respuesta-asistente.model';
 import {
   MensajeAsistenteResponse,
   SesionAsistenteResponse,
@@ -17,30 +23,39 @@ import {
 } from '../services/asistente-virtual.service';
 
 const MENSAJES_BIENVENIDA: Record<RolUsuario, string> = {
-  ALUMNO: '¡Hola! Soy Cred. Puedo ayudarte con tu saldo, compras, pagos y eventos.',
+  ALUMNO: 'Hola. Soy Recredito. Puedo ayudarte con saldo, compras, menu y pedidos.',
   PADRE:
-    '¡Hola! Soy Cred. Puedo ayudarte con tus hijos, presupuestos, compras y restricciones.',
+    'Hola. Soy Recredito. Puedo ayudarte con hijos, presupuestos, restricciones y eventos.',
   VENDEDOR:
-    '¡Hola! Soy Cred. Puedo ayudarte con stock, ventas, pedidos y eventos escolares.',
+    'Hola. Soy Recredito. Puedo ayudarte con stock, ventas, productos y pedidos del buffet.',
 };
 
-const MENSAJE_BIENVENIDA_DEFAULT =
-  '¡Hola! Soy Cred. ¿En qué te puedo ayudar?';
+const MENSAJE_BIENVENIDA_DEFAULT = 'Hola. Soy Recredito. En que te puedo ayudar?';
 const MENSAJE_ERROR =
-  'No pude responder en este momento. Probá de nuevo en unos minutos.';
+  'No pude responder en este momento. Proba de nuevo en unos minutos.';
+const ESTADO_ESPERANDO_RECREO = 'ESPERANDO_RECREO';
+const ESTADO_ESPERANDO_CONFIRMACION = 'ESPERANDO_CONFIRMACION';
+const ESTADO_EJECUTADA = 'EJECUTADA';
 
 @Injectable()
 export class AsistenteVirtualPresenter {
   private readonly perfilService = inject(PerfilService);
   private readonly asistenteService = inject(AsistenteVirtualService);
+  private readonly homeAlumnoService = inject(HomeAlumnoService);
 
   private readonly abiertoState = signal(false);
   private readonly mensajesState = signal<MensajeAsistente[]>([]);
   private readonly enviandoState = signal(false);
   private readonly cargandoHistorialState = signal(false);
-  private readonly historialInicializadoState = signal(false);
+  private readonly historialRevisadoState = signal(false);
+  private readonly historialDisponibleState = signal(false);
+  private readonly historialVisibleState = signal(false);
   private readonly sesionIdState = signal<string | null>(null);
-  private readonly capacidadesState = signal<readonly CapacidadAsistente[]>([]);
+  private readonly sesionHistorialState = signal<string | null>(null);
+  private readonly accionState = signal<AccionAsistente | null>(null);
+  private readonly sugerenciasBackendState = signal<
+    readonly SugerenciaCapacidad[]
+  >([]);
 
   readonly abierto: Signal<boolean> = this.abiertoState.asReadonly();
   readonly mensajes: Signal<readonly MensajeAsistente[]> =
@@ -49,24 +64,41 @@ export class AsistenteVirtualPresenter {
   readonly procesando: Signal<boolean> = computed(
     () => this.enviandoState() || this.cargandoHistorialState(),
   );
+  readonly puedeVerHistorial: Signal<boolean> = computed(
+    () =>
+      this.historialDisponibleState() &&
+      !this.historialVisibleState() &&
+      !this.tieneAccionInteractiva(),
+  );
+  readonly opcionesDisponibles: Signal<readonly SugerenciaCapacidad[]> =
+    computed(() => {
+      const rol = this.perfilService.rol();
+      return rol ? SUGERENCIAS_ASISTENTE_POR_ROL[rol] : [];
+    });
 
   readonly sugerencias: Signal<readonly SugerenciaCapacidad[]> = computed(() => {
-    const rol = this.perfilService.rol();
-    if (!rol) return [];
+    const accion = this.accionState();
+    const sugerenciasBackend = this.sugerenciasBackendState();
 
-    const base = SUGERENCIAS_ASISTENTE_POR_ROL[rol];
-    const capacidades = this.capacidadesState();
-    if (capacidades.length === 0) return base;
+    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
+      return SUGERENCIAS_COMPRA_PENDIENTE;
+    }
 
-    const permitidas = new Set(capacidades);
-    const filtradas = base.filter((s) => permitidas.has(s.capacidad));
-    return filtradas.length > 0 ? filtradas : base;
+    if (accion?.estado === ESTADO_ESPERANDO_RECREO) {
+      return sugerenciasBackend;
+    }
+
+    if (sugerenciasBackend.length > 0) {
+      return sugerenciasBackend;
+    }
+
+    return [];
   });
 
   abrir(): void {
     this.asegurarBienvenida();
     this.abiertoState.set(true);
-    void this.cargarUltimaSesion();
+    void this.revisarUltimaSesion();
   }
 
   cerrar(): void {
@@ -89,6 +121,10 @@ export class AsistenteVirtualPresenter {
       ...lista,
       this.crearMensajeUsuario(limpio),
     ]);
+    if (this.sesionIdState() === null) {
+      this.historialDisponibleState.set(false);
+      this.historialVisibleState.set(false);
+    }
     this.enviandoState.set(true);
 
     try {
@@ -102,14 +138,20 @@ export class AsistenteVirtualPresenter {
         limpio,
         this.sesionIdState(),
       );
-      this.sesionIdState.set(respuesta.sesionId);
-      this.capacidadesState.set(respuesta.capacidades ?? []);
+      const sesionIdRespuesta = respuesta.sesionId || this.sesionIdState();
+
+      if (sesionIdRespuesta) {
+        this.sesionIdState.set(sesionIdRespuesta);
+      }
+
+      this.aplicarEstadoRespuesta(respuesta);
       this.mensajesState.update((lista) => [
         ...lista,
         this.crearMensajeCred(
           respuesta.respuesta,
-          respuesta.generadoPorIa,
+          respuesta.generadoPorIa ?? false,
           respuesta.fechaHora,
+          respuesta.accion ?? null,
         ),
       ]);
     } catch (err) {
@@ -123,10 +165,8 @@ export class AsistenteVirtualPresenter {
     }
   }
 
-  enviarSugerencia(capacidad: CapacidadAsistente): Promise<void> {
-    const sugerencia = this.sugerencias().find((s) => s.capacidad === capacidad);
-    if (!sugerencia) return Promise.resolve();
-    return this.enviar(sugerencia.prompt);
+  enviarSugerencia(prompt: string): Promise<void> {
+    return this.enviar(prompt);
   }
 
   async nuevaConversacion(): Promise<void> {
@@ -136,8 +176,9 @@ export class AsistenteVirtualPresenter {
     const sesionId = this.sesionIdState();
 
     this.sesionIdState.set(null);
-    this.capacidadesState.set([]);
-    this.historialInicializadoState.set(true);
+    this.limpiarAccionInteractiva();
+    this.historialVisibleState.set(false);
+    this.historialDisponibleState.set(this.sesionHistorialState() !== null);
     this.mensajesState.set([this.crearMensajeCred(this.mensajeBienvenida(), false)]);
 
     if (!contexto || !sesionId) return;
@@ -149,9 +190,40 @@ export class AsistenteVirtualPresenter {
     }
   }
 
-  private async cargarUltimaSesion(): Promise<void> {
+  async verMensajesAnteriores(): Promise<void> {
+    if (this.procesando() || !this.puedeVerHistorial()) return;
+
+    const contexto = this.obtenerContexto();
+    const sesionId = this.sesionHistorialState();
+    if (!contexto || !sesionId) return;
+
+    this.cargandoHistorialState.set(true);
+    try {
+      const mensajes = await this.asistenteService.obtenerMensajes(
+        contexto,
+        sesionId,
+      );
+      const mapeados = mensajes.map((m) => this.mapearMensajeBackend(m));
+      if (mapeados.length === 0) {
+        this.historialDisponibleState.set(false);
+        return;
+      }
+
+      this.sesionIdState.set(sesionId);
+      this.historialVisibleState.set(true);
+      this.historialDisponibleState.set(false);
+      this.limpiarAccionInteractiva();
+      this.mensajesState.set([this.crearSeparadorHistorial(), ...mapeados]);
+    } catch (err) {
+      console.warn('No se pudo cargar el historial del asistente:', err);
+    } finally {
+      this.cargandoHistorialState.set(false);
+    }
+  }
+
+  private async revisarUltimaSesion(): Promise<void> {
     if (
-      this.historialInicializadoState() ||
+      this.historialRevisadoState() ||
       this.cargandoHistorialState() ||
       this.enviandoState()
     ) {
@@ -160,30 +232,32 @@ export class AsistenteVirtualPresenter {
 
     const contexto = this.obtenerContexto();
     if (!contexto) {
-      this.historialInicializadoState.set(true);
+      this.historialRevisadoState.set(true);
       return;
     }
 
-    this.cargandoHistorialState.set(true);
     try {
       const sesiones = await this.asistenteService.listarSesiones(contexto);
       const ultima = this.obtenerUltimaSesion(sesiones);
-      if (!ultima) return;
+      if (!ultima) {
+        this.historialDisponibleState.set(false);
+        return;
+      }
 
       const mensajes = await this.asistenteService.obtenerMensajes(
         contexto,
         ultima.sesionId,
       );
-      const mapeados = mensajes.map((m) => this.mapearMensajeBackend(m));
-      this.sesionIdState.set(ultima.sesionId);
-      if (mapeados.length > 0) {
-        this.mensajesState.set(mapeados);
+      if (!this.mensajesSoloBienvenida() || this.sesionIdState() !== null) {
+        return;
       }
+
+      this.sesionHistorialState.set(ultima.sesionId);
+      this.historialDisponibleState.set(mensajes.length > 0);
     } catch (err) {
-      console.warn('No se pudo cargar el historial del asistente:', err);
+      console.warn('No se pudo revisar la ultima sesion del asistente:', err);
     } finally {
-      this.historialInicializadoState.set(true);
-      this.cargandoHistorialState.set(false);
+      this.historialRevisadoState.set(true);
     }
   }
 
@@ -204,13 +278,6 @@ export class AsistenteVirtualPresenter {
     const perfil = this.perfilService.getPerfil();
     if (!perfil) return null;
 
-    if (perfil.rol === 'ALUMNO') {
-      return {
-        rol: perfil.rol,
-        alumnoId: this.perfilService.obtenerAlumnoId(),
-      };
-    }
-
     return { rol: perfil.rol };
   }
 
@@ -224,6 +291,77 @@ export class AsistenteVirtualPresenter {
     return rol ? MENSAJES_BIENVENIDA[rol] : MENSAJE_BIENVENIDA_DEFAULT;
   }
 
+  private aplicarEstadoRespuesta(respuesta: RespuestaAsistente): void {
+    const accion = respuesta.accion ?? null;
+    const sugerenciasBackend = this.mapearSugerenciasBackend(
+      respuesta.sugerencias,
+    );
+
+    this.accionState.set(accion);
+
+    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
+      this.sugerenciasBackendState.set([]);
+      return;
+    }
+
+    this.sugerenciasBackendState.set(sugerenciasBackend);
+
+    if (accion?.estado === ESTADO_EJECUTADA) {
+      this.refrescarPedidoAlumnoSiAplica();
+      if (accion.compraId) {
+        this.reproducirSonidoExito();
+      }
+    }
+  }
+
+  private reproducirSonidoExito(): void {
+    const audio = new Audio('exito.mp3');
+    audio.volume = 0.6;
+    void audio.play().catch(() => undefined);
+  }
+
+  private refrescarPedidoAlumnoSiAplica(): void {
+    if (this.perfilService.rol() !== 'ALUMNO') return;
+    const alumnoId = this.perfilService.obtenerAlumnoId();
+    if (!alumnoId) return;
+    void this.homeAlumnoService.cargarPedidoEnCurso(alumnoId);
+  }
+
+  private mapearSugerenciasBackend(
+    sugerencias: readonly SugerenciaRespuestaAsistente[] | undefined,
+  ): readonly SugerenciaCapacidad[] {
+    if (!sugerencias || sugerencias.length === 0) return [];
+
+    return sugerencias
+      .filter((s) => s.label.trim().length > 0 && s.mensaje.trim().length > 0)
+      .map((s, index) => ({
+        id: `backend-${index}-${this.normalizarId(s.mensaje)}`,
+        label: s.label.trim(),
+        emoji: '',
+        prompt: s.mensaje.trim(),
+        tipo: 'backend',
+        tipoAccion: s.tipoAccion ?? null,
+      }));
+  }
+
+  private tieneAccionInteractiva(): boolean {
+    const estado = this.accionState()?.estado;
+    return (
+      estado === ESTADO_ESPERANDO_RECREO ||
+      estado === ESTADO_ESPERANDO_CONFIRMACION
+    );
+  }
+
+  private limpiarAccionInteractiva(): void {
+    this.accionState.set(null);
+    this.sugerenciasBackendState.set([]);
+  }
+
+  private mensajesSoloBienvenida(): boolean {
+    const mensajes = this.mensajesState();
+    return mensajes.length <= 1 && !this.historialVisibleState();
+  }
+
   private mapearMensajeBackend(
     mensaje: MensajeAsistenteResponse,
   ): MensajeAsistente {
@@ -233,6 +371,7 @@ export class AsistenteVirtualPresenter {
       texto: mensaje.contenido,
       fechaHora: this.fechaDesdeBackend(mensaje.fechaHora),
       generadoPorIa: mensaje.rol === 'ASISTENTE_IA',
+      accion: mensaje.accion ?? null,
     };
   }
 
@@ -249,19 +388,40 @@ export class AsistenteVirtualPresenter {
     texto: string,
     generadoPorIa: boolean,
     fechaHora?: string,
+    accion?: AccionAsistente | null,
   ): MensajeAsistente {
     return {
       id: this.crearId(),
       rol: 'cred',
       texto,
-      fechaHora: fechaHora ? this.fechaDesdeBackend(fechaHora) : new Date(),
+      fechaHora: this.fechaDesdeBackend(fechaHora),
       generadoPorIa,
+      accion,
     };
   }
 
-  private fechaDesdeBackend(valor: string): Date {
+  private crearSeparadorHistorial(): MensajeAsistente {
+    return {
+      id: `historial-${this.crearId()}`,
+      rol: 'separador',
+      texto: 'Mensajes anteriores',
+      fechaHora: new Date(),
+    };
+  }
+
+  private fechaDesdeBackend(valor?: string | null): Date {
+    if (!valor) return new Date();
+
     const fecha = new Date(valor);
     return Number.isNaN(fecha.getTime()) ? new Date() : fecha;
+  }
+
+  private normalizarId(valor: string): string {
+    const normalizado = valor
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    return normalizado || this.crearId();
   }
 
   private crearId(): string {

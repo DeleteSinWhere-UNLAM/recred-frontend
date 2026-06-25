@@ -13,6 +13,7 @@ import { ExitoPresenter } from './presenter/exito.presenter';
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 
@@ -34,7 +35,15 @@ export class ExitoPage implements OnInit {
   ngOnInit(): void {
     if (this.presenter.vacia()) {
       this.router.navigateByUrl(this.usuarioService.homeUrl());
+      return;
     }
+    this.reproducirSonidoExito();
+  }
+
+  private reproducirSonidoExito(): void {
+    const audio = new Audio('exito.mp3');
+    audio.volume = 0.6;
+    void audio.play().catch(() => undefined);
   }
 
   protected get totalFormateado(): string {

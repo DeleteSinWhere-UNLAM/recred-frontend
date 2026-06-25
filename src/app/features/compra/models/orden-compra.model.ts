@@ -9,6 +9,7 @@ export type Recreo =
 
 export interface OrdenAlumno {
   alumno: Alumno;
+  buffetId: string;
   items: ItemCarrito[];
   fecha: string;
   recreo: Recreo;
@@ -20,6 +21,7 @@ export interface OrdenCompra {
   ordenes: OrdenAlumno[];
   total: number;
   codigos: Record<string, string>;
+  sugerenciaId?: string;
 }
 
 export const RECREO_LABELS: Record<Recreo, string> = {

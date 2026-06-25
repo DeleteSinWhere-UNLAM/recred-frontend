@@ -1,0 +1,346 @@
+@if (!esNested()) {
+  <app-navbar [userName]="nombreNavbar()" />
+}
+
+<main class="movimientos" [class.movimientos--nested]="esNested()">
+  <div class="movimientos__container">
+    
+    @if (!esNested()) {
+      <button 
+        type="button" 
+        class="movimientos__volver" 
+        (click)="volver()" 
+        aria-label="Volver al inicio"
+      >
+        <i class="fa-solid fa-arrow-left"></i> Volver al Inicio
+      </button>
+    }
+    
+    <header class="movimientos__header">
+
+      <div class="movimientos__titulo-area" [class.movimientos__titulo-area--alumno]="esVistaAlumno()">
+        <div class="movimientos__icono">
+          <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+        </div>
+        <div class="movimientos__titulo-texto">
+          @if (esVistaIndividual() && !esVistaAlumno()) {
+            <h1 id="page-title" class="movimientos__titulo">Movimientos de {{ nombreAlumno() }}</h1>
+            <p class="movimientos__subtitulo">Historial completo de compras y consumos</p>
+          } @else {
+            <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
+            @if (!esVistaAlumno()) {
+              <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
+            }
+          }
+        </div>
+        @if (esVistaAlumno()) {
+          <span class="movimientos__ola" aria-hidden="true"></span>
+        }
+      </div>
+    </header>
+
+    
+    <section class="movimientos__control-card" aria-label="Búsqueda y filtros">
+      <div class="movimientos__search-row">
+        <div class="movimientos__search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+          <input
+            type="text"
+            [ngModel]="filtroBusqueda()"
+            (ngModelChange)="filtroBusqueda.set($event)"
+            [placeholder]="esVistaAlumno() ? 'Buscar por item, código...' : 'Buscar por alumno, item, código...'"
+            class="movimientos__search-input"
+            id="search-input"
+          />
+        </div>
+        
+        <button
+          type="button"
+          class="movimientos__btn-filtros-avanzados"
+          [class.active]="mostrarFiltrosAvanzados()"
+          (click)="mostrarFiltrosAvanzados.set(!mostrarFiltrosAvanzados())"
+          id="btn-filtros-avanzados"
+        >
+          <i class="fa-solid fa-filter" aria-hidden="true"></i>
+          <span>Filtros Avanzados</span>
+        </button>
+      </div>
+
+      
+      <div class="movimientos__filtros-avanzados-panel" [class.open]="mostrarFiltrosAvanzados()">
+        <div class="movimientos__filtros-avanzados-grid">
+          
+          @if (!esVistaAlumno() && !esVistaIndividual()) {
+            <div class="movimientos__filtro-group">
+              <label for="select-alumno" class="movimientos__label">Seleccionar Hijo</label>
+              <div class="movimientos__select-wrapper">
+                <select
+                  id="select-alumno"
+                  [value]="selectedAlumnoId()"
+                  (change)="onAlumnoChange($event)"
+                  class="movimientos__select"
+                >
+                  <option value="todos">Todos los hijos</option>
+                  @for (alumno of alumnos(); track alumno.id) {
+                    <option [value]="alumno.id">{{ alumno.nombre }} {{ alumno.apellido }}</option>
+                  }
+                </select>
+                <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
+              </div>
+            </div>
+          }
+
+          
+          <div class="movimientos__filtro-group">
+            <label for="filtro-estado" class="movimientos__label">Estado</label>
+            <div class="movimientos__select-wrapper">
+              <select
+                id="filtro-estado"
+                [ngModel]="filtroEstado()"
+                (ngModelChange)="filtroEstado.set($event)"
+                class="movimientos__select"
+              >
+                <option value="TODOS">Todos los estados</option>
+                <option value="PENDIENTE">A Preparar</option>
+                <option value="EN_PREPARACION">En preparación</option>
+                <option value="LISTO">Listo para retirar</option>
+                <option value="ENTREGADO">Entregado</option>
+                <option value="CANCELADO">Cancelado</option>
+                <option value="NO_RETIRADO">No entregado</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
+            </div>
+          </div>
+
+          
+          <div class="movimientos__filtro-group">
+            <label for="fecha-desde" class="movimientos__label">Fecha Desde</label>
+            <input
+              id="fecha-desde"
+              type="date"
+              [ngModel]="filtroFechaDesde()"
+              (ngModelChange)="filtroFechaDesde.set($event)"
+              class="movimientos__input"
+            />
+          </div>
+          <div class="movimientos__filtro-group">
+            <label for="fecha-hasta" class="movimientos__label">Fecha Hasta</label>
+            <input
+              id="fecha-hasta"
+              type="date"
+              [ngModel]="filtroFechaHasta()"
+              (ngModelChange)="filtroFechaHasta.set($event)"
+              class="movimientos__input"
+            />
+          </div>
+
+          
+          <div class="movimientos__filtro-group">
+            <label for="precio-min" class="movimientos__label">Precio Mín.</label>
+            <div class="movimientos__input-monto-wrapper">
+              <span class="monto-prefix">$</span>
+              <input
+                id="precio-min"
+                type="number"
+                placeholder="0"
+                [ngModel]="filtroPrecioMin()"
+                (ngModelChange)="filtroPrecioMin.set($event)"
+                class="movimientos__input movimientos__input--monto"
+              />
+            </div>
+          </div>
+          <div class="movimientos__filtro-group">
+            <label for="precio-max" class="movimientos__label">Precio Máx.</label>
+            <div class="movimientos__input-monto-wrapper">
+              <span class="monto-prefix">$</span>
+              <input
+                id="precio-max"
+                type="number"
+                placeholder="Max"
+                [ngModel]="filtroPrecioMax()"
+                (ngModelChange)="filtroPrecioMax.set($event)"
+                class="movimientos__input movimientos__input--monto"
+              />
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="movimientos__filtros-actions">
+          <button type="button" class="movimientos__limpiar-btn" (click)="limpiarFiltros()" id="limpiar-filtros-btn">
+            <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
+            <span>Limpiar Filtros</span>
+          </button>
+        </div>
+      </div>
+
+      
+      @if (activeChips.length > 0) {
+        <div class="movimientos__chips-row">
+          @for (chip of activeChips; track chip.id) {
+            <span class="movimientos__chip">
+              {{ chip.label }}
+              <button type="button" class="movimientos__chip-remove" (click)="removeChip(chip.id)" aria-label="Eliminar filtro">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+              </button>
+            </span>
+          }
+        </div>
+      }
+
+      <div class="movimientos__grouping-row">
+        <span class="movimientos__grouping-label">Agrupar por:</span>
+        <div class="movimientos__grouping-buttons">
+          <button 
+            type="button" 
+            class="movimientos__grouping-btn" 
+            [class.active]="criterioAgrupacion() === 'FECHA_COMPRA'"
+            (click)="criterioAgrupacion.set('FECHA_COMPRA')"
+          >
+            <i class="fa-solid fa-calendar-day"></i> Fecha de compra
+          </button>
+          <button 
+            type="button" 
+            class="movimientos__grouping-btn" 
+            [class.active]="criterioAgrupacion() === 'FECHA_RETIRO'"
+            (click)="criterioAgrupacion.set('FECHA_RETIRO')"
+          >
+            <i class="fa-solid fa-truck-ramp-box"></i> Fecha de retiro
+          </button>
+          @if (!esVistaAlumno() && !esVistaIndividual()) {
+            <button 
+              type="button" 
+              class="movimientos__grouping-btn" 
+              [class.active]="criterioAgrupacion() === 'ALUMNO'"
+              (click)="criterioAgrupacion.set('ALUMNO')"
+            >
+              <i class="fa-solid fa-user"></i> Alumno
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+
+    
+    <div class="movimientos__list-container">
+      @if (cargando()) {
+        
+        <div class="movimientos__loading">
+          @for (i of [1, 2, 3]; track i) {
+            <div class="movimientos__skeleton-card">
+              <div class="skeleton-circle"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--text"></div>
+              </div>
+              <div class="skeleton-right"></div>
+            </div>
+          }
+        </div>
+      } @else if (errorMsg()) {
+        
+        <div class="movimientos__error-card" role="alert">
+          <i class="fa-solid fa-circle-exclamation error-icon" aria-hidden="true"></i>
+          <p class="error-text">{{ errorMsg() }}</p>
+          <button type="button" class="movimientos__reintentar-btn" (click)="cargarHistorial()">
+            Reintentar
+          </button>
+        </div>
+      } @else if (movimientosFiltrados().length === 0) {
+        
+        <div class="movimientos__vacio-card">
+          <div class="vacio-icono-wrapper">
+            <i class="fa-solid fa-receipt vacio-icon" aria-hidden="true"></i>
+          </div>
+          <p class="vacio-titulo">No se encontraron movimientos</p>
+          <p class="vacio-subtitulo">
+            @if (esVistaAlumno()) {
+              Intentá cambiando los filtros de búsqueda.
+            } @else {
+              Intentá cambiando los filtros o seleccionando otro alumno.
+            }
+          </p>
+        </div>
+      } @else {
+        
+        <div class="movimientos__timeline">
+          @for (grupo of movimientosAgrupados(); track grupo.titulo) {
+            <div class="movimientos__fecha-grupo">
+              <button 
+                type="button" 
+                class="movimientos__fecha-header-btn" 
+                (click)="toggleGroup(grupo.titulo)"
+                [attr.aria-expanded]="isGroupExpanded(grupo.titulo)"
+              >
+                <span class="movimientos__fecha-titulo">{{ grupo.titulo }}</span>
+                <i class="fa-solid fa-chevron-up toggle-icon" [class.collapsed]="!isGroupExpanded(grupo.titulo)"></i>
+              </button>
+              
+              <div class="movimientos__fecha-card" [class.collapsed]="!isGroupExpanded(grupo.titulo)">
+                @for (mov of grupo.movimientos; track mov.id; let last = $last) {
+                  <article class="movimientos__fila">
+                    <div class="movimientos__fila-left">
+                      <div class="movimientos__iniciales" [attr.data-alumno]="mov.studentId">
+                        @if (getFotoPerfilAlumno(mov.studentId); as url) {
+                          <img [src]="url" [alt]="'Foto de ' + getNombreAlumno(mov.studentId)" class="movimientos__avatar-img" />
+                        } @else {
+                          {{ getInicialesAlumno(mov.studentId) }}
+                        }
+                      </div>
+                      <div class="movimientos__fila-info">
+                        <h3 class="movimientos__fila-nombre">{{ getNombreAlumno(mov.studentId) }}</h3>
+                        @if (mov.tipo === 'ANTICIPADA' && mov.withdrawalCode) {
+                          <p class="movimientos__fila-clave">
+                            Clave de retiro: <strong>{{ mov.withdrawalCode }}</strong>
+                          </p>
+                        }
+                      </div>
+                    </div>
+
+                    
+                    <div class="movimientos__fila-status-col">
+                      <span class="movimientos__status-pill" [attr.data-status]="mov.status">
+                        {{ mov.statusLabel || mov.status }}
+                      </span>
+                    </div>
+
+                    
+                    <div class="movimientos__fila-time-col">
+                      <span class="movimientos__fila-time-label">
+                        {{ mostrarHoraOMediodia(mov) }}
+                      </span>
+                    </div>
+
+                    <div class="movimientos__fila-right">
+                      <div class="movimientos__fila-monto">
+                        {{ formatearPrecio(mov.totalAmount) }}
+                      </div>
+                      <button type="button" class="movimientos__fila-detalles-btn" (click)="abrirDetalle(mov)" [id]="'detalles-' + mov.id">
+                        <i class="fa-solid fa-utensils" aria-hidden="true" style="margin-right: 6px;"></i>
+                        <span>Ver detalles</span>
+                      </button>
+                    </div>
+                  </article>
+                  @if (!last) {
+                    <div class="movimientos__fila-divider"></div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</main>
+
+
+@if (modalMovimiento(); as mov) {
+  <app-movimiento-detalle-modal
+    [movimiento]="mov"
+    [nombreAlumno]="getNombreAlumno(mov.studentId)"
+    [esVistaAlumno]="esVistaAlumno()"
+    (cerrar)="cerrarDetalle()"
+    (cancelar)="cancelarPedido($event)"
+  />
+}

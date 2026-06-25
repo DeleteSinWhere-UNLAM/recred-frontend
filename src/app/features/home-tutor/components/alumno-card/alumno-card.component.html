@@ -1,10 +1,29 @@
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
 <article class="alumno-card">
+
   <header class="alumno-card__header">
     <div class="alumno-card__identidad">
-      <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Avatar de ' + nombreCompleto">
+      <div class="alumno-card__avatar-wrap" [attr.aria-label]="'Foto de ' + nombreCompleto">
+        @if (fotoPerfil) {
+        <img class="alumno-card__avatar alumno-card__avatar--foto" [src]="fotoPerfil" [alt]="nombreCompleto" />
+        } @else {
         <div class="alumno-card__avatar">
           <span>{{ iniciales }}</span>
         </div>
+        }
+        @if (esPadre) {
+        <button type="button" class="alumno-card__avatar-editar" [disabled]="subiendoFoto()"
+          (click)="abrirSelectorFoto()" [title]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
+          [attr.aria-label]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de ' + alumno.nombre">
+          @if (subiendoFoto()) {
+          <span class="alumno-card__avatar-loader" aria-hidden="true"></span>
+          } @else {
+          <i class="fa-solid fa-pen" aria-hidden="true"></i>
+          }
+        </button>
+        <input #inputFotoAlumno type="file" accept="image/jpeg,image/png,image/webp" class="alumno-card__input-foto"
+          aria-hidden="true" tabindex="-1" (change)="onFotoSeleccionada($event)" />
+        }
       </div>
       <div class="alumno-card__texto">
         <h3 class="alumno-card__nombre">{{ nombreCompleto }}</h3>
@@ -15,59 +34,128 @@
       </div>
     </div>
 
-    <div class="alumno-card__saldo" [class.alumno-card__saldo--negativo]="saldoNegativo">
-      <span class="alumno-card__saldo-label">
-        <i class="fa-solid fa-wallet" aria-hidden="true"></i>
-        Saldo
-      </span>
+    <div class="alumno-card__saldo" [class.alumno-card__saldo--negativo]="saldoNegativo"
+      [class.alumno-card__saldo--bajo]="saldoBajo">
+      <span class="alumno-card__saldo-label">Saldo</span>
       <span class="alumno-card__saldo-valor">{{ saldoFormateado }}</span>
     </div>
   </header>
 
-  <div class="alumno-card__acciones" role="group" aria-label="Acciones rápidas">
-    <button type="button" class="alumno-card__accion alumno-card__accion--menta">
-      <span class="alumno-card__accion-icono" aria-hidden="true">
+
+  <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
+
+    <a class="alumno-card__btn alumno-card__btn--menta" (click)="navegar('/acreditar-mercado-pago')"
+      routerLinkActive="active">
+      <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-plus"></i>
       </span>
-      <span class="alumno-card__accion-label">Acreditar</span>
-    </button>
-    <a class="alumno-card__accion alumno-card__accion--melocoton" [routerLink]="['/restricciones', alumno.id]">
-      <span class="alumno-card__accion-icono" aria-hidden="true">
-        <i class="fa-solid fa-shield-halved"></i>
-      </span>
-      <span class="alumno-card__accion-label">Restricciones</span>
+      <span class="alumno-card__btn-label">Acreditar</span>
     </a>
-    <a class="alumno-card__accion alumno-card__accion--dorado" [routerLink]="['/presupuesto', alumno.id]">
-      <span class="alumno-card__accion-icono" aria-hidden="true">
-        <i class="fa-solid fa-piggy-bank"></i>
+
+    <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')"
+      routerLinkActive="active">
+      <span class="alumno-card__btn-icono" aria-hidden="true">
+        <i class="fa-solid fa-shield"></i>
       </span>
-      <span class="alumno-card__accion-label">Presupuesto</span>
+      <span class="alumno-card__btn-label">Restricciones</span>
     </a>
-    <a class="alumno-card__accion alumno-card__accion--pizarra" [routerLink]="['/estadistica', alumno.id]">
-      <span class="alumno-card__accion-icono" aria-hidden="true">
-        <i class="fa-solid fa-chart-line"></i>
+
+    <a class="alumno-card__btn alumno-card__btn--gris" (click)="navegar('/tutor-movimientos')"
+      routerLinkActive="active">
+      <span class="alumno-card__btn-icono" aria-hidden="true">
+        <i class="fa-solid fa-list"></i>
       </span>
-      <span class="alumno-card__accion-label">Estadística</span>
+      <span class="alumno-card__btn-label">Movimientos</span>
     </a>
   </div>
 
-  <nav class="alumno-card__config" aria-label="Configuración">
-    <button type="button" class="alumno-card__config-link">
-      <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-      <span>Pendientes</span>
-    </button>
-    <button type="button" class="alumno-card__config-link">
-      <i class="fa-solid fa-list" aria-hidden="true"></i>
-      <span>Movimientos</span>
-    </button>
-    <a class="alumno-card__config-link" [routerLink]="['/prediccion-gasto', alumno.id]">
-      <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
-      <span>Predicción</span>
-    </a>
-  </nav>
+  <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
+    <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
+      <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')"
+        routerLinkActive="active">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-clock"></i>
+        </span>
+        <span class="alumno-card__btn-label">Horarios</span>
+      </a>
 
-  <a class="alumno-card__cta" [routerLink]="['/buffet', alumno.id]">
+      <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
+        routerLinkActive="active">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-piggy-bank"></i>
+        </span>
+        <span class="alumno-card__btn-label">Presupuesto</span>
+      </a>
+
+      <a class="alumno-card__btn alumno-card__btn--pizarra" (click)="navegar('/estadistica')"
+        routerLinkActive="active">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-chart-line"></i>
+        </span>
+        <span class="alumno-card__btn-label">Estadística</span>
+      </a>
+
+      <a class="alumno-card__btn alumno-card__btn--morado" (click)="navegar('/movimientos-pendientes')"
+        routerLinkActive="active">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          @if (cantidadPendientes > 0) {
+          <span class="alumno-card__btn-badge">{{ cantidadPendientes }}</span>
+          }
+        </span>
+        <span class="alumno-card__btn-label">Pendientes</span>
+      </a>
+
+      <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegar('/prediccion-gasto')"
+        routerLinkActive="active">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-compass"></i>
+        </span>
+        <span class="alumno-card__btn-label">Predicción</span>
+      </a>
+
+      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegar('/preferencias')" routerLinkActive="active">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </span>
+        <span class="alumno-card__btn-label">Preferencias</span>
+      </a>
+
+      @if (esPadre) {
+      <a class="alumno-card__btn alumno-card__btn--menta" title="Adelanto" (click)="navegar('/adelanto')"
+        routerLinkActive="active">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+        </span>
+        <span class="alumno-card__btn-label">Adelanto</span>
+      </a>
+      }
+    </div>
+  </div>
+
+  <div class="alumno-card__toggle-wrapper">
+    <button type="button" class="alumno-card__toggle-btn" (click)="toggleBotones()">
+      <span>{{ mostrarTodosLosBotones() ? 'Ocultar' : 'Ver más' }}</span>
+      <i class="fa-solid" [class.fa-chevron-down]="!mostrarTodosLosBotones()"
+        [class.fa-chevron-up]="mostrarTodosLosBotones()"></i>
+    </button>
+  </div>
+
+  <div class="alumno-card__budget">
+    <span class="alumno-card__budget-label">Presupuesto</span>
+    <div class="alumno-card__budget-bar">
+      <div class="alumno-card__budget-progress" [style.width.%]="budgetPercentage"></div>
+    </div>
+    <span class="alumno-card__budget-percentage">{{ budgetPercentage }}%</span>
+    <span class="alumno-card__budget-fraction">{{ budgetSpentFormateado }} / {{ budgetLimitFormateado }}</span>
+  </div>
+
+  <a class="alumno-card__cta" (click)="navegar('/buffet')">
     <i class="fa-solid fa-utensils" aria-hidden="true"></i>
-    Ir al Buffet
+    Ir al buffet
   </a>
 </article>
+
+@if (fotoEvent()) {
+<app-crop-modal [imageEvent]="fotoEvent()!" (cropped)="onFotoRecortada($event)" (canceled)="onCancelarRecorte()" />
+}

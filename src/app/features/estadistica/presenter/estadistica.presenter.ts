@@ -23,10 +23,12 @@ export class EstadisticaPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoState();
-    return alumno ? `${alumno.nombre} ${alumno.apellido}` : '';
+    return alumno ? alumno.nombre.split(' ')[0] : '';
   });
 
   readonly grado = computed(() => this.alumnoState()?.grado ?? '');
+
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
 
   readonly iniciales = computed(() => {
     const alumno = this.alumnoState();

@@ -1,98 +1,30 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { Observable, Subscription, catchError, finalize, of, switchMap } from 'rxjs';
-import { RecomendacionesService } from '../../services/recomendaciones.service';
-import { Sugerencia } from '../../models/recomendacion.model';
 import { SeasonalListComponent } from '../../components/seasonal-list/seasonal-list.component';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
+import { SeasonalPagePresenter } from './presenter/seasonal-page.presenter';
+import { IaPromotionApprovalModalComponent } from '../../components/ia-promotion-approval-modal/ia-promotion-approval-modal.component';
+import { UsuarioService } from '../../../../data-access/services/usuario.service';
 
 @Component({
   selector: 'app-seasonal-page',
   standalone: true,
-  imports: [CommonModule, SeasonalListComponent, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, SeasonalListComponent, IaPromotionApprovalModalComponent],
+  providers: [SeasonalPagePresenter],
   templateUrl: './seasonal-page.component.html',
   styleUrls: ['./seasonal-page.component.css']
 })
-export class SeasonalPageComponent implements OnInit, OnDestroy {
-  private readonly recomendacionesService = inject(RecomendacionesService);
-  private readonly router = inject(Router);
-  private subscription = new Subscription();
+export class SeasonalPageComponent implements OnInit {
+  protected readonly presenter = inject(SeasonalPagePresenter);
+  private readonly usuarioService = inject(UsuarioService);
 
-  volver(): void {
-    this.router.navigateByUrl('/kiosquero');
+  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+
+  constructor() {
+    this.usuarioService.setHomeUrl('/kiosquero');
   }
-
-  isLoading = false;
-  error: string | null = null;
-  sugerencias: Sugerencia[] = [];
-  tipPromocional: string | null = null;
 
   ngOnInit(): void {
-    this.loadRecommendations();
-  }
-
-  loadRecommendations(): void {
-    this.isLoading = true;
-    this.error = null;
-
-    const sub = this.getCurrentPosition().pipe(
-      switchMap(position => {
-        return this.recomendacionesService.getSeasonalRecommendations(
-          position.coords.latitude,
-          position.coords.longitude
-        );
-      }),
-      catchError(err => {
-        if (err instanceof GeolocationPositionError) {
-          this.error = 'No pudimos acceder a tu ubicación. Por favor, permite el acceso para ver recomendaciones.';
-        } else {
-          this.error = 'Ocurrió un error al conectar con el motor de recomendaciones.';
-        }
-        return of(null);
-      }),
-      finalize(() => {
-        this.isLoading = false;
-      })
-    ).subscribe({
-      next: (response) => {
-        if (response) {
-          this.sugerencias = response.sugerencias || [];
-          this.tipPromocional = response.tip_promocional || null;
-        }
-      }
-    });
-
-    this.subscription.add(sub);
-  }
-
-  private getCurrentPosition(): Observable<GeolocationPosition> {
-    return new Observable<GeolocationPosition>((observer) => {
-      if (!navigator.geolocation) {
-        observer.error(new Error('La geolocalización no está soportada en tu navegador.'));
-        observer.complete();
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          observer.next(position);
-          observer.complete();
-        },
-        (error) => {
-          observer.error(error);
-          observer.complete();
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.presenter.loadRecommendations();
   }
 }

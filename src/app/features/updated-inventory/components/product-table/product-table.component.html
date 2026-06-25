@@ -1,97 +1,131 @@
 @if (isLoading) {
   <div class="product-table__estado">
     <div class="product-table__spinner"></div>
-    <p>Cargando productos...</p>
+    <p>Cargando inventario...</p>
   </div>
 } @else if (products.length === 0) {
   <div class="product-table__estado product-table__estado--vacio">
     <div class="product-table__estado-icono" aria-hidden="true">
       <i class="fa-solid fa-box-open"></i>
     </div>
-    <p class="product-table__estado-titulo">Sin productos</p>
-    <p class="product-table__estado-subtitulo">Agregá tu primer producto con el botón de arriba.</p>
+    <p class="product-table__estado-titulo">Sin productos para mostrar</p>
+    <p class="product-table__estado-subtitulo">No hay productos que coincidan con el filtro actual.</p>
   </div>
 } @else {
-  <section class="product-table" aria-labelledby="tabla-productos-titulo">
-    <h3 id="tabla-productos-titulo" class="product-table__titulo">
-      Productos cargados
-    </h3>
-
-    <div class="product-table__wrapper">
-      <table class="product-table__tabla">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th class="product-table__col-number">Precio</th>
-            <th class="product-table__col-number">Stock</th>
-            <th class="product-table__col-actions">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (product of products; track product.id) {
-            <tr>
-              <td>
-                <span class="product-table__nombre">{{ product.nombre }}</span>
-                <span class="product-table__desc">{{ product.descripcion }}</span>
-              </td>
-              <td>
-                <span class="product-table__categoria">{{ product.categoriaNombre || '—' }}</span>
-              </td>
-              <td class="product-table__col-number">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</td>
-              <td class="product-table__col-number">
-                <span class="product-table__stock" [class.product-table__stock--low]="product.stockActual <= 5">
-                  {{ product.stockActual }}
+  <section class="product-table" aria-labelledby="productos-stock-titulo">
+    <div class="product-table__grid">
+      @for (product of products; track product.productId) {
+        <article
+          class="product-card"
+          [class.product-card--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+          [class.product-card--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+          [class.product-card--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
+          [class.product-card--pausado]="getOperationalStatus(product) === 'PAUSADO'"
+          [class.product-card--ok]="getOperationalStatus(product) === 'OK'"
+          [class.product-card--updated]="isHighlighted(product)"
+        >
+          <header class="product-card__header">
+            <div class="product-card__title-group">
+              <span class="product-card__mode">{{ getModeLabel(product.tipoManejoInventario) }}</span>
+              <div class="product-card__name-container">
+                <h4 class="product-card__name">{{ product.nombre }}</h4>
+                <span
+                  class="product-card__status"
+                  [class.product-card__status--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+                  [class.product-card__status--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+                  [class.product-card__status--alta-reserva]="getOperationalStatus(product) === 'ALTA_RESERVA'"
+                  [class.product-card__status--pausado]="getOperationalStatus(product) === 'PAUSADO'"
+                  [class.product-card__status--ok]="getOperationalStatus(product) === 'OK'"
+                >
+                  <i class="fa-solid" [ngClass]="getStatusIcon(product)" aria-hidden="true"></i>
+                  {{ getStatusLabel(product) }}
                 </span>
-              </td>
-              <td class="product-table__col-actions">
-                <div class="product-table__acciones">
-                  <button
-                    type="button"
-                    class="product-table__btn product-table__btn--edit"
-                    (click)="edit.emit(product)"
-                    aria-label="Editar producto"
-                  >
-                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                    <span>Editar</span>
-                  </button>
-                  <button
-                    type="button"
-                    class="product-table__btn product-table__btn--delete"
-                    (click)="remove.emit(product)"
-                    aria-label="Eliminar producto"
-                  >
-                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                    <span>Eliminar</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="product-table__cards">
-      @for (product of products; track product.id) {
-        <article class="product-table__card">
-          <header class="product-table__card-header">
-            <div class="product-table__card-info">
-              <span class="product-table__nombre">{{ product.nombre }}</span>
-              <span class="product-table__categoria">{{ product.categoriaNombre || '—' }}</span>
+              </div>
+              <span class="product-card__price">{{ product.precio | currency:'ARS':'symbol-narrow':'1.2-2' }}</span>
             </div>
-            <span class="product-table__stock" [class.product-table__stock--low]="product.stockActual <= 5">
-              {{ product.stockActual }} uds.
-            </span>
+
+            <div class="product-card__image-wrapper">
+              <img
+                [src]="product.urlImagen || IMAGEN_FALLBACK"
+                [alt]="product.nombre"
+                class="product-card__image"
+                loading="lazy"
+                (error)="onImagenError($event)"
+              />
+            </div>
           </header>
-          <p class="product-table__card-desc">{{ product.descripcion }}</p>
-          <footer class="product-table__card-footer">
-            <span class="product-table__card-precio">{{ product.precio | currency:'ARS':'symbol':'1.2-2' }}</span>
+
+          <section class="product-card__availability" aria-label="Disponibilidad">
+            <div class="product-card__availability-row">
+              <span>{{ getAvailabilityLabel(product) }}</span>
+              <strong>
+                {{ getStockValue(product) }}
+                @if (product.tipoManejoInventario === 'CUPO_DIARIO') {
+                  / {{ formatNullable(product.cupoMaximoDiario) }}
+                }
+              </strong>
+            </div>
+
+            @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
+              <div
+                class="product-card__bar"
+                [attr.aria-label]="'Disponibilidad ' + getAvailabilityPercent(product) + '%'"
+              >
+                <span
+                  class="product-card__bar-fill"
+                  [class.product-card__bar-fill--agotado]="getOperationalStatus(product) === 'AGOTADO'"
+                  [class.product-card__bar-fill--bajo]="getOperationalStatus(product) === 'BAJO_STOCK'"
+                  [class.product-card__bar-fill--alta-reserva]="isHighReservation(product)"
+                  [style.width.%]="getAvailabilityPercent(product)"
+                ></span>
+              </div>
+
+              <div class="product-card__split">
+                <span>Reservado {{ formatNullable(product.stockReservado) }}</span>
+                <span>Total {{ getAvailabilityBase(product) }}</span>
+              </div>
+            }
+          </section>
+
+          @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
+            <dl class="product-card__metrics">
+              <div class="product-card__metric">
+                <dt>Actual</dt>
+                <dd>{{ formatNullable(product.stockActual) }}</dd>
+              </div>
+              <div class="product-card__metric">
+                <dt>Mínimo</dt>
+                <dd>{{ formatNullable(product.stockMinimo) }}</dd>
+              </div>
+              <div class="product-card__metric">
+                <dt>Reserva</dt>
+                <dd>{{ getReservationPercent(product) }}%</dd>
+              </div>
+            </dl>
+          }
+
+          <footer class="product-card__footer">
             <div class="product-table__acciones">
               <button
                 type="button"
+                class="product-table__btn product-table__btn--manage"
+                (click)="emitManageInventory(product)"
+              >
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                <span>Gestionar</span>
+              </button>
+              <button
+                type="button"
+                class="product-table__btn product-table__btn--history"
+                (click)="emitViewHistory(product)"
+              >
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                <span>Historial</span>
+              </button>
+              <button
+                type="button"
                 class="product-table__btn product-table__btn--edit"
-                (click)="edit.emit(product)"
+                (click)="emitEditProduct(product)"
               >
                 <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 <span>Editar</span>
@@ -99,7 +133,7 @@
               <button
                 type="button"
                 class="product-table__btn product-table__btn--delete"
-                (click)="remove.emit(product)"
+                (click)="emitDeleteProduct(product)"
               >
                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
                 <span>Eliminar</span>

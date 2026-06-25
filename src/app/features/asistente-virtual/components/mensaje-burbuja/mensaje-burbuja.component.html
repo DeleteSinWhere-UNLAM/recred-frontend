@@ -8,6 +8,30 @@
   }
   <div class="mensaje-burbuja__contenido">
     <p class="mensaje-burbuja__texto">{{ mensaje.texto }}</p>
+    @if (muestraComprobante) {
+      <div class="mensaje-burbuja__comprobante" aria-label="Comprobante de compra">
+        <div class="mensaje-burbuja__comprobante-header">
+          <span>Compra confirmada</span>
+          <strong>{{ valorTexto(accion?.codigoRetiro) }}</strong>
+        </div>
+        <dl class="mensaje-burbuja__comprobante-detalle">
+          <div>
+            <dt>Estado</dt>
+            <dd>{{ valorTexto(accion?.estadoCompra) }}</dd>
+          </div>
+          <div>
+            <dt>Recreo</dt>
+            <dd>{{ valorTexto(accion?.recreo) }}</dd>
+          </div>
+          @if (totalFormateado) {
+            <div>
+              <dt>Total</dt>
+              <dd>{{ totalFormateado }}</dd>
+            </div>
+          }
+        </dl>
+      </div>
+    }
     <span class="mensaje-burbuja__hora">{{ horaFormateada }}</span>
   </div>
 </div>

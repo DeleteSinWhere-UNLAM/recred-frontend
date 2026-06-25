@@ -1,0 +1,212 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="oportunidades">
+  <div class="oportunidades__container">
+    <button type="button" class="sa__back" (click)="volver()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
+    @if (presenter.isLoading$ | async) {
+    <div class="sa__notice" role="status">
+      <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>Cargando oportunidades de stock…</span>
+    </div>
+    }
+
+    @if (presenter.error$ | async; as errorMsg) {
+    <div class="sa__notice sa__notice--error" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      <span>{{ errorMsg }}</span>
+    </div>
+    }
+
+    @if ((presenter.sugerencias$ | async); as sugerencias) {
+    @if (sugerencias.length > 0) {
+
+    <section class="sa__summary-panel" aria-label="Resumen de oportunidades">
+      <div class="sa__summary-heading">
+        <span aria-hidden="true">
+          <i class="fa-solid fa-rocket"></i>
+        </span>
+        <div>
+          <div class="sa__title-container">
+            <h1>Oportunidades de Stock</h1>
+            <span class="sa__premium-badge">AVANZADO</span>
+          </div>
+          <p>
+            Productos que están funcionando en otros kioscos y que podrías
+            incorporar a tu inventario.
+          </p>
+        </div>
+      </div>
+
+      <div class="sa__metrics">
+        <article class="sa__metric sa__metric--info">
+          <span class="sa__metric-icon" aria-hidden="true">
+            <i class="fa-solid fa-box-open"></i>
+          </span>
+          <div>
+            <small>Productos sugeridos</small>
+            <strong>{{ presenter.totalProductos }}</strong>
+          </div>
+        </article>
+
+        <article class="sa__metric sa__metric--success">
+          <span class="sa__metric-icon" aria-hidden="true">
+            <i class="fa-solid fa-bag-shopping"></i>
+          </span>
+          <div>
+            <small>Ventas potenciales</small>
+            <strong>{{ presenter.totalVentas }}</strong>
+          </div>
+        </article>
+
+        <article class="sa__metric sa__metric--warning">
+          <span class="sa__metric-icon" aria-hidden="true">
+            <i class="fa-solid fa-coins"></i>
+          </span>
+          <div>
+            <small>Ingreso potencial</small>
+            <strong>{{ presenter.totalIngresosLabel }}</strong>
+          </div>
+        </article>
+
+        <article class="sa__metric sa__metric--danger">
+          <span class="sa__metric-icon" aria-hidden="true">
+            <i class="fa-solid fa-users"></i>
+          </span>
+          <div>
+            <small>Clientes alcanzables</small>
+            <strong>{{ presenter.totalClientes }}</strong>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="sa__module sa__chart-panel" aria-labelledby="sa-chart-title">
+      <div class="sa__module-header">
+        <span aria-hidden="true">
+          <i class="fa-solid fa-chart-bar"></i>
+        </span>
+        <div>
+          <h2 id="sa-chart-title">Ingreso potencial por producto</h2>
+          <small>Ordenado por mayor oportunidad de ingresos</small>
+        </div>
+      </div>
+
+      <div class="sa__hbar-chart">
+        @for (
+        item of presenter.chartData;
+        track item.nombre;
+        let index = $index
+        ) {
+        <article class="sa__hbar-row" [class.sa__hbar-row--top]="index === 0">
+          <span class="sa__hbar-rank">{{ index + 1 }}</span>
+
+          <div class="sa__hbar-label">
+            <strong>{{ item.nombre }}</strong>
+            <small>
+              {{ item.ventas }} ventas · {{ item.clientes }} clientes ·
+              {{ presenter.formatCurrency(item.precio) }}
+            </small>
+          </div>
+
+          <div class="sa__hbar-track" aria-hidden="true">
+            <span class="sa__hbar-fill" [style.width.%]="item.ingresoPercent"></span>
+          </div>
+
+          <strong class="sa__hbar-value">
+            {{ presenter.formatCurrency(item.ingresos) }}
+          </strong>
+        </article>
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="sa-products-title">
+      <div class="sa__section-heading">
+        <div class="sa__module-header">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-lightbulb"></i>
+          </span>
+          <div>
+            <h2 id="sa-products-title">Productos recomendados</h2>
+            <small>Detalle de cada oportunidad</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="sa__cards-grid">
+        @for (card of presenter.productCards; track card.id) {
+        <article class="sa__product-card">
+          <div class="sa__card-header">
+            <div class="sa__card-icon" aria-hidden="true">
+              <i class="fa-solid fa-cube"></i>
+            </div>
+            <div class="sa__card-title">
+              <strong>{{ card.nombre }}</strong>
+              <span class="sa__card-price">
+                {{ presenter.formatCurrency(card.precio) }}
+              </span>
+            </div>
+          </div>
+
+          <p class="sa__card-message">{{ card.mensaje }}</p>
+
+          <div class="sa__card-stats">
+            <div class="sa__card-stat">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-bag-shopping"></i>
+              </span>
+              <div>
+                <small>Ventas</small>
+                <strong>{{ card.ventas }}</strong>
+              </div>
+            </div>
+
+            <div class="sa__card-stat sa__card-stat--ingresos">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-coins"></i>
+              </span>
+              <div>
+                <small>Ingresos</small>
+                <strong>{{ presenter.formatCurrency(card.ingresos) }}</strong>
+              </div>
+            </div>
+
+            <div class="sa__card-stat">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-users"></i>
+              </span>
+              <div>
+                <small>Clientes</small>
+                <strong>{{ card.clientes }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="sa__card-bar" aria-hidden="true">
+            <span [style.width.%]="card.ingresoPercent"></span>
+          </div>
+        </article>
+        }
+      </div>
+    </section>
+    } @else if ((presenter.isLoading$ | async) === false) {
+    <div class="sa__empty-state">
+      <span aria-hidden="true">
+        <i class="fa-solid fa-circle-check"></i>
+      </span>
+
+      <h2>Sin oportunidades por ahora</h2>
+
+      <p>
+        No encontramos productos de otros kioscos que te recomendemos
+        incorporar en este momento.
+      </p>
+    </div>
+    }
+    }
+  </div>
+</main>

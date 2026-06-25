@@ -5,10 +5,13 @@
     <app-perfil-header
       [iniciales]="presenter.iniciales()"
       [nombreCompleto]="presenter.nombreCompleto()"
+      [urlFotoPerfil]="presenter.urlFotoPerfil()"
       [grado]="presenter.grado()"
       [colegio]="presenter.nombreColegio()"
       [saldoFormateado]="presenter.saldoFormateado()"
       [saldoNegativo]="presenter.saldoNegativo()"
+      [fondo]="presenter.fondoPerfil()"
+      (cambioFondo)="presenter.cambiarFondoPerfil($event)"
     />
 
     <app-acciones-grid
@@ -25,5 +28,3 @@
     />
   </div>
 </main>
-
-<app-asistente-virtual />

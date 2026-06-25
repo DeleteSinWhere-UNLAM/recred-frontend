@@ -1,4 +1,20 @@
 <form class="input-mensaje" (submit)="onSubmit($event)">
+  @if (mostrarAcciones) {
+    <button
+      type="button"
+      class="input-mensaje__acciones"
+      [class.input-mensaje__acciones--abiertas]="accionesAbiertas"
+      [attr.aria-expanded]="accionesAbiertas"
+      aria-controls="asistente-panel-acciones"
+      aria-label="Ver opciones del asistente"
+      title="Ver opciones"
+      (click)="onAlternarAcciones()"
+    >
+      <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+      <span>Acciones</span>
+    </button>
+  }
+
   <input
     #inputEl
     type="text"
@@ -10,7 +26,7 @@
     [ngModel]="texto()"
     (ngModelChange)="texto.set($event)"
     name="mensaje-asistente"
-    aria-label="Tu pregunta para Cred"
+    aria-label="Tu pregunta para Recredito"
   />
   <button
     type="submit"

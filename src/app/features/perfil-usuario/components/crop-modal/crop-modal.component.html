@@ -1,0 +1,28 @@
+<div class="crop-modal">
+  <div class="crop-modal__container">
+    <header class="crop-modal__header">
+      <h2 class="crop-modal__title">Ajustar foto de perfil</h2>
+      <p class="crop-modal__subtitle">Arrastrá y hacé zoom para encuadrar tu foto.</p>
+    </header>
+
+    <div class="crop-modal__body">
+      <image-cropper
+        [imageChangedEvent]="imageEvent!"
+        [maintainAspectRatio]="true"
+        [aspectRatio]="1 / 1"
+        [roundCropper]="true"
+        format="webp"
+        (imageCropped)="imageCropped($event)"
+      ></image-cropper>
+    </div>
+
+    <footer class="crop-modal__footer">
+      <app-button-component variant="outline" (Click)="cancel()">
+        Cancelar
+      </app-button-component>
+      <app-button-component variant="success" (Click)="confirm()">
+        Guardar
+      </app-button-component>
+    </footer>
+  </div>
+</div>

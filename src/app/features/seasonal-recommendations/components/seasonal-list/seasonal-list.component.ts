@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Sugerencia } from '../../models/recomendacion.model';
 import { RecommendationCardComponent } from '../recommendation-card/recommendation-card.component';
@@ -14,4 +14,13 @@ import { TipCardComponent } from '../tip-card/tip-card.component';
 export class SeasonalListComponent {
   @Input({ required: true }) sugerencias: Sugerencia[] = [];
   @Input() tipPromocional: string | null = null;
+  @Input() hasTipAction = false;
+  @Input() tipActionText = '';
+  @Input() tipActionIcon = '';
+
+  @Output() tipActionClick = new EventEmitter<void>();
+
+  onTipActionClick(): void {
+    this.tipActionClick.emit();
+  }
 }

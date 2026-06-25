@@ -1,0 +1,15 @@
+<main class="preferencias-detectadas">
+  <h1 class="preferencias-detectadas__titulo">Preferencias detectadas</h1>
+
+  @if (preferencias.length > 0) {
+    <div class="preferencias-detectadas__lista">
+      @for (preferencia of preferencias; track preferencia.sugerenciaId) {
+        <app-preferencia-detectada-card [preferencia]="preferencia" />
+      }
+    </div>
+  } @else {
+    <p class="preferencias-detectadas__vacio">
+      No hay preferencias detectadas.
+    </p>
+  }
+</main>

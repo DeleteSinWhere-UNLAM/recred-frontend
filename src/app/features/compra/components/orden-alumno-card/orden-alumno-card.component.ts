@@ -6,15 +6,19 @@ import {
   Output,
   computed,
   signal,
+  inject,
 } from '@angular/core';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { ItemCarrito } from '../../models/carrito.model';
-import { Recreo } from '../../models/orden-compra.model';
+import { Recreo, RECREO_LABELS } from '../../models/orden-compra.model';
 import { CarritoItemComponent } from '../carrito-item/carrito-item.component';
+import { RecreoOpcion } from '../../carrito/presenter/carrito.presenter';
+import { UsuarioService } from '../../../../data-access/services/usuario.service';
 
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 
@@ -26,6 +30,7 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdenAlumnoCardComponent {
+  private readonly usuarioService = inject(UsuarioService);
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly itemsState = signal<ItemCarrito[]>([]);
 
@@ -42,7 +47,11 @@ export class OrdenAlumnoCardComponent {
   @Input() seleccionado = false;
   @Input() fecha = '';
   @Input() recreo: Recreo = 'PRIMER_RECREO';
+  @Input() recreosDisponibles: RecreoOpcion[] = [];
   @Input() fechaMinima = '';
+  @Input() motivoBloqueoPresupuesto?: string;
+  @Input() modoSoloLectura = false;
+  @Input() favoritoDeshabilitado = false;
 
   @Output() toggleSeleccion = new EventEmitter<void>();
   @Output() fechaCambia = new EventEmitter<string>();
@@ -50,19 +59,30 @@ export class OrdenAlumnoCardComponent {
   @Output() sumarItem = new EventEmitter<string>();
   @Output() restarItem = new EventEmitter<string>();
   @Output() eliminarItem = new EventEmitter<string>();
+  @Output() guardarFavorito = new EventEmitter<void>();
+  @Output() editarRetiro = new EventEmitter<void>();
 
   readonly alumnoActual = computed(() => this.alumnoState());
   readonly itemsActuales = computed(() => this.itemsState());
 
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const a = this.alumnoState();
     if (!a) return '';
-    return ((a.nombre[0] ?? '') + (a.apellido[0] ?? '')).toUpperCase();
+    if (this.usuarioService.esVistaAlumno()) {
+      return ((a.nombre[0] ?? '') + (a.apellido[0] ?? '')).toUpperCase();
+    }
+    return (a.nombre[0] ?? '').toUpperCase();
   });
 
   readonly nombreCompleto = computed(() => {
     const a = this.alumnoState();
-    return a ? `${a.nombre} ${a.apellido}` : '';
+    if (!a) return '';
+    if (this.usuarioService.esVistaAlumno()) {
+      return `${a.nombre} ${a.apellido}`;
+    }
+    return `${a.nombre}`;
   });
 
   readonly subtotal = computed(() =>
@@ -71,6 +91,14 @@ export class OrdenAlumnoCardComponent {
       0,
     ),
   );
+
+  readonly fechaFormateada = computed(() => {
+    if (!this.fecha) return '—';
+    const [year, month, day] = this.fecha.split('-');
+    return `${day}/${month}/${year}`;
+  });
+
+  readonly recreoLabel = computed(() => RECREO_LABELS[this.recreo] ?? this.recreo);
 
   readonly subtotalFormateado = computed(() =>
     formateadorPrecio.format(this.subtotal()),

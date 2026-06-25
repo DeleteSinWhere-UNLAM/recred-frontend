@@ -1,11 +1,23 @@
 export type AccionKiosqueroId =
+  | 'ver-pedidos'
+  | 'venta-espontanea'
+  | 'tracking-pedidos'
   | 'cargar-productos'
-  | 'dashboard'
+  | 'cierre-diario'
+  | 'reportes'
   | 'stock'
   | 'sugerencias'
-  | 'recomendaciones';
+  | 'recomendaciones'
+  | 'recomendaciones-estacionales'
+  | 'oportunidades-stock'
+  | 'promociones';
 
-export type AccionKiosqueroColor = 'pizarra' | 'menta' | 'dorado' | 'melocoton';
+export type AccionKiosqueroColor =
+  | 'pizarra'
+  | 'menta'
+  | 'dorado'
+  | 'melocoton'
+  | 'violeta';
 
 export interface AccionKiosquero {
   id: AccionKiosqueroId;
@@ -14,4 +26,6 @@ export interface AccionKiosquero {
   icono: string;
   ruta: string;
   color?: AccionKiosqueroColor;
+  destacada?: boolean;
+  premium?: boolean;
 }

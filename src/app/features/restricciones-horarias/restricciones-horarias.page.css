@@ -1,0 +1,777 @@
+/* ==========================================================================
+   VISTA DE LÍMITES Y HORARIOS POR RECREO (TUTOR) - REDISEÑO NEUMÓRFICO
+   ========================================================================== */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.restricciones {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.restricciones__container {
+  width: 100%;
+  max-width: 760px;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+
+
+/* Header Section */
+.restricciones__header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.restricciones__titulo {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+
+
+
+/* Loading state */
+.restricciones__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 24px;
+  color: var(--color-texto-claro);
+  font-weight: 600;
+}
+
+.restricciones__loading i {
+  font-size: 28px;
+  color: var(--color-pizarra);
+}
+
+/* ==========================================================================
+   MAIN CARD CONTAINER
+   ========================================================================== */
+.franja-card {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ==========================================================================
+   TABS BAR (LÍNEA DE TIEMPO DE RECREOS) - INTERNAS EN LA TARJETA
+   ========================================================================== */
+.restricciones__horarios-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.restricciones__horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.horario-card {
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 20px;
+  padding: 24px 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(51, 65, 85, 0.03);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.horario-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+  border-color: var(--color-borde-fuerte);
+}
+
+.horario-card__clock-wrapper {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.horario-card:hover .horario-card__clock-wrapper {
+  transform: scale(1.04);
+}
+
+.clock-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.horario-card__nombre {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  line-height: 1.3;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.horario-card--bloqueado {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.05);
+}
+
+.horario-card--bloqueado .horario-card__nombre {
+  color: #047857;
+  font-weight: 800;
+}
+
+.horario-card:not(.horario-card--bloqueado) {
+  background-color: var(--color-superficie-alt);
+  border-color: var(--color-borde);
+  box-shadow: none;
+}
+
+.horario-card:not(.horario-card--bloqueado) .horario-card__nombre {
+  color: var(--color-texto-claro);
+  font-weight: 600;
+}
+
+.restricciones__tabs {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  background-color: var(--color-superficie-alt);
+  border-radius: 16px;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.tab-btn {
+  flex: 1;
+  min-height: 44px;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-texto-claro);
+  cursor: pointer;
+  box-shadow: var(--shadow-neu-concave);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  outline: none;
+}
+
+.tab-btn:hover {
+  background-color: var(--color-superficie-alt);
+  color: var(--color-texto-oscuro);
+}
+
+.tab-btn--active {
+  background-color: var(--color-pizarra);
+  color: var(--color-superficie);
+  border-color: var(--color-borde-fuerte);
+  font-weight: 800;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Header Info */
+.franja-card__header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.carousel-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.carousel-btn:hover:not(:disabled) {
+  background-color: var(--color-borde-fuerte);
+  color: var(--color-texto-oscuro);
+}
+
+.carousel-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.franja-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  text-align: center;
+}
+
+.franja-card__nombre {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  margin: 0;
+}
+
+.franja-card__horario {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--color-texto-claro);
+  margin: 0;
+  font-weight: 600;
+}
+
+.franja-card__horario i {
+  font-size: 14px;
+  color: var(--color-texto-claro);
+}
+
+/* Refined Badge States */
+.franja-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+}
+
+.franja-card__badge--libre {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.franja-card__badge--activo {
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+.franja-card__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   FREEDOM ILLUSTRATION (SIN RESTRICCIONES)
+   ========================================================================== */
+.franja-card__libertad {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 16px;
+  animation: fadeIn 300ms ease;
+}
+
+.libertad-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #dcfce7;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.libertad-text {
+  font-size: 14.5px;
+  color: #166534;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+}
+
+
+
+/* ==========================================================================
+   ACTIVE RESTRICTIONS DETAILED LIST
+   ========================================================================== */
+.restricciones-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.restricciones-lista__titulo {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--color-texto-claro);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.restricciones-lista__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.restricciones-lista__grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.restricciones-lista__grid::-webkit-scrollbar-track {
+  background: var(--color-superficie-alt);
+  border-radius: 4px;
+}
+
+.restricciones-lista__grid::-webkit-scrollbar-thumb {
+  background: var(--color-borde-fuerte);
+  border-radius: 4px;
+}
+
+.restricciones-lista__grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.restriccion-item-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background-color: #f8fafc;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  animation: slideIn 250ms ease;
+  transition: all 0.2s ease;
+}
+
+.restriccion-item-card:hover {
+  background-color: #fff5f5;
+  border-color: #fca5a5;
+}
+
+.restriccion-item-card--total {
+  background-color: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.restriccion-item-card--total .restriccion-item-card__info {
+  color: #b91c1c;
+}
+
+.restriccion-item-card__info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+}
+
+.restriccion-item-card__info i {
+  font-size: 15px;
+  color: var(--color-texto-claro);
+}
+
+.restriccion-item-card--total .restriccion-item-card__info i {
+  color: var(--color-melocoton);
+}
+
+.restriccion-item-card__btn-quitar {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.restriccion-item-card__btn-quitar:hover {
+  background-color: #fecaca;
+  color: #b91c1c;
+}
+
+/* ==========================================================================
+   TOTAL BLOCK TOGGLE
+   ========================================================================== */
+.total-block-card {
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-card);
+  transition: all 0.25s ease;
+  margin-bottom: 0;
+}
+
+.total-block-card--checked {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.05);
+}
+
+.total-block-card__icono-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.total-block-card__icono-container--gray {
+  background-color: var(--color-superficie);
+  color: var(--color-texto-claro);
+}
+
+.total-block-card__icono-container--red {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-melocoton);
+}
+
+.total-block-card__textos {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.total-block-card__titulo {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+}
+
+.total-block-card__sub {
+  font-size: 13px;
+  color: var(--color-texto-claro);
+  margin-top: 2px;
+}
+
+/* Premium Custom Toggle Switch */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle__slider {
+  position: absolute;
+  inset: 0;
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle__slider::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle__input:checked + .toggle__slider {
+  background-color: #ef4444; /* Red toggle when checked for total block */
+}
+
+.toggle__input:checked + .toggle__slider::after {
+  transform: translateX(18px);
+}
+
+/* ==========================================================================
+   BOTTOM CONTROLS / FORM ACTIONS
+   ========================================================================== */
+.franja-card__acciones {
+  margin-top: 4px;
+}
+
+.add-restriction__controles {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.add-restriction__select {
+  flex: 1;
+  width: calc(50% - 6px);
+  min-height: 46px;
+  padding: 0 16px;
+  background-color: var(--color-superficie-alt);
+  color: var(--color-texto-oscuro);
+  border: 1px solid var(--color-borde-fuerte);
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  box-sizing: border-box;
+}
+
+.add-restriction__select:focus {
+  border-color: var(--color-pizarra);
+  box-shadow: 0 0 0 3px var(--color-foco);
+  background-color: var(--color-superficie);
+}
+
+.add-restriction__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 24px;
+  background-color: #e2e8f0; /* Grey/disabled */
+  color: #94a3b8;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease, transform 0.1s ease;
+  flex: 1;
+  width: calc(50% - 6px);
+  box-sizing: border-box;
+}
+
+.add-restriction__btn:not(:disabled) {
+  background-color: var(--color-dorado);
+  color: #1a3b5c;
+  box-shadow: 0 8px 20px rgba(242, 183, 5, 0.18);
+}
+
+.add-restriction__btn:not(:disabled):hover {
+  background-color: var(--color-dorado-dark);
+  color: #1a3b5c;
+}
+
+.add-restriction__btn:not(:disabled):active {
+  transform: scale(0.98);
+  box-shadow: inset 0 0 0 1px rgba(180, 130, 0, 0.26);
+}
+
+.add-restriction__btn:disabled {
+  background-color: var(--color-superficie-alt);
+  color: var(--color-texto-claro);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   KEYFRAME ANIMATIONS
+   ========================================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVIDAD
+   ========================================================================== */
+
+  
+  .restricciones__container {
+    padding: 0 16px;
+  }
+  
+  .franja-card {
+    padding: 24px 20px 28px;
+    border-radius: 24px;
+    gap: 16px;
+  }
+  
+  .restricciones__tabs {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .tab-btn {
+    min-height: 42px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+  
+  .franja-card__header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .franja-card__badge {
+    align-self: flex-start;
+  }
+  
+
+  
+  .add-restriction__controles {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .add-restriction__select {
+    flex: 1;
+    width: calc(50% - 5px);
+  }
+  
+  .add-restriction__btn {
+    flex: 1;
+    width: calc(50% - 5px);
+  }
+
+/* Dark theme specific adjustments */
+[data-theme="dark"] .total-block-card--checked {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .franja-card__libertad {
+  background-color: rgba(129, 178, 154, 0.15); /* var(--color-menta) mix */
+  border-color: rgba(129, 178, 154, 0.3);
+}
+
+[data-theme="dark"] .libertad-text {
+  color: var(--color-menta);
+}
+
+[data-theme="dark"] .libertad-circle {
+  background-color: rgba(129, 178, 154, 0.25);
+  color: var(--color-menta);
+}
+
+[data-theme="dark"] .restriccion-item-card {
+  background-color: rgba(231, 111, 81, 0.08); /* var(--color-melocoton) mix */
+  border-color: rgba(231, 111, 81, 0.2);
+}
+
+[data-theme="dark"] .restriccion-item-card:hover {
+  background-color: rgba(231, 111, 81, 0.15);
+  border-color: rgba(231, 111, 81, 0.4);
+}
+
+[data-theme="dark"] .restriccion-item-card--total {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .restriccion-item-card--total .restriccion-item-card__info {
+  color: var(--color-melocoton);
+}
+
+[data-theme="dark"] .restriccion-item-card__btn-quitar:hover {
+  background-color: rgba(239, 68, 68, 0.3);
+  color: #fee2e2;
+}
+
+[data-theme="dark"] .horario-card--bloqueado {
+  background-color: rgba(129, 178, 154, 0.15);
+  border-color: rgba(129, 178, 154, 0.3);
+}
+
+[data-theme="dark"] .horario-card--bloqueado .horario-card__nombre {
+  color: var(--color-menta);
+}
+

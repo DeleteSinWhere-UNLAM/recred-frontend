@@ -1,2 +1,20 @@
 <router-outlet />
+@if (mostrarAsistente()) {
+  <app-asistente-virtual />
+}
 <app-toast-host />
+<app-notificacion-saldo-bajo />
+<app-notificacion-sugerencia-saludable />
+
+@if (dialogService.activeDialog(); as dialog) {
+  <app-modal-component
+    [isOpen]="true"
+    [title]="dialog.title"
+    [message]="dialog.message"
+    [confirmText]="dialog.confirmText || 'Aceptar'"
+    [cancelText]="dialog.cancelText || 'Cancelar'"
+    [showCancel]="dialog.showCancel ?? true"
+    (confirm)="dialogService.handleConfirm()"
+    (dismiss)="dialogService.handleDismiss()"
+  />
+}

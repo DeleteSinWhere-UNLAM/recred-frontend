@@ -1,10 +1,10 @@
-<app-navbar />
+<app-navbar [userName]="nombreUsuario" />
 
 <main class="seasonal-page">
   <button
     type="button"
     class="seasonal-page__volver"
-    (click)="volver()"
+    (click)="presenter.volver()"
   >
     <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
     <span>Volver</span>
@@ -16,37 +16,98 @@
         <i class="fa-solid fa-leaf"></i>
       </div>
       <div class="seasonal-page__identidad">
-        <h2 class="seasonal-page__titulo">Recomendaciones estacionales</h2>
+        <div class="seasonal-page__titulo-container">
+          <h2 class="seasonal-page__titulo">Recomendaciones estacionales</h2>
+          <span class="seasonal-page__premium-badge">AVANZADO</span>
+        </div>
         <p class="seasonal-page__subtitulo">
           Basadas en tu ubicación y el clima del entorno escolar
         </p>
       </div>
     </header>
 
-    @if (isLoading) {
+    @if (presenter.seasonInfo() || presenter.weatherInfo()) {
+      <div class="seasonal-page__metrics-grid">
+        @if (presenter.seasonInfo()) {
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--blue">
+              <i class="fa-regular fa-calendar-days"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Estación</span>
+              <strong class="metric-card__value">{{ presenter.seasonInfo()?.estacion_actual }}</strong>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--green">
+              <i class="fa-solid fa-leaf"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Faltan para {{ presenter.seasonInfo()?.proxima_estacion }}</span>
+              <strong class="metric-card__value">{{ presenter.seasonInfo()?.dias_restantes }} días</strong>
+            </div>
+          </div>
+        }
+        @if (presenter.weatherInfo()) {
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--blue-light">
+              <i class="fa-solid fa-cloud"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Clima actual</span>
+              <strong class="metric-card__value">{{ presenter.weatherInfo()?.condition }}, {{ presenter.weatherInfo()?.temperature }}°C</strong>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card__icon metric-card__icon--indigo">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div class="metric-card__content">
+              <span class="metric-card__label">Ubicación</span>
+              <strong class="metric-card__value">{{ presenter.weatherInfo()?.ciudad }}, {{ presenter.weatherInfo()?.provincia }}</strong>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (presenter.isLoading()) {
       <div class="seasonal-page__estado">
         <div class="seasonal-page__spinner"></div>
         <p>Analizando el clima de tu zona y generando recomendaciones...</p>
       </div>
-    } @else if (error) {
+    } @else if (presenter.error()) {
       <div class="seasonal-page__estado seasonal-page__estado--error">
         <div class="seasonal-page__error-icono">
           <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
         </div>
-        <p>{{ error }}</p>
+        <p>{{ presenter.error() }}</p>
         <button
           type="button"
           class="seasonal-page__reintentar"
-          (click)="loadRecommendations()"
+          (click)="presenter.loadRecommendations()"
         >
           Reintentar
         </button>
       </div>
     } @else {
       <app-seasonal-list
-        [sugerencias]="sugerencias"
-        [tipPromocional]="tipPromocional">
+        [sugerencias]="presenter.sugerencias()"
+        [tipPromocional]="presenter.tipPromocional()"
+        [hasTipAction]="!!presenter.suggestedPromotion() && !presenter.isLoading()"
+        tipActionText="Generar promoción"
+        tipActionIcon="fa-solid fa-wand-magic-sparkles"
+        (tipActionClick)="presenter.abrirModalPromocion()">
       </app-seasonal-list>
     }
   </div>
 </main>
+
+@if (presenter.shouldShowPromotionModal()) {
+  <app-ia-promotion-approval-modal
+    [suggestedPromotion]="presenter.suggestedPromotion()!"
+    [resolvedProducts]="presenter.resolvedProducts()"
+    (confirmPromotion)="presenter.confirmPromotion($event)"
+    (closeModal)="presenter.closeModal()">
+  </app-ia-promotion-approval-modal>
+}

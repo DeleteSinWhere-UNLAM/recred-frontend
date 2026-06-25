@@ -28,6 +28,8 @@ export class CodigoRetiroCardComponent {
 
   readonly alumnoActual = computed(() => this.alumnoState());
 
+  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+
   readonly iniciales = computed(() => {
     const a = this.alumnoState();
     if (!a) return '';
@@ -37,6 +39,15 @@ export class CodigoRetiroCardComponent {
   readonly nombreCompleto = computed(() => {
     const a = this.alumnoState();
     return a ? `${a.nombre} ${a.apellido}` : '';
+  });
+
+  readonly fechaFormateada = computed(() => {
+    if (!this.fecha) return '';
+    const parts = this.fecha.split('T')[0].split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return this.fecha;
   });
 
   readonly recreoLabel = computed(() => RECREO_LABELS[this.recreo]);

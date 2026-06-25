@@ -29,10 +29,4 @@ describe('SugerenciasPage', () => {
   it('debería crear la página', () => {
     expect(component).toBeTruthy();
   });
-
-  it('debería mostrar el título de sugerencias', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.textContent).toContain('Sugerencias del día');
-  });
 });

@@ -1,0 +1,543 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.acreditar-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.acreditar-page__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.acreditar-page__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: var(--color-texto-claro);
+  gap: 12px;
+}
+
+/* Header Student Card */
+.acreditar-page__alumno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--color-superficie);
+  padding: 24px 32px;
+  border-radius: 24px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-borde);
+  margin-bottom: 16px;
+}
+
+.acreditar-page__alumno-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.acreditar-page__avatar-wrap {
+  flex-shrink: 0;
+}
+
+.acreditar-page__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra); /* Deep slate blue */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow:
+    0 0 0 3px var(--color-superficie),
+    0 0 0 5px var(--color-dorado),
+    0 8px 16px rgba(74, 111, 165, 0.08);
+  overflow: hidden;
+}
+
+.acreditar-page__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.acreditar-page__alumno-info h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  line-height: 1.2;
+}
+
+.acreditar-page__alumno-info p {
+  margin: 4px 0 0 0;
+  color: var(--color-texto-claro);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.acreditar-page__alumno-info p i {
+  color: var(--color-menta);
+}
+
+/* Yellow Saldo total display */
+.acreditar-page__alumno-saldo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background-color: var(--color-dorado);
+  border-radius: 12px;
+  color: #1a3b5c;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(242, 183, 5, 0.15);
+}
+
+.acreditar-page__saldo-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.acreditar-page__saldo-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(26, 59, 92, 0.8);
+  letter-spacing: 0.5px;
+}
+
+.acreditar-page__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.acreditar-page__saldo-icon {
+  opacity: 0.2;
+  display: flex;
+  align-items: center;
+}
+
+.acreditar-page__card-svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Two-column layout grid */
+.acreditar-page__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .acreditar-page__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Left Form & Right History Cards (equal look and feel) */
+.acreditar-page__form-section,
+.acreditar-page__history-section {
+  background: var(--color-superficie);
+  padding: 20px 24px;
+  border-radius: 24px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-borde);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.acreditar-page__form-section {
+  overflow-y: auto;
+  scrollbar-width: none;
+  justify-content: center;
+}
+
+.acreditar-page__form-section::-webkit-scrollbar {
+  display: none;
+}
+
+
+.acreditar-page__form-section h3,
+.acreditar-page__history-section h3 {
+  margin: 0 0 8px 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  text-align: center;
+}
+
+.acreditar-page__description,
+.acreditar-page__history-description {
+  color: var(--color-texto-claro);
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.acreditar-page__input-group {
+  margin-bottom: 12px;
+}
+
+.acreditar-page__input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+}
+
+/* Input Wrapper & Mercado Pago Badge decoration */
+.acreditar-page__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.acreditar-page__input-group input {
+  width: 100%;
+  padding: 14px 48px 14px 16px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  border: 1px solid var(--color-borde-fuerte);
+  border-radius: 12px;
+  background-color: var(--color-superficie-alt);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.acreditar-page__input-group input:focus {
+  outline: none;
+  border-color: var(--color-pizarra);
+  background-color: var(--color-superficie);
+}
+
+.acreditar-page__mp-logo {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.acreditar-page__mp-svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Quick actions presets grid */
+.acreditar-page__presets-section {
+  margin-bottom: 16px;
+}
+
+.acreditar-page__presets-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  margin-bottom: 10px;
+}
+
+.acreditar-page__presets-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.acreditar-page__preset-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 4px;
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.acreditar-page__preset-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(74, 111, 165, 0.15);
+  box-shadow: 0 4px 10px rgba(74, 111, 165, 0.04);
+}
+
+.acreditar-page__preset-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 12px;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+
+.acreditar-page__preset-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-texto-claro);
+}
+
+/* Presets colors */
+.acreditar-page__preset-btn--menta .acreditar-page__preset-icono {
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  color: var(--color-menta);
+}
+
+.acreditar-page__preset-btn--melocoton .acreditar-page__preset-icono {
+  background-color: color-mix(in srgb, var(--color-melocoton) 15%, transparent);
+  color: var(--color-melocoton);
+}
+
+.acreditar-page__preset-btn--azul .acreditar-page__preset-icono {
+  background-color: color-mix(in srgb, var(--color-pizarra) 15%, transparent);
+  color: var(--color-pizarra);
+}
+
+.acreditar-page__preset-btn--morado .acreditar-page__preset-icono {
+  background-color: #a855f7;
+}
+
+.acreditar-page__preset-btn--gris .acreditar-page__preset-icono {
+  background-color: #475569;
+}
+
+.acreditar-page__preset-btn--celeste .acreditar-page__preset-icono {
+  background-color: #06b6d4;
+}
+
+.acreditar-page__preset-btn--violeta .acreditar-page__preset-icono {
+  background-color: #8b5cf6;
+}
+
+/* Actions buttons (Continuar / Cancelar) */
+.acreditar-page__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.acreditar-page__btn {
+  width: 100%;
+  padding: 14px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s, opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.acreditar-page__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.acreditar-page__btn--primary {
+  background-color: var(--color-dorado);
+  color: #1a3b5c;
+  box-shadow: 0 8px 20px rgba(242, 183, 5, 0.18);
+}
+
+.acreditar-page__btn--primary:not(:disabled):hover {
+  background-color: var(--color-dorado-dark);
+}
+
+.acreditar-page__btn--primary:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.acreditar-page__btn--secondary {
+  background-color: var(--color-superficie-alt);
+  color: var(--color-texto-claro);
+}
+
+.acreditar-page__btn--secondary:not(:disabled):hover {
+  background-color: var(--color-borde-fuerte);
+  color: var(--color-texto-oscuro);
+}
+
+/* History list & Items */
+.acreditar-page__history-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.acreditar-page__history-list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.acreditar-page__history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.acreditar-page__history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.acreditar-page__history-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-borde-fuerte);
+  border-radius: 8px;
+}
+
+.acreditar-page__history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
+  border-radius: 16px;
+}
+
+.acreditar-page__history-item-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.acreditar-page__history-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-menta);
+  font-size: 14px;
+}
+
+.acreditar-page__history-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.acreditar-page__history-monto {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+}
+
+.acreditar-page__history-fecha {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+}
+
+.acreditar-page__history-status {
+  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
+  color: var(--color-menta);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.acreditar-page__history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--color-texto-claro);
+  gap: 12px;
+  flex: 1;
+}
+
+.acreditar-page__history-empty i {
+  font-size: 36px;
+  color: var(--color-borde-fuerte);
+}
+
+.acreditar-page__history-empty p {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .acreditar-page__content {
+    padding: 24px 16px;
+  }
+
+  .acreditar-page__alumno {
+    padding: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .acreditar-page__alumno-left {
+    justify-content: center;
+  }
+
+  .acreditar-page__alumno-saldo {
+    justify-content: center;
+  }
+
+  .acreditar-page__form-section,
+  .acreditar-page__history-section {
+    padding: 24px 16px;
+  }
+
+  .acreditar-page__presets-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

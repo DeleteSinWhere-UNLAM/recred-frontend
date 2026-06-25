@@ -1,0 +1,653 @@
+<app-navbar [userName]="presenter.nombreKiosquero()" />
+
+<main class="kiosquero-reportes">
+  <div class="kiosquero-reportes__container">
+    <button type="button" class="kr__back" (click)="volver()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
+    <section
+      class="kr"
+      aria-labelledby="kr-title"
+      [attr.aria-busy]="presenter.isLoading()"
+    >
+      
+
+      @if (presenter.errorMessage(); as errorMessage) {
+        <div class="kr__notice kr__notice--error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      @if (presenter.isLoading()) {
+        <div class="kr__notice" role="status">
+          <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+          <span>Cargando reportes.</span>
+        </div>
+      }
+
+      @if (presenter.hasPanelData()) {
+        <section
+          class="kr__summary-panel"
+          aria-label="Resumen comercial del período"
+        >
+          <div class="kr__section-heading kr__section-heading--light">
+            <span aria-hidden="true">
+              <i class="fa-solid fa-chart-pie"></i>
+            </span>
+            <div>
+              <div class="kr__title-container">
+                <h2 id="kr-title">Resumen comercial</h2>
+                <span class="kr__premium-badge">AVANZADO</span>
+              </div>
+            </div>
+
+            <div class="kr__summary-actions">
+              <label class="kr__date-field kr__date-field--summary">
+                <span>Período</span>
+                <select
+                  [value]="presenter.selectedRangePreset()"
+                  (change)="presenter.onReportRangePresetChange($event)"
+                >
+                  @for (option of presenter.reportRangeOptions; track option.id) {
+                    <option [value]="option.id">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+
+              @if (presenter.selectedRangePreset() === "CUSTOM") {
+                <label class="kr__date-field kr__date-field--summary">
+                  <span>Desde</span>
+                  <input
+                    type="date"
+                    [value]="presenter.reportRangeFrom()"
+                    (change)="presenter.onReportRangeFromChange($event)"
+                  />
+                </label>
+
+                <label class="kr__date-field kr__date-field--summary">
+                  <span>Hasta</span>
+                  <input
+                    type="date"
+                    [value]="presenter.reportRangeTo()"
+                    (change)="presenter.onReportRangeToChange($event)"
+                  />
+                </label>
+              }
+
+              <button
+                type="button"
+                class="kr__refresh kr__refresh--summary"
+                [disabled]="presenter.isLoading()"
+                (click)="presenter.refrescarReportes()"
+                aria-label="Actualizar reportes"
+              >
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                <span>Actualizar</span>
+              </button>
+            </div>
+          </div>
+
+          <section class="kr__summary" aria-label="Indicadores principales">
+            @for (
+              metric of presenter.reportSummaryMetrics();
+              track metric.label
+            ) {
+              <article
+                class="kr__metric"
+                [class.kr__metric--success]="metric.tone === 'success'"
+              >
+                <span class="kr__metric-icon" aria-hidden="true">
+                  <i class="fa-solid {{ metric.icon }}"></i>
+                </span>
+                <div>
+                  <small>{{ metric.label }}</small>
+                  <strong>{{ metric.value }}</strong>
+                </div>
+              </article>
+            }
+          </section>
+        </section>
+        <section
+          class="kr__module kr__category-panel"
+          aria-labelledby="category-title"
+        >
+          <div class="kr__category-header">
+            <div class="kr__module-header">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-layer-group"></i>
+              </span>
+              <div>
+                <h2 id="category-title">Ventas por categoría</h2>
+              </div>
+            </div>
+          </div>
+          @if (presenter.salesByCategory().length > 0) {
+            <div class="kr__category-overview">
+              <article class="kr__category-kpi">
+                <span aria-hidden="true">
+                  <i class="fa-solid fa-shapes"></i>
+                </span>
+                <div>
+                  <small>Categorías activas</small>
+                  <strong>{{ presenter.salesByCategory().length }}</strong>
+                  <em>con ventas</em>
+                </div>
+              </article>
+
+              <article class="kr__category-kpi">
+                <span aria-hidden="true">
+                  <i class="fa-solid fa-star"></i>
+                </span>
+                <div>
+                  <small>Más vendida</small>
+                  <strong>{{
+                    presenter.salesByCategory()[0].categoryName
+                  }}</strong>
+                  <em>{{ presenter.salesByCategory()[0].quantityLabel }}</em>
+                </div>
+              </article>
+
+              <article class="kr__category-kpi">
+                <span aria-hidden="true">
+                  <i class="fa-solid fa-dollar-sign"></i>
+                </span>
+                <div>
+                  <small>Total vendido</small>
+                  <strong>{{
+                    presenter.reportSummaryMetrics()[0].value
+                  }}</strong>
+                  <em>en el período</em>
+                </div>
+              </article>
+
+              <article class="kr__category-leader">
+                <span class="kr__category-leader-icon" aria-hidden="true">
+                  <i class="fa-solid fa-trophy"></i>
+                </span>
+
+                <div>
+                  <small>Líder en ventas</small>
+                  <strong>{{
+                    presenter.salesByCategory()[0].categoryName
+                  }}</strong>
+                  <em
+                    >{{ presenter.salesByCategory()[0].totalPercentLabel }} del
+                    total vendido</em
+                  >
+                </div>
+
+                <div
+                  class="kr__category-ring"
+                  aria-hidden="true"
+                  [style.--category-ring-percent]="
+                    presenter.salesByCategory()[0].totalPercent
+                  "
+                >
+                  <span></span>
+                </div>
+              </article>
+            </div>
+
+            <div class="kr__category-table">
+              <div class="kr__category-table-head">
+                <span>Categoría</span>
+                <span>Unidades vendidas</span>
+                <span>Importe</span>
+                <span>% del total</span>
+              </div>
+
+              @for (
+                category of presenter.salesByCategory();
+                track category.categoryId ?? category.categoryName;
+                let index = $index
+              ) {
+                <article class="kr__category-row">
+                  <div class="kr__category-name">
+                    <span class="kr__category-rank">{{ index + 1 }}</span>
+                    <span class="kr__category-icon" aria-hidden="true">
+                      <i class="fa-solid fa-tag"></i>
+                    </span>
+                    <div>
+                      <strong>{{ category.categoryName }}</strong>
+                      <small>{{ category.quantityLabel }}</small>
+                    </div>
+                  </div>
+
+                  <div class="kr__category-bar-cell">
+                    <div class="kr__bar-track" aria-hidden="true">
+                      <span [style.width.%]="category.barPercent"></span>
+                    </div>
+                    <strong>{{ category.quantityLabel }}</strong>
+                  </div>
+
+                  <strong class="kr__category-total">{{
+                    category.totalLabel
+                  }}</strong>
+                  <strong class="kr__category-percent"
+                    >{{ category.totalPercentLabel }}</strong
+                  >
+                </article>
+              }
+            </div>
+          } @else {
+            <p class="kr__empty kr__empty--category">
+              Sin ventas entregadas por categoría.
+            </p>
+          }
+        </section>
+
+        <section class="kr__commerce-panel" aria-label="Actividad y pedidos">
+          <div class="kr__commerce-grid">
+            <section
+              class="kr__sales-slot-card"
+              aria-labelledby="sales-slot-title"
+            >
+              <div class="kr__module-header kr__module-header--large">
+                <span aria-hidden="true">
+                  <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <div>
+                  <h2 id="sales-slot-title">Ventas por recreo</h2>
+                </div>
+              </div>
+
+              <div class="kr__sales-slot-body">
+                <article class="kr__sales-total-card">
+                  <span aria-hidden="true">
+                    <i class="fa-solid fa-wallet"></i>
+                  </span>
+                  <div>
+                    <small>Total vendido</small>
+                    <strong>{{
+                      presenter.reportSummaryMetrics()[0].value
+                    }}</strong>
+                  </div>
+                </article>
+
+                <div class="kr__sales-slot-list">
+                  @if (presenter.salesByTimeSlot().length > 0) {
+                    @for (
+                      slot of presenter.salesByTimeSlot();
+                      track slot.timeSlot
+                    ) {
+                      <article class="kr__sales-slot-item">
+                        <div class="kr__sales-slot-info">
+                          <strong>{{ slot.timeSlot }}</strong>
+                          <small>
+                            <i class="fa-solid fa-users" aria-hidden="true"></i>
+                            {{ slot.ordersLabel }}
+                          </small>
+                        </div>
+
+                        <div class="kr__sales-slot-progress" aria-hidden="true">
+                          <span [style.width.%]="slot.percent"></span>
+                        </div>
+
+                        <strong class="kr__sales-slot-amount">{{
+                          slot.totalSoldLabel
+                        }}</strong>
+                      </article>
+                    }
+                  } @else {
+                    <p class="kr__empty">Sin ventas por recreo.</p>
+                  }
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="kr__purchase-card"
+              aria-labelledby="purchase-type-title"
+            >
+              <div class="kr__module-header kr__module-header--large">
+                <span aria-hidden="true">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                </span>
+                <div>
+                  <h2 id="purchase-type-title">Tipo de compra</h2>
+                </div>
+              </div>
+
+              @if (presenter.ordersByPurchaseType().length > 0) {
+                <div class="kr__purchase-list">
+                  @for (
+                    type of presenter.ordersByPurchaseType();
+                    track type.type
+                  ) {
+                    <article
+                      class="kr__purchase-item"
+                      [class.kr__purchase-item--anticipated]="
+                        type.type === 'ANTICIPADA'
+                      "
+                    >
+                      <div>
+                        <strong>{{ type.label }}</strong>
+                        <small>{{ type.ordersLabel }} compras</small>
+                      </div>
+
+                      <div class="kr__purchase-progress" aria-hidden="true">
+                        <span [style.width.%]="type.percent"></span>
+                      </div>
+
+                      <strong class="kr__purchase-percent"
+                        >{{ type.percent }}%</strong
+                      >
+                    </article>
+                  }
+                </div>
+              } @else {
+                <p class="kr__empty">Sin compras registradas.</p>
+              }
+            </section>
+          </div>
+
+          
+        </section>
+
+        <div class="kr__grid kr__grid--rankings">
+          @for (group of presenter.rankingProductGroups(); track group.title) {
+            <section
+              class="kr__module kr__ranking-panel"
+              [class.kr__ranking-panel--reserved]="
+                group.title === 'Más reservados ahora'
+              "
+              [attr.aria-label]="group.title"
+            >
+              <div class="kr__ranking-header">
+                <div class="kr__module-header">
+                  <span aria-hidden="true">
+                    <i class="fa-solid {{ group.icon }}"></i>
+                  </span>
+
+                  <div>
+                    <h2>{{ group.title }}</h2>
+                    <p>Top {{ group.items.length }} productos</p>
+                  </div>
+                </div>
+
+                @if (group.title === "Más reservados ahora") {
+                  <span class="kr__ranking-badge">
+                    <i class="fa-solid fa-clock" aria-hidden="true"></i>
+                    En tiempo real
+                  </span>
+                } @else {
+                  <span class="kr__ranking-badge">
+                    <i class="fa-solid fa-tag" aria-hidden="true"></i>
+                    {{ group.items.length }} productos
+                  </span>
+                }
+              </div>
+
+              @if (group.items.length > 0) {
+                <div class="kr__ranking-list">
+                  @for (
+                    item of group.items;
+                    track item.id;
+                    let index = $index
+                  ) {
+                    <article
+                      class="kr__rank-item"
+                      [class.kr__rank-item--winner]="index === 0"
+                    >
+                      <span class="kr__rank-number">{{ index + 1 }}</span>
+
+                      <div class="kr__rank-media">
+                        <img
+                          class="kr__rank-image"
+                          [src]="item.imageUrl || IMAGEN_FALLBACK"
+                          [alt]="item.label"
+                          loading="lazy"
+                          (error)="onImagenError($event)"
+                        />
+                      </div>
+
+                      <div class="kr__rank-info">
+                        <strong>{{ item.label }}</strong>
+                        <small>
+                          @if (group.title === "Más reservados ahora") {
+                            {{ item.detail }} reservadas
+                          } @else {
+                            {{ item.detail }} vendidas
+                          }
+                        </small>
+
+                        @if (group.title !== "Más reservados ahora") {
+                          <div class="kr__rank-progress" aria-hidden="true">
+                            <span></span>
+                          </div>
+                        }
+                      </div>
+
+                      @if (group.title === "Más reservados ahora") {
+                        <div class="kr__rank-reserved">
+                          <strong>{{
+                            item.detail.replace(" unidades", "")
+                          }}</strong>
+                          <span>Reservado</span>
+                        </div>
+                      } @else if (item.amount) {
+                        <strong class="kr__rank-amount">{{
+                          item.amount
+                        }}</strong>
+                      }
+                    </article>
+                  }
+                </div>
+              } @else {
+                <p class="kr__empty">{{ group.emptyLabel }}</p>
+              }
+            </section>
+          }
+        </div>
+
+        <section
+          class="kr__module kr__module--trend kr__trend-panel"
+          aria-labelledby="trend-title"
+        >
+          <div class="kr__trend-header">
+            <div class="kr__module-header">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-chart-column"></i>
+              </span>
+              <div>
+                <h2 id="trend-title">{{ presenter.trendTitle() }}</h2>
+              </div>
+            </div>
+
+            <p>{{ presenter.trendSubtitle() }}</p>
+          </div>
+
+          @if (presenter.trendDays().length > 0) {
+            <div class="kr__trend-dashboard">
+              <aside class="kr__trend-summary">
+                <article class="kr__trend-summary-item">
+                  <span aria-hidden="true">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                  </span>
+                  <div>
+                    <small>Mejor día</small>
+                    @if (presenter.bestTrendDay(); as day) {
+                      <strong>{{ day.dateLabel }}</strong>
+                      <em>{{ day.totalSoldLabel }}</em>
+                    }
+                  </div>
+                </article>
+
+                <article class="kr__trend-summary-item">
+                  <span aria-hidden="true">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                  </span>
+                  <div>
+                    <small>Último día</small>
+                    <strong>
+                      {{
+                        presenter.trendDays()[presenter.trendDays().length - 1]
+                          .createdOrdersLabel
+                      }}
+                    </strong>
+                    <em>
+                      {{
+                        presenter.trendDays()[presenter.trendDays().length - 1]
+                          .deliveredOrdersLabel
+                      }}
+                    </em>
+                  </div>
+                </article>
+
+                <article class="kr__trend-summary-item">
+                  <span aria-hidden="true">
+                    <i class="fa-solid fa-circle-check"></i>
+                  </span>
+                  <div>
+                    <small>Referencia</small>
+                    <strong>Período</strong>
+                    <em>{{ presenter.trendDays().length }} días</em>
+                  </div>
+                </article>
+              </aside>
+
+              <div
+                class="kr__trend-chart"
+                aria-label="Ventas del período"
+              >
+                <div class="kr__trend-axis">
+                  <span>Ventas</span>
+                  <span>$</span>
+                </div>
+
+                <div class="kr__trend-columns">
+                  @for (day of presenter.trendDays(); track day.date) {
+                    <article
+                      class="kr__trend-column"
+                      [class.kr__trend-column--peak]="day.percent === 100"
+                    >
+                      @if (day.percent === 100) {
+                        <span class="kr__trend-peak-label">
+                          <i class="fa-solid fa-star" aria-hidden="true"></i>
+                          Pico
+                        </span>
+                      }
+
+                      <strong>{{ day.totalSoldLabel }}</strong>
+
+                      <div class="kr__trend-bar" aria-hidden="true">
+                        <span [style.height.%]="day.percent"></span>
+                      </div>
+
+                      <small>{{ day.dateLabel }}</small>
+                    </article>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="kr__trend-cards"
+              [class.kr__trend-cards--scroll]="presenter.trendDays().length > 7"
+              aria-label="Detalle diario de ventas"
+            >
+              @for (day of presenter.trendDays(); track day.date) {
+                <article
+                  class="kr__trend-card"
+                  role="button"
+                  tabindex="0"
+                  [class.kr__trend-card--peak]="day.percent === 100"
+                  [class.kr__trend-card--selected]="
+                    presenter.selectedTrendDay()?.date === day.date
+                  "
+                  (click)="presenter.selectTrendDay(day.date)"
+                  (keydown.enter)="presenter.selectTrendDay(day.date)"
+                  (keydown.space)="
+                    $event.preventDefault(); presenter.selectTrendDay(day.date)
+                  "
+                >
+                  <div class="kr__trend-card-head">
+                    <span>{{ day.dateLabel }}</span>
+                    @if (day.percent === 100) {
+                      <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    }
+                  </div>
+
+                  <strong>{{ day.totalSoldLabel }}</strong>
+
+                  <div class="kr__trend-card-detail">
+                    <span>
+                      <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+                      {{ day.createdOrdersLabel }}
+                    </span>
+                    <span>
+                      <i
+                        class="fa-solid fa-circle-check"
+                        aria-hidden="true"
+                      ></i>
+                      {{ day.deliveredOrdersLabel }}
+                    </span>
+                    <span>
+                      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                      {{ day.nonDeliveredOrdersLabel }}
+                    </span>
+                  </div>
+
+                  <div class="kr__trend-card-progress" aria-hidden="true">
+                    <span [style.width.%]="day.percent"></span>
+                  </div>
+                </article>
+              }
+            </div>
+
+            @if (presenter.selectedTrendDay(); as selectedDay) {
+              <section
+                class="kr__trend-breakdown"
+                aria-label="Desglose de pedidos del día seleccionado"
+              >
+                <div class="kr__trend-breakdown-head">
+                  <span aria-hidden="true">
+                    <i class="fa-solid fa-calendar-day"></i>
+                  </span>
+                  <div>
+                    <small>Día seleccionado</small>
+                    <strong>{{ selectedDay.dateLabel }}</strong>
+                  </div>
+                  <em>{{ selectedDay.totalSoldLabel }}</em>
+                </div>
+
+                <div class="kr__trend-breakdown-grid">
+                  @for (
+                    item of presenter.selectedTrendBreakdown();
+                    track item.label
+                  ) {
+                    <article
+                      class="kr__trend-breakdown-item"
+                      [class.kr__trend-breakdown-item--success]="
+                        item.tone === 'success'
+                      "
+                      [class.kr__trend-breakdown-item--warning]="
+                        item.tone === 'warning'
+                      "
+                      [class.kr__trend-breakdown-item--danger]="
+                        item.tone === 'danger'
+                      "
+                    >
+                      <small>{{ item.label }}</small>
+                      <strong>{{ item.value }}</strong>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+          } @else {
+            <p class="kr__empty">Sin tendencia disponible.</p>
+          }
+        </section>
+      } @else if (!presenter.isLoading() && !presenter.errorMessage()) {
+        <div class="kr__notice" role="status">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <span>Sin datos para el período seleccionado.</span>
+        </div>
+      }
+    </section>
+  </div>
+</main>

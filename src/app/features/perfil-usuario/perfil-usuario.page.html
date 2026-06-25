@@ -1,0 +1,269 @@
+<app-navbar [userName]="nombreNavbar()" />
+
+<main class="perfil-usuario">
+  <div class="perfil-usuario__container">
+    <button type="button" class="perfil-usuario__volver" (click)="volver()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
+    <header class="perfil-usuario__header" [class.perfil-usuario__header--alumno]="esVistaAlumno()">
+      <div class="perfil-usuario__avatar-wrapper" aria-label="Foto de perfil">
+        @if (fotoPerfil()) {
+        <img class="perfil-usuario__avatar perfil-usuario__avatar--foto" [src]="fotoPerfil()!"
+          [alt]="nombreCompleto()" />
+        } @else {
+        <div class="perfil-usuario__avatar" aria-hidden="true">
+          {{ iniciales() }}
+        </div>
+        }
+        <button type="button" class="perfil-usuario__avatar-editar" [disabled]="subiendoFoto()"
+          (click)="abrirSelectorFoto()" [title]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'"
+          [attr.aria-label]="subiendoFoto() ? 'Subiendo foto...' : 'Cambiar foto de perfil'">
+          @if (subiendoFoto()) {
+          <span class="perfil-usuario__avatar-loader" aria-hidden="true"></span>
+          } @else {
+          <i class="fa-solid fa-pen" aria-hidden="true"></i>
+          }
+        </button>
+        <input #inputFoto type="file" accept="image/jpeg,image/png,image/webp" class="perfil-usuario__input-foto"
+          aria-hidden="true" tabindex="-1" (change)="onFotoSeleccionada($event)" />
+      </div>
+      <div class="perfil-usuario__heading">
+        <p class="perfil-usuario__eyebrow">Cuenta RECRED</p>
+        <h1 class="perfil-usuario__titulo">{{ nombreCompleto() }}</h1>
+        <p class="perfil-usuario__subtitulo">
+          Administrá tus datos de contacto y documentación.
+        </p>
+      </div>
+      @if (esVistaAlumno()) {
+      <span class="perfil-usuario__ola" aria-hidden="true"></span>
+      }
+    </header>
+
+    @if (cargando()) {
+    <section class="perfil-usuario__estado" aria-live="polite">
+      <span class="perfil-usuario__loader" aria-hidden="true"></span>
+      <p>Cargando perfil...</p>
+    </section>
+    } @else if (error()) {
+    <section class="perfil-usuario__estado perfil-usuario__estado--error">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      <p>{{ error() }}</p>
+      <button type="button" (click)="cargarPerfil()">Reintentar</button>
+    </section>
+    } @else {
+    <section class="perfil-usuario__grid" aria-label="Datos del usuario">
+      <article class="perfil-usuario__panel">
+        <h2 class="perfil-usuario__panel-titulo">Usuario</h2>
+
+        <dl class="perfil-usuario__datos">
+          <div>
+            <dt>Email</dt>
+            <dd>{{ usuario()?.email || perfil()?.email || '-' }}</dd>
+          </div>
+          <!-- Ocultamos el rol a pedido del usuario -->
+          <!-- <div>
+            <dt>Rol</dt>
+            <dd>{{ rolLabel(usuario()?.role || perfil()?.role) }}</dd>
+          </div> -->
+          @if (esTutor() || esKiosquero()) {
+          <div>
+            <dt>Plan</dt>
+            <dd>{{ esPremium() ? 'Avanzado' : 'Gratuito' }}</dd>
+          </div>
+          <div>
+            <dt>Vigencia</dt>
+            <dd>{{ esPremium() ? vigenciaPlan() : 'Sin vencimiento' }}</dd>
+          </div>
+          }
+        </dl>
+      </article>
+
+      <form class="perfil-usuario__panel perfil-usuario__form" [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="perfil-usuario__form-header">
+          <h2 class="perfil-usuario__panel-titulo">Perfil completo</h2>
+          @if (form.dirty) {
+          <span class="perfil-usuario__cambios">Cambios sin guardar</span>
+          }
+        </div>
+
+        <label class="perfil-usuario__campo perfil-usuario__campo--full">
+          <span>Nombre</span>
+          <input type="text" formControlName="firstName" autocomplete="given-name"
+            [class.perfil-usuario__input--error]="campoInvalido('firstName')" />
+          @if (campoInvalido('firstName')) {
+          <small>Ingresá un nombre válido.</small>
+          }
+        </label>
+
+        <label class="perfil-usuario__campo perfil-usuario__campo--full">
+          <span>Apellido</span>
+          <input type="text" formControlName="lastName" autocomplete="family-name"
+            [class.perfil-usuario__input--error]="campoInvalido('lastName')" />
+          @if (campoInvalido('lastName')) {
+          <small>Ingresá un apellido válido.</small>
+          }
+        </label>
+
+        <label class="perfil-usuario__campo perfil-usuario__campo--full">
+          <span>Teléfono</span>
+          <input type="tel" formControlName="phone" autocomplete="tel" placeholder="1122334455"
+            [class.perfil-usuario__input--error]="campoInvalido('phone')" />
+          @if (campoInvalido('phone')) {
+          <small>El teléfono es demasiado largo.</small>
+          }
+        </label>
+
+        <!-- Ocultamos el documento a pedido del usuario -->
+        <!-- <label class="perfil-usuario__campo">
+          <span>DNI / documento</span>
+          <input type="text" formControlName="documentNumber" autocomplete="off" placeholder="40111222"
+            [class.perfil-usuario__input--error]="campoInvalido('documentNumber')" />
+          @if (campoInvalido('documentNumber')) {
+          <small>El documento es demasiado largo.</small>
+          }
+        </label> -->
+
+        <div class="perfil-usuario__acciones">
+          <button type="button" class="perfil-usuario__boton perfil-usuario__boton--secundario"
+            [disabled]="guardando() || !form.dirty" (click)="descartarCambios()">
+            Descartar
+          </button>
+          <button type="submit" class="perfil-usuario__boton perfil-usuario__boton--primario"
+            [disabled]="guardando() || form.invalid">
+            @if (guardando()) {
+            Guardando...
+            } @else {
+            Guardar cambios
+            }
+          </button>
+        </div>
+      </form>
+    </section>
+
+    @if (esKiosquero()) {
+    <div class="perfil-usuario__divider" aria-hidden="true"></div>
+
+    <section class="perfil-usuario__payout-section" aria-label="Configuración de pagos">
+      @if (cargandoPayout()) {
+      <div class="perfil-usuario__estado" aria-live="polite">
+        <span class="perfil-usuario__loader" aria-hidden="true"></span>
+        <p>Cargando configuración de pagos...</p>
+      </div>
+      } @else {
+      <form class="perfil-usuario__panel perfil-usuario__form" [formGroup]="payoutForm" (ngSubmit)="guardarPayout()">
+        <div class="perfil-usuario__form-header">
+          <h2 class="perfil-usuario__panel-titulo">Configuración de Cobros / Transferencias</h2>
+          @if (payoutForm.dirty) {
+          <span class="perfil-usuario__cambios">Cambios sin guardar</span>
+          }
+        </div>
+
+        @if (proximaEjecucion()) {
+        <div class="perfil-usuario__payout-info perfil-usuario__campo--full">
+          <div class="perfil-usuario__payout-info-item">
+            <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+            <div>
+              <span class="info-label">Próxima liquidación:</span>
+              <strong class="info-value">{{ proximaEjecucion() }}</strong>
+            </div>
+          </div>
+          @if (ultimaEjecucion()) {
+          <div class="perfil-usuario__payout-info-item">
+            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+            <div>
+              <span class="info-label">Último pago realizado:</span>
+              <strong class="info-value">{{ ultimaEjecucion() }}</strong>
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        <label class="perfil-usuario__campo perfil-usuario__campo--full">
+          <span>Titular de la cuenta / Razón Social</span>
+          <input type="text" formControlName="accountHolderName" placeholder="Nombre del Kiosquero o Razón Social"
+            [class.perfil-usuario__input--error]="campoPayoutInvalido('accountHolderName')" />
+          @if (campoPayoutInvalido('accountHolderName')) {
+          <small>Ingresá un nombre de titular válido.</small>
+          }
+        </label>
+
+        <label class="perfil-usuario__campo">
+          <span>CUIT del destinatario</span>
+          <input type="text" formControlName="destinationCuit" placeholder="20304567890" maxlength="11"
+            [class.perfil-usuario__input--error]="campoPayoutInvalido('destinationCuit')" />
+          @if (campoPayoutInvalido('destinationCuit')) {
+          <small>El CUIT debe tener exactamente 11 dígitos numéricos.</small>
+          }
+        </label>
+
+        <label class="perfil-usuario__campo">
+          <span>CVU del destinatario</span>
+          <input type="text" formControlName="destinationCvu" placeholder="1234567890123456789012" maxlength="22"
+            [class.perfil-usuario__input--error]="campoPayoutInvalido('destinationCvu')" />
+          @if (campoPayoutInvalido('destinationCvu')) {
+          <small>El CVU debe tener exactamente 22 dígitos numéricos.</small>
+          }
+        </label>
+
+        <label class="perfil-usuario__campo">
+          <span>Estado de transferencias</span>
+          <select formControlName="estado" [class.perfil-usuario__input--error]="campoPayoutInvalido('estado')">
+            <option value="ACTIVE">Activo</option>
+            <option value="PAUSED">Pausado</option>
+            <option value="CANCELLED">Cancelado</option>
+          </select>
+          @if (campoPayoutInvalido('estado')) {
+          <small>Seleccioná un estado válido.</small>
+          }
+        </label>
+
+        <label class="perfil-usuario__campo">
+          <span>Frecuencia (Cantidad)</span>
+          <input type="number" formControlName="cantidadIntervalo" placeholder="7"
+            [class.perfil-usuario__input--error]="campoPayoutInvalido('cantidadIntervalo')" />
+          @if (campoPayoutInvalido('cantidadIntervalo')) {
+          <small>Ingresá una cantidad de intervalo válida (mínimo 1).</small>
+          }
+        </label>
+
+        <label class="perfil-usuario__campo">
+          <span>Frecuencia (Unidad)</span>
+          <select formControlName="unidadIntervalo"
+            [class.perfil-usuario__input--error]="campoPayoutInvalido('unidadIntervalo')">
+            <option value="DAYS">Días</option>
+            <option value="WEEKS">Semanas</option>
+            <option value="MONTHS">Meses</option>
+          </select>
+          @if (campoPayoutInvalido('unidadIntervalo')) {
+          <small>Seleccioná una unidad válida.</small>
+          }
+        </label>
+
+        <div class="perfil-usuario__acciones">
+          <button type="button" class="perfil-usuario__boton perfil-usuario__boton--secundario"
+            [disabled]="guardandoPayout() || !payoutForm.dirty" (click)="descartarCambiosPayout()">
+            Descartar
+          </button>
+          <button type="submit" class="perfil-usuario__boton perfil-usuario__boton--primario"
+            [disabled]="guardandoPayout() || payoutForm.invalid">
+            @if (guardandoPayout()) {
+            Guardando...
+            } @else {
+            Guardar configuración
+            }
+          </button>
+        </div>
+      </form>
+      }
+    </section>
+    }
+    }
+  </div>
+</main>
+
+@if (fotoEvent()) {
+<app-crop-modal [imageEvent]="fotoEvent()!" (cropped)="onFotoRecortada($event)" (canceled)="onCancelarRecorte()" />
+}

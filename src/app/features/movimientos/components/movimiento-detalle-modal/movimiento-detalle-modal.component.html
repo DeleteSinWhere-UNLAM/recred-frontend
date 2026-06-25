@@ -1,0 +1,278 @@
+<div
+  class="mov-modal-overlay"
+  (click)="onOverlayClick($event)"
+  (keydown)="onKeyDown($event)"
+  tabindex="0"
+  role="button"
+  aria-label="Cerrar modal"
+>
+  <div class="mov-modal" role="dialog" aria-labelledby="modal-titulo">
+    <header class="mov-modal__header" [class.mov-modal__header--pedido]="movimiento.tipo === 'ANTICIPADA'">
+      @if (movimiento.tipo === 'ANTICIPADA') {
+        <div class="mov-modal__title-section">
+          <span class="mov-modal__header-badge" [attr.data-status]="movimiento.status">
+            {{ movimiento.statusLabel || movimiento.status }}
+          </span>
+          <h3 id="modal-titulo" class="mov-modal__titulo">Detalle del Pedido</h3>
+        </div>
+      } @else {
+        <h3 id="modal-titulo" class="mov-modal__titulo">Detalles del Movimiento</h3>
+      }
+      <button type="button" class="mov-modal__close-btn" (click)="onCerrar()" aria-label="Cerrar modal">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="mov-modal__body">
+      @if (movimiento.tipo === 'ANTICIPADA') {
+        
+        <section class="mov-modal__section" aria-labelledby="client-info-title">
+          <h4 id="client-info-title" class="mov-modal__section-titulo-pedido">Información de Retiro</h4>
+          <div class="mov-modal__info-grid">
+            <div>
+              <span class="mov-modal__label">Alumno</span>
+              <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Fecha Programada</span>
+              <span class="mov-modal__value">{{ formatearFechaProgramada(movimiento.pickupDate) }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Franja Horaria</span>
+              <span class="mov-modal__value">{{ movimiento.pickupSlotDescription || 'Por definir' }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Método de Pago</span>
+              <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
+            </div>
+          </div>
+        </section>
+
+        
+        @if (movimiento.withdrawalCode) {
+          <section class="mov-modal__section mov-modal__section--keyword" aria-labelledby="keyword-title">
+            <h4 id="keyword-title" class="mov-modal__section-titulo" style="margin: 0; text-align: center;">Clave de Retiro</h4>
+            <div class="keyword-badge">
+              <i class="fa-solid fa-key keyword-badge__icon"></i>
+              <span class="keyword-badge__code">{{ movimiento.withdrawalCode }}</span>
+            </div>
+          </section>
+        }
+
+        
+        <section class="mov-modal__section" aria-labelledby="products-title">
+          <h4 id="products-title" class="mov-modal__section-titulo-pedido">Productos Pedidos</h4>
+          <div class="items-list">
+            @for (item of movimiento.items; track item.productId) {
+              <div class="item-wrapper">
+                <div class="item-row">
+                  <div class="item-row__info">
+                    <span class="item-row__name">{{ item.productName }}</span>
+                    <span class="item-row__qty">x{{ item.quantity }}</span>
+                  </div>
+                  <span class="item-row__price">
+                    {{ formatearPrecio(item.unitPrice * item.quantity) }}
+                  </span>
+                </div>
+                @if (esPromocion(item.productName)) {
+                  <div class="item-promo-action">
+                    <button type="button" class="promo-details-trigger" (click)="togglePromoDetails(item.productId)">
+                      <i class="fa-solid" [class.fa-chevron-down]="!expandedPromos.has(item.productId)" [class.fa-chevron-up]="expandedPromos.has(item.productId)"></i>
+                      {{ expandedPromos.has(item.productId) ? 'Ocultar detalles' : 'Ver detalles' }}
+                    </button>
+                  </div>
+                }
+                @if (expandedPromos.has(item.productId)) {
+                  <div class="promo-details-panel">
+                    @if (promosLoaded.get(item.productId)?.loading) {
+                      <div class="promo-details-loading">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Cargando detalles...
+                      </div>
+                    } @else if (promosLoaded.get(item.productId)?.error) {
+                      <div class="promo-details-error">
+                        No se pudieron cargar los detalles de la promoción.
+                      </div>
+                    } @else {
+                      @let data = promosLoaded.get(item.productId);
+                      @if (data && data.promotion) {
+                        <div class="promo-details-grid">
+                          <div class="promo-details-section">
+                            <span class="promo-details-subtitle">Productos Incluidos:</span>
+                            <ul class="promo-details-list">
+                              @for (prod of data.products; track prod.id) {
+                                <li>
+                                  <span class="prod-name">{{ prod.nombre }}</span>
+                                  <span class="prod-price">{{ formatearPrecio(prod.precio) }}</span>
+                                </li>
+                              }
+                            </ul>
+                          </div>
+                          
+                          <div class="promo-details-summary">
+                            <div class="promo-summary-row">
+                              <span>Precio original (suma):</span>
+                              <span class="original-price">{{ formatearPrecio(getPromoOriginalPrice(item.productId)) }}</span>
+                            </div>
+                            <div class="promo-summary-row">
+                              <span>Descuento aplicado:</span>
+                              <span class="discount-badge">{{ data.promotion.discountPercentage }}% OFF</span>
+                            </div>
+                            <div class="promo-summary-row promo-summary-row--total">
+                              <span>Precio promocional (unitario):</span>
+                              <span class="promo-price">{{ formatearPrecio(getPromoDiscountedPrice(item.productId)) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="total-row">
+            <span class="total-row__label">Total del Pedido</span>
+            <strong class="total-row__value">{{ formatearPrecio(movimiento.totalAmount) }}</strong>
+          </div>
+        </section>
+      } @else {
+        
+        <div class="mov-modal__section mov-modal__section--info">
+          <div class="mov-modal__info-grid">
+            <div>
+              <span class="mov-modal__label">Fecha y Hora</span>
+              <span class="mov-modal__value">{{ formatearFecha(movimiento.date) }}</span>
+            </div>
+            <div>
+              <span class="mov-modal__label">Alumno</span>
+              <span class="mov-modal__value">{{ nombreAlumno || 'Alumno' }}</span>
+            </div>
+            @if (esVistaAlumno) {
+              <div>
+                <span class="mov-modal__label">Medio de Pago</span>
+                <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
+              </div>
+            }
+            <div>
+              <span class="mov-modal__label">Estado</span>
+              <div>
+                <span class="mov-modal__badge" [attr.data-status]="movimiento.status">
+                  {{ movimiento.statusLabel || movimiento.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mov-modal__section">
+          <h4 class="mov-modal__section-titulo">Productos Consumidos</h4>
+          <div class="mov-modal__table-container">
+            <table class="mov-modal__table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th class="txt-center">Cant.</th>
+                  <th class="txt-right">Unitario</th>
+                  <th class="txt-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of movimiento.items; track item.productId) {
+                  <tr>
+                    <td>
+                      <div class="table-prod-name-wrapper">
+                        <span>{{ item.productName }}</span>
+                        @if (esPromocion(item.productName)) {
+                          <button type="button" class="promo-details-trigger-table" (click)="togglePromoDetails(item.productId)">
+                            <i class="fa-solid" [class.fa-chevron-down]="!expandedPromos.has(item.productId)" [class.fa-chevron-up]="expandedPromos.has(item.productId)"></i>
+                            {{ expandedPromos.has(item.productId) ? 'Ocultar' : 'Detalles' }}
+                          </button>
+                        }
+                      </div>
+                    </td>
+                    <td class="txt-center">{{ item.quantity }}</td>
+                    <td class="txt-right">{{ formatearPrecio(item.unitPrice) }}</td>
+                    <td class="txt-right">{{ formatearPrecio(item.unitPrice * item.quantity) }}</td>
+                  </tr>
+                  @if (expandedPromos.has(item.productId)) {
+                    <tr class="promo-details-row">
+                      <td colspan="4">
+                        <div class="promo-details-panel">
+                          @if (promosLoaded.get(item.productId)?.loading) {
+                            <div class="promo-details-loading">
+                              <i class="fa-solid fa-spinner fa-spin"></i> Cargando detalles...
+                            </div>
+                          } @else if (promosLoaded.get(item.productId)?.error) {
+                            <div class="promo-details-error">
+                              No se pudieron cargar los detalles de la promoción.
+                            </div>
+                          } @else {
+                            @let data = promosLoaded.get(item.productId);
+                            @if (data && data.promotion) {
+                              <div class="promo-details-grid">
+                                <div class="promo-details-section">
+                                  <span class="promo-details-subtitle">Productos Incluidos:</span>
+                                  <ul class="promo-details-list">
+                                    @for (prod of data.products; track prod.id) {
+                                      <li>
+                                        <span class="prod-name">{{ prod.nombre }}</span>
+                                        <span class="prod-price">{{ formatearPrecio(prod.precio) }}</span>
+                                      </li>
+                                    }
+                                  </ul>
+                                </div>
+                                
+                                <div class="promo-details-summary">
+                                  <div class="promo-summary-row">
+                                    <span>Precio original (suma):</span>
+                                    <span class="original-price">{{ formatearPrecio(getPromoOriginalPrice(item.productId)) }}</span>
+                                  </div>
+                                  <div class="promo-summary-row">
+                                    <span>Descuento aplicado:</span>
+                                    <span class="discount-badge">{{ data.promotion.discountPercentage }}% OFF</span>
+                                  </div>
+                                  <div class="promo-summary-row promo-summary-row--total">
+                                    <span>Precio promocional (unitario):</span>
+                                    <span class="promo-price">{{ formatearPrecio(getPromoDiscountedPrice(item.productId)) }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (movimiento.tipo === 'ANTICIPADA') {
+      <footer class="mov-modal__footer--pedido">
+        @if (puedoCancelar()) {
+          <button type="button" class="mov-modal__btn--danger" [disabled]="esFechaLimiteSuperada()" (click)="onCancelar()">
+            <i class="fa-solid fa-ban"></i> Cancelar Pedido
+          </button>
+        }
+        <button type="button" class="mov-modal__btn--secondary" (click)="onCerrar()">
+          Cerrar
+        </button>
+      </footer>
+    } @else {
+      <footer class="mov-modal__footer">
+        <div class="mov-modal__total">
+          <span>Total de la Compra</span>
+          <strong>{{ formatearPrecio(movimiento.totalAmount) }}</strong>
+        </div>
+        <button type="button" class="mov-modal__action-btn" (click)="onCerrar()">
+          Listo
+        </button>
+      </footer>
+    }
+  </div>
+</div>

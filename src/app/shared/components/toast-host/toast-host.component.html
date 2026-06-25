@@ -11,7 +11,7 @@
         [class.fa-circle-exclamation]="toast.variante === 'error'"
         aria-hidden="true"
       ></i>
-      <span class="toast__mensaje">{{ toast.mensaje }}</span>
+      <span class="toast__mensaje" [innerHTML]="toast.mensaje"></span>
       <button
         type="button"
         class="toast__cerrar"

@@ -7,9 +7,11 @@ import {
   Output,
   computed,
   signal,
+  inject,
 } from '@angular/core';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { Colegio } from '../../../../data-access/models/colegio.model';
+import { UsuarioService } from '../../../../data-access/services/usuario.service';
 
 @Component({
   selector: 'app-seleccionar-alumno-modal',
@@ -18,6 +20,8 @@ import { Colegio } from '../../../../data-access/models/colegio.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SeleccionarAlumnoModalComponent {
+  private readonly usuarioService = inject(UsuarioService);
+  protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   private readonly alumnosState = signal<Alumno[]>([]);
   private readonly colegiosState = signal<Colegio[]>([]);
 
@@ -44,7 +48,10 @@ export class SeleccionarAlumnoModalComponent {
   }
 
   protected iniciales(alumno: Alumno): string {
-    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    if (this.esVistaAlumno()) {
+      return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    }
+    return (alumno.nombre[0] ?? '').toUpperCase();
   }
 
   protected nombreColegio(colegioId: string): string {

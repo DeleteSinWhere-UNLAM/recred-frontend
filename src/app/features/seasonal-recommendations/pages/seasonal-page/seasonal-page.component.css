@@ -8,7 +8,7 @@
 }
 
 .seasonal-page__container {
-  max-width: 760px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -72,13 +72,36 @@
   flex-shrink: 0;
 }
 
+.seasonal-page__titulo-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
 .seasonal-page__titulo {
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
   color: var(--color-pizarra);
   line-height: 1.2;
-  margin: 0 0 2px;
+  margin: 0;
+}
+
+.seasonal-page__premium-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  color: #1e293b;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
 }
 
 .seasonal-page__subtitulo {
@@ -86,6 +109,97 @@
   color: var(--color-texto-claro);
   font-weight: 500;
   margin: 0;
+}
+
+.seasonal-page__acciones {
+  margin-left: auto;
+}
+
+.seasonal-page__btn-promocion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: var(--color-menta);
+  color: var(--color-fondo);
+  border: none;
+  border-radius: var(--radius-button);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(129, 178, 154, 0.3);
+}
+
+.seasonal-page__btn-promocion:hover {
+  background-color: color-mix(in srgb, var(--color-menta) 85%, black);
+  transform: translateY(-1px);
+}
+
+.seasonal-page__metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: #ffffff;
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.metric-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.metric-card__icon--blue {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.metric-card__icon--green {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.metric-card__icon--blue-light {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.metric-card__icon--indigo {
+  background-color: #eef2ff;
+  color: #4338ca;
+}
+
+.metric-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-card__label {
+  font-size: 13px;
+  color: #64748b;
+  font-family: var(--font-body);
+}
+
+.metric-card__value {
+  font-size: 15px;
+  color: #0f172a;
+  font-family: var(--font-display);
 }
 
 .seasonal-page__estado {

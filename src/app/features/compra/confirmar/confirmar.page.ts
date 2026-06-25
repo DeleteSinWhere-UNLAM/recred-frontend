@@ -17,6 +17,7 @@ import { ConfirmarPresenter } from './presenter/confirmar.presenter';
 const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
+  currencyDisplay: 'narrowSymbol',
   maximumFractionDigits: 0,
 });
 
@@ -34,11 +35,12 @@ export class ConfirmarPage implements OnInit {
   protected readonly presenter = inject(ConfirmarPresenter);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
+  protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   protected readonly lineas = computed<ResumenLinea[]>(() =>
     this.presenter.ordenes().map((o) => ({
       alumnoId: o.alumno.id,
-      nombre: `${o.alumno.nombre} ${o.alumno.apellido}`,
+      nombre: this.usuarioService.esVistaAlumno() ? `${o.alumno.nombre} ${o.alumno.apellido}` : o.alumno.nombre,
       subtotal: o.subtotal,
       incluido: true,
     })),

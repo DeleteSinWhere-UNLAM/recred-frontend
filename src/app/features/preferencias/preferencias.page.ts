@@ -1,22 +1,24 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 
 import { Preferencia } from './models/preferencia.model';
 import { PreferenciasService } from './services/preferencias.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 
 import { PreferenciaCardComponent } from './components/preferencia-card/preferencia-card.component';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { } from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-preferencias-page',
   templateUrl: './preferencias.page.html',
   styleUrl: './preferencias.page.css',
-  imports: [NavbarComponent, PreferenciaCardComponent],
+  imports: [ PreferenciaCardComponent],
 })
 export class PreferenciasPage {
   private readonly preferenciasService = inject(PreferenciasService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
@@ -24,14 +26,17 @@ export class PreferenciasPage {
   preferencias: Preferencia[] = [];
 
   constructor() {
-    this.usuarioService.setHomeUrl('/alumno');
+    this.usuarioService.setHomeUrl('/tutor');
 
-    this.preferenciasService.getPreferencias().subscribe((data) => {
-      this.preferencias = data;
+    effect(() => {
+      const alumnoId = this.contextoService.alumnoId() || undefined;
+      this.preferenciasService.getPreferencias(alumnoId).subscribe((data) => {
+        this.preferencias = data;
+      });
     });
   }
 
   volver(): void {
-    this.router.navigateByUrl('/alumno');
+    this.router.navigateByUrl('/tutor');
   }
 }

@@ -1,0 +1,52 @@
+<main class="restricciones">
+  <div class="restricciones__container">
+    <header class="restricciones__header">
+      <h1 id="restricciones-titulo" class="restricciones__titulo">Restricciones alimentarias de {{ presenter.alumno()?.nombre || presenter.nombreCompleto() }}</h1>
+    </header>
+
+
+
+      <ul class="restricciones__lista" role="list">
+        @for (descriptor of presenter.catalogo; track descriptor.clave) {
+          <li class="restriccion-item">
+            <div
+              class="restriccion-item__icono"
+              [class]="'restriccion-item__icono--' + descriptor.clave"
+              aria-hidden="true"
+            >
+              <i class="fa-solid {{ descriptor.icono }}"></i>
+            </div>
+
+            <div class="restriccion-item__texto">
+              <p class="restriccion-item__titulo">{{ descriptor.titulo }}</p>
+              <p class="restriccion-item__descripcion">{{ descriptor.descripcion }}</p>
+            </div>
+
+            <label class="toggle">
+              <input
+                type="checkbox"
+                class="toggle__input"
+                [checked]="presenter.restricciones()[descriptor.clave]"
+                (change)="presenter.alternar(descriptor.clave)"
+                [attr.aria-label]="descriptor.titulo"
+              />
+              <span class="toggle__slider" aria-hidden="true"></span>
+            </label>
+          </li>
+        }
+      </ul>
+
+    <button
+      type="button"
+      class="restricciones__guardar"
+      (click)="presenter.guardar()"
+      [disabled]="presenter.cargando() || presenter.guardando()"
+    >
+      @if (presenter.guardando()) {
+        Guardando...
+      } @else {
+        Guardar cambios
+      }
+    </button>
+  </div>
+</main>

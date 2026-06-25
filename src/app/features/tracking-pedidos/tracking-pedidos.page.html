@@ -1,0 +1,171 @@
+<main class="tracking-container">
+  <header class="tracking-header">
+    <button class="back-btn" (click)="volverHome()" aria-label="Volver al inicio">
+      <i class="fa-solid fa-arrow-left"></i> Volver
+    </button>
+    <div class="tracking-header__text">
+      <h1 class="tracking-header__title">Seguimiento de Pedidos</h1>
+      <p class="tracking-header__subtitle">Visualizá, prepará y entregá los pedidos programados por los alumnos.</p>
+    </div>
+  </header>
+
+  <section class="filters-card" aria-label="Filtros de pedidos">
+    <div class="filters-grid">
+      <div class="filter-item">
+        <label for="search-input" class="filter-label">Buscar Alumno o Clave</label>
+        <div class="search-input-wrap">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Nombre o clave de retiro..."
+            [ngModel]="filterSearch()"
+            (ngModelChange)="filterSearch.set($event)"
+            class="filter-control filter-control--search"
+          />
+        </div>
+      </div>
+
+      <div class="filter-item">
+        <label for="fecha-input" class="filter-label">Fecha de Retiro</label>
+        <input
+          id="fecha-input"
+          type="date"
+          [ngModel]="filterFecha()"
+          (ngModelChange)="filterFecha.set($event)"
+          class="filter-control"
+        />
+      </div>
+
+      <div class="filter-item">
+        <label for="franja-select" class="filter-label">Franja Horaria</label>
+        <select
+          id="franja-select"
+          [ngModel]="filterFranja()"
+          (ngModelChange)="filterFranja.set($event)"
+          class="filter-control"
+        >
+          <option value="">Todas las franjas</option>
+          @for (slot of timeSlots(); track slot.id) {
+            <option [value]="slot.id">{{ slot.description }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="estado-select" class="filter-label">Estado de Retiro</label>
+        <select
+          id="estado-select"
+          [ngModel]="filterEstado()"
+          (ngModelChange)="filterEstado.set($event)"
+          class="filter-control"
+        >
+          <option value="">Todos los estados</option>
+          <option value="PROGRAMADO">A preparar (Programados)</option>
+          <option value="LISTO">Listos para retirar</option>
+          <option value="RETIRADO">Entregados</option>
+          <option value="NO_RETIRADO">No retirados</option>
+          <option value="CANCELADO">Cancelados</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <button class="clear-filters-btn" (click)="limpiarFiltros()">
+        <i class="fa-solid fa-eraser"></i> Limpiar Filtros
+      </button>
+      <button class="reload-btn" (click)="loadPickups()" [disabled]="loading()">
+        <i class="fa-solid fa-rotate" [class.fa-spin]="loading()"></i> Actualizar
+      </button>
+    </div>
+  </section>
+
+  <section class="orders-section" aria-labelledby="orders-list-title">
+    <div class="orders-section__header">
+      <h2 id="orders-list-title" class="orders-section__title">Pedidos Recibidos</h2>
+      <span class="orders-count-badge">{{ filteredPickups().length }} pedido(s) encontrado(s)</span>
+    </div>
+
+    @if (loading() && allPickupsState().length === 0) {
+      <div class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
+        <p>Cargando pedidos programados...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-state">
+        <i class="fa-solid fa-triangle-exclamation error-state__icon"></i>
+        <p>{{ error() }}</p>
+        <button class="retry-btn" (click)="loadPickups()">Reintentar</button>
+      </div>
+    } @else if (filteredPickups().length === 0) {
+      <div class="empty-state">
+        <i class="fa-solid fa-clipboard-list empty-state__icon"></i>
+        <p class="empty-state__text">No se encontraron pedidos con los filtros seleccionados.</p>
+        <button class="clear-filters-btn" (click)="limpiarFiltros()">Restablecer filtros</button>
+      </div>
+    } @else {
+      <div class="orders-list">
+        @for (order of filteredPickups(); track order.id) {
+          <article class="order-card" [class.order-card--active]="selectedOrder()?.id === order.id">
+            <div class="order-card__header">
+              <div class="order-card__time">
+                <span class="order-card__date-pill">
+                  <i class="fa-regular fa-calendar"></i> {{ order.pickupDate | date: 'dd-MM-yyyy' }}
+                </span>
+                <span class="order-card__slot">
+                  <i class="fa-regular fa-clock"></i> {{ order.pickupSlotDescription }}
+                </span>
+              </div>
+              <span class="status-badge" [class]="'status-badge--' + order.status.toLowerCase()">
+                {{ order.statusLabel }}
+              </span>
+            </div>
+
+            <div class="order-card__body">
+              <div class="order-card__client">
+                <span class="order-card__client-label">Alumno</span>
+                <h3 class="order-card__client-name">{{ order.studentName }}</h3>
+              </div>
+
+              <div class="order-card__summary">
+                <span class="order-card__summary-label">Detalle</span>
+                <p class="order-card__summary-text">{{ getItemsSummary(order) }}</p>
+              </div>
+
+              <div class="order-card__details">
+                @if (order.status === 'ENTREGADO') {
+                  <div class="order-card__keyword">
+                    <span class="order-card__keyword-label">Clave de Retiro</span>
+                    <span class="order-card__keyword-value">{{ order.withdrawalCode }}</span>
+                  </div>
+                }
+                <div class="order-card__total">
+                  <span class="order-card__total-label">Total</span>
+                  <strong class="order-card__total-value">
+                    {{ order.totalAmount | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="order-card__actions">
+              <button class="details-btn" (click)="onVerDetalles(order)">
+                Ver detalles <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</main>
+
+@if (selectedOrder()) {
+  <app-order-details-modal
+    [order]="selectedOrder()!"
+    [isUpdating]="isUpdating()"
+    (closeModal)="onCerrarModal()"
+    (advanceStatus)="onAdvanceStatus($event)"
+    (cancelOrder)="onCancelOrder($event)"
+  />
+}
