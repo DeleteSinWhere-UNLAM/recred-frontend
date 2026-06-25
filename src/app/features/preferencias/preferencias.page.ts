@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 
 import { Preferencia } from './models/preferencia.model';
 import { PreferenciasService } from './services/preferencias.service';
@@ -17,6 +18,7 @@ import { } from '../../shared/components/navbar/navbar.component';
 export class PreferenciasPage {
   private readonly preferenciasService = inject(PreferenciasService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
@@ -26,8 +28,11 @@ export class PreferenciasPage {
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
 
-    this.preferenciasService.getPreferencias().subscribe((data) => {
-      this.preferencias = data;
+    effect(() => {
+      const alumnoId = this.contextoService.alumnoId() || undefined;
+      this.preferenciasService.getPreferencias(alumnoId).subscribe((data) => {
+        this.preferencias = data;
+      });
     });
   }
 

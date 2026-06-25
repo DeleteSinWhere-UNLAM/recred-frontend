@@ -75,7 +75,7 @@ export class HomeAlumnoService {
       const pendientes = await firstValueFrom(
         this.movimientosService.getPendientesAlumno(alumnoId),
       );
-      const pedido = this.elegirPedidoDeHoy(pendientes);
+      const pedido = this.elegirUltimoPedido(pendientes);
       this.pedidosState.update((mapa) => ({ ...mapa, [alumnoId]: pedido }));
     } catch (err) {
       console.error('Error cargando pedido en curso del alumno:', err);
@@ -83,28 +83,19 @@ export class HomeAlumnoService {
     }
   }
 
-  private elegirPedidoDeHoy(movimientos: readonly Movimiento[]): PedidoEnCurso | null {
-    const hoy = new Date().toISOString().slice(0, 10);
-    const candidatos = movimientos.filter((m) => this.esDeHoy(m, hoy));
-    if (candidatos.length === 0) return null;
+  private elegirUltimoPedido(movimientos: readonly Movimiento[]): PedidoEnCurso | null {
+    if (movimientos.length === 0) return null;
 
-    const ordenados = [...candidatos].sort(
-      (a, b) => this.momentoRetiro(a) - this.momentoRetiro(b),
+    const ordenados = [...movimientos].sort(
+      (a, b) => this.momentoPedido(b) - this.momentoPedido(a),
     );
     return this.mapearAPedido(ordenados[0]);
   }
 
-  private esDeHoy(mov: Movimiento, hoy: string): boolean {
-    if (mov.pickupDate) return mov.pickupDate.startsWith(hoy);
-    return (mov.date ?? '').startsWith(hoy);
-  }
-
-  private momentoRetiro(mov: Movimiento): number {
-    const base = mov.pickupDate ?? mov.date ?? '';
-    const time = mov.pickupSlotStartTime ?? '00:00';
-    const iso = base.length === 10 ? `${base}T${time}` : base;
+  private momentoPedido(mov: Movimiento): number {
+    const iso = mov.date ?? mov.pickupDate ?? '';
     const t = new Date(iso).getTime();
-    return Number.isNaN(t) ? Number.MAX_SAFE_INTEGER : t;
+    return Number.isNaN(t) ? 0 : t;
   }
 
   private mapearAPedido(mov: Movimiento): PedidoEnCurso {

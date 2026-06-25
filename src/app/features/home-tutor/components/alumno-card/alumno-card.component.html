@@ -114,7 +114,7 @@
         <span class="alumno-card__btn-label">Predicción</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--violeta" [routerLink]="['/preferencias']" routerLinkActive="active">
+      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegar('/preferencias')" routerLinkActive="active">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </span>

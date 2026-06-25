@@ -2,24 +2,28 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NotificacionSaldoBajoComponent } from './notificacion-saldo-bajo.component';
 import { NotificacionSaldoBajoService } from './notificacion-saldo-bajo.service';
 import { Router } from '@angular/router';
+import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
 
 describe('NotificacionSaldoBajoComponent', () => {
   let component: NotificacionSaldoBajoComponent;
   let fixture: ComponentFixture<NotificacionSaldoBajoComponent>;
   let notificacionServiceSpy: jasmine.SpyObj<NotificacionSaldoBajoService>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let contextoServiceSpy: jasmine.SpyObj<AlumnoContextoService>;
 
   beforeEach(async () => {
     notificacionServiceSpy = jasmine.createSpyObj('NotificacionSaldoBajoService', ['cerrar'], {
       state$: () => ({ show: true, balance: 100, alumnoId: 'test-alumno-id' })
     });
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    contextoServiceSpy = jasmine.createSpyObj<AlumnoContextoService>('AlumnoContextoService', ['setAlumnoId']);
 
     await TestBed.configureTestingModule({
       imports: [NotificacionSaldoBajoComponent],
       providers: [
         { provide: NotificacionSaldoBajoService, useValue: notificacionServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: AlumnoContextoService, useValue: contextoServiceSpy }
       ]
     }).compileComponents();
 
@@ -40,6 +44,7 @@ describe('NotificacionSaldoBajoComponent', () => {
   it('dado que se hace clic en comprarSaldo, debe cerrar la notificación y navegar a acreditar-mercado-pago', () => {
     component.comprarSaldo();
     expect(notificacionServiceSpy.cerrar).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/acreditar-mercado-pago', 'test-alumno-id']);
+    expect(contextoServiceSpy.setAlumnoId).toHaveBeenCalledWith('test-alumno-id');
+    expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/acreditar-mercado-pago');
   });
 });

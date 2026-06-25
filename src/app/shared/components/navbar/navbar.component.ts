@@ -142,7 +142,8 @@ export class NavbarComponent {
   protected irABilleteraDeHijo(alumnoId: string): void {
     this.menuAbierto.set(false);
     this.menuBilleteraAbierto.set(false);
-    void this.router.navigate(['/billetera', alumnoId]);
+    this.contextoService.setAlumnoId(alumnoId);
+    void this.router.navigateByUrl('/billetera');
   }
 
   protected irAPremium(): void {

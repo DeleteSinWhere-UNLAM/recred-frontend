@@ -47,7 +47,7 @@ describe('HomeAlumnoService', () => {
     expect(service.getPedidoEnCurso('alumno-1')).toBeUndefined();
   });
 
-  it('debería cargar y mapear el pendiente de hoy', async () => {
+  it('debería cargar y mapear el pendiente más reciente', async () => {
     const movimientos: Movimiento[] = [
       {
         id: 'compra-1',
@@ -78,7 +78,7 @@ describe('HomeAlumnoService', () => {
     expect(pedido?.itemsResumen).toEqual(['Sándwich JyQ', '2x Jugo']);
   });
 
-  it('debería ignorar pendientes de otros días', async () => {
+  it('debería elegir el pendiente con fecha más reciente aunque no sea de hoy', async () => {
     const movimientos: Movimiento[] = [
       {
         id: 'compra-vieja',
@@ -92,12 +92,31 @@ describe('HomeAlumnoService', () => {
         tipo: 'ANTICIPADA',
         pickupDate: '2024-01-01',
       },
+      {
+        id: 'compra-nueva',
+        studentId: 'alumno-1',
+        totalAmount: 2000,
+        status: 'PENDIENTE',
+        statusLabel: 'A preparar',
+        paymentMethod: 'DEBIT',
+        date: '2026-06-27T10:00:00',
+        items: [
+          { productId: 'p1', productName: 'Medialunas', quantity: 2, unitPrice: 500 },
+        ],
+        tipo: 'ANTICIPADA',
+        pickupDate: '2026-06-27',
+        pickupSlotStartTime: '09:30',
+      },
     ];
     movimientosServiceSpy.getPendientesAlumno.and.returnValue(of(movimientos));
 
     await service.cargarPedidoEnCurso('alumno-1');
 
-    expect(service.getPedidoEnCurso('alumno-1')).toBeUndefined();
+    const pedido = service.getPedidoEnCurso('alumno-1');
+    expect(pedido?.id).toBe('compra-nueva');
+    expect(pedido?.estado).toBe('CONFIRMADO');
+    expect(pedido?.retiraEn).toBe('09:30');
+    expect(pedido?.itemsResumen).toEqual(['2x Medialunas']);
   });
 
   it('debería dejar el pedido nulo si falla el endpoint', async () => {

@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, computed } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
@@ -14,8 +13,7 @@ import { RestriccionesNutricionalesPresenter } from './presenter/restricciones-n
   providers: [RestriccionesNutricionalesPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RestriccionesNutricionalesPage implements OnInit {
-  private readonly route = inject(ActivatedRoute);
+export class RestriccionesNutricionalesPage {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
@@ -24,8 +22,10 @@ export class RestriccionesNutricionalesPage implements OnInit {
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
   protected readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
 
-  ngOnInit(): void {
-    const alumnoId = this.contextoService.alumnoId();
-    void this.presenter.init(alumnoId);
+  constructor() {
+    effect(() => {
+      const alumnoId = this.contextoService.alumnoId();
+      void this.presenter.init(alumnoId);
+    });
   }
 }

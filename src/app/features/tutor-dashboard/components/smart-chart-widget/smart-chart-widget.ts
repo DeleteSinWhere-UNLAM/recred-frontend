@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, SimpleChanges, OnInit, OnChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { ChildDashboardSummary } from '../../models/tutor-dashboard.model';
 
 interface ScriptContext {
@@ -45,6 +45,11 @@ export class SmartChartWidget implements OnInit, OnChanges {
   chartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 24
+      }
+    },
     plugins: {
       legend: { display: false }
     },
@@ -59,6 +64,49 @@ export class SmartChartWidget implements OnInit, OnChanges {
       }
     }
   };
+
+  chartPlugins = [
+    {
+      id: 'valueLabels',
+      afterDatasetsDraw: (chart: Chart) => {
+        const { ctx, data } = chart;
+        ctx.save();
+        ctx.font = 'bold 11px Inter, sans-serif';
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.fillStyle = isDarkMode ? '#cbd5e1' : '#475569';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+
+        data.datasets.forEach((dataset, datasetIndex: number) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          meta.data.forEach((element, index: number) => {
+            const val = dataset.data[index];
+            if (val !== undefined && val !== null) {
+              const config = chart.config as ChartConfiguration;
+              const isPieOrDoughnut = config.type === 'pie' || config.type === 'doughnut';
+              if (isPieOrDoughnut) return;
+
+              let displayVal = val.toString();
+              const label = dataset.label || '';
+              if (label.includes('Finanzas') || label.includes('($)')) {
+                displayVal = `$${val.toLocaleString('es-AR')}`;
+              } else if (label.includes('Salud') || label.includes('Pts')) {
+                displayVal = `${val.toLocaleString('es-AR')} pts`;
+              } else if (label.includes('Logística') || label.includes('Entregas')) {
+                displayVal = `${val.toLocaleString('es-AR')}`;
+              }
+
+              const position = element.tooltipPosition(false);
+              if (position && typeof position.x === 'number' && typeof position.y === 'number') {
+                ctx.fillText(displayVal, position.x, position.y - 6);
+              }
+            }
+          });
+        });
+        ctx.restore();
+      }
+    }
+  ];
 
   ngOnInit() {
     this.selectedChildId = this.config.childId || (this.children.length > 0 ? this.children[0].studentId : '');
@@ -126,6 +174,11 @@ export class SmartChartWidget implements OnInit, OnChanges {
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: isPieOrDoughnut ? 0 : 24
+        }
+      },
       plugins: {
         legend: { 
           display: isPieOrDoughnut,

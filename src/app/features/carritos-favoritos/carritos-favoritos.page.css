@@ -1,6 +1,9 @@
 .carritos-page {
   padding: 32px 16px;
   min-height: calc(100vh - 70px);
+  background:
+    var(--body-gradient),
+    var(--color-fondo);
 }
 
 .carritos-page__container {

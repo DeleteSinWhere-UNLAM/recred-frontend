@@ -1,5 +1,6 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
@@ -29,6 +30,7 @@ export class HomeAlumnoPresenter {
   private readonly colegiosService = inject(ColegiosService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
+  private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
@@ -144,6 +146,7 @@ export class HomeAlumnoPresenter {
       const alumno = alumnos.find((a) => a.id === alumnoId) ?? alumnos[0];
       if (alumno) {
         this.alumnoState.set(alumno);
+        this.contextoService.setAlumnoId(alumno.id);
         void this.homeAlumnoService.cargarPedidoEnCurso(alumno.id);
         if (alumno.colegioId) {
           void this.homeAlumnoService.cargarRecreos(alumno.colegioId);
@@ -156,17 +159,19 @@ export class HomeAlumnoPresenter {
     if (!accion.ruta) return;
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
-    if (accion.id === 'buffet' || accion.id === 'pedidos') {
-      this.router.navigate([accion.ruta, alumnoId]);
+    if (accion.id === 'buffet') {
+      this.contextoService.setAlumnoId(alumnoId);
+      void this.router.navigateByUrl(accion.ruta);
       return;
     }
-    this.router.navigateByUrl(accion.ruta);
+    void this.router.navigateByUrl(accion.ruta);
   }
 
   irAlBuffet(): void {
     const alumnoId = this.alumnoState()?.id;
     if (!alumnoId) return;
-    this.router.navigate(['/buffet', alumnoId]);
+    this.contextoService.setAlumnoId(alumnoId);
+    void this.router.navigateByUrl('/buffet');
   }
 
   verPedido(): void {

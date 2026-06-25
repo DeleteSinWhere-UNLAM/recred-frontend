@@ -6,12 +6,14 @@ import { PerfilService } from '../../../data-access/services/perfil.service';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { HomeAlumnoService } from '../services/home-alumno.service';
+import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 
 describe('HomeAlumnoPresenter', () => {
   let presenter: HomeAlumnoPresenter;
   let routerSpy: jasmine.SpyObj<Router>;
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let homeAlumnoServiceSpy: jasmine.SpyObj<HomeAlumnoService>;
+  let contextoServiceSpy: jasmine.SpyObj<AlumnoContextoService>;
 
   beforeEach(() => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
@@ -28,6 +30,7 @@ describe('HomeAlumnoPresenter', () => {
     ]);
     homeAlumnoServiceSpy.cargarPedidoEnCurso.and.resolveTo();
     homeAlumnoServiceSpy.cargarRecreos.and.resolveTo();
+    contextoServiceSpy = jasmine.createSpyObj<AlumnoContextoService>('AlumnoContextoService', ['setAlumnoId', 'limpiar']);
 
     const usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['getAlumnoActual']);
     usuarioServiceSpy.getAlumnoActual.and.returnValue({ id: 'alumno-1' });
@@ -48,6 +51,7 @@ describe('HomeAlumnoPresenter', () => {
         { provide: ColegiosService, useValue: colegiosServiceSpy },
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: HomeAlumnoService, useValue: homeAlumnoServiceSpy },
+        { provide: AlumnoContextoService, useValue: contextoServiceSpy },
       ]
     });
 
@@ -121,6 +125,7 @@ describe('HomeAlumnoPresenter', () => {
     expect(presenter.nombreColegio()).toBe('Colegio Test');
     expect(presenter.tienePedidoEnCurso()).toBeTrue();
     expect(presenter.estadoPedidoLabel()).toBe('Preparando tu pedido');
+    expect(contextoServiceSpy.setAlumnoId).toHaveBeenCalledWith('alumno-1');
   });
 
   it('debería navegar correctamente al ejecutar acciones', async () => {
@@ -128,7 +133,8 @@ describe('HomeAlumnoPresenter', () => {
     await new Promise(r => setTimeout(r, 0));
 
     presenter.ejecutarAccion(presenter.acciones()[0]);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/buffet', 'alumno-1']);
+    expect(contextoServiceSpy.setAlumnoId).toHaveBeenCalledWith('alumno-1');
+    expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/buffet');
 
     presenter.ejecutarAccion(presenter.acciones()[2]);
     expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/favoritos');

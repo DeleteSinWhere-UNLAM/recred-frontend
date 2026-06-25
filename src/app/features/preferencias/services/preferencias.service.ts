@@ -20,8 +20,8 @@ export class PreferenciasService {
     return `alumnos/${alumnoId}`;
   }
 
-  getPreferencias(): Observable<Preferencia[]> {
-    const alumnoId = this.perfilService.obtenerAlumnoId() ?? this.fallbackAlumnoId;
+  getPreferencias(alumnoIdSeleccionado?: string): Observable<Preferencia[]> {
+    const alumnoId = alumnoIdSeleccionado ?? this.perfilService.obtenerAlumnoId() ?? this.fallbackAlumnoId;
     const path = this.getPath(alumnoId);
     return this.http
       .get<Preferencia[]>(`${environment.apiUrl}/${path}/preferencias?ultima=true`)

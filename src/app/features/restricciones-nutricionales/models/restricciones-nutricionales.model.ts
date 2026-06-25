@@ -38,7 +38,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   {
     clave: 'sinTacc',
     titulo: 'TACC',
-    descripcion: 'Bloques productos con gluten.',
+    descripcion: 'Bloquea productos con gluten.',
     icono: 'fa-wheat-awn',
     colorIcono: 'melocoton',
     palabrasClave: ['tacc', 'gluten', 'celiac'],
@@ -54,7 +54,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   {
     clave: 'sinSodio',
     titulo: 'Sin Sodio',
-    descripcion: 'Bloques productos con alto sodio.',
+    descripcion: 'Bloquea productos con alto sodio.',
     icono: 'fa-heart-pulse',
     colorIcono: 'dorado',
     palabrasClave: ['sodio', 'sal'],
@@ -70,7 +70,7 @@ export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   {
     clave: 'contieneLacteos',
     titulo: 'Contiene Lácteos',
-    descripcion: 'Bloques productos con lácteos.',
+    descripcion: 'Bloquea productos con lácteos.',
     icono: 'fa-cow',
     colorIcono: 'melocoton',
     palabrasClave: ['lacteo'],
