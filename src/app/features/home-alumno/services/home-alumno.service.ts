@@ -59,7 +59,7 @@ export class HomeAlumnoService {
         .sort((a, b) => this.aMinutos(a.horaInicio) - this.aMinutos(b.horaInicio));
       this.recreosState.update((mapa) => ({ ...mapa, [colegioId]: recreos }));
     } catch (err) {
-      console.error('Error cargando recreos del colegio:', err);
+      console.warn('Error cargando recreos del colegio:', err);
       this.recreosState.update((mapa) => ({ ...mapa, [colegioId]: [] }));
     }
   }
@@ -78,7 +78,7 @@ export class HomeAlumnoService {
       const pedido = this.elegirUltimoPedido(pendientes);
       this.pedidosState.update((mapa) => ({ ...mapa, [alumnoId]: pedido }));
     } catch (err) {
-      console.error('Error cargando pedido en curso del alumno:', err);
+      console.warn('Error cargando pedido en curso del alumno:', err);
       this.pedidosState.update((mapa) => ({ ...mapa, [alumnoId]: null }));
     }
   }
