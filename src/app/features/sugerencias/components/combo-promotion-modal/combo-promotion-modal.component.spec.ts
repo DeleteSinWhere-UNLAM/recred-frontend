@@ -14,7 +14,7 @@ describe('ComboPromotionModalComponent', () => {
 
     fixture = TestBed.createComponent(ComboPromotionModalComponent);
     component = fixture.componentInstance;
-    component.baseProductName = 'Test Product';
+    component.baseProductName = 'Test Producto';
     component.suggestedProducts = [
       { id: 'p1', nombre: 'Prod 1', precio: 100 } as SuggestedProduct,
       { id: 'p2', nombre: 'Prod 2', precio: 200 } as SuggestedProduct

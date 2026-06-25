@@ -301,7 +301,7 @@ export class CarritoService {
     console.log('[DEBUG validarAgregar] Matched rule for category:', producto.categoria.id, rule);
     if (rule) {
       const totalCategory = spentPastCategory + spentCartCategory + additionalCost;
-      console.log('[DEBUG validarAgregar] Category cost check:', {
+      console.log('[DEBUG validarAgregar] Categoria cost check:', {
         spentPastCategory,
         spentCartCategory,
         additionalCost,

@@ -3,17 +3,17 @@ import { PromotionService, Promotion } from '../../../data-access/services/promo
 import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { ProductService } from '../../updated-inventory/services/product.service';
-import { Product } from '../../updated-inventory/models/product.interface';
+import { ProductoService } from '../../inventario/services/producto.service';
+import { Producto } from '../../inventario/models/producto.interface';
 
 export interface PromotionWithProducts extends Promotion {
-  products: Product[];
+  products: Producto[];
 }
 
 @Injectable()
 export class PromocionesPagePresenter {
   private readonly promotionService = inject(PromotionService);
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(ProductoService);
   private readonly router = inject(Router);
   private readonly dialogService = inject(DialogService);
 
@@ -47,7 +47,7 @@ export class PromocionesPagePresenter {
     return Math.round(originalTotal * (1 - (promotion.discountPercentage || 0) / 100));
   }
 
-  getVisibleProducts(promotion: PromotionWithProducts): Product[] {
+  getVisibleProducts(promotion: PromotionWithProducts): Producto[] {
     return promotion.products.slice(0, 3);
   }
 
@@ -114,7 +114,7 @@ export class PromocionesPagePresenter {
     );
   }
 
-  private resolveProducts(productIds: string[]): Observable<Product[]> {
+  private resolveProducts(productIds: string[]): Observable<Producto[]> {
     if (!productIds || productIds.length === 0) return of([]);
 
     return forkJoin(
@@ -128,7 +128,7 @@ export class PromocionesPagePresenter {
             peso: 0,
             requierePreparacion: false,
             stockActual: 0,
-          } as Product))
+          } as Producto))
         )
       )
     );

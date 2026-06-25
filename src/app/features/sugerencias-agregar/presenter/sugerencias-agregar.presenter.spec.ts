@@ -112,7 +112,7 @@ describe('SugerenciasAgregarPresenter', () => {
     });
   });
 
-  describe('Chart data y Product Cards', () => {
+  describe('Chart data y Producto Cards', () => {
     beforeEach(() => {
       mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(of(mockData));
       presenter.initialize('user-1');
