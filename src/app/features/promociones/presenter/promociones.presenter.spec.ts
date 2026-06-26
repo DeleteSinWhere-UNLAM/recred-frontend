@@ -3,20 +3,20 @@ import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { PromotionService, Promotion } from '../../../data-access/services/promociones/promotion.service';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { Product } from '../../updated-inventory/models/product.interface';
-import { ProductService } from '../../updated-inventory/services/product.service';
+import { Producto } from '../../inventario/models/producto.interface';
+import { ProductoService } from '../../inventario/services/producto.service';
 import { PromocionesPagePresenter } from './promociones.presenter';
 
 describe('PromocionesPagePresenter', () => {
   let presenter: PromocionesPagePresenter;
   let mockPromotionService: jasmine.SpyObj<PromotionService>;
-  let mockProductService: jasmine.SpyObj<ProductService>;
+  let mockProductoService: jasmine.SpyObj<ProductoService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockDialogService: jasmine.SpyObj<DialogService>;
 
   beforeEach(() => {
     mockPromotionService = jasmine.createSpyObj('PromotionService', ['getPromotions', 'discardPromotion']);
-    mockProductService = jasmine.createSpyObj('ProductService', ['getById']);
+    mockProductoService = jasmine.createSpyObj('ProductoService', ['getById']);
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
     mockDialogService = jasmine.createSpyObj('DialogService', ['confirm']);
 
@@ -24,7 +24,7 @@ describe('PromocionesPagePresenter', () => {
       providers: [
         PromocionesPagePresenter,
         { provide: PromotionService, useValue: mockPromotionService },
-        { provide: ProductService, useValue: mockProductService },
+        { provide: ProductoService, useValue: mockProductoService },
         { provide: Router, useValue: mockRouter },
         { provide: DialogService, useValue: mockDialogService }
       ]
@@ -45,7 +45,7 @@ describe('PromocionesPagePresenter', () => {
     ];
     const mockProduct = createProduct('p1', 'Alfajor', 1200);
     mockPromotionService.getPromotions.and.returnValue(of(mockPromotions));
-    mockProductService.getById.and.returnValue(of(mockProduct));
+    mockProductoService.getById.and.returnValue(of(mockProduct));
 
     presenter.loadPromotions();
 
@@ -54,7 +54,7 @@ describe('PromocionesPagePresenter', () => {
     expect(presenter.promotions().length).toBe(1);
     expect(presenter.promotions()[0].name).toBe('Promo 1');
     expect(presenter.promotions()[0].products).toEqual([mockProduct]);
-    expect(mockProductService.getById).toHaveBeenCalledWith('p1');
+    expect(mockProductoService.getById).toHaveBeenCalledWith('p1');
   });
 
   it('Dado que el backend devuelve nombres en espanol o snake_case, deberia normalizarlos correctamente', () => {
@@ -62,7 +62,7 @@ describe('PromocionesPagePresenter', () => {
       { id: '1', nombre: 'Promo Spanish', porcentaje_descuento: 15, productosIds: ['p1'], fechaInicio: '2026-06-12T00:00:00.123456Z', fechaFin: '2026-06-20T00:00:00.654321Z', estado: 'DRAFT' }
     ];
     mockPromotionService.getPromotions.and.returnValue(of(mockRawPromotions as unknown as Promotion[]));
-    mockProductService.getById.and.returnValue(of(createProduct('p1', 'Jugo', 900)));
+    mockProductoService.getById.and.returnValue(of(createProduct('p1', 'Jugo', 900)));
 
     presenter.loadPromotions();
 
@@ -80,7 +80,7 @@ describe('PromocionesPagePresenter', () => {
       { id: '1', name: 'Promo 1', discountPercentage: 10, productIds: ['p1'], startDate: '2026-06-12T00:00:00Z', endDate: '2026-06-20T00:00:00Z', status: 'ACTIVE' }
     ];
     mockPromotionService.getPromotions.and.returnValue(of(mockPromotions));
-    mockProductService.getById.and.returnValue(throwError(() => new Error('Not found')));
+    mockProductoService.getById.and.returnValue(throwError(() => new Error('Not found')));
 
     presenter.loadPromotions();
 
@@ -105,7 +105,7 @@ describe('PromocionesPagePresenter', () => {
   });
 });
 
-function createProduct(id: string, nombre: string, precio: number): Product {
+function createProduct(id: string, nombre: string, precio: number): Producto {
   return {
     id,
     nombre,

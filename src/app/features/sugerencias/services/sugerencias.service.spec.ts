@@ -93,7 +93,7 @@ describe('SugerenciasService', () => {
       const userId = 'user-123';
       const mockResponse: ComboSuggestion = {
         idProduct: 'prod-123',
-        productName: 'Test Product',
+        productName: 'Test Producto',
         suggestedProducts: []
       };
 

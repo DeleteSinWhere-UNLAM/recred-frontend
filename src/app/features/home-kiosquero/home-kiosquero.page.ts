@@ -9,17 +9,17 @@ import {
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
-import { UploadSelectionModalComponent } from '../updated-inventory/components/upload-selection-modal/upload-selection-modal.component';
-import { BulkUploadTableModalComponent } from '../updated-inventory/components/bulk-upload-table-modal/bulk-upload-table-modal.component';
+import { ModalSeleccionCargaComponent } from '../inventario/components/modal-seleccion-carga/modal-seleccion-carga.component';
+import { ModalTablaCargaMasivaComponent } from '../inventario/components/modal-tabla-carga-masiva/modal-tabla-carga-masiva.component';
 import { AccionKiosquero } from './models/accion-kiosquero.model';
 import { Router } from '@angular/router';
-import { BulkUploadService, BulkProductResponse } from '../updated-inventory/services/bulk-upload.service';
-import { ProductService } from '../updated-inventory/services/product.service';
+import { CargaMasivaService, RespuestaProductoMasivo } from '../inventario/services/carga-masiva.service';
+import { ProductoService } from '../inventario/services/producto.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
-import { Category } from '../updated-inventory/models/category.interface';
-import { CreateProductRequest } from '../updated-inventory/models/requests/create-product-request.interface';
-import { ProductFormComponent, ProductFormData } from '../updated-inventory/components/product-form/product-form.component';
+import { Categoria } from '../inventario/models/categoria.interface';
+import { SolicitudCrearProducto } from '../inventario/models/requests/crear-producto-request.interface';
+import { FormularioProductoComponent, DatosFormularioProducto } from '../inventario/components/formulario-producto/formulario-producto.component';
 
 const IMAGEN_FALLBACK =
   'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
@@ -28,15 +28,15 @@ const IMAGEN_FALLBACK =
   selector: 'app-home-kiosquero-page',
   templateUrl: './home-kiosquero.page.html',
   styleUrl: './home-kiosquero.page.css',
-  imports: [NavbarComponent, UploadSelectionModalComponent, BulkUploadTableModalComponent, ProductFormComponent],
+  imports: [NavbarComponent, ModalSeleccionCargaComponent, ModalTablaCargaMasivaComponent, FormularioProductoComponent],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeKiosqueroPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   private readonly router = inject(Router);
-  private readonly bulkUploadService = inject(BulkUploadService);
-  private readonly productService = inject(ProductService);
+  private readonly bulkUploadService = inject(CargaMasivaService);
+  private readonly productService = inject(ProductoService);
   private readonly toastService = inject(ToastService);
   private readonly perfilService = inject(PerfilService);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -49,8 +49,8 @@ export class HomeKiosqueroPage implements OnInit {
   isProcessingFile = false;
   isManualProductFormVisible = false;
   isSavingManualProduct = false;
-  bulkProductsData: BulkProductResponse[] = [];
-  categories: Category[] = [];
+  bulkProductsData: RespuestaProductoMasivo[] = [];
+  categories: Categoria[] = [];
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
@@ -130,7 +130,7 @@ export class HomeKiosqueroPage implements OnInit {
     });
   }
 
-  handleBulkProductsSave(products: BulkProductResponse[]): void {
+  handleBulkProductsSave(products: RespuestaProductoMasivo[]): void {
     const currentBuffetId = this.perfilService.obtenerBuffetId();
     if (!currentBuffetId) {
       this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
@@ -141,7 +141,7 @@ export class HomeKiosqueroPage implements OnInit {
 
     const normalizedNewCategories = new Map<string, string>();
 
-    const createRequests: CreateProductRequest[] = products.map((prod) => {
+    const createRequests: SolicitudCrearProducto[] = products.map((prod) => {
       const isNewCategory = prod.categoriaId === 'NEW';
       let finalNuevaCategoriaNombre = '';
 
@@ -186,7 +186,7 @@ export class HomeKiosqueroPage implements OnInit {
     });
   }
 
-  handleManualProductSubmit(data: ProductFormData): void {
+  handleManualProductSubmit(data: DatosFormularioProducto): void {
     const currentBuffetId = this.perfilService.obtenerBuffetId();
     if (!currentBuffetId) {
       this.toastService.mostrar('No se encontró un buffet asociado a tu perfil', 'error');
@@ -199,7 +199,7 @@ export class HomeKiosqueroPage implements OnInit {
     const CLASIFICACION_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
     const CLASIFICACION_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
 
-    const buildHealthClassificationIds = (formData: ProductFormData): string[] => {
+    const buildHealthClassificationIds = (formData: DatosFormularioProducto): string[] => {
       const ids: string[] = [];
       if (!formData.contiene_tacc) ids.push(CLASIFICACION_SIN_TACC);
       if (!formData.contiene_azucar) ids.push(CLASIFICACION_SIN_AZUCAR);
@@ -208,7 +208,7 @@ export class HomeKiosqueroPage implements OnInit {
     };
 
     const isNewCategory = data.categoriaId === "NEW";
-    const payload: CreateProductRequest = {
+    const payload: SolicitudCrearProducto = {
       nombre: data.nombre,
       descripcion: data.descripcion,
       precio: data.precio,

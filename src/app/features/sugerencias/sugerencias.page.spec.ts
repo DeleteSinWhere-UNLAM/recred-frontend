@@ -7,7 +7,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { CommonModule } from '@angular/common';
-import { Product } from '../updated-inventory/models/product.interface';
+import { Producto } from '../inventario/models/producto.interface';
 import { SugerenciaProducto } from './models/sugerencia-producto.model';
 
 @Component({
@@ -17,7 +17,7 @@ import { SugerenciaProducto } from './models/sugerencia-producto.model';
 })
 class MockComboPromotionModalComponent {
   @Input() baseProductName!: string;
-  @Input() suggestedProducts: Product[] = [];
+  @Input() suggestedProducts: Producto[] = [];
   @Output() confirmPromotion = new EventEmitter<{ discountPercentage: number, startDate: string, endDate: string, productIds: string[] }>();
   @Output() closeModal = new EventEmitter<void>();
 }

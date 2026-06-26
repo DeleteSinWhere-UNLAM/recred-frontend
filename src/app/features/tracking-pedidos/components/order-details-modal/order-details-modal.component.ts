@@ -5,8 +5,8 @@ import { ScheduledPickup, EstadoCompra } from '../../models/tracking-pedidos.mod
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PromotionService, Promotion } from '../../../../data-access/services/promociones/promotion.service';
-import { ProductService } from '../../../../features/updated-inventory/services/product.service';
-import { Product } from '../../../../features/updated-inventory/models/product.interface';
+import { ProductoService } from '../../../../features/inventario/services/producto.service';
+import { Producto } from '../../../../features/inventario/models/producto.interface';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -21,10 +21,10 @@ import { catchError } from 'rxjs/operators';
 export class OrderDetailsModalComponent {
   private readonly compraService = inject(CompraService);
   private readonly promotionService = inject(PromotionService);
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(ProductoService);
   private readonly dialogService = inject(DialogService);
 
-  promosLoaded = new Map<string, { promotion: Promotion | null; products: Product[]; loading: boolean; error: boolean }>();
+  promosLoaded = new Map<string, { promotion: Promotion | null; products: Producto[]; loading: boolean; error: boolean }>();
   expandedPromos = new Set<string>();
 
   esPromocion(nombre: string): boolean {

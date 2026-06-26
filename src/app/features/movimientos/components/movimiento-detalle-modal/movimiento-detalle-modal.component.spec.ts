@@ -3,13 +3,13 @@ import { MovimientoDetalleModalComponent } from './movimiento-detalle-modal.comp
 import { Movimiento } from '../../models/movimiento.model';
 import { By } from '@angular/platform-browser';
 import { PromotionService } from '../../../../data-access/services/promociones/promotion.service';
-import { ProductService } from '../../../../features/updated-inventory/services/product.service';
+import { ProductoService } from '../../../../features/inventario/services/producto.service';
 
 describe('MovimientoDetalleModalComponent', () => {
   let component: MovimientoDetalleModalComponent;
   let fixture: ComponentFixture<MovimientoDetalleModalComponent>;
   let mockPromotionService: jasmine.SpyObj<PromotionService>;
-  let mockProductService: jasmine.SpyObj<ProductService>;
+  let mockProductoService: jasmine.SpyObj<ProductoService>;
 
   const mockMovimiento: Movimiento = {
     id: 'mov-1',
@@ -27,13 +27,13 @@ describe('MovimientoDetalleModalComponent', () => {
 
   beforeEach(async () => {
     mockPromotionService = jasmine.createSpyObj('PromotionService', ['getPromotionById']);
-    mockProductService = jasmine.createSpyObj('ProductService', ['getById']);
+    mockProductoService = jasmine.createSpyObj('ProductoService', ['getById']);
 
     await TestBed.configureTestingModule({
       imports: [MovimientoDetalleModalComponent],
       providers: [
         { provide: PromotionService, useValue: mockPromotionService },
-        { provide: ProductService, useValue: mockProductService }
+        { provide: ProductoService, useValue: mockProductoService }
       ]
     }).compileComponents();
 

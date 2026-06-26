@@ -82,6 +82,8 @@ describe('MovimientosPage', () => {
   const mockMovimientosList = [mockMovimiento1, mockMovimiento2, mockMovimiento3];
 
   beforeEach(async () => {
+    localStorage.removeItem('recreopago_homeUrl');
+    localStorage.removeItem('recreopago_nombreNavbar');
     movimientosServiceSpy = jasmine.createSpyObj<MovimientosService>('MovimientosService', [
       'getHistorialAlumno',
       'getHistorialTutor',

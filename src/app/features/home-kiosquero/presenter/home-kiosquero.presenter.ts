@@ -31,8 +31,8 @@ import {
   DashboardRangeParams,
   HomeKiosqueroService,
 } from '../services/home-kiosquero.service';
-import { InventoryRealtimeService } from '../../updated-inventory/services/inventory-realtime.service';
-import { RealtimeInventoryEvent } from '../../updated-inventory/models/inventory.interface';
+import { InventarioRealtimeService } from '../../inventario/services/inventario-realtime.service';
+import { EventoInventarioRealtime } from '../../inventario/models/inventario.interface';
 
 type MetricTone = 'success' | 'warning' | 'danger';
 type PanelMode = 'home' | 'reportes';
@@ -170,7 +170,7 @@ export class HomeKiosqueroPresenter {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly homeKiosqueroService = inject(HomeKiosqueroService);
-  private readonly inventoryRealtimeService = inject(InventoryRealtimeService);
+  private readonly inventoryRealtimeService = inject(InventarioRealtimeService);
   private readonly router = inject(Router);
   private readonly zone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
@@ -1365,7 +1365,7 @@ export class HomeKiosqueroPresenter {
     );
   }
 
-  private scheduleRealtimeRefresh(event: RealtimeInventoryEvent): void {
+  private scheduleRealtimeRefresh(event: EventoInventarioRealtime): void {
     if (
       !this.shouldRefreshPanelForRealtimeEvent(event) ||
       this.realtimeRefreshTimeoutId !== null
@@ -1677,7 +1677,7 @@ export class HomeKiosqueroPresenter {
   }
 
   private shouldRefreshPanelForRealtimeEvent(
-    event: RealtimeInventoryEvent,
+    event: EventoInventarioRealtime,
   ): boolean {
     return (
       document.visibilityState === 'visible' &&
@@ -1686,7 +1686,7 @@ export class HomeKiosqueroPresenter {
     );
   }
 
-  private isRealtimeEventForCurrentPanel(event: RealtimeInventoryEvent): boolean {
+  private isRealtimeEventForCurrentPanel(event: EventoInventarioRealtime): boolean {
     if (this.panelModeState() === 'reportes') {
       return this.isRealtimeEventForReportRange(event);
     }
@@ -1694,14 +1694,14 @@ export class HomeKiosqueroPresenter {
     return this.isRealtimeEventForSelectedDate(event);
   }
 
-  private isRealtimeEventForReportRange(event: RealtimeInventoryEvent): boolean {
+  private isRealtimeEventForReportRange(event: EventoInventarioRealtime): boolean {
     const eventDate = event.date?.trim() || this.getTodayInputDate();
     const range = this.getReportRange();
 
     return eventDate >= range.from && eventDate <= range.to;
   }
 
-  private isRealtimeEventForSelectedDate(event: RealtimeInventoryEvent): boolean {
+  private isRealtimeEventForSelectedDate(event: EventoInventarioRealtime): boolean {
     const eventDate = event.date?.trim();
 
     if (eventDate) {

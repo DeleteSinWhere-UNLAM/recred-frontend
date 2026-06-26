@@ -76,8 +76,8 @@ export const routes: Routes = [
           {
         path: 'prediccion-gasto',
         loadChildren: () =>
-          import('./features/spending-prediction/spending-prediction.routes').then(
-            (m) => m.SPENDING_PREDICTION_ROUTES,
+          import('./features/prediccion-gasto/prediccion-gasto.routes').then(
+            (m) => m.PREDICCION_GASTO_ROUTES,
           ),
       },
           {
@@ -242,8 +242,8 @@ export const routes: Routes = [
       {
         path: 'cierre-diario',
         loadComponent: () =>
-          import('./features/daily-close/daily-close.page').then(
-            (m) => m.DailyClosePage,
+          import('./features/cierre-diario/cierre-diario.page').then(
+            (m) => m.CierreDiarioPage,
           ),
       },
       {
@@ -263,22 +263,22 @@ export const routes: Routes = [
       {
         path: 'cargar-producto-ia',
         loadChildren: () =>
-          import('./features/ai-product-upload/ai-product-upload.routes').then(
-            (m) => m.aiProductUploadRoutes,
+          import('./features/cargar-producto-ia/cargar-producto-ia.routes').then(
+            (m) => m.cargarProductoIaRoutes,
           ),
       },
       {
         path: 'recomendaciones-estacionales',
         loadComponent: () =>
-          import('./features/seasonal-recommendations/pages/seasonal-page/seasonal-page.component').then(
-            (m) => m.SeasonalPageComponent,
+          import('./features/recomendaciones-estacionales/pages/recomendaciones-page/recomendaciones-page.component').then(
+            (m) => m.RecomendacionesPageComponent,
           ),
       },
       {
         path: 'admin-productos',
         loadChildren: () =>
-          import('./features/updated-inventory/updated-inventory.routes').then(
-            (m) => m.updatedInventoryRoutes,
+          import('./features/inventario/inventario.routes').then(
+            (m) => m.inventarioRoutes,
           ),
       },
       
