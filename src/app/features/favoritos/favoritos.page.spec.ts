@@ -68,6 +68,11 @@ describe('FavoritosPage', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    localStorage.removeItem('recreopago_homeUrl');
+    localStorage.removeItem('recreopago_nombreNavbar');
+  });
+
   it('debería crear la página', () => {
     expect(component).toBeTruthy();
     expect(component.alumnoId).toBe('alumno-123');
