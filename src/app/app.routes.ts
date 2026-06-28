@@ -240,6 +240,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'kiosquero/proveedores',
+        loadChildren: () =>
+          import('./features/proveedores/proveedores.routes').then(
+            (m) => m.PROVEEDORES_ROUTES,
+          ),
+      },
+      {
         path: 'cierre-diario',
         loadComponent: () =>
           import('./features/cierre-diario/cierre-diario.page').then(

@@ -1,0 +1,170 @@
+<app-navbar [userName]="nombreKiosquero()" />
+
+<main class="comp-container">
+  <header class="comp-header">
+    <button class="back-btn" (click)="volver()" aria-label="Volver a proveedores">
+      <i class="fa-solid fa-arrow-left"></i> Volver a Proveedores
+    </button>
+    <h1 class="comp-title">Comparador de Precios & Recomendación</h1>
+    <p class="comp-subtitle">Seleccioná los productos de tu buffet para que Gemini compare los costos de tus proveedores y recomiende la opción más económica.</p>
+  </header>
+
+  <div class="comp-layout">
+    <!-- Left Column: Inventory Products Selector -->
+    <section class="products-section" aria-label="Selección de productos">
+      <div class="products-section__header">
+        <h2 class="section-title">Productos en Inventario</h2>
+        <div class="selection-actions">
+          <button class="select-helper" (click)="selectAllLowStock()">
+            <i class="fa-solid fa-triangle-exclamation"></i> Bajo Stock
+          </button>
+          <button class="select-helper" (click)="selectAll()">Todos</button>
+          <button class="select-helper" (click)="clearSelection()">Limpiar</button>
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
+          <p>Cargando catálogo del buffet...</p>
+        </div>
+      }
+
+      @if (!isLoading() && products().length === 0) {
+        <div class="empty-state">
+          <i class="fa-solid fa-box-open empty-state__icon"></i>
+          <h3 class="empty-state__title">Sin productos</h3>
+          <p class="empty-state__text">No tenés productos cargados en tu inventario. Registrá productos en el inventario para poder compararlos.</p>
+        </div>
+      }
+
+      @if (!isLoading() && products().length > 0) {
+        <div class="products-grid">
+          @for (prod of products(); track prod.id) {
+            <article
+              class="product-card"
+              [class.product-card--selected]="isProductSelected(prod.id)"
+              (click)="toggleProductSelection(prod.id)"
+            >
+              <div class="product-card__selector">
+                <input
+                  type="checkbox"
+                  [checked]="isProductSelected(prod.id)"
+                  (change)="$event.stopPropagation(); toggleProductSelection(prod.id)"
+                  class="product-checkbox"
+                />
+              </div>
+              <div class="product-card__info">
+                <h3 class="product-card__name">{{ prod.nombre }}</h3>
+                <p class="product-card__desc">{{ prod.descripcion || 'Sin descripción' }}</p>
+                <div class="product-card__stock-row">
+                  <span class="product-card__stock" [class.product-card__stock--critical]="isLowStock(prod)">
+                    Stock: {{ prod.stockActual }} un.
+                  </span>
+                  @if (isLowStock(prod)) {
+                    <span class="badge-critical"><i class="fa-solid fa-triangle-exclamation"></i> Stock Crítico</span>
+                  }
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Right Column: Comparison Panel & Results -->
+    <aside class="results-section" aria-label="Resultados de cotización">
+      <div class="comparison-card">
+        <h2 class="section-title">Cotizar Compra</h2>
+        <p class="section-description">Se compararán las listas de precios activas cargadas de tus proveedores.</p>
+
+        <div class="comparison-status">
+          <div class="status-metric">
+            <span class="status-metric__label">Seleccionados</span>
+            <strong class="status-metric__value">{{ selectedProductIds().size }}</strong>
+          </div>
+        </div>
+
+        <button
+          class="quote-btn"
+          [disabled]="selectedProductIds().size === 0 || isFetchingRecommendations()"
+          (click)="getRecommendations()"
+        >
+          @if (isFetchingRecommendations()) {
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Buscando Ofertas...
+          } @else {
+            <i class="fa-solid fa-calculator"></i> Obtener Mejor Oferta
+          }
+        </button>
+      </div>
+
+      <!-- Recommendation Cards -->
+      @if (recommendations().length > 0) {
+        <div class="recommendations-list">
+          <h2 class="results-title"><i class="fa-solid fa-square-poll-vertical"></i> Compras Sugeridas</h2>
+          
+          @for (rec of recommendations(); track rec.productoInventarioId) {
+            <article class="rec-card">
+              <header class="rec-card__header">
+                <h3 class="rec-card__prod-name">{{ rec.nombreProducto }}</h3>
+              </header>
+
+              <div class="rec-card__body">
+                <!-- Best supplier recommendation -->
+                <div class="best-offer">
+                  <span class="best-offer__label">Mejor Proveedor Recomendado</span>
+                  <div class="best-offer__box">
+                    <div class="best-offer__supplier">
+                      <i class="fa-solid fa-medal icon-best"></i>
+                      <strong class="supplier-name">{{ rec.nombreProveedorRecomendado }}</strong>
+                    </div>
+                    <div class="best-offer__price-wrap">
+                      <span class="best-offer__price">{{ rec.mejorPrecio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</span>
+                      <small class="best-offer__unit">/ {{ rec.unidad || 'unidad' }}</small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Collapsible Alternatives accordion -->
+                <div class="alternatives-accordion">
+                  <button class="accordion-trigger" (click)="toggleAccordion(rec.productoInventarioId)">
+                    <span>Otras Alternativas ({{ rec.alternativas.length || 0 }})</span>
+                    <i class="fa-solid" [class.fa-chevron-up]="isAccordionExpanded(rec.productoInventarioId)" [class.fa-chevron-down]="!isAccordionExpanded(rec.productoInventarioId)"></i>
+                  </button>
+
+                  @if (isAccordionExpanded(rec.productoInventarioId)) {
+                    <div class="accordion-content">
+                      @if (!rec.alternativas || rec.alternativas.length === 0) {
+                        <p class="no-alt-text">No hay otros proveedores con listas de precios para este producto.</p>
+                      } @else {
+                        <table class="alt-table">
+                          <thead>
+                            <tr>
+                              <th>Proveedor</th>
+                              <th class="text-right">Precio</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (alt of rec.alternativas; track alt.proveedorId) {
+                              <tr>
+                                <td>{{ alt.nombreProveedor }}</td>
+                                <td class="text-right font-semibold">
+                                  {{ alt.precio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+                                  <small class="alt-unit">/ {{ alt.unidad || 'unidad' }}</small>
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </aside>
+  </div>
+</main>

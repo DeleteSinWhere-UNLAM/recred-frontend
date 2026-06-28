@@ -10,7 +10,8 @@ export type AccionKiosqueroId =
   | 'recomendaciones'
   | 'recomendaciones-estacionales'
   | 'oportunidades-stock'
-  | 'promociones';
+  | 'promociones'
+  | 'proveedores';
 
 export type AccionKiosqueroColor =
   | 'pizarra'

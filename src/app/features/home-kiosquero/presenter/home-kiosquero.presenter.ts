@@ -956,6 +956,14 @@ export class HomeKiosqueroPresenter {
       ruta: '/cierre-diario',
       color: 'melocoton',
     },
+    {
+      id: 'proveedores',
+      titulo: 'Proveedores y Precios',
+      descripcion: 'Gestionar listas de precios y recomendaciones por IA',
+      icono: 'fa-truck-field',
+      ruta: '/kiosquero/proveedores',
+      color: 'dorado',
+    },
   ]);
 
   readonly primaryAction = computed<AccionKiosquero | null>(() => {

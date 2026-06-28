@@ -1,0 +1,146 @@
+<app-navbar [userName]="nombreKiosquero()" />
+
+<main class="mapping-container" (click)="closeProductDropdown()">
+  <header class="mapping-header">
+    <button class="back-btn" (click)="volver()" aria-label="Volver a la ficha">
+      <i class="fa-solid fa-arrow-left"></i> Volver a Ficha
+    </button>
+    <div class="mapping-header__info">
+      <h1 class="mapping-header__title">Mapeo de Productos</h1>
+      <p class="mapping-header__subtitle">
+        Proveedor: <strong>{{ supplier()?.nombre }}</strong> &bull; Lista: <strong>{{ priceList()?.nombreOriginal
+          }}</strong>
+      </p>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
+    <p>Procesando información y cargando mapeos...</p>
+  </div>
+  }
+
+  @if (!isLoading() && items().length === 0) {
+  <div class="empty-state">
+    <i class="fa-solid fa-wand-magic-sparkles empty-state__icon"></i>
+    <h3 class="empty-state__title">No hay ítems extraídos</h3>
+    <p class="empty-state__text">No pudimos leer ningún producto de la lista cargada o el archivo está vacío.</p>
+    <button class="back-btn" (click)="volver()">Volver al Proveedor</button>
+  </div>
+  }
+
+  @if (!isLoading() && items().length > 0) {
+  <section class="table-card" aria-label="Tabla de mapeos de productos">
+    <div class="table-responsive">
+      <table class="mapping-table">
+        <thead>
+          <tr>
+            <th>Producto del Proveedor</th>
+            <th>Unidad</th>
+            <th>Notas Extraídas</th>
+            <th>Costo Unitario</th>
+            <th>Producto en Inventario Mapeado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.id) {
+          <tr class="mapping-row" [class.mapping-row--suggested]="item.productoInventarioId && !item.mappingConfirmado"
+            [class.mapping-row--unmapped]="!item.productoInventarioId && !item.mappingConfirmado"
+            [class.mapping-row--confirmed]="item.mappingConfirmado">
+            <!-- Supplier Product Name -->
+            <td class="font-semibold">{{ item.nombreProductoProveedor }}</td>
+
+            <!-- Unit -->
+            <td><span class="unit-pill">{{ item.unidad || 'unidad' }}</span></td>
+
+            <!-- Extracted Notes -->
+            <td class="notes-cell">
+              <span class="notes-text" [title]="item.notas">{{ item.notas || '-' }}</span>
+            </td>
+
+            <!-- Cost -->
+            <td class="font-semibold text-right">
+              {{ item.precio | currency: 'ARS': 'symbol-narrow': '1.2-2' }}
+            </td>
+
+            <!-- Product Mapped Dropdown Selector -->
+            <td class="dropdown-cell">
+              <!-- Match Badge & Selector Box -->
+              <div class="selector-box" (click)="openProductDropdown(item.id, $event)"
+                [class.selector-box--suggested]="item.productoInventarioId && !item.mappingConfirmado"
+                [class.selector-box--unmapped]="!item.productoInventarioId && !item.mappingConfirmado"
+                [class.selector-box--confirmed]="item.mappingConfirmado">
+                <div class="selector-box__content">
+                  @if (item.mappingConfirmado && !item.productoInventarioId) {
+                  <span class="selected-product-name italic-text">Producto fuera de inventario</span>
+                  <span class="badge badge--confirmed"><i class="fa-solid fa-check"></i> Confirmado</span>
+                  } @else if (item.productoInventarioId) {
+                  <span class="selected-product-name">{{ item.nombreProductoInventario }}</span>
+                  @if (!item.mappingConfirmado) {
+                  <span class="badge badge--suggested">Sugerido por IA</span>
+                  } @else {
+                  <span class="badge badge--confirmed"><i class="fa-solid fa-check"></i> Confirmado</span>
+                  }
+                  } @else {
+                  <span class="unmapped-placeholder">Sin Mapear</span>
+                  <span class="badge badge--unmapped">Requerido</span>
+                  }
+                </div>
+                <i class="fa-solid fa-chevron-down selector-box__arrow"></i>
+              </div>
+
+              <!-- Dynamic Search Dropdown Overlay -->
+              @if (activeDropdownRowId() === item.id) {
+              <!-- Full screen click-catcher for closing dropdown -->
+              <div class="dropdown-overlay" (click)="closeProductDropdown()"></div>
+
+              <div class="dropdown-menu" (click)="$event.stopPropagation()">
+                <div class="dropdown-search">
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input type="text" placeholder="Buscar producto..." [(ngModel)]="productSearchQuery"
+                    (click)="$event.stopPropagation()" class="dropdown-search-input" #searchBox />
+                </div>
+                <ul class="dropdown-list">
+                  <li class="dropdown-item dropdown-item--unmap"
+                    [class.dropdown-item--selected]="item.mappingConfirmado && !item.productoInventarioId"
+                    (click)="selectProduct(item, null)">
+                    <i class="fa-solid fa-ban text-danger"></i> <span
+                      class="italic-text text-danger font-semibold">Producto fuera de inventario</span>
+                  </li>
+
+                  @for (prod of getFilteredInventoryProducts(); track prod.id) {
+                  <li class="dropdown-item" [class.dropdown-item--selected]="prod.id === item.productoInventarioId"
+                    (click)="selectProduct(item, prod)">
+                    <span>{{ prod.nombre }}</span>
+                    <small class="dropdown-item__price">{{ prod.precio | currency: 'ARS': 'symbol-narrow': '1.0-0'
+                      }}</small>
+                  </li>
+                  }
+                  @if (getFilteredInventoryProducts().length === 0) {
+                  <li class="dropdown-no-results">No se encontraron productos</li>
+                  }
+                </ul>
+              </div>
+              }
+            </td>
+
+            <!-- Confirm Action Button -->
+            <td>
+              @if (item.productoInventarioId && !item.mappingConfirmado) {
+              <button class="confirm-btn" (click)="confirmMapping(item)" title="Confirmar sugerencia de IA">
+                Confirmar Mapeo
+              </button>
+              } @else {
+              <span class="confirm-placeholder">-</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+  }
+</main>
