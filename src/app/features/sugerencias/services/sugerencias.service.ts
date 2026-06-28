@@ -30,9 +30,9 @@ export class SugerenciasService {
     );
   }
 
-  getComboSuggestions(productId: string, userId: string): Observable<ComboSuggestion> {
+  getComboSuggestions(productId: string): Observable<ComboSuggestion> {
     return this.http.get<ComboSuggestion>(
-      `${this.baseUrl}/combo-suggestions/${productId}/${userId}`,
+      `${this.baseUrl}/combo-suggestions/${productId}`,
     );
   }
 }

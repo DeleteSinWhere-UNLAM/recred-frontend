@@ -87,7 +87,7 @@ describe('SugerenciasPresenter', () => {
       presenter['userId'] = 'user-1';
       presenter.openComboPromotionModal();
 
-      expect(mockSugerenciasService.getComboSuggestions).toHaveBeenCalledWith('P1', 'user-1');
+      expect(mockSugerenciasService.getComboSuggestions).toHaveBeenCalledWith('P1');
       
       let isModalOpen = false;
       presenter.isComboModalOpen$.subscribe(v => isModalOpen = v);

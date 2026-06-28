@@ -46,7 +46,7 @@ export class SugerenciasPresenter {
     const selected = this._sugerenciaSeleccionada.getValue();
 
     if (this.hasSelectedProduct(selected)) {
-      this.sugerenciasService.getComboSuggestions(selected.estadisticasVenta.productoId, this.userId)
+      this.sugerenciasService.getComboSuggestions(selected.estadisticasVenta.productoId)
         .subscribe((suggestions) => {
           console.log(suggestions);
           this._suggestedProducts.next(suggestions.suggestedProducts);
