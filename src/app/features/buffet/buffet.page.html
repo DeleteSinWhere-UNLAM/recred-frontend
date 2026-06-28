@@ -15,14 +15,6 @@
 
           <div class="buffet__titulo-bloque">
             <h2 class="buffet__titulo">Menú del Buffet</h2>
-            <div class="buffet__titulo-meta">
-              @if (presenter.buffet(); as buffet) {
-              <p class="buffet__buffet-nombre">{{ buffet.nombre }}</p>
-              }
-              <span class="buffet__productos-count">
-                {{ presenter.productosFiltrados().length }} productos
-              </span>
-            </div>
           </div>
 
           @if (presenter.alumno(); as alumno) {
