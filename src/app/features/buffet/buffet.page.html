@@ -112,6 +112,7 @@
         </section>
 
         @if (!esVistaAlumno() && presenter.alumno(); as alumno) {
+        @if (tieneRestriccionesActivas()) {
         <section class="buffet__restricciones-barra" aria-label="Restricciones del alumno">
           <div class="buffet__restricciones-header">
             <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
@@ -119,38 +120,25 @@
           </div>
           <div class="buffet__restricciones-badges">
             <!-- Nutricionales -->
-            @if (presenter.restriccionesNutricionales().length > 0) {
             @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
             <span class="restriccion-pill-card restriccion-pill-card--danger">
               <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
               {{ rest.descripcion }}
             </span>
             }
-            } @else {
-            <span class="restriccion-pill-card restriccion-pill-card--success">
-              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-              Sin restricciones alimenticias
-            </span>
-            }
 
             <!-- Horarias -->
-            @if (presenter.tieneRestriccionesHorarias()) {
             @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
-            <span class="restriccion-pill-card" [class.restriccion-pill-card--success]="!horario.bloqueado"
-              [class.restriccion-pill-card--muted]="horario.bloqueado">
-              <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado"
-                [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
-              {{ horario.descripcion }}
-            </span>
-            }
-            } @else {
-            <span class="restriccion-pill-card restriccion-pill-card--success">
-              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-              Sin restricciones horarias
-            </span>
+              @if (horario.bloqueado) {
+              <span class="restriccion-pill-card restriccion-pill-card--muted">
+                <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                {{ horario.descripcion }}
+              </span>
+              }
             }
           </div>
         </section>
+        }
         }
 
 

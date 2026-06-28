@@ -83,6 +83,12 @@ export class BuffetPage implements OnInit {
   protected readonly categoriasColapsado = signal(false);
   protected readonly otrosLimitesColapsado = signal(true);
 
+  readonly tieneRestriccionesActivas = computed(() => {
+    const hayNutricionales = this.presenter.restriccionesNutricionales().length > 0;
+    const hayHorariasBloqueadas = this.presenter.restriccionesHorariasInformativas().some(h => h.bloqueado);
+    return hayNutricionales || hayHorariasBloqueadas;
+  });
+
   readonly presupuestoInfo = computed(() => {
     const pres = this.presenter.presupuestoDisponible();
     const saldoVal = this.presenter.saldo();

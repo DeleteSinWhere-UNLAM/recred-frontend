@@ -2374,7 +2374,7 @@
 /* ── Tarjeta de Promoción ───────────────────────────────────── */
 .promo-card {
   flex: 0 0 calc(50% - 12px);
-  min-width: 480px;
+  min-width: 420px;
   display: flex;
   flex-direction: column;
   background-color: var(--color-superficie);
