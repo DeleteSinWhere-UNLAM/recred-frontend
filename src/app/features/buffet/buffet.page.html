@@ -173,51 +173,46 @@
               @for (promo of promocionesDestacadasFiltradas(); track promo.id) {
               <article class="promo-card" [class.promo-card--bloqueada]="!esVistaAlumno() && promo.bloqueada"
                 [class.promo-card--restringida]="promo.bloqueadaPorRestriccion">
-                <!-- Color vertical banner / Left side -->
-                <div class="promo-card__banner"
-                  [class]="'promo-card__banner--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
-                  <span class="promo-card__badge-promo">PROMO</span>
+                <!-- Color horizontal banner / Top header -->
+                <header class="promo-card__header"
+                  [class]="'promo-card__header--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
+                  <h4 class="promo-card__header-title">{{ promo.nombre }}</h4>
                   @if (!esVistaAlumno() && promo.bloqueada) {
                   <span class="promo-card__badge-bloqueado" [title]="promo.motivoBloqueo || 'Bloqueado por el tutor'">
                     <i class="fa-solid fa-lock" aria-hidden="true"></i> Bloqueada
                   </span>
                   }
-                  <h4 class="promo-card__banner-title">{{ promo.nombre }}</h4>
-                  <p class="promo-card__banner-desc">
-                    @for (item of promo.itemsList; track $index) {
-                    + {{ item }}<br>
-                    }
-                  </p>
-                </div>
+                </header>
 
-                <!-- Right side info & image -->
+                <!-- Body info & image -->
                 <div class="promo-card__body">
+                  <!-- Left 50% -->
                   <div class="promo-card__media">
                     <img [src]="promo.imagen" [alt]="promo.nombre" class="promo-card__image" loading="lazy" />
                   </div>
 
+                  <!-- Right 50% -->
                   <div class="promo-card__content">
-                    <h4 class="promo-card__title">{{ promo.nombre }}</h4>
+                    <div class="promo-card__price-info">
+                      @if (promo.precioOriginal && promo.precioOriginal !== promo.precio) {
+                      <span class="promo-card__price-original">{{ formatARS(promo.precioOriginal) }}</span>
+                      }
+                      <span class="promo-card__price-value">{{ formatARS(promo.precio) }}</span>
+                    </div>
 
-                    <div class="promo-card__footer">
-                      <div class="promo-card__price-info">
-                        <div class="promo-card__price-value-container">
-                          @if (promo.precioOriginal && promo.precioOriginal !== promo.precio) {
-                          <span class="promo-card__price-original">{{ formatARS(promo.precioOriginal) }}</span>
-                          }
-                          <span class="promo-card__price-value">{{ formatARS(promo.precio) }}</span>
-                          @if (promo.descuento) {
-                          <span class="promo-card__discount-tag">{{ promo.descuento }}</span>
-                          }
-                        </div>
-                      </div>
+                    <div class="promo-card__items-list">
+                      @for (item of promo.itemsList; track $index) {
+                      <span class="promo-card__item-text">+ {{ item }}</span>
+                      }
+                    </div>
 
+                    <div class="promo-card__action-area">
                       @if (promo.bloqueadaPorRestriccion) {
-                      <!-- Restricción nutricional: botón deshabilitado con motivo -->
-                      <button type="button" class="promo-card__btn-restringido" disabled>
+                      <!-- Restricción nutricional: texto de advertencia (sin botón) -->
+                      <div class="promo-card__restriction-badge">
                         <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
                         {{ getMensajeRestriccionPromo(promo) }}
-                      </button>
+                      </div>
                       } @else if (puedeComprarPromo(promo)) {
                       <button type="button" class="promo-card__btn-agregar"
                         [class.promo-card__btn-agregar--premium]="esPremium()" (click)="agregarPromoAlCarrito(promo)">
