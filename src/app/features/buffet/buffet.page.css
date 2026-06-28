@@ -2306,9 +2306,11 @@
   overflow-x: auto;
   scroll-behavior: smooth;
   width: 100%;
-  padding: 12px 8px 16px;
-  margin: 0;
+  padding: 12px 24px 40px;
+  margin: 0 -12px;
   scrollbar-width: none; /* Firefox */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%);
 }
 
 .promos-carousel__container::-webkit-scrollbar {
