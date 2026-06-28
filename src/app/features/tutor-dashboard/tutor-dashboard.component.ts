@@ -50,6 +50,12 @@ export class TutorDashboardComponent implements OnInit {
   // Transfer state
   draggedChild: ChildDashboardSummary | null = null;
   transferAmounts: Record<string, number | null> = {};
+  
+  // Modal transfer state
+  showTransferModal = false;
+  transferSourceChild: ChildDashboardSummary | null = null;
+  transferTargetChildId = '';
+  isTransferring = false;
 
   // Grid state
   gridConfig: GridsterConfig = {};
@@ -231,6 +237,70 @@ export class TutorDashboardComponent implements OnInit {
   applySmartAction(): void {
     console.log('Action applied for', this.selectedChild?.studentName);
     this.closeSmartActionModal();
+  }
+
+  // Button Transfer Logic
+  openTransferModal(sourceChild: ChildDashboardSummary): void {
+    if (this.esPlanGratuito) {
+      this.dialogService.alert('La transferencia entre hijos no está permitida en cuentas gratuitas.', 'Plan Gratuito');
+      return;
+    }
+    
+    const amount = this.transferAmounts[sourceChild.studentId];
+    if (!amount || amount <= 0) {
+      this.dialogService.alert('Debes ingresar un monto mayor a 0 antes de transferir.', 'Monto Inválido');
+      return;
+    }
+
+    this.transferSourceChild = sourceChild;
+    this.transferTargetChildId = '';
+    
+    // Si solo hay un destinatario posible, autoseleccionarlo
+    const possibleTargets = this.globalSummary?.children.filter(c => c.studentId !== sourceChild.studentId) || [];
+    if (possibleTargets.length === 1) {
+      this.transferTargetChildId = possibleTargets[0].studentId;
+    }
+
+    this.showTransferModal = true;
+  }
+
+  closeTransferModal(): void {
+    if (this.isTransferring) return;
+    this.showTransferModal = false;
+    this.transferSourceChild = null;
+    this.transferTargetChildId = '';
+  }
+
+  confirmTransfer(): void {
+    if (!this.transferSourceChild || !this.transferTargetChildId) {
+      this.dialogService.alert('Debes seleccionar un destinatario.', 'Destinatario Inválido');
+      return;
+    }
+    
+    if (this.isTransferring) return;
+    
+    const amount = this.transferAmounts[this.transferSourceChild.studentId];
+    if (!amount || amount <= 0) return;
+
+    const sourceId = this.transferSourceChild.studentId;
+    const targetId = this.transferTargetChildId;
+
+    this.isTransferring = true;
+    this.dashboardService.transferBalance(sourceId, targetId, amount).subscribe({
+      next: () => {
+        console.log(`Successfully transferred $${amount}`);
+        this.transferAmounts[sourceId] = null;
+        this.isTransferring = false;
+        this.closeTransferModal();
+        this.ngOnInit();
+      },
+      error: async (err) => {
+        console.error('Transfer failed', err);
+        this.isTransferring = false;
+        await this.dialogService.alert('Hubo un error al procesar la transferencia. Revisa el monto o la conexión.', 'Error de Transferencia');
+        this.closeTransferModal();
+      }
+    });
   }
 
   initGrid() {

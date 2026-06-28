@@ -142,8 +142,14 @@ export class AdelantoPage {
     const confirm = await this.dialogService.confirm(`¿Estás seguro de que deseas saldar el adelanto de $${credito.amount}?`, 'Pagar Adelanto');
     if (!confirm) return;
 
+    const creditIdToPay = credito.id || credito.creditId;
+    if (!creditIdToPay) {
+      await this.dialogService.alert('No se pudo identificar el adelanto a pagar.', 'Error');
+      return;
+    }
+
     this.cargando.set(true);
-    this.microcreditosService.payCredit(credito.id).subscribe({
+    this.microcreditosService.payCredit(creditIdToPay).subscribe({
       next: async () => {
         await this.dialogService.alert('El adelanto ha sido saldado exitosamente.', 'Adelanto Saldado');
         this.creditoActivo.set(null);
@@ -152,7 +158,8 @@ export class AdelantoPage {
       },
       error: async (err) => {
         this.cargando.set(false);
-        await this.dialogService.alert('Error al pagar el adelanto: ' + (err.error || err.message), 'Error');
+        const errorMessage = typeof err.error === 'string' ? err.error : (err.error?.message || err.message);
+        await this.dialogService.alert('Error al pagar el adelanto: ' + errorMessage, 'Error');
       }
     });
   }
