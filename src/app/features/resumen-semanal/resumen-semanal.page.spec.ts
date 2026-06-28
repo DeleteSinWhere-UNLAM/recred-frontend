@@ -73,7 +73,7 @@ describe('ResumenSemanalPage', () => {
     it('debería crear el componente e inicializar el resumen', () => {
       expect(component).toBeTruthy();
       expect(component.nombreUsuario).toBe('Test User');
-      expect(mockResumenService.getResumen).toHaveBeenCalledWith('user-id-123');
+      expect(mockResumenService.getResumen).toHaveBeenCalled();
       expect(component.hijos.length).toBe(2);
       expect(component.resumenProcesado?.mensajes[0].nombre).toBe('Ahorro');
     });

@@ -31,8 +31,7 @@ describe('ResumenSemanalService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('debería hacer una petición GET a la API con el usuarioId correcto', () => {
-    const mockUsuarioId = 'usuario-123';
+  it('debería hacer una petición GET a la API al endpoint /resumen/me', () => {
     const mockRespuesta: ResumenSemanal = {
       id: 'res-123',
       fechaDesde: '2023-01-01',
@@ -41,12 +40,12 @@ describe('ResumenSemanalService', () => {
     };
 
     // Llamamos al método
-    service.getResumen(mockUsuarioId).subscribe((data) => {
+    service.getResumen().subscribe((data) => {
       expect(data).toEqual(mockRespuesta);
     });
 
     // Esperamos que se haga una petición HTTP a la URL construida
-    const req = httpMock.expectOne(`${environment.apiUrl}/resumen/${mockUsuarioId}`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/resumen/me`);
     
     // Verificamos que sea de tipo GET
     expect(req.request.method).toBe('GET');
