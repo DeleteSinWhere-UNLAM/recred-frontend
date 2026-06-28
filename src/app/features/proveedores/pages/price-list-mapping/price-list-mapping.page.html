@@ -1,6 +1,6 @@
 <app-navbar [userName]="nombreKiosquero()" />
 
-<main class="mapping-container" (click)="closeProductDropdown()">
+<main class="mapping-container" (click)="closeProductDropdown()" tabindex="-1" (keydown.enter)="closeProductDropdown()">
   <header class="mapping-header">
     <button class="back-btn" (click)="volver()" aria-label="Volver a la ficha">
       <i class="fa-solid fa-arrow-left"></i> Volver a Ficha
@@ -68,7 +68,8 @@
             <!-- Product Mapped Dropdown Selector -->
             <td class="dropdown-cell">
               <!-- Match Badge & Selector Box -->
-              <div class="selector-box" (click)="openProductDropdown(item.id, $event)"
+              <div class="selector-box" (click)="openProductDropdown(item.id, $event)" tabindex="0"
+                (keydown.enter)="openProductDropdown(item.id, $event)"
                 [class.selector-box--suggested]="item.productoInventarioId && !item.mappingConfirmado"
                 [class.selector-box--unmapped]="!item.productoInventarioId && !item.mappingConfirmado"
                 [class.selector-box--confirmed]="item.mappingConfirmado">
@@ -94,9 +95,11 @@
               <!-- Dynamic Search Dropdown Overlay -->
               @if (activeDropdownRowId() === item.id) {
               <!-- Full screen click-catcher for closing dropdown -->
-              <div class="dropdown-overlay" (click)="closeProductDropdown()"></div>
+              <div class="dropdown-overlay" (click)="closeProductDropdown()" tabindex="-1"
+                (keydown.enter)="closeProductDropdown()"></div>
 
-              <div class="dropdown-menu" (click)="$event.stopPropagation()">
+              <div class="dropdown-menu" (click)="$event.stopPropagation()" tabindex="-1"
+                (keydown.enter)="$event.stopPropagation()">
                 <div class="dropdown-search">
                   <i class="fa-solid fa-magnifying-glass search-icon"></i>
                   <input type="text" placeholder="Buscar producto..." [(ngModel)]="productSearchQuery"
@@ -105,14 +108,14 @@
                 <ul class="dropdown-list">
                   <li class="dropdown-item dropdown-item--unmap"
                     [class.dropdown-item--selected]="item.mappingConfirmado && !item.productoInventarioId"
-                    (click)="selectProduct(item, null)">
+                    (click)="selectProduct(item, null)" tabindex="0" (keydown.enter)="selectProduct(item, null)">
                     <i class="fa-solid fa-ban text-danger"></i> <span
                       class="italic-text text-danger font-semibold">Producto fuera de inventario</span>
                   </li>
 
                   @for (prod of getFilteredInventoryProducts(); track prod.id) {
                   <li class="dropdown-item" [class.dropdown-item--selected]="prod.id === item.productoInventarioId"
-                    (click)="selectProduct(item, prod)">
+                    (click)="selectProduct(item, prod)" tabindex="0" (keydown.enter)="selectProduct(item, prod)">
                     <span>{{ prod.nombre }}</span>
                     <small class="dropdown-item__price">{{ prod.precio | currency: 'ARS': 'symbol-narrow': '1.0-0'
                       }}</small>

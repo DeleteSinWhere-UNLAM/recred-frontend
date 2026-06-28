@@ -135,7 +135,7 @@ export class SuppliersListPage implements OnInit {
     if (selected) {
       // Edit mode
       this.supplierService.updateSupplier(selected.id, payload).subscribe({
-        next: (updated) => {
+        next: () => {
           this.toastService.mostrar('Proveedor actualizado exitosamente', 'success');
           this.loadSuppliers();
           this.closeFormModal();
@@ -149,7 +149,7 @@ export class SuppliersListPage implements OnInit {
     } else {
       // Create mode
       this.supplierService.createSupplier(payload).subscribe({
-        next: (created) => {
+        next: () => {
           this.toastService.mostrar('Proveedor creado exitosamente', 'success');
           this.loadSuppliers();
           this.closeFormModal();

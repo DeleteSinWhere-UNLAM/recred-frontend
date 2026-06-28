@@ -80,7 +80,8 @@
         </div>
         } @else {
         <div class="drop-zone" [class.drop-zone--active]="isDragOver()" (dragover)="onDragOver($event)"
-          (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+          (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()" tabindex="0"
+          (keydown.enter)="fileInput.click()">
           <i class="fa-solid fa-cloud-arrow-up drop-zone__icon"></i>
           <h3 class="drop-zone__title">Arrastrá tu archivo aquí o hacé clic para seleccionar</h3>
           <p class="drop-zone__subtitle">Admite exclusivamente archivos PDF y CSV de hasta 5MB.</p>
@@ -112,7 +113,7 @@
             </thead>
             <tbody>
               @for (list of data.listasPrecios; track list.id) {
-              <tr class="history-row" (click)="verMapeo(list.id)">
+              <tr class="history-row" (click)="verMapeo(list.id)" tabindex="0" (keydown.enter)="verMapeo(list.id)">
                 <td>
                   <div class="file-cell">
                     <i class="fa-regular" [class.fa-file-pdf]="list.nombreOriginal.endsWith('.pdf')"
@@ -149,8 +150,9 @@
   }
   <!-- Consultar Precios Modal -->
   @if (isPricesModalOpen()) {
-  <div class="modal-overlay" (click)="closePricesModal()">
-    <div class="modal-dialog modal-dialog--large" (click)="$event.stopPropagation()">
+  <div class="modal-overlay" (click)="closePricesModal()" tabindex="-1" (keydown.enter)="closePricesModal()">
+    <div class="modal-dialog modal-dialog--large" (click)="$event.stopPropagation()" tabindex="-1"
+      (keydown.enter)="$event.stopPropagation()">
       <header class="modal-header">
         <h2 class="modal-title">
           <i class="fa-solid fa-tags"></i> Precios de Productos - {{ supplier()?.nombre }}

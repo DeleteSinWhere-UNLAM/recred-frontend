@@ -123,7 +123,7 @@ export class SupplierDetailPage implements OnInit {
         this.isUploading.set(false);
         this.toastService.mostrar('Lista de precios subida y procesada correctamente con IA', 'success');
         this.loadSupplier(); // Refresh details & history
-        
+
         // Navigate to the mapping page (Vista 3) of the newly uploaded price list
         this.router.navigate(['/kiosquero/proveedores/lista-precio', priceList.id]);
       },
@@ -158,7 +158,7 @@ export class SupplierDetailPage implements OnInit {
     this.isPricesModalOpen.set(false);
   }
 
-  getLatestPrices(): any[] {
+  getLatestPrices(): PrecioProducto[] {
     const data = this.supplier();
     if (!data || !data.listasPrecios) return [];
 
@@ -195,4 +195,12 @@ export class SupplierDetailPage implements OnInit {
       .filter(p => p.nombre.toLowerCase().includes(query))
       .sort((a, b) => a.nombre.localeCompare(b.nombre));
   }
+}
+
+export interface PrecioProducto {
+  nombre: string;
+  precio: number;
+  fecha: string;
+  unidad: string;
+  lista: string;
 }

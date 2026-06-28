@@ -84,7 +84,7 @@ export class PriceListMappingPage implements OnInit {
         if (foundSupplier && foundList) {
           this.supplier.set(foundSupplier);
           this.priceList.set(foundList);
-          
+
           // Fetch full supplier details to get items
           this.supplierService.getSupplierById(foundSupplier.id).subscribe({
             next: (detail) => {
@@ -135,7 +135,6 @@ export class PriceListMappingPage implements OnInit {
 
   selectProduct(item: ItemListaPrecioProveedorResponse, product: Producto | null): void {
     const productId = product ? product.id : null;
-    const productName = product ? product.nombre : null;
 
     this.supplierService.updateMapping(item.id, productId).subscribe({
       next: (updated) => {
