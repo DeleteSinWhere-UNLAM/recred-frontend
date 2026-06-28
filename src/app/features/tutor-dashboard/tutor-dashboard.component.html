@@ -374,9 +374,9 @@
           <p>Vas a transferir <strong>${{ transferAmounts[transferSourceChild.studentId] | number:'1.0-0' }}</strong> desde la cuenta de <strong>{{ transferSourceChild.studentName }}</strong>.</p>
           
           <div class="modal-field">
-            <label class="modal-label">Destinatario</label>
+            <label class="modal-label" for="transferTarget">Destinatario</label>
             <div class="modal-input-wrap">
-              <select class="modal-input custom-select" [(ngModel)]="transferTargetChildId">
+              <select id="transferTarget" class="modal-input custom-select" [(ngModel)]="transferTargetChildId">
                 <option value="" disabled>Selecciona un destinatario...</option>
                 @for (c of globalSummary.children; track c.studentId) {
                   @if (c.studentId !== transferSourceChild.studentId) {

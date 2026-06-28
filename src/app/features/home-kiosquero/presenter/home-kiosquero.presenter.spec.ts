@@ -297,6 +297,7 @@ describe('HomeKiosqueroPresenter', () => {
       'recomendaciones',
       'promociones',
       'cierre-diario',
+      'proveedores',
     ]);
     expect(presenter.featuredActions().map((accion) => accion.id)).toEqual([
       'venta-espontanea',
@@ -305,7 +306,9 @@ describe('HomeKiosqueroPresenter', () => {
       'sugerencias',
       'cierre-diario',
     ]);
-    expect(presenter.secondaryActions().map((accion) => accion.id)).toEqual([]);
+    expect(presenter.secondaryActions().map((accion) => accion.id)).toEqual([
+      'proveedores',
+    ]);
   });
 
   it('formatea ventas por categoria con porcentaje de barra y porcentaje real', () => {

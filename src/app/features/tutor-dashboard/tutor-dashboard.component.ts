@@ -54,7 +54,7 @@ export class TutorDashboardComponent implements OnInit {
   // Modal transfer state
   showTransferModal = false;
   transferSourceChild: ChildDashboardSummary | null = null;
-  transferTargetChildId: string = '';
+  transferTargetChildId = '';
   isTransferring = false;
 
   // Grid state
