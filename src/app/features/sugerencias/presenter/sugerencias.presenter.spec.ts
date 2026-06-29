@@ -23,7 +23,7 @@ describe('SugerenciasPresenter', () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
     mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
     mockProductoService = jasmine.createSpyObj('ProductoService', ['getById']);
-    mockProductoService.getById.and.returnValue(of({} as any));
+    mockProductoService.getById.and.returnValue(of({} as unknown as Producto));
 
     TestBed.configureTestingModule({
       providers: [
@@ -112,7 +112,7 @@ describe('SugerenciasPresenter', () => {
         estadisticasVenta: { productoId: 'P1' }
       } as unknown as SugerenciaProducto;
       presenter.seleccionarProducto(mockSugerencia);
-      mockProductoService.getById.and.callFake((id) => of({ id, urlImagen: `http://res.cloudinary.com/djzfudbze/image/upload/v1/${id}.png` } as any));
+      mockProductoService.getById.and.callFake((id) => of({ id, urlImagen: `http://res.cloudinary.com/djzfudbze/image/upload/v1/${id}.png` } as unknown as Producto));
       mockPromotionService.createPromotion.and.returnValue(of({} as Promotion));
 
       presenter.generatePromotion({

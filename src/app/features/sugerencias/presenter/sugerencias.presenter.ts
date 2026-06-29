@@ -72,7 +72,16 @@ export class SugerenciasPresenter {
       forkJoin(
         productIds.map(id => 
           this.productService.getById(id).pipe(
-            catchError(() => of({ id, urlImagen: null } as any))
+            catchError(() => of({
+              id,
+              nombre: '',
+              descripcion: '',
+              precio: 0,
+              peso: 0,
+              requierePreparacion: false,
+              stockActual: 0,
+              urlImagen: null
+            } as Producto))
           )
         )
       ).pipe(

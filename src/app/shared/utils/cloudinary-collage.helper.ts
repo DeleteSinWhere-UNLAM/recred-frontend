@@ -22,7 +22,7 @@ export function getCloudinaryPublicId(url: string): string {
     
     // Replace slashes with colons for Cloudinary overlay format
     return path.replace(/\//g, ':');
-  } catch (e) {
+  } catch {
     return fallback;
   }
 }
