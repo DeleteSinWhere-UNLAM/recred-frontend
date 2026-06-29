@@ -9,7 +9,8 @@ export interface EnableSchoolCreditRequest {
 }
 
 export interface SchoolCredit {
-  id: string;
+  id?: string;
+  creditId?: string;
   studentId: string;
   amount: number;
   installments: number;

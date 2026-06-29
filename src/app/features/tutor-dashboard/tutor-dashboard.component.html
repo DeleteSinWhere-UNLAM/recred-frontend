@@ -77,14 +77,15 @@
                 [attr.draggable]="esPlanGratuito ? 'false' : 'true'"
                 (dragstart)="onDragStart($event, child)"
                 (dragend)="onDragEnd($event)"
-                [attr.title]="esPlanGratuito ? 'Disponible en Planes Premium' : 'Arrastrar para transferir'"
-                (click)="$event.stopPropagation()"
+                [attr.title]="esPlanGratuito ? 'Disponible en Planes Premium' : 'Presiona o arrastra para transferir'"
+                (click)="openTransferModal(child); $event.stopPropagation()"
                 (keydown.enter)="$event.stopPropagation()"
                 tabindex="0">
                 @if (esPlanGratuito) {
                   <i class="fa-solid fa-lock" style="color: var(--color-dorado);"></i>
                 } @else {
-                  <i class="fa-solid fa-money-bill-wave" style="font-size: 28px; color: white; pointer-events: none;"></i>                }
+                  <i class="fa-solid fa-money-bill-wave" style="font-size: 28px; color: white; pointer-events: none;"></i>
+                }
               </div>
             </div>
           </div>
@@ -352,6 +353,49 @@
         <div class="modal-actions">
           <button class="modal-btn-cancelar" (click)="closeSmartActionModal()">Descartar</button>
           <button class="modal-btn-confirmar" (click)="applySmartAction()">Aceptar e Implementar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Transfer Modal -->
+  @if (showTransferModal && transferSourceChild && globalSummary) {
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <button class="modal-close" (click)="closeTransferModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <h2 class="modal-title">
+          Transferir Saldo
+        </h2>
+        
+        <div class="modal-body">
+          <p>Vas a transferir <strong>${{ transferAmounts[transferSourceChild.studentId] | number:'1.0-0' }}</strong> desde la cuenta de <strong>{{ transferSourceChild.studentName }}</strong>.</p>
+          
+          <div class="modal-field">
+            <label class="modal-label" for="transferTarget">Destinatario</label>
+            <div class="modal-input-wrap">
+              <select id="transferTarget" class="modal-input custom-select" [(ngModel)]="transferTargetChildId">
+                <option value="" disabled>Selecciona un destinatario...</option>
+                @for (c of globalSummary.children; track c.studentId) {
+                  @if (c.studentId !== transferSourceChild.studentId) {
+                    <option [value]="c.studentId">{{ c.studentName }}</option>
+                  }
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn-cancelar" (click)="closeTransferModal()" [disabled]="isTransferring">Cancelar</button>
+          <button class="modal-btn-confirmar" (click)="confirmTransfer()" [disabled]="isTransferring">
+            @if (isTransferring) {
+              <i class="fa-solid fa-spinner fa-spin"></i> Transfiriendo...
+            } @else {
+              Confirmar
+            }
+          </button>
         </div>
       </div>
     </div>
