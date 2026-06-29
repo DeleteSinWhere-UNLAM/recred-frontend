@@ -1,0 +1,212 @@
+<app-navbar [userName]="nombreKiosquero()" />
+
+<main class="suppliers-container">
+  <header class="suppliers-header">
+    <button class="back-btn" (click)="volverHome()" aria-label="Volver al inicio">
+      <i class="fa-solid fa-arrow-left"></i> Volver
+    </button>
+    <div class="suppliers-header__content">
+      <div class="suppliers-header__text">
+        <h1 class="suppliers-header__title">Gestión de Proveedores</h1>
+        <p class="suppliers-header__subtitle">Administrá tu directorio de proveedores, subí listas de precios y compará
+          ofertas.</p>
+      </div>
+      <div class="suppliers-header__actions">
+        <button class="action-btn action-btn--secondary" (click)="irComparador()">
+          <i class="fa-solid fa-calculator"></i> Comparar Precios
+        </button>
+        <button class="action-btn action-btn--primary" (click)="openAddModal()">
+          <i class="fa-solid fa-plus"></i> Agregar Proveedor
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search & Filter Card -->
+  <section class="filters-card" aria-label="Buscador de proveedores">
+    <div class="search-input-wrap">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" placeholder="Buscar por nombre, días de visita o notas..." [ngModel]="searchQuery()"
+        (ngModelChange)="onSearchChange($event)" class="search-control" />
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  @if (isLoading() && filteredSuppliers().length === 0) {
+  <div class="loading-state">
+    <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
+    <p>Cargando proveedores...</p>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && filteredSuppliers().length === 0) {
+  <div class="empty-state">
+    <i class="fa-solid fa-truck-field empty-state__icon"></i>
+    <h3 class="empty-state__title">No se encontraron proveedores</h3>
+    <p class="empty-state__text">
+      @if (searchQuery()) {
+      No hay coincidencias para tu búsqueda. Intentá con otro término.
+      } @else {
+      Registrá tus proveedores de mercadería para empezar a gestionar sus listas de precios e IA auto-matching.
+      }
+    </p>
+    @if (!searchQuery()) {
+    <button class="action-btn action-btn--primary" (click)="openAddModal()">
+      Registrar Primer Proveedor
+    </button>
+    }
+  </div>
+  }
+
+  <!-- Suppliers Grid -->
+  @if (filteredSuppliers().length > 0) {
+  <div class="suppliers-grid">
+    @for (supplier of filteredSuppliers(); track supplier.id) {
+    <article class="supplier-card" (click)="verFicha(supplier.id)" tabindex="0" (keydown.enter)="verFicha(supplier.id)">
+      <div class="supplier-card__header">
+        <div class="supplier-card__avatar">
+          {{ supplier.nombre.substring(0, 2).toUpperCase() }}
+        </div>
+        <div class="supplier-card__identity">
+          <h3 class="supplier-card__name">{{ supplier.nombre }}</h3>
+          <span class="supplier-card__visits-badge">
+            <i class="fa-regular fa-calendar-days"></i> Visita: {{ supplier.diasVisita || 'No programada' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="supplier-card__body">
+        <div class="supplier-card__contact-row">
+          <i class="fa-solid fa-phone"></i>
+          <span>{{ supplier.telefono || 'Sin teléfono' }}</span>
+        </div>
+        <div class="supplier-card__contact-row">
+          <i class="fa-solid fa-envelope"></i>
+          <span class="email-text">{{ supplier.email || 'Sin correo' }}</span>
+        </div>
+        @if (supplier.notas) {
+        <div class="supplier-card__notes">
+          <strong>Notas:</strong> {{ supplier.notas }}
+        </div>
+        }
+      </div>
+
+      <div class="supplier-card__actions">
+        <button class="card-btn card-btn--edit" (click)="openEditModal(supplier, $event)" aria-label="Editar">
+          <i class="fa-solid fa-pen-to-square"></i> Editar
+        </button>
+        <button class="card-btn card-btn--delete" (click)="openDeleteModal(supplier, $event)" aria-label="Eliminar">
+          <i class="fa-solid fa-trash-can"></i> Eliminar
+        </button>
+        <button class="card-btn card-btn--view">
+          Ver Ficha <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </article>
+    }
+  </div>
+  }
+
+  <!-- Add / Edit Supplier Modal -->
+  @if (isFormModalOpen()) {
+  <div class="modal-overlay" (click)="closeFormModal()" tabindex="-1" (keydown.enter)="closeFormModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" tabindex="-1"
+      (keydown.enter)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2 class="modal-title">
+          {{ selectedSupplier() ? 'Editar Proveedor' : 'Registrar Proveedor' }}
+        </h2>
+        <button class="modal-close-btn" (click)="closeFormModal()">&times;</button>
+      </header>
+
+      <form [formGroup]="supplierForm" (ngSubmit)="saveSupplier()" class="modal-form">
+        <div class="form-group">
+          <label for="nombre">Nombre del Proveedor <span class="required">*</span></label>
+          <input id="nombre" type="text" formControlName="nombre" placeholder="Ej. Distribuidora Coca-Cola, Arcor"
+            class="form-control"
+            [class.form-control--error]="supplierForm.get('nombre')?.invalid && supplierForm.get('nombre')?.touched" />
+          @if (supplierForm.get('nombre')?.invalid && supplierForm.get('nombre')?.touched) {
+          <small class="error-msg">El nombre es obligatorio y debe tener al menos 2 caracteres.</small>
+          }
+        </div>
+
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" type="text" formControlName="telefono" placeholder="Ej. +54 9 11 1234-5678"
+              class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" formControlName="email" placeholder="Ej. ventas@proveedor.com"
+              class="form-control"
+              [class.form-control--error]="supplierForm.get('email')?.invalid && supplierForm.get('email')?.touched" />
+            @if (supplierForm.get('email')?.invalid && supplierForm.get('email')?.touched) {
+            <small class="error-msg">Ingresá un correo electrónico válido.</small>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="diasVisita">Días de Visita / Entrega</label>
+          <input id="diasVisita" type="text" formControlName="diasVisita" placeholder="Ej. Lunes y Jueves, Quincenal"
+            class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label for="notas">Notas Internas</label>
+          <textarea id="notas" formControlName="notas"
+            placeholder="Notas rápidas sobre el proveedor, plazos de pago, etc." rows="3"
+            class="form-control"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="modal-btn modal-btn--cancel" (click)="closeFormModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="modal-btn modal-btn--submit" [disabled]="supplierForm.invalid || isLoading()">
+            @if (isLoading()) {
+            <i class="fa-solid fa-spinner fa-spin"></i> Guardando...
+            } @else {
+            {{ selectedSupplier() ? 'Guardar Cambios' : 'Registrar Proveedor' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- Delete Confirmation Modal -->
+  @if (isDeleteModalOpen()) {
+  <div class="modal-overlay" (click)="closeDeleteModal()" tabindex="-1" (keydown.enter)="closeDeleteModal()">
+    <div class="modal-dialog modal-dialog--confirm" (click)="$event.stopPropagation()" tabindex="-1"
+      (keydown.enter)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2 class="modal-title text-danger">Confirmar Eliminación</h2>
+        <button class="modal-close-btn" (click)="closeDeleteModal()">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar al proveedor <strong>{{ selectedSupplier()?.nombre }}</strong>?</p>
+        <p class="warning-text"><i class="fa-solid fa-triangle-exclamation"></i> Esta acción no se puede deshacer y
+          podría afectar el historial de listas de precios asociadas.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn--cancel" (click)="closeDeleteModal()" [disabled]="isLoading()">
+          Cancelar
+        </button>
+        <button class="modal-btn modal-btn--danger" (click)="confirmDelete()" [disabled]="isLoading()">
+          @if (isLoading()) {
+          <i class="fa-solid fa-spinner fa-spin"></i> Eliminando...
+          } @else {
+          Eliminar Proveedor
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</main>

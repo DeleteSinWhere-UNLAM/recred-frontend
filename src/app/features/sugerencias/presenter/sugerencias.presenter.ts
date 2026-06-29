@@ -1,11 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, forkJoin, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { SugerenciaProducto, EstadisticasVenta, SuggestedProduct } from '../models/sugerencia-producto.model';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
 import { PromotionFormData } from '../components/combo-promotion-modal/combo-promotion-modal.component';
 import { ToastService } from '../../../shared/services/toast.service';
+import { ProductoService } from '../../inventario/services/producto.service';
+import { Producto } from '../../inventario/models/producto.interface';
+import { buildCloudinaryCollageUrl } from '../../../shared/utils/cloudinary-collage.helper';
 
 @Injectable()
 export class SugerenciasPresenter {
@@ -27,10 +31,11 @@ export class SugerenciasPresenter {
   private readonly promotionService = inject(PromotionService);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
+  private readonly productService = inject(ProductoService);
 
   initialize(userId: string): void {
     this.userId = userId;
-    this.sugerenciasService.getSugerencias(this.userId).subscribe((data) => {
+    this.sugerenciasService.getSugerencias().subscribe((data) => {
       this._sugerencias.next(data);
       if (this.hasSugerencias(data)) {
         this.seleccionarProducto(data[0]);
@@ -46,7 +51,7 @@ export class SugerenciasPresenter {
     const selected = this._sugerenciaSeleccionada.getValue();
 
     if (this.hasSelectedProduct(selected)) {
-      this.sugerenciasService.getComboSuggestions(selected.estadisticasVenta.productoId, this.userId)
+      this.sugerenciasService.getComboSuggestions(selected.estadisticasVenta.productoId)
         .subscribe((suggestions) => {
           console.log(suggestions);
           this._suggestedProducts.next(suggestions.suggestedProducts);
@@ -63,15 +68,40 @@ export class SugerenciasPresenter {
   generatePromotion(formData: PromotionFormData): void {
     const selected = this._sugerenciaSeleccionada.getValue();
     if (this.hasSelectedProduct(selected)) {
-      const promotionData = {
-        name: `Combo ${selected.productoOriginal}`,
-        discountPercentage: formData.discountPercentage,
-        startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
-        productIds: [selected.estadisticasVenta.productoId, ...formData.productIds]
-      };
-      console.log(promotionData)
-      this.promotionService.createPromotion(promotionData).subscribe({
+      const productIds = [selected.estadisticasVenta.productoId, ...formData.productIds];
+      
+      forkJoin(
+        productIds.map(id => 
+          this.productService.getById(id).pipe(
+            catchError(() => of({
+              id,
+              nombre: '',
+              descripcion: '',
+              precio: 0,
+              peso: 0,
+              requierePreparacion: false,
+              stockActual: 0,
+              urlImagen: null
+            } as Producto))
+          )
+        )
+      ).pipe(
+        switchMap((products) => {
+          const imageUrls = products.map(p => p.urlImagen);
+          const collageUrl = buildCloudinaryCollageUrl(imageUrls);
+          
+          const promotionData = {
+            name: `Combo ${selected.productoOriginal}`,
+            discountPercentage: formData.discountPercentage,
+            startDate: new Date(formData.startDate).toISOString(),
+            endDate: new Date(formData.endDate).toISOString(),
+            productIds: productIds,
+            imageUrl: collageUrl
+          };
+          
+          return this.promotionService.createPromotion(promotionData);
+        })
+      ).subscribe({
         next: () => {
           this.closeComboPromotionModal();
           this.toastService.mostrar("Combo creado exitosamente", "success");

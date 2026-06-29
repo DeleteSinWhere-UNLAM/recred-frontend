@@ -12,6 +12,7 @@ export type AccionKiosqueroId =
   | 'oportunidades-stock'
   | 'promociones'
   | 'proveedores';
+
 export type AccionKiosqueroColor =
   | 'pizarra'
   | 'menta'

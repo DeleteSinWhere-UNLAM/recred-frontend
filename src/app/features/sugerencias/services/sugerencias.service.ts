@@ -16,9 +16,9 @@ export class SugerenciasService {
 
   private readonly baseUrl = environment.apiUrl;
 
-  getSugerencias(usuarioId: string): Observable<SugerenciaProducto[]> {
+  getSugerencias(): Observable<SugerenciaProducto[]> {
     return this.http.get<SugerenciaProducto[]>(
-      `${this.baseUrl}/kiosqueros/${usuarioId}/lista-sugerencia-cambio-producto`,
+      `${this.baseUrl}/kiosqueros/me/lista-sugerencia-cambio-producto`,
     );
   }
 
@@ -30,9 +30,9 @@ export class SugerenciasService {
     );
   }
 
-  getComboSuggestions(productId: string, userId: string): Observable<ComboSuggestion> {
+  getComboSuggestions(productId: string): Observable<ComboSuggestion> {
     return this.http.get<ComboSuggestion>(
-      `${this.baseUrl}/combo-suggestions/${productId}/${userId}`,
+      `${this.baseUrl}/combo-suggestions/${productId}`,
     );
   }
 }

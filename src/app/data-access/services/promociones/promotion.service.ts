@@ -13,6 +13,7 @@ export interface Promotion {
   endDate: string;
   status: string;
   buffetId?: string;
+  imageUrl?: string;
 }
 
 @Injectable({

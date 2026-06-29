@@ -12,9 +12,9 @@ export class ResumenSemanalService {
 
   private readonly baseUrl = environment.apiUrl;
 
-  getResumen(usuarioId: string): Observable<ResumenSemanal> {
+  getResumen(): Observable<ResumenSemanal> {
     return this.http.get<ResumenSemanal>(
-      `${this.baseUrl}/resumen/${usuarioId}`,
+      `${this.baseUrl}/resumen/me`,
     );
   }
 }

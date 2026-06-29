@@ -36,11 +36,11 @@ export class SugerenciasAgregarPresenter {
 
   private readonly sugerenciasService = inject(SugerenciasAgregarService);
 
-  initialize(userId: string): void {
+  initialize(): void {
     this._isLoading.next(true);
     this._error.next(null);
 
-    this.sugerenciasService.getSugerenciasAgregarProducto(userId).subscribe({
+    this.sugerenciasService.getSugerenciasAgregarProducto().subscribe({
       next: (data) => {
         this._sugerencias.next(data);
         this._isLoading.next(false);

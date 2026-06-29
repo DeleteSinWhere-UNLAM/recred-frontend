@@ -1,0 +1,211 @@
+<app-navbar [userName]="nombreKiosquero()" />
+
+<main class="detail-container">
+  <header class="detail-header">
+    <button class="back-btn" (click)="volver()" aria-label="Volver al directorio">
+      <i class="fa-solid fa-arrow-left"></i> Volver a Proveedores
+    </button>
+    <h1 class="detail-title">Ficha del Proveedor</h1>
+  </header>
+
+  @if (isLoading() && !supplier()) {
+  <div class="loading-state">
+    <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
+    <p>Cargando información del proveedor...</p>
+  </div>
+  }
+
+  @if (supplier(); as data) {
+  <div class="detail-layout">
+    <!-- Profile Sidebar Card -->
+    <aside class="profile-card">
+      <div class="profile-card__header">
+        <div class="profile-card__avatar">
+          {{ data.nombre.substring(0,2).toUpperCase() }}
+        </div>
+        <h2 class="profile-card__name">{{ data.nombre }}</h2>
+        <span class="profile-card__badge">Proveedor Activo</span>
+      </div>
+
+      <div class="profile-card__details">
+        <div class="detail-row">
+          <span class="detail-row__label"><i class="fa-solid fa-phone"></i> Teléfono</span>
+          <span class="detail-row__value">{{ data.telefono || 'No especificado' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-row__label"><i class="fa-solid fa-envelope"></i> Email</span>
+          <span class="detail-row__value email-text">{{ data.email || 'No especificado' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-row__label"><i class="fa-solid fa-calendar-day"></i> Días de Visita</span>
+          <span class="detail-row__value">{{ data.diasVisita || 'No programada' }}</span>
+        </div>
+
+        @if (data.notas) {
+        <div class="profile-card__notes">
+          <h3 class="profile-card__notes-title">Notas de Gestión</h3>
+          <p class="profile-card__notes-text">{{ data.notas }}</p>
+        </div>
+        }
+
+        <button class="consult-prices-btn animate-hover" (click)="openPricesModal()">
+          <i class="fa-solid fa-tags"></i> Consultar precios de productos
+        </button>
+      </div>
+    </aside>
+
+    <!-- Upload Zone & History -->
+    <section class="main-content" aria-label="Historial de listas de precios e IA">
+      <!-- File Upload Zone -->
+      <article class="upload-card">
+        <h2 class="section-title">Actualizar Lista de Precios</h2>
+        <p class="section-description">Subí una nueva lista de precios para que se extraigan los
+          productos y se actualicen los precios.</p>
+
+        @if (isUploading()) {
+        <div class="upload-processing">
+          <div class="spinner-container">
+            <i class="fa-solid fa-gear fa-spin gear-left"></i>
+            <i class="fa-solid fa-robot pulse-icon"></i>
+            <i class="fa-solid fa-gear fa-spin gear-right"></i>
+          </div>
+          <h3 class="upload-processing__title">Procesando lista...</h3>
+          <p class="upload-processing__subtitle">Estamos extrayendo los productos, costos y unidades para asociarlos con
+            tu inventario. Esto puede demorar unos segundos.</p>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill"></div>
+          </div>
+        </div>
+        } @else {
+        <div class="drop-zone" [class.drop-zone--active]="isDragOver()" (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()" tabindex="0"
+          (keydown.enter)="fileInput.click()">
+          <i class="fa-solid fa-cloud-arrow-up drop-zone__icon"></i>
+          <h3 class="drop-zone__title">Arrastrá tu archivo aquí o hacé clic para seleccionar</h3>
+          <p class="drop-zone__subtitle">Admite exclusivamente archivos PDF y CSV de hasta 5MB.</p>
+          <input #fileInput type="file" accept=".pdf,.csv" (change)="onFileSelected($event)"
+            class="hidden-file-input" />
+        </div>
+        }
+      </article>
+
+      <!-- Price Lists History -->
+      <article class="history-card">
+        <h2 class="section-title">Historial de Listas Cargadas</h2>
+
+        @if (!data.listasPrecios || data.listasPrecios.length === 0) {
+        <div class="history-empty">
+          <i class="fa-solid fa-receipt history-empty__icon"></i>
+          <p class="history-empty__text">No hay listas de precios registradas para este proveedor.</p>
+        </div>
+        } @else {
+        <div class="table-responsive">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Nombre de Archivo</th>
+                <th>Fecha de Carga</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (list of data.listasPrecios; track list.id) {
+              <tr class="history-row" (click)="verMapeo(list.id)" tabindex="0" (keydown.enter)="verMapeo(list.id)">
+                <td>
+                  <div class="file-cell">
+                    <i class="fa-regular" [class.fa-file-pdf]="list.nombreOriginal.endsWith('.pdf')"
+                      [class.fa-file-excel]="list.nombreOriginal.endsWith('.csv')"></i>
+                    <span class="file-name">{{ list.nombreOriginal }}</span>
+                  </div>
+                </td>
+                <td>{{ list.creadoEn | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  <span class="status-badge" [class.status-badge--active]="list.activa">
+                    {{ list.activa ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions-cell">
+                    <button class="btn-action btn-action--download" (click)="descargarArchivo(list.urlArchivo, $event)"
+                      title="Descargar original">
+                      <i class="fa-solid fa-download"></i>
+                    </button>
+                    <button class="btn-action btn-action--map" title="Revisar mapeos de productos">
+                      Mapeo <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </article>
+    </section>
+  </div>
+  }
+  <!-- Consultar Precios Modal -->
+  @if (isPricesModalOpen()) {
+  <div class="modal-overlay" (click)="closePricesModal()" tabindex="-1" (keydown.enter)="closePricesModal()">
+    <div class="modal-dialog modal-dialog--large" (click)="$event.stopPropagation()" tabindex="-1"
+      (keydown.enter)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2 class="modal-title">
+          <i class="fa-solid fa-tags"></i> Precios de Productos - {{ supplier()?.nombre }}
+        </h2>
+        <button class="modal-close-btn" (click)="closePricesModal()">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <div class="search-input-wrap shadow-search mb-4">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" placeholder="Buscar producto..." [(ngModel)]="pricesSearchQuery"
+            class="search-control search-control--modal" />
+        </div>
+
+        @if (getLatestPrices().length === 0) {
+        <div class="prices-empty">
+          <i class="fa-solid fa-circle-question"></i>
+          <p>No se encontraron productos o no hay precios cargados para este proveedor.</p>
+        </div>
+        } @else {
+        <div class="table-responsive table-modal-scroll">
+          <table class="prices-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Unidad</th>
+                <th>Última Actualización</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (prod of getLatestPrices(); track prod.nombre) {
+              <tr>
+                <td class="font-semibold">{{ prod.nombre }}</td>
+                <td class="font-semibold price-col">
+                  {{ prod.precio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+                </td>
+                <td><span class="unit-pill">{{ prod.unidad }}</span></td>
+                <td>{{ prod.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn--cancel" (click)="closePricesModal()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</main>

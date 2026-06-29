@@ -9,7 +9,6 @@ describe('SugerenciasAgregarService', () => {
   let service: SugerenciasAgregarService;
   let httpMock: HttpTestingController;
 
-  const mockUserId = 'user-123';
   const baseUrl = environment.apiUrl;
 
   const mockResponse: SugerenciaAgregarProducto[] = [
@@ -51,11 +50,11 @@ describe('SugerenciasAgregarService', () => {
   });
 
   it('getSugerenciasAgregarProducto debería hacer un GET al endpoint correcto', () => {
-    service.getSugerenciasAgregarProducto(mockUserId).subscribe((data) => {
+    service.getSugerenciasAgregarProducto().subscribe((data) => {
       expect(data).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne(`${baseUrl}/sugerencias/agregar-producto/${mockUserId}`);
+    const req = httpMock.expectOne(`${baseUrl}/sugerencias/agregar-producto`);
     expect(req.request.method).toBe('GET');
     req.flush(mockResponse);
   });

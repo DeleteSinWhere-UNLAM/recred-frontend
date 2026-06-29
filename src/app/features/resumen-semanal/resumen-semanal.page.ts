@@ -41,7 +41,7 @@ export class ResumenSemanalPage {
     const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
 
     if (usuarioId) {
-      this.resumenService.getResumen(usuarioId).subscribe((data) => {
+      this.resumenService.getResumen().subscribe((data) => {
         this.resumen = data;
 
         const resumenInterno = JSON.parse(data.resumen);

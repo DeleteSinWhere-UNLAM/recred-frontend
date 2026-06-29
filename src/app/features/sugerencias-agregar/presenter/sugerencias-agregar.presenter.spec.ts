@@ -54,9 +54,9 @@ describe('SugerenciasAgregarPresenter', () => {
   it('debería inicializarse correctamente y cargar sugerencias', () => {
     mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(of(mockData));
     
-    presenter.initialize('user-1');
+    presenter.initialize();
 
-    expect(mockSugerenciasAgregarService.getSugerenciasAgregarProducto).toHaveBeenCalledWith('user-1');
+    expect(mockSugerenciasAgregarService.getSugerenciasAgregarProducto).toHaveBeenCalled();
     
     presenter.sugerencias$.subscribe(s => {
       expect(s).toEqual(mockData);
@@ -74,7 +74,7 @@ describe('SugerenciasAgregarPresenter', () => {
   it('debería manejar errores al inicializar', () => {
     mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('Error')));
     
-    presenter.initialize('user-1');
+    presenter.initialize();
 
     presenter.error$.subscribe(error => {
       expect(error).toBe('No se pudieron cargar las oportunidades de stock.');
@@ -88,7 +88,7 @@ describe('SugerenciasAgregarPresenter', () => {
   describe('KPIs computados', () => {
     beforeEach(() => {
       mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(of(mockData));
-      presenter.initialize('user-1');
+      presenter.initialize();
     });
 
     it('debería calcular totalProductos correctamente', () => {
@@ -115,7 +115,7 @@ describe('SugerenciasAgregarPresenter', () => {
   describe('Chart data y Producto Cards', () => {
     beforeEach(() => {
       mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(of(mockData));
-      presenter.initialize('user-1');
+      presenter.initialize();
     });
 
     it('debería generar chartData ordenado por ingresos y calcular ingresoPercent relativo al maximo', () => {
