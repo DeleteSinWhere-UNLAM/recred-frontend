@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { PreferenciasDetectadasService } from './preferencias-detectadas.service';
 import { PreferenciaDetectada } from '../models/preferencia-detectada.model';
+import { PreferenciasDetectadasMother } from '../preferencias-detectadas.mother';
 
 describe('PreferenciasDetectadasService', () => {
   let service: PreferenciasDetectadasService;
@@ -29,17 +30,7 @@ describe('PreferenciasDetectadasService', () => {
     it('debería solicitar las preferencias del tutor realizando un GET al endpoint correspondiente', () => {
       
       const userIdMock = 'user-123';
-      const mockRespuesta: PreferenciaDetectada[] = [{
-        sugerenciaId: 'sug-1',
-        alumnoId: 'al-1',
-        alumnoUserId: 'user-al-1',
-        alumnoNombre: 'Juancito',
-        tipo: 'COMPRA',
-        titulo: 'Le gustan los alfajores',
-        mensaje: 'Compra muchos alfajores',
-        productoId: 'prod-1',
-        razonIA: 'Por frecuencia'
-      }];
+      const mockRespuesta: PreferenciaDetectada[] = [PreferenciasDetectadasMother.crearPreferencia()];
       let respuestaObtenida: PreferenciaDetectada[] | undefined;
 
       service.getPreferencias(userIdMock).subscribe((data) => {

@@ -1,23 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PreferenciaDetectadaCardComponent } from './preferencia-detectada-card.component';
 import { PreferenciaDetectada } from '../../models/preferencia-detectada.model';
+import { PreferenciasDetectadasMother } from '../../preferencias-detectadas.mother';
 
-class PreferenciaDetectadaCardMother {
-  static crearPreferencia(override: Partial<PreferenciaDetectada> = {}): PreferenciaDetectada {
-    return {
-      sugerenciaId: 'sug-1',
-      alumnoId: 'al-1',
-      alumnoUserId: 'user-al-1',
-      alumnoNombre: 'Juancito',
-      tipo: 'COMPRA',
-      titulo: 'Le gustan los alfajores',
-      mensaje: 'Compra muchos alfajores',
-      productoId: 'prod-1',
-      razonIA: 'Por frecuencia',
-      ...override
-    } as unknown as PreferenciaDetectada;
-  }
-}
+
 
 describe('PreferenciaDetectadaCardComponent', () => {
   let component: PreferenciaDetectadaCardComponent;
@@ -33,7 +19,7 @@ describe('PreferenciaDetectadaCardComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(PreferenciaDetectadaCardComponent);
       component = fixture.componentInstance;
-      component.preferencia = PreferenciaDetectadaCardMother.crearPreferencia();
+      component.preferencia = PreferenciasDetectadasMother.crearPreferencia();
       fixture.detectChanges();
     });
 

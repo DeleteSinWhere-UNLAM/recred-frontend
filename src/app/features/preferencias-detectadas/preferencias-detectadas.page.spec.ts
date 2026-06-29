@@ -7,31 +7,9 @@ import { Component, Input, signal } from '@angular/core';
 import { PreferenciaDetectada } from './models/preferencia-detectada.model';
 import { PreferenciaDetectadaCardComponent } from './components/preferencia-detectada-card/preferencia-detectada-card.component';
 import { Usuario } from '../../data-access/models/usuario.model';
+import { PreferenciasDetectadasMother } from './preferencias-detectadas.mother';
 
-class PreferenciasDetectadasMother {
-  static crearUsuario(override: Partial<Usuario> = {}): Usuario {
-    return {
-      id: 'user-id-123',
-      nombre: 'Test User',
-      ...override
-    } as unknown as Usuario;
-  }
 
-  static crearPreferencia(override: Partial<PreferenciaDetectada> = {}): PreferenciaDetectada {
-    return {
-      sugerenciaId: 'sug-1',
-      alumnoId: 'al-1',
-      alumnoUserId: 'user-al-1',
-      alumnoNombre: 'Juancito',
-      tipo: 'COMPRA',
-      titulo: 'Le gustan los alfajores',
-      mensaje: 'Compra muchos alfajores',
-      productoId: 'prod-1',
-      razonIA: 'Por frecuencia',
-      ...override
-    } as unknown as PreferenciaDetectada;
-  }
-}
 
 @Component({
   selector: 'app-preferencia-detectada-card',
