@@ -34,7 +34,7 @@ export class SugerenciasAgregarPresenter {
   private readonly _error = new BehaviorSubject<string | null>(null);
   readonly error$ = this._error.asObservable();
 
-  private readonly sugerenciasService = inject(SugerenciasAgregarService);
+  constructor(private readonly sugerenciasService: SugerenciasAgregarService) {}
 
   initialize(): void {
     this._isLoading.next(true);

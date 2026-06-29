@@ -1,149 +1,221 @@
-import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { SugerenciasAgregarPresenter } from './sugerencias-agregar.presenter';
 import { SugerenciasAgregarService } from '../services/sugerencias-agregar.service';
 import { SugerenciaAgregarProducto } from '../models/sugerencia-agregar.model';
 
-describe('SugerenciasAgregarPresenter', () => {
-  let presenter: SugerenciasAgregarPresenter;
-  let mockSugerenciasAgregarService: jasmine.SpyObj<SugerenciasAgregarService>;
-
-  const mockData: SugerenciaAgregarProducto[] = [
-    {
+class SugerenciasAgregarMother {
+  static crearSugerencia(override: Partial<SugerenciaAgregarProducto> = {}): SugerenciaAgregarProducto {
+    return {
       id: '1',
       alumnoId: null,
       buffetId: 'b1',
       productoId: 'p1',
-      titulo: 'Title 1',
-      mensaje: 'Msg 1',
-      metadata: { totalSales: 10, productName: 'Prod A', productPrice: 100, totalRevenue: 1000, totalCustomers: 5 }
-    },
-    {
-      id: '2',
-      alumnoId: null,
-      buffetId: 'b1',
-      productoId: 'p2',
-      titulo: 'Title 2',
-      mensaje: 'Msg 2',
-      metadata: { totalSales: 20, productName: 'Prod B', productPrice: 50, totalRevenue: 1000, totalCustomers: 10 }
-    },
-    {
-      id: '3',
-      alumnoId: null,
-      buffetId: 'b1',
-      productoId: 'p3',
-      titulo: 'Title 3',
-      mensaje: 'Msg 3',
-      metadata: { totalSales: 5, productName: 'Prod C', productPrice: 400, totalRevenue: 2000, totalCustomers: 2 }
-    }
-  ];
+      titulo: 'Título por defecto',
+      mensaje: 'Mensaje por defecto',
+      metadata: {
+        totalSales: 10,
+        productName: 'Producto por defecto',
+        productPrice: 100,
+        totalRevenue: 1000,
+        totalCustomers: 5
+      },
+      ...override
+    };
+  }
+
+  static crearListaSugerencias(): SugerenciaAgregarProducto[] {
+    return [
+      this.crearSugerencia({
+        id: '1',
+        metadata: { totalSales: 10, productName: 'Prod A', productPrice: 100, totalRevenue: 1000, totalCustomers: 5 }
+      }),
+      this.crearSugerencia({
+        id: '2',
+        metadata: { totalSales: 20, productName: 'Prod B', productPrice: 50, totalRevenue: 1000, totalCustomers: 10 }
+      }),
+      this.crearSugerencia({
+        id: '3',
+        mensaje: 'Msg 3',
+        metadata: { totalSales: 5, productName: 'Prod C', productPrice: 400, totalRevenue: 2000, totalCustomers: 2 }
+      })
+    ];
+  }
+}
+
+describe('SugerenciasAgregarPresenter', () => {
+  let presenter: SugerenciasAgregarPresenter;
+  let servicio: jasmine.SpyObj<SugerenciasAgregarService>;
 
   beforeEach(() => {
-    mockSugerenciasAgregarService = jasmine.createSpyObj('SugerenciasAgregarService', ['getSugerenciasAgregarProducto']);
-
-    TestBed.configureTestingModule({
-      providers: [
-        SugerenciasAgregarPresenter,
-        { provide: SugerenciasAgregarService, useValue: mockSugerenciasAgregarService }
-      ]
-    });
-
-    presenter = TestBed.inject(SugerenciasAgregarPresenter);
+    servicio = jasmine.createSpyObj('SugerenciasAgregarService', ['getSugerenciasAgregarProducto']);
+    presenter = new SugerenciasAgregarPresenter(servicio);
   });
 
-  it('debería inicializarse correctamente y cargar sugerencias', () => {
-    mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(of(mockData));
-    
-    presenter.initialize();
+  describe('Inicialización', () => {
+    it('debería solicitar las sugerencias al servicio y actualizar el estado cuando sea exitoso', () => {
+      // Arrange
+      const sugerenciasEsperadas = SugerenciasAgregarMother.crearListaSugerencias();
+      servicio.getSugerenciasAgregarProducto.and.returnValue(of(sugerenciasEsperadas));
+      
+      let sugerenciasEmitidas: SugerenciaAgregarProducto[] | undefined;
+      let isLoadingEmitido: boolean | undefined;
+      let errorEmitido: string | null | undefined;
+      
+      presenter.sugerencias$.subscribe(val => sugerenciasEmitidas = val);
+      presenter.isLoading$.subscribe(val => isLoadingEmitido = val);
+      presenter.error$.subscribe(val => errorEmitido = val);
 
-    expect(mockSugerenciasAgregarService.getSugerenciasAgregarProducto).toHaveBeenCalled();
-    
-    presenter.sugerencias$.subscribe(s => {
-      expect(s).toEqual(mockData);
+      // Act
+      presenter.initialize();
+
+      // Assert
+      expect(servicio.getSugerenciasAgregarProducto).toHaveBeenCalled();
+      expect(sugerenciasEmitidas).toEqual(sugerenciasEsperadas);
+      expect(isLoadingEmitido).toBeFalse();
+      expect(errorEmitido).toBeNull();
     });
 
-    presenter.isLoading$.subscribe(loading => {
-      expect(loading).toBeFalse();
-    });
+    it('debería actualizar el estado de error cuando el servicio falle', () => {
+      // Arrange
+      servicio.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('Error de red')));
+      
+      let errorEmitido: string | null | undefined;
+      let isLoadingEmitido: boolean | undefined;
+      
+      presenter.error$.subscribe(val => errorEmitido = val);
+      presenter.isLoading$.subscribe(val => isLoadingEmitido = val);
 
-    presenter.error$.subscribe(error => {
-      expect(error).toBeNull();
+      // Act
+      presenter.initialize();
+
+      // Assert
+      expect(errorEmitido).toBe('No se pudieron cargar las oportunidades de stock.');
+      expect(isLoadingEmitido).toBeFalse();
     });
   });
 
-  it('debería manejar errores al inicializar', () => {
-    mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('Error')));
-    
-    presenter.initialize();
-
-    presenter.error$.subscribe(error => {
-      expect(error).toBe('No se pudieron cargar las oportunidades de stock.');
-    });
-
-    presenter.isLoading$.subscribe(loading => {
-      expect(loading).toBeFalse();
-    });
-  });
-
-  describe('KPIs computados', () => {
+  describe('KPIs Computados', () => {
     beforeEach(() => {
-      mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(of(mockData));
+      servicio.getSugerenciasAgregarProducto.and.returnValue(of(SugerenciasAgregarMother.crearListaSugerencias()));
       presenter.initialize();
     });
 
-    it('debería calcular totalProductos correctamente', () => {
-      expect(presenter.totalProductos).toBe(3);
+    it('debería calcular el total de productos analizados', () => {
+      // Arrange
+      let total: number;
+
+      // Act
+      total = presenter.totalProductos;
+
+      // Assert
+      expect(total).toBe(3);
     });
 
-    it('debería calcular totalVentas correctamente', () => {
-      expect(presenter.totalVentas).toBe(10 + 20 + 5); // 35
+    it('debería sumar las ventas totales de todas las sugerencias', () => {
+      // Arrange
+      let total: number;
+
+      // Act
+      total = presenter.totalVentas;
+
+      // Assert
+      expect(total).toBe(35);
     });
 
-    it('debería calcular totalIngresos correctamente', () => {
-      expect(presenter.totalIngresos).toBe(1000 + 1000 + 2000); // 4000
+    it('debería calcular los ingresos totales esperados', () => {
+      // Arrange
+      let total: number;
+
+      // Act
+      total = presenter.totalIngresos;
+
+      // Assert
+      expect(total).toBe(4000);
     });
 
-    it('debería calcular totalClientes correctamente', () => {
-      expect(presenter.totalClientes).toBe(5 + 10 + 2); // 17
+    it('debería sumar la cantidad de clientes únicos afectados', () => {
+      // Arrange
+      let total: number;
+
+      // Act
+      total = presenter.totalClientes;
+
+      // Assert
+      expect(total).toBe(17);
     });
 
-    it('debería formatear totalIngresosLabel correctamente', () => {
-      expect(presenter.totalIngresosLabel).toBe('$4.000');
+    it('debería formatear correctamente la etiqueta del total de ingresos', () => {
+      // Arrange
+      let etiqueta: string;
+
+      // Act
+      etiqueta = presenter.totalIngresosLabel;
+
+      // Assert
+      expect(etiqueta).toBe('$4.000');
     });
   });
 
-  describe('Chart data y Producto Cards', () => {
+  describe('Datos de Gráficos y Tarjetas', () => {
     beforeEach(() => {
-      mockSugerenciasAgregarService.getSugerenciasAgregarProducto.and.returnValue(of(mockData));
+      servicio.getSugerenciasAgregarProducto.and.returnValue(of(SugerenciasAgregarMother.crearListaSugerencias()));
       presenter.initialize();
     });
 
-    it('debería generar chartData ordenado por ingresos y calcular ingresoPercent relativo al maximo', () => {
-      const data = presenter.chartData;
-      
-      // Sorted by revenue descending (Prod C: 2000, Prod A: 1000, Prod B: 1000)
-      expect(data.length).toBe(3);
-      expect(data[0].nombre).toBe('Prod C');
-      expect(data[0].ingresos).toBe(2000);
-      expect(data[0].ingresoPercent).toBe(100); // 2000 / 2000 * 100
+    it('debería generar los datos del gráfico ordenados por ingreso mayor y calcular el porcentaje relativo', () => {
+      // Arrange
+      let datos;
 
-      expect(data[1].ingresoPercent).toBe(50); // 1000 / 2000 * 100
+      // Act
+      datos = presenter.chartData;
+      
+      // Assert
+      expect(datos.length).toBe(3);
+      expect(datos[0].nombre).toBe('Prod C');
+      expect(datos[0].ingresos).toBe(2000);
+      expect(datos[0].ingresoPercent).toBe(100); 
+      expect(datos[1].ingresoPercent).toBe(50);
     });
 
-    it('debería generar productCards ordenado por ingresos con los campos correctos', () => {
-      const cards = presenter.productCards;
+    it('debería generar las tarjetas de productos mapeando correctamente todos los campos', () => {
+      // Arrange
+      let tarjetas;
+
+      // Act
+      tarjetas = presenter.productCards;
       
-      expect(cards.length).toBe(3);
-      expect(cards[0].nombre).toBe('Prod C');
-      expect(cards[0].ingresoPercent).toBe(100);
-      expect(cards[0].mensaje).toBe('Msg 3');
+      // Assert
+      expect(tarjetas.length).toBe(3);
+      expect(tarjetas[0].nombre).toBe('Prod C');
+      expect(tarjetas[0].ingresoPercent).toBe(100);
+      expect(tarjetas[0].mensaje).toBe('Msg 3');
     });
   });
 
-  describe('Helpers', () => {
-    it('debería formatear moneda correctamente', () => {
-      expect(presenter.formatCurrency(1500)).toBe('$1.500');
-      expect(presenter.formatCurrency(0)).toBe('$0');
+  describe('Helpers de Formateo', () => {
+    
+    // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
+    it('debería formatear valores numéricos a moneda local sin decimales', () => {
+      // Arrange
+      let formateado: string;
+
+      // Act
+      formateado = presenter.formatCurrency(1500);
+
+      // Assert
+      expect(formateado).toBe('$1.500');
+    });
+
+    // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
+    it('debería formatear cero correctamente', () => {
+      // Arrange
+      let formateado: string;
+
+      // Act
+      formateado = presenter.formatCurrency(0);
+
+      // Assert
+      expect(formateado).toBe('$0');
     });
   });
 });

@@ -27,11 +27,13 @@ export class SugerenciasPresenter {
 
   private userId = '';
 
-  private readonly sugerenciasService = inject(SugerenciasService);
-  private readonly promotionService = inject(PromotionService);
-  private readonly router = inject(Router);
-  private readonly toastService = inject(ToastService);
-  private readonly productService = inject(ProductoService);
+  constructor(
+    private readonly sugerenciasService: SugerenciasService,
+    private readonly promotionService: PromotionService,
+    private readonly router: Router,
+    private readonly toastService: ToastService,
+    private readonly productService: ProductoService
+  ) {}
 
   initialize(userId: string): void {
     this.userId = userId;
