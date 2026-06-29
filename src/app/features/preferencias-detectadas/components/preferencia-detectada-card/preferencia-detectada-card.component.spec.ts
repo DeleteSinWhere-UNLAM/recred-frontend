@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PreferenciaDetectadaCardComponent } from './preferencia-detectada-card.component';
-import { PreferenciaDetectada } from '../../models/preferencia-detectada.model';
 import { PreferenciasDetectadasMother } from '../../preferencias-detectadas.mother';
 
 

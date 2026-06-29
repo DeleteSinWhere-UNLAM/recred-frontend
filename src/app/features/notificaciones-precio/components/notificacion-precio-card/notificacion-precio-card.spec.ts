@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NotificacionPrecioCardComponent } from './notificacion-precio-card';
-import { NotificacionPrecio } from '../../models/notificacion-precio.model';
 import { NotificacionesPrecioMother } from '../../notificaciones-precio.mother';
 
 

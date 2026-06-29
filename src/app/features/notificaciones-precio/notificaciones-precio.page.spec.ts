@@ -7,7 +7,6 @@ import { Component, Input, signal } from '@angular/core';
 import { NotificacionPrecio } from './models/notificacion-precio.model';
 import { NotificacionPrecioCardComponent } from './components/notificacion-precio-card/notificacion-precio-card';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { Usuario } from '../../data-access/models/usuario.model';
 import { NotificacionesPrecioMother } from './notificaciones-precio.mother';
 
 

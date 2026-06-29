@@ -6,7 +6,6 @@ import { of } from 'rxjs';
 import { Component, Input, signal } from '@angular/core';
 import { PreferenciaDetectada } from './models/preferencia-detectada.model';
 import { PreferenciaDetectadaCardComponent } from './components/preferencia-detectada-card/preferencia-detectada-card.component';
-import { Usuario } from '../../data-access/models/usuario.model';
 import { PreferenciasDetectadasMother } from './preferencias-detectadas.mother';
 
 
