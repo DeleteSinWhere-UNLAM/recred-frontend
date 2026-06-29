@@ -1,4 +1,4 @@
-import { Injectable, Signal, computed, inject, signal } from '@angular/core';
+﻿import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
@@ -18,6 +18,8 @@ import {
   Producto,
 } from '../models/producto.model';
 import { RestriccionProductoService } from '../../restriccion-producto/services/restriccion-producto.service';
+import { CompraService } from '../../compra/services/compra.service';
+import { OrdenAlumno } from '../../compra/models/orden-compra.model';
 import { getPeriodRange, getProductCategory, isSameCategory } from '../../compra/utils/budget-helpers';
 import { PERIODO_LABELS } from '../../presupuesto/models/presupuesto.model';
 import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
@@ -88,6 +90,7 @@ export class BuffetPresenter {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly compraService = inject(CompraService);
   private readonly restriccionProductoService = inject(RestriccionProductoService);
   private readonly franjasService = inject(FranjasHorariasService);
   private readonly restriccionesService = inject(RestriccionesHorariasService);
@@ -654,9 +657,48 @@ export class BuffetPresenter {
   volver(): void {
     this.router.navigateByUrl(this.usuarioService.homeUrl());
   }
+  procesandoPago = signal<boolean>(false);
 
-  irAlCarrito(): void {
-    this.router.navigateByUrl('/compra');
+  iniciarPago(): void {
+    const alumno = this.alumnoState();
+    const items = this.itemsCarrito();
+    if (!alumno || items.length === 0 || this.procesandoPago()) return;
+
+    const buffet = this.buffetState();
+    if (!buffet) {
+      this.toastService.mostrar('No se pudo resolver el buffet del pedido', 'error');
+      return;
+    }
+
+    const subtotal = this.totalCarrito();
+    if (alumno.saldo < subtotal) {
+      this.toastService.mostrar('Saldo insuficiente para realizar el pedido', 'error');
+      return;
+    }
+
+    const orden: OrdenAlumno = {
+      alumno: alumno,
+      buffetId: buffet.id,
+      items: items,
+      fecha: this.fechaSeleccionadaState(),
+      recreo: this.recreoSeleccionadoState(),
+      subtotal: subtotal
+    };
+
+    this.compraService.iniciarOrden([orden]);
+    
+    this.procesandoPago.set(true);
+    this.compraService.procesarPago().subscribe({
+      next: () => {
+        this.carritoService.limpiarAlumno(alumno.id);
+        this.procesandoPago.set(false);
+        this.router.navigateByUrl('/compra/exito');
+      },
+      error: () => {
+        this.procesandoPago.set(false);
+        this.toastService.mostrar('No pudimos procesar el pago. Intentalo de nuevo.', 'error');
+      }
+    });
   }
 
   cambiarAlumno(nuevoAlumnoId: string): void {
@@ -674,6 +716,24 @@ export class BuffetPresenter {
     this.toastService.mostrar(
       `${verbo} ${cantidad}x "${producto.nombre}" al carrito`,
     );
+  }
+
+  setCantidadProducto(producto: Producto, cantidad: number): void {
+    const alumno = this.alumnoState();
+    if (!alumno) return;
+
+    const itemExistente = this.itemsCarrito().find((i) => i.producto.id === producto.id);
+    const cantidadActual = itemExistente ? itemExistente.cantidad : 0;
+    const cantidadAdicional = cantidad - cantidadActual;
+
+    if (cantidadAdicional > 0) {
+      if (!this.carritoService.puedeAgregar(producto, alumno.id, cantidadAdicional)) {
+        this.toastService.mostrar('No es posible agregar más unidades de este producto.', 'error');
+        return;
+      }
+    }
+
+    this.carritoService.setCantidadPorProducto(producto, alumno.id, cantidad);
   }
 
   toggleFavorito(producto: Producto): void {
@@ -849,3 +909,9 @@ export class BuffetPresenter {
     return [...porId.values()];
   }
 }
+
+
+
+
+
+

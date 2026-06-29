@@ -1,10 +1,11 @@
+﻿import { FavoritosService } from '../../favoritos/services/favoritos.service';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { BuffetService } from '../services/buffet.service';
-import { FavoritosService } from '../../favoritos/services/favoritos.service';
+import { CompraService } from '../../compra/services/compra.service';
 import { CarritoService } from '../../compra/services/carrito.service';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
@@ -27,6 +28,7 @@ describe('BuffetPresenter', () => {
   let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
   let buffetServiceSpy: jasmine.SpyObj<BuffetService>;
   let favoritosServiceSpy: jasmine.SpyObj<FavoritosService>;
+  let compraServiceSpy: jasmine.SpyObj<CompraService>;
   let carritoServiceSpy: jasmine.SpyObj<CarritoService>;
   let colegiosServiceSpy: jasmine.SpyObj<ColegiosService>;
   let usuarioServiceSpy: jasmine.SpyObj<UsuarioService>;
@@ -104,7 +106,8 @@ describe('BuffetPresenter', () => {
     buffetServiceSpy = jasmine.createSpyObj<BuffetService>('BuffetService', [
       'obtenerBuffetDelAlumno', 'getProductosDelBuffet',
     ]);
-    favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos']);
+    favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos', 'agregarFavorito', 'removerFavorito']);
+    compraServiceSpy = jasmine.createSpyObj<CompraService>('CompraService', ['iniciarOrden', 'procesarPago']);
     carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', [
       'agregar', 'setCatalog', 'cargarPresupuestoYConsumo', 'getSeleccionRetiro', 'setSeleccionRetiro'
     ]);
@@ -133,6 +136,8 @@ describe('BuffetPresenter', () => {
     buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of(mockBuffet));
     buffetServiceSpy.getProductosDelBuffet.and.returnValue(of(mockProductos));
     favoritosServiceSpy.getFavoritos.and.returnValue(of([]));
+    favoritosServiceSpy.agregarFavorito.and.returnValue(of(undefined));
+    favoritosServiceSpy.removerFavorito.and.returnValue(of(undefined));
     colegiosServiceSpy.getColegios.and.returnValue([{ id: 'colegio-1', nombre: 'Fernando Fader' }]);
     usuarioServiceSpy.homeUrl.and.returnValue('/tutor');
     usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
@@ -153,6 +158,7 @@ describe('BuffetPresenter', () => {
         { provide: AlumnosService, useValue: alumnosServiceSpy },
         { provide: BuffetService, useValue: buffetServiceSpy },
         { provide: FavoritosService, useValue: favoritosServiceSpy },
+        { provide: CompraService, useValue: compraServiceSpy },
         { provide: CarritoService, useValue: carritoServiceSpy },
         { provide: ColegiosService, useValue: colegiosServiceSpy },
         { provide: UsuarioService, useValue: usuarioServiceSpy },
@@ -257,3 +263,9 @@ describe('BuffetPresenter', () => {
     });
   });
 });
+
+
+
+
+
+
