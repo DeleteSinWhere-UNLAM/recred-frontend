@@ -2152,7 +2152,7 @@
   padding: 18px 24px;
   z-index: 99;
   box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.08);
-  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; transform: translateY(0); opacity: 1;
 }
 
 @keyframes slide-up {
@@ -3307,3 +3307,10 @@
 
 
 
+
+
+.buffet__footer-cart.footer-hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
