@@ -30,7 +30,7 @@ export class SugerenciasPresenter {
 
   initialize(userId: string): void {
     this.userId = userId;
-    this.sugerenciasService.getSugerencias(this.userId).subscribe((data) => {
+    this.sugerenciasService.getSugerencias().subscribe((data) => {
       this._sugerencias.next(data);
       if (this.hasSugerencias(data)) {
         this.seleccionarProducto(data[0]);

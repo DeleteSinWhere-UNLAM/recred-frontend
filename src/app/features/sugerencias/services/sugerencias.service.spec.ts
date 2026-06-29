@@ -30,30 +30,27 @@ describe('SugerenciasService', () => {
   });
 
   describe('getSugerencias', () => {
-    it('debería hacer un GET a /kiosqueros/:id/lista-sugerencia-cambio-producto', () => {
-      const mockId = 'user-123';
+    it('debería hacer un GET a /kiosqueros/me/lista-sugerencia-cambio-producto', () => {
       const mockResponse: SugerenciaProducto[] = [];
 
-      service.getSugerencias(mockId).subscribe(response => {
+      service.getSugerencias().subscribe(response => {
         expect(response).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/kiosqueros/${mockId}/lista-sugerencia-cambio-producto`);
+      const req = httpMock.expectOne(`${environment.apiUrl}/kiosqueros/me/lista-sugerencia-cambio-producto`);
       expect(req.request.method).toBe('GET');
       req.flush(mockResponse);
     });
 
     it('debería manejar errores del servidor al obtener sugerencias', () => {
-      const mockId = 'user-123';
-
-      service.getSugerencias(mockId).subscribe({
+      service.getSugerencias().subscribe({
         next: () => fail('debería haber fallado con un error 500'),
         error: (error) => {
           expect(error.status).toBe(500);
         }
       });
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/kiosqueros/${mockId}/lista-sugerencia-cambio-producto`);
+      const req = httpMock.expectOne(`${environment.apiUrl}/kiosqueros/me/lista-sugerencia-cambio-producto`);
       req.flush('Error del servidor', { status: 500, statusText: 'Internal Server Error' });
     });
   });

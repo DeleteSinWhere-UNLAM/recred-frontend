@@ -49,7 +49,7 @@ describe('SugerenciasPresenter', () => {
 
       presenter.initialize('user-1');
 
-      expect(mockSugerenciasService.getSugerencias).toHaveBeenCalledWith('user-1');
+      expect(mockSugerenciasService.getSugerencias).toHaveBeenCalled();
       expect(presenter.totalProductosAnalizados).toBe(2);
       expect(presenter.totalStockInmovilizado).toBe(30);
       expect(presenter.promedioDiasSinVenta).toBe(8); // (5+10)/2 = 7.5 -> round(7.5) = 8
