@@ -1,143 +1,158 @@
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 import { SugerenciasPresenter } from './sugerencias.presenter';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
+import { Router } from '@angular/router';
 import { ToastService } from '../../../shared/services/toast.service';
-import { of } from 'rxjs';
+import { ProductoService } from '../../inventario/services/producto.service';
 import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 import { Promotion } from '../../../data-access/services/promociones/promotion.service';
-import { ProductoService } from '../../inventario/services/producto.service';
-import { Producto } from '../../inventario/models/producto.interface';
+import { SugerenciasMother } from '../sugerencias.mother';
+
+
 
 describe('SugerenciasPresenter', () => {
   let presenter: SugerenciasPresenter;
-  let mockSugerenciasService: jasmine.SpyObj<SugerenciasService>;
-  let mockPromotionService: jasmine.SpyObj<PromotionService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockToastService: jasmine.SpyObj<ToastService>;
-  let mockProductoService: jasmine.SpyObj<ProductoService>;
+  let servicioSugerencias: jasmine.SpyObj<SugerenciasService>;
+  let servicioPromociones: jasmine.SpyObj<PromotionService>;
+  let router: jasmine.SpyObj<Router>;
+  let toast: jasmine.SpyObj<ToastService>;
+  let servicioProducto: jasmine.SpyObj<ProductoService>;
 
   beforeEach(() => {
-    mockSugerenciasService = jasmine.createSpyObj('SugerenciasService', ['getSugerencias', 'getComboSuggestions']);
-    mockPromotionService = jasmine.createSpyObj('PromotionService', ['createPromotion']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
-    mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
-    mockProductoService = jasmine.createSpyObj('ProductoService', ['getById']);
-    mockProductoService.getById.and.returnValue(of({} as unknown as Producto));
+    servicioSugerencias = jasmine.createSpyObj('SugerenciasService', ['getSugerencias', 'getComboSuggestions']);
+    servicioPromociones = jasmine.createSpyObj('PromotionService', ['createPromotion']);
+    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    toast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
 
     TestBed.configureTestingModule({
       providers: [
         SugerenciasPresenter,
-        { provide: SugerenciasService, useValue: mockSugerenciasService },
-        { provide: PromotionService, useValue: mockPromotionService },
-        { provide: Router, useValue: mockRouter },
-        { provide: ToastService, useValue: mockToastService },
-        { provide: ProductoService, useValue: mockProductoService }
+        { provide: SugerenciasService, useValue: servicioSugerencias },
+        { provide: PromotionService, useValue: servicioPromociones },
+        { provide: Router, useValue: router },
+        { provide: ToastService, useValue: toast },
+        { provide: ProductoService, useValue: servicioProducto }
       ]
     });
 
     presenter = TestBed.inject(SugerenciasPresenter);
   });
 
-  it('debería crearse', () => {
-    expect(presenter).toBeTruthy();
-  });
-
-  describe('initialize', () => {
-    it('debería cargar sugerencias y seleccionar la primera si existe', () => {
-      const mockSugerencias = [
-        { productoOriginal: 'P1', estadisticasVenta: { stockActual: 10, diasSinVenta: 5 } },
-        { productoOriginal: 'P2', estadisticasVenta: { stockActual: 20, diasSinVenta: 10 } }
-      ] as SugerenciaProducto[];
-      
-      mockSugerenciasService.getSugerencias.and.returnValue(of(mockSugerencias));
+  describe('Inicialización', () => {
+    it('debería solicitar las sugerencias al servicio y seleccionar el primer producto automáticamente', () => {
+      const sugerencias = SugerenciasMother.crearSugerencias();
+      servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
+      let sugerenciaActiva: SugerenciaProducto | undefined;
+      let sugerenciasEmitidas: SugerenciaProducto[] = [];
+      presenter.sugerencias$.subscribe(val => sugerenciasEmitidas = val);
+      presenter.sugerenciaSeleccionada$.subscribe(val => sugerenciaActiva = val);
 
       presenter.initialize('user-1');
 
-      expect(mockSugerenciasService.getSugerencias).toHaveBeenCalled();
+      expect(servicioSugerencias.getSugerencias).toHaveBeenCalled();
+      expect(sugerenciasEmitidas).toEqual(sugerencias);
+      expect(sugerenciaActiva).toEqual(sugerencias[0]);
       expect(presenter.totalProductosAnalizados).toBe(2);
       expect(presenter.totalStockInmovilizado).toBe(30);
-      expect(presenter.promedioDiasSinVenta).toBe(8); // (5+10)/2 = 7.5 -> round(7.5) = 8
-      expect(presenter.productoMasCritico?.productoOriginal).toBe('P2');
-      expect(presenter.estadisticasSeleccionadas?.stockActual).toBe(10);
+      expect(presenter.promedioDiasSinVenta).toBe(8);
+      expect(presenter.productoMasCritico?.productoOriginal).toBe('Producto 2');
     });
 
-    it('no debería fallar si no hay sugerencias', () => {
-      mockSugerenciasService.getSugerencias.and.returnValue(of([]));
+    it('no debería seleccionar ningún producto ni fallar cuando el servicio retorna una lista vacía', () => {
+      servicioSugerencias.getSugerencias.and.returnValue(of([]));
+      let sugerenciaActiva: SugerenciaProducto | undefined;
+      presenter.sugerenciaSeleccionada$.subscribe(val => sugerenciaActiva = val);
 
       presenter.initialize('user-1');
 
+      expect(sugerenciaActiva).toBeUndefined();
       expect(presenter.totalProductosAnalizados).toBe(0);
       expect(presenter.totalStockInmovilizado).toBe(0);
       expect(presenter.promedioDiasSinVenta).toBe(0);
-      expect(presenter.productoMasCritico).toBeUndefined();
     });
   });
 
-  describe('openComboPromotionModal', () => {
-    it('debería cargar sugerencias de combo y abrir modal si hay producto seleccionado', () => {
-      const mockSugerencia = {
-        productoOriginal: 'P1',
-        estadisticasVenta: { productoId: 'P1' }
-      } as unknown as SugerenciaProducto;
-      presenter.seleccionarProducto(mockSugerencia);
+  describe('Modal de Promociones de Combos', () => {
+    it('debería cargar sugerencias de combo y abrir el modal cuando hay un producto activo', () => {
+      const sugerencia = SugerenciasMother.crearSugerencia();
+      presenter.seleccionarProducto(sugerencia);
+      servicioSugerencias.getComboSuggestions.and.returnValue(of(SugerenciasMother.crearComboSuggestion()));
+      let modalAbierto = false;
+      presenter.isComboModalOpen$.subscribe(val => modalAbierto = val);
 
-      const mockComboSuggestion: ComboSuggestion = {
-        idProduct: 'P1',
-        productName: 'P1',
-        suggestedProducts: [{ id: 'combo1', nombre: 'Combo 1', precio: 100 }]
-      };
-      mockSugerenciasService.getComboSuggestions.and.returnValue(of(mockComboSuggestion));
-
-      presenter['userId'] = 'user-1';
       presenter.openComboPromotionModal();
 
-      expect(mockSugerenciasService.getComboSuggestions).toHaveBeenCalledWith('P1');
-      
-      let isModalOpen = false;
-      presenter.isComboModalOpen$.subscribe(v => isModalOpen = v);
-      expect(isModalOpen).toBeTrue();
+      expect(servicioSugerencias.getComboSuggestions).toHaveBeenCalledWith('p1');
+      expect(modalAbierto).toBeTrue();
     });
 
-    it('no debería hacer nada si no hay producto seleccionado', () => {
+    it('no debería ejecutar ninguna acción al solicitar abrir el modal sin un producto activo', () => {
+      let modalAbierto = false;
+      presenter.isComboModalOpen$.subscribe(val => modalAbierto = val);
+
       presenter.openComboPromotionModal();
-      expect(mockSugerenciasService.getComboSuggestions).not.toHaveBeenCalled();
+
+      expect(servicioSugerencias.getComboSuggestions).not.toHaveBeenCalled();
+      expect(modalAbierto).toBeFalse();
+    });
+
+    it('debería cerrar el modal y vaciar los productos sugeridos al solicitar el cierre', () => {
+      let modalAbierto = true;
+      let productosSugeridos: ComboSuggestion['suggestedProducts'] | undefined;
+      presenter.isComboModalOpen$.subscribe(val => modalAbierto = val);
+      presenter.suggestedProducts$.subscribe(val => productosSugeridos = val);
+
+      presenter.closeComboPromotionModal();
+
+      expect(modalAbierto).toBeFalse();
+      expect(productosSugeridos).toEqual([]);
     });
   });
 
-  describe('generatePromotion', () => {
-    it('debería crear promoción y cerrar modal si hay producto seleccionado', () => {
-      const mockSugerencia = { 
-        productoOriginal: 'P1',
-        estadisticasVenta: { productoId: 'P1' }
-      } as unknown as SugerenciaProducto;
-      presenter.seleccionarProducto(mockSugerencia);
-      mockProductoService.getById.and.callFake((id) => of({ id, urlImagen: `http://res.cloudinary.com/djzfudbze/image/upload/v1/${id}.png` } as unknown as Producto));
-      mockPromotionService.createPromotion.and.returnValue(of({} as Promotion));
-
-      presenter.generatePromotion({
+  describe('Generación de Promoción', () => {
+    it('debería crear la promoción en el servicio, notificar el éxito y redirigir al listado', () => {
+      presenter.seleccionarProducto(SugerenciasMother.crearSugerencia());
+      servicioProducto.getById.and.returnValue(of(SugerenciasMother.crearProducto()));
+      servicioPromociones.createPromotion.and.returnValue(of({} as Promotion));
+      const datosPromocion = {
         discountPercentage: 10,
         startDate: '2026-06-16',
         endDate: '2026-06-20',
-        productIds: ['combo1']
-      });
+        productIds: ['c1']
+      };
+      let modalAbierto = true;
+      presenter.isComboModalOpen$.subscribe(val => modalAbierto = val);
 
-      expect(mockPromotionService.createPromotion).toHaveBeenCalledWith(jasmine.objectContaining({
-        name: 'Combo P1',
+      presenter.generatePromotion(datosPromocion);
+
+      expect(servicioPromociones.createPromotion).toHaveBeenCalledWith(jasmine.objectContaining({
+        name: 'Combo Producto Base',
         discountPercentage: 10,
-        startDate: new Date('2026-06-16').toISOString(),
-        endDate: new Date('2026-06-20').toISOString(),
-        productIds: ['P1', 'combo1'],
-        imageUrl: jasmine.any(String)
+        productIds: ['p1', 'c1']
       }));
+      expect(modalAbierto).toBeFalse();
+      expect(toast.mostrar).toHaveBeenCalledWith('Combo creado exitosamente', 'success');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/promociones');
+    });
 
-      let isModalOpen = true;
-      presenter.isComboModalOpen$.subscribe(v => isModalOpen = v);
-      expect(isModalOpen).toBeFalse();
+    it('debería notificar el error y redirigir al listado cuando el servicio de promociones falle', () => {
+      presenter.seleccionarProducto(SugerenciasMother.crearSugerencia());
+      servicioProducto.getById.and.returnValue(of(SugerenciasMother.crearProducto()));
+      servicioPromociones.createPromotion.and.returnValue(throwError(() => new Error('API Error')));
+      const datosPromocion = {
+        discountPercentage: 10,
+        startDate: '2026-06-16',
+        endDate: '2026-06-20',
+        productIds: ['c1']
+      };
 
-      expect(mockToastService.mostrar).toHaveBeenCalledWith('Combo creado exitosamente', 'success');
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/promociones');
+      presenter.generatePromotion(datosPromocion);
+
+      expect(toast.mostrar).toHaveBeenCalledWith('Error al crear el combo', 'error');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/promociones');
     });
   });
 });

@@ -1,56 +1,41 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { Component, Input } from '@angular/core';
 import { SugerenciasAgregarPage } from './sugerencias-agregar.page';
 import { SugerenciasAgregarPresenter } from './presenter/sugerencias-agregar.presenter';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { Component, Input } from '@angular/core';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { SugerenciasAgregarMother } from './sugerencias-agregar.mother';
 
 @Component({
   selector: 'app-navbar',
   template: '',
   standalone: true
 })
-class Mock{
+class NavbarStub {
   @Input() userName = '';
 }
 
 describe('SugerenciasAgregarPage', () => {
   let component: SugerenciasAgregarPage;
   let fixture: ComponentFixture<SugerenciasAgregarPage>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockUsuarioService: jasmine.SpyObj<UsuarioService>;
-  let mockPresenter: jasmine.SpyObj<SugerenciasAgregarPresenter>;
+  let router: jasmine.SpyObj<Router>;
+  let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let presenter: jasmine.SpyObj<SugerenciasAgregarPresenter>;
 
   beforeEach(async () => {
-    mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual', 'setHomeUrl']);
+    presenter = jasmine.createSpyObj('SugerenciasAgregarPresenter', ['initialize']);
 
-    mockUsuarioService = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual', 'setHomeUrl']);
-    mockUsuarioService.getUsuarioActual.and.returnValue({ id: 'user-1', nombre: 'Test Kiosquero', rol: 'KIOSQUERO' } as ReturnType<UsuarioService['getUsuarioActual']>);
-
-    mockPresenter = jasmine.createSpyObj('SugerenciasAgregarPresenter', ['initialize'], {
-      isLoading$: of(false),
-      error$: of(null),
-      sugerencias$: of([]),
-      totalProductos: 0,
-      totalVentas: 0,
-      totalIngresosLabel: '$0',
-      totalClientes: 0,
-      chartData: [],
-      productCards: [],
-      formatCurrency: (val: number) => `$${val}`
-    });
+    servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasAgregarMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasAgregarMother.crearUsuario>[0]));
 
     await TestBed.configureTestingModule({
       imports: [SugerenciasAgregarPage],
       providers: [
-        { provide: Router, useValue: mockRouter },
-        { provide: UsuarioService, useValue: mockUsuarioService },
-        provideHttpClient(),
-        provideHttpClientTesting()
+        { provide: Router, useValue: router },
+        { provide: UsuarioService, useValue: servicioUsuario }
       ]
     })
       .overrideComponent(SugerenciasAgregarPage, {
@@ -58,45 +43,52 @@ describe('SugerenciasAgregarPage', () => {
           imports: [NavbarComponent]
         },
         add: {
-          imports: [Mock],
+          imports: [NavbarStub],
           providers: [
-            { provide: SugerenciasAgregarPresenter, useValue: mockPresenter }
+            { provide: SugerenciasAgregarPresenter, useValue: presenter }
           ]
         }
       })
       .compileComponents();
 
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-1', nombre: 'Test' }));
-
     fixture = TestBed.createComponent(SugerenciasAgregarPage);
     component = fixture.componentInstance;
+  });
+
+  it('debería configurar la url de inicio del kiosquero al construirse', () => {
+
+    const urlEsperada = '/kiosquero';
+    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
+  });
+
+  it('debería delegar al presenter la inicialización si el usuario existe en sesión', () => {
+
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasAgregarMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasAgregarMother.crearUsuario>[0])));
+
+
     fixture.detectChanges();
+
+    expect(presenter.initialize).toHaveBeenCalled();
   });
 
-  it('debería crearse', () => {
-    expect(component).toBeTruthy();
+  it('no debería delegar la inicialización al presenter si no hay usuario en sesión', () => {
+
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+
+    fixture.detectChanges();
+
+
+    expect(presenter.initialize).not.toHaveBeenCalled();
   });
 
-  it('debería llamar a setHomeUrl al construirse', () => {
-    expect(mockUsuarioService.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
-  });
+  it('debería delegar al router la navegación hacia el home al presionar volver', () => {
 
-  it('debería inicializar el presenter en ngOnInit si hay un usuario en localStorage', () => {
-    component.ngOnInit();
-    expect(mockPresenter.initialize).toHaveBeenCalled();
-  });
+    const urlDestino = '/kiosquero';
 
-  it('no debería inicializar el presenter si no hay usuario en localStorage', () => {
-    mockPresenter.initialize.calls.reset();
-    (localStorage.getItem as jasmine.Spy).and.returnValue(null);
 
-    component.ngOnInit();
-
-    expect(mockPresenter.initialize).not.toHaveBeenCalled();
-  });
-
-  it('volver debería navegar a /kiosquero', () => {
     component.volver();
-    expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith(urlDestino);
   });
 });

@@ -4,21 +4,19 @@ import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
 import { Router } from '@angular/router';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { CommonModule } from '@angular/common';
-import { Producto } from '../inventario/models/producto.interface';
-import { SugerenciaProducto } from './models/sugerencia-producto.model';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { ComboPromotionModalComponent } from './components/combo-promotion-modal/combo-promotion-modal.component';
+import { SugerenciasMother } from './sugerencias.mother';
 
 @Component({
   selector: 'app-combo-promotion-modal',
   standalone: true,
   template: ''
 })
-class MockComboPromotionModalComponent {
+class ComboPromotionModalStub {
   @Input() baseProductName!: string;
-  @Input() suggestedProducts: Producto[] = [];
-  @Output() confirmPromotion = new EventEmitter<{ discountPercentage: number, startDate: string, endDate: string, productIds: string[] }>();
+  @Input() suggestedProducts: unknown[] = [];
+  @Output() confirmPromotion = new EventEmitter<Record<string, unknown>>();
   @Output() closeModal = new EventEmitter<void>();
 }
 
@@ -27,47 +25,47 @@ class MockComboPromotionModalComponent {
   standalone: true,
   template: ''
 })
-class Mock{
+class NavbarStub {
   @Input() userName!: string;
 }
 
 describe('SugerenciasPage', () => {
   let component: SugerenciasPage;
   let fixture: ComponentFixture<SugerenciasPage>;
-  let mockPresenter: jasmine.SpyObj<SugerenciasPresenter>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockUsuarioService: jasmine.SpyObj<UsuarioService>;
+  let presenter: jasmine.SpyObj<SugerenciasPresenter>;
+  let router: jasmine.SpyObj<Router>;
+  let servicioUsuario: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(async () => {
-    mockPresenter = jasmine.createSpyObj('SugerenciasPresenter', [
+    presenter = jasmine.createSpyObj('SugerenciasPresenter', [
       'initialize',
       'openComboPromotionModal',
       'generatePromotion',
       'closeComboPromotionModal',
       'seleccionarProducto'
     ]);
-
-    mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
-
-    mockUsuarioService = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual']);
-    mockUsuarioService.getUsuarioActual.and.returnValue({ nombre: 'Test User', id: 'test-id' });
-
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'test-id' }));
+    
+    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    servicioUsuario = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual']);
+    
+    servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasMother.crearUsuario());
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasMother.crearUsuario()));
 
     await TestBed.configureTestingModule({
       imports: [SugerenciasPage],
       providers: [
-        { provide: Router, useValue: mockRouter },
-        { provide: UsuarioService, useValue: mockUsuarioService },
-        provideHttpClient(),
-        provideHttpClientTesting()
+        { provide: Router, useValue: router },
+        { provide: UsuarioService, useValue: servicioUsuario }
       ]
     })
       .overrideComponent(SugerenciasPage, {
-        set: {
-          imports: [CommonModule, Mock, MockComboPromotionModalComponent],
+        remove: {
+          imports: [NavbarComponent, ComboPromotionModalComponent]
+        },
+        add: {
+          imports: [NavbarStub, ComboPromotionModalStub],
           providers: [
-            { provide: SugerenciasPresenter, useValue: mockPresenter }
+            { provide: SugerenciasPresenter, useValue: presenter }
           ]
         }
       })
@@ -78,56 +76,68 @@ describe('SugerenciasPage', () => {
     fixture.detectChanges();
   });
 
-  it('debería crear la página', () => {
-    expect(component).toBeTruthy();
+  it('debería configurar la url de inicio del kiosquero al construirse', () => {
+    
+    const urlEsperada = '/kiosquero';
+    
+    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
   });
 
-  it('debería inicializar el presenter con el ID de usuario del localStorage', () => {
-    expect(mockPresenter.initialize).toHaveBeenCalledWith('test-id');
+  it('debería delegar al presenter la inicialización cuando el usuario existe en sesión', () => {
+    
+    const idUsuarioEsperado = 'test-id';
+    
+    expect(presenter.initialize).toHaveBeenCalledWith(idUsuarioEsperado);
   });
 
-  it('volver debería navegar a /kiosquero', () => {
-    component.volver();
-    expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
-  });
-
-  it('seleccionarProducto debería llamar a seleccionarProducto en el presenter', () => {
-    const mockSugerencia = {} as SugerenciaProducto;
-    component.seleccionarProducto(mockSugerencia);
-    expect(mockPresenter.seleccionarProducto).toHaveBeenCalledWith(mockSugerencia);
-  });
-
-  it('onGenerarPromocion debería abrir el modal', () => {
-    component.onGenerarPromocion();
-    expect(mockPresenter.openComboPromotionModal).toHaveBeenCalled();
-  });
-
-  it('onConfirmPromotion debería llamar a generatePromotion en el presenter', () => {
-    const mockData = {} as { discountPercentage: number, startDate: string, endDate: string, productIds: string[] };
-    component.onConfirmPromotion(mockData);
-    expect(mockPresenter.generatePromotion).toHaveBeenCalledWith(mockData);
-  });
-
-  it('onCloseModal debería cerrar el modal', () => {
-    component.onCloseModal();
-    expect(mockPresenter.closeComboPromotionModal).toHaveBeenCalled();
-  });
-
-  it('debería llamar a setHomeUrl del usuarioService con "/kiosquero" al construirse', () => {
-    expect(mockUsuarioService.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
-  });
-
-  it('no debería llamar a initialize en el presenter si no hay perfil en localStorage', () => {
-    mockPresenter.initialize.calls.reset();
+  it('no debería delegar la inicialización al presenter cuando el usuario no existe en sesión', () => {
+    
+    presenter.initialize.calls.reset();
     (localStorage.getItem as jasmine.Spy).and.returnValue(null);
+    
     component.ngOnInit();
-    expect(mockPresenter.initialize).not.toHaveBeenCalled();
+    
+    expect(presenter.initialize).not.toHaveBeenCalled();
   });
 
-  it('no debería llamar a initialize en el presenter si el perfil en localStorage no tiene id', () => {
-    mockPresenter.initialize.calls.reset();
-    (localStorage.getItem as jasmine.Spy).and.returnValue(JSON.stringify({ name: 'Sin ID' }));
-    component.ngOnInit();
-    expect(mockPresenter.initialize).not.toHaveBeenCalled();
+  it('debería delegar al router la navegación hacia el home al presionar volver', () => {
+    
+    const urlDestino = '/kiosquero';
+    
+    component.volver();
+    
+    expect(router.navigateByUrl).toHaveBeenCalledWith(urlDestino);
+  });
+
+  it('debería delegar al presenter la selección de un producto', () => {
+    
+    const sugerencia = SugerenciasMother.crearSugerencia();
+    
+    component.seleccionarProducto(sugerencia);
+    
+    expect(presenter.seleccionarProducto).toHaveBeenCalledWith(sugerencia);
+  });
+
+  it('debería solicitar al presenter la apertura del modal promocional', () => {
+    
+    component.onGenerarPromocion();
+    
+    expect(presenter.openComboPromotionModal).toHaveBeenCalled();
+  });
+
+  it('debería solicitar al presenter la generación de la promoción confirmada', () => {
+    
+    const datosPromocion = { discountPercentage: 10, startDate: 'hoy', endDate: 'manana', productIds: ['1'] };
+    
+    component.onConfirmPromotion(datosPromocion);
+    
+    expect(presenter.generatePromotion).toHaveBeenCalledWith(datosPromocion);
+  });
+
+  it('debería solicitar al presenter el cierre del modal promocional', () => {
+    
+    component.onCloseModal();
+    
+    expect(presenter.closeComboPromotionModal).toHaveBeenCalled();
   });
 });

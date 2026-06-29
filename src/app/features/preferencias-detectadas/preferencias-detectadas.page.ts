@@ -33,8 +33,6 @@ export class PreferenciasDetectadasPage {
     if (usuarioId) {
       this.preferenciasService.getPreferencias(usuarioId).subscribe((data) => {
         this.preferencias = data;
-
-        console.log('PREFERENCIAS DETECTADAS:', data);
       });
     }
   }
