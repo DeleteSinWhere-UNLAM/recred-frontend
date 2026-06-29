@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupplierService } from '../../services/supplier.service';
-import { SupplierResponse } from '../../models/proveedores.interfaces';
+import { SupplierResponse, ListaPrecioProveedorResponse } from '../../models/proveedores.interfaces';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
@@ -34,7 +34,19 @@ export class SupplierDetailPage implements OnInit {
   isPricesModalOpen = signal<boolean>(false);
   pricesSearchQuery = signal<string>('');
 
+  ocultasTemporalmente = signal<string[]>([]);
+  eliminadasDefinitivamente = signal<string[]>([]);
+
   ngOnInit(): void {
+    const saved = localStorage.getItem('recred_eliminadas_listas_precio');
+    if (saved) {
+      try {
+        this.eliminadasDefinitivamente.set(JSON.parse(saved));
+      } catch (e) {
+        console.error('Error parsing deleted lists from localStorage', e);
+      }
+    }
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -142,6 +154,40 @@ export class SupplierDetailPage implements OnInit {
   descargarArchivo(url: string, event: Event): void {
     event.stopPropagation();
     window.open(url, '_blank');
+  }
+
+  isListMapped(list: ListaPrecioProveedorResponse): boolean {
+    return !!list.items && list.items.length > 0 && list.items.every(item => item.mappingConfirmado);
+  }
+
+  ocultarTemporalmente(id: string, event: Event): void {
+    event.stopPropagation();
+    this.ocultasTemporalmente.update(ids => [...ids, id]);
+    this.toastService.mostrar('Lista ocultada temporalmente', 'success');
+  }
+
+  eliminarDefinitivamente(id: string, event: Event): void {
+    event.stopPropagation();
+    const saved = localStorage.getItem('recred_eliminadas_listas_precio');
+    const ids: string[] = saved ? JSON.parse(saved) : [];
+    if (!ids.includes(id)) {
+      ids.push(id);
+      localStorage.setItem('recred_eliminadas_listas_precio', JSON.stringify(ids));
+    }
+    this.eliminadasDefinitivamente.update(current => [...current, id]);
+    this.toastService.mostrar('Lista eliminada de la vista', 'success');
+  }
+
+  getListasPreciosFiltradas(): ListaPrecioProveedorResponse[] {
+    const data = this.supplier();
+    if (!data || !data.listasPrecios) return [];
+
+    const ocultas = this.ocultasTemporalmente();
+    const eliminadas = this.eliminadasDefinitivamente();
+
+    return data.listasPrecios.filter(
+      list => !ocultas.includes(list.id) && !eliminadas.includes(list.id)
+    );
   }
 
   volver(): void {
