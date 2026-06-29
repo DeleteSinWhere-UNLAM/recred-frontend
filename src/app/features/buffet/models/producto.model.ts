@@ -1,4 +1,4 @@
-export interface CategoriaProducto {
+﻿export interface CategoriaProducto {
   id: string;
   descripcion: string;
 }
@@ -23,6 +23,7 @@ export interface Producto {
   bloqueadoPorRestriccion?: boolean;
   motivoBloqueo?: string;
   superaPresupuesto?: boolean;
+  esCombo?: boolean;
 }
 
 export function tieneClasificacion(producto: Producto, descripcion: string): boolean {
@@ -35,3 +36,4 @@ export function tieneClasificacion(producto: Producto, descripcion: string): boo
 export function disponible(producto: Producto): boolean {
   return producto.estadoStock !== 'SIN_STOCK';
 }
+
