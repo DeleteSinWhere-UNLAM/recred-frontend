@@ -1,11 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, forkJoin, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { SugerenciaProducto, EstadisticasVenta, SuggestedProduct } from '../models/sugerencia-producto.model';
 import { SugerenciasService } from '../services/sugerencias.service';
 import { PromotionService } from '../../../data-access/services/promociones/promotion.service';
 import { PromotionFormData } from '../components/combo-promotion-modal/combo-promotion-modal.component';
 import { ToastService } from '../../../shared/services/toast.service';
+import { ProductoService } from '../../inventario/services/producto.service';
+import { buildCloudinaryCollageUrl } from '../../../shared/utils/cloudinary-collage.helper';
 
 @Injectable()
 export class SugerenciasPresenter {
@@ -27,6 +30,7 @@ export class SugerenciasPresenter {
   private readonly promotionService = inject(PromotionService);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
+  private readonly productService = inject(ProductoService);
 
   initialize(userId: string): void {
     this.userId = userId;
@@ -63,15 +67,31 @@ export class SugerenciasPresenter {
   generatePromotion(formData: PromotionFormData): void {
     const selected = this._sugerenciaSeleccionada.getValue();
     if (this.hasSelectedProduct(selected)) {
-      const promotionData = {
-        name: `Combo ${selected.productoOriginal}`,
-        discountPercentage: formData.discountPercentage,
-        startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
-        productIds: [selected.estadisticasVenta.productoId, ...formData.productIds]
-      };
-      console.log(promotionData)
-      this.promotionService.createPromotion(promotionData).subscribe({
+      const productIds = [selected.estadisticasVenta.productoId, ...formData.productIds];
+      
+      forkJoin(
+        productIds.map(id => 
+          this.productService.getById(id).pipe(
+            catchError(() => of({ id, urlImagen: null } as any))
+          )
+        )
+      ).pipe(
+        switchMap((products) => {
+          const imageUrls = products.map(p => p.urlImagen);
+          const collageUrl = buildCloudinaryCollageUrl(imageUrls);
+          
+          const promotionData = {
+            name: `Combo ${selected.productoOriginal}`,
+            discountPercentage: formData.discountPercentage,
+            startDate: new Date(formData.startDate).toISOString(),
+            endDate: new Date(formData.endDate).toISOString(),
+            productIds: productIds,
+            imageUrl: collageUrl
+          };
+          
+          return this.promotionService.createPromotion(promotionData);
+        })
+      ).subscribe({
         next: () => {
           this.closeComboPromotionModal();
           this.toastService.mostrar("Combo creado exitosamente", "success");

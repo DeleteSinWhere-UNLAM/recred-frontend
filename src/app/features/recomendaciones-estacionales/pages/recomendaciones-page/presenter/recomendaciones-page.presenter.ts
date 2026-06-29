@@ -8,6 +8,7 @@ import { ToastService } from '../../../../../shared/services/toast.service';
 import { PerfilService } from '../../../../../data-access/services/perfil.service';
 import { Sugerencia, PromocionSugerida, InfoEstacion, InfoClima } from '../../../models/recomendacion.model';
 import { Producto } from '../../../../inventario/models/producto.interface';
+import { buildCloudinaryCollageUrl } from '../../../../../shared/utils/cloudinary-collage.helper';
 
 @Injectable()
 export class RecomendacionesPagePresenter {
@@ -139,6 +140,11 @@ export class RecomendacionesPagePresenter {
     const buffetId = this.perfilService.obtenerBuffetId() ?? '';
     const suggested = this.suggestedPromotionState();
     
+    // Find the resolved product details for selected productIds to get their urlImagen
+    const selectedProducts = this.resolvedProductsState().filter(p => formData.productIds.includes(p.id));
+    const imageUrls = selectedProducts.map(p => p.urlImagen);
+    const collageUrl = buildCloudinaryCollageUrl(imageUrls);
+
     const request = {
       name: suggested?.nombre || 'Promoción Estacional',
       discountPercentage: formData.discountPercentage,
@@ -146,7 +152,8 @@ export class RecomendacionesPagePresenter {
       endDate: new Date(formData.endDate).toISOString(),
       productIds: formData.productIds,
       buffetId: buffetId,
-      isActive: true
+      isActive: true,
+      imageUrl: collageUrl
     };
 
     this.promotionService.createPromotion(request).pipe(
