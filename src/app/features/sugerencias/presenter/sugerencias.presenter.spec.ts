@@ -8,6 +8,7 @@ import { of } from 'rxjs';
 import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 import { Promotion } from '../../../data-access/services/promociones/promotion.service';
 import { ProductoService } from '../../inventario/services/producto.service';
+import { Producto } from '../../inventario/models/producto.interface';
 
 describe('SugerenciasPresenter', () => {
   let presenter: SugerenciasPresenter;

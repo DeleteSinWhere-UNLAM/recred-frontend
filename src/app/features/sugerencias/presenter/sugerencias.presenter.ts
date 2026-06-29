@@ -8,6 +8,7 @@ import { PromotionService } from '../../../data-access/services/promociones/prom
 import { PromotionFormData } from '../components/combo-promotion-modal/combo-promotion-modal.component';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ProductoService } from '../../inventario/services/producto.service';
+import { Producto } from '../../inventario/models/producto.interface';
 import { buildCloudinaryCollageUrl } from '../../../shared/utils/cloudinary-collage.helper';
 
 @Injectable()
