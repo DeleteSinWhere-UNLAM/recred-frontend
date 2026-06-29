@@ -23,34 +23,28 @@ describe('ResumenSemanalService', () => {
   });
 
   afterEach(() => {
-    // Verificamos que no haya peticiones http pendientes después de cada test
     httpMock.verify();
   });
 
-  it('debería ser creado', () => {
-    expect(service).toBeTruthy();
-  });
+  describe('Obtención de datos', () => {
+    it('debería solicitar el resumen semanal realizando un GET al endpoint correspondiente', () => {
+      
+      const mockRespuesta: ResumenSemanal = {
+        id: 'res-123',
+        fechaDesde: '2023-01-01',
+        fechaHasta: '2023-01-07',
+        resumen: '{"hijos":{}}'
+      };
+      let respuestaObtenida: ResumenSemanal | undefined;
 
-  it('debería hacer una petición GET a la API al endpoint /resumen/me', () => {
-    const mockRespuesta: ResumenSemanal = {
-      id: 'res-123',
-      fechaDesde: '2023-01-01',
-      fechaHasta: '2023-01-07',
-      resumen: '{"hijos":{}}'
-    };
+      service.getResumen().subscribe((data) => {
+        respuestaObtenida = data;
+      });
+      const req = httpMock.expectOne(`${environment.apiUrl}/resumen/me`);
+      req.flush(mockRespuesta);
 
-    // Llamamos al método
-    service.getResumen().subscribe((data) => {
-      expect(data).toEqual(mockRespuesta);
+      expect(req.request.method).toBe('GET');
+      expect(respuestaObtenida).toEqual(mockRespuesta);
     });
-
-    // Esperamos que se haga una petición HTTP a la URL construida
-    const req = httpMock.expectOne(`${environment.apiUrl}/resumen/me`);
-    
-    // Verificamos que sea de tipo GET
-    expect(req.request.method).toBe('GET');
-
-    // Respondemos a la petición con nuestros datos de prueba
-    req.flush(mockRespuesta);
   });
 });

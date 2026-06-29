@@ -3,145 +3,189 @@ import { ResumenSemanalPage } from './resumen-semanal.page';
 import { ResumenSemanalService } from './services/resumen-semanal.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { of } from 'rxjs';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { signal } from '@angular/core';
-import { HijoResumen, ResumenSemanal } from './models/resumen-semanal.model';
+import { Component, Input, signal } from '@angular/core';
+import { HijoResumen, MensajeHijo, ResumenSemanal } from './models/resumen-semanal.model';
+import { Usuario } from '../../data-access/models/usuario.model';
+
+class ResumenSemanalMother {
+  static crearUsuario(override: Partial<Usuario> = {}): Usuario {
+    return {
+      id: 'user-id-123',
+      nombre: 'Test User',
+      ...override
+    } as unknown as Usuario;
+  }
+
+  static crearResumen(override: Partial<ResumenSemanal> = {}): ResumenSemanal {
+    return {
+      id: '1',
+      fechaDesde: '2023-01-01',
+      fechaHasta: '2023-01-07',
+      resumen: JSON.stringify({
+        hijos: {
+          'Juan Perez': this.crearHijoResumen(),
+          'Maria Lopez': this.crearHijoResumen({ totalGastado: 500, LimiteGasto: 1000, porCategoria: undefined })
+        },
+        mensaje: JSON.stringify([this.crearMensajeHijo()])
+      }),
+      ...override
+    } as unknown as ResumenSemanal;
+  }
+
+  static crearHijoResumen(override: Partial<HijoResumen> = {}): HijoResumen {
+    return {
+      totalGastado: 1000,
+      LimiteGasto: 2000,
+      productoMasConsumido: { nombre: 'Alfajor', cantidad: 5, porcentaje: 10 },
+      porCategoria: { Snacks: 60, Bebidas: 40 },
+      ...override
+    } as unknown as HijoResumen;
+  }
+
+  static crearMensajeHijo(override: Partial<MensajeHijo> = {}): MensajeHijo {
+    return {
+      nombre: 'Juan Perez',
+      mensaje: 'Buen ahorro',
+      ...override
+    } as unknown as MensajeHijo;
+  }
+}
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true
+})
+class NavbarStub {
+  @Input() userName = '';
+}
 
 describe('ResumenSemanalPage', () => {
-  let mockResumenService: jasmine.SpyObj<ResumenSemanalService>;
-  let mockUsuarioService: unknown;
+  let servicioResumen: jasmine.SpyObj<ResumenSemanalService>;
+  let servicioUsuario: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(async () => {
-    mockResumenService = jasmine.createSpyObj('ResumenSemanalService', ['getResumen']);
-
-    mockUsuarioService = {
-      getUsuarioActual: jasmine.createSpy('getUsuarioActual').and.returnValue({ nombre: 'Test User' }),
+    servicioResumen = jasmine.createSpyObj('ResumenSemanalService', ['getResumen']);
+    
+    servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual'], {
       esVistaKiosquero: signal(false),
       esVistaAlumno: signal(false),
       nombreNavbar: signal('Test User'),
       homeUrl: signal('/tutor')
-    };
+    });
+
+    servicioUsuario.getUsuarioActual.and.returnValue(ResumenSemanalMother.crearUsuario());
 
     await TestBed.configureTestingModule({
       imports: [ResumenSemanalPage],
       providers: [
-        { provide: ResumenSemanalService, useValue: mockResumenService },
-        { provide: UsuarioService, useValue: mockUsuarioService },
-        provideRouter([]),
-        provideHttpClient(),
-        provideHttpClientTesting()
+        { provide: ResumenSemanalService, useValue: servicioResumen },
+        { provide: UsuarioService, useValue: servicioUsuario }
       ]
-    }).compileComponents();
+    })
+      .overrideComponent(ResumenSemanalPage, {
+        add: {
+          imports: [NavbarStub]
+        }
+      })
+      .compileComponents();
   });
 
-  describe('cuando el perfil existe en localStorage', () => {
+  describe('Cuando el perfil existe en localStorage', () => {
     let component: ResumenSemanalPage;
     let fixture: ComponentFixture<ResumenSemanalPage>;
 
     beforeEach(() => {
       spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
-
-      mockResumenService.getResumen.and.returnValue(of({
-        id: '1',
-        fechaDesde: '2023-01-01',
-        fechaHasta: '2023-01-07',
-        resumen: JSON.stringify({
-          hijos: {
-            'Juan': {
-              totalGastado: 1000,
-              LimiteGasto: 2000,
-              productoMasConsumido: { nombre: 'Alfajor', cantidad: 5 },
-              porCategoria: { 'Snacks': 60, 'Bebidas': 40 }
-            },
-            'Maria': {
-              totalGastado: 500,
-              LimiteGasto: 1000,
-              porCategoria: undefined
-            }
-          },
-          mensaje: JSON.stringify([{ nombre: 'Ahorro', mensaje: 'Buen ahorro' }])
-        })
-      } as unknown as ResumenSemanal));
-
+      servicioResumen.getResumen.and.returnValue(of(ResumenSemanalMother.crearResumen()));
+      
       fixture = TestBed.createComponent(ResumenSemanalPage);
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
 
-    it('debería crear el componente e inicializar el resumen', () => {
-      expect(component).toBeTruthy();
-      expect(component.nombreUsuario).toBe('Test User');
-      expect(mockResumenService.getResumen).toHaveBeenCalled();
-      expect(component.hijos.length).toBe(2);
-      expect(component.resumenProcesado?.mensajes[0].nombre).toBe('Ahorro');
-    });
-
-    it('debería calcular totalFamiliar correctamente', () => {
-      expect(component.totalFamiliar).toBe(1500);
-    });
-
-    it('debería devolver categorías correctamente desde getCategorias()', () => {
-      const juan = component.hijos[0];
-      expect(component.getCategorias(juan.datos)).toEqual([['Snacks', 60], ['Bebidas', 40]]);
-
-      const maria = component.hijos[1];
-      expect(component.getCategorias(maria.datos)).toEqual([]);
-    });
-
-    it('debería calcular hijosResumen con ordenamiento y porcentajes', () => {
-      const resumen = component.hijosResumen;
-      expect(resumen.length).toBe(2);
-      expect(resumen[0].nombre).toBe('Juan');
-      expect(resumen[0].gasto).toBe(1000);
-      expect(resumen[0].porcentaje).toBeCloseTo(66.66, 1);
+    it('debería inicializar el resumen parseando correctamente el JSON desde el servicio', () => {
       
-      expect(resumen[1].nombre).toBe('Maria');
-      expect(resumen[1].gasto).toBe(500);
-      expect(resumen[1].porcentaje).toBeCloseTo(33.33, 1);
+      const cantidadHijos = component.hijos.length;
+      const primerMensaje = component.resumenProcesado?.mensajes[0].nombre;
+
+      expect(servicioResumen.getResumen).toHaveBeenCalled();
+      expect(cantidadHijos).toBe(2);
+      expect(primerMensaje).toBe('Juan');
     });
 
-    it('debería manejar el caso donde totalFamiliar sea 0 para los porcentajes', () => {
-      component.hijos = [{ nombre: 'Cero', datos: { totalGastado: 0 } as unknown as HijoResumen }];
-      expect(component.hijosResumen[0].porcentaje).toBe(0);
+    it('debería calcular el total familiar sumando todos los consumos', () => {
+      
+      const total = component.totalFamiliar;
+
+      expect(total).toBe(1500);
     });
 
-    it('debería manejar el caso de fallbacks en totalGastado nulo', () => {
-      component.hijos = [{ nombre: 'Nulo', datos: { totalGastado: undefined } as unknown as HijoResumen }];
-      expect(component.totalFamiliar).toBe(0);
-      expect(component.hijosResumen[0].gasto).toBe(0);
+    it('debería devolver el arreglo de categorías vacío si el hijo no tiene categorías', () => {
+      
+      const hijoSinCategorias = component.hijos[1];
+      const categorias = component.getCategorias(hijoSinCategorias.datos);
+
+      expect(categorias).toEqual([]);
+    });
+
+    it('debería calcular el resumen de hijos ordenado por gasto mayor y calcular su porcentaje del total', () => {
+      
+      const resumenCalculado = component.hijosResumen;
+
+      expect(resumenCalculado.length).toBe(2);
+      expect(resumenCalculado[0].nombre).toBe('Juan');
+      expect(resumenCalculado[0].gasto).toBe(1000);
+      expect(resumenCalculado[0].porcentaje).toBeCloseTo(66.66, 1);
+      expect(resumenCalculado[1].nombre).toBe('Maria');
+      expect(resumenCalculado[1].gasto).toBe(500);
+      expect(resumenCalculado[1].porcentaje).toBeCloseTo(33.33, 1);
+    });
+
+    it('debería devolver porcentaje cero cuando el gasto total familiar es cero', () => {
+      
+      component.hijos = [{ nombre: 'Cero', datos: ResumenSemanalMother.crearHijoResumen({ totalGastado: 0 }) }];
+      const resumenCalculado = component.hijosResumen;
+
+      expect(resumenCalculado[0].porcentaje).toBe(0);
+    });
+
+    it('debería fallback a cero cuando el hijo tiene gasto nulo', () => {
+      
+      component.hijos = [{ nombre: 'Nulo', datos: ResumenSemanalMother.crearHijoResumen({ totalGastado: undefined as unknown as number }) }];
+      const total = component.totalFamiliar;
+      const gastoPrimerHijo = component.hijosResumen[0].gasto;
+
+      expect(total).toBe(0);
+      expect(gastoPrimerHijo).toBe(0);
     });
   });
 
-  describe('cuando el perfil no está en localStorage o el JSON no tiene campos', () => {
-    it('no debería llamar al servicio si localStorage devuelve null', () => {
+  describe('Cuando la API o el estado interno varían', () => {
+    it('no debería solicitar el resumen al servicio si el id de usuario no existe en la sesión', () => {
+      
       spyOn(localStorage, 'getItem').and.returnValue(null);
-
       const fixture = TestBed.createComponent(ResumenSemanalPage);
       const component = fixture.componentInstance;
       fixture.detectChanges();
 
-      expect(mockResumenService.getResumen).not.toHaveBeenCalled();
+      expect(servicioResumen.getResumen).not.toHaveBeenCalled();
       expect(component.resumen).toBeUndefined();
     });
 
-    it('debería manejar mensajes nulos de forma segura (fallback a [])', () => {
+    it('debería parsear mensajes como un arreglo vacío si la API devuelve el campo mensaje nulo', () => {
+      
       spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-456' }));
-
-      mockResumenService.getResumen.and.returnValue(of({
-        id: '2',
-        resumen: JSON.stringify({
-          hijos: {},
-          mensaje: null
-        })
-      } as unknown as ResumenSemanal));
-
+      const resumenMalo = ResumenSemanalMother.crearResumen();
+      resumenMalo.resumen = JSON.stringify({ hijos: {}, mensaje: null });
+      servicioResumen.getResumen.and.returnValue(of(resumenMalo));
       const fixture = TestBed.createComponent(ResumenSemanalPage);
       const component = fixture.componentInstance;
       fixture.detectChanges();
 
-      expect(component.resumenProcesado?.mensajes).toEqual([]);
+      const mensajesCalculados = component.resumenProcesado?.mensajes;
+
+      expect(mensajesCalculados).toEqual([]);
     });
   });
 });
