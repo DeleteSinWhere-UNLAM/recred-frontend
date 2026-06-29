@@ -6,8 +6,8 @@
       <i class="fa-solid fa-arrow-left"></i> Volver a Proveedores
     </button>
     <h1 class="comp-title">Comparador de Precios & Recomendación</h1>
-    <p class="comp-subtitle">Seleccioná los productos de tu buffet para que Gemini compare los costos de tus proveedores
-      y recomiende la opción más económica.</p>
+    <p class="comp-subtitle">Seleccioná los productos de tu buffet para comparar los costos de tus proveedores
+      y recomendar la opción más económica calculada por unidad.</p>
   </header>
 
   <div class="comp-layout">
@@ -21,6 +21,25 @@
           </button>
           <button class="select-helper" (click)="selectAll()">Todos</button>
           <button class="select-helper" (click)="clearSelection()">Limpiar</button>
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="products-filters">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-box__icon"></i>
+          <input type="text" placeholder="Buscar por nombre..." 
+                 [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" 
+                 class="search-box__input" />
+        </div>
+        <div class="category-box">
+          <select [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event)" 
+                  class="category-box__select">
+            <option value="TODAS">Todas las categorías</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.desc }}</option>
+            }
+          </select>
         </div>
       </div>
 
@@ -40,9 +59,17 @@
       </div>
       }
 
-      @if (!isLoading() && products().length > 0) {
+      @if (!isLoading() && products().length > 0 && filteredProducts().length === 0) {
+      <div class="empty-state">
+        <i class="fa-solid fa-magnifying-glass empty-state__icon"></i>
+        <h3 class="empty-state__title">Sin coincidencias</h3>
+        <p class="empty-state__text">No hay productos que coincidan con la búsqueda o filtro seleccionados.</p>
+      </div>
+      }
+
+      @if (!isLoading() && filteredProducts().length > 0) {
       <div class="products-grid">
-        @for (prod of products(); track prod.id) {
+        @for (prod of filteredProducts(); track prod.id) {
         <article class="product-card" [class.product-card--selected]="isProductSelected(prod.id)"
           (click)="toggleProductSelection(prod.id)" tabindex="0" (keydown.enter)="toggleProductSelection(prod.id)">
           <div class="product-card__selector">
@@ -93,67 +120,98 @@
       <!-- Recommendation Cards -->
       @if (recommendations().length > 0) {
       <div class="recommendations-list">
-        <h2 class="results-title"><i class="fa-solid fa-square-poll-vertical"></i> Compras Sugeridas</h2>
+        <div class="results-header-row">
+          <h2 class="results-title"><i class="fa-solid fa-square-poll-vertical"></i> Compras Sugeridas</h2>
+          <div class="export-buttons">
+            <button class="export-btn export-btn--excel" (click)="exportToCsv()" title="Exportar a Excel (CSV)">
+              <i class="fa-solid fa-file-excel"></i> Excel
+            </button>
+            <button class="export-btn export-btn--pdf" (click)="exportToPdf()" title="Exportar a PDF">
+              <i class="fa-solid fa-file-pdf"></i> PDF
+            </button>
+          </div>
+        </div>
 
         @for (rec of recommendations(); track rec.productoInventarioId) {
-        <article class="rec-card">
+        <article class="rec-card" [class.rec-card--unquoted]="!rec.proveedorRecomendadoId">
           <header class="rec-card__header">
             <h3 class="rec-card__prod-name">{{ rec.nombreProducto }}</h3>
+            @if (!rec.proveedorRecomendadoId) {
+              <span class="badge-unquoted"><i class="fa-solid fa-triangle-exclamation"></i> Sin cotización</span>
+            }
           </header>
 
           <div class="rec-card__body">
-            <!-- Best supplier recommendation -->
-            <div class="best-offer">
-              <span class="best-offer__label">Mejor Proveedor Recomendado</span>
-              <div class="best-offer__box">
-                <div class="best-offer__supplier">
-                  <i class="fa-solid fa-medal icon-best"></i>
-                  <strong class="supplier-name">{{ rec.nombreProveedorRecomendado }}</strong>
-                </div>
-                <div class="best-offer__price-wrap">
-                  <span class="best-offer__price">{{ rec.mejorPrecio | currency: 'ARS': 'symbol-narrow': '1.0-0'
-                    }}</span>
-                  <small class="best-offer__unit">/ {{ rec.unidad || 'unidad' }}</small>
+            @if (!rec.proveedorRecomendadoId) {
+              <div class="unquoted-alert">
+                <i class="fa-solid fa-circle-info unquoted-alert__icon"></i>
+                <p class="unquoted-alert__text">No tenés listas de precios vigentes o mapeos confirmados para este producto con tus proveedores.</p>
+              </div>
+            } @else {
+              <!-- Best supplier recommendation -->
+              <div class="best-offer">
+                <span class="best-offer__label">Mejor Proveedor Recomendado</span>
+                <div class="best-offer__box">
+                  <div class="best-offer__supplier">
+                    <i class="fa-solid fa-medal icon-best"></i>
+                    <strong class="supplier-name">{{ rec.nombreProveedorRecomendado }}</strong>
+                  </div>
+                  <div class="best-offer__price-wrap">
+                    <span class="best-offer__price">
+                      {{ rec.mejorPrecio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+                    </span>
+                    <small class="best-offer__unit">/ {{ rec.unidad || 'unidad' }}</small>
+                    
+                    @if (rec.mejorPrecioUnitario && rec.mejorPrecioUnitario !== rec.mejorPrecio) {
+                      <div class="unit-price-label">
+                        (Equivale a <strong>{{ rec.mejorPrecioUnitario | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</strong> por unidad)
+                      </div>
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Collapsible Alternatives accordion -->
-            <div class="alternatives-accordion">
-              <button class="accordion-trigger" (click)="toggleAccordion(rec.productoInventarioId)">
-                <span>Otras Alternativas ({{ rec.alternativas.length || 0 }})</span>
-                <i class="fa-solid" [class.fa-chevron-up]="isAccordionExpanded(rec.productoInventarioId)"
-                  [class.fa-chevron-down]="!isAccordionExpanded(rec.productoInventarioId)"></i>
-              </button>
+              <!-- Collapsible Alternatives accordion -->
+              <div class="alternatives-accordion">
+                <button class="accordion-trigger" (click)="toggleAccordion(rec.productoInventarioId)">
+                  <span>Otras Alternativas ({{ rec.alternativas.length || 0 }})</span>
+                  <i class="fa-solid" [class.fa-chevron-up]="isAccordionExpanded(rec.productoInventarioId)"
+                    [class.fa-chevron-down]="!isAccordionExpanded(rec.productoInventarioId)"></i>
+                </button>
 
-              @if (isAccordionExpanded(rec.productoInventarioId)) {
-              <div class="accordion-content">
-                @if (!rec.alternativas || rec.alternativas.length === 0) {
-                <p class="no-alt-text">No hay otros proveedores con listas de precios para este producto.</p>
-                } @else {
-                <table class="alt-table">
-                  <thead>
-                    <tr>
-                      <th>Proveedor</th>
-                      <th class="text-right">Precio</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (alt of rec.alternativas; track alt.proveedorId) {
-                    <tr>
-                      <td>{{ alt.nombreProveedor }}</td>
-                      <td class="text-right font-semibold">
-                        {{ alt.precio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
-                        <small class="alt-unit">/ {{ alt.unidad || 'unidad' }}</small>
-                      </td>
-                    </tr>
-                    }
-                  </tbody>
-                </table>
+                @if (isAccordionExpanded(rec.productoInventarioId)) {
+                <div class="accordion-content">
+                  @if (!rec.alternativas || rec.alternativas.length === 0) {
+                  <p class="no-alt-text">No hay otros proveedores con listas de precios para este producto.</p>
+                  } @else {
+                  <table class="alt-table">
+                    <thead>
+                      <tr>
+                        <th>Proveedor</th>
+                        <th class="text-right">Precio Total</th>
+                        <th class="text-right">Precio Unitario</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (alt of rec.alternativas; track alt.proveedorId) {
+                      <tr>
+                        <td>{{ alt.nombreProveedor }}</td>
+                        <td class="text-right font-semibold">
+                          {{ alt.precio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+                          <small class="alt-unit">/ {{ alt.unidad || 'unidad' }}</small>
+                        </td>
+                        <td class="text-right font-semibold text-muted">
+                          {{ (alt.precioUnitario || alt.precio) | currency: 'ARS': 'symbol-narrow': '1.0-0' }} / un.
+                        </td>
+                      </tr>
+                      }
+                    </tbody>
+                  </table>
+                  }
+                </div>
                 }
               </div>
-              }
-            </div>
+            }
           </div>
         </article>
         }

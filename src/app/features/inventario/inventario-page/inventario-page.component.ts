@@ -216,6 +216,12 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl('/kiosquero');
   }
 
+  irAComparador(): void {
+    this.router.navigate(['/kiosquero/proveedores/comparador'], {
+      queryParams: { preselect: 'low-stock' }
+    });
+  }
+
   get filteredProducts(): ItemResumenInventario[] {
     const normalizedSearchQuery = this.normalizeSearchText(this.searchQuery);
     let products = normalizedSearchQuery

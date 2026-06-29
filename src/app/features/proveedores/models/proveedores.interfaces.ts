@@ -42,6 +42,7 @@ export interface AlternativaProveedor {
   nombreProveedor: string;
   precio: number;
   unidad: string;
+  precioUnitario?: number;
 }
 
 export interface RecomendacionProveedor {
@@ -51,5 +52,6 @@ export interface RecomendacionProveedor {
   nombreProveedorRecomendado: string;
   mejorPrecio: number;
   unidad: string;
+  mejorPrecioUnitario?: number;
   alternativas: AlternativaProveedor[];
 }
