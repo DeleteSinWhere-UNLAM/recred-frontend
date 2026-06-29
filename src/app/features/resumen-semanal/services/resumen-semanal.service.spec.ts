@@ -5,6 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { ResumenSemanalService } from './resumen-semanal.service';
 import { environment } from '../../../../environments/environment';
 import { ResumenSemanal } from '../models/resumen-semanal.model';
+import { ResumenSemanalMother } from '../resumen-semanal.mother';
 
 describe('ResumenSemanalService', () => {
   let service: ResumenSemanalService;
@@ -29,12 +30,7 @@ describe('ResumenSemanalService', () => {
   describe('Obtención de datos', () => {
     it('debería solicitar el resumen semanal realizando un GET al endpoint correspondiente', () => {
       
-      const mockRespuesta: ResumenSemanal = {
-        id: 'res-123',
-        fechaDesde: '2023-01-01',
-        fechaHasta: '2023-01-07',
-        resumen: '{"hijos":{}}'
-      };
+      const mockRespuesta: ResumenSemanal = ResumenSemanalMother.crearResumen();
       let respuestaObtenida: ResumenSemanal | undefined;
 
       service.getResumen().subscribe((data) => {
