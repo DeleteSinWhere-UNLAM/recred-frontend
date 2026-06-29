@@ -79,9 +79,8 @@ export class BuffetPage implements OnInit {
   protected readonly panelLateralCerrado = signal<boolean>(false);
   protected readonly diasCalendario = signal<DateCell[]>([]);
 
-  protected readonly presupuestoColapsado = signal(false);
-  protected readonly categoriasColapsado = signal(false);
-  protected readonly otrosLimitesColapsado = signal(true);
+  protected readonly presupuestoColapsado = signal(true);
+  protected readonly limitesColapsado = signal(true);
 
   readonly tieneRestriccionesActivas = computed(() => {
     const hayNutricionales = this.presenter.restriccionesNutricionales().length > 0;
@@ -348,7 +347,21 @@ export class BuffetPage implements OnInit {
       estadoStock: 'DISPONIBLE'
     };
 
+    const eraVacio = this.presenter.itemsCarrito().length === 0;
     this.presenter.agregarAlCarrito(pTemp, 1);
+    
+    if (eraVacio && this.panelLateralCerrado()) {
+      this.panelLateralCerrado.set(false);
+    }
+  }
+
+  protected onAgregarAlCarrito(producto: Producto, cantidad: number): void {
+    const eraVacio = this.presenter.itemsCarrito().length === 0;
+    this.presenter.agregarAlCarrito(producto, cantidad);
+    
+    if (eraVacio && this.panelLateralCerrado()) {
+      this.panelLateralCerrado.set(false);
+    }
   }
 
   constructor() {
