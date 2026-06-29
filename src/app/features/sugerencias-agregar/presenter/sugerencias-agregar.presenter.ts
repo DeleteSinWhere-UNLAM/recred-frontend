@@ -40,7 +40,7 @@ export class SugerenciasAgregarPresenter {
     this._isLoading.next(true);
     this._error.next(null);
 
-    this.sugerenciasService.getSugerenciasAgregarProducto(userId).subscribe({
+    this.sugerenciasService.getSugerenciasAgregarProducto().subscribe({
       next: (data) => {
         this._sugerencias.next(data);
         this._isLoading.next(false);

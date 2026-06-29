@@ -56,7 +56,7 @@ describe('SugerenciasAgregarPresenter', () => {
     
     presenter.initialize('user-1');
 
-    expect(mockSugerenciasAgregarService.getSugerenciasAgregarProducto).toHaveBeenCalledWith('user-1');
+    expect(mockSugerenciasAgregarService.getSugerenciasAgregarProducto).toHaveBeenCalled();
     
     presenter.sugerencias$.subscribe(s => {
       expect(s).toEqual(mockData);

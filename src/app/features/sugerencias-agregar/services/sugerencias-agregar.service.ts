@@ -11,9 +11,9 @@ export class SugerenciasAgregarService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl;
 
-  getSugerenciasAgregarProducto(userId: string): Observable<SugerenciaAgregarProducto[]> {
+  getSugerenciasAgregarProducto(): Observable<SugerenciaAgregarProducto[]> {
     return this.http.get<SugerenciaAgregarProducto[]>(
-      `${this.baseUrl}/sugerencias/agregar-producto/${userId}`,
+      `${this.baseUrl}/sugerencias/agregar-producto`,
     );
   }
 }
