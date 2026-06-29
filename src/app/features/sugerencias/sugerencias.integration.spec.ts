@@ -58,8 +58,8 @@ class NavbarStub {
 })
 class ComboPromotionModalStub {
   @Input() baseProductName = '';
-  @Input() suggestedProducts: any[] = [];
-  @Output() confirmPromotion = new EventEmitter<any>();
+  @Input() suggestedProducts: unknown[] = [];
+  @Output() confirmPromotion = new EventEmitter<Record<string, unknown>>();
   @Output() closeModal = new EventEmitter<void>();
 }
 

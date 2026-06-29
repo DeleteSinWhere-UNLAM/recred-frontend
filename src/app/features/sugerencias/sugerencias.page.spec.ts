@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Usuario } from '../../data-access/models/usuario.model';
 import { SugerenciasPage } from './sugerencias.page';
 import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
 import { Router } from '@angular/router';
@@ -9,15 +10,15 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { ComboPromotionModalComponent } from './components/combo-promotion-modal/combo-promotion-modal.component';
 
 class SugerenciasMother {
-  static crearUsuario(override: Partial<any> = {}) {
+  static crearUsuario(override: Partial<Usuario> = {}): Usuario {
     return {
       id: 'test-id',
       nombre: 'Test User',
       ...override
-    };
+    } as unknown as Usuario;
   }
 
-  static crearSugerencia(override: Partial<any> = {}): SugerenciaProducto {
+  static crearSugerencia(override: Record<string, unknown> = {}): SugerenciaProducto {
     return {
       productoOriginal: 'Producto',
       ...override
@@ -32,8 +33,8 @@ class SugerenciasMother {
 })
 class ComboPromotionModalStub {
   @Input() baseProductName!: string;
-  @Input() suggestedProducts: any[] = [];
-  @Output() confirmPromotion = new EventEmitter<any>();
+  @Input() suggestedProducts: unknown[] = [];
+  @Output() confirmPromotion = new EventEmitter<Record<string, unknown>>();
   @Output() closeModal = new EventEmitter<void>();
 }
 

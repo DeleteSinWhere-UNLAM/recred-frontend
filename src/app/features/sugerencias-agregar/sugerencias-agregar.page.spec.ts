@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Usuario } from '../../data-access/models/usuario.model';
 import { Router } from '@angular/router';
 import { Component, Input } from '@angular/core';
 import { SugerenciasAgregarPage } from './sugerencias-agregar.page';
@@ -7,13 +8,13 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 class UsuarioMother {
-  static crearUsuario(override: Partial<any> = {}): any {
+  static crearUsuario(override: Partial<Usuario> = {}): Usuario {
     return {
       id: 'user-1',
       nombre: 'Test Kiosquero',
       rol: 'KIOSQUERO',
       ...override
-    };
+    } as unknown as Usuario;
   }
 }
 

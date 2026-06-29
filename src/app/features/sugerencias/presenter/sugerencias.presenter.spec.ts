@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { SugerenciasPresenter } from './sugerencias.presenter';
 import { SugerenciasService } from '../services/sugerencias.service';
@@ -10,7 +11,7 @@ import { Producto } from '../../inventario/models/producto.interface';
 import { Promotion } from '../../../data-access/services/promociones/promotion.service';
 
 class SugerenciasMother {
-  static crearSugerencia(override: Partial<any> = {}): SugerenciaProducto {
+  static crearSugerencia(override: Record<string, unknown> = {}): SugerenciaProducto {
     return {
       productoOriginal: 'Producto Base',
       estadisticasVenta: {
@@ -73,13 +74,18 @@ describe('SugerenciasPresenter', () => {
     toast = jasmine.createSpyObj('ToastService', ['mostrar']);
     servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
 
-    presenter = new SugerenciasPresenter(
-      servicioSugerencias,
-      servicioPromociones,
-      router,
-      toast,
-      servicioProducto
-    );
+    TestBed.configureTestingModule({
+      providers: [
+        SugerenciasPresenter,
+        { provide: SugerenciasService, useValue: servicioSugerencias },
+        { provide: PromotionService, useValue: servicioPromociones },
+        { provide: Router, useValue: router },
+        { provide: ToastService, useValue: toast },
+        { provide: ProductoService, useValue: servicioProducto }
+      ]
+    });
+
+    presenter = TestBed.inject(SugerenciasPresenter);
   });
 
   describe('Inicialización', () => {

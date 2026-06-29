@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { SugerenciasAgregarPresenter } from './sugerencias-agregar.presenter';
 import { SugerenciasAgregarService } from '../services/sugerencias-agregar.service';
@@ -48,7 +49,13 @@ describe('SugerenciasAgregarPresenter', () => {
 
   beforeEach(() => {
     servicio = jasmine.createSpyObj('SugerenciasAgregarService', ['getSugerenciasAgregarProducto']);
-    presenter = new SugerenciasAgregarPresenter(servicio);
+    TestBed.configureTestingModule({
+      providers: [
+        SugerenciasAgregarPresenter,
+        { provide: SugerenciasAgregarService, useValue: servicio }
+      ]
+    });
+    presenter = TestBed.inject(SugerenciasAgregarPresenter);
   });
 
   describe('Inicialización', () => {
@@ -101,57 +108,37 @@ describe('SugerenciasAgregarPresenter', () => {
     });
 
     it('debería calcular el total de productos analizados', () => {
-      // Arrange
-      let total: number;
+      
+      const total = presenter.totalProductos;
 
-      // Act
-      total = presenter.totalProductos;
-
-      // Assert
       expect(total).toBe(3);
     });
 
     it('debería sumar las ventas totales de todas las sugerencias', () => {
-      // Arrange
-      let total: number;
+      
+      const total = presenter.totalVentas;
 
-      // Act
-      total = presenter.totalVentas;
-
-      // Assert
       expect(total).toBe(35);
     });
 
     it('debería calcular los ingresos totales esperados', () => {
-      // Arrange
-      let total: number;
+      
+      const total = presenter.totalIngresos;
 
-      // Act
-      total = presenter.totalIngresos;
-
-      // Assert
       expect(total).toBe(4000);
     });
 
     it('debería sumar la cantidad de clientes únicos afectados', () => {
-      // Arrange
-      let total: number;
+      
+      const total = presenter.totalClientes;
 
-      // Act
-      total = presenter.totalClientes;
-
-      // Assert
       expect(total).toBe(17);
     });
 
     it('debería formatear correctamente la etiqueta del total de ingresos', () => {
-      // Arrange
-      let etiqueta: string;
+      
+      const etiqueta = presenter.totalIngresosLabel;
 
-      // Act
-      etiqueta = presenter.totalIngresosLabel;
-
-      // Assert
       expect(etiqueta).toBe('$4.000');
     });
   });
@@ -163,13 +150,9 @@ describe('SugerenciasAgregarPresenter', () => {
     });
 
     it('debería generar los datos del gráfico ordenados por ingreso mayor y calcular el porcentaje relativo', () => {
-      // Arrange
-      let datos;
-
-      // Act
-      datos = presenter.chartData;
       
-      // Assert
+      const datos = presenter.chartData;
+      
       expect(datos.length).toBe(3);
       expect(datos[0].nombre).toBe('Prod C');
       expect(datos[0].ingresos).toBe(2000);
@@ -178,13 +161,9 @@ describe('SugerenciasAgregarPresenter', () => {
     });
 
     it('debería generar las tarjetas de productos mapeando correctamente todos los campos', () => {
-      // Arrange
-      let tarjetas;
-
-      // Act
-      tarjetas = presenter.productCards;
       
-      // Assert
+      const tarjetas = presenter.productCards;
+      
       expect(tarjetas.length).toBe(3);
       expect(tarjetas[0].nombre).toBe('Prod C');
       expect(tarjetas[0].ingresoPercent).toBe(100);
@@ -196,25 +175,17 @@ describe('SugerenciasAgregarPresenter', () => {
     
     // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
     it('debería formatear valores numéricos a moneda local sin decimales', () => {
-      // Arrange
-      let formateado: string;
+      
+      const formateado = presenter.formatCurrency(1500);
 
-      // Act
-      formateado = presenter.formatCurrency(1500);
-
-      // Assert
       expect(formateado).toBe('$1.500');
     });
 
     // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
     it('debería formatear cero correctamente', () => {
-      // Arrange
-      let formateado: string;
+      
+      const formateado = presenter.formatCurrency(0);
 
-      // Act
-      formateado = presenter.formatCurrency(0);
-
-      // Assert
       expect(formateado).toBe('$0');
     });
   });
