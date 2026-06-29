@@ -9,7 +9,6 @@ describe('SugerenciasAgregarService', () => {
   let service: SugerenciasAgregarService;
   let httpMock: HttpTestingController;
 
-  const mockUserId = 'user-123';
   const baseUrl = environment.apiUrl;
 
   const mockResponse: SugerenciaAgregarProducto[] = [
