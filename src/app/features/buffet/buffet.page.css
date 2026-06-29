@@ -1,4 +1,4 @@
-:host {
+﻿:host {
   --saldo-bg: linear-gradient(180deg, rgba(255, 248, 224, 0.95), rgba(242, 183, 5, 0.12)), var(--color-superficie);
   --saldo-border: rgba(242, 183, 5, 0.24);
   --saldo-text: var(--color-pizarra);
@@ -3196,3 +3196,113 @@
   padding: 24px 0;
   font-style: italic;
 }
+
+/* Promo Card Cantidad Styles */
+.promo-card__cantidad {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  margin-top: auto;
+  padding: 4px;
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid rgba(74, 111, 165, 0.08);
+  border-radius: 16px;
+}
+
+.promo-card__cantidad-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra);
+  border: 1px solid rgba(74, 111, 165, 0.12);
+  border-radius: 11px;
+  box-shadow: 0 6px 14px rgba(51, 65, 85, 0.06);
+  font-size: 12px;
+  transition:
+    background-color var(--transition-ui),
+    border-color var(--transition-ui),
+    color var(--transition-ui),
+    transform var(--transition-ui);
+}
+
+.promo-card__cantidad-btn:hover:not(:disabled) {
+  background-color: rgba(74, 111, 165, 0.08);
+  border-color: var(--color-borde-fuerte);
+  color: var(--color-pizarra-dark);
+}
+
+.promo-card__cantidad-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.promo-card__cantidad-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.promo-card__cantidad-valor {
+  min-width: 24px;
+  color: var(--color-texto-oscuro);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+[data-theme="dark"] .promo-card__cantidad {
+  background-color: var(--color-superficie-alt);
+  border-color: var(--color-borde);
+}
+
+[data-theme="dark"] .promo-card__cantidad-btn:hover:not(:disabled) {
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra-dark);
+}
+
+/* Favorito Btn in Sidebar */
+.buffet__sidebar-section-header-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.buffet__sidebar-section-header-inline .buffet__sidebar-section-title {
+  margin-bottom: 0;
+}
+.buffet__sidebar-fav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid var(--color-primario);
+  color: var(--color-primario);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all var(--transition-ui);
+}
+.buffet__sidebar-fav-btn i {
+  color: #ef4444; /* Heart icon red color when enabled */
+}
+.buffet__sidebar-fav-btn:hover:not(:disabled) {
+  background-color: rgba(74, 111, 165, 0.08);
+  border-color: var(--color-primario-dark);
+}
+.buffet__sidebar-fav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: var(--color-fondo);
+  border-color: var(--color-borde);
+  color: var(--color-texto-claro);
+}
+.buffet__sidebar-fav-btn:disabled i {
+  color: var(--color-texto-claro);
+}
+
+

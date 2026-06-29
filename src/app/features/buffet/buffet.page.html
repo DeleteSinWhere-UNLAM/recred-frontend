@@ -194,10 +194,26 @@
                         {{ getMensajeRestriccionPromo(promo) }}
                       </div>
                       } @else if (puedeComprarPromo(promo)) {
-                      <button type="button" class="promo-card__btn-agregar"
-                        [class.promo-card__btn-agregar--premium]="esPremium()" (click)="agregarPromoAlCarrito(promo)">
-                        Agregar Promo
-                      </button>
+                        <div class="promo-card__cantidad" style="margin-top: 0;">
+                          <button
+                            type="button"
+                            class="promo-card__cantidad-btn"
+                            (click)="onAgregarAlCarrito(promoComoProducto(promo), obtenerCantidadEnCarrito(promo.id) - 1)"
+                            [disabled]="obtenerCantidadEnCarrito(promo.id) <= 0"
+                            aria-label="Restar uno"
+                          >
+                            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+                          </button>
+                          <span class="promo-card__cantidad-valor" aria-live="polite">{{ obtenerCantidadEnCarrito(promo.id) }}</span>
+                          <button
+                            type="button"
+                            class="promo-card__cantidad-btn"
+                            (click)="onAgregarAlCarrito(promoComoProducto(promo), obtenerCantidadEnCarrito(promo.id) + 1)"
+                            aria-label="Sumar uno"
+                          >
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                          </button>
+                        </div>
                       } @else {
                       <button type="button" class="promo-card__btn-insuficiente" disabled>
                         Saldo insuficiente
@@ -233,7 +249,8 @@
           @for (producto of productosSueltos(); track producto.id) {
           <app-producto-card [producto]="producto" [alumnoId]="presenter.alumno()?.id ?? ''"
             [esFavorito]="presenter.favoritos().has(producto.id)" [mostrarCandado]="!esVistaAlumno()"
-            (agregar)="onAgregarAlCarrito($event.producto, $event.cantidad)"
+
+            (cambioCantidad)="onAgregarAlCarrito($event.producto, $event.cantidad)"
             (toggleFavorito)="presenter.toggleFavorito($event)" (toggleLock)="presenter.toggleLock($event)" />
           }
         </section>
@@ -265,10 +282,7 @@
 
         <div class="buffet__sidebar-content">          <!-- SECCIÓN 1: CARRITO (TU PEDIDO) -->
           <div class="buffet__sidebar-section">
-            <h3 class="buffet__sidebar-section-title">
-              <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-              Tu Pedido
-            </h3>
+            <div class="buffet__sidebar-section-header-inline"> <h3 class="buffet__sidebar-section-title"> <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Tu Pedido </h3> <button type="button" class="buffet__sidebar-fav-btn" [disabled]="hayCombosEnCarrito() || presenter.itemsCarrito().length === 0" (click)="abrirModalFavorito()" title="Guardar este pedido como favorito para compras rápidas futuras"> <i class="fa-heart fa-regular" aria-hidden="true"></i> <span>Guardar como favorito</span> </button> </div>
             
             <div class="buffet__sidebar-cart-items">
               @if (presenter.itemsCarrito().length > 0) {
@@ -283,10 +297,7 @@
                   </div>
                 </div>
                 }
-                <div class="buffet__sidebar-cart-total">
-                  <span>Total:</span>
-                  <strong>{{ formatARS(presenter.totalCarrito()) }}</strong>
-                </div>
+                
               } @else {
                 <p class="buffet__sidebar-empty-cart">No hay productos en tu pedido aún.</p>
               }
@@ -517,16 +528,32 @@
         <span class="buffet__footer-cart-badge">{{ presenter.cantidadItemsCarrito() }}</span>
       </div>
       <div class="buffet__footer-cart-text">
-        <span class="buffet__footer-cart-label">Subtotal del carrito</span>
+        <span class="buffet__footer-cart-label">TOTAL</span>
         <span class="buffet__footer-cart-total">{{ formatARS(presenter.totalCarrito()) }}</span>
       </div>
     </div>
-    <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()"
-      (click)="presenter.irAlCarrito()">
-      <span>Ver Carrito y Pagar</span>
-      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-    </button>
+    <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()" [disabled]="presenter.procesandoPago()" (click)="presenter.iniciarPago()"> <i class="fa-solid fa-lock" aria-hidden="true"></i> @if(presenter.procesandoPago()) { <span>Procesando...</span> } @else { <span>Avanzar al Pago</span> } </button>
   </div>
 </div>
 }
 }
+
+
+
+
+
+@if (mostrarModalFavorito) {
+  <app-guardar-favorito-modal
+    [initialAlumnoId]="favoritoModalAlumnoId"
+    [items]="favoritoModalItems"
+    (closeModal)="cerrarModalFavorito()"
+  />
+}
+
+
+
+
+
+
+
+

@@ -1,3 +1,4 @@
+﻿import { GuardarFavoritoModalComponent } from '../compra/components/guardar-favorito-modal/guardar-favorito-modal.component';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,6 +22,7 @@ import { BuffetPresenter, PresupuestoDisponibleCategoria } from './presenter/buf
 import { Recreo } from '../compra/models/orden-compra.model';
 import { Producto, CategoriaProducto, ClasificacionSalud } from './models/producto.model';
 import { CarritoService } from '../compra/services/carrito.service';
+import { CarritosFavoritosService } from '../carritos-favoritos/services/carritos-favoritos.service';
 
 export interface DateCell {
   date: Date;
@@ -56,7 +58,7 @@ export interface MappedPromotion {
   selector: 'app-buffet-page',
   templateUrl: './buffet.page.html',
   styleUrl: './buffet.page.css',
-  imports: [NavbarComponent, ProductoCardComponent, SeleccionarAlumnoModalComponent],
+  imports: [NavbarComponent, ProductoCardComponent, SeleccionarAlumnoModalComponent, GuardarFavoritoModalComponent],
   providers: [BuffetPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -67,6 +69,7 @@ export class BuffetPage implements OnInit {
   private readonly alumnosService = inject(AlumnosService);
   private readonly colegiosService = inject(ColegiosService);
   private readonly carritoService = inject(CarritoService);
+  private readonly carritosFavoritosService = inject(CarritosFavoritosService);
   protected readonly presenter = inject(BuffetPresenter);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
@@ -77,6 +80,33 @@ export class BuffetPage implements OnInit {
 
   protected readonly mostrarSelector = signal(false);
   protected readonly panelLateralCerrado = signal<boolean>(false);
+
+  protected mostrarModalFavorito = false;
+  protected favoritoModalAlumnoId = '';
+  protected favoritoModalItems: { productId: string; productName: string; price: number; quantity: number }[] = [];
+
+  protected readonly hayCombosEnCarrito = computed(() => {
+    return this.presenter.itemsCarrito().some(i => i.producto.esCombo);
+  });
+
+  protected abrirModalFavorito(): void {
+    const alumno = this.presenter.alumno();
+    if (!alumno || this.presenter.itemsCarrito().length === 0) return;
+    this.favoritoModalAlumnoId = alumno.id;
+    this.favoritoModalItems = this.presenter.itemsCarrito().map((i) => ({
+      productId: i.producto.id,
+      productName: i.producto.nombre,
+      price: i.producto.precio,
+      quantity: i.cantidad,
+    }));
+    this.mostrarModalFavorito = true;
+  }
+
+  protected cerrarModalFavorito(): void {
+    this.mostrarModalFavorito = false;
+    this.favoritoModalAlumnoId = '';
+    this.favoritoModalItems = [];
+  }
   protected readonly diasCalendario = signal<DateCell[]>([]);
 
   protected readonly presupuestoColapsado = signal(true);
@@ -308,7 +338,8 @@ export class BuffetPage implements OnInit {
       categoria: promo.categoria || { id: 'comidas', descripcion: 'Comidas' },
       clasificacionesSalud: promo.clasificacionesSalud || [],
       imagen: promo.imagen || '',
-      estadoStock: 'DISPONIBLE'
+      estadoStock: 'DISPONIBLE',
+      esCombo: true
     };
 
     return this.carritoService.puedeAgregar(pTemp, alumno.id, 1);
@@ -330,6 +361,20 @@ export class BuffetPage implements OnInit {
     return 'No apto: ' + etiquetas.join(' \u00b7 ');
   }
 
+  protected promoComoProducto(promo: MappedPromotion): Producto {
+    return {
+      id: promo.id,
+      nombre: promo.nombre,
+      descripcion: promo.descripcion || '',
+      precio: promo.precio,
+      categoria: promo.categoria || { id: 'comidas', descripcion: 'Comidas' },
+      clasificacionesSalud: promo.clasificacionesSalud || [],
+      imagen: promo.imagen || '',
+      estadoStock: 'DISPONIBLE',
+      esCombo: true
+    };
+  }
+
   protected agregarPromoAlCarrito(promo: MappedPromotion): void {
     const alumno = this.presenter.alumno();
     if (!alumno) return;
@@ -344,7 +389,8 @@ export class BuffetPage implements OnInit {
       categoria: promo.categoria || { id: 'comidas', descripcion: 'Comidas' },
       clasificacionesSalud: promo.clasificacionesSalud || [],
       imagen: promo.imagen || '',
-      estadoStock: 'DISPONIBLE'
+      estadoStock: 'DISPONIBLE',
+      esCombo: true
     };
 
     const eraVacio = this.presenter.itemsCarrito().length === 0;
@@ -357,11 +403,16 @@ export class BuffetPage implements OnInit {
 
   protected onAgregarAlCarrito(producto: Producto, cantidad: number): void {
     const eraVacio = this.presenter.itemsCarrito().length === 0;
-    this.presenter.agregarAlCarrito(producto, cantidad);
+    this.presenter.setCantidadProducto(producto, cantidad);
     
-    if (eraVacio && this.panelLateralCerrado()) {
+    if (eraVacio && cantidad > 0 && this.panelLateralCerrado()) {
       this.panelLateralCerrado.set(false);
     }
+  }
+
+  protected obtenerCantidadEnCarrito(productoId: string): number {
+    const item = this.presenter.itemsCarrito().find(i => i.producto.id === productoId);
+    return item ? item.cantidad : 0;
   }
 
   constructor() {
@@ -557,3 +608,8 @@ export class BuffetPage implements OnInit {
     return '';
   }
 }
+
+
+
+
+
