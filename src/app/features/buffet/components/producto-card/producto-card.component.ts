@@ -1,4 +1,4 @@
-import {
+﻿import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
@@ -19,11 +19,6 @@ const formateadorPrecio = new Intl.NumberFormat('es-AR', {
   maximumFractionDigits: 0,
 });
 
-export interface AgregarEvento {
-  producto: Producto;
-  cantidad: number;
-}
-
 @Component({
   selector: 'app-producto-card',
   templateUrl: './producto-card.component.html',
@@ -36,12 +31,10 @@ export class ProductoCardComponent {
 
   private readonly productoState = signal<Producto | undefined>(undefined);
   private readonly alumnoIdState = signal<string>('');
-  protected readonly cantidad = signal<number>(1);
 
   @Input({ required: true })
   set producto(valor: Producto) {
     this.productoState.set(valor);
-    this.cantidad.set(1);
   }
 
   @Input({ required: true })
@@ -52,7 +45,7 @@ export class ProductoCardComponent {
   @Input() esFavorito = false;
   @Input() mostrarCandado = false;
  
-  @Output() agregar = new EventEmitter<AgregarEvento>();
+  @Output() cambioCantidad = new EventEmitter<{ producto: Producto; cantidad: number }>();
   @Output() toggleFavorito = new EventEmitter<Producto>();
   @Output() toggleLock = new EventEmitter<Producto>();
 
@@ -106,7 +99,7 @@ export class ProductoCardComponent {
     const p = this.productoState();
     const alumnoId = this.alumnoIdState();
     if (!p || !alumnoId) return null;
-    const validation = this.carritoService.validarAgregar(p, alumnoId, this.cantidad());
+    const validation = this.carritoService.validarAgregar(p, alumnoId, this.cantidadEnCarrito());
     return validation.permitido ? null : validation.razon;
   });
 
@@ -129,7 +122,7 @@ export class ProductoCardComponent {
     const p = this.productoState();
     const alumnoId = this.alumnoIdState();
     if (!p || !alumnoId) return true;
-    return !this.carritoService.puedeAgregar(p, alumnoId, this.cantidad() + 1);
+    return !this.carritoService.puedeAgregar(p, alumnoId, this.cantidadEnCarrito() + 1);
   });
 
   readonly precioFormateado = computed(() => {
@@ -144,21 +137,17 @@ export class ProductoCardComponent {
     return this.carritoService.cantidadDe(p.id, alumnoId);
   });
 
-  readonly estaEnCarrito = computed(() => this.cantidadEnCarrito() > 0);
-
   protected sumar(): void {
-    this.cantidad.update((v) => v + 1);
+    const p = this.productoState();
+    if (p) {
+      this.cambioCantidad.emit({ producto: p, cantidad: this.cantidadEnCarrito() + 1 });
+    }
   }
 
   protected restar(): void {
-    this.cantidad.update((v) => (v > 1 ? v - 1 : 1));
-  }
-
-  protected onAgregar(): void {
     const p = this.productoState();
-    if (p && disponible(p)) {
-      this.agregar.emit({ producto: p, cantidad: this.cantidad() });
-      this.cantidad.set(1);
+    if (p && this.cantidadEnCarrito() > 0) {
+      this.cambioCantidad.emit({ producto: p, cantidad: this.cantidadEnCarrito() - 1 });
     }
   }
 

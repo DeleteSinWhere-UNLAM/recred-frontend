@@ -95,7 +95,7 @@
       <article class="history-card">
         <h2 class="section-title">Historial de Listas Cargadas</h2>
 
-        @if (!data.listasPrecios || data.listasPrecios.length === 0) {
+        @if (getListasPreciosFiltradas().length === 0) {
         <div class="history-empty">
           <i class="fa-solid fa-receipt history-empty__icon"></i>
           <p class="history-empty__text">No hay listas de precios registradas para este proveedor.</p>
@@ -112,7 +112,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (list of data.listasPrecios; track list.id) {
+              @for (list of getListasPreciosFiltradas(); track list.id) {
               <tr class="history-row" (click)="verMapeo(list.id)" tabindex="0" (keydown.enter)="verMapeo(list.id)">
                 <td>
                   <div class="file-cell">
@@ -133,8 +133,18 @@
                       title="Descargar original">
                       <i class="fa-solid fa-download"></i>
                     </button>
+                    @if (!isListMapped(list)) {
                     <button class="btn-action btn-action--map" title="Revisar mapeos de productos">
                       Mapeo <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    }
+                    <button class="btn-action btn-action--hide" (click)="ocultarTemporalmente(list.id, $event)"
+                      title="Ocultar temporalmente">
+                      Ocultar <i class="fa-solid fa-eye-slash"></i>
+                    </button>
+                    <button class="btn-action btn-action--delete" (click)="eliminarDefinitivamente(list.id, $event)"
+                      title="Eliminar de la lista">
+                      <i class="fa-solid fa-xmark"></i>
                     </button>
                   </div>
                 </td>

@@ -147,6 +147,34 @@
   transform: translateY(1px);
 }
 
+.inventario__reponer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 16px;
+  background-color: var(--color-menta);
+  color: var(--color-superficie);
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(129, 178, 154, 0.28);
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.inventario__reponer:hover {
+  background-color: color-mix(in srgb, var(--color-menta) 85%, #000);
+}
+
+.inventario__reponer:active {
+  transform: translateY(1px);
+}
+
 .inventario__resumen {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

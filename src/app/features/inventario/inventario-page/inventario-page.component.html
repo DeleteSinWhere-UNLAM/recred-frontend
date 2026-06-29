@@ -24,6 +24,14 @@
     <div class="inventario__acciones-header">
       <button
         type="button"
+        class="inventario__reponer"
+        (click)="irAComparador()"
+      >
+        <i class="fa-solid fa-calculator" aria-hidden="true"></i>
+        <span>Reponer Stock con Mejor Precio</span>
+      </button>
+      <button
+        type="button"
         class="inventario__nuevo"
         (click)="openCreateForm()"
       >
