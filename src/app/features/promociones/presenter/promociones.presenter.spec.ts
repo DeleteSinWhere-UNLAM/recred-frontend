@@ -103,6 +103,46 @@ describe('PromocionesPagePresenter', () => {
     presenter.volver();
     expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
   });
+
+  it('Dado que el usuario hace clic en nueva promocion, deberia navegar a sugerencias', () => {
+    presenter.nuevaPromocion();
+    expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/sugerencias');
+  });
+
+  describe('deletePromotion', () => {
+    it('deberia no hacer nada si el usuario cancela la confirmacion', async () => {
+      mockDialogService.confirm.and.returnValue(Promise.resolve(false));
+
+      await presenter.deletePromotion('promo-1');
+
+      expect(mockDialogService.confirm).toHaveBeenCalled();
+      expect(mockPromotionService.discardPromotion).not.toHaveBeenCalled();
+    });
+
+    it('deberia eliminar la promocion y volver a cargar la lista en caso de exito', async () => {
+      mockDialogService.confirm.and.returnValue(Promise.resolve(true));
+      mockPromotionService.discardPromotion.and.returnValue(of(undefined));
+      mockPromotionService.getPromotions.and.returnValue(of([]));
+
+      await presenter.deletePromotion('promo-1');
+
+      expect(mockDialogService.confirm).toHaveBeenCalled();
+      expect(mockPromotionService.discardPromotion).toHaveBeenCalledWith('promo-1');
+      expect(mockPromotionService.getPromotions).toHaveBeenCalled();
+    });
+
+    it('deberia setear el estado de error si falla la eliminacion', async () => {
+      mockDialogService.confirm.and.returnValue(Promise.resolve(true));
+      const errorResponse = new Error('Delete failed');
+      mockPromotionService.discardPromotion.and.returnValue(throwError(() => errorResponse));
+
+      await presenter.deletePromotion('promo-1');
+
+      expect(mockDialogService.confirm).toHaveBeenCalled();
+      expect(mockPromotionService.discardPromotion).toHaveBeenCalledWith('promo-1');
+      expect(presenter.error()).toBe('Error al eliminar la promoción.');
+    });
+  });
 });
 
 function createProduct(id: string, nombre: string, precio: number): Producto {

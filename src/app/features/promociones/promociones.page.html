@@ -11,7 +11,7 @@
       <p>Visualizá y gestioná las promociones creadas en tu kiosco.</p>
     </div>
     <div class="header-actions">
-      <button class="btn btn-primary">
+      <button type="button" class="btn btn-primary" (click)="presenter.nuevaPromocion()">
         <i class="fa-solid fa-plus"></i> Nueva Promoción
       </button>
     </div>
@@ -39,15 +39,17 @@
   <div class="promotions-grid">
     @for (promo of presenter.promotions(); track promo.id) {
     <div class="promotion-card" [class.draft]="promo.status === 'DRAFT'" [class.active]="promo.status === 'ACTIVE'">
-      <div class="promo-header">
-        <div class="promo-badges">
-          <span class="status-badge" [ngClass]="promo.status | lowercase">{{ presenter.getStatusLabel(promo.status)
-            }}</span>
-          <span class="discount-badge">Descuento {{ promo.discountPercentage }}%</span>
+      <div class="promotion-card__image-container">
+        <img [src]="promo.imageUrl || 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png'" alt="Imagen de la promoción" class="promotion-card__image" />
+        <div class="promo-header-overlay">
+          <div class="promo-badges">
+            <span class="status-badge" [ngClass]="promo.status | lowercase">{{ presenter.getStatusLabel(promo.status) }}</span>
+            <span class="discount-badge">Descuento {{ promo.discountPercentage }}%</span>
+          </div>
+          <button type="button" class="delete-btn" (click)="presenter.deletePromotion(promo.id)" title="Descartar promoción">
+            <i class="fa-solid fa-trash"></i>
+          </button>
         </div>
-        <button class="delete-btn" (click)="presenter.deletePromotion(promo.id)" title="Descartar promoción">
-          <i class="fa-solid fa-trash"></i>
-        </button>
       </div>
 
       <div class="promo-body">

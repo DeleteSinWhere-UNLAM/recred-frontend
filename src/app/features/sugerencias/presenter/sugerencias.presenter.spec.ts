@@ -7,6 +7,8 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { of } from 'rxjs';
 import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 import { Promotion } from '../../../data-access/services/promociones/promotion.service';
+import { ProductoService } from '../../inventario/services/producto.service';
+import { Producto } from '../../inventario/models/producto.interface';
 
 describe('SugerenciasPresenter', () => {
   let presenter: SugerenciasPresenter;
@@ -14,12 +16,15 @@ describe('SugerenciasPresenter', () => {
   let mockPromotionService: jasmine.SpyObj<PromotionService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockToastService: jasmine.SpyObj<ToastService>;
+  let mockProductoService: jasmine.SpyObj<ProductoService>;
 
   beforeEach(() => {
     mockSugerenciasService = jasmine.createSpyObj('SugerenciasService', ['getSugerencias', 'getComboSuggestions']);
     mockPromotionService = jasmine.createSpyObj('PromotionService', ['createPromotion']);
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
     mockToastService = jasmine.createSpyObj('ToastService', ['mostrar']);
+    mockProductoService = jasmine.createSpyObj('ProductoService', ['getById']);
+    mockProductoService.getById.and.returnValue(of({} as unknown as Producto));
 
     TestBed.configureTestingModule({
       providers: [
@@ -27,7 +32,8 @@ describe('SugerenciasPresenter', () => {
         { provide: SugerenciasService, useValue: mockSugerenciasService },
         { provide: PromotionService, useValue: mockPromotionService },
         { provide: Router, useValue: mockRouter },
-        { provide: ToastService, useValue: mockToastService }
+        { provide: ToastService, useValue: mockToastService },
+        { provide: ProductoService, useValue: mockProductoService }
       ]
     });
 
@@ -107,6 +113,7 @@ describe('SugerenciasPresenter', () => {
         estadisticasVenta: { productoId: 'P1' }
       } as unknown as SugerenciaProducto;
       presenter.seleccionarProducto(mockSugerencia);
+      mockProductoService.getById.and.callFake((id) => of({ id, urlImagen: `http://res.cloudinary.com/djzfudbze/image/upload/v1/${id}.png` } as unknown as Producto));
       mockPromotionService.createPromotion.and.returnValue(of({} as Promotion));
 
       presenter.generatePromotion({
@@ -121,7 +128,8 @@ describe('SugerenciasPresenter', () => {
         discountPercentage: 10,
         startDate: new Date('2026-06-16').toISOString(),
         endDate: new Date('2026-06-20').toISOString(),
-        productIds: ['P1', 'combo1']
+        productIds: ['P1', 'combo1'],
+        imageUrl: jasmine.any(String)
       }));
 
       let isModalOpen = true;
