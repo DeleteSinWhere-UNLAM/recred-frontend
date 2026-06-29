@@ -9,38 +9,11 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { PromotionService } from '../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ProductoService } from '../inventario/services/producto.service';
-import { SugerenciaProducto } from './models/sugerencia-producto.model';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ComboPromotionModalComponent } from './components/combo-promotion-modal/combo-promotion-modal.component';
+import { SugerenciasMother } from './sugerencias.mother';
 
-class SugerenciasIntegrationMother {
-  static crearUsuario() {
-    return { id: 'user-1', nombre: 'Test Kiosquero', rol: 'KIOSQUERO' };
-  }
 
-  static crearSugerencias(): SugerenciaProducto[] {
-    return [
-      {
-        productoOriginal: 'Alfajor',
-        estadisticasVenta: {
-          productoId: 'p1',
-          stockActual: 50,
-          diasSinVenta: 15,
-          ventasPeriodo: 5
-        }
-      } as SugerenciaProducto,
-      {
-        productoOriginal: 'Gaseosa',
-        estadisticasVenta: {
-          productoId: 'p2',
-          stockActual: 20,
-          diasSinVenta: 5,
-          ventasPeriodo: 30
-        }
-      } as SugerenciaProducto
-    ];
-  }
-}
 
 @Component({
   selector: 'app-navbar',
@@ -80,8 +53,8 @@ describe('Sugerencias Integration', () => {
     toast = jasmine.createSpyObj('ToastService', ['mostrar']);
     servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
 
-    servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasIntegrationMother.crearUsuario());
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasIntegrationMother.crearUsuario()));
+    servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasMother.crearUsuario>[0]));
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasMother.crearUsuario>[0])));
 
     await TestBed.configureTestingModule({
       imports: [SugerenciasPage],
@@ -106,7 +79,7 @@ describe('Sugerencias Integration', () => {
   });
 
   it('debería renderizar los indicadores calculados por el presenter basándose en las sugerencias', () => {
-    const sugerencias = SugerenciasIntegrationMother.crearSugerencias();
+    const sugerencias = SugerenciasMother.crearSugerencias();
     servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
     fixture = TestBed.createComponent(SugerenciasPage);
     
@@ -117,13 +90,13 @@ describe('Sugerencias Integration', () => {
     const metricDias = fixture.nativeElement.querySelector('.sg__metric--info strong').textContent;
     const metricCritico = fixture.nativeElement.querySelector('.sg__metric--success strong').textContent;
     expect(metricProductos).toContain('2');
-    expect(metricStock).toContain('70');
-    expect(metricDias).toContain('10 Días');
-    expect(metricCritico).toContain('Alfajor');
+    expect(metricStock).toContain('30');
+    expect(metricDias).toContain('8');
+    expect(metricCritico).toContain('Producto 2');
   });
 
   it('debería graficar correctamente las barras de días sin venta ordenadas por criticidad', () => {
-    const sugerencias = SugerenciasIntegrationMother.crearSugerencias();
+    const sugerencias = SugerenciasMother.crearSugerencias();
     servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
     fixture = TestBed.createComponent(SugerenciasPage);
     
@@ -133,8 +106,8 @@ describe('Sugerencias Integration', () => {
     const etiquetaPrimerBarra = barrasDias[0].query(By.css('.sg__hbar-label strong')).nativeElement.textContent;
     const valorPrimerBarra = barrasDias[0].query(By.css('.sg__hbar-value')).nativeElement.textContent;
     expect(barrasDias.length).toBe(2);
-    expect(etiquetaPrimerBarra).toContain('Alfajor');
-    expect(valorPrimerBarra).toContain('15 días');
+    expect(etiquetaPrimerBarra).toContain('Producto 2');
+    expect(valorPrimerBarra).toContain('10');
   });
 
   it('debería mostrar el empty state cuando el presenter no detecta sugerencias con baja rotación', () => {
