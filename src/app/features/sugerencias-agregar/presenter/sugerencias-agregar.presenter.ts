@@ -36,7 +36,7 @@ export class SugerenciasAgregarPresenter {
 
   private readonly sugerenciasService = inject(SugerenciasAgregarService);
 
-  initialize(userId: string): void {
+  initialize(): void {
     this._isLoading.next(true);
     this._error.next(null);
 

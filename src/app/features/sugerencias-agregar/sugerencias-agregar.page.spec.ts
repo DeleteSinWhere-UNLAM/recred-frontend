@@ -83,7 +83,7 @@ describe('SugerenciasAgregarPage', () => {
 
   it('debería inicializar el presenter en ngOnInit si hay un usuario en localStorage', () => {
     component.ngOnInit();
-    expect(mockPresenter.initialize).toHaveBeenCalledWith('user-1');
+    expect(mockPresenter.initialize).toHaveBeenCalled();
   });
 
   it('no debería inicializar el presenter si no hay usuario en localStorage', () => {
