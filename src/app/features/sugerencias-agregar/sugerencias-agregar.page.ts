@@ -28,7 +28,7 @@ export class SugerenciasAgregarPage implements OnInit {
     const perfilRaw = localStorage.getItem('recred.perfil');
     const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
     if (usuarioId) {
-      this.presenter.initialize(usuarioId);
+      this.presenter.initialize();
     }
   }
 

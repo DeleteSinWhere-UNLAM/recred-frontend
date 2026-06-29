@@ -55,7 +55,7 @@ describe('SugerenciasPresenter', () => {
 
       presenter.initialize('user-1');
 
-      expect(mockSugerenciasService.getSugerencias).toHaveBeenCalledWith('user-1');
+      expect(mockSugerenciasService.getSugerencias).toHaveBeenCalled();
       expect(presenter.totalProductosAnalizados).toBe(2);
       expect(presenter.totalStockInmovilizado).toBe(30);
       expect(presenter.promedioDiasSinVenta).toBe(8); // (5+10)/2 = 7.5 -> round(7.5) = 8
@@ -93,7 +93,7 @@ describe('SugerenciasPresenter', () => {
       presenter['userId'] = 'user-1';
       presenter.openComboPromotionModal();
 
-      expect(mockSugerenciasService.getComboSuggestions).toHaveBeenCalledWith('P1', 'user-1');
+      expect(mockSugerenciasService.getComboSuggestions).toHaveBeenCalledWith('P1');
       
       let isModalOpen = false;
       presenter.isComboModalOpen$.subscribe(v => isModalOpen = v);
