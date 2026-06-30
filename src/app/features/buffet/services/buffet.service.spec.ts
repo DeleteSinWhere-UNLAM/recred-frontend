@@ -1,15 +1,28 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  TestRequest,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { environment } from '../../../../environments/environment';
+import { Producto } from '../models/producto.model';
 import { BuffetService } from './buffet.service';
+
+interface MenuProductoDto {
+  id: string;
+  nombre: string;
+  precio: number;
+  bloqueado?: boolean;
+  motivoBloqueo?: string | null;
+}
 
 describe('BuffetService', () => {
   let service: BuffetService;
   let httpMock: HttpTestingController;
 
-  const alumnoId = '345c0add-4188-489f-a290-bf1ab68b260a';
-  const buffetId = '0f8fad5b-d9cb-469f-a165-70867728950e';
+  const ALUMNO_ID = '345c0add-4188-489f-a290-bf1ab68b260a';
+  const BUFFET_ID = '0f8fad5b-d9cb-469f-a165-70867728950e';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -23,169 +36,151 @@ describe('BuffetService', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  function expectMenuRequest() {
-    const req = httpMock.expectOne((request) =>
-      request.url === `${environment.apiUrl}/alumnos/${alumnoId}/menu-buffet` &&
-      request.params.get('buffetId') === buffetId
-    );
-    expect(req.request.params.get('buffetId')).toBe(buffetId);
-    return req;
-  }
+  afterEach(() => httpMock.verify());
 
-  afterEach(() => {
-    httpMock.verify();
-  });
-
-  it('debería crearse el servicio', () => {
+  it('dado que se inyecta el servicio, deberia crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('mapMenuProductDtoToProducto — separación de tipos de bloqueo', () => {
+  describe('mapMenuProductDtoToProducto — separacion de tipos de bloqueo', () => {
+    it('dado un motivo "Bloqueado por el tutor", cuando obtengo productos, deberia mapear bloqueado=true y sin estado restriccion', (done) => {
+      const dto = unDtoBloqueado('prod-1', 'Coca Cola', 'Bloqueado por el tutor');
 
-    it('debería mapear bloqueado=true y bloqueadoPorRestriccion=false si el motivo es "Bloqueado por el tutor"', (done) => {
-      const mockDtos = [{
-        id: 'prod-1', nombre: 'Coca Cola', precio: 1000,
-        bloqueado: true, motivoBloqueo: 'Bloqueado por el tutor'
-      }];
-
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].bloqueado).toBeTrue();
-          expect(productos[0].bloqueadoPorRestriccion).toBeFalsy();
-          expect(productos[0].motivoBloqueo).toBe('Bloqueado por el tutor');
-          expect(productos[0].estadoStock).toBe('SIN_STOCK');
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        thenElProductoTieneBloqueado(productos[0], true);
+        thenElProductoTieneBloqueadoPorRestriccion(productos[0], false);
+        expect(productos[0].motivoBloqueo).toBe('Bloqueado por el tutor');
+        expect(productos[0].estadoStock).toBe('SIN_STOCK');
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
 
-    it('debería mapear bloqueadoPorRestriccion=true y bloqueado=false si el motivo es una restricción nutricional', (done) => {
-      const mockDtos = [{
-        id: 'prod-2', nombre: 'Galletitas Oreo', precio: 500,
-        bloqueado: true, motivoBloqueo: 'Contiene: Gluten (TACC)'
-      }];
+    it('dado un motivo "Contiene: Gluten (TACC)", cuando obtengo productos, deberia mapear bloqueadoPorRestriccion=true', (done) => {
+      const dto = unDtoBloqueado('prod-2', 'Galletitas Oreo', 'Contiene: Gluten (TACC)');
 
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].bloqueado).toBeFalsy();
-          expect(productos[0].bloqueadoPorRestriccion).toBeTrue();
-          expect(productos[0].motivoBloqueo).toBe('Contiene: Gluten (TACC)');
-          expect(productos[0].estadoStock).toBe('SIN_STOCK');
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        thenElProductoTieneBloqueado(productos[0], false);
+        thenElProductoTieneBloqueadoPorRestriccion(productos[0], true);
+        expect(productos[0].motivoBloqueo).toBe('Contiene: Gluten (TACC)');
+        expect(productos[0].estadoStock).toBe('SIN_STOCK');
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
 
-    it('debería mapear bloqueadoPorRestriccion=true para restricción de lácteos', (done) => {
-      const mockDtos = [{
-        id: 'prod-3', nombre: 'Leche Entera', precio: 400,
-        bloqueado: true, motivoBloqueo: 'Contiene: Lácteos'
-      }];
+    it('dado un motivo "Contiene: Lácteos", cuando obtengo productos, deberia mapear bloqueadoPorRestriccion=true', (done) => {
+      const dto = unDtoBloqueado('prod-3', 'Leche Entera', 'Contiene: Lácteos');
 
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].bloqueado).toBeFalsy();
-          expect(productos[0].bloqueadoPorRestriccion).toBeTrue();
-          expect(productos[0].motivoBloqueo).toBe('Contiene: Lácteos');
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        thenElProductoTieneBloqueado(productos[0], false);
+        thenElProductoTieneBloqueadoPorRestriccion(productos[0], true);
+        expect(productos[0].motivoBloqueo).toBe('Contiene: Lácteos');
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
 
-    it('debería mapear bloqueadoPorRestriccion=true para restricción horaria', (done) => {
-      const mockDtos = [{
-        id: 'prod-4', nombre: 'Alfajor', precio: 600,
-        bloqueado: true, motivoBloqueo: 'No permitido en este horario'
-      }];
+    it('dado un motivo de restriccion horaria, cuando obtengo productos, deberia mapear bloqueadoPorRestriccion=true', (done) => {
+      const dto = unDtoBloqueado('prod-4', 'Alfajor', 'No permitido en este horario');
 
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].bloqueado).toBeFalsy();
-          expect(productos[0].bloqueadoPorRestriccion).toBeTrue();
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        thenElProductoTieneBloqueado(productos[0], false);
+        thenElProductoTieneBloqueadoPorRestriccion(productos[0], true);
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
 
-    it('debería mapear superaPresupuesto=true y bloqueado=false para motivos de presupuesto general', (done) => {
-      const mockDtos = [{
-        id: 'prod-5', nombre: 'Hamburguesa', precio: 2000,
-        bloqueado: true, motivoBloqueo: 'Supera el límite de gasto'
-      }];
+    it('dado un motivo "Supera el limite de gasto", cuando obtengo productos, deberia mapear superaPresupuesto=true sin bloqueo', (done) => {
+      const dto = unDtoBloqueado('prod-5', 'Hamburguesa', 'Supera el límite de gasto');
 
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].bloqueado).toBeFalsy();
-          expect(productos[0].bloqueadoPorRestriccion).toBeFalsy();
-          expect(productos[0].superaPresupuesto).toBeTrue();
-          expect(productos[0].estadoStock).toBe('DISPONIBLE');
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        thenElProductoTieneBloqueado(productos[0], false);
+        thenElProductoTieneBloqueadoPorRestriccion(productos[0], false);
+        expect(productos[0].superaPresupuesto).toBeTrue();
+        expect(productos[0].estadoStock).toBe('DISPONIBLE');
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
 
-    it('debería mapear superaPresupuesto=true para motivo de presupuesto por categoría', (done) => {
-      const mockDtos = [{
-        id: 'prod-6', nombre: 'Pizza', precio: 1800,
-        bloqueado: true, motivoBloqueo: 'Supera límite de su categoría'
-      }];
+    it('dado un motivo "Supera limite de su categoria", cuando obtengo productos, deberia mapear superaPresupuesto=true', (done) => {
+      const dto = unDtoBloqueado('prod-6', 'Pizza', 'Supera límite de su categoría');
 
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].superaPresupuesto).toBeTrue();
-          expect(productos[0].bloqueado).toBeFalsy();
-          expect(productos[0].bloqueadoPorRestriccion).toBeFalsy();
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        expect(productos[0].superaPresupuesto).toBeTrue();
+        thenElProductoTieneBloqueado(productos[0], false);
+        thenElProductoTieneBloqueadoPorRestriccion(productos[0], false);
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
 
-    it('debería mapear un producto sin bloqueo como disponible y sin restricciones', (done) => {
-      const mockDtos = [{
-        id: 'prod-7', nombre: 'Agua Mineral', precio: 300,
-        bloqueado: false, motivoBloqueo: null
-      }];
+    it('dado un producto sin bloqueo, cuando obtengo productos, deberia mapear como disponible y sin restricciones', (done) => {
+      const dto = unDtoSinBloqueo('prod-7', 'Agua Mineral');
 
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].bloqueado).toBeFalsy();
-          expect(productos[0].bloqueadoPorRestriccion).toBeFalsy();
-          expect(productos[0].superaPresupuesto).toBeFalsy();
-          expect(productos[0].estadoStock).toBe('DISPONIBLE');
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        thenElProductoTieneBloqueado(productos[0], false);
+        thenElProductoTieneBloqueadoPorRestriccion(productos[0], false);
+        expect(productos[0].superaPresupuesto).toBeFalsy();
+        expect(productos[0].estadoStock).toBe('DISPONIBLE');
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
 
-    it('debería preservar el motivoBloqueo en el objeto Producto mapeado', (done) => {
+    it('dado un motivo complejo, cuando obtengo productos, deberia preservar el motivoBloqueo intacto', (done) => {
       const motivo = 'Contiene: Gluten (TACC), Azúcar';
-      const mockDtos = [{
-        id: 'prod-8', nombre: 'Pepitos', precio: 400,
-        bloqueado: true, motivoBloqueo: motivo
-      }];
+      const dto = unDtoBloqueado('prod-8', 'Pepitos', motivo);
 
-      service.getProductosDelBuffet(buffetId, alumnoId).subscribe({
-        next: (productos) => {
-          expect(productos[0].motivoBloqueo).toBe(motivo);
-          done();
-        }
+      whenObtengoProductos((productos) => {
+        expect(productos[0].motivoBloqueo).toBe(motivo);
+        done();
       });
 
-      expectMenuRequest().flush(mockDtos);
+      thenSeHizoGetAMenu().flush([dto]);
     });
   });
+
+  function unDtoBloqueado(id: string, nombre: string, motivoBloqueo: string): MenuProductoDto {
+    return { id, nombre, precio: 100, bloqueado: true, motivoBloqueo };
+  }
+
+  function unDtoSinBloqueo(id: string, nombre: string): MenuProductoDto {
+    return { id, nombre, precio: 100, bloqueado: false, motivoBloqueo: null };
+  }
+
+  function whenObtengoProductos(asercion: (productos: Producto[]) => void): void {
+    service.getProductosDelBuffet(BUFFET_ID, ALUMNO_ID).subscribe({
+      next: asercion,
+    });
+  }
+
+  function thenSeHizoGetAMenu(): TestRequest {
+    const req = httpMock.expectOne(
+      (r) =>
+        r.url === `${environment.apiUrl}/alumnos/${ALUMNO_ID}/menu-buffet` &&
+        r.params.get('buffetId') === BUFFET_ID,
+    );
+    expect(req.request.params.get('buffetId')).toBe(BUFFET_ID);
+    return req;
+  }
+
+  function thenElProductoTieneBloqueado(p: Producto, esperado: boolean): void {
+    if (esperado) expect(p.bloqueado).toBeTrue();
+    else expect(p.bloqueado).toBeFalsy();
+  }
+
+  function thenElProductoTieneBloqueadoPorRestriccion(p: Producto, esperado: boolean): void {
+    if (esperado) expect(p.bloqueadoPorRestriccion).toBeTrue();
+    else expect(p.bloqueadoPorRestriccion).toBeFalsy();
+  }
 });

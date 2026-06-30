@@ -5,64 +5,46 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../../data-access/services/colegios.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
-import { Colegio } from '../../../data-access/models/colegio.model';
-import { Grado } from '../../../data-access/models/grado.model';
+import { CrearHijoRequest } from '../../../data-access/services/alumnos.service';
 import { CrearHijoPresenter } from './crear-hijo.presenter';
+import {
+  AlumnoNuevoMother,
+  ColegioMother,
+  CrearHijoFormMother,
+  GradoMother,
+} from '../crear-hijo.mother';
 
 describe('CrearHijoPresenter', () => {
   let presenter: CrearHijoPresenter;
-  let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
-  let colegiosServiceSpy: jasmine.SpyObj<ColegiosService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let routerSpy: jasmine.SpyObj<Router>;
-
-  const mockColegios: Colegio[] = [
-    { id: 'colegio-1', nombre: 'Instituto San José' },
-    { id: 'colegio-2', nombre: 'Colegio Santa María' },
-  ];
-
-  const mockGrados: Grado[] = [
-    { id: 'grado-1', nombre: '5to A' },
-    { id: 'grado-2', nombre: '6to B' },
-  ];
-
-  const mockAlumnoCreado: Alumno = {
-    id: 'alumno-nuevo',
-    nombre: 'Juan',
-    apellido: 'Pérez',
-    grado: '5to A',
-    colegioId: 'colegio-1',
-    saldo: 0,
-  };
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
+  let servicioColegios: jasmine.SpyObj<ColegiosService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
+  let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>('AlumnosService', [
-      'crearHijo',
+    servicioAlumnos = jasmine.createSpyObj<AlumnosService>('AlumnosService', ['crearHijo']);
+    servicioColegios = jasmine.createSpyObj<ColegiosService>('ColegiosService', [
+      'obtenerColegios',
+      'obtenerGradosPorColegio',
     ]);
-    colegiosServiceSpy = jasmine.createSpyObj<ColegiosService>(
-      'ColegiosService',
-      ['obtenerColegios', 'obtenerGradosPorColegio'],
-    );
-    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', [
-      'mostrar',
-    ]);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
-    routerSpy.navigateByUrl.and.resolveTo(true);
+    servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+    router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
+    router.navigateByUrl.and.resolveTo(true);
 
     TestBed.configureTestingModule({
       providers: [
         CrearHijoPresenter,
-        { provide: AlumnosService, useValue: alumnosServiceSpy },
-        { provide: ColegiosService, useValue: colegiosServiceSpy },
-        { provide: ToastService, useValue: toastServiceSpy },
-        { provide: Router, useValue: routerSpy },
+        { provide: AlumnosService, useValue: servicioAlumnos },
+        { provide: ColegiosService, useValue: servicioColegios },
+        { provide: ToastService, useValue: servicioToast },
+        { provide: Router, useValue: router },
       ],
     });
 
     presenter = TestBed.inject(CrearHijoPresenter);
   });
 
-  it('debería crearse el presenter', () => {
+  it('dado el presenter recien creado, deberia tener los signals en sus valores iniciales', () => {
     expect(presenter).toBeTruthy();
     expect(presenter.colegios()).toEqual([]);
     expect(presenter.grados()).toEqual([]);
@@ -71,166 +53,191 @@ describe('CrearHijoPresenter', () => {
   });
 
   describe('cargarColegios', () => {
-    it('debería traer colegios del back y exponerlos en el signal', async () => {
-      colegiosServiceSpy.obtenerColegios.and.resolveTo(mockColegios);
+    it('dado que el back devuelve una lista, cuando cargo colegios, deberia exponerlos en el signal', async () => {
+      const colegios = ColegioMother.crearLista();
+      givenColegiosDelBack(colegios);
 
-      await presenter.cargarColegios();
+      await whenCargoColegios();
 
-      expect(colegiosServiceSpy.obtenerColegios).toHaveBeenCalledTimes(1);
-      expect(presenter.colegios()).toEqual(mockColegios);
+      thenSeLlamoObtenerColegiosVecesIgualA(1);
+      expect(presenter.colegios()).toEqual(colegios);
       expect(presenter.cargandoColegios()).toBeFalse();
     });
 
-    it('no debería volver a llamar al back si ya hay colegios cargados', async () => {
-      colegiosServiceSpy.obtenerColegios.and.resolveTo(mockColegios);
-      await presenter.cargarColegios();
+    it('dado que ya hay colegios cargados, cuando vuelvo a cargar, no deberia volver a pegarle al back', async () => {
+      givenColegiosDelBack(ColegioMother.crearLista());
+      await whenCargoColegios();
 
-      await presenter.cargarColegios();
+      await whenCargoColegios();
 
-      expect(colegiosServiceSpy.obtenerColegios).toHaveBeenCalledTimes(1);
+      thenSeLlamoObtenerColegiosVecesIgualA(1);
     });
 
-    it('debería mostrar un toast de error si la llamada al back falla', async () => {
-      colegiosServiceSpy.obtenerColegios.and.rejectWith(
-        new HttpErrorResponse({ status: 500 }),
-      );
+    it('dado que el back de colegios falla, cuando cargo colegios, deberia mostrar un toast de error', async () => {
+      givenQueElBackDeColegiosFalla();
 
-      await presenter.cargarColegios();
+      await whenCargoColegios();
 
       expect(presenter.colegios()).toEqual([]);
       expect(presenter.cargandoColegios()).toBeFalse();
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
-        'No se pudieron cargar los colegios.',
-        'error',
-      );
+      thenSeMostroToast('No se pudieron cargar los colegios.', 'error');
     });
   });
 
   describe('cargarGrados', () => {
-    it('debería traer los grados del colegio elegido', async () => {
-      colegiosServiceSpy.obtenerGradosPorColegio.and.resolveTo(mockGrados);
+    it('dado un colegioId valido, cuando cargo grados, deberia traer los grados del back', async () => {
+      const grados = GradoMother.crearLista();
+      givenGradosDelBack(grados);
 
-      await presenter.cargarGrados('colegio-1');
+      await whenCargoGrados('colegio-1');
 
-      expect(colegiosServiceSpy.obtenerGradosPorColegio).toHaveBeenCalledWith(
-        'colegio-1',
-      );
-      expect(presenter.grados()).toEqual(mockGrados);
+      expect(servicioColegios.obtenerGradosPorColegio).toHaveBeenCalledWith('colegio-1');
+      expect(presenter.grados()).toEqual(grados);
       expect(presenter.cargandoGrados()).toBeFalse();
     });
 
-    it('debería resetear los grados y no pegarle al back si el colegioId es vacío', async () => {
-      colegiosServiceSpy.obtenerGradosPorColegio.and.resolveTo(mockGrados);
-      await presenter.cargarGrados('colegio-1');
-      expect(presenter.grados().length).toBe(2);
+    it('dado un colegioId vacio, cuando cargo grados, deberia resetear los grados sin pegarle al back', async () => {
+      givenGradosDelBack(GradoMother.crearLista());
+      await whenCargoGrados('colegio-1');
 
-      await presenter.cargarGrados('');
+      await whenCargoGrados('');
 
       expect(presenter.grados()).toEqual([]);
-      expect(
-        colegiosServiceSpy.obtenerGradosPorColegio,
-      ).toHaveBeenCalledTimes(1);
+      expect(servicioColegios.obtenerGradosPorColegio).toHaveBeenCalledTimes(1);
     });
 
-    it('debería mostrar un toast de error si la llamada al back falla', async () => {
-      colegiosServiceSpy.obtenerGradosPorColegio.and.rejectWith(
-        new HttpErrorResponse({ status: 500 }),
-      );
+    it('dado que el back de grados falla, cuando cargo grados, deberia mostrar un toast de error', async () => {
+      givenQueElBackDeGradosFalla();
 
-      await presenter.cargarGrados('colegio-1');
+      await whenCargoGrados('colegio-1');
 
       expect(presenter.grados()).toEqual([]);
       expect(presenter.cargandoGrados()).toBeFalse();
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
-        'No se pudieron cargar los grados.',
-        'error',
-      );
+      thenSeMostroToast('No se pudieron cargar los grados.', 'error');
     });
   });
 
   describe('crear', () => {
-    const reqValido = {
-      nombre: 'Juan',
-      apellido: 'Pérez',
-      username: 'juan.perez',
-      email: 'juan.perez@example.com',
-      dni: '40123456',
-      gradoId: 'grado-1',
-    };
+    it('dado un form valido, cuando creo el hijo, deberia mostrar toast de exito y navegar a /tutor', async () => {
+      const req = CrearHijoFormMother.crear();
+      givenAlumnosCrearHijoResuelve(AlumnoNuevoMother.crear());
 
-    it('debería crear el hijo, mostrar toast y navegar a /tutor', async () => {
-      alumnosServiceSpy.crearHijo.and.resolveTo(mockAlumnoCreado);
-
-      const ok = await presenter.crear(reqValido);
+      const ok = await whenCreo(req);
 
       expect(ok).toBeTrue();
-      expect(alumnosServiceSpy.crearHijo).toHaveBeenCalledWith(reqValido);
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
-        'Juan Pérez fue agregado como hijo',
-        'success',
-      );
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/tutor');
+      expect(servicioAlumnos.crearHijo).toHaveBeenCalledWith(req);
+      thenSeMostroToast('Juan Pérez fue agregado como hijo', 'success');
+      thenSeNavegoA('/tutor');
       expect(presenter.guardando()).toBeFalse();
       expect(presenter.error()).toBeNull();
     });
 
-    it('no debería disparar dos creaciones simultáneas', async () => {
-      let resolverCreacion!: (alumno: Alumno) => void;
-      alumnosServiceSpy.crearHijo.and.returnValue(
-        new Promise<Alumno>((resolve) => {
-          resolverCreacion = resolve;
-        }),
-      );
+    it('dado que ya hay una creacion en curso, cuando disparo otra, no deberia ejecutar la segunda', async () => {
+      const [promesaPendiente, resolver] = givenCreacionPendiente();
 
-      const primera = presenter.crear(reqValido);
-      const segunda = presenter.crear(reqValido);
-
+      const primera = whenCreo(CrearHijoFormMother.crear());
+      const segunda = whenCreo(CrearHijoFormMother.crear());
       const resultadoSegunda = await segunda;
-      expect(resultadoSegunda).toBeFalse();
-
-      resolverCreacion(mockAlumnoCreado);
+      resolver(AlumnoNuevoMother.crear());
       await primera;
+      await promesaPendiente;
 
-      expect(alumnosServiceSpy.crearHijo).toHaveBeenCalledTimes(1);
+      expect(resultadoSegunda).toBeFalse();
+      expect(servicioAlumnos.crearHijo).toHaveBeenCalledTimes(1);
     });
 
-    it('debería mostrar el mensaje del back si viene en el error 409', async () => {
-      alumnosServiceSpy.crearHijo.and.rejectWith(
-        new HttpErrorResponse({
-          status: 409,
-          error: { message: 'El DNI ya existe' },
-        }),
-      );
+    it('dado un error 409 con mensaje del back, cuando creo el hijo, deberia exponer ese mensaje', async () => {
+      givenCrearHijoRechazaCon409ConMensaje('El DNI ya existe');
 
-      const ok = await presenter.crear(reqValido);
+      const ok = await whenCreo(CrearHijoFormMother.crear());
 
       expect(ok).toBeFalse();
       expect(presenter.error()).toBe('El DNI ya existe');
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
-        'El DNI ya existe',
-        'error',
-      );
-      expect(routerSpy.navigateByUrl).not.toHaveBeenCalled();
+      thenSeMostroToast('El DNI ya existe', 'error');
+      expect(router.navigateByUrl).not.toHaveBeenCalled();
     });
 
-    it('debería usar mensaje por defecto para 409 sin body', async () => {
-      alumnosServiceSpy.crearHijo.and.rejectWith(
-        new HttpErrorResponse({ status: 409 }),
-      );
+    it('dado un error 409 sin body, cuando creo el hijo, deberia usar el mensaje por defecto', async () => {
+      givenCrearHijoRechazaCon409SinBody();
 
-      await presenter.crear(reqValido);
+      await whenCreo(CrearHijoFormMother.crear());
 
       expect(presenter.error()).toBe('Ya existe un alumno con esos datos.');
     });
 
-    it('debería usar mensaje genérico para errores no-HTTP', async () => {
-      alumnosServiceSpy.crearHijo.and.rejectWith(new Error('boom'));
+    it('dado un error que no es HTTP, cuando creo el hijo, deberia usar el mensaje generico', async () => {
+      givenCrearHijoRechazaConErrorGenerico();
 
-      await presenter.crear(reqValido);
+      await whenCreo(CrearHijoFormMother.crear());
 
-      expect(presenter.error()).toBe(
-        'No se pudo crear el hijo. Intenta nuevamente.',
-      );
+      expect(presenter.error()).toBe('No se pudo crear el hijo. Intenta nuevamente.');
     });
   });
+
+  function givenColegiosDelBack(colegios: ReturnType<typeof ColegioMother.crearLista>): void {
+    servicioColegios.obtenerColegios.and.resolveTo(colegios);
+  }
+
+  function givenGradosDelBack(grados: ReturnType<typeof GradoMother.crearLista>): void {
+    servicioColegios.obtenerGradosPorColegio.and.resolveTo(grados);
+  }
+
+  function givenQueElBackDeColegiosFalla(): void {
+    servicioColegios.obtenerColegios.and.rejectWith(new HttpErrorResponse({ status: 500 }));
+  }
+
+  function givenQueElBackDeGradosFalla(): void {
+    servicioColegios.obtenerGradosPorColegio.and.rejectWith(new HttpErrorResponse({ status: 500 }));
+  }
+
+  function givenAlumnosCrearHijoResuelve(alumno: Alumno): void {
+    servicioAlumnos.crearHijo.and.resolveTo(alumno);
+  }
+
+  function givenCreacionPendiente(): [Promise<Alumno>, (a: Alumno) => void] {
+    let resolver!: (a: Alumno) => void;
+    const promesa = new Promise<Alumno>((resolve) => {
+      resolver = resolve;
+    });
+    servicioAlumnos.crearHijo.and.returnValue(promesa);
+    return [promesa, resolver];
+  }
+
+  function givenCrearHijoRechazaCon409ConMensaje(mensaje: string): void {
+    servicioAlumnos.crearHijo.and.rejectWith(
+      new HttpErrorResponse({ status: 409, error: { message: mensaje } }),
+    );
+  }
+
+  function givenCrearHijoRechazaCon409SinBody(): void {
+    servicioAlumnos.crearHijo.and.rejectWith(new HttpErrorResponse({ status: 409 }));
+  }
+
+  function givenCrearHijoRechazaConErrorGenerico(): void {
+    servicioAlumnos.crearHijo.and.rejectWith(new Error('boom'));
+  }
+
+  function whenCargoColegios(): Promise<void> {
+    return presenter.cargarColegios();
+  }
+
+  function whenCargoGrados(colegioId: string): Promise<void> {
+    return presenter.cargarGrados(colegioId);
+  }
+
+  function whenCreo(req: CrearHijoRequest): Promise<boolean> {
+    return presenter.crear(req);
+  }
+
+  function thenSeLlamoObtenerColegiosVecesIgualA(cantidad: number): void {
+    expect(servicioColegios.obtenerColegios).toHaveBeenCalledTimes(cantidad);
+  }
+
+  function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error'): void {
+    expect(servicioToast.mostrar).toHaveBeenCalledWith(mensaje, tipo);
+  }
+
+  function thenSeNavegoA(url: string): void {
+    expect(router.navigateByUrl).toHaveBeenCalledWith(url);
+  }
 });

@@ -7,14 +7,11 @@ import {
 import { environment } from '../../../../environments/environment';
 import { BilleteraService } from './billetera.service';
 import { BilleteraResumen } from '../models/billetera.model';
+import { BilleteraMother } from '../billetera.mother';
 
 describe('BilleteraService', () => {
   let service: BilleteraService;
   let httpMock: HttpTestingController;
-
-  const ALUMNO_ID = 'alumno-1';
-  const DESDE = '2026-06-01';
-  const HASTA = '2026-06-14';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,38 +32,20 @@ describe('BilleteraService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('dado un alumno y un rango de fechas, cuando consulto el resumen, deberia llamar al GET con esos query params y devolver el resumen', () => {
-    const resumenEsperado = ResumenBilleteraMother.create();
+  it('dado un alumno y un rango de fechas, cuando consulto el resumen, deberia hacer GET con esos query params y devolver el resumen', () => {
+    const resumenEsperado = BilleteraMother.crearResumen({ saldoActual: 1250 });
 
-    const resultado = whenConsultoElResumen(ALUMNO_ID, DESDE, HASTA);
+    const resultado = whenConsultoElResumen(BilleteraMother.ALUMNO_ID, BilleteraMother.DESDE, BilleteraMother.HASTA);
 
-    thenSeHizoGetConRango(ALUMNO_ID, DESDE, HASTA, resumenEsperado);
+    thenSeHizoGetConRango(BilleteraMother.ALUMNO_ID, BilleteraMother.DESDE, BilleteraMother.HASTA, resumenEsperado);
     expect(resultado()).toEqual(resumenEsperado);
   });
 
   it('dado un alumno sin rango de fechas, cuando consulto el resumen, no deberia enviar query params de rango', () => {
-    whenConsultoElResumen(ALUMNO_ID);
+    whenConsultoElResumen(BilleteraMother.ALUMNO_ID);
 
-    thenSeHizoGetSinRango(ALUMNO_ID);
+    thenSeHizoGetSinRango(BilleteraMother.ALUMNO_ID);
   });
-
-  const ResumenBilleteraMother = {
-    create(overrides: Partial<BilleteraResumen> = {}): BilleteraResumen {
-      return {
-        alumnoId: ALUMNO_ID,
-        saldoActual: 1250,
-        periodo: { desde: DESDE, hasta: HASTA },
-        montoIngresado: 3000,
-        montoGastado: 1750,
-        balancePeriodo: 1250,
-        cantidadCompras: 8,
-        gastoPorCategoria: [],
-        gastoPorClasificacionSalud: [],
-        movimientos: [],
-        ...overrides,
-      };
-    },
-  };
 
   function whenConsultoElResumen(
     alumnoId: string,
