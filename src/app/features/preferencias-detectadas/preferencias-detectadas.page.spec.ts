@@ -1,14 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PreferenciasDetectadasPage } from './preferencias-detectadas.page';
-import { PreferenciasDetectadasService } from './services/preferencias-detectadas.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { of } from 'rxjs';
+import { PreferenciasDetectadasPresenter } from './presenter/preferencias-detectadas.presenter';
 import { Component, Input, signal } from '@angular/core';
 import { PreferenciaDetectada } from './models/preferencia-detectada.model';
 import { PreferenciaDetectadaCardComponent } from './components/preferencia-detectada-card/preferencia-detectada-card.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { PreferenciasDetectadasMother } from './preferencias-detectadas.mother';
-
-
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-preferencia-detectada-card',
@@ -29,11 +28,21 @@ class NavbarStub {
 }
 
 describe('PreferenciasDetectadasPage', () => {
-  let servicioPreferencias: jasmine.SpyObj<PreferenciasDetectadasService>;
+  let fixture: ComponentFixture<PreferenciasDetectadasPage>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let presenter: jasmine.SpyObj<PreferenciasDetectadasPresenter>;
+  
+  let preferenciasSubject: BehaviorSubject<PreferenciaDetectada[]>;
+  let errorSubject: BehaviorSubject<string | null>;
 
   beforeEach(async () => {
-    servicioPreferencias = jasmine.createSpyObj('PreferenciasDetectadasService', ['getPreferencias']);
+    preferenciasSubject = new BehaviorSubject<PreferenciaDetectada[]>([]);
+    errorSubject = new BehaviorSubject<string | null>(null);
+
+    presenter = jasmine.createSpyObj('PreferenciasDetectadasPresenter', ['initialize'], {
+      preferencias$: preferenciasSubject.asObservable(),
+      error$: errorSubject.asObservable()
+    });
     
     servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual'], {
       esVistaKiosquero: signal(false),
@@ -47,54 +56,29 @@ describe('PreferenciasDetectadasPage', () => {
     await TestBed.configureTestingModule({
       imports: [PreferenciasDetectadasPage],
       providers: [
-        { provide: PreferenciasDetectadasService, useValue: servicioPreferencias },
         { provide: UsuarioService, useValue: servicioUsuario }
       ]
     })
       .overrideComponent(PreferenciasDetectadasPage, {
         remove: {
-          imports: [PreferenciaDetectadaCardComponent]
+          imports: [PreferenciaDetectadaCardComponent, NavbarComponent],
+          providers: [PreferenciasDetectadasPresenter]
         },
         add: {
-          imports: [NavbarStub, PreferenciaDetectadaCardStub]
+          imports: [NavbarStub, PreferenciaDetectadaCardStub],
+          providers: [
+            { provide: PreferenciasDetectadasPresenter, useValue: presenter }
+          ]
         }
       })
       .compileComponents();
+
+    fixture = TestBed.createComponent(PreferenciasDetectadasPage);
   });
 
-  describe('Cuando el perfil existe en localStorage', () => {
-    let component: PreferenciasDetectadasPage;
-    let fixture: ComponentFixture<PreferenciasDetectadasPage>;
+  it('debería inicializar el presenter al cargar la vista', () => {
+    fixture.detectChanges();
 
-    beforeEach(() => {
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
-      const preferenciasEsperadas = [PreferenciasDetectadasMother.crearPreferencia()];
-      servicioPreferencias.getPreferencias.and.returnValue(of(preferenciasEsperadas));
-      
-      fixture = TestBed.createComponent(PreferenciasDetectadasPage);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
-    it('debería solicitar las preferencias detectadas al servicio y asignarlas al estado', () => {
-      
-      const cantidadPreferencias = component.preferencias.length;
-
-      expect(servicioPreferencias.getPreferencias).toHaveBeenCalledWith('user-id-123');
-      expect(cantidadPreferencias).toBe(1);
-    });
-  });
-
-  describe('Cuando la sesión no es válida', () => {
-    it('no debería solicitar las preferencias si el id de usuario no existe', () => {
-      
-      spyOn(localStorage, 'getItem').and.returnValue(null);
-      const fixture = TestBed.createComponent(PreferenciasDetectadasPage);
-      const component = fixture.componentInstance;
-      fixture.detectChanges();
-
-      expect(servicioPreferencias.getPreferencias).not.toHaveBeenCalled();
-      expect(component.preferencias.length).toBe(0);
-    });
+    expect(presenter.initialize).toHaveBeenCalled();
   });
 });
