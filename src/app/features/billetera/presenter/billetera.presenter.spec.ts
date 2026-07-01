@@ -6,21 +6,8 @@ import { BilleteraService } from '../services/billetera.service';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
-import {
-  BilleteraResumen,
-  DireccionMovimiento,
-  MovimientoBilletera,
-} from '../models/billetera.model';
-
-interface AlumnoMock {
-  id: string;
-  nombre: string;
-  apellido: string;
-  grado: string;
-  colegioId: string;
-  saldo: number;
-  urlFotoPerfil?: string;
-}
+import { BilleteraResumen } from '../models/billetera.model';
+import { AlumnoMock, BilleteraMother } from '../billetera.mother';
 
 describe('BilleteraPresenter', () => {
   let presenter: BilleteraPresenter;
@@ -30,26 +17,20 @@ describe('BilleteraPresenter', () => {
   let usuarioServiceSpy: jasmine.SpyObj<UsuarioService>;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  const ALUMNO_ID = 'alumno-1';
+  const ALUMNO_ID = BilleteraMother.ALUMNO_ID;
 
   beforeEach(() => {
     billeteraServiceSpy = jasmine.createSpyObj('BilleteraService', ['getResumen']);
-    alumnosServiceSpy = jasmine.createSpyObj('AlumnosService', [
-      'asegurarCargados',
-      'getAlumnoById',
-    ]);
+    alumnosServiceSpy = jasmine.createSpyObj('AlumnosService', ['asegurarCargados', 'getAlumnoById']);
     perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);
-    usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', [
-      'getAlumnoActual',
-      'esVistaAlumno',
-    ]);
+    usuarioServiceSpy = jasmine.createSpyObj('UsuarioService', ['getAlumnoActual', 'esVistaAlumno']);
     routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     alumnosServiceSpy.asegurarCargados.and.resolveTo();
     givenUnAlumno();
     givenUnResumen();
     perfilServiceSpy.obtenerAlumnoId.and.returnValue(null);
-    usuarioServiceSpy.getAlumnoActual.and.returnValue(AlumnoMother.create());
+    usuarioServiceSpy.getAlumnoActual.and.returnValue(BilleteraMother.crearAlumno());
     usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
 
     TestBed.configureTestingModule({
@@ -89,7 +70,7 @@ describe('BilleteraPresenter', () => {
 
     it('dado un resumen con movimientos, categorias y clasificaciones, cuando inicializo, las banderas hay* deberian ser true', fakeAsync(() => {
       givenUnResumen({
-        movimientos: [MovimientoMother.create()],
+        movimientos: [BilleteraMother.crearMovimiento()],
         gastoPorCategoria: [{ categoria: 'Golosinas', monto: 600, porcentaje: 30 }],
         gastoPorClasificacionSalud: [{ clasificacion: 'Saludable', monto: 900, porcentaje: 50 }],
       });
@@ -236,8 +217,8 @@ describe('BilleteraPresenter', () => {
     });
 
     it('dado un movimiento, cuando lo formateo con signo, deberia anteponer "+" si entra y "-" si sale', () => {
-      expect(presenter.formatearMontoConSigno(MovimientoMother.con('ENTRADA'))).toContain('+');
-      expect(presenter.formatearMontoConSigno(MovimientoMother.con('SALIDA'))).toContain('-');
+      expect(presenter.formatearMontoConSigno(BilleteraMother.crearMovimientoConDireccion('ENTRADA'))).toContain('+');
+      expect(presenter.formatearMontoConSigno(BilleteraMother.crearMovimientoConDireccion('SALIDA'))).toContain('-');
     });
 
     it('dado que estoy en vista alumno, cuando vuelvo, deberia navegar a /alumno', () => {
@@ -275,58 +256,8 @@ describe('BilleteraPresenter', () => {
     }));
   });
 
-  const AlumnoMother = {
-    create(overrides: Partial<AlumnoMock> = {}): AlumnoMock {
-      return {
-        id: ALUMNO_ID,
-        nombre: 'Nombre',
-        apellido: 'Apellido',
-        grado: '4to',
-        colegioId: 'col-1',
-        saldo: 0,
-        urlFotoPerfil: undefined,
-        ...overrides,
-      };
-    },
-  };
-
-  const MovimientoMother = {
-    create(overrides: Partial<MovimientoBilletera> = {}): MovimientoBilletera {
-      return {
-        id: 'mov-1',
-        fechaHora: '2026-06-14T10:15:00',
-        tipo: 'COMPRA',
-        descripcion: 'Compra en buffet',
-        monto: 450,
-        direccion: 'SALIDA',
-        ...overrides,
-      };
-    },
-    con(direccion: DireccionMovimiento): MovimientoBilletera {
-      return this.create({ direccion, monto: 100 });
-    },
-  };
-
-  const ResumenBilleteraMother = {
-    create(overrides: Partial<BilleteraResumen> = {}): BilleteraResumen {
-      return {
-        alumnoId: ALUMNO_ID,
-        saldoActual: 0,
-        periodo: { desde: '2026-06-01', hasta: '2026-06-14' },
-        montoIngresado: 0,
-        montoGastado: 0,
-        balancePeriodo: 0,
-        cantidadCompras: 8,
-        gastoPorCategoria: [],
-        gastoPorClasificacionSalud: [],
-        movimientos: [],
-        ...overrides,
-      };
-    },
-  };
-
   function givenUnAlumno(props: Partial<AlumnoMock> = {}): void {
-    alumnosServiceSpy.getAlumnoById.and.returnValue(AlumnoMother.create(props) as never);
+    alumnosServiceSpy.getAlumnoById.and.returnValue(BilleteraMother.crearAlumno(props) as never);
   }
 
   function givenNingunAlumno(): void {
@@ -334,7 +265,7 @@ describe('BilleteraPresenter', () => {
   }
 
   function givenUnResumen(props: Partial<BilleteraResumen> = {}): void {
-    billeteraServiceSpy.getResumen.and.returnValue(of(ResumenBilleteraMother.create(props)));
+    billeteraServiceSpy.getResumen.and.returnValue(of(BilleteraMother.crearResumen(props)));
   }
 
   function givenQueElServicioFalla(mensaje: string): void {

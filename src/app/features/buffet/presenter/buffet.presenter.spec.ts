@@ -1,8 +1,8 @@
-﻿import { FavoritosService } from '../../favoritos/services/favoritos.service';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { FavoritosService } from '../../favoritos/services/favoritos.service';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { BuffetService } from '../services/buffet.service';
 import { CompraService } from '../../compra/services/compra.service';
@@ -19,99 +19,63 @@ import { PromotionService } from '../../../data-access/services/promociones/prom
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { Perfil } from '../../../data-access/models/perfil.model';
 import { BuffetPresenter } from './buffet.presenter';
-import { Alumno } from '../../../data-access/models/alumno.model';
-import { Buffet } from '../models/buffet.model';
 import { Producto } from '../models/producto.model';
+import { AlumnoMother } from '../../../data-access/services/alumno.mother';
+import { BuffetMother, ProductoMother } from '../buffet.mother';
 
 describe('BuffetPresenter', () => {
   let presenter: BuffetPresenter;
-  let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
-  let buffetServiceSpy: jasmine.SpyObj<BuffetService>;
-  let favoritosServiceSpy: jasmine.SpyObj<FavoritosService>;
-  let compraServiceSpy: jasmine.SpyObj<CompraService>;
-  let carritoServiceSpy: jasmine.SpyObj<CarritoService>;
-  let colegiosServiceSpy: jasmine.SpyObj<ColegiosService>;
-  let usuarioServiceSpy: jasmine.SpyObj<UsuarioService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let restriccionProductoServiceSpy: jasmine.SpyObj<RestriccionProductoService>;
-  let franjasHorariasServiceSpy: jasmine.SpyObj<FranjasHorariasService>;
-  let restriccionesHorariasServiceSpy: jasmine.SpyObj<RestriccionesHorariasService>;
-  let presupuestoServiceSpy: jasmine.SpyObj<PresupuestoService>;
-  let restriccionesNutricionalesServiceSpy: jasmine.SpyObj<RestriccionesNutricionalesService>;
-  let promotionServiceSpy: jasmine.SpyObj<PromotionService>;
-  let mockPerfilService: Partial<PerfilService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
+  let servicioBuffet: jasmine.SpyObj<BuffetService>;
+  let servicioFavoritos: jasmine.SpyObj<FavoritosService>;
+  let servicioCompra: jasmine.SpyObj<CompraService>;
+  let servicioCarrito: jasmine.SpyObj<CarritoService>;
+  let servicioColegios: jasmine.SpyObj<ColegiosService>;
+  let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
+  let router: jasmine.SpyObj<Router>;
+  let servicioRestriccionProducto: jasmine.SpyObj<RestriccionProductoService>;
+  let servicioFranjas: jasmine.SpyObj<FranjasHorariasService>;
+  let servicioRestriccionesHorarias: jasmine.SpyObj<RestriccionesHorariasService>;
+  let servicioPresupuesto: jasmine.SpyObj<PresupuestoService>;
+  let servicioRestriccionesNutricionales: jasmine.SpyObj<RestriccionesNutricionalesService>;
+  let servicioPromotion: jasmine.SpyObj<PromotionService>;
+  let perfilService: Partial<PerfilService>;
 
-  const mockAlumno: Alumno = {
+  const ALUMNO = AlumnoMother.crear({
     id: 'alumno-1',
     nombre: 'Julián',
     apellido: 'García',
     grado: '4to Año A',
     colegioId: 'colegio-1',
     saldo: 25000,
-  };
-
-  const mockBuffet: Buffet = {
-    id: 'buffet-1',
-    nombre: 'El Buffet de Mariano',
-    colegioId: 'colegio-1',
-  };
-
-  const productoBloqueadoPorTutor: Producto = {
-    id: 'prod-tutor',
-    nombre: 'Alfajor',
-    descripcion: 'Dulce',
-    precio: 500,
-    categoria: { id: 'snacks', descripcion: 'Snacks' },
-    clasificacionesSalud: [],
-    imagen: '',
-    estadoStock: 'SIN_STOCK',
-    bloqueado: true,
-  };
-
-  const productoBloqueadoPorRestriccion: Producto = {
-    id: 'prod-restriccion',
-    nombre: 'Galletitas Oreo',
-    descripcion: 'Con TACC',
-    precio: 400,
-    categoria: { id: 'snacks', descripcion: 'Snacks' },
-    clasificacionesSalud: [],
-    imagen: '',
-    estadoStock: 'SIN_STOCK',
-    bloqueado: false,
-    bloqueadoPorRestriccion: true,
-    motivoBloqueo: 'Contiene: Gluten (TACC)',
-  };
-
-  const productoDisponible: Producto = {
-    id: 'prod-libre',
-    nombre: 'Agua Mineral',
-    descripcion: 'Bebida',
-    precio: 300,
-    categoria: { id: 'bebidas', descripcion: 'Bebidas' },
-    clasificacionesSalud: [],
-    imagen: '',
-    estadoStock: 'DISPONIBLE',
-    bloqueado: false,
-  };
-
-  const mockProductos: Producto[] = [
-    productoDisponible,
-    productoBloqueadoPorTutor,
-    productoBloqueadoPorRestriccion,
-  ];
+  });
+  const BUFFET = BuffetMother.crear();
+  const PRODUCTO_DISPONIBLE = ProductoMother.crearDisponible();
+  const PRODUCTO_BLOQUEADO_TUTOR = ProductoMother.crearBloqueadoPorTutor();
+  const PRODUCTO_BLOQUEADO_RESTRICCION = ProductoMother.crearBloqueadoPorRestriccion();
+  const PRODUCTOS = [PRODUCTO_DISPONIBLE, PRODUCTO_BLOQUEADO_TUTOR, PRODUCTO_BLOQUEADO_RESTRICCION];
 
   beforeEach(() => {
-    alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>('AlumnosService', ['getAlumnoById']);
-    buffetServiceSpy = jasmine.createSpyObj<BuffetService>('BuffetService', [
-      'obtenerBuffetDelAlumno', 'getProductosDelBuffet',
+    servicioAlumnos = jasmine.createSpyObj<AlumnosService>('AlumnosService', ['getAlumnoById']);
+    servicioBuffet = jasmine.createSpyObj<BuffetService>('BuffetService', [
+      'obtenerBuffetDelAlumno',
+      'getProductosDelBuffet',
     ]);
-    favoritosServiceSpy = jasmine.createSpyObj<FavoritosService>('FavoritosService', ['getFavoritos', 'agregarFavorito', 'removerFavorito']);
-    compraServiceSpy = jasmine.createSpyObj<CompraService>('CompraService', ['iniciarOrden', 'procesarPago']);
-    carritoServiceSpy = jasmine.createSpyObj<CarritoService>('CarritoService', [
-      'agregar', 'setCatalog', 'cargarPresupuestoYConsumo', 'getSeleccionRetiro', 'setSeleccionRetiro'
+    servicioFavoritos = jasmine.createSpyObj<FavoritosService>('FavoritosService', [
+      'getFavoritos',
+      'agregarFavorito',
+      'removerFavorito',
     ]);
-    const mockCarrito = carritoServiceSpy as unknown as {
+    servicioCompra = jasmine.createSpyObj<CompraService>('CompraService', ['iniciarOrden', 'procesarPago']);
+    servicioCarrito = jasmine.createSpyObj<CarritoService>('CarritoService', [
+      'agregar',
+      'setCatalog',
+      'cargarPresupuestoYConsumo',
+      'getSeleccionRetiro',
+      'setSeleccionRetiro',
+    ]);
+    const mockCarrito = servicioCarrito as unknown as {
       items: unknown;
       budgets: unknown;
       purchases: unknown;
@@ -119,153 +83,198 @@ describe('BuffetPresenter', () => {
     mockCarrito.items = signal([]);
     mockCarrito.budgets = signal(new Map());
     mockCarrito.purchases = signal(new Map());
-    colegiosServiceSpy = jasmine.createSpyObj<ColegiosService>('ColegiosService', ['getColegios']);
-    usuarioServiceSpy = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl', 'esVistaAlumno']);
-    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigateByUrl', 'navigate']);
-    restriccionProductoServiceSpy = jasmine.createSpyObj<RestriccionProductoService>(
-      'RestriccionProductoService', ['bloquearProducto', 'desbloquearProducto']
+    servicioColegios = jasmine.createSpyObj<ColegiosService>('ColegiosService', ['getColegios']);
+    servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl', 'esVistaAlumno']);
+    servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+    router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl', 'navigate']);
+    servicioRestriccionProducto = jasmine.createSpyObj<RestriccionProductoService>(
+      'RestriccionProductoService',
+      ['bloquearProducto', 'desbloquearProducto'],
     );
-    franjasHorariasServiceSpy = jasmine.createSpyObj<FranjasHorariasService>('FranjasHorariasService', ['getFranjasHorarias']);
-    restriccionesHorariasServiceSpy = jasmine.createSpyObj<RestriccionesHorariasService>('RestriccionesHorariasService', ['getRestriccionesPorAlumno']);
-    presupuestoServiceSpy = jasmine.createSpyObj<PresupuestoService>('PresupuestoService', ['checkBudgetDates', 'getPresupuesto']);
-    restriccionesNutricionalesServiceSpy = jasmine.createSpyObj<RestriccionesNutricionalesService>('RestriccionesNutricionalesService', ['getRestriccionesAlumno']);
-    promotionServiceSpy = jasmine.createSpyObj<PromotionService>('PromotionService', ['getPromotions']);
+    servicioFranjas = jasmine.createSpyObj<FranjasHorariasService>('FranjasHorariasService', ['getFranjasHorarias']);
+    servicioRestriccionesHorarias = jasmine.createSpyObj<RestriccionesHorariasService>(
+      'RestriccionesHorariasService',
+      ['getRestriccionesPorAlumno'],
+    );
+    servicioPresupuesto = jasmine.createSpyObj<PresupuestoService>('PresupuestoService', [
+      'checkBudgetDates',
+      'getPresupuesto',
+    ]);
+    servicioRestriccionesNutricionales = jasmine.createSpyObj<RestriccionesNutricionalesService>(
+      'RestriccionesNutricionalesService',
+      ['getRestriccionesAlumno'],
+    );
+    servicioPromotion = jasmine.createSpyObj<PromotionService>('PromotionService', ['getPromotions']);
 
-    alumnosServiceSpy.getAlumnoById.and.returnValue(mockAlumno);
-    buffetServiceSpy.obtenerBuffetDelAlumno.and.returnValue(of(mockBuffet));
-    buffetServiceSpy.getProductosDelBuffet.and.returnValue(of(mockProductos));
-    favoritosServiceSpy.getFavoritos.and.returnValue(of([]));
-    favoritosServiceSpy.agregarFavorito.and.returnValue(of(undefined));
-    favoritosServiceSpy.removerFavorito.and.returnValue(of(undefined));
-    colegiosServiceSpy.getColegios.and.returnValue([{ id: 'colegio-1', nombre: 'Fernando Fader' }]);
-    usuarioServiceSpy.homeUrl.and.returnValue('/tutor');
-    usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
-    franjasHorariasServiceSpy.getFranjasHorarias.and.returnValue(Promise.resolve([]));
-    restriccionesHorariasServiceSpy.getRestriccionesPorAlumno.and.returnValue(Promise.resolve([]));
-    presupuestoServiceSpy.checkBudgetDates.and.returnValue(Promise.resolve([]));
-    restriccionesNutricionalesServiceSpy.getRestriccionesAlumno.and.returnValue(Promise.resolve([]));
-    promotionServiceSpy.getPromotions.and.returnValue(of([]));
+    aplicarDefaults();
 
-    mockPerfilService = {
+    perfilService = {
       esPlanGratuito: signal(true),
-      perfil: signal<Perfil | null>({ plan: 'FREE' } as unknown as Perfil)
+      perfil: signal<Perfil | null>({ plan: 'FREE' } as unknown as Perfil),
     };
 
     TestBed.configureTestingModule({
       providers: [
         BuffetPresenter,
-        { provide: AlumnosService, useValue: alumnosServiceSpy },
-        { provide: BuffetService, useValue: buffetServiceSpy },
-        { provide: FavoritosService, useValue: favoritosServiceSpy },
-        { provide: CompraService, useValue: compraServiceSpy },
-        { provide: CarritoService, useValue: carritoServiceSpy },
-        { provide: ColegiosService, useValue: colegiosServiceSpy },
-        { provide: UsuarioService, useValue: usuarioServiceSpy },
-        { provide: PerfilService, useValue: mockPerfilService },
-        { provide: ToastService, useValue: toastServiceSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: RestriccionProductoService, useValue: restriccionProductoServiceSpy },
-        { provide: FranjasHorariasService, useValue: franjasHorariasServiceSpy },
-        { provide: RestriccionesHorariasService, useValue: restriccionesHorariasServiceSpy },
-        { provide: PresupuestoService, useValue: presupuestoServiceSpy },
-        { provide: RestriccionesNutricionalesService, useValue: restriccionesNutricionalesServiceSpy },
-        { provide: PromotionService, useValue: promotionServiceSpy },
+        { provide: AlumnosService, useValue: servicioAlumnos },
+        { provide: BuffetService, useValue: servicioBuffet },
+        { provide: FavoritosService, useValue: servicioFavoritos },
+        { provide: CompraService, useValue: servicioCompra },
+        { provide: CarritoService, useValue: servicioCarrito },
+        { provide: ColegiosService, useValue: servicioColegios },
+        { provide: UsuarioService, useValue: servicioUsuario },
+        { provide: PerfilService, useValue: perfilService },
+        { provide: ToastService, useValue: servicioToast },
+        { provide: Router, useValue: router },
+        { provide: RestriccionProductoService, useValue: servicioRestriccionProducto },
+        { provide: FranjasHorariasService, useValue: servicioFranjas },
+        { provide: RestriccionesHorariasService, useValue: servicioRestriccionesHorarias },
+        { provide: PresupuestoService, useValue: servicioPresupuesto },
+        { provide: RestriccionesNutricionalesService, useValue: servicioRestriccionesNutricionales },
+        { provide: PromotionService, useValue: servicioPromotion },
       ],
     });
 
     presenter = TestBed.inject(BuffetPresenter);
   });
 
-  it('debería crearse el presenter', () => {
+  it('dado que se inyecta el presenter, deberia crearse correctamente', () => {
     expect(presenter).toBeTruthy();
   });
 
-  describe('productosFiltrados — separación bloqueo tutor vs restricción', () => {
-    it('en vista tutor: debe mostrar todos los productos (disponibles, bloqueados por tutor y por restricción)', fakeAsync(() => {
-      usuarioServiceSpy.esVistaAlumno.and.returnValue(false);
-      presenter.init('alumno-1');
-      tick();
+  describe('productosFiltrados — separacion bloqueo tutor vs restriccion', () => {
+    it('dado vista tutor, cuando inicializo, deberia mostrar todos los productos (disponibles + bloqueados por tutor + restringidos)', fakeAsync(() => {
+      givenVistaAlumno(false);
+
+      whenInicializo('alumno-1');
 
       const filtrados = presenter.productosFiltrados();
       expect(filtrados.length).toBe(3);
     }));
 
-    it('en vista alumno: debe ocultar los productos bloqueados por el tutor y los restringidos por nutrición', fakeAsync(() => {
-      usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
-      presenter.init('alumno-1');
-      tick();
+    it('dado vista alumno, cuando inicializo, deberia ocultar los productos bloqueados por el tutor y por restriccion', fakeAsync(() => {
+      givenVistaAlumno(true);
+
+      whenInicializo('alumno-1');
 
       const filtrados = presenter.productosFiltrados();
       expect(filtrados.length).toBe(1);
-      expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
-      expect(filtrados.some(p => p.id === 'prod-tutor')).toBeFalse();
-      expect(filtrados.some(p => p.id === 'prod-restriccion')).toBeFalse();
+      expect(filtrados.some((p) => p.id === 'prod-libre')).toBeTrue();
+      expect(filtrados.some((p) => p.id === 'prod-tutor')).toBeFalse();
+      expect(filtrados.some((p) => p.id === 'prod-restriccion')).toBeFalse();
     }));
 
-    it('en vista alumno: los productos disponibles deben aparecer', fakeAsync(() => {
-      usuarioServiceSpy.esVistaAlumno.and.returnValue(true);
-      presenter.init('alumno-1');
-      tick();
+    it('dado vista alumno, cuando inicializo, los productos disponibles deberian aparecer', fakeAsync(() => {
+      givenVistaAlumno(true);
+
+      whenInicializo('alumno-1');
 
       const filtrados = presenter.productosFiltrados();
-      expect(filtrados.some(p => p.id === 'prod-libre')).toBeTrue();
+      expect(filtrados.some((p) => p.id === 'prod-libre')).toBeTrue();
     }));
   });
 
   describe('toggleLock — bloqueo y desbloqueo manual', () => {
-    it('debería bloquear un producto de forma optimista y llamar al servicio', () => {
-      presenter.init('alumno-1');
-      const producto = { ...productoDisponible, bloqueado: false };
-      restriccionProductoServiceSpy.bloquearProducto.and.returnValue(of(undefined));
+    it('dado un producto disponible, cuando lo bloqueo, deberia marcarlo optimistamente y llamar al servicio', () => {
+      const producto = { ...PRODUCTO_DISPONIBLE, bloqueado: false };
+      givenBloqueoOk();
+      whenInicializoSinTick('alumno-1');
 
-      presenter.toggleLock(producto);
-
-      expect(producto.bloqueado).toBeTrue();
-      expect(restriccionProductoServiceSpy.bloquearProducto).toHaveBeenCalledWith('alumno-1', 'prod-libre');
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se bloqueó "Agua Mineral"', 'success');
-    });
-
-    it('debería revertir el bloqueo optimista si el servicio falla', () => {
-      spyOn(console, 'error');
-      presenter.init('alumno-1');
-      const producto = { ...productoDisponible, bloqueado: false };
-      restriccionProductoServiceSpy.bloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));
-
-      presenter.toggleLock(producto);
-
-      expect(producto.bloqueado).toBeFalse();
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Error al bloquear el producto', 'error');
-    });
-
-    it('debería desbloquear un producto de forma optimista y llamar al servicio', () => {
-      presenter.init('alumno-1');
-      const producto = { ...productoBloqueadoPorTutor, bloqueado: true };
-      restriccionProductoServiceSpy.desbloquearProducto.and.returnValue(of(undefined));
-
-      presenter.toggleLock(producto);
-
-      expect(producto.bloqueado).toBeFalse();
-      expect(restriccionProductoServiceSpy.desbloquearProducto).toHaveBeenCalledWith('alumno-1', 'prod-tutor');
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Se desbloqueó "Alfajor"', 'success');
-    });
-
-    it('debería revertir el desbloqueo optimista si el servicio falla', () => {
-      spyOn(console, 'error');
-      presenter.init('alumno-1');
-      const producto = { ...productoBloqueadoPorTutor, bloqueado: true };
-      restriccionProductoServiceSpy.desbloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));
-
-      presenter.toggleLock(producto);
+      whenToggleoLock(producto);
 
       expect(producto.bloqueado).toBeTrue();
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Error al desbloquear el producto', 'error');
+      expect(servicioRestriccionProducto.bloquearProducto).toHaveBeenCalledWith('alumno-1', 'prod-libre');
+      thenSeMostroToast('Se bloqueó "Agua Mineral"', 'success');
+    });
+
+    it('dado que el bloqueo falla, cuando toggleo lock, deberia revertir y mostrar un toast de error', () => {
+      spyOn(console, 'error');
+      const producto = { ...PRODUCTO_DISPONIBLE, bloqueado: false };
+      givenBloqueoFalla();
+      whenInicializoSinTick('alumno-1');
+
+      whenToggleoLock(producto);
+
+      expect(producto.bloqueado).toBeFalse();
+      thenSeMostroToast('Error al bloquear el producto', 'error');
+    });
+
+    it('dado un producto bloqueado por el tutor, cuando lo desbloqueo, deberia marcarlo optimistamente y llamar al servicio', () => {
+      const producto = { ...PRODUCTO_BLOQUEADO_TUTOR, bloqueado: true };
+      givenDesbloqueoOk();
+      whenInicializoSinTick('alumno-1');
+
+      whenToggleoLock(producto);
+
+      expect(producto.bloqueado).toBeFalse();
+      expect(servicioRestriccionProducto.desbloquearProducto).toHaveBeenCalledWith('alumno-1', 'prod-tutor');
+      thenSeMostroToast('Se desbloqueó "Alfajor"', 'success');
+    });
+
+    it('dado que el desbloqueo falla, cuando toggleo lock, deberia revertir y mostrar un toast de error', () => {
+      spyOn(console, 'error');
+      const producto = { ...PRODUCTO_BLOQUEADO_TUTOR, bloqueado: true };
+      givenDesbloqueoFalla();
+      whenInicializoSinTick('alumno-1');
+
+      whenToggleoLock(producto);
+
+      expect(producto.bloqueado).toBeTrue();
+      thenSeMostroToast('Error al desbloquear el producto', 'error');
     });
   });
+
+  function aplicarDefaults(): void {
+    servicioAlumnos.getAlumnoById.and.returnValue(ALUMNO);
+    servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(of(BUFFET));
+    servicioBuffet.getProductosDelBuffet.and.returnValue(of(PRODUCTOS));
+    servicioFavoritos.getFavoritos.and.returnValue(of([]));
+    servicioFavoritos.agregarFavorito.and.returnValue(of(undefined));
+    servicioFavoritos.removerFavorito.and.returnValue(of(undefined));
+    servicioColegios.getColegios.and.returnValue([{ id: 'colegio-1', nombre: 'Fernando Fader' }]);
+    servicioUsuario.homeUrl.and.returnValue('/tutor');
+    servicioUsuario.esVistaAlumno.and.returnValue(false);
+    servicioFranjas.getFranjasHorarias.and.resolveTo([]);
+    servicioRestriccionesHorarias.getRestriccionesPorAlumno.and.resolveTo([]);
+    servicioPresupuesto.checkBudgetDates.and.resolveTo([]);
+    servicioRestriccionesNutricionales.getRestriccionesAlumno.and.resolveTo([]);
+    servicioPromotion.getPromotions.and.returnValue(of([]));
+  }
+
+  function givenVistaAlumno(esAlumno: boolean): void {
+    servicioUsuario.esVistaAlumno.and.returnValue(esAlumno);
+  }
+
+  function givenBloqueoOk(): void {
+    servicioRestriccionProducto.bloquearProducto.and.returnValue(of(undefined));
+  }
+
+  function givenDesbloqueoOk(): void {
+    servicioRestriccionProducto.desbloquearProducto.and.returnValue(of(undefined));
+  }
+
+  function givenBloqueoFalla(): void {
+    servicioRestriccionProducto.bloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));
+  }
+
+  function givenDesbloqueoFalla(): void {
+    servicioRestriccionProducto.desbloquearProducto.and.returnValue(throwError(() => new Error('Error de red')));
+  }
+
+  function whenInicializo(alumnoId: string): void {
+    presenter.init(alumnoId);
+    tick();
+  }
+
+  function whenInicializoSinTick(alumnoId: string): void {
+    presenter.init(alumnoId);
+  }
+
+  function whenToggleoLock(producto: Producto): void {
+    presenter.toggleLock(producto);
+  }
+
+  function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error'): void {
+    expect(servicioToast.mostrar).toHaveBeenCalledWith(mensaje, tipo);
+  }
 });
-
-
-
-
-
-
