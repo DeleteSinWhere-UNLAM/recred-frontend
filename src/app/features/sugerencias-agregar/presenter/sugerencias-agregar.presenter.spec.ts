@@ -23,7 +23,6 @@ describe('SugerenciasAgregarPresenter', () => {
 
   describe('Inicialización', () => {
     it('debería solicitar las sugerencias al servicio y actualizar el estado cuando sea exitoso', () => {
-      // Arrange
       const sugerenciasEsperadas = SugerenciasAgregarMother.crearListaSugerencias();
       servicio.getSugerenciasAgregarProducto.and.returnValue(of(sugerenciasEsperadas));
       
@@ -35,10 +34,8 @@ describe('SugerenciasAgregarPresenter', () => {
       presenter.isLoading$.subscribe(val => isLoadingEmitido = val);
       presenter.error$.subscribe(val => errorEmitido = val);
 
-      // Act
       presenter.initialize();
 
-      // Assert
       expect(servicio.getSugerenciasAgregarProducto).toHaveBeenCalled();
       expect(sugerenciasEmitidas).toEqual(sugerenciasEsperadas);
       expect(isLoadingEmitido).toBeFalse();
@@ -46,7 +43,6 @@ describe('SugerenciasAgregarPresenter', () => {
     });
 
     it('debería actualizar el estado de error cuando el servicio falle', () => {
-      // Arrange
       servicio.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('Error de red')));
       
       let errorEmitido: string | null | undefined;
@@ -55,10 +51,8 @@ describe('SugerenciasAgregarPresenter', () => {
       presenter.error$.subscribe(val => errorEmitido = val);
       presenter.isLoading$.subscribe(val => isLoadingEmitido = val);
 
-      // Act
       presenter.initialize();
 
-      // Assert
       expect(errorEmitido).toBe('No se pudieron cargar las oportunidades de stock.');
       expect(isLoadingEmitido).toBeFalse();
     });
