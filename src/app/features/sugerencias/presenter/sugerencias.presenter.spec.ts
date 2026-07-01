@@ -9,6 +9,7 @@ import { ProductoService } from '../../inventario/services/producto.service';
 import { SugerenciaProducto, ComboSuggestion } from '../models/sugerencia-producto.model';
 import { Promotion } from '../../../data-access/services/promociones/promotion.service';
 import { SugerenciasMother } from '../sugerencias.mother';
+import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 
 
@@ -19,6 +20,7 @@ describe('SugerenciasPresenter', () => {
   let router: jasmine.SpyObj<Router>;
   let toast: jasmine.SpyObj<ToastService>;
   let servicioProducto: jasmine.SpyObj<ProductoService>;
+  let servicioUsuario: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(() => {
     servicioSugerencias = jasmine.createSpyObj('SugerenciasService', ['getSugerencias', 'getComboSuggestions']);
@@ -26,6 +28,7 @@ describe('SugerenciasPresenter', () => {
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
     toast = jasmine.createSpyObj('ToastService', ['mostrar']);
     servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
+    servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -34,7 +37,8 @@ describe('SugerenciasPresenter', () => {
         { provide: PromotionService, useValue: servicioPromociones },
         { provide: Router, useValue: router },
         { provide: ToastService, useValue: toast },
-        { provide: ProductoService, useValue: servicioProducto }
+        { provide: ProductoService, useValue: servicioProducto },
+        { provide: UsuarioService, useValue: servicioUsuario }
       ]
     });
 
@@ -43,6 +47,8 @@ describe('SugerenciasPresenter', () => {
 
   describe('Inicialización', () => {
     it('debería solicitar las sugerencias al servicio y seleccionar el primer producto automáticamente', () => {
+      const usuario = SugerenciasMother.crearUsuario();
+      servicioUsuario.getUsuarioActual.and.returnValue(usuario);
       const sugerencias = SugerenciasMother.crearSugerencias();
       servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
       let sugerenciaActiva: SugerenciaProducto | undefined;
@@ -50,7 +56,7 @@ describe('SugerenciasPresenter', () => {
       presenter.sugerencias$.subscribe(val => sugerenciasEmitidas = val);
       presenter.sugerenciaSeleccionada$.subscribe(val => sugerenciaActiva = val);
 
-      presenter.initialize('user-1');
+      presenter.initialize();
 
       expect(servicioSugerencias.getSugerencias).toHaveBeenCalled();
       expect(sugerenciasEmitidas).toEqual(sugerencias);
@@ -61,12 +67,14 @@ describe('SugerenciasPresenter', () => {
       expect(presenter.productoMasCritico?.productoOriginal).toBe('Producto 2');
     });
 
-    it('no debería seleccionar ningún producto ni fallar cuando el servicio retorna una lista vacía', () => {
+    it('debería inicializar sin emitir datos si la respuesta de sugerencias está vacía', () => {
+      const usuario = SugerenciasMother.crearUsuario();
+      servicioUsuario.getUsuarioActual.and.returnValue(usuario);
       servicioSugerencias.getSugerencias.and.returnValue(of([]));
       let sugerenciaActiva: SugerenciaProducto | undefined;
       presenter.sugerenciaSeleccionada$.subscribe(val => sugerenciaActiva = val);
 
-      presenter.initialize('user-1');
+      presenter.initialize();
 
       expect(sugerenciaActiva).toBeUndefined();
       expect(presenter.totalProductosAnalizados).toBe(0);
@@ -75,7 +83,14 @@ describe('SugerenciasPresenter', () => {
     });
   });
 
-  describe('Modal de Promociones de Combos', () => {
+  describe('Modal de Combo de Promoción', () => {
+    beforeEach(() => {
+      const usuario = SugerenciasMother.crearUsuario();
+      servicioUsuario.getUsuarioActual.and.returnValue(usuario);
+      servicioSugerencias.getSugerencias.and.returnValue(of(SugerenciasMother.crearSugerencias()));
+      presenter.initialize();
+    });
+    
     it('debería cargar sugerencias de combo y abrir el modal cuando hay un producto activo', () => {
       const sugerencia = SugerenciasMother.crearSugerencia();
       presenter.seleccionarProducto(sugerencia);
@@ -90,6 +105,7 @@ describe('SugerenciasPresenter', () => {
     });
 
     it('no debería ejecutar ninguna acción al solicitar abrir el modal sin un producto activo', () => {
+      presenter.seleccionarProducto(undefined as unknown as SugerenciaProducto);
       let modalAbierto = false;
       presenter.isComboModalOpen$.subscribe(val => modalAbierto = val);
 

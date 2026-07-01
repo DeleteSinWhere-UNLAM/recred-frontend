@@ -54,7 +54,6 @@ describe('Sugerencias Integration', () => {
     servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
 
     servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasMother.crearUsuario>[0]));
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasMother.crearUsuario>[0])));
 
     await TestBed.configureTestingModule({
       imports: [SugerenciasPage],

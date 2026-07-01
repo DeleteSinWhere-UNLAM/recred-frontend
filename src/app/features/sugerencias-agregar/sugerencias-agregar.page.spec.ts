@@ -61,24 +61,10 @@ describe('SugerenciasAgregarPage', () => {
     expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
   });
 
-  it('debería delegar al presenter la inicialización si el usuario existe en sesión', () => {
-
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasAgregarMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasAgregarMother.crearUsuario>[0])));
-
-
+  it('debería inicializar el presenter al cargar la vista', () => {
     fixture.detectChanges();
 
     expect(presenter.initialize).toHaveBeenCalled();
-  });
-
-  it('no debería delegar la inicialización al presenter si no hay usuario en sesión', () => {
-
-    spyOn(localStorage, 'getItem').and.returnValue(null);
-
-    fixture.detectChanges();
-
-
-    expect(presenter.initialize).not.toHaveBeenCalled();
   });
 
   it('debería delegar al router la navegación hacia el home al presionar volver', () => {

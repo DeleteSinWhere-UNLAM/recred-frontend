@@ -49,8 +49,6 @@ describe('SugerenciasPage', () => {
     servicioUsuario = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual']);
     
     servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasMother.crearUsuario());
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasMother.crearUsuario()));
-
     await TestBed.configureTestingModule({
       imports: [SugerenciasPage],
       providers: [
@@ -76,29 +74,14 @@ describe('SugerenciasPage', () => {
     fixture.detectChanges();
   });
 
-  it('debería configurar la url de inicio del kiosquero al construirse', () => {
-    
-    const urlEsperada = '/kiosquero';
-    
-    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
+  it('debería setear la URL de inicio para kiosquero en el servicio y luego inicializar el presenter al cargar la vista', () => {
+      
+    fixture.detectChanges();
+
+    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
+    expect(presenter.initialize).toHaveBeenCalled();
   });
 
-  it('debería delegar al presenter la inicialización cuando el usuario existe en sesión', () => {
-    
-    const idUsuarioEsperado = 'test-id';
-    
-    expect(presenter.initialize).toHaveBeenCalledWith(idUsuarioEsperado);
-  });
-
-  it('no debería delegar la inicialización al presenter cuando el usuario no existe en sesión', () => {
-    
-    presenter.initialize.calls.reset();
-    (localStorage.getItem as jasmine.Spy).and.returnValue(null);
-    
-    component.ngOnInit();
-    
-    expect(presenter.initialize).not.toHaveBeenCalled();
-  });
 
   it('debería delegar al router la navegación hacia el home al presionar volver', () => {
     

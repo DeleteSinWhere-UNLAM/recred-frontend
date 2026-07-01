@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { SugerenciaAgregarProducto } from '../models/sugerencia-agregar.model';
 import { SugerenciasAgregarService } from '../services/sugerencias-agregar.service';
+import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 export interface ChartBarItem {
   nombre: string;
@@ -35,8 +36,16 @@ export class SugerenciasAgregarPresenter {
   readonly error$ = this._error.asObservable();
 
   private readonly sugerenciasService = inject(SugerenciasAgregarService);
+  private readonly usuarioService = inject(UsuarioService);
 
   initialize(): void {
+    const usuarioId = this.usuarioService.getUsuarioActual()?.id;
+
+    if (!usuarioId) {
+      this._error.next('Usuario no autenticado.');
+      return;
+    }
+
     this._isLoading.next(true);
     this._error.next(null);
 

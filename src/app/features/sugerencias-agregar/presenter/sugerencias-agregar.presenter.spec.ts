@@ -4,18 +4,23 @@ import { SugerenciasAgregarPresenter } from './sugerencias-agregar.presenter';
 import { SugerenciasAgregarService } from '../services/sugerencias-agregar.service';
 import { SugerenciaAgregarProducto } from '../models/sugerencia-agregar.model';
 import { SugerenciasAgregarMother } from '../sugerencias-agregar.mother';
+import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 
 describe('SugerenciasAgregarPresenter', () => {
   let presenter: SugerenciasAgregarPresenter;
   let servicio: jasmine.SpyObj<SugerenciasAgregarService>;
+  let usuarioService: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(() => {
     servicio = jasmine.createSpyObj('SugerenciasAgregarService', ['getSugerenciasAgregarProducto']);
+    usuarioService = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual']);
+    
     TestBed.configureTestingModule({
       providers: [
         SugerenciasAgregarPresenter,
-        { provide: SugerenciasAgregarService, useValue: servicio }
+        { provide: SugerenciasAgregarService, useValue: servicio },
+        { provide: UsuarioService, useValue: usuarioService }
       ]
     });
     presenter = TestBed.inject(SugerenciasAgregarPresenter);
@@ -23,6 +28,8 @@ describe('SugerenciasAgregarPresenter', () => {
 
   describe('Inicialización', () => {
     it('debería solicitar las sugerencias al servicio y actualizar el estado cuando sea exitoso', () => {
+      const usuario = SugerenciasAgregarMother.crearUsuario();
+      usuarioService.getUsuarioActual.and.returnValue(usuario);
       const sugerenciasEsperadas = SugerenciasAgregarMother.crearListaSugerencias();
       servicio.getSugerenciasAgregarProducto.and.returnValue(of(sugerenciasEsperadas));
       
@@ -42,7 +49,20 @@ describe('SugerenciasAgregarPresenter', () => {
       expect(errorEmitido).toBeNull();
     });
 
+    it('debería emitir un error si no hay usuario en sesión', () => {
+      usuarioService.getUsuarioActual.and.returnValue(null as unknown as ReturnType<UsuarioService['getUsuarioActual']>);
+      let errorEmitido: string | null | undefined;
+      presenter.error$.subscribe(val => errorEmitido = val);
+
+      presenter.initialize();
+
+      expect(errorEmitido).toBe('Usuario no autenticado.');
+      expect(servicio.getSugerenciasAgregarProducto).not.toHaveBeenCalled();
+    });
+
     it('debería actualizar el estado de error cuando el servicio falle', () => {
+      const usuario = SugerenciasAgregarMother.crearUsuario();
+      usuarioService.getUsuarioActual.and.returnValue(usuario);
       servicio.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('Error de red')));
       
       let errorEmitido: string | null | undefined;
@@ -60,6 +80,8 @@ describe('SugerenciasAgregarPresenter', () => {
 
   describe('KPIs Computados', () => {
     beforeEach(() => {
+      const usuario = SugerenciasAgregarMother.crearUsuario();
+      usuarioService.getUsuarioActual.and.returnValue(usuario);
       servicio.getSugerenciasAgregarProducto.and.returnValue(of(SugerenciasAgregarMother.crearListaSugerencias()));
       presenter.initialize();
     });
@@ -102,6 +124,8 @@ describe('SugerenciasAgregarPresenter', () => {
 
   describe('Datos de Gráficos y Tarjetas', () => {
     beforeEach(() => {
+      const usuario = SugerenciasAgregarMother.crearUsuario();
+      usuarioService.getUsuarioActual.and.returnValue(usuario);
       servicio.getSugerenciasAgregarProducto.and.returnValue(of(SugerenciasAgregarMother.crearListaSugerencias()));
       presenter.initialize();
     });

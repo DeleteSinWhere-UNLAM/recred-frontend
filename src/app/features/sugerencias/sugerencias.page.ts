@@ -28,11 +28,7 @@ export class SugerenciasPage implements OnInit {
   }
 
   ngOnInit(): void {
-    const perfilRaw = localStorage.getItem('recred.perfil');
-    const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
-    if (this.hasUsuarioId(usuarioId)) {
-      this.presenter.initialize(usuarioId);
-    }
+    this.presenter.initialize();
   }
 
   volver(): void {

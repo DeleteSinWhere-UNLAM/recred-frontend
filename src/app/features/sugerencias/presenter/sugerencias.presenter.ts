@@ -10,6 +10,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { ProductoService } from '../../inventario/services/producto.service';
 import { Producto } from '../../inventario/models/producto.interface';
 import { buildCloudinaryCollageUrl } from '../../../shared/utils/cloudinary-collage.helper';
+import { UsuarioService } from '../../../data-access/services/usuario.service';
 
 @Injectable()
 export class SugerenciasPresenter {
@@ -32,9 +33,13 @@ export class SugerenciasPresenter {
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
   private readonly productService = inject(ProductoService);
+  private readonly usuarioService = inject(UsuarioService);
 
-  initialize(userId: string): void {
+  initialize(): void {
+    const userId = this.usuarioService.getUsuarioActual()?.id;
+    if (!userId) return;
     this.userId = userId;
+
     this.sugerenciasService.getSugerencias().subscribe((data) => {
       this._sugerencias.next(data);
       if (this.hasSugerencias(data)) {
