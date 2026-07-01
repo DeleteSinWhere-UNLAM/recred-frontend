@@ -17,6 +17,14 @@ interface TrackingMetric {
   tone?: 'success' | 'warning' | 'danger';
 }
 
+interface TrackingPedidosFilters {
+  fecha?: string;
+  status?: EstadoCompra;
+  estadoRetiro?: EstadoRetiro;
+  franjaId?: string;
+  search?: string;
+}
+
 const ESTADOS_COMPRA: readonly EstadoCompra[] = [
   'PENDIENTE',
   'EN_PREPARACION',
@@ -56,6 +64,7 @@ export class TrackingPedidosPage implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private requestSeq = 0;
   protected readonly userName = computed(() => this.usuarioService.getUsuarioActual().nombre);
   protected readonly loading = signal<boolean>(false);
   protected readonly isUpdating = signal<boolean>(false);
@@ -71,7 +80,7 @@ export class TrackingPedidosPage implements OnInit {
     const pickups = this.allPickupsState();
     const pending = pickups.filter((p) => p.status === 'PENDIENTE').length;
     const ready = pickups.filter((p) => p.status === 'LISTO').length;
-    const expired = pickups.filter((p) => p.status === 'VENCIDO' || p.withdrawalStatus === 'NO_RETIRADO').length;
+    const expired = pickups.filter((p) => p.status === 'VENCIDO').length;
 
     return [
       {
@@ -169,11 +178,16 @@ export class TrackingPedidosPage implements OnInit {
   }
 
   protected loadPickups(): void {
+    const requestId = ++this.requestSeq;
     this.loading.set(true);
     this.error.set(null);
 
-    this.trackingService.getScheduledPickups().subscribe({
+    this.trackingService.getScheduledPickups(this.buildBackendFilters()).subscribe({
       next: (data) => {
+        if (requestId !== this.requestSeq) {
+          return;
+        }
+
         const sorted = [...data].sort((a, b) => {
           const dateDiff = new Date(a.pickupDate).getTime() - new Date(b.pickupDate).getTime();
           if (dateDiff !== 0) return dateDiff;
@@ -190,6 +204,10 @@ export class TrackingPedidosPage implements OnInit {
         }
       },
       error: (err) => {
+        if (requestId !== this.requestSeq) {
+          return;
+        }
+
         console.error('Error fetching pickups:', err);
         this.error.set('No se pudieron cargar los pedidos. Por favor, intente de nuevo.');
         this.loading.set(false);
@@ -244,6 +262,7 @@ export class TrackingPedidosPage implements OnInit {
     this.filterEstadoRetiro.set('');
     this.filterFranja.set('');
     this.filterSearch.set('');
+    this.loadPickups();
   }
 
   protected volverHome(): void {
@@ -254,12 +273,28 @@ export class TrackingPedidosPage implements OnInit {
     return order.items.map((i) => `${i.productName} x${i.quantity}`).join(', ');
   }
 
+  protected onFechaChange(value: string): void {
+    this.filterFecha.set(value);
+    this.loadPickups();
+  }
+
+  protected onFranjaChange(value: string): void {
+    this.filterFranja.set(value);
+    this.loadPickups();
+  }
+
+  protected onSearchChange(value: string): void {
+    this.filterSearch.set(value);
+  }
+
   protected onEstadoCompraChange(value: string): void {
     this.filterEstado.set(this.isEstadoCompra(value) ? value : '');
+    this.loadPickups();
   }
 
   protected onEstadoRetiroChange(value: string): void {
     this.filterEstadoRetiro.set(this.isEstadoRetiro(value) ? value : '');
+    this.loadPickups();
   }
 
   protected statusBadgeClass(status: EstadoCompra): string {
@@ -314,6 +349,33 @@ export class TrackingPedidosPage implements OnInit {
     if (search) {
       this.filterSearch.set(search);
     }
+  }
+
+  private buildBackendFilters(): TrackingPedidosFilters | undefined {
+    const filters: TrackingPedidosFilters = {};
+    const fecha = this.filterFecha();
+    const status = this.filterEstado();
+    const estadoRetiro = this.filterEstadoRetiro();
+    const franjaId = this.filterFranja();
+    const search = this.filterSearch().trim();
+
+    if (fecha) {
+      filters.fecha = fecha;
+    }
+    if (status) {
+      filters.status = status;
+    }
+    if (estadoRetiro) {
+      filters.estadoRetiro = estadoRetiro;
+    }
+    if (franjaId) {
+      filters.franjaId = franjaId;
+    }
+    if (search) {
+      filters.search = search;
+    }
+
+    return Object.keys(filters).length > 0 ? filters : undefined;
   }
 
   private isEstadoCompra(value: string | null | undefined): value is EstadoCompra {
