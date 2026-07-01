@@ -1,19 +1,45 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 
-import { } from '../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { TrackingPedidosService } from './services/tracking-pedidos.service';
-import { ScheduledPickup, EstadoCompra, TimeSlotFilter } from './models/tracking-pedidos.model';
+import { ScheduledPickup, EstadoCompra, EstadoRetiro, TimeSlotFilter } from './models/tracking-pedidos.model';
 import { OrderDetailsModalComponent } from './components/order-details-modal/order-details-modal.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { ToastService } from '../../shared/services/toast.service';
+
+interface TrackingMetric {
+  label: string;
+  value: string;
+  icon: string;
+  tone?: 'success' | 'warning' | 'danger';
+}
+
+const ESTADOS_COMPRA: readonly EstadoCompra[] = [
+  'PENDIENTE',
+  'EN_PREPARACION',
+  'LISTO',
+  'ENTREGADO',
+  'CANCELADO',
+  'RECHAZADO',
+  'VENCIDO',
+];
+
+const ESTADOS_RETIRO: readonly EstadoRetiro[] = [
+  'PROGRAMADO',
+  'LISTO',
+  'RETIRADO',
+  'NO_RETIRADO',
+  'CANCELADO',
+];
 
 @Component({
   selector: 'app-tracking-pedidos-page',
   standalone: true,
   imports: [
+    NavbarComponent,
     CommonModule,
     FormsModule,
     CurrencyPipe,
@@ -29,16 +55,72 @@ export class TrackingPedidosPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   protected readonly userName = computed(() => this.usuarioService.getUsuarioActual().nombre);
   protected readonly loading = signal<boolean>(false);
   protected readonly isUpdating = signal<boolean>(false);
   protected readonly error = signal<string | null>(null);
   protected readonly allPickupsState = signal<ScheduledPickup[]>([]);
   protected readonly filterFecha = signal<string>('');
-  protected readonly filterEstado = signal<string>('');
+  protected readonly filterEstado = signal<EstadoCompra | ''>('');
+  protected readonly filterEstadoRetiro = signal<EstadoRetiro | ''>('');
   protected readonly filterFranja = signal<string>('');
   protected readonly filterSearch = signal<string>('');
   protected readonly selectedOrder = signal<ScheduledPickup | null>(null);
+  protected readonly metrics = computed<TrackingMetric[]>(() => {
+    const pickups = this.allPickupsState();
+    const pending = pickups.filter((p) => p.status === 'PENDIENTE').length;
+    const ready = pickups.filter((p) => p.status === 'LISTO').length;
+    const expired = pickups.filter((p) => p.status === 'VENCIDO' || p.withdrawalStatus === 'NO_RETIRADO').length;
+
+    return [
+      {
+        label: 'A preparar',
+        value: this.formatNumber(pending),
+        icon: 'fa-hourglass-half',
+        tone: pending > 0 ? 'warning' : 'success',
+      },
+      {
+        label: 'Ya listos',
+        value: this.formatNumber(ready),
+        icon: 'fa-bell-concierge',
+        tone: ready > 0 ? 'warning' : 'success',
+      },
+      {
+        label: 'Vencidos',
+        value: this.formatNumber(expired),
+        icon: 'fa-clock-rotate-left',
+        tone: expired > 0 ? 'danger' : 'success',
+      },
+      {
+        label: 'Resultado actual',
+        value: this.formatNumber(this.filteredPickups().length),
+        icon: 'fa-filter',
+      },
+    ];
+  });
+  protected readonly activeFiltersLabel = computed(() => {
+    const labels: string[] = [];
+
+    if (this.filterFecha()) {
+      labels.push(this.formatDate(this.filterFecha()));
+    }
+    if (this.filterEstado()) {
+      labels.push(this.getEstadoCompraLabel(this.filterEstado()));
+    }
+    if (this.filterEstadoRetiro()) {
+      labels.push(this.getEstadoRetiroLabel(this.filterEstadoRetiro()));
+    }
+    if (this.filterFranja()) {
+      const slot = this.timeSlots().find((item) => item.id === this.filterFranja());
+      labels.push(slot?.description ?? 'Franja seleccionada');
+    }
+    if (this.filterSearch().trim()) {
+      labels.push(`Busqueda: ${this.filterSearch().trim()}`);
+    }
+
+    return labels.length ? labels.join(' - ') : 'Sin filtros aplicados';
+  });
   protected readonly timeSlots = computed<TimeSlotFilter[]>(() => {
     const unique = new Map<string, string>();
     for (const p of this.allPickupsState()) {
@@ -53,14 +135,18 @@ export class TrackingPedidosPage implements OnInit {
     let list = this.allPickupsState();
     const fecha = this.filterFecha();
     const estado = this.filterEstado();
+    const estadoRetiro = this.filterEstadoRetiro();
     const franja = this.filterFranja();
     const search = this.filterSearch().trim().toLowerCase();
 
     if (fecha) {
       list = list.filter((p) => p.pickupDate === fecha);
     }
-    if (estado && estado !== 'TODOS') {
-      list = list.filter((p) => p.withdrawalStatus === estado);
+    if (estado) {
+      list = list.filter((p) => p.status === estado);
+    }
+    if (estadoRetiro) {
+      list = list.filter((p) => p.withdrawalStatus === estadoRetiro);
     }
     if (franja && franja !== 'TODAS') {
       list = list.filter((p) => p.pickupSlotId === franja);
@@ -78,6 +164,7 @@ export class TrackingPedidosPage implements OnInit {
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
+    this.applyQueryFilters(this.route.snapshot.queryParamMap);
     this.loadPickups();
   }
 
@@ -154,6 +241,7 @@ export class TrackingPedidosPage implements OnInit {
   protected limpiarFiltros(): void {
     this.filterFecha.set('');
     this.filterEstado.set('');
+    this.filterEstadoRetiro.set('');
     this.filterFranja.set('');
     this.filterSearch.set('');
   }
@@ -164,5 +252,89 @@ export class TrackingPedidosPage implements OnInit {
 
   protected getItemsSummary(order: ScheduledPickup): string {
     return order.items.map((i) => `${i.productName} x${i.quantity}`).join(', ');
+  }
+
+  protected onEstadoCompraChange(value: string): void {
+    this.filterEstado.set(this.isEstadoCompra(value) ? value : '');
+  }
+
+  protected onEstadoRetiroChange(value: string): void {
+    this.filterEstadoRetiro.set(this.isEstadoRetiro(value) ? value : '');
+  }
+
+  protected statusBadgeClass(status: EstadoCompra): string {
+    return `tp-status tp-status--${status.toLowerCase()}`;
+  }
+
+  protected getEstadoCompraLabel(status: EstadoCompra | ''): string {
+    const labels: Record<EstadoCompra, string> = {
+      PENDIENTE: 'A preparar',
+      EN_PREPARACION: 'En preparacion',
+      LISTO: 'Listo para retirar',
+      ENTREGADO: 'Entregado',
+      CANCELADO: 'Cancelado',
+      RECHAZADO: 'Rechazado',
+      VENCIDO: 'Vencido',
+    };
+
+    return status ? labels[status] : 'Todos los pedidos';
+  }
+
+  protected getEstadoRetiroLabel(status: EstadoRetiro | ''): string {
+    const labels: Record<EstadoRetiro, string> = {
+      PROGRAMADO: 'Retiro programado',
+      LISTO: 'Retiro listo',
+      RETIRADO: 'Retirado',
+      NO_RETIRADO: 'No retirado',
+      CANCELADO: 'Retiro cancelado',
+    };
+
+    return status ? labels[status] : 'Todos los retiros';
+  }
+
+  private applyQueryFilters(params: ParamMap): void {
+    const fecha = params.get('date') ?? params.get('fecha');
+    const estado = params.get('status') ?? params.get('estado');
+    const estadoRetiro = params.get('withdrawalStatus') ?? params.get('estadoRetiro');
+    const franja = params.get('franja') ?? params.get('franjaId');
+    const search = params.get('search');
+
+    if (fecha) {
+      this.filterFecha.set(fecha);
+    }
+    if (this.isEstadoCompra(estado)) {
+      this.filterEstado.set(estado);
+    }
+    if (this.isEstadoRetiro(estadoRetiro)) {
+      this.filterEstadoRetiro.set(estadoRetiro);
+    }
+    if (franja) {
+      this.filterFranja.set(franja);
+    }
+    if (search) {
+      this.filterSearch.set(search);
+    }
+  }
+
+  private isEstadoCompra(value: string | null | undefined): value is EstadoCompra {
+    return ESTADOS_COMPRA.includes(value as EstadoCompra);
+  }
+
+  private isEstadoRetiro(value: string | null | undefined): value is EstadoRetiro {
+    return ESTADOS_RETIRO.includes(value as EstadoRetiro);
+  }
+
+  private formatNumber(value: number): string {
+    return new Intl.NumberFormat('es-AR').format(value);
+  }
+
+  private formatDate(value: string): string {
+    const [year, month, day] = value.split('-');
+
+    if (!year || !month || !day) {
+      return value;
+    }
+
+    return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
   }
 }
