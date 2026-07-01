@@ -58,7 +58,6 @@ export class SugerenciasPresenter {
     if (this.hasSelectedProduct(selected)) {
       this.sugerenciasService.getComboSuggestions(selected.estadisticasVenta.productoId)
         .subscribe((suggestions) => {
-          console.log(suggestions);
           this._suggestedProducts.next(suggestions.suggestedProducts);
           this._isComboModalOpen.next(true);
         });

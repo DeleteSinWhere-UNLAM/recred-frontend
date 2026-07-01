@@ -154,7 +154,6 @@ describe('SugerenciasAgregarPresenter', () => {
 
   describe('Helpers de Formateo', () => {
     
-    // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
     it('debería formatear valores numéricos a moneda local sin decimales', () => {
       
       const formateado = presenter.formatCurrency(1500);
@@ -162,7 +161,6 @@ describe('SugerenciasAgregarPresenter', () => {
       expect(formateado).toBe('$1.500');
     });
 
-    // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
     it('debería formatear cero correctamente', () => {
       
       const formateado = presenter.formatCurrency(0);
