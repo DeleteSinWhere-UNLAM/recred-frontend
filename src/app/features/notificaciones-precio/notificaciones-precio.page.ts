@@ -1,38 +1,26 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { NotificacionesPrecioService } from './services/notificaciones-precio.service';
-import { NotificacionPrecio } from './models/notificacion-precio.model';
 import { NotificacionPrecioCardComponent } from './components/notificacion-precio-card/notificacion-precio-card';
+import { NotificacionesPrecioPresenter } from './presenter/notificaciones-precio.presenter';
 
 @Component({
   selector: 'app-notificaciones-precio-page',
   standalone: true,
   templateUrl: './notificaciones-precio.page.html',
   styleUrl: './notificaciones-precio.page.css',
-  imports: [ NavbarComponent, NotificacionPrecioCardComponent],
+  imports: [CommonModule, NavbarComponent, NotificacionPrecioCardComponent],
+  providers: [NotificacionesPrecioPresenter]
 })
-export class NotificacionesPrecioPage {
+export class NotificacionesPrecioPage implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
+  readonly presenter = inject(NotificacionesPrecioPresenter);
 
-  private readonly notificacionesService = inject(NotificacionesPrecioService);
+  readonly nombreUsuario = this.usuarioService.getUsuarioActual()?.nombre || '';
 
-  readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
-
-  notificaciones: NotificacionPrecio[] = [];
-
-  constructor() {
-    const perfilRaw = localStorage.getItem('recred.perfil');
-
-    const usuarioId = perfilRaw ? JSON.parse(perfilRaw).id : null;
-
-    if (usuarioId) {
-      this.notificacionesService
-        .getNotificaciones(usuarioId)
-        .subscribe((data) => {
-          this.notificaciones = data;
-        });
-    }
+  ngOnInit(): void {
+    this.presenter.initialize();
   }
 }

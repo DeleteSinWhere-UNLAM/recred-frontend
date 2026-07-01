@@ -3,13 +3,19 @@
 <main class="notificaciones">
   <h1 class="notificaciones__titulo">Cambios de precio</h1>
 
-  @if (notificaciones.length > 0) {
-    <div class="notificaciones__lista">
-      @for (notificacion of notificaciones; track notificacion.productoId) {
-        <app-notificacion-precio-card [notificacion]="notificacion" />
-      }
-    </div>
-  } @else {
-    <p class="notificaciones__vacio">No hay notificaciones disponibles.</p>
+  @if (presenter.notificaciones$ | async; as notificaciones) {
+    @if (notificaciones.length > 0) {
+      <div class="notificaciones__lista">
+        @for (notificacion of notificaciones; track notificacion.productoId) {
+          <app-notificacion-precio-card [notificacion]="notificacion" />
+        }
+      </div>
+    } @else {
+      <p class="notificaciones__vacio">No hay notificaciones disponibles.</p>
+    }
+  }
+
+  @if (presenter.error$ | async; as error) {
+    <p class="notificaciones__error">{{ error }}</p>
   }
 </main>
