@@ -1,4 +1,8 @@
-@if (resumen && resumenProcesado) {
+<app-navbar [userName]="nombreUsuario" />
+
+@if (presenter.error$ | async; as error) {
+  <p class="rs__error">{{ error }}</p>
+} @else if (presenter.resumen$ | async; as resumen) {
   <main class="rs">
     <div class="rs__container">
       <header class="rs__header">
@@ -26,7 +30,7 @@
             </span>
             <div>
               <small>Gasto total</small>
-              <strong>${{ totalFamiliar }}</strong>
+              <strong>${{ presenter.totalFamiliar$ | async }}</strong>
             </div>
           </article>
 
@@ -36,7 +40,7 @@
             </span>
             <div>
               <small>Mayor consumo</small>
-              <strong>{{ hijosResumen[0]?.nombre ?? "-" }}</strong>
+              <strong>{{ (presenter.hijosResumen$ | async)?.[0]?.nombre ?? "-" }}</strong>
             </div>
           </article>
 
@@ -46,7 +50,7 @@
             </span>
             <div>
               <small>Integrantes</small>
-              <strong>{{ hijos.length }}</strong>
+              <strong>{{ (presenter.hijos$ | async)?.length }}</strong>
             </div>
           </article>
         </div>
@@ -64,7 +68,7 @@
           </div>
 
           <div class="rs__chart-bars">
-            @for (item of hijosResumen; track item.nombre; let i = $index) {
+            @for (item of presenter.hijosResumen$ | async; track item.nombre; let i = $index) {
               <article class="rs__bar-item">
                 <div class="rs__ranking">
                   @if (i === 0) {
@@ -100,9 +104,9 @@
             </div>
           </div>
 
-          @if (resumenProcesado.mensajes.length) {
+          @if ((presenter.mensajes$ | async)?.length) {
             <div class="rs__insight-list">
-              @for (mensaje of resumenProcesado.mensajes; track mensaje.nombre) {
+              @for (mensaje of presenter.mensajes$ | async; track mensaje.nombre) {
                 <article class="rs__insight-item">
                   <div class="rs__insight-item__header">
                     <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
@@ -129,7 +133,7 @@
         </div>
 
         <div class="rs__children-grid">
-          @for (hijo of hijos; track hijo.nombre) {
+          @for (hijo of presenter.hijos$ | async; track hijo.nombre) {
             <article class="rs__child-card">
               <header class="rs__child-card__header">
                 <h3>{{ hijo.nombre }}</h3>
@@ -171,10 +175,10 @@
                 </article>
               </div>
 
-              @if (getCategorias(hijo.datos).length > 0) {
+              @if (presenter.getCategorias(hijo.datos).length > 0) {
                 <div class="rs__categories">
                   <h4 class="rs__categories-title">Gastos por categoría</h4>
-                  @for (categoria of getCategorias(hijo.datos); track categoria[0]) {
+                  @for (categoria of presenter.getCategorias(hijo.datos); track categoria[0]) {
                     <div class="rs__category">
                       <div class="rs__category-header">
                         <span>{{ categoria[0] }}</span>

@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ResumenSemanalPage } from './resumen-semanal.page';
-import { ResumenSemanalService } from './services/resumen-semanal.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { of } from 'rxjs';
+import { ResumenSemanalPresenter } from './presenter/resumen-semanal.presenter';
 import { Component, Input, signal } from '@angular/core';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ResumenSemanalMother } from './resumen-semanal.mother';
 
 @Component({
@@ -16,11 +16,12 @@ class NavbarStub {
 }
 
 describe('ResumenSemanalPage', () => {
-  let servicioResumen: jasmine.SpyObj<ResumenSemanalService>;
+  let fixture: ComponentFixture<ResumenSemanalPage>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let presenter: jasmine.SpyObj<ResumenSemanalPresenter>;
 
   beforeEach(async () => {
-    servicioResumen = jasmine.createSpyObj('ResumenSemanalService', ['getResumen']);
+    presenter = jasmine.createSpyObj('ResumenSemanalPresenter', ['initialize']);
     
     servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual'], {
       esVistaKiosquero: signal(false),
@@ -34,113 +35,29 @@ describe('ResumenSemanalPage', () => {
     await TestBed.configureTestingModule({
       imports: [ResumenSemanalPage],
       providers: [
-        { provide: ResumenSemanalService, useValue: servicioResumen },
         { provide: UsuarioService, useValue: servicioUsuario }
       ]
     })
       .overrideComponent(ResumenSemanalPage, {
+        remove: {
+          imports: [NavbarComponent],
+          providers: [ResumenSemanalPresenter]
+        },
         add: {
-          imports: [NavbarStub]
+          imports: [NavbarStub],
+          providers: [
+            { provide: ResumenSemanalPresenter, useValue: presenter }
+          ]
         }
       })
       .compileComponents();
+
+    fixture = TestBed.createComponent(ResumenSemanalPage);
   });
 
-  describe('Cuando el perfil existe en localStorage', () => {
-    let component: ResumenSemanalPage;
-    let fixture: ComponentFixture<ResumenSemanalPage>;
+  it('debería inicializar el presenter al cargar la vista', () => {
+    fixture.detectChanges();
 
-    beforeEach(() => {
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
-      servicioResumen.getResumen.and.returnValue(of(ResumenSemanalMother.crearResumen()));
-      
-      fixture = TestBed.createComponent(ResumenSemanalPage);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
-    it('debería inicializar el resumen parseando correctamente el JSON desde el servicio', () => {
-      
-      const cantidadHijos = component.hijos.length;
-      const primerMensaje = component.resumenProcesado?.mensajes[0].nombre;
-
-      expect(servicioResumen.getResumen).toHaveBeenCalled();
-      expect(cantidadHijos).toBe(2);
-      expect(primerMensaje).toBe('Juan');
-    });
-
-    it('debería calcular el total familiar sumando todos los consumos', () => {
-      
-      const total = component.totalFamiliar;
-
-      expect(total).toBe(1500);
-    });
-
-    it('debería devolver el arreglo de categorías vacío si el hijo no tiene categorías', () => {
-      
-      const hijoSinCategorias = component.hijos[1];
-      const categorias = component.getCategorias(hijoSinCategorias.datos);
-
-      expect(categorias).toEqual([]);
-    });
-
-    it('debería calcular el resumen de hijos ordenado por gasto mayor y calcular su porcentaje del total', () => {
-      
-      const resumenCalculado = component.hijosResumen;
-
-      expect(resumenCalculado.length).toBe(2);
-      expect(resumenCalculado[0].nombre).toBe('Juan');
-      expect(resumenCalculado[0].gasto).toBe(1000);
-      expect(resumenCalculado[0].porcentaje).toBeCloseTo(66.66, 1);
-      expect(resumenCalculado[1].nombre).toBe('Maria');
-      expect(resumenCalculado[1].gasto).toBe(500);
-      expect(resumenCalculado[1].porcentaje).toBeCloseTo(33.33, 1);
-    });
-
-    it('debería devolver porcentaje cero cuando el gasto total familiar es cero', () => {
-      
-      component.hijos = [{ nombre: 'Cero', datos: ResumenSemanalMother.crearHijoResumen({ totalGastado: 0 }) }];
-      const resumenCalculado = component.hijosResumen;
-
-      expect(resumenCalculado[0].porcentaje).toBe(0);
-    });
-
-    it('debería fallback a cero cuando el hijo tiene gasto nulo', () => {
-      
-      component.hijos = [{ nombre: 'Nulo', datos: ResumenSemanalMother.crearHijoResumen({ totalGastado: undefined as unknown as number }) }];
-      const total = component.totalFamiliar;
-      const gastoPrimerHijo = component.hijosResumen[0].gasto;
-
-      expect(total).toBe(0);
-      expect(gastoPrimerHijo).toBe(0);
-    });
-  });
-
-  describe('Cuando la API o el estado interno varían', () => {
-    it('no debería solicitar el resumen al servicio si el id de usuario no existe en la sesión', () => {
-      
-      spyOn(localStorage, 'getItem').and.returnValue(null);
-      const fixture = TestBed.createComponent(ResumenSemanalPage);
-      const component = fixture.componentInstance;
-      fixture.detectChanges();
-
-      expect(servicioResumen.getResumen).not.toHaveBeenCalled();
-      expect(component.resumen).toBeUndefined();
-    });
-
-    it('debería parsear mensajes como un arreglo vacío si la API devuelve el campo mensaje nulo', () => {
-      
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-456' }));
-      const resumenMalo = ResumenSemanalMother.crearResumen();
-      resumenMalo.resumen = JSON.stringify({ hijos: {}, mensaje: null });
-      servicioResumen.getResumen.and.returnValue(of(resumenMalo));
-      const fixture = TestBed.createComponent(ResumenSemanalPage);
-      const component = fixture.componentInstance;
-      fixture.detectChanges();
-
-      const mensajesCalculados = component.resumenProcesado?.mensajes;
-
-      expect(mensajesCalculados).toEqual([]);
-    });
+    expect(presenter.initialize).toHaveBeenCalled();
   });
 });
