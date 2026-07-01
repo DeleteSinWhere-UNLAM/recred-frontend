@@ -358,7 +358,7 @@ describe('HomeKiosqueroPresenter', () => {
   it('navega a pedidos con fecha y estado preparados para filtro', () => {
     presenter.abrirPedidos('LISTO');
 
-    expect(router.navigate).toHaveBeenCalledOnceWith(['/cierre-diario'], {
+    expect(router.navigate).toHaveBeenCalledOnceWith(['/kiosquero/pedidos-tracking'], {
       queryParams: {
         date: presenter.selectedDate(),
         status: 'LISTO',

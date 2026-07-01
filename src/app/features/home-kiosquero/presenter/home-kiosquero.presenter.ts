@@ -1165,7 +1165,7 @@ export class HomeKiosqueroPresenter {
   }
 
   abrirPedidos(status: KiosqueroOrderStatus): void {
-    this.router.navigate(['/cierre-diario'], {
+    this.router.navigate(['/kiosquero/pedidos-tracking'], {
       queryParams: {
         date: this.selectedDateState(),
         status,

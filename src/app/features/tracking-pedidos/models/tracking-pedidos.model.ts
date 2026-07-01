@@ -1,4 +1,11 @@
-export type EstadoCompra = 'PENDIENTE' | 'EN_PREPARACION' | 'LISTO' | 'ENTREGADO' | 'CANCELADO';
+export type EstadoCompra =
+  | 'PENDIENTE'
+  | 'EN_PREPARACION'
+  | 'LISTO'
+  | 'ENTREGADO'
+  | 'CANCELADO'
+  | 'RECHAZADO'
+  | 'VENCIDO';
 export type EstadoRetiro = 'PROGRAMADO' | 'LISTO' | 'RETIRADO' | 'NO_RETIRADO' | 'CANCELADO';
 
 export interface PurchaseItem {
