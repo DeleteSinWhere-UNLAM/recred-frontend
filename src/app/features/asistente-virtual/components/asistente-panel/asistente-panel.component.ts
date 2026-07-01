@@ -94,6 +94,8 @@ export class AsistentePanelComponent implements AfterViewInit {
   private readonly deshabilitadoState = signal(false);
   private readonly mostrarHistorialState = signal(false);
   private readonly accionesAbiertasState = signal(true);
+  private readonly mostrarSelectorFechaRetiroState = signal(false);
+  private readonly fechaRetiroMinimaState = signal('');
 
   @Input({ required: true })
   set mensajes(valor: readonly MensajeAsistente[]) {
@@ -125,9 +127,20 @@ export class AsistentePanelComponent implements AfterViewInit {
     this.mostrarHistorialState.set(valor);
   }
 
+  @Input()
+  set mostrarSelectorFechaRetiro(valor: boolean) {
+    this.mostrarSelectorFechaRetiroState.set(valor);
+  }
+
+  @Input()
+  set fechaRetiroMinima(valor: string) {
+    this.fechaRetiroMinimaState.set(valor);
+  }
+
   @Output() cerrar = new EventEmitter<void>();
   @Output() enviar = new EventEmitter<string>();
   @Output() sugerencia = new EventEmitter<string>();
+  @Output() fechaRetiro = new EventEmitter<string>();
   @Output() nuevaConversacion = new EventEmitter<void>();
   @Output() verHistorial = new EventEmitter<void>();
 
@@ -141,6 +154,10 @@ export class AsistentePanelComponent implements AfterViewInit {
   protected readonly deshabilitado_ = this.deshabilitadoState.asReadonly();
   protected readonly mostrarHistorial_ = this.mostrarHistorialState.asReadonly();
   protected readonly accionesAbiertas_ = this.accionesAbiertasState.asReadonly();
+  protected readonly mostrarSelectorFechaRetiro_ =
+    this.mostrarSelectorFechaRetiroState.asReadonly();
+  protected readonly fechaRetiroMinima_ =
+    this.fechaRetiroMinimaState.asReadonly();
   protected readonly gruposOpciones = computed(() =>
     this.crearGruposOpciones(this.opcionesState()),
   );
@@ -181,6 +198,19 @@ export class AsistentePanelComponent implements AfterViewInit {
 
   protected onSugerencia(prompt: string): void {
     this.sugerencia.emit(prompt);
+  }
+
+  protected onFechaRetiroSeleccionada(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const valor = input.value;
+    if (!valor || this.deshabilitadoState()) return;
+    if (this.fechaRetiroMinimaState() && valor < this.fechaRetiroMinimaState()) {
+      input.value = '';
+      return;
+    }
+
+    this.fechaRetiro.emit(valor);
+    input.value = '';
   }
 
   protected onToggleAcciones(): void {

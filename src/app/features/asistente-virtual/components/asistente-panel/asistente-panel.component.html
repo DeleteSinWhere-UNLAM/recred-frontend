@@ -74,6 +74,22 @@
     (elegir)="onSugerencia($event)"
   />
 
+  @if (mostrarSelectorFechaRetiro_()) {
+    <section class="asistente-panel__fecha-retiro" aria-label="Fecha de retiro">
+      <label class="asistente-panel__fecha-label" for="asistente-fecha-retiro">
+        Fecha de retiro
+      </label>
+      <input
+        id="asistente-fecha-retiro"
+        type="date"
+        class="asistente-panel__fecha-input"
+        [min]="fechaRetiroMinima_()"
+        [disabled]="deshabilitado_()"
+        (change)="onFechaRetiroSeleccionada($event)"
+      />
+    </section>
+  }
+
   @if (accionesAbiertas_() && gruposOpciones().length > 0) {
     <section
       id="asistente-panel-acciones"

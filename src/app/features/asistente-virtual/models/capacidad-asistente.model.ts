@@ -97,6 +97,13 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       prompt: 'mostrame mis pedidos pendientes',
     },
     {
+      id: 'cancelar-pedido',
+      capacidad: 'PEDIDOS_PENDIENTES',
+      label: 'Cancelar pedido',
+      emoji: 'X',
+      prompt: 'cancelar mi pedido',
+    },
+    {
       id: 'codigo-retiro',
       capacidad: 'CODIGO_RETIRO',
       label: 'Codigo de retiro',
