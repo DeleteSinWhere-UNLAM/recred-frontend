@@ -1,5 +1,8 @@
 import { MensajeAsistente } from './mensaje-asistente.model';
-import { AccionAsistente } from './respuesta-asistente.model';
+import {
+  AccionAsistente,
+  IntencionAsistente,
+} from './respuesta-asistente.model';
 
 export interface SesionAsistente {
   readonly id: string | null;
@@ -17,16 +20,18 @@ export interface SesionAsistenteResponse {
 
 export type EstadoAccionChatbot =
   | 'PENDIENTE'
+  | 'ESPERANDO_FECHA'
   | 'EJECUTADA'
   | 'CANCELADA'
-  | 'FALLIDA';
+  | 'FALLIDA'
+  | 'INFORMATIVA';
 
 export interface AccionPendienteChatbot {
   readonly tipo?: string | null;
 }
 
 export interface MetadataMensajeAsistente {
-  readonly intencionChatbot?: string | null;
+  readonly intencionChatbot?: IntencionAsistente | null;
   readonly estadoAccionChatbot?: EstadoAccionChatbot | null;
   readonly accionPendienteChatbot?: AccionPendienteChatbot | null;
 }

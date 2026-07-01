@@ -1,11 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { PerfilMother } from '../../../data-access/services/alumno.mother';
 import { HomeAlumnoService } from '../../home-alumno/services/home-alumno.service';
+import {
+  ESTADO_COMPRA_CANCELADO,
+  ESTADO_ESPERANDO_FECHA,
+  INPUT_FECHA_RETIRO,
+  RespuestaAsistente,
+  TIPO_ACCION_CANCELACION_COMPRA,
+} from '../models/respuesta-asistente.model';
 import { AsistenteVirtualService } from '../services/asistente-virtual.service';
 import { AsistenteVirtualPresenter } from './asistente-virtual.presenter';
-import { RespuestaAsistente } from '../models/respuesta-asistente.model';
-import { PerfilMother } from '../../../data-access/services/alumno.mother';
 import {
   AccionAsistenteMother,
   MensajeAsistenteResponseMother,
@@ -27,9 +33,15 @@ describe('AsistenteVirtualPresenter', () => {
   let servicioHomeAlumno: jasmine.SpyObj<HomeAlumnoService>;
 
   beforeEach(() => {
-    servicioPerfil = jasmine.createSpyObj('PerfilService', ['rol', 'getPerfil', 'obtenerAlumnoId']);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', [
+      'rol',
+      'getPerfil',
+      'obtenerAlumnoId',
+    ]);
     servicioPerfil.rol.and.returnValue('ALUMNO');
-    servicioPerfil.getPerfil.and.returnValue(PerfilMother.crear({ rol: 'ALUMNO' }));
+    servicioPerfil.getPerfil.and.returnValue(
+      PerfilMother.crear({ rol: 'ALUMNO' }),
+    );
     servicioPerfil.obtenerAlumnoId.and.returnValue(null);
 
     servicioAsistente = jasmine.createSpyObj('AsistenteVirtualService', [
@@ -43,7 +55,9 @@ describe('AsistenteVirtualPresenter', () => {
     servicioAsistente.obtenerMensajes.and.resolveTo([]);
     servicioAsistente.cerrarSesion.and.resolveTo();
 
-    servicioHomeAlumno = jasmine.createSpyObj('HomeAlumnoService', ['cargarPedidoEnCurso']);
+    servicioHomeAlumno = jasmine.createSpyObj('HomeAlumnoService', [
+      'cargarPedidoEnCurso',
+    ]);
     servicioHomeAlumno.cargarPedidoEnCurso.and.resolveTo();
 
     TestBed.configureTestingModule({
@@ -93,7 +107,9 @@ describe('AsistenteVirtualPresenter', () => {
 
       whenAbro();
 
-      thenElUltimoMensajeContiene('hijos, presupuestos, restricciones y eventos');
+      thenElUltimoMensajeContiene(
+        'hijos, presupuestos, restricciones y eventos',
+      );
     });
 
     it('dado que no hay rol ni perfil, cuando abro el asistente, deberia usar el mensaje default', () => {
@@ -102,7 +118,9 @@ describe('AsistenteVirtualPresenter', () => {
 
       whenAbro();
 
-      expect(presenter.mensajes()[0].texto).toBe('Hola. Soy Recredito. En que te puedo ayudar?');
+      expect(presenter.mensajes()[0].texto).toBe(
+        'Hola. Soy Recredito. En que te puedo ayudar?',
+      );
     });
 
     it('dado el asistente abierto, cuando lo cierro, deberia quedar cerrado', () => {
@@ -133,7 +151,9 @@ describe('AsistenteVirtualPresenter', () => {
     });
 
     it('dado que el back responde, cuando envio, deberia agregar el mensaje del usuario y la respuesta del asistente en orden', async () => {
-      givenRespuestaDelBack(RespuestaAsistenteMother.crear({ respuesta: 'Tu saldo es de $ 1500' }));
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({ respuesta: 'Tu saldo es de $ 1500' }),
+      );
 
       await whenEnvio('saldo');
 
@@ -146,10 +166,14 @@ describe('AsistenteVirtualPresenter', () => {
     });
 
     it('dado que ya hay una sesion abierta, cuando envio otro mensaje, deberia incluir la sesionId y el rol en la llamada', async () => {
-      givenRespuestaDelBack(RespuestaAsistenteMother.crear({ sesionId: 'sesion-nueva' }));
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({ sesionId: 'sesion-nueva' }),
+      );
       await whenEnvio('saldo');
       servicioAsistente.enviarMensaje.calls.reset();
-      givenRespuestaDelBack(RespuestaAsistenteMother.crear({ sesionId: 'sesion-nueva' }));
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({ sesionId: 'sesion-nueva' }),
+      );
 
       await whenEnvio('eventos');
 
@@ -166,7 +190,9 @@ describe('AsistenteVirtualPresenter', () => {
 
       await whenEnvio('saldo');
 
-      thenElUltimoMensajeEs('No pude responder en este momento. Proba de nuevo en unos minutos.');
+      thenElUltimoMensajeEs(
+        'No pude responder en este momento. Proba de nuevo en unos minutos.',
+      );
       expect(presenter.enviando()).toBeFalse();
     });
 
@@ -176,7 +202,9 @@ describe('AsistenteVirtualPresenter', () => {
 
       await whenEnvio('saldo');
 
-      thenElUltimoMensajeEs('No pude responder en este momento. Proba de nuevo en unos minutos.');
+      thenElUltimoMensajeEs(
+        'No pude responder en este momento. Proba de nuevo en unos minutos.',
+      );
       expect(servicioAsistente.enviarMensaje).not.toHaveBeenCalled();
     });
   });
@@ -184,19 +212,29 @@ describe('AsistenteVirtualPresenter', () => {
   describe('sugerencias dinamicas segun la respuesta del asistente', () => {
     it('dado una accion esperando confirmacion, cuando envio, deberia exponer las sugerencias de compra pendiente', async () => {
       givenRespuestaDelBack(
-        RespuestaAsistenteMother.crear({ accion: AccionAsistenteMother.crearEsperandoConfirmacion() }),
+        RespuestaAsistenteMother.crear({
+          accion: AccionAsistenteMother.crearEsperandoConfirmacion(),
+        }),
       );
 
       await whenEnvio('comprame lo de siempre');
 
       const sugerencias = presenter.sugerencias();
-      expect(sugerencias.map((s) => s.id)).toEqual(['confirmar-compra', 'cancelar-compra']);
+      expect(sugerencias.map((s) => s.id)).toEqual([
+        'confirmar-compra',
+        'cancelar-compra',
+      ]);
     });
 
     it('dado sugerencias del backend sin accion, cuando envio, deberia mapearlas', async () => {
       givenRespuestaDelBack(
         RespuestaAsistenteMother.crear({
-          sugerencias: [SugerenciaRespuestaMother.crear({ label: 'Ver más', mensaje: 'mostrame mas' })],
+          sugerencias: [
+            SugerenciaRespuestaMother.crear({
+              label: 'Ver mas',
+              mensaje: 'mostrame mas',
+            }),
+          ],
         }),
       );
 
@@ -204,7 +242,7 @@ describe('AsistenteVirtualPresenter', () => {
 
       const sugerencias = presenter.sugerencias();
       expect(sugerencias.length).toBe(1);
-      expect(sugerencias[0].label).toBe('Ver más');
+      expect(sugerencias[0].label).toBe('Ver mas');
       expect(sugerencias[0].prompt).toBe('mostrame mas');
       expect(sugerencias[0].tipo).toBe('backend');
     });
@@ -215,7 +253,7 @@ describe('AsistenteVirtualPresenter', () => {
           sugerencias: [
             SugerenciaRespuestaMother.crear({ label: '', mensaje: 'algo' }),
             SugerenciaRespuestaMother.crear({ label: 'Algo', mensaje: '' }),
-            SugerenciaRespuestaMother.crear({ label: 'Válida', mensaje: 'va' }),
+            SugerenciaRespuestaMother.crear({ label: 'Valida', mensaje: 'va' }),
           ],
         }),
       );
@@ -232,28 +270,128 @@ describe('AsistenteVirtualPresenter', () => {
 
       expect(presenter.sugerencias()).toEqual([]);
     });
+
+    it('dado que la accion espera FECHA_RETIRO, cuando envio, deberia habilitar el selector de fecha y ocultar sugerencias', async () => {
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          action: {
+            status: ESTADO_ESPERANDO_FECHA,
+            requiredInputs: [INPUT_FECHA_RETIRO],
+          },
+          respuesta: 'Para que fecha queres retirar?',
+        }),
+      );
+
+      await whenEnvio('comprame una medialuna');
+
+      expect(presenter.requiereFechaRetiro()).toBeTrue();
+      expect(presenter.sugerencias()).toEqual([]);
+      expect(presenter.mensajes().at(-1)?.accion?.status).toBe(
+        ESTADO_ESPERANDO_FECHA,
+      );
+    });
+  });
+
+  describe('Fecha de retiro', () => {
+    it('dado una sesion esperando fecha, cuando elijo una fecha ISO del input, deberia enviarla como dd/MM/yyyy en la misma sesion', async () => {
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          sesionId: 'sesion-fecha',
+          action: {
+            status: ESTADO_ESPERANDO_FECHA,
+            requiredInputs: [INPUT_FECHA_RETIRO],
+          },
+        }),
+      );
+      await whenEnvio('comprame una medialuna');
+
+      servicioAsistente.enviarMensaje.calls.reset();
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          sesionId: 'sesion-fecha',
+          respuesta: 'En que recreo?',
+          accion: AccionAsistenteMother.crearEsperandoRecreo(),
+        }),
+      );
+
+      await presenter.enviarFechaRetiro('2026-07-03');
+
+      expect(servicioAsistente.enviarMensaje).toHaveBeenCalledOnceWith(
+        { rol: 'ALUMNO' },
+        'para el 03/07/2026',
+        'sesion-fecha',
+      );
+      expect(presenter.mensajes().at(-2)?.texto).toBe('para el 03/07/2026');
+    });
   });
 
   describe('Refresco del pedido del alumno tras una accion ejecutada', () => {
     it('dado una accion ejecutada con compraId y rol ALUMNO, cuando envio, deberia pedirle al HomeAlumnoService que recargue el pedido', async () => {
       servicioPerfil.obtenerAlumnoId.and.returnValue('alumno-1');
       givenRespuestaDelBack(
-        RespuestaAsistenteMother.crear({ accion: AccionAsistenteMother.crearEjecutadaConCompra() }),
+        RespuestaAsistenteMother.crear({
+          accion: AccionAsistenteMother.crearEjecutadaConCompra(),
+        }),
       );
 
       await whenEnvio('confirmar');
 
-      expect(servicioHomeAlumno.cargarPedidoEnCurso).toHaveBeenCalledWith('alumno-1');
+      expect(servicioHomeAlumno.cargarPedidoEnCurso).toHaveBeenCalledWith(
+        'alumno-1',
+      );
     });
 
     it('dado una accion ejecutada con rol PADRE, cuando envio, no deberia refrescar el pedido', async () => {
       givenRol('PADRE');
       servicioPerfil.getPerfil.and.returnValue(PerfilMother.crearTutor());
       givenRespuestaDelBack(
-        RespuestaAsistenteMother.crear({ accion: AccionAsistenteMother.crearEjecutadaConCompra() }),
+        RespuestaAsistenteMother.crear({
+          accion: AccionAsistenteMother.crearEjecutadaConCompra(),
+        }),
       );
 
       await whenEnvio('confirmar');
+
+      expect(servicioHomeAlumno.cargarPedidoEnCurso).not.toHaveBeenCalled();
+    });
+
+    it('dado una cancelacion ejecutada con rol ALUMNO, cuando envio, deberia refrescar el pedido', async () => {
+      servicioPerfil.obtenerAlumnoId.and.returnValue('alumno-1');
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          respuesta: 'Tu compra fue cancelada.',
+          accion: {
+            tipo: TIPO_ACCION_CANCELACION_COMPRA,
+            estado: 'EJECUTADA',
+            compraId: 'compra-1',
+            estadoCompra: ESTADO_COMPRA_CANCELADO,
+          },
+        }),
+      );
+
+      await whenEnvio('cancelar mi pedido');
+
+      expect(servicioHomeAlumno.cargarPedidoEnCurso).toHaveBeenCalledOnceWith(
+        'alumno-1',
+      );
+      expect(presenter.mensajes().at(-1)?.accion?.estadoCompra).toBe(
+        ESTADO_COMPRA_CANCELADO,
+      );
+    });
+
+    it('dado una cancelacion informativa, cuando envio, no deberia refrescar el pedido', async () => {
+      servicioPerfil.obtenerAlumnoId.and.returnValue('alumno-1');
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          respuesta: 'Tenes mas de una compra pendiente.',
+          accion: {
+            tipo: TIPO_ACCION_CANCELACION_COMPRA,
+            estado: 'INFORMATIVA',
+          },
+        }),
+      );
+
+      await whenEnvio('cancelar mi pedido');
 
       expect(servicioHomeAlumno.cargarPedidoEnCurso).not.toHaveBeenCalled();
     });
@@ -272,12 +410,17 @@ describe('AsistenteVirtualPresenter', () => {
     });
 
     it('dado una sesion abierta, cuando inicio una nueva conversacion, deberia cerrarla en el backend', async () => {
-      givenRespuestaDelBack(RespuestaAsistenteMother.crear({ sesionId: 'sesion-abierta' }));
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({ sesionId: 'sesion-abierta' }),
+      );
       await whenEnvio('saldo');
 
       await presenter.nuevaConversacion();
 
-      expect(servicioAsistente.cerrarSesion).toHaveBeenCalledWith({ rol: 'ALUMNO' }, 'sesion-abierta');
+      expect(servicioAsistente.cerrarSesion).toHaveBeenCalledWith(
+        { rol: 'ALUMNO' },
+        'sesion-abierta',
+      );
     });
 
     it('dado que no hay sesionId asignada, cuando inicio una nueva conversacion, no deberia intentar cerrar sesion', async () => {
@@ -289,7 +432,9 @@ describe('AsistenteVirtualPresenter', () => {
 
   describe('Historial de sesiones anteriores', () => {
     it('dado una sesion vieja con mensajes en el back, cuando abro, deberia marcar el historial como disponible', async () => {
-      givenSesionViejaConMensajes('sesion-vieja', [MensajeAsistenteResponseMother.crearUsuario()]);
+      givenSesionViejaConMensajes('sesion-vieja', [
+        MensajeAsistenteResponseMother.crearUsuario(),
+      ]);
 
       presenter.abrir();
       await flushPromises();
@@ -300,7 +445,9 @@ describe('AsistenteVirtualPresenter', () => {
     it('dado una sesion vieja con mensajes, cuando veo el historial, deberia prependerlos con un separador', async () => {
       givenSesionViejaConMensajes('sesion-vieja', [
         MensajeAsistenteResponseMother.crearUsuario({ contenido: 'hola' }),
-        MensajeAsistenteResponseMother.crearAsistente({ contenido: 'hola, ¿en qué te ayudo?' }),
+        MensajeAsistenteResponseMother.crearAsistente({
+          contenido: 'hola, en que te ayudo?',
+        }),
       ]);
       presenter.abrir();
       await flushPromises();
@@ -311,7 +458,7 @@ describe('AsistenteVirtualPresenter', () => {
       expect(mensajes[0].rol).toBe('separador');
       expect(mensajes[0].texto).toBe('Mensajes anteriores');
       expect(mensajes[1].texto).toBe('hola');
-      expect(mensajes[2].texto).toBe('hola, ¿en qué te ayudo?');
+      expect(mensajes[2].texto).toBe('hola, en que te ayudo?');
       expect(presenter.puedeVerHistorial()).toBeFalse();
     });
 

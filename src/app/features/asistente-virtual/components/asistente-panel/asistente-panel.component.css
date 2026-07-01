@@ -212,6 +212,47 @@
   border-top: 1px solid var(--color-borde);
 }
 
+.asistente-panel__fecha-retiro {
+  flex-shrink: 0;
+  display: grid;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: color-mix(in srgb, var(--color-menta) 7%, var(--color-superficie));
+  border-top: 1px solid var(--color-borde);
+}
+
+.asistente-panel__fecha-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.asistente-panel__fecha-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--color-menta) 50%, var(--color-borde));
+  border-radius: 12px;
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra-dark);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.asistente-panel__fecha-input:focus-visible {
+  outline: 2px solid var(--color-menta);
+  outline-offset: 2px;
+}
+
+.asistente-panel__fecha-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .asistente-panel__acciones-scroll {
   max-height: clamp(132px, 26vh, 190px);
   overflow-y: auto;

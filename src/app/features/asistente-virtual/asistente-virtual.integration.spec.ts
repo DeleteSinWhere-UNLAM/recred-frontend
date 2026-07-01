@@ -34,9 +34,12 @@ class AsistentePanelStub {
   @Input() enviando = false;
   @Input() deshabilitado = false;
   @Input() mostrarHistorial = false;
+  @Input() mostrarSelectorFechaRetiro = false;
+  @Input() fechaRetiroMinima = '';
   @Output() cerrar = new EventEmitter<void>();
   @Output() enviar = new EventEmitter<string>();
   @Output() sugerencia = new EventEmitter<string>();
+  @Output() fechaRetiro = new EventEmitter<string>();
   @Output() nuevaConversacion = new EventEmitter<void>();
   @Output() verHistorial = new EventEmitter<void>();
 }

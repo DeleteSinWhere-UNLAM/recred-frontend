@@ -10,8 +10,14 @@ import {
 import { MensajeAsistente } from '../models/mensaje-asistente.model';
 import {
   AccionAsistente,
+  ESTADO_COMPRA_CANCELADO,
+  ESTADO_ESPERANDO_FECHA,
+  EstadoAccionAsistente,
+  INPUT_FECHA_RETIRO,
+  InputRequeridoAsistente,
   RespuestaAsistente,
   SugerenciaRespuestaAsistente,
+  TIPO_ACCION_CANCELACION_COMPRA,
 } from '../models/respuesta-asistente.model';
 import {
   MensajeAsistenteResponse,
@@ -79,13 +85,18 @@ export class AsistenteVirtualPresenter {
   readonly sugerencias: Signal<readonly SugerenciaCapacidad[]> = computed(() => {
     const accion = this.accionState();
     const sugerenciasBackend = this.sugerenciasBackendState();
+    const estadoAccion = this.estadoAccion(accion);
 
-    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
+    if (estadoAccion === ESTADO_ESPERANDO_CONFIRMACION) {
       return SUGERENCIAS_COMPRA_PENDIENTE;
     }
 
-    if (accion?.estado === ESTADO_ESPERANDO_RECREO) {
+    if (estadoAccion === ESTADO_ESPERANDO_RECREO) {
       return sugerenciasBackend;
+    }
+
+    if (this.requiereFechaRetiro()) {
+      return [];
     }
 
     if (sugerenciasBackend.length > 0) {
@@ -94,6 +105,16 @@ export class AsistenteVirtualPresenter {
 
     return [];
   });
+  readonly requiereFechaRetiro: Signal<boolean> = computed(() => {
+    const accion = this.accionState();
+    return (
+      this.estadoAccion(accion) === ESTADO_ESPERANDO_FECHA &&
+      this.inputsAccion(accion).includes(INPUT_FECHA_RETIRO)
+    );
+  });
+  readonly fechaRetiroMinima: Signal<string> = computed(() =>
+    this.formatearFechaInput(new Date()),
+  );
 
   abrir(): void {
     this.asegurarBienvenida();
@@ -144,14 +165,14 @@ export class AsistenteVirtualPresenter {
         this.sesionIdState.set(sesionIdRespuesta);
       }
 
-      this.aplicarEstadoRespuesta(respuesta);
+      const accion = this.aplicarEstadoRespuesta(respuesta);
       this.mensajesState.update((lista) => [
         ...lista,
         this.crearMensajeCred(
           respuesta.respuesta,
           respuesta.generadoPorIa ?? false,
           respuesta.fechaHora,
-          respuesta.accion ?? null,
+          accion,
         ),
       ]);
     } catch (err) {
@@ -167,6 +188,11 @@ export class AsistenteVirtualPresenter {
 
   enviarSugerencia(prompt: string): Promise<void> {
     return this.enviar(prompt);
+  }
+
+  enviarFechaRetiro(fechaInput: string): Promise<void> {
+    const mensaje = this.formatearMensajeFechaRetiro(fechaInput);
+    return mensaje ? this.enviar(mensaje) : Promise.resolve();
   }
 
   async nuevaConversacion(): Promise<void> {
@@ -291,27 +317,30 @@ export class AsistenteVirtualPresenter {
     return rol ? MENSAJES_BIENVENIDA[rol] : MENSAJE_BIENVENIDA_DEFAULT;
   }
 
-  private aplicarEstadoRespuesta(respuesta: RespuestaAsistente): void {
-    const accion = respuesta.accion ?? null;
+  private aplicarEstadoRespuesta(respuesta: RespuestaAsistente): AccionAsistente | null {
+    const accion = this.obtenerAccionRespuesta(respuesta);
     const sugerenciasBackend = this.mapearSugerenciasBackend(
       respuesta.sugerencias,
     );
+    const estadoAccion = this.estadoAccion(accion);
 
     this.accionState.set(accion);
 
-    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
+    if (estadoAccion === ESTADO_ESPERANDO_CONFIRMACION) {
       this.sugerenciasBackendState.set([]);
-      return;
+      return accion;
     }
 
     this.sugerenciasBackendState.set(sugerenciasBackend);
 
-    if (accion?.estado === ESTADO_EJECUTADA) {
+    if (accion && estadoAccion === ESTADO_EJECUTADA) {
       this.refrescarPedidoAlumnoSiAplica();
-      if (accion.compraId) {
+      if (accion.compraId && !this.esCancelacionCompra(accion)) {
         this.reproducirSonidoExito();
       }
     }
+
+    return accion;
   }
 
   private reproducirSonidoExito(): void {
@@ -325,6 +354,31 @@ export class AsistenteVirtualPresenter {
     const alumnoId = this.perfilService.obtenerAlumnoId();
     if (!alumnoId) return;
     void this.homeAlumnoService.cargarPedidoEnCurso(alumnoId);
+  }
+
+  private esCancelacionCompra(accion: AccionAsistente): boolean {
+    return (
+      accion.tipo === TIPO_ACCION_CANCELACION_COMPRA ||
+      accion.estadoCompra === ESTADO_COMPRA_CANCELADO
+    );
+  }
+
+  private obtenerAccionRespuesta(
+    respuesta: RespuestaAsistente,
+  ): AccionAsistente | null {
+    return respuesta.accion ?? respuesta.action ?? null;
+  }
+
+  private estadoAccion(
+    accion: AccionAsistente | null | undefined,
+  ): EstadoAccionAsistente | null {
+    return accion?.estado ?? accion?.status ?? null;
+  }
+
+  private inputsAccion(
+    accion: AccionAsistente | null | undefined,
+  ): readonly InputRequeridoAsistente[] {
+    return accion?.inputsRequeridos ?? accion?.requiredInputs ?? [];
   }
 
   private mapearSugerenciasBackend(
@@ -345,10 +399,11 @@ export class AsistenteVirtualPresenter {
   }
 
   private tieneAccionInteractiva(): boolean {
-    const estado = this.accionState()?.estado;
+    const estado = this.estadoAccion(this.accionState());
     return (
       estado === ESTADO_ESPERANDO_RECREO ||
-      estado === ESTADO_ESPERANDO_CONFIRMACION
+      estado === ESTADO_ESPERANDO_CONFIRMACION ||
+      estado === ESTADO_ESPERANDO_FECHA
     );
   }
 
@@ -426,5 +481,33 @@ export class AsistenteVirtualPresenter {
 
   private crearId(): string {
     return globalThis.crypto?.randomUUID?.() ?? `msg-${Date.now()}`;
+  }
+
+  private formatearFechaInput(fecha: Date): string {
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatearMensajeFechaRetiro(fechaInput: string): string | null {
+    const limpia = fechaInput.trim();
+    if (!limpia) return null;
+
+    const partesInput = /^(\d{4})-(\d{2})-(\d{2})$/.exec(limpia);
+    if (partesInput) {
+      const [, year, month, day] = partesInput;
+      return `para el ${day}/${month}/${year}`;
+    }
+
+    if (/^\d{2}\/\d{2}(\/\d{4})?$/.test(limpia)) {
+      return `para el ${limpia}`;
+    }
+
+    if (/^para el \d{2}\/\d{2}(\/\d{4})?$/i.test(limpia)) {
+      return limpia;
+    }
+
+    return null;
   }
 }
