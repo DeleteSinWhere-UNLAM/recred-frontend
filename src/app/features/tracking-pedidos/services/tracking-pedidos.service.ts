@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { ScheduledPickup, EstadoCompra } from '../models/tracking-pedidos.model';
+import { ScheduledPickup, EstadoCompra, EstadoRetiro } from '../models/tracking-pedidos.model';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +13,8 @@ export class TrackingPedidosService {
 
   getScheduledPickups(filters?: {
     fecha?: string;
-    estadoRetiro?: string;
+    status?: EstadoCompra;
+    estadoRetiro?: EstadoRetiro;
     franjaId?: string;
     search?: string;
   }): Observable<ScheduledPickup[]> {
@@ -22,6 +23,9 @@ export class TrackingPedidosService {
     if (filters) {
       if (filters.fecha) {
         params = params.set('fecha', filters.fecha);
+      }
+      if (filters.status) {
+        params = params.set('status', filters.status);
       }
       if (filters.estadoRetiro) {
         params = params.set('estadoRetiro', filters.estadoRetiro);

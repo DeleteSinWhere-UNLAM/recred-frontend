@@ -68,7 +68,7 @@
             type="text"
             placeholder="Nombre o clave de retiro"
             [ngModel]="filterSearch()"
-            (ngModelChange)="filterSearch.set($event)"
+            (ngModelChange)="onSearchChange($event)"
           />
         </div>
       </label>
@@ -78,7 +78,7 @@
         <input
           type="date"
           [ngModel]="filterFecha()"
-          (ngModelChange)="filterFecha.set($event)"
+          (ngModelChange)="onFechaChange($event)"
         />
       </label>
 
@@ -86,7 +86,7 @@
         <span>Franja horaria</span>
         <select
           [ngModel]="filterFranja()"
-          (ngModelChange)="filterFranja.set($event)"
+          (ngModelChange)="onFranjaChange($event)"
         >
           <option value="">Todas las franjas</option>
           @for (slot of timeSlots(); track slot.id) {
