@@ -1,4 +1,4 @@
-﻿import { GuardarFavoritoModalComponent } from '../compra/components/guardar-favorito-modal/guardar-favorito-modal.component';
+import { GuardarFavoritoModalComponent } from '../compra/components/guardar-favorito-modal/guardar-favorito-modal.component';
 import {
   ChangeDetectionStrategy,
   Component,

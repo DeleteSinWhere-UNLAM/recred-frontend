@@ -1,4 +1,4 @@
-﻿import { Injectable, computed, signal, inject, effect } from '@angular/core';
+import { Injectable, computed, signal, inject, effect } from '@angular/core';
 import { Producto } from '../../buffet/models/producto.model';
 import { ItemCarrito } from '../models/carrito.model';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';

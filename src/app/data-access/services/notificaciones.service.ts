@@ -24,6 +24,10 @@ export interface NotificacionBackend {
   tipo?: string;
 }
 
+export interface NotificacionesResponse {
+  notifications: NotificacionBackend[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class NotificacionesService {
   private readonly http = inject(HttpClient);
@@ -42,10 +46,11 @@ export class NotificacionesService {
   }
 
   obtenerNotificaciones(): void {
-    this.http.get<NotificacionBackend[]>(`${environment.apiUrl}/notifications/me?size=5`).subscribe({
+    this.http.get<NotificacionesResponse>(`${environment.apiUrl}/notifications/me?size=5`).subscribe({
       next: (data) => {
         console.log('Lista de notificaciones:', data);
-        const mapeadas: Notificacion[] = (data || []).map((item) => ({
+        const items: NotificacionBackend[] = data?.notifications || [];
+        const mapeadas: Notificacion[] = items.map((item) => ({
           id: item.id,
           titulo: item.titulo || item.title || 'Notificación',
           mensaje: item.mensaje || item.message || '',

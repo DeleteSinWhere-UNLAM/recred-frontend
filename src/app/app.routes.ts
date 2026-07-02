@@ -34,6 +34,14 @@ export const routes: Routes = [
             loadComponent: () => import('./features/adelanto/adelanto').then((m) => m.AdelantoPage),
           },
           {
+            path: 'favoritos-alumno',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/favoritos-alumno/favoritos-alumno.page').then(
+                (m) => m.FavoritosAlumnoPage,
+              ),
+          },
+          {
         path: 'restricciones-horarias',
         canActivate: [alumnoContextoGuard],
         loadComponent: () =>
