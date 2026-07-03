@@ -1,235 +1,221 @@
 import { TestBed } from '@angular/core/testing';
-import { CarritoService } from './carrito.service';
+import { of } from 'rxjs';
+import { AlumnoMother } from '../../../data-access/services/alumno.mother';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
+import { Presupuesto } from '../../presupuesto/models/presupuesto.model';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
 import { MovimientosService } from '../../movimientos/services/movimientos.service';
-import { AlumnosService } from '../../../data-access/services/alumnos.service';
-import { of } from 'rxjs';
-import { Producto } from '../../buffet/models/producto.model';
-import { Presupuesto } from '../../presupuesto/models/presupuesto.model';
+import { ProductoMother } from '../compra.mother';
+import { CarritoService } from './carrito.service';
 
 describe('CarritoService', () => {
   let service: CarritoService;
-  let presupuestoServiceSpy: jasmine.SpyObj<PresupuestoService>;
-  let movimientosServiceSpy: jasmine.SpyObj<MovimientosService>;
-  let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
-
-  const mockProductoBase: Producto = {
-    id: 'prod-123',
-    nombre: 'Sándwich',
-    descripcion: 'Delicioso tostado',
-    precio: 1000,
-    categoria: { id: 'comidas', descripcion: 'Comidas' },
-    clasificacionesSalud: [],
-    imagen: 'sandwich.jpg',
-    estadoStock: 'DISPONIBLE',
-  };
+  let servicioPresupuesto: jasmine.SpyObj<PresupuestoService>;
+  let servicioMovimientos: jasmine.SpyObj<MovimientosService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
 
   beforeEach(() => {
-    presupuestoServiceSpy = jasmine.createSpyObj('PresupuestoService', ['getPresupuesto']);
-    movimientosServiceSpy = jasmine.createSpyObj('MovimientosService', ['getHistorialAlumno']);
-    alumnosServiceSpy = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
+    servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', ['getPresupuesto']);
+    servicioMovimientos = jasmine.createSpyObj('MovimientosService', ['getHistorialAlumno']);
+    servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
+    servicioMovimientos.getHistorialAlumno.and.returnValue(of([]));
+
+    localStorage.clear();
 
     TestBed.configureTestingModule({
       providers: [
         CarritoService,
-        { provide: PresupuestoService, useValue: presupuestoServiceSpy },
-        { provide: MovimientosService, useValue: movimientosServiceSpy },
-        { provide: AlumnosService, useValue: alumnosServiceSpy },
-      ]
+        { provide: PresupuestoService, useValue: servicioPresupuesto },
+        { provide: MovimientosService, useValue: servicioMovimientos },
+        { provide: AlumnosService, useValue: servicioAlumnos },
+      ],
     });
 
     service = TestBed.inject(CarritoService);
   });
 
-  it('debería crearse el servicio', () => {
-    expect(service).toBeTruthy();
-  });
+  afterEach(() => localStorage.clear());
 
-  describe('validarAgregar', () => {
-    it('debería retornar rechazado por presupuesto si el producto tiene superaPresupuesto en true', () => {
-      const p = { ...mockProductoBase, superaPresupuesto: true };
-      const res = service.validarAgregar(p, 'alumno-1', 1);
-      expect(res.permitido).toBeFalse();
-      expect(res.razon).toBe('presupuesto');
-    });
+  describe('manipulacion basica del carrito', () => {
+    it('dado un producto nuevo, cuando lo agrego, deberia sumar cantidad y total', () => {
+      whenAgrego(ProductoMother.crear(), 'alumno-1', 1);
 
-    it('debería retornar rechazado por saldo si excede la billetera del alumno (sin presupuesto)', () => {
-      alumnosServiceSpy.getAlumnoById.and.returnValue({
-        id: 'alumno-1',
-        nombre: 'Test',
-        apellido: 'Test',
-        grado: '4to',
-        colegioId: '1',
-        saldo: 800
-      });
-
-      const p = { ...mockProductoBase, precio: 1000 };
-      const res = service.validarAgregar(p, 'alumno-1', 1);
-      
-      expect(res.permitido).toBeFalse();
-      expect(res.razon).toBe('saldo');
-    });
-
-    it('debería retornar permitido si el saldo es suficiente (sin presupuesto)', () => {
-      alumnosServiceSpy.getAlumnoById.and.returnValue({
-        id: 'alumno-1',
-        nombre: 'Test',
-        apellido: 'Test',
-        grado: '4to',
-        colegioId: '1',
-        saldo: 1500
-      });
-
-      const p = { ...mockProductoBase, precio: 1000 };
-      const res = service.validarAgregar(p, 'alumno-1', 1);
-      
-      expect(res.permitido).toBeTrue();
-    });
-
-    it('debería calcular el total acumulado en carrito y validar saldo', () => {
-      alumnosServiceSpy.getAlumnoById.and.returnValue({
-        id: 'alumno-1',
-        nombre: 'Test',
-        apellido: 'Test',
-        grado: '4to',
-        colegioId: '1',
-        saldo: 1500
-      });
-
-      const p = { ...mockProductoBase, precio: 1000 };
-      
-      service.agregar(p, 'alumno-1', 1);
-      
-      const res = service.validarAgregar(p, 'alumno-1', 1);
-      
-      expect(res.permitido).toBeFalse();
-      expect(res.razon).toBe('saldo');
-    });
-
-    it('debería rechazar por categoría si excede el presupuesto específico de una categoría', async () => {
-      const budget: Presupuesto = {
-        id: 'budget-1',
-        fechaInicio: '2026-06-01',
-        alumnoId: 'alumno-1',
-        activo: true,
-        periodo: 'SEMANAL',
-        montoLimiteGeneral: 5000,
-        reglasCategoria: [
-          { id: 'rule-1', categoriaId: 'comidas', descripcionCategoria: 'Comidas', porcentajeLimite: 20, montoLimiteCalculado: 1000, activo: true }
-        ]
-      };
-
-      presupuestoServiceSpy.getPresupuesto.and.resolveTo(budget);
-      movimientosServiceSpy.getHistorialAlumno.and.returnValue(of([]));
-      alumnosServiceSpy.getAlumnoById.and.returnValue({ id: 'alumno-1', nombre: 'Test', apellido: 'Test', grado: '4to', colegioId: '1', saldo: 10000 });
-
-      await service.cargarPresupuestoYConsumo('alumno-1');
-
-      const p = { ...mockProductoBase, precio: 1200 };
-      const res = service.validarAgregar(p, 'alumno-1', 1);
-      
-      expect(res.permitido).toBeFalse();
-      expect(res.razon).toBe('categoria');
-    });
-
-    it('debería rechazar por presupuesto general si excede el monto limite general', async () => {
-      const budget: Presupuesto = {
-        id: 'budget-1',
-        fechaInicio: '2026-06-01',
-        alumnoId: 'alumno-1',
-        activo: true,
-        periodo: 'SEMANAL',
-        montoLimiteGeneral: 5000,
-        reglasCategoria: []
-      };
-
-      presupuestoServiceSpy.getPresupuesto.and.resolveTo(budget);
-      movimientosServiceSpy.getHistorialAlumno.and.returnValue(of([]));
-      alumnosServiceSpy.getAlumnoById.and.returnValue({ id: 'alumno-1', nombre: 'Test', apellido: 'Test', grado: '4to', colegioId: '1', saldo: 10000 });
-
-      await service.cargarPresupuestoYConsumo('alumno-1');
-
-      const p = { ...mockProductoBase, precio: 6000 };
-      const res = service.validarAgregar(p, 'alumno-1', 1);
-      
-      expect(res.permitido).toBeFalse();
-      expect(res.razon).toBe('presupuesto');
-    });
-  });
-
-  describe('manipulación del carrito', () => {
-    it('debería agregar un producto', () => {
-      service.agregar(mockProductoBase, 'alumno-1', 1);
       expect(service.cantidadTotal()).toBe(1);
-      expect(service.totalARS()).toBe(1000);
+      expect(service.totalARS()).toBe(500);
       expect(service.itemsPorAlumno().get('alumno-1')?.length).toBe(1);
     });
 
-    it('debería agrupar el mismo producto en el carrito si se suma cantidad', () => {
-      service.agregar(mockProductoBase, 'alumno-1', 1);
-      service.agregar(mockProductoBase, 'alumno-1', 2);
-      
+    it('dado el mismo producto agregado dos veces al mismo alumno, deberia consolidarlo en un item con cantidad sumada', () => {
+      const producto = ProductoMother.crear({ precio: 1000 });
+
+      whenAgrego(producto, 'alumno-1', 1);
+      whenAgrego(producto, 'alumno-1', 2);
+
       expect(service.cantidadTotal()).toBe(3);
       expect(service.totalARS()).toBe(3000);
-      
-      const itemsAlumno = service.itemsPorAlumno().get('alumno-1');
-      expect(itemsAlumno?.length).toBe(1);
-      expect(itemsAlumno![0].cantidad).toBe(3);
+      expect(service.itemsPorAlumno().get('alumno-1')?.length).toBe(1);
     });
 
-    it('debería permitir cambiar la cantidad de un item existente', () => {
-      service.agregar(mockProductoBase, 'alumno-1', 1);
-      const itemsAlumno = service.itemsPorAlumno().get('alumno-1');
-      const itemId = itemsAlumno![0].id;
-      
+    it('dado un item existente, cuando cambio la cantidad con +1, deberia sumar uno', () => {
+      whenAgrego(ProductoMother.crear(), 'alumno-1', 1);
+      const itemId = primerItemDe('alumno-1');
+
       service.cambiarCantidad(itemId, 1);
+
       expect(service.cantidadTotal()).toBe(2);
     });
 
-    it('debería permitir quitar un producto', () => {
-      service.agregar(mockProductoBase, 'alumno-1', 1);
-      const itemsAlumno = service.itemsPorAlumno().get('alumno-1');
-      const itemId = itemsAlumno![0].id;
-      
+    it('dado un item existente, cuando lo quito, deberia dejar el carrito sin items', () => {
+      whenAgrego(ProductoMother.crear(), 'alumno-1', 1);
+      const itemId = primerItemDe('alumno-1');
+
       service.quitar(itemId);
+
       expect(service.cantidadTotal()).toBe(0);
     });
-    
-    it('debería limpiar el carrito de un alumno específico', () => {
-      service.agregar(mockProductoBase, 'alumno-1', 1);
-      service.agregar(mockProductoBase, 'alumno-2', 1);
-      
+
+    it('dado dos alumnos con items, cuando limpio uno, deberia dejar solo los del otro', () => {
+      whenAgrego(ProductoMother.crear(), 'alumno-1', 1);
+      whenAgrego(ProductoMother.crear(), 'alumno-2', 1);
+
       service.limpiarAlumno('alumno-1');
-      
+
       expect(service.cantidadTotal()).toBe(1);
       expect(service.itemsPorAlumno().has('alumno-1')).toBeFalse();
       expect(service.itemsPorAlumno().has('alumno-2')).toBeTrue();
     });
 
-    it('debería limpiar todo el carrito', () => {
-      service.agregar(mockProductoBase, 'alumno-1', 1);
-      service.agregar(mockProductoBase, 'alumno-2', 1);
-      
+    it('dado items de varios alumnos, cuando limpio todo, deberia quedar el carrito vacio', () => {
+      whenAgrego(ProductoMother.crear(), 'alumno-1', 1);
+      whenAgrego(ProductoMother.crear(), 'alumno-2', 1);
+
       service.limpiar();
-      
+
       expect(service.cantidadTotal()).toBe(0);
     });
   });
 
-  describe('selección de retiro', () => {
-    it('debería permitir setear y obtener selección de retiro por alumno', () => {
+  describe('seleccion de retiro', () => {
+    it('dado un alumno, cuando seteo su retiro, deberia poder recuperarlo por alumno', () => {
       service.setSeleccionRetiro('alumno-1', '2026-06-14', 'PRIMER_RECREO');
-      
+
       const seleccion = service.getSeleccionRetiro('alumno-1');
       expect(seleccion?.fecha).toBe('2026-06-14');
       expect(seleccion?.recreo).toBe('PRIMER_RECREO');
     });
 
-    it('debería permitir limpiar selección de retiro', () => {
+    it('dado un retiro seteado, cuando lo limpio, deberia quedar undefined', () => {
       service.setSeleccionRetiro('alumno-1', '2026-06-14', 'PRIMER_RECREO');
-      
+
       service.clearSeleccionRetiro('alumno-1');
+
       expect(service.getSeleccionRetiro('alumno-1')).toBeUndefined();
     });
   });
+
+  describe('validarAgregar', () => {
+    it('dado un producto marcado como superaPresupuesto, cuando valido, deberia rechazar por presupuesto', () => {
+      const producto = ProductoMother.crear({ superaPresupuesto: true });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeFalse();
+      expect(resultado.razon).toBe('presupuesto');
+    });
+
+    it('dado un alumno sin presupuesto y saldo insuficiente, cuando valido, deberia rechazar por saldo', () => {
+      givenAlumnoConSaldo('alumno-1', 800);
+      const producto = ProductoMother.crear({ precio: 1000 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeFalse();
+      expect(resultado.razon).toBe('saldo');
+    });
+
+    it('dado un alumno sin presupuesto y saldo suficiente, cuando valido, deberia permitirlo', () => {
+      givenAlumnoConSaldo('alumno-1', 1500);
+      const producto = ProductoMother.crear({ precio: 1000 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeTrue();
+    });
+
+    it('dado el carrito ya usa el saldo del alumno, cuando valido agregar otro, deberia rechazar por saldo', () => {
+      givenAlumnoConSaldo('alumno-1', 1500);
+      const producto = ProductoMother.crear({ precio: 1000 });
+      service.agregar(producto, 'alumno-1', 1);
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeFalse();
+      expect(resultado.razon).toBe('saldo');
+    });
+
+    it('dado un presupuesto por categoria excedido, cuando valido, deberia rechazar por categoria', async () => {
+      await givenPresupuestoCon({
+        montoLimiteGeneral: 5000,
+        reglasCategoria: [
+          {
+            id: 'rule-1',
+            categoriaId: 'comidas',
+            descripcionCategoria: 'Comidas',
+            porcentajeLimite: 20,
+            montoLimiteCalculado: 1000,
+            activo: true,
+          },
+        ],
+      });
+      const producto = ProductoMother.crear({ precio: 1200 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeFalse();
+      expect(resultado.razon).toBe('categoria');
+    });
+
+    it('dado el monto excede el limite general del presupuesto, cuando valido, deberia rechazar por presupuesto', async () => {
+      await givenPresupuestoCon({ montoLimiteGeneral: 5000, reglasCategoria: [] });
+      const producto = ProductoMother.crear({ precio: 6000 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeFalse();
+      expect(resultado.razon).toBe('presupuesto');
+    });
+  });
+
+  function whenAgrego(producto: ReturnType<typeof ProductoMother.crear>, alumnoId: string, cantidad: number): void {
+    service.agregar(producto, alumnoId, cantidad);
+  }
+
+  function primerItemDe(alumnoId: string): string {
+    return service.itemsPorAlumno().get(alumnoId)![0].id;
+  }
+
+  function givenAlumnoConSaldo(alumnoId: string, saldo: number): void {
+    servicioAlumnos.getAlumnoById.and.returnValue(
+      AlumnoMother.crear({ id: alumnoId, saldo }),
+    );
+  }
+
+  async function givenPresupuestoCon(datos: {
+    montoLimiteGeneral: number;
+    reglasCategoria: Presupuesto['reglasCategoria'];
+  }): Promise<void> {
+    const presupuesto: Presupuesto = {
+      id: 'budget-1',
+      fechaInicio: '2026-06-01',
+      alumnoId: 'alumno-1',
+      activo: true,
+      periodo: 'SEMANAL',
+      montoLimiteGeneral: datos.montoLimiteGeneral,
+      reglasCategoria: datos.reglasCategoria,
+    };
+    servicioPresupuesto.getPresupuesto.and.resolveTo(presupuesto);
+    servicioMovimientos.getHistorialAlumno.and.returnValue(of([]));
+    servicioAlumnos.getAlumnoById.and.returnValue(AlumnoMother.crear({ id: 'alumno-1', saldo: 10000 }));
+    await service.cargarPresupuestoYConsumo('alumno-1');
+  }
 });

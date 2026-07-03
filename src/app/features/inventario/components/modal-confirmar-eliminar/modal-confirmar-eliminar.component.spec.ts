@@ -7,32 +7,64 @@ describe('ModalConfirmarEliminarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalConfirmarEliminarComponent]
-    })
-    .compileComponents();
-    
+      imports: [ModalConfirmarEliminarComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(ModalConfirmarEliminarComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('render', () => {
+    it('dado isOpen en false, no deberia renderizar el modal', () => {
+      component.isOpen = false;
+      fixture.detectChanges();
+
+      expect(queryUno('.confirm-delete__card')).toBeNull();
+    });
+
+    it('dado isOpen en true y un productName, deberia renderizar el nombre en el mensaje', () => {
+      component.isOpen = true;
+      component.productName = 'Alfajor';
+      fixture.detectChanges();
+
+      const mensaje = queryUno('.confirm-delete__mensaje')?.textContent ?? '';
+      expect(mensaje).toContain('Alfajor');
+    });
   });
 
-  it('debería emitir el evento confirmed al disparar la acción de confirmación', () => {
-    spyOn(component.confirmed, 'emit');
-    
-    component.confirmed.emit();
-    
-    expect(component.confirmed.emit).toHaveBeenCalled();
+  describe('eventos', () => {
+    it('dado el modal abierto, cuando hago click en Eliminar, deberia emitir confirmed', () => {
+      component.isOpen = true;
+      fixture.detectChanges();
+      spyOn(component.confirmed, 'emit');
+
+      (queryUno('.confirm-delete__btn--delete') as HTMLButtonElement).click();
+
+      expect(component.confirmed.emit).toHaveBeenCalled();
+    });
+
+    it('dado el modal abierto, cuando hago click en Cancelar, deberia emitir cancelled', () => {
+      component.isOpen = true;
+      fixture.detectChanges();
+      spyOn(component.cancelled, 'emit');
+
+      (queryUno('.confirm-delete__btn--cancel') as HTMLButtonElement).click();
+
+      expect(component.cancelled.emit).toHaveBeenCalled();
+    });
+
+    it('dado el modal abierto, cuando hago click en el overlay (backdrop), deberia emitir cancelled', () => {
+      component.isOpen = true;
+      fixture.detectChanges();
+      spyOn(component.cancelled, 'emit');
+
+      (queryUno('.confirm-delete__overlay') as HTMLElement).click();
+
+      expect(component.cancelled.emit).toHaveBeenCalled();
+    });
   });
 
-  it('debería emitir el evento cancelled al disparar la acción de cancelación', () => {
-    spyOn(component.cancelled, 'emit');
-    
-    component.cancelled.emit();
-    
-    expect(component.cancelled.emit).toHaveBeenCalled();
-  });
+  function queryUno(selector: string): Element | null {
+    return (fixture.nativeElement as HTMLElement).querySelector(selector);
+  }
 });

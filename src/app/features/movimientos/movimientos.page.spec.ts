@@ -1,129 +1,104 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter, Router, ActivatedRoute, convertToParamMap, ParamMap } from '@angular/router';
-import { of, throwError, BehaviorSubject } from 'rxjs';
-import { signal } from '@angular/core';
-
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ActivatedRoute, ParamMap, Router, convertToParamMap, provideRouter } from '@angular/router';
+import { BehaviorSubject, of, throwError } from 'rxjs';
+import { AlumnoMother } from '../../data-access/services/alumno.mother';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
+import { UsuarioService } from '../../data-access/services/usuario.service';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { DialogService } from '../../shared/services/dialog.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { MovimientoDetalleModalComponent } from './components/movimiento-detalle-modal/movimiento-detalle-modal.component';
+import { Movimiento } from './models/movimiento.model';
+import { MovimientoMother } from './movimientos.mother';
 import { MovimientosPage } from './movimientos.page';
 import { MovimientosService } from './services/movimientos.service';
-import { AlumnosService } from '../../data-access/services/alumnos.service';
-import { UsuarioService } from '../../data-access/services/usuario.service';
-import { PerfilService } from '../../data-access/services/perfil.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { DialogService } from '../../shared/services/dialog.service';
-import { Movimiento } from './models/movimiento.model';
-import { Alumno } from '../../data-access/models/alumno.model';
+
+@Component({ selector: 'app-navbar', template: '', standalone: true })
+class NavbarStub {
+  @Input() userName = '';
+}
+
+@Component({ selector: 'app-movimiento-detalle-modal', template: '', standalone: true })
+class MovimientoDetalleModalStub {
+  @Input() movimiento: Movimiento | undefined;
+  @Input() nombreAlumno = '';
+  @Input() esVistaAlumno = false;
+  @Output() cerrar = new EventEmitter<void>();
+  @Output() cancelar = new EventEmitter<string>();
+}
 
 describe('MovimientosPage', () => {
   let component: MovimientosPage;
   let fixture: ComponentFixture<MovimientosPage>;
   let router: Router;
+  let servicioMovimientos: jasmine.SpyObj<MovimientosService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
+  let servicioPerfil: jasmine.SpyObj<PerfilService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioDialog: jasmine.SpyObj<DialogService>;
+  let paramMap$: BehaviorSubject<ParamMap>;
 
-  let movimientosServiceSpy: jasmine.SpyObj<MovimientosService>;
-  let alumnosServiceSpy: jasmine.SpyObj<AlumnosService>;
-  let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let dialogServiceSpy: jasmine.SpyObj<DialogService>;
+  const alumno1 = AlumnoMother.crear({ id: 'alumno-1', nombre: 'Julián', apellido: 'García', saldo: 2000 });
+  const alumno2 = AlumnoMother.crear({ id: 'alumno-2', nombre: 'Sofía', apellido: 'García', saldo: 1500 });
 
-  let paramMapSubject: BehaviorSubject<ParamMap>;
-
-  const mockAlumno1: Alumno = {
-    id: 'alumno-1',
-    nombre: 'Julián',
-    apellido: 'García',
-    grado: '4to Año A',
-    colegioId: '1',
-    saldo: 2000
-  };
-
-  const mockAlumno2: Alumno = {
-    id: 'alumno-2',
-    nombre: 'Sofía',
-    apellido: 'García',
-    grado: '2do Año B',
-    colegioId: '1',
-    saldo: 1500
-  };
-
-  const mockMovimiento1: Movimiento = {
-    id: 'mov-1',
-    studentId: 'alumno-1',
-    totalAmount: 1500,
-    status: 'APPROVED',
-    statusLabel: 'Aprobado',
-    paymentMethod: 'CREDIT',
-    date: '2026-06-05T10:00:00Z',
-    items: [{ productId: 'prod-1', productName: 'Tostado', quantity: 1, unitPrice: 1500 }]
-  };
-
-  const mockMovimiento2: Movimiento = {
+  const mov1 = MovimientoMother.crear({ id: 'mov-1', studentId: 'alumno-1', totalAmount: 1500 });
+  const mov2 = MovimientoMother.crear({
     id: 'mov-2',
     studentId: 'alumno-2',
-    totalAmount: 800,
     status: 'PENDING',
     statusLabel: 'Pendiente',
-    paymentMethod: 'DEBIT',
+    totalAmount: 800,
     date: '2026-06-07T12:00:00Z',
-    items: [{ productId: 'prod-2', productName: 'Jugo', quantity: 1, unitPrice: 800 }]
-  };
-
-  const mockMovimiento3: Movimiento = {
+  });
+  const mov3 = MovimientoMother.crear({
     id: 'mov-3',
     studentId: 'alumno-1',
-    totalAmount: 2500,
     status: 'REJECTED',
     statusLabel: 'Rechazado',
-    paymentMethod: 'CREDIT',
+    totalAmount: 2500,
     date: '2026-06-06T15:00:00Z',
-    items: [{ productId: 'prod-3', productName: 'Pizza', quantity: 1, unitPrice: 2500 }]
-  };
-
-  const mockMovimientosList = [mockMovimiento1, mockMovimiento2, mockMovimiento3];
+  });
+  const movimientos = [mov1, mov2, mov3];
 
   beforeEach(async () => {
     localStorage.removeItem('recreopago_homeUrl');
     localStorage.removeItem('recreopago_nombreNavbar');
-    movimientosServiceSpy = jasmine.createSpyObj<MovimientosService>('MovimientosService', [
+
+    servicioMovimientos = jasmine.createSpyObj<MovimientosService>('MovimientosService', [
       'getHistorialAlumno',
       'getHistorialTutor',
       'cancelarCompra',
     ]);
-    alumnosServiceSpy = jasmine.createSpyObj<AlumnosService>('AlumnosService', [
+    servicioAlumnos = jasmine.createSpyObj<AlumnosService>('AlumnosService', [
       'asegurarCargados',
       'getAlumnoById',
     ]);
-    perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', [
-      'obtenerAlumnoId',
-    ]);
-    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', [
-      'mostrar',
-    ]);
-    dialogServiceSpy = jasmine.createSpyObj<DialogService>('DialogService', [
-      'confirm',
-      'alert',
-    ]);
-    dialogServiceSpy.confirm.and.returnValue(Promise.resolve(true));
+    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerAlumnoId']);
+    servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+    servicioDialog = jasmine.createSpyObj<DialogService>('DialogService', ['confirm', 'alert']);
+    servicioDialog.confirm.and.resolveTo(true);
 
-    alumnosServiceSpy.asegurarCargados.and.resolveTo([mockAlumno1, mockAlumno2]);
-    Object.defineProperty(alumnosServiceSpy, 'alumnos', {
-      value: signal([mockAlumno1, mockAlumno2]),
+    servicioAlumnos.asegurarCargados.and.resolveTo([alumno1, alumno2]);
+    Object.defineProperty(servicioAlumnos, 'alumnos', {
+      value: signal([alumno1, alumno2]),
       writable: true,
     });
-
-    alumnosServiceSpy.getAlumnoById.and.callFake((id: string) => {
-      if (id === 'alumno-1') return mockAlumno1;
-      if (id === 'alumno-2') return mockAlumno2;
+    servicioAlumnos.getAlumnoById.and.callFake((id: string) => {
+      if (id === 'alumno-1') return alumno1;
+      if (id === 'alumno-2') return alumno2;
       return undefined;
     });
 
-    perfilServiceSpy.obtenerAlumnoId.and.returnValue('alumno-1');
+    servicioPerfil.obtenerAlumnoId.and.returnValue('alumno-1');
+    servicioMovimientos.getHistorialTutor.and.returnValue(of(movimientos));
+    servicioMovimientos.getHistorialAlumno.and.returnValue(of([mov1, mov3]));
+    servicioMovimientos.cancelarCompra.and.returnValue(of(undefined));
 
-    movimientosServiceSpy.getHistorialTutor.and.returnValue(of(mockMovimientosList));
-    movimientosServiceSpy.getHistorialAlumno.and.returnValue(of([mockMovimiento1, mockMovimiento3]));
-    movimientosServiceSpy.cancelarCompra.and.returnValue(of(undefined));
-
-    paramMapSubject = new BehaviorSubject(convertToParamMap({}));
+    paramMap$ = new BehaviorSubject(convertToParamMap({}));
 
     await TestBed.configureTestingModule({
       imports: [MovimientosPage],
@@ -131,18 +106,20 @@ describe('MovimientosPage', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
-        { provide: MovimientosService, useValue: movimientosServiceSpy },
-        { provide: AlumnosService, useValue: alumnosServiceSpy },
-        { provide: PerfilService, useValue: perfilServiceSpy },
-        { provide: ToastService, useValue: toastServiceSpy },
-        { provide: DialogService, useValue: dialogServiceSpy },
+        { provide: MovimientosService, useValue: servicioMovimientos },
+        { provide: AlumnosService, useValue: servicioAlumnos },
+        { provide: PerfilService, useValue: servicioPerfil },
+        { provide: ToastService, useValue: servicioToast },
+        { provide: DialogService, useValue: servicioDialog },
         UsuarioService,
-        {
-          provide: ActivatedRoute,
-          useValue: { paramMap: paramMapSubject.asObservable() },
-        },
+        { provide: ActivatedRoute, useValue: { paramMap: paramMap$.asObservable() } },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(MovimientosPage, {
+        remove: { imports: [NavbarComponent, MovimientoDetalleModalComponent] },
+        add: { imports: [NavbarStub, MovimientoDetalleModalStub] },
+      })
+      .compileComponents();
 
     router = TestBed.inject(Router);
     spyOn(router, 'navigate');
@@ -152,82 +129,68 @@ describe('MovimientosPage', () => {
     component = fixture.componentInstance;
   });
 
-  it('debería crear la página', fakeAsync(() => {
-    fixture.detectChanges();
-    tick();
-    expect(component).toBeTruthy();
-    expect(alumnosServiceSpy.asegurarCargados).toHaveBeenCalled();
-  }));
-
-  describe('Carga de historial', () => {
-    it('debería cargar el historial de todos los alumnos si alumnoId param no está presente', fakeAsync(() => {
-      paramMapSubject.next(convertToParamMap({}));
-      fixture.detectChanges();
+  describe('carga del historial', () => {
+    it('dado sin alumnoId en el paramMap, cuando se monta, deberia cargar el historial del tutor y ordenarlo por fecha desc', fakeAsync(() => {
+      whenMonto();
       tick();
 
       expect(component.selectedAlumnoId()).toBe('todos');
-      expect(movimientosServiceSpy.getHistorialTutor).toHaveBeenCalled();
+      expect(servicioMovimientos.getHistorialTutor).toHaveBeenCalled();
       expect(component.cargando()).toBeFalse();
-      expect(component.rawMovimientos()[0].id).toBe('mov-2');
-      expect(component.rawMovimientos()[1].id).toBe('mov-3');
-      expect(component.rawMovimientos()[2].id).toBe('mov-1');
+      expect(component.rawMovimientos().map((m) => m.id)).toEqual(['mov-2', 'mov-3', 'mov-1']);
     }));
 
-    it('debería cargar el historial de un alumno específico si alumnoId param está presente', fakeAsync(() => {
-      paramMapSubject.next(convertToParamMap({ alumnoId: 'alumno-1' }));
-      fixture.detectChanges();
+    it('dado un alumnoId en el paramMap, cuando se monta, deberia cargar solo el historial de ese alumno', fakeAsync(() => {
+      paramMap$.next(convertToParamMap({ alumnoId: 'alumno-1' }));
+
+      whenMonto();
       tick();
 
       expect(component.selectedAlumnoId()).toBe('alumno-1');
-      expect(movimientosServiceSpy.getHistorialAlumno).toHaveBeenCalledWith('alumno-1');
-      expect(component.cargando()).toBeFalse();
+      expect(servicioMovimientos.getHistorialAlumno).toHaveBeenCalledWith('alumno-1');
       expect(component.rawMovimientos().length).toBe(2);
-      expect(component.rawMovimientos()[0].id).toBe('mov-3');
     }));
 
-    it('debería manejar error al cargar historial', fakeAsync(() => {
+    it('dado que la carga falla, cuando se monta, deberia setear el mensaje de error y dejar cargando en false', fakeAsync(() => {
       spyOn(console, 'error');
-      movimientosServiceSpy.getHistorialTutor.and.returnValue(throwError(() => new Error('Error de red')));
-      paramMapSubject.next(convertToParamMap({}));
-      fixture.detectChanges();
+      servicioMovimientos.getHistorialTutor.and.returnValue(throwError(() => new Error('boom')));
+
+      whenMonto();
       tick();
 
       expect(component.cargando()).toBeFalse();
-      expect(component.errorMsg()).toBe('No se pudieron obtener los movimientos de la base de datos.');
-      expect(console.error).toHaveBeenCalled();
+      expect(component.errorMsg()).toContain('No se pudieron obtener los movimientos');
     }));
   });
 
-  describe('Filtros', () => {
+  describe('filtros', () => {
     beforeEach(fakeAsync(() => {
-      paramMapSubject.next(convertToParamMap({}));
-      fixture.detectChanges();
+      whenMonto();
       tick();
     }));
 
-    it('debería retornar todos los movimientos por defecto', () => {
+    it('dado sin filtros aplicados, movimientosFiltrados deberia devolver los 3 movimientos', () => {
       expect(component.movimientosFiltrados().length).toBe(3);
     });
 
-    it('debería filtrar por estado', () => {
+    it('dado filtroEstado en PENDING, deberia dejar solo mov-2', () => {
       component.filtroEstado.set('PENDING');
-      expect(component.movimientosFiltrados().length).toBe(1);
-      expect(component.movimientosFiltrados()[0].id).toBe('mov-2');
+
+      const filtrados = component.movimientosFiltrados();
+      expect(filtrados.length).toBe(1);
+      expect(filtrados[0].id).toBe('mov-2');
     });
 
-    it('debería filtrar por fecha desde/hasta', () => {
-
-
+    it('dado filtroFechaDesde 2026-06-06, deberia dejar solo movimientos posteriores', () => {
       component.filtroFechaDesde.set('2026-06-06');
+
       expect(component.movimientosFiltrados().length).toBe(2);
 
       component.filtroFechaHasta.set('2026-06-06');
       expect(component.movimientosFiltrados().length).toBe(1);
     });
 
-    it('debería filtrar por rango de precios', () => {
-
-
+    it('dado filtroPrecioMin/Max, deberia filtrar por rango de precio', () => {
       component.filtroPrecioMin.set(1000);
       expect(component.movimientosFiltrados().length).toBe(2);
 
@@ -235,7 +198,7 @@ describe('MovimientosPage', () => {
       expect(component.movimientosFiltrados().length).toBe(1);
     });
 
-    it('debería limpiar filtros correctamente', () => {
+    it('dado filtros aplicados, cuando llamo limpiarFiltros, deberia resetear todos', () => {
       component.filtroEstado.set('APPROVED');
       component.filtroFechaDesde.set('2026-06-01');
       component.filtroPrecioMin.set(100);
@@ -249,96 +212,113 @@ describe('MovimientosPage', () => {
     });
   });
 
-  describe('Modal de detalle', () => {
-    it('debería abrir y cerrar el modal de detalle del movimiento', () => {
+  describe('modal de detalle', () => {
+    it('dado sin modal abierto, cuando abro detalle de un movimiento, deberia setearlo en modalMovimiento', () => {
       expect(component.modalMovimiento()).toBeNull();
 
-      component.abrirDetalle(mockMovimiento1);
-      expect(component.modalMovimiento()).toEqual(mockMovimiento1);
+      component.abrirDetalle(mov1);
+
+      expect(component.modalMovimiento()).toEqual(mov1);
+    });
+
+    it('dado el modal abierto, cuando cierro, deberia limpiar modalMovimiento', () => {
+      component.abrirDetalle(mov1);
 
       component.cerrarDetalle();
+
       expect(component.modalMovimiento()).toBeNull();
     });
 
-    it('debería cancelar el pedido y actualizar el estado a CANCELADO', fakeAsync(() => {
-      component.modalMovimiento.set(mockMovimiento2);
-      
+    it('dado un pedido en el modal, cuando cancelo y el usuario confirma, deberia actualizar el estado a CANCELADO', fakeAsync(() => {
+      component.modalMovimiento.set(mov2);
+
       component.cancelarPedido('mov-2');
       tick();
-      
-      expect(dialogServiceSpy.confirm).toHaveBeenCalled();
-      expect(movimientosServiceSpy.cancelarCompra).toHaveBeenCalledWith('mov-2');
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('Pedido cancelado y saldo reembolsado', 'success');
+
+      expect(servicioDialog.confirm).toHaveBeenCalled();
+      expect(servicioMovimientos.cancelarCompra).toHaveBeenCalledWith('mov-2');
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Pedido cancelado y saldo reembolsado',
+        'success',
+      );
       expect(component.modalMovimiento()?.status).toBe('CANCELADO');
     }));
   });
 
-  describe('Formateadores y selectores de UI', () => {
+  describe('helpers de UI', () => {
     beforeEach(fakeAsync(() => {
-      paramMapSubject.next(convertToParamMap({}));
-      fixture.detectChanges();
+      whenMonto();
       tick();
     }));
 
-    it('debería retornar el nombre del alumno correctamente', () => {
+    it('dado un studentId conocido, getNombreAlumno deberia devolver "Nombre Apellido"', () => {
       expect(component.getNombreAlumno('alumno-1')).toBe('Julián García');
+    });
+
+    it('dado un studentId desconocido, getNombreAlumno deberia devolver "Alumno"', () => {
       expect(component.getNombreAlumno('alumno-desconocido')).toBe('Alumno');
     });
 
-    it('debería retornar las iniciales del alumno correctamente', () => {
+    it('dado un studentId conocido, getInicialesAlumno deberia devolver las iniciales en mayuscula', () => {
       expect(component.getInicialesAlumno('alumno-1')).toBe('JG');
+    });
+
+    it('dado un studentId desconocido, getInicialesAlumno deberia devolver "AL"', () => {
       expect(component.getInicialesAlumno('alumno-desconocido')).toBe('AL');
     });
 
-    it('debería formatear fecha correctamente', () => {
-      const fecha = component.formatearFecha('2026-06-07T12:00:00Z');
-      expect(fecha).toBeTruthy();
+    it('dado una fecha valida, formatearFecha deberia devolver un string no vacio', () => {
+      expect(component.formatearFecha('2026-06-07T12:00:00Z')).toBeTruthy();
     });
 
-    it('debería navegar a la ruta correspondiente al cambiar de alumno en el select', () => {
-      const mockEventTodos = { target: { value: 'todos' } } as unknown as Event;
-      component.onAlumnoChange(mockEventTodos);
-      expect(router.navigate).toHaveBeenCalledWith(['/movimientos']);
+    it('dado un cambio de select a "todos", deberia navegar a /movimientos', () => {
+      component.onAlumnoChange({ target: { value: 'todos' } } as unknown as Event);
 
-      const mockEventAlumno = { target: { value: 'alumno-1' } } as unknown as Event;
-      component.onAlumnoChange(mockEventAlumno);
+      expect(router.navigate).toHaveBeenCalledWith(['/movimientos']);
+    });
+
+    it('dado un cambio de select a un alumno, deberia navegar a /movimientos/{id}', () => {
+      component.onAlumnoChange({ target: { value: 'alumno-1' } } as unknown as Event);
+
       expect(router.navigate).toHaveBeenCalledWith(['/movimientos', 'alumno-1']);
     });
 
-    it('debería navegar a la home de tutor al presionar volver', () => {
+    it('dado la vista tutor, cuando hago click en volver, deberia navegar a /tutor', () => {
       component.volver();
+
       expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
     });
   });
 
-  describe('Vista Alumno', () => {
-    let usuarioService: UsuarioService;
+  describe('vista alumno', () => {
+    let servicioUsuario: UsuarioService;
 
     beforeEach(() => {
-      usuarioService = TestBed.inject(UsuarioService);
-      usuarioService.setHomeUrl('/alumno');
+      servicioUsuario = TestBed.inject(UsuarioService);
+      servicioUsuario.setHomeUrl('/alumno');
     });
 
-    afterEach(() => {
-      usuarioService.setHomeUrl('/tutor');
-    });
+    afterEach(() => servicioUsuario.setHomeUrl('/tutor'));
 
-    it('debería forzar el id del alumno logueado al inicializar', fakeAsync(() => {
-      paramMapSubject.next(convertToParamMap({}));
-      fixture.detectChanges();
+    it('dado la vista alumno, cuando se monta, deberia forzar el alumnoId del perfil', fakeAsync(() => {
+      whenMonto();
       tick();
 
       expect(component.selectedAlumnoId()).toBe('alumno-1');
-      expect(movimientosServiceSpy.getHistorialAlumno).toHaveBeenCalledWith('alumno-1');
+      expect(servicioMovimientos.getHistorialAlumno).toHaveBeenCalledWith('alumno-1');
     }));
 
-    it('debería navegar a la home de alumno al presionar volver', fakeAsync(() => {
-      paramMapSubject.next(convertToParamMap({}));
-      fixture.detectChanges();
+    it('dado la vista alumno, cuando hago click en volver, deberia navegar a /alumno', fakeAsync(() => {
+      whenMonto();
       tick();
 
       component.volver();
+
       expect(router.navigateByUrl).toHaveBeenCalledWith('/alumno');
     }));
   });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

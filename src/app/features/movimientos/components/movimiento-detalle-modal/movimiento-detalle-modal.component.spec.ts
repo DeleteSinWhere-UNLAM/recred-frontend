@@ -1,85 +1,67 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MovimientoDetalleModalComponent } from './movimiento-detalle-modal.component';
-import { Movimiento } from '../../models/movimiento.model';
 import { By } from '@angular/platform-browser';
+import { ProductoService } from '../../../inventario/services/producto.service';
 import { PromotionService } from '../../../../data-access/services/promociones/promotion.service';
-import { ProductoService } from '../../../../features/inventario/services/producto.service';
+import { MovimientoMother } from '../../movimientos.mother';
+import { Movimiento } from '../../models/movimiento.model';
+import { MovimientoDetalleModalComponent } from './movimiento-detalle-modal.component';
 
 describe('MovimientoDetalleModalComponent', () => {
   let component: MovimientoDetalleModalComponent;
   let fixture: ComponentFixture<MovimientoDetalleModalComponent>;
-  let mockPromotionService: jasmine.SpyObj<PromotionService>;
-  let mockProductoService: jasmine.SpyObj<ProductoService>;
-
-  const mockMovimiento: Movimiento = {
-    id: 'mov-1',
-    studentId: 'alumno-1',
-    totalAmount: 1500,
-    status: 'PENDIENTE',
-    statusLabel: 'Pendiente',
-    paymentMethod: 'DEBIT',
-    date: '2026-06-05T10:00:00Z',
-    items: [{ productId: 'prod-1', productName: 'Tostado', quantity: 1, unitPrice: 1500 }],
-    tipo: 'ANTICIPADA',
-    pickupDate: '2026-06-15',
-    pickupSlotStartTime: '10:00'
-  };
+  let servicioPromociones: jasmine.SpyObj<PromotionService>;
+  let servicioProducto: jasmine.SpyObj<ProductoService>;
 
   beforeEach(async () => {
-    mockPromotionService = jasmine.createSpyObj('PromotionService', ['getPromotionById']);
-    mockProductoService = jasmine.createSpyObj('ProductoService', ['getById']);
+    servicioPromociones = jasmine.createSpyObj('PromotionService', ['getPromotionById']);
+    servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
 
     await TestBed.configureTestingModule({
       imports: [MovimientoDetalleModalComponent],
       providers: [
-        { provide: PromotionService, useValue: mockPromotionService },
-        { provide: ProductoService, useValue: mockProductoService }
-      ]
+        { provide: PromotionService, useValue: servicioPromociones },
+        { provide: ProductoService, useValue: servicioProducto },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MovimientoDetalleModalComponent);
     component = fixture.componentInstance;
-    component.movimiento = { ...mockMovimiento };
-    fixture.detectChanges();
-  });
-
-  it('debería crear el componente', () => {
-    expect(component).toBeTruthy();
+    component.movimiento = MovimientoMother.crearAnticipada();
   });
 
   describe('puedoCancelar', () => {
-    it('debería retornar true si es vista tutor, tipo ANTICIPADA y estado PENDIENTE', () => {
-      component.esVistaAlumno = false;
-      component.movimiento.tipo = 'ANTICIPADA';
-      component.movimiento.status = 'PENDIENTE';
+    it('dado vista tutor con ANTICIPADA PENDIENTE, cuando lo consulto, deberia poder cancelar', () => {
+      givenVistaTutor();
+      givenMovimiento(MovimientoMother.crearAnticipada({ status: 'PENDIENTE' }));
+
       expect(component.puedoCancelar()).toBeTrue();
     });
 
-    it('debería retornar true si es vista tutor, tipo ANTICIPADA y estado EN_PREPARACION', () => {
-      component.esVistaAlumno = false;
-      component.movimiento.tipo = 'ANTICIPADA';
-      component.movimiento.status = 'EN_PREPARACION';
+    it('dado vista tutor con ANTICIPADA EN_PREPARACION, cuando lo consulto, deberia poder cancelar', () => {
+      givenVistaTutor();
+      givenMovimiento(MovimientoMother.crearAnticipada({ status: 'EN_PREPARACION' }));
+
       expect(component.puedoCancelar()).toBeTrue();
     });
 
-    it('debería retornar false si es vista alumno', () => {
+    it('dado vista alumno, no deberia poder cancelar (aun si es ANTICIPADA y PENDIENTE)', () => {
       component.esVistaAlumno = true;
-      component.movimiento.tipo = 'ANTICIPADA';
-      component.movimiento.status = 'PENDIENTE';
+      givenMovimiento(MovimientoMother.crearAnticipada({ status: 'PENDIENTE' }));
+
       expect(component.puedoCancelar()).toBeFalse();
     });
 
-    it('debería retornar false si el tipo no es ANTICIPADA', () => {
-      component.esVistaAlumno = false;
-      component.movimiento.tipo = 'PRESENCIAL';
-      component.movimiento.status = 'PENDIENTE';
+    it('dado un tipo PRESENCIAL, no deberia poder cancelar', () => {
+      givenVistaTutor();
+      givenMovimiento(MovimientoMother.crearAnticipada({ tipo: 'PRESENCIAL', status: 'PENDIENTE' }));
+
       expect(component.puedoCancelar()).toBeFalse();
     });
 
-    it('debería retornar false si el estado no es PENDIENTE ni EN_PREPARACION', () => {
-      component.esVistaAlumno = false;
-      component.movimiento.tipo = 'ANTICIPADA';
-      component.movimiento.status = 'CANCELADO';
+    it('dado un estado CANCELADO, no deberia poder cancelar', () => {
+      givenVistaTutor();
+      givenMovimiento(MovimientoMother.crearAnticipada({ status: 'CANCELADO' }));
+
       expect(component.puedoCancelar()).toBeFalse();
     });
   });
@@ -90,53 +72,73 @@ describe('MovimientoDetalleModalComponent', () => {
       jasmine.clock().mockDate(new Date('2026-06-14T09:30:00-03:00'));
     });
 
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
+    afterEach(() => jasmine.clock().uninstall());
 
-    it('debería retornar false si falta pickupDate o pickupSlotStartTime', () => {
-      component.movimiento.pickupDate = undefined;
+    it('dado sin pickupDate o sin pickupSlotStartTime, deberia devolver false', () => {
+      givenMovimiento(MovimientoMother.crearAnticipada({ pickupDate: undefined }));
       expect(component.esFechaLimiteSuperada()).toBeFalse();
 
-      component.movimiento.pickupDate = '2026-06-15';
-      component.movimiento.pickupSlotStartTime = undefined;
-      expect(component.esFechaLimiteSuperada()).toBeFalse();
-    });
-
-    it('debería retornar false si falta más de una hora para la franja de retiro', () => {
-      component.movimiento.pickupDate = '2026-06-15';
-      component.movimiento.pickupSlotStartTime = '10:00';
+      givenMovimiento(
+        MovimientoMother.crearAnticipada({
+          pickupDate: '2026-06-15',
+          pickupSlotStartTime: undefined,
+        }),
+      );
       expect(component.esFechaLimiteSuperada()).toBeFalse();
     });
 
-    it('debería retornar true si falta exactamente una hora para la franja de retiro', () => {
+    it('dado que faltan mas de una hora para el retiro, deberia devolver false', () => {
+      givenMovimiento(
+        MovimientoMother.crearAnticipada({
+          pickupDate: '2026-06-15',
+          pickupSlotStartTime: '10:00',
+        }),
+      );
+
+      expect(component.esFechaLimiteSuperada()).toBeFalse();
+    });
+
+    it('dado que falta exactamente una hora, deberia devolver true', () => {
       jasmine.clock().mockDate(new Date('2026-06-14T10:00:00-03:00'));
-      component.movimiento.pickupDate = '2026-06-14';
-      component.movimiento.pickupSlotStartTime = '11:00';
+      givenMovimiento(
+        MovimientoMother.crearAnticipada({
+          pickupDate: '2026-06-14',
+          pickupSlotStartTime: '11:00',
+        }),
+      );
+
       expect(component.esFechaLimiteSuperada()).toBeTrue();
     });
 
-    it('debería retornar true si falta menos de una hora para la franja de retiro', () => {
+    it('dado que falta menos de una hora, deberia devolver true', () => {
       jasmine.clock().mockDate(new Date('2026-06-14T10:15:00-03:00'));
-      component.movimiento.pickupDate = '2026-06-14';
-      component.movimiento.pickupSlotStartTime = '11:00';
+      givenMovimiento(
+        MovimientoMother.crearAnticipada({
+          pickupDate: '2026-06-14',
+          pickupSlotStartTime: '11:00',
+        }),
+      );
+
       expect(component.esFechaLimiteSuperada()).toBeTrue();
     });
 
-    it('debería retornar true si la hora de retiro ya pasó', () => {
+    it('dado que la hora de retiro ya paso, deberia devolver true', () => {
       jasmine.clock().mockDate(new Date('2026-06-14T11:30:00-03:00'));
-      component.movimiento.pickupDate = '2026-06-14';
-      component.movimiento.pickupSlotStartTime = '11:00';
+      givenMovimiento(
+        MovimientoMother.crearAnticipada({
+          pickupDate: '2026-06-14',
+          pickupSlotStartTime: '11:00',
+        }),
+      );
+
       expect(component.esFechaLimiteSuperada()).toBeTrue();
     });
   });
 
-  describe('Acciones en el DOM', () => {
-    it('debería deshabilitar el botón de cancelar si se superó la fecha límite', () => {
-      component.esVistaAlumno = false;
-      component.movimiento.tipo = 'ANTICIPADA';
-      component.movimiento.status = 'PENDIENTE';
-      
+  describe('acciones en el DOM', () => {
+    it('dado un movimiento cancelable con fecha limite superada, deberia deshabilitar el boton de cancelar', () => {
+      givenVistaTutor();
+      givenMovimiento(MovimientoMother.crearAnticipada({ status: 'PENDIENTE' }));
       spyOn(component, 'esFechaLimiteSuperada').and.returnValue(true);
       fixture.detectChanges();
 
@@ -145,11 +147,9 @@ describe('MovimientoDetalleModalComponent', () => {
       expect(btn.nativeElement.disabled).toBeTrue();
     });
 
-    it('debería habilitar el botón de cancelar si NO se superó la fecha límite', () => {
-      component.esVistaAlumno = false;
-      component.movimiento.tipo = 'ANTICIPADA';
-      component.movimiento.status = 'PENDIENTE';
-      
+    it('dado un movimiento cancelable sin fecha limite superada, deberia habilitar el boton de cancelar', () => {
+      givenVistaTutor();
+      givenMovimiento(MovimientoMother.crearAnticipada({ status: 'PENDIENTE' }));
       spyOn(component, 'esFechaLimiteSuperada').and.returnValue(false);
       fixture.detectChanges();
 
@@ -158,12 +158,10 @@ describe('MovimientoDetalleModalComponent', () => {
       expect(btn.nativeElement.disabled).toBeFalse();
     });
 
-    it('debería emitir el evento cancelar al hacer clic en el botón habilitado', () => {
+    it('dado el boton habilitado, cuando hago click en cancelar, deberia emitir cancelar con el id del movimiento', () => {
       spyOn(component.cancelar, 'emit');
-      component.esVistaAlumno = false;
-      component.movimiento.tipo = 'ANTICIPADA';
-      component.movimiento.status = 'PENDIENTE';
-      
+      givenVistaTutor();
+      givenMovimiento(MovimientoMother.crearAnticipada({ status: 'PENDIENTE' }));
       spyOn(component, 'esFechaLimiteSuperada').and.returnValue(false);
       fixture.detectChanges();
 
@@ -173,4 +171,46 @@ describe('MovimientoDetalleModalComponent', () => {
       expect(component.cancelar.emit).toHaveBeenCalledWith(component.movimiento.id);
     });
   });
+
+  describe('formatos y fecha del movimiento', () => {
+    it('dado un ANTICIPADA con pickupDate y slot, mostrarFecha deberia incluir slot + fecha formateada', () => {
+      givenMovimiento(
+        MovimientoMother.crearAnticipada({
+          pickupDate: '2026-07-15',
+          pickupSlotDescription: 'Primer recreo',
+        }),
+      );
+
+      const texto = component.mostrarFecha(component.movimiento);
+      expect(texto).toContain('Primer recreo');
+      expect(texto).toContain('15');
+    });
+
+    it('dado un movimiento sin ANTICIPADA, mostrarFecha deberia usar el date del movimiento', () => {
+      givenMovimiento(MovimientoMother.crear({ date: '2026-06-05T10:00:00Z' }));
+
+      expect(component.mostrarFecha(component.movimiento)).toBeTruthy();
+    });
+
+    it('dado formatearPrecio, deberia incluir simbolo $', () => {
+      const precio = component.formatearPrecio(1500);
+      expect(precio).toContain('$');
+    });
+
+    it('dado formatearFechaProgramada con yyyy-MM-dd, deberia devolver dd/MM/yyyy', () => {
+      expect(component.formatearFechaProgramada('2026-07-15')).toBe('15/07/2026');
+    });
+
+    it('dado formatearFechaProgramada con string vacio, deberia devolver string vacio', () => {
+      expect(component.formatearFechaProgramada('')).toBe('');
+    });
+  });
+
+  function givenVistaTutor(): void {
+    component.esVistaAlumno = false;
+  }
+
+  function givenMovimiento(movimiento: Movimiento): void {
+    component.movimiento = movimiento;
+  }
 });
