@@ -98,6 +98,13 @@
   background-color: var(--color-superficie-alt);
 }
 
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none !important;
+}
+
 /* Filters Card */
 .filters-card {
   background-color: var(--color-superficie);
