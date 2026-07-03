@@ -172,6 +172,18 @@ describe('BuffetPresenter', () => {
       const filtrados = presenter.productosFiltrados();
       expect(filtrados.some((p) => p.id === 'prod-libre')).toBeTrue();
     }));
+
+    it('dado vista tutor, cuando inicializo, los productos habilitados deben estar al principio y los bloqueados/sin stock al fondo', fakeAsync(() => {
+      givenVistaAlumno(false);
+
+      whenInicializo('alumno-1');
+
+      const filtrados = presenter.productosFiltrados();
+      // En los mock de PRODUCTOS, prod-libre es disponible. prod-tutor y prod-restriccion estan bloqueados/sin stock.
+      expect(filtrados[0].id).toBe('prod-libre');
+      expect(filtrados[1].id).toBe('prod-tutor');
+      expect(filtrados[2].id).toBe('prod-restriccion');
+    }));
   });
 
   describe('toggleLock — bloqueo y desbloqueo manual', () => {

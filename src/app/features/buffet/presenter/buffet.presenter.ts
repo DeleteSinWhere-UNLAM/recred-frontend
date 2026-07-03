@@ -414,7 +414,7 @@ export class BuffetPresenter {
     const favs = this.favoritosState();
     const esAlumno = this.usuarioService.esVistaAlumno();
 
-    return this.productosState().filter((producto) => {
+    const filtered = this.productosState().filter((producto) => {
       if (esAlumno) {
         if (producto.bloqueado) {
           return false;
@@ -445,6 +445,14 @@ export class BuffetPresenter {
         return false;
       }
       return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const aBlocked = !!(a.bloqueado || a.bloqueadoPorRestriccion || a.estadoStock === 'SIN_STOCK');
+      const bBlocked = !!(b.bloqueado || b.bloqueadoPorRestriccion || b.estadoStock === 'SIN_STOCK');
+      if (aBlocked && !bBlocked) return 1;
+      if (!aBlocked && bBlocked) return -1;
+      return 0;
     });
   });
 
