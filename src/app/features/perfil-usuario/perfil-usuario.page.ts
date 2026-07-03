@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
@@ -8,7 +9,7 @@ import {
 } from '../../data-access/models/perfil-usuario.model';
 import { PerfilUsuarioService } from '../../data-access/services/perfil-usuario.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { PayoutConfigService } from '../../data-access/services/payout-config.service';
+import { PayoutConfigService } from '../home-kiosquero/services/payout-config.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { PayoutConfig } from '../../data-access/models/payout-config.model';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -51,6 +52,8 @@ export class PerfilUsuarioPage implements OnInit {
   protected readonly tienePayoutExistente = signal(false);
   protected readonly proximaEjecucion = signal<string | null>(null);
   protected readonly ultimaEjecucion = signal<string | null>(null);
+  protected readonly cvuGuardado = signal<string | null>(null);
+  protected readonly cuitGuardado = signal<string | null>(null);
 
   protected readonly esKiosquero = computed(() => {
     const role = this.usuario()?.role || this.perfil()?.role;
@@ -109,6 +112,11 @@ export class PerfilUsuarioPage implements OnInit {
     }),
   });
 
+  protected readonly unidadIntervaloSeleccionada = toSignal(
+    this.payoutForm.controls.unidadIntervalo.valueChanges,
+    { initialValue: this.payoutForm.controls.unidadIntervalo.value }
+  );
+
   @ViewChild('inputFoto') private readonly inputFoto!: ElementRef<HTMLInputElement>;
 
   protected readonly form: PerfilUsuarioForm = new FormGroup({
@@ -155,8 +163,23 @@ export class PerfilUsuarioPage implements OnInit {
     () => this.perfil()?.urlFotoPerfil ?? null,
   );
 
+  private readonly destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
     void this.cargarPerfil();
+
+    this.payoutForm.controls.unidadIntervalo.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((unidad) => {
+        const cantidadActual = this.payoutForm.controls.cantidadIntervalo.value;
+        if (unidad === 'DAYS' && cantidadActual !== 1 && cantidadActual !== 10) {
+          this.payoutForm.controls.cantidadIntervalo.setValue(1);
+        } else if (unidad === 'WEEKS' && cantidadActual !== 1 && cantidadActual !== 2) {
+          this.payoutForm.controls.cantidadIntervalo.setValue(1);
+        } else if (unidad === 'MONTHS' && cantidadActual !== 1 && cantidadActual !== 2 && cantidadActual !== 3) {
+          this.payoutForm.controls.cantidadIntervalo.setValue(1);
+        }
+      });
   }
 
   protected async cargarPerfil(): Promise<void> {
@@ -371,7 +394,7 @@ export class PerfilUsuarioPage implements OnInit {
   }
 
   protected async cargarConfiguracionPayout(): Promise<void> {
-    const kiosqueroId = this.perfilService.obtenerBuffetId();
+    const kiosqueroId = this.usuario()?.id || this.perfil()?.id;
     if (!kiosqueroId) {
       console.warn('No se encontró el ID del kiosquero para cargar la configuración de pagos.');
       return;
@@ -382,6 +405,7 @@ export class PerfilUsuarioPage implements OnInit {
 
     try {
       const config = await this.payoutConfigService.obtenerConfiguracion(kiosqueroId);
+      console.log('Respuesta del backend para PayoutConfig:', config);
       if (config) {
         this.payoutForm.setValue({
           destinationCvu: config.destinationCvu || '',
@@ -394,12 +418,21 @@ export class PerfilUsuarioPage implements OnInit {
         this.proximaEjecucion.set(config.proximaEjecucion || null);
         this.ultimaEjecucion.set(config.ultimaEjecucion || null);
         this.tienePayoutExistente.set(true);
+        this.cvuGuardado.set(config.destinationCvu || null);
+        this.cuitGuardado.set(config.destinationCuit || null);
       }
     } catch (err) {
       console.warn('Error al cargar la configuración de pagos o inexistente:', err);
       this.tienePayoutExistente.set(false);
       this.proximaEjecucion.set(null);
       this.ultimaEjecucion.set(null);
+      this.cvuGuardado.set(null);
+      this.cuitGuardado.set(null);
+      
+      const doc = this.perfil()?.documentNumber;
+      if (doc) {
+        this.payoutForm.patchValue({ destinationCuit: doc });
+      }
     } finally {
       this.cargandoPayout.set(false);
     }
@@ -414,7 +447,7 @@ export class PerfilUsuarioPage implements OnInit {
       return;
     }
 
-    const kiosqueroId = this.perfilService.obtenerBuffetId();
+    const kiosqueroId = this.usuario()?.id || this.perfil()?.id;
     if (!kiosqueroId) {
       this.toastService.mostrar('No se encontró el ID del kiosquero.', 'error');
       return;
@@ -430,6 +463,8 @@ export class PerfilUsuarioPage implements OnInit {
 
       const proxima = response?.proximaEjecucion;
       this.proximaEjecucion.set(proxima || null);
+      this.cvuGuardado.set(response?.destinationCvu || data.destinationCvu);
+      this.cuitGuardado.set(response?.destinationCuit || data.destinationCuit);
 
       let mensajeExito = 'Vinculación exitosa y configuración guardada correctamente.';
       if (proxima) {

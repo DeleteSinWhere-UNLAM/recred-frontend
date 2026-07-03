@@ -488,4 +488,36 @@ export class MovimientosPage implements OnInit {
       });
     }
   }
+
+  async revertirCancelacion(id: string): Promise<void> {
+    const confirmed = await this.dialogService.confirm('¿Estás seguro de que deseas revertir la cancelación de este pedido?', 'Revertir Cancelación');
+    if (confirmed) {
+      this.movimientosService.revertirCancelacionCompra(id).subscribe({
+        next: () => {
+          this.toastService.mostrar('Cancelación revertida exitosamente', 'success');
+          
+          this.rawMovimientos.update((list) =>
+            list.map((m) =>
+              m.id === id
+                ? { ...m, status: 'PENDIENTE', statusLabel: 'A Preparar' }
+                : m
+            )
+          );
+          
+          const openModal = this.modalMovimiento();
+          if (openModal && openModal.id === id) {
+            this.modalMovimiento.set({
+              ...openModal,
+              status: 'PENDIENTE',
+              statusLabel: 'A Preparar'
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error al revertir la cancelación:', err);
+          this.toastService.mostrar('Error al revertir la cancelación', 'error');
+        }
+      });
+    }
+  }
 }
