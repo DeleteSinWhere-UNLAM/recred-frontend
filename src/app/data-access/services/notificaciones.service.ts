@@ -44,15 +44,13 @@ export class NotificacionesService {
   private readonly http = inject(HttpClient);
 
   private readonly allNotificacionesState = signal<Notificacion[]>([]);
-  // Muestra todas las notificaciones cargadas ordenadas por no leídas primero, luego por fecha descendente
   readonly notificaciones = computed(() => {
     return [...this.allNotificacionesState()].sort((a, b) => {
       const readA = a.read ? 1 : 0;
       const readB = b.read ? 1 : 0;
       if (readA !== readB) {
-        return readA - readB; // No leídas (0) antes que leídas (1)
+        return readA - readB;
       }
-      // Orden cronológico descendente
       const dateA = a.fecha ? new Date(a.fecha).getTime() : 0;
       const dateB = b.fecha ? new Date(b.fecha).getTime() : 0;
       return dateB - dateA;
@@ -69,8 +67,6 @@ export class NotificacionesService {
   }
 
   obtenerNotificaciones(): void {
-    // Fetcheamos 50 para tener un conteo preciso en el badge,
-    // pero el dropdown muestra solo las 5 más recientes (slice en la signal)
     this.http.get<NotificacionesResponse>(`${environment.apiUrl}/notifications/me?size=50`).subscribe({
       next: (data) => {
         console.log('Lista de notificaciones:', data);

@@ -15,7 +15,6 @@ function decodeMatch(match: string): string {
 
 function decodeIfNeeded(str: string): string {
   if (UTF8_DOUBLE_ENCODED_REGEX.test(str)) {
-    // Reset regex lastIndex because of /g
     UTF8_DOUBLE_ENCODED_REGEX.lastIndex = 0;
     return str.replace(UTF8_DOUBLE_ENCODED_REGEX, decodeMatch);
   }
@@ -33,7 +32,6 @@ function sanitizeObject(obj: unknown): unknown {
     return obj.map((item: unknown) => sanitizeObject(item));
   }
   if (typeof obj === 'object') {
-    // Avoid processing binary blobs, files or other non-plain objects
     const proto = Object.getPrototypeOf(obj);
     if (proto !== null && proto !== Object.prototype && proto !== Array.prototype) {
       return obj;
