@@ -249,15 +249,17 @@ export class MovimientosPage implements OnInit {
         this.cargarHistorial();
       });
 
-      this.route.queryParamMap.subscribe((queryParams) => {
-        const purchaseId = queryParams.get('id');
-        if (purchaseId && this.rawMovimientos().length > 0) {
-          const found = this.rawMovimientos().find((m) => m.id === purchaseId);
-          if (found) {
-            this.abrirDetalle(found);
+      if (this.route.queryParamMap) {
+        this.route.queryParamMap.subscribe((queryParams) => {
+          const purchaseId = queryParams.get('id');
+          if (purchaseId && this.rawMovimientos().length > 0) {
+            const found = this.rawMovimientos().find((m) => m.id === purchaseId);
+            if (found) {
+              this.abrirDetalle(found);
+            }
           }
-        }
-      });
+        });
+      }
     });
   }
 
@@ -278,7 +280,7 @@ export class MovimientosPage implements OnInit {
         this.cargando.set(false);
 
         // Check if there is an order ID in query params to open the modal
-        const purchaseId = this.route.snapshot.queryParamMap.get('id');
+        const purchaseId = this.route.snapshot?.queryParamMap?.get('id');
         if (purchaseId) {
           const found = this.rawMovimientos().find((m) => m.id === purchaseId);
           if (found) {
