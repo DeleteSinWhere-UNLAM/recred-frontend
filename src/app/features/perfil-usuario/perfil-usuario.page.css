@@ -361,6 +361,12 @@
   margin-bottom: 8px;
 }
 
+.perfil-usuario__payout-info--limpio {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+}
+
 .perfil-usuario__payout-info-item {
   display: flex;
   align-items: center;
@@ -387,6 +393,24 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--color-texto-oscuro);
+}
+
+.payout-destacado {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  background-color: color-mix(in srgb, var(--color-dorado) 35%, var(--color-superficie));
+  color: var(--color-pizarra);
+  padding: 6px 12px;
+  border-radius: 0; /* Sin vértices redondeados */
+}
+
+.payout-destacado i,
+.payout-destacado .info-value {
+  color: inherit !important;
+  font-weight: 900;
+  font-size: 14px;
 }
 
 .perfil-usuario__campo small {
