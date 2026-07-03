@@ -12,6 +12,8 @@ import { MicrocreditosService, SchoolCredit } from '../../../../data-access/serv
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CropModalComponent } from '../../../perfil-usuario/components/crop-modal/crop-modal.component';
 import { DialogService } from '../../../../shared/services/dialog.service';
+import { PresupuestoService } from '../../../presupuesto/services/presupuesto.service';
+import { getPeriodRange } from '../../../compra/utils/budget-helpers';
 
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -39,6 +41,7 @@ export class AlumnoCardComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly router = inject(Router);
   private readonly contextoService = inject(AlumnoContextoService);
+  private readonly presupuestoService = inject(PresupuestoService);
   private readonly _cantidadPendientes = signal<number>(0);
   
   private readonly currentUrl = toSignal(
@@ -53,6 +56,10 @@ export class AlumnoCardComponent implements OnInit {
   mostrarTodosLosBotones = signal<boolean>(false);
   readonly subiendoFoto = signal(false);
   protected readonly fotoEvent = signal<Event | null>(null);
+
+  readonly hasBudget = signal<boolean>(false);
+  readonly budgetLimit = signal<number>(1000);
+  readonly budgetSpent = signal<number>(0);
 
   @ViewChild('inputFotoAlumno') private readonly inputFotoAlumno!: ElementRef<HTMLInputElement>;
 
@@ -70,6 +77,49 @@ export class AlumnoCardComponent implements OnInit {
         next: (credito) => this.creditoActivo.set(credito),
         error: () => this.creditoActivo.set(null)
       });
+      this.cargarPresupuestoYConsumo();
+    }
+  }
+
+  private async cargarPresupuestoYConsumo(): Promise<void> {
+    try {
+      const budget = await this.presupuestoService.getPresupuesto(this.alumno.id);
+      if (budget && budget.activo) {
+        this.hasBudget.set(true);
+        this.budgetLimit.set(budget.montoLimiteGeneral);
+
+        this.movimientosService.getHistorialAlumno(this.alumno.id).subscribe({
+          next: (history) => {
+            if (!history) {
+              this.budgetSpent.set(0);
+              return;
+            }
+            const referenceDate = new Date();
+            const { start, end } = getPeriodRange(budget.periodo, referenceDate);
+            const activeStatuses = ['APPROVED', 'PENDING', 'PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'];
+            
+            const approvedPastPurchases = history.filter((m) => {
+              if (!activeStatuses.includes(m.status)) return false;
+              const purchaseDate = m.pickupDate ? new Date(m.pickupDate + 'T12:00:00') : new Date(m.date);
+              return purchaseDate >= start && purchaseDate <= end;
+            });
+
+            const spentPastGeneral = approvedPastPurchases.reduce((acc, m) => acc + m.totalAmount, 0);
+            this.budgetSpent.set(spentPastGeneral);
+          },
+          error: (err) => {
+            console.error('Error fetching student purchase history for budget calculation:', err);
+            this.budgetSpent.set(0);
+          }
+        });
+      } else {
+        this.hasBudget.set(false);
+        this.budgetLimit.set(1000);
+        this.budgetSpent.set(0);
+      }
+    } catch (err) {
+      console.error('Error loading budget:', err);
+      this.hasBudget.set(false);
     }
   }
 
@@ -165,27 +215,20 @@ export class AlumnoCardComponent implements OnInit {
     return this.alumno.saldo < 500;
   }
 
-  readonly budgetLimit = 1000;
-
-  get budgetSpent(): number {
-    const nombre = this.alumno.nombre.toLowerCase();
-    if (nombre.includes('eugenio')) return 450;
-    if (nombre.includes('emmanuel')) return 700;
-    if (nombre.includes('adrian')) return 850;
-    if (nombre.includes('rocio')) return 600;
-    return 500;
-  }
-
   get budgetPercentage(): number {
-    return Math.round((this.budgetSpent / this.budgetLimit) * 100);
+    const limit = this.budgetLimit();
+    if (limit <= 0) return 0;
+    const remaining = Math.max(0, limit - this.budgetSpent());
+    return Math.round((remaining / limit) * 100);
   }
 
-  get budgetSpentFormateado(): string {
-    return `$${this.budgetSpent}`;
+  get budgetRestanteFormateado(): string {
+    const restante = Math.max(0, this.budgetLimit() - this.budgetSpent());
+    return formateadorSaldo.format(restante);
   }
 
   get budgetLimitFormateado(): string {
-    return `$${this.budgetLimit}`;
+    return formateadorSaldo.format(this.budgetLimit());
   }
 
   get cantidadPendientes(): number {

@@ -12,6 +12,7 @@ export interface Notificacion {
   compraId?: string;
   productoId?: string;
   sugerenciaId?: string;
+  read?: boolean;
 }
 
 export interface NotificacionBackend {
@@ -36,21 +37,29 @@ export interface NotificacionBackend {
   suggestionId?: string;
 }
 
-export interface NotificacionesResponse {
-  notifications: NotificacionBackend[];
-}
+export type NotificacionesResponse = NotificacionBackend[] | { notifications: NotificacionBackend[] };
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionesService {
   private readonly http = inject(HttpClient);
 
-  private readonly notificacionesState = signal<Notificacion[]>([]);
-  readonly notificaciones = this.notificacionesState.asReadonly();
+  private readonly allNotificacionesState = signal<Notificacion[]>([]);
+  readonly notificaciones = computed(() => {
+    return [...this.allNotificacionesState()].sort((a, b) => {
+      const readA = a.read ? 1 : 0;
+      const readB = b.read ? 1 : 0;
+      if (readA !== readB) {
+        return readA - readB;
+      }
+      const dateA = a.fecha ? new Date(a.fecha).getTime() : 0;
+      const dateB = b.fecha ? new Date(b.fecha).getTime() : 0;
+      return dateB - dateA;
+    });
+  });
 
   private readonly cantidadState = signal<number>(0);
   readonly cantidad: Signal<number> = computed(() => {
-    const listLen = this.notificaciones().length;
-    return listLen > 0 ? listLen : this.cantidadState();
+    return this.notificaciones().filter((n) => !n.read).length;
   });
 
   setCantidad(cantidad: number): void {
@@ -58,10 +67,12 @@ export class NotificacionesService {
   }
 
   obtenerNotificaciones(): void {
-    this.http.get<NotificacionesResponse>(`${environment.apiUrl}/notifications/me?size=5`).subscribe({
+    this.http.get<NotificacionesResponse>(`${environment.apiUrl}/notifications/me?size=50`).subscribe({
       next: (data) => {
         console.log('Lista de notificaciones:', data);
-        const items: NotificacionBackend[] = data?.notifications || [];
+        const items: NotificacionBackend[] = Array.isArray(data)
+          ? data
+          : (data as { notifications: NotificacionBackend[] })?.notifications || [];
         const mapeadas: Notificacion[] = items.map((item) => ({
           id: item.id,
           titulo: item.titulo || item.title || 'Notificación',
@@ -72,8 +83,9 @@ export class NotificacionesService {
           compraId: item.purchaseId || item.compraId,
           productoId: item.productId || item.productoId,
           sugerenciaId: item.suggestionId || item.sugerenciaId,
+          read: item.read ?? false,
         }));
-        this.notificacionesState.set(mapeadas);
+        this.allNotificacionesState.set(mapeadas);
       },
       error: (err) => {
         console.error('Error al obtener notificaciones:', err);
@@ -82,6 +94,24 @@ export class NotificacionesService {
   }
 
   agregarNotificacion(notificacion: Notificacion): void {
-    this.notificacionesState.update((lista) => [notificacion, ...lista]);
+    this.allNotificacionesState.update((lista) => [
+      { ...notificacion, read: notificacion.read ?? false },
+      ...lista
+    ]);
+  }
+
+  marcarComoLeida(notificationId: string): void {
+    if (!notificationId) return;
+    this.http.put<void>(`${environment.apiUrl}/notifications/${notificationId}/already-read`, {}).subscribe({
+      next: () => {
+        console.log(`Notificación ${notificationId} marcada como leída`);
+        this.allNotificacionesState.update((lista) =>
+          lista.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
+        );
+      },
+      error: (err) => {
+        console.error(`Error al marcar notificación ${notificationId} como leída:`, err);
+      }
+    });
   }
 }

@@ -191,7 +191,9 @@
                   <h3>{{ order.studentName }}</h3>
                 </div>
 
-                <p class="tp-order__items">{{ getItemsSummary(order) }}</p>
+                <p class="tp-order__items">
+                  {{ getCantidadItems(order) }} {{ getCantidadItems(order) === 1 ? 'producto' : 'productos' }}
+                </p>
 
                 <div class="tp-order__meta">
                   <div>
