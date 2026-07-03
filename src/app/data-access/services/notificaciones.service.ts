@@ -114,4 +114,22 @@ export class NotificacionesService {
       }
     });
   }
+
+  marcarTodasComoLeidas(): void {
+    const noLeidas = this.allNotificacionesState().filter((n) => !n.read && n.id);
+    if (noLeidas.length === 0) return;
+
+    // Actualización optimista: marca todo como leído de inmediato en la UI
+    this.allNotificacionesState.update((lista) =>
+      lista.map((n) => ({ ...n, read: true }))
+    );
+
+    // Luego llama al backend por cada notificación no leída
+    noLeidas.forEach((n) => {
+      this.http.put<void>(`${environment.apiUrl}/notifications/${n.id}/already-read`, {}).subscribe({
+        next: () => console.log(`Notificación ${n.id} marcada como leída`),
+        error: (err) => console.error(`Error al marcar notificación ${n.id} como leída:`, err),
+      });
+    });
+  }
 }

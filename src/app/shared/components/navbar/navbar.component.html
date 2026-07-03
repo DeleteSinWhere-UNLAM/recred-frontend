@@ -73,7 +73,17 @@
         </button>
         @if (menuNotifAbierto()) {
         <div class="navbar__menu navbar__menu--notif" role="menu">
-          <p class="navbar__menu-titulo">Notificaciones</p>
+          <div class="navbar__notif-header">
+            <p class="navbar__menu-titulo">Notificaciones</p>
+            @if (notifCount() > 0) {
+            <button type="button" class="navbar__notif-marcar-todas"
+              (click)="marcarTodasComoLeidas()"
+              title="Marcar todas como leídas">
+              <i class="fa-solid fa-check-double" aria-hidden="true"></i>
+              <span>Marcar todas</span>
+            </button>
+            }
+          </div>
           @if (notificaciones().length === 0) {
           <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
           } @else {

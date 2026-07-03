@@ -109,6 +109,10 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  protected marcarTodasComoLeidas(): void {
+    this.notificacionesService.marcarTodasComoLeidas();
+  }
+
   protected clickEnNotificacion(notif: Notificacion): void {
     this.menuNotifAbierto.set(false);
     console.log('Notificacion clickeada:', notif);
