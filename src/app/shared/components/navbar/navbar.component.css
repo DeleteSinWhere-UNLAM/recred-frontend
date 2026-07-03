@@ -366,6 +366,19 @@
   cursor: pointer;
 }
 
+.navbar__notif-item--unread {
+  background-color: #fffdeb; /* Amarillo muy claro */
+}
+
+.navbar__notif-item--read {
+  background-color: var(--color-superficie); /* Blanco / color superficie del tema */
+}
+
+.navbar__notif-item--unread:hover,
+.navbar__notif-item--read:hover {
+  background-color: var(--color-fondo);
+}
+
 .navbar__notif-titulo {
   display: block;
   font-family: var(--font-display);

@@ -4,6 +4,7 @@ import {
   ElementRef,
   HostListener,
   Input,
+  OnInit,
   computed,
   inject,
   signal,
@@ -25,7 +26,7 @@ import { AlumnoContextoService } from '../../../core/services/alumno-contexto.se
   imports: [RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly carritoService = inject(CarritoService);
@@ -38,6 +39,11 @@ export class NavbarComponent {
   private readonly contextoService = inject(AlumnoContextoService);
 
   @Input() userName = '';
+
+  ngOnInit(): void {
+    this.notificacionesService.obtenerNotificaciones();
+  }
+
 
   protected readonly esPremium = computed(() => {
     if (typeof this.perfilService?.perfil !== 'function') {
@@ -106,6 +112,10 @@ export class NavbarComponent {
   protected clickEnNotificacion(notif: Notificacion): void {
     this.menuNotifAbierto.set(false);
     console.log('Notificacion clickeada:', notif);
+
+    if (notif.id) {
+      this.notificacionesService.marcarComoLeida(notif.id);
+    }
 
     try {
       const esKiosquero = this.perfilService.rol() === 'VENDEDOR' || 

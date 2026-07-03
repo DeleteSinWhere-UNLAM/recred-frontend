@@ -74,13 +74,15 @@
         @if (menuNotifAbierto()) {
         <div class="navbar__menu navbar__menu--notif" role="menu">
           <p class="navbar__menu-titulo">Notificaciones</p>
-          @if (notifCount() === 0) {
+          @if (notificaciones().length === 0) {
           <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
           } @else {
           <div class="navbar__notif-list">
             @for (notif of notificaciones(); track notif.id || $index) {
             <button type="button" class="navbar__notif-item"
               [class.navbar__notif-item--clickable]="true"
+              [class.navbar__notif-item--unread]="!notif.read"
+              [class.navbar__notif-item--read]="notif.read"
               (click)="clickEnNotificacion(notif)">
               <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
               <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>
