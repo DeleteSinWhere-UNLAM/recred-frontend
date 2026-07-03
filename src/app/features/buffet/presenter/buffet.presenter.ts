@@ -320,13 +320,12 @@ export class BuffetPresenter {
       spentCartGeneral += item.producto.precio * item.cantidad;
     }
 
-    const limiteTeorico = alumno.saldo + spentPastGeneral;
-    const montoLimiteGeneral = Math.min(budget.montoLimiteGeneral, limiteTeorico);
+    const montoLimiteGeneral = budget.montoLimiteGeneral;
+    const montoConsumidoGeneral = spentPastGeneral + spentCartGeneral;
     const montoDisponibleGeneral = Math.max(
       0,
-      Math.min(alumno.saldo - spentCartGeneral, budget.montoLimiteGeneral - spentPastGeneral - spentCartGeneral)
+      budget.montoLimiteGeneral - spentPastGeneral - spentCartGeneral
     );
-    const montoConsumidoGeneral = montoLimiteGeneral - montoDisponibleGeneral;
     const porcentajeConsumidoGeneral = montoLimiteGeneral > 0
       ? Math.round((montoConsumidoGeneral / montoLimiteGeneral) * 100)
       : 0;
@@ -574,6 +573,7 @@ export class BuffetPresenter {
     }
 
     this.fechaSeleccionadaState.set(adjustedFecha);
+    void this.carritoService.cargarPresupuestoYConsumo(alumno.id);
 
     const recreoActual = this.recreoSeleccionadoState();
     const opciones = this.recreosDisponibles();

@@ -218,15 +218,17 @@ export class AlumnoCardComponent implements OnInit {
   get budgetPercentage(): number {
     const limit = this.budgetLimit();
     if (limit <= 0) return 0;
-    return Math.round((this.budgetSpent() / limit) * 100);
+    const remaining = Math.max(0, limit - this.budgetSpent());
+    return Math.round((remaining / limit) * 100);
   }
 
-  get budgetSpentFormateado(): string {
-    return `$${this.budgetSpent()}`;
+  get budgetRestanteFormateado(): string {
+    const restante = Math.max(0, this.budgetLimit() - this.budgetSpent());
+    return formateadorSaldo.format(restante);
   }
 
   get budgetLimitFormateado(): string {
-    return `$${this.budgetLimit()}`;
+    return formateadorSaldo.format(this.budgetLimit());
   }
 
   get cantidadPendientes(): number {
