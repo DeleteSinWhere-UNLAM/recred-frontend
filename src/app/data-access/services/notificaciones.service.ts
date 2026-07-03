@@ -8,6 +8,10 @@ export interface Notificacion {
   mensaje?: string;
   fecha?: string;
   tipo?: string;
+  alumnoId?: string;
+  compraId?: string;
+  productoId?: string;
+  sugerenciaId?: string;
 }
 
 export interface NotificacionBackend {
@@ -22,6 +26,14 @@ export interface NotificacionBackend {
   mensaje?: string;
   fecha?: string;
   tipo?: string;
+  alumnoId?: string;
+  compraId?: string;
+  productoId?: string;
+  sugerenciaId?: string;
+  studentId?: string;
+  purchaseId?: string;
+  productId?: string;
+  suggestionId?: string;
 }
 
 export interface NotificacionesResponse {
@@ -56,6 +68,10 @@ export class NotificacionesService {
           mensaje: item.mensaje || item.message || '',
           fecha: item.fecha || item.createdAt,
           tipo: item.tipo || item.type,
+          alumnoId: item.studentId || item.alumnoId,
+          compraId: item.purchaseId || item.compraId,
+          productoId: item.productId || item.productoId,
+          sugerenciaId: item.suggestionId || item.sugerenciaId,
         }));
         this.notificacionesState.set(mapeadas);
       },

@@ -104,9 +104,41 @@ export class NavbarComponent {
   }
 
   protected clickEnNotificacion(notif: Notificacion): void {
-    if (notif.tipo === 'RESUMEN_SEMANAL') {
-      this.menuNotifAbierto.set(false);
-      this.router.navigateByUrl('/resumen-semanal');
+    this.menuNotifAbierto.set(false);
+
+    if (notif.tipo === 'ESTADO_COMPRA' || notif.tipo === 'RETIRO_PROGRAMADO') {
+      if (notif.alumnoId) {
+        this.contextoService.setAlumnoId(notif.alumnoId);
+      } else {
+        this.contextoService.limpiar();
+      }
+      const queryParams = notif.compraId ? { id: notif.compraId } : {};
+      void this.router.navigate(['/movimientos'], { queryParams });
+    } else if (notif.tipo === 'RESUMEN_SEMANAL') {
+      void this.router.navigateByUrl('/resumen-semanal');
+    } else if (notif.tipo === 'SALDO_BAJO') {
+      if (notif.alumnoId) {
+        this.contextoService.setAlumnoId(notif.alumnoId);
+      }
+      void this.router.navigateByUrl('/billetera');
+    } else if (notif.tipo === 'ALERTA_PRESUPUESTO') {
+      if (notif.alumnoId) {
+        this.contextoService.setAlumnoId(notif.alumnoId);
+      }
+      void this.router.navigateByUrl('/presupuesto');
+    } else if (notif.tipo === 'ALERTA_RESTRICCION') {
+      if (notif.alumnoId) {
+        this.contextoService.setAlumnoId(notif.alumnoId);
+      }
+      void this.router.navigateByUrl('/restricciones-horarias');
+    } else if (notif.tipo === 'SUGERENCIA_IA') {
+      void this.router.navigateByUrl('/preferencias-detectadas');
+    } else if (notif.tipo === 'ALERTA_PRECIO') {
+      void this.router.navigateByUrl('/notificaciones-precio');
+    } else if (notif.tipo === 'AGREGAR_PRODUCTO') {
+      void this.router.navigateByUrl('/sugerencias-agregar');
+    } else {
+      void this.router.navigateByUrl('/tutor-dashboard');
     }
   }
 
