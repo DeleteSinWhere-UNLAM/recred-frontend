@@ -294,6 +294,11 @@ export class TrackingPedidosPage implements OnInit {
     return order.items.map((i) => `${i.productName} x${i.quantity}`).join(', ');
   }
 
+  protected getCantidadItems(order: ScheduledPickup): number {
+    if (!order.items) return 0;
+    return order.items.reduce((acc, i) => acc + i.quantity, 0);
+  }
+
   protected onFechaChange(value: string): void {
     this.filterFecha.set(value);
     this.loadPickups();
