@@ -110,7 +110,7 @@ export class NavbarComponent {
     try {
       const esKiosquero = this.perfilService.rol() === 'VENDEDOR' || 
                           (typeof this.esVistaKiosquero === 'function' && this.esVistaKiosquero()) ||
-                          (this.esVistaKiosquero as any) === true;
+                          (this.esVistaKiosquero as unknown) === true;
 
       console.log('¿Es vista kiosquero?', esKiosquero);
 
