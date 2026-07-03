@@ -149,14 +149,16 @@
     </button>
   </div>
 
-  <div class="alumno-card__budget">
-    <span class="alumno-card__budget-label">Presupuesto</span>
-    <div class="alumno-card__budget-bar">
-      <div class="alumno-card__budget-progress" [style.width.%]="budgetPercentage"></div>
+  @if (hasBudget()) {
+    <div class="alumno-card__budget">
+      <span class="alumno-card__budget-label">Presupuesto</span>
+      <div class="alumno-card__budget-bar">
+        <div class="alumno-card__budget-progress" [style.width.%]="budgetPercentage"></div>
+      </div>
+      <span class="alumno-card__budget-percentage">{{ budgetPercentage }}%</span>
+      <span class="alumno-card__budget-fraction">{{ budgetSpentFormateado }} / {{ budgetLimitFormateado }}</span>
     </div>
-    <span class="alumno-card__budget-percentage">{{ budgetPercentage }}%</span>
-    <span class="alumno-card__budget-fraction">{{ budgetSpentFormateado }} / {{ budgetLimitFormateado }}</span>
-  </div>
+  }
 
   <a class="alumno-card__cta" (click)="navegar('/buffet')">
     <i class="fa-solid fa-utensils" aria-hidden="true"></i>
