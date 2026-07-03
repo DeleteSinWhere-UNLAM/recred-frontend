@@ -45,7 +45,7 @@
   <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
 
     <a class="alumno-card__btn alumno-card__btn--menta" (click)="navegar('/acreditar-mercado-pago')"
-      routerLinkActive="active">
+      [class.active]="isActive('/acreditar-mercado-pago')">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-plus"></i>
       </span>
@@ -53,7 +53,7 @@
     </a>
 
     <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')"
-      routerLinkActive="active">
+      [class.active]="isActive('/restricciones-nutricionales')">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-shield"></i>
       </span>
@@ -61,7 +61,7 @@
     </a>
 
     <a class="alumno-card__btn alumno-card__btn--gris" (click)="navegar('/tutor-movimientos')"
-      routerLinkActive="active">
+      [class.active]="isActive('/tutor-movimientos')">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-list"></i>
       </span>
@@ -72,7 +72,7 @@
   <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
     <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
       <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')"
-        routerLinkActive="active">
+        [class.active]="isActive('/restricciones-horarias')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-clock"></i>
         </span>
@@ -80,7 +80,7 @@
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
-        routerLinkActive="active">
+        [class.active]="isActive('/presupuesto')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-piggy-bank"></i>
         </span>
@@ -88,7 +88,7 @@
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--pizarra" (click)="navegar('/estadistica')"
-        routerLinkActive="active">
+        [class.active]="isActive('/estadistica')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-chart-line"></i>
         </span>
@@ -96,7 +96,7 @@
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--morado" (click)="navegar('/movimientos-pendientes')"
-        routerLinkActive="active">
+        [class.active]="isActive('/movimientos-pendientes')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-clock-rotate-left"></i>
           @if (cantidadPendientes > 0) {
@@ -107,14 +107,14 @@
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegar('/prediccion-gasto')"
-        routerLinkActive="active">
+        [class.active]="isActive('/prediccion-gasto')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-compass"></i>
         </span>
         <span class="alumno-card__btn-label">Predicción</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegar('/preferencias')" routerLinkActive="active">
+      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegar('/preferencias')" [class.active]="isActive('/preferencias')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </span>
@@ -123,7 +123,7 @@
 
       @if (esPadre) {
       <a class="alumno-card__btn alumno-card__btn--menta" title="Adelanto" (click)="navegar('/adelanto')"
-        routerLinkActive="active">
+        [class.active]="isActive('/adelanto')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-hand-holding-dollar"></i>
         </span>
@@ -132,7 +132,7 @@
       }
 
       <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')"
-        routerLinkActive="active">
+        [class.active]="isActive('/favoritos-alumno')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-heart"></i>
         </span>

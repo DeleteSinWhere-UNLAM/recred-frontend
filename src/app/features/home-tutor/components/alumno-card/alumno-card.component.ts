@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild, inject, signal } from '@angular/core';
-import { Router, RouterLinkActive } from '@angular/router';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, inject, signal, Input } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs/operators';
 import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
 import { FormsModule } from '@angular/forms';
 import { Alumno } from '../../../../data-access/models/alumno.model';
@@ -23,7 +25,7 @@ const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   standalone: true,
   templateUrl: './alumno-card.component.html',
   styleUrl: './alumno-card.component.css',
-  imports: [RouterLinkActive, FormsModule, CropModalComponent],
+  imports: [FormsModule, CropModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlumnoCardComponent implements OnInit {
@@ -38,6 +40,15 @@ export class AlumnoCardComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly _cantidadPendientes = signal<number>(0);
+  
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(event => (event as NavigationEnd).urlAfterRedirects)
+    ),
+    { initialValue: this.router.url }
+  );
+
   creditoActivo = signal<SchoolCredit | null>(null);
   mostrarTodosLosBotones = signal<boolean>(false);
   readonly subiendoFoto = signal(false);
@@ -187,6 +198,13 @@ export class AlumnoCardComponent implements OnInit {
 
   get esPremium(): boolean {
     return this.perfilService.perfil()?.plan === 'PREMIUM';
+  }
+
+  isActive(ruta: string): boolean {
+    const url = this.currentUrl();
+    if (!url) return false;
+    // Check both route and context
+    return this.contextoService.alumnoId() === this.alumno.id && url.includes(ruta);
   }
 
 }
