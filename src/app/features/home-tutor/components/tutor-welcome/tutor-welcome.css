@@ -370,6 +370,17 @@
   color: #dc3545;
 }
 
+.pedido-item__ver-mas {
+  color: var(--color-pizarra, #4a6fa5);
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.pedido-item__ver-mas:hover {
+  color: var(--color-pizarra-dark, #3b5a8a);
+}
+
 
 /* Responsive */
 @media (max-width: 992px) {

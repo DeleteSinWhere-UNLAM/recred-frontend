@@ -168,4 +168,22 @@ export class TutorWelcome implements OnInit {
     if (s === 'ENTREGADO' || s === 'APPROVED') return 'Entregado';
     return defaultLabel || status;
   }
+
+  getCantidadProductos(pedido: Movimiento): number {
+    if (!pedido.items) return 0;
+    return pedido.items.reduce((acc, item) => acc + item.quantity, 0);
+  }
+
+  verDetallePedido(pedido: Movimiento): void {
+    if (pedido.studentId) {
+      this.contextoService.setAlumnoId(pedido.studentId);
+      this.router.navigate([`/tutor-movimientos/${pedido.studentId}`], {
+        queryParams: { id: pedido.id }
+      });
+    } else {
+      this.router.navigate(['/tutor-movimientos'], {
+        queryParams: { id: pedido.id }
+      });
+    }
+  }
 }

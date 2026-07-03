@@ -155,7 +155,7 @@
       <div class="alumno-card__budget-bar">
         <div class="alumno-card__budget-progress" [style.width.%]="budgetPercentage"></div>
       </div>
-      <span class="alumno-card__budget-fraction">{{ budgetPercentage }}%</span>
+      <span class="alumno-card__budget-fraction" [attr.title]="budgetRestanteFormateado + ' / ' + budgetLimitFormateado">{{ budgetPercentage }}%</span>
     </div>
   }
 
