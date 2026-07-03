@@ -1,0 +1,6 @@
+Arreglo modal/accesos directos
+
+-Se corrige el modal de confirmación de cancelación que no es visible a simple vista (queda escondido detrás del modal de los detalles de la compra anticipada.
+-El botón de cancelar pedido cambia su icono y se agrega un acceso directo  junto a la foto del alumno.
+-Cambia la posición del estado del pedido en el modal de detalles.
+Se agrega un botón para revertir la cancelación.

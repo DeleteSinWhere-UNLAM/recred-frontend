@@ -129,8 +129,20 @@ export class MovimientoDetalleModalComponent {
     return diffMs <= oneHourMs;
   }
 
+  estaCancelado(): boolean {
+    return !this.esVistaAlumno &&
+           this.movimiento.tipo === 'ANTICIPADA' &&
+           this.movimiento.status === 'CANCELADO';
+  }
+
   onCancelar(): void {
     this.cancelar.emit(this.movimiento.id);
+  }
+
+  @Output() revertirCancelacion = new EventEmitter<string>();
+
+  onRevertirCancelacion(): void {
+    this.revertirCancelacion.emit(this.movimiento.id);
   }
 
   onOverlayClick(event: MouseEvent): void {
