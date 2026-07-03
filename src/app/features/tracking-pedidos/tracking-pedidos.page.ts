@@ -175,6 +175,18 @@ export class TrackingPedidosPage implements OnInit {
     this.usuarioService.setHomeUrl('/kiosquero');
     this.applyQueryFilters(this.route.snapshot.queryParamMap);
     this.loadPickups();
+
+    if (this.route.queryParamMap) {
+      this.route.queryParamMap.subscribe((queryParams) => {
+        const orderId = queryParams.get('id');
+        if (orderId && this.allPickupsState().length > 0) {
+          const found = this.allPickupsState().find((p) => p.id === orderId);
+          if (found) {
+            this.selectedOrder.set(found);
+          }
+        }
+      });
+    }
   }
 
   protected loadPickups(): void {
@@ -201,6 +213,15 @@ export class TrackingPedidosPage implements OnInit {
         if (selected) {
           const updated = sorted.find((p) => p.id === selected.id);
           this.selectedOrder.set(updated ?? null);
+        }
+
+        // Check if there is an order ID in query params to open the modal
+        const orderId = this.route.snapshot?.queryParamMap?.get('id');
+        if (orderId) {
+          const found = sorted.find((p) => p.id === orderId);
+          if (found) {
+            this.selectedOrder.set(found);
+          }
         }
       },
       error: (err) => {
