@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SupplierService } from '../../services/supplier.service';
@@ -28,6 +28,17 @@ export class SuppliersListPage implements OnInit {
   filteredSuppliers = signal<SupplierResponse[]>([]);
   searchQuery = signal<string>('');
   isLoading = signal<boolean>(false);
+
+  // Computeds
+  readonly isCompararDisabled = computed(() => {
+    const list = this.suppliers();
+    if (list.length === 0) {
+      return true;
+    }
+    return !list.some(supplier => 
+      supplier.listasPrecios && supplier.listasPrecios.length > 0
+    );
+  });
 
   // Modal States
   isFormModalOpen = signal<boolean>(false);
@@ -202,6 +213,7 @@ export class SuppliersListPage implements OnInit {
   }
 
   irComparador(): void {
+    if (this.isCompararDisabled()) return;
     this.router.navigateByUrl('/kiosquero/proveedores/comparador');
   }
 }
