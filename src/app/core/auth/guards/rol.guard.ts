@@ -73,3 +73,41 @@ export const rolGuard: CanActivateFn = (route) => {
 export const rolChildGuard: CanActivateChildFn = (route) => {
   return resolverRol(route);
 };
+
+export const wildcardRedirectGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  const perfilService = inject(PerfilService);
+
+  // Intentar redirección síncrona si hay sesión activa en caché
+  const cachedPerfil = perfilService.getPerfil();
+  if (cachedPerfil && cachedPerfil.rol && cachedPerfil.rol.toString() !== 'PENDIENTE') {
+    const rol = cachedPerfil.rol;
+    if (rol === 'ALUMNO') {
+      return router.createUrlTree(['/alumno']);
+    } else if (rol === 'VENDEDOR') {
+      return router.createUrlTree(['/kiosquero']);
+    } else {
+      return router.createUrlTree(['/tutor']);
+    }
+  }
+
+  // Si no hay caché, verificar asíncronamente
+  return perfilService.asegurarPerfil().then(
+    (perfil) => {
+      if (perfil && perfil.rol && perfil.rol.toString() !== 'PENDIENTE') {
+        const rol = perfil.rol;
+        if (rol === 'ALUMNO') {
+          return router.createUrlTree(['/alumno']);
+        } else if (rol === 'VENDEDOR') {
+          return router.createUrlTree(['/kiosquero']);
+        } else {
+          return router.createUrlTree(['/tutor']);
+        }
+      }
+      return router.createUrlTree(['/']);
+    },
+    () => {
+      return router.createUrlTree(['/']);
+    }
+  );
+};
