@@ -316,7 +316,48 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-texto-claro);
+}
+
+.navbar__notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid var(--color-borde);
+  padding-right: 8px;
+}
+
+.navbar__notif-marcar-todas {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-pizarra, #3a5a8a);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.navbar__notif-marcar-todas:hover {
+  background-color: rgba(58, 90, 138, 0.09);
+  border-color: rgba(58, 90, 138, 0.25);
+  color: var(--color-pizarra, #3a5a8a);
+}
+
+.navbar__notif-marcar-todas:active {
+  background-color: rgba(58, 90, 138, 0.16);
+}
+
+.navbar__notif-marcar-todas i {
+  font-size: 11px;
 }
 
 .navbar__menu-vacio {

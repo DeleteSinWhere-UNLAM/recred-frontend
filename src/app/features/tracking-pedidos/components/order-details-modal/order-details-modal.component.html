@@ -34,12 +34,6 @@
               <strong class="info-item__value">{{ order.pickupSlotDescription || 'Por definir' }}</strong>
             </div>
           }
-          @if (order.paymentMethod && order.paymentMethod.toUpperCase() !== 'CREDITOS' && order.paymentMethod.toUpperCase() !== 'CREDIT') {
-            <div class="info-item">
-              <span class="info-item__label">Método de Pago</span>
-              <strong class="info-item__value">{{ order.paymentMethod }}</strong>
-            </div>
-          }
         </div>
       </section>
 

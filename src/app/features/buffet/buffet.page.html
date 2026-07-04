@@ -372,11 +372,6 @@
                 }
               </div>
             </div>
-            } @else {
-            <div class="buffet__sidebar-budget-status budget-status--ok">
-              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-              <span>Presupuesto disponible para la fecha seleccionada</span>
-            </div>
             }
             }
           </div>
@@ -419,10 +414,10 @@
                 <!-- Gráfico circular principal de resumen -->
                 <div class="buffet__sidebar-circle-gauge-new">
                   <svg class="circle-gauge-svg-new" viewBox="0 0 100 100">
-                    <circle class="circle-gauge-bg-new" cx="50" cy="50" r="42" stroke-width="8"></circle>
-                    <circle class="circle-gauge-fill-new" cx="50" cy="50" r="42" stroke-width="8"
-                      [style.strokeDashoffset]="263.89 - (263.89 * (info.porcentajeDisponible || 0)) / 100"
-                      stroke-dasharray="263.89"
+                    <circle class="circle-gauge-bg-new" cx="50" cy="50" r="44" stroke-width="6"></circle>
+                    <circle class="circle-gauge-fill-new" cx="50" cy="50" r="44" stroke-width="6"
+                      [style.strokeDashoffset]="276.46 - (276.46 * (info.porcentajeDisponible || 0)) / 100"
+                      stroke-dasharray="276.46"
                       transform="rotate(-90 50 50)"></circle>
                   </svg>
                   <div class="circle-gauge-text-new">
