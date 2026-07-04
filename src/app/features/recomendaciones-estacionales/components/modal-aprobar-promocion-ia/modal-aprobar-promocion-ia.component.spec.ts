@@ -1,52 +1,111 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ProductoInventarioMother } from '../../../inventario/inventario.mother';
+import { PromocionSugeridaMother } from '../../recomendaciones-estacionales.mother';
 import { ModalAprobarPromocionIaComponent } from './modal-aprobar-promocion-ia.component';
-import { PromocionSugerida } from '../../models/recomendacion.model';
-import { Producto } from '../../../inventario/models/producto.interface';
 
 describe('ModalAprobarPromocionIaComponent', () => {
   let component: ModalAprobarPromocionIaComponent;
   let fixture: ComponentFixture<ModalAprobarPromocionIaComponent>;
 
-  const mockSuggestedPromotion: PromocionSugerida = {
-    nombre: 'Combo Invierno',
-    descuento: 20,
-    categorias_destino: ['caliente'],
-    productIds: ['prod-1', 'prod-2']
-  };
-
-  const mockProducts: Producto[] = [
-    { id: 'prod-1', nombre: 'Café', descripcion: '', precio: 1000, peso: 0, requierePreparacion: false, stockActual: 10 },
-    { id: 'prod-2', nombre: 'Alfajor', descripcion: '', precio: 500, peso: 0, requierePreparacion: false, stockActual: 5 }
-  ];
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalAprobarPromocionIaComponent]
+      imports: [ModalAprobarPromocionIaComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ModalAprobarPromocionIaComponent);
     component = fixture.componentInstance;
-    component.suggestedPromotion = mockSuggestedPromotion;
-    component.resolvedProducts = mockProducts;
+    component.suggestedPromotion = PromocionSugeridaMother.crear();
+    component.resolvedProducts = [
+      ProductoInventarioMother.crear({ id: 'prod-1', nombre: 'Café', precio: 1000 }),
+      ProductoInventarioMother.crear({ id: 'prod-2', nombre: 'Alfajor', precio: 500 }),
+    ];
     fixture.detectChanges();
   });
 
-  it('Dado que se crea el componente, debería inicializarse correctamente', () => {
-    expect(component).toBeTruthy();
-    expect(component.promotionForm).toBeDefined();
-    expect(component.selectedProductIds.size).toBe(0);
+  describe('Estado inicial', () => {
+    it('dado el modal recien montado, deberia inicializar el form con el descuento sugerido y sin productos seleccionados', () => {
+      expect(component.promotionForm).toBeDefined();
+      expect(component.promotionForm.get('discountPercentage')?.value).toBe(20);
+      expect(component.selectedProductIds.size).toBe(0);
+    });
   });
 
-  it('Dado que se hace click en confirmar, debería emitir los datos del formulario si es valido', () => {
-    spyOn(component.confirmPromotion, 'emit');
-    component.selectedProductIds.add('prod-1'); // Simulamos selección de producto
-    component.onConfirm();
-    expect(component.confirmPromotion.emit).toHaveBeenCalled();
+  describe('toggleProductSelection', () => {
+    it('dado un productId no seleccionado, cuando lo toggleo, deberia agregarlo', () => {
+      component.toggleProductSelection('prod-1');
+
+      expect(component.isProductSelected('prod-1')).toBeTrue();
+    });
+
+    it('dado un productId ya seleccionado, cuando lo toggleo, deberia sacarlo', () => {
+      component.toggleProductSelection('prod-1');
+
+      component.toggleProductSelection('prod-1');
+
+      expect(component.isProductSelected('prod-1')).toBeFalse();
+    });
   });
 
-  it('Dado que el usuario hace clic en cerrar, debe emitir closeModal', () => {
-    spyOn(component.closeModal, 'emit');
-    component.onClose();
-    expect(component.closeModal.emit).toHaveBeenCalled();
+  describe('getDiscountedPrice', () => {
+    it('dado un descuento del 20%, el precio final de $1000 deberia ser $800', () => {
+      component.promotionForm.patchValue({ discountPercentage: 20 });
+
+      expect(component.getDiscountedPrice(1000)).toBe(800);
+    });
+
+    it('dado un descuento del 50%, el precio final de $500 deberia ser $250', () => {
+      component.promotionForm.patchValue({ discountPercentage: 50 });
+
+      expect(component.getDiscountedPrice(500)).toBe(250);
+    });
+  });
+
+  describe('onConfirm', () => {
+    it('dado el form valido y productos seleccionados, cuando confirmo, deberia emitir confirmPromotion con el payload', () => {
+      spyOn(component.confirmPromotion, 'emit');
+      component.selectedProductIds.add('prod-1');
+      component.promotionForm.patchValue({
+        discountPercentage: 25,
+        startDate: '2026-06-10',
+        endDate: '2026-06-20',
+      });
+
+      component.onConfirm();
+
+      expect(component.confirmPromotion.emit).toHaveBeenCalledWith({
+        discountPercentage: 25,
+        startDate: '2026-06-10',
+        endDate: '2026-06-20',
+        productIds: ['prod-1'],
+      });
+    });
+
+    it('dado el form invalido, cuando confirmo, no deberia emitir', () => {
+      spyOn(component.confirmPromotion, 'emit');
+      component.selectedProductIds.add('prod-1');
+      component.promotionForm.patchValue({ discountPercentage: null });
+
+      component.onConfirm();
+
+      expect(component.confirmPromotion.emit).not.toHaveBeenCalled();
+    });
+
+    it('dado sin productos seleccionados, cuando confirmo, no deberia emitir', () => {
+      spyOn(component.confirmPromotion, 'emit');
+
+      component.onConfirm();
+
+      expect(component.confirmPromotion.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onClose', () => {
+    it('dado el modal, cuando llamo onClose, deberia emitir closeModal', () => {
+      spyOn(component.closeModal, 'emit');
+
+      component.onClose();
+
+      expect(component.closeModal.emit).toHaveBeenCalled();
+    });
   });
 });

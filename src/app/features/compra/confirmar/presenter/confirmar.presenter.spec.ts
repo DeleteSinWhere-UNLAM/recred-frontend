@@ -1,96 +1,143 @@
+import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { ConfirmarPresenter } from './confirmar.presenter';
-import { CompraService } from '../../services/compra.service';
-import { CarritoService } from '../../services/carrito.service';
-import { SugerenciasService } from '../../../sugerencias/services/sugerencias.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { signal } from '@angular/core';
-
+import { SugerenciasService } from '../../../sugerencias/services/sugerencias.service';
+import { OrdenAlumnoMother, OrdenCompraMother } from '../../compra.mother';
 import { OrdenCompra } from '../../models/orden-compra.model';
-
-import { Alumno } from '../../../../data-access/models/alumno.model';
+import { CarritoService } from '../../services/carrito.service';
+import { CompraService } from '../../services/compra.service';
+import { ConfirmarPresenter } from './confirmar.presenter';
 
 describe('ConfirmarPresenter', () => {
   let presenter: ConfirmarPresenter;
-  let compraServiceSpy: jasmine.SpyObj<CompraService>;
-  let carritoServiceSpy: jasmine.SpyObj<CarritoService>;
-  let sugerenciasServiceSpy: jasmine.SpyObj<SugerenciasService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let routerSpy: jasmine.SpyObj<Router>;
-
-  const mockOrdenBase: OrdenCompra = {
-    id: '',
-    total: 100,
-    ordenes: [
-      {
-        alumno: { id: 'alumno-1', nombre: 'Juan' } as unknown as Alumno,
-        buffetId: '0f8fad5b-d9cb-469f-a165-70867728950e',
-        subtotal: 100,
-        items: [],
-        fecha: '',
-        recreo: 'PRIMER_RECREO',
-      }
-    ],
-    codigos: {}
-  };
-
-  const ordenEnCursoSignal = signal<OrdenCompra | null>(mockOrdenBase);
+  let servicioCompra: jasmine.SpyObj<CompraService>;
+  let servicioCarrito: jasmine.SpyObj<CarritoService>;
+  let servicioSugerencias: jasmine.SpyObj<SugerenciasService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
+  let router: jasmine.SpyObj<Router>;
+  let ordenEnCurso: WritableSignal<OrdenCompra | null>;
 
   beforeEach(() => {
-    compraServiceSpy = jasmine.createSpyObj('CompraService', ['procesarPago', 'cancelarOrden'], {
-      ordenEnCurso: ordenEnCursoSignal.asReadonly()
+    ordenEnCurso = signal<OrdenCompra | null>(OrdenCompraMother.crear());
+
+    servicioCompra = jasmine.createSpyObj('CompraService', ['procesarPago', 'cancelarOrden'], {
+      ordenEnCurso: ordenEnCurso.asReadonly(),
     });
-    carritoServiceSpy = jasmine.createSpyObj('CarritoService', ['limpiarAlumno']);
-    sugerenciasServiceSpy = jasmine.createSpyObj('SugerenciasService', ['comprarSugerencia']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['mostrar']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    servicioCarrito = jasmine.createSpyObj('CarritoService', ['limpiarAlumno']);
+    servicioSugerencias = jasmine.createSpyObj('SugerenciasService', ['comprarSugerencia']);
+    servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     TestBed.configureTestingModule({
       providers: [
         ConfirmarPresenter,
-        { provide: CompraService, useValue: compraServiceSpy },
-        { provide: CarritoService, useValue: carritoServiceSpy },
-        { provide: SugerenciasService, useValue: sugerenciasServiceSpy },
-        { provide: ToastService, useValue: toastServiceSpy },
-        { provide: Router, useValue: routerSpy },
-      ]
+        { provide: CompraService, useValue: servicioCompra },
+        { provide: CarritoService, useValue: servicioCarrito },
+        { provide: SugerenciasService, useValue: servicioSugerencias },
+        { provide: ToastService, useValue: servicioToast },
+        { provide: Router, useValue: router },
+      ],
     });
 
     presenter = TestBed.inject(ConfirmarPresenter);
-    ordenEnCursoSignal.set(mockOrdenBase);
   });
 
-  it('debe confirmar la compra SIN sugerenciaId correctamente', () => {
-    compraServiceSpy.procesarPago.and.returnValue(of({ ...mockOrdenBase, id: 'orden-1' }));
+  describe('Estado inicial derivado de la orden en curso', () => {
+    it('dado una orden en curso, cuando leo ordenes/total/vacia, deberia reflejar el estado', () => {
+      expect(presenter.ordenes().length).toBe(1);
+      expect(presenter.total()).toBe(500);
+      expect(presenter.vacia()).toBeFalse();
+    });
 
-    presenter.confirmar();
+    it('dado sin orden en curso, vacia deberia ser true', () => {
+      ordenEnCurso.set(null);
 
-    expect(sugerenciasServiceSpy.comprarSugerencia).not.toHaveBeenCalled();
-    expect(compraServiceSpy.procesarPago).toHaveBeenCalled();
-    expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/compra/exito');
+      expect(presenter.vacia()).toBeTrue();
+    });
   });
 
-  it('debe confirmar la compra CON sugerenciaId llamando primero al servicio de sugerencias', () => {
-    const ordenConSugerencia = { ...mockOrdenBase, sugerenciaId: 'sug-123' };
-    ordenEnCursoSignal.set(ordenConSugerencia);
-    
-    sugerenciasServiceSpy.comprarSugerencia.and.returnValue(of(undefined));
-    compraServiceSpy.procesarPago.and.returnValue(of({ ...ordenConSugerencia, id: 'orden-1' }));
+  describe('advertenciaSaldo', () => {
+    it('dado todos los alumnos con saldo suficiente, no deberia haber advertencia', () => {
+      expect(presenter.advertenciaSaldo()).toBeNull();
+    });
 
-    presenter.confirmar();
+    it('dado un alumno con saldo insuficiente, deberia listar su nombre en la advertencia', () => {
+      ordenEnCurso.set(
+        OrdenCompraMother.crear({
+          ordenes: [OrdenAlumnoMother.crearSinSaldo()],
+        }),
+      );
 
-    expect(sugerenciasServiceSpy.comprarSugerencia).toHaveBeenCalledWith('sug-123');
-    expect(compraServiceSpy.procesarPago).toHaveBeenCalled();
-    expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/compra/exito');
+      expect(presenter.advertenciaSaldo()).toContain('Saldo insuficiente');
+    });
   });
 
-  it('debe mostrar toast de error si falla el pago', () => {
-    compraServiceSpy.procesarPago.and.returnValue(throwError(() => new Error('Error')));
+  describe('recreoLabel', () => {
+    it('dado PRIMER_RECREO, deberia devolver el label en espanol', () => {
+      expect(presenter.recreoLabel('PRIMER_RECREO')).toBe('1er Recreo');
+    });
+  });
 
-    presenter.confirmar();
+  describe('formatearFecha', () => {
+    it('dado una fecha ISO, deberia devolverla como dd-MM-yyyy', () => {
+      expect(presenter.formatearFecha('2026-07-15')).toBe('15-07-2026');
+    });
 
-    expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(jasmine.any(String), 'error');
+    it('dado string vacio, deberia devolver string vacio', () => {
+      expect(presenter.formatearFecha('')).toBe('');
+    });
+  });
+
+  describe('confirmar', () => {
+    it('dado una orden sin sugerencia, cuando confirmo, deberia procesar pago, limpiar carrito y navegar a /compra/exito', () => {
+      servicioCompra.procesarPago.and.returnValue(of(OrdenCompraMother.crearPagada()));
+
+      presenter.confirmar();
+
+      expect(servicioSugerencias.comprarSugerencia).not.toHaveBeenCalled();
+      expect(servicioCompra.procesarPago).toHaveBeenCalled();
+      expect(servicioCarrito.limpiarAlumno).toHaveBeenCalledWith('alumno-1');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/compra/exito');
+    });
+
+    it('dado una orden con sugerenciaId, cuando confirmo, deberia primero comprar la sugerencia y despues procesar pago', () => {
+      ordenEnCurso.set(OrdenCompraMother.crear({ sugerenciaId: 'sug-123' }));
+      servicioSugerencias.comprarSugerencia.and.returnValue(of(undefined));
+      servicioCompra.procesarPago.and.returnValue(of(OrdenCompraMother.crearPagada()));
+
+      presenter.confirmar();
+
+      expect(servicioSugerencias.comprarSugerencia).toHaveBeenCalledWith('sug-123');
+      expect(servicioCompra.procesarPago).toHaveBeenCalled();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/compra/exito');
+    });
+
+    it('dado que el pago falla, cuando confirmo, deberia mostrar el toast de error', () => {
+      servicioCompra.procesarPago.and.returnValue(throwError(() => new Error('boom')));
+
+      presenter.confirmar();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(jasmine.any(String), 'error');
+      expect(router.navigateByUrl).not.toHaveBeenCalled();
+    });
+
+    it('dado sin orden en curso, cuando confirmo, no deberia hacer nada', () => {
+      ordenEnCurso.set(null);
+
+      presenter.confirmar();
+
+      expect(servicioCompra.procesarPago).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('cancelar', () => {
+    it('dado la page abierta, cuando cancelo, deberia cancelar la orden y navegar a /compra', () => {
+      presenter.cancelar();
+
+      expect(servicioCompra.cancelarOrden).toHaveBeenCalled();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/compra');
+    });
   });
 });

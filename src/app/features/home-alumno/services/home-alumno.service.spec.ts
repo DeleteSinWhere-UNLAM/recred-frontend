@@ -132,6 +132,71 @@ describe('HomeAlumnoService', () => {
     expect(service.getProximoRecreo(COLEGIO_ID, new Date(2026, 5, 22, 8, 0))).toBeUndefined();
   });
 
+  it('dado alumnoId vacio en cargarPedidoEnCurso, no deberia llamar al service de movimientos', async () => {
+    await service.cargarPedidoEnCurso('');
+
+    expect(servicioMovimientos.getPendientesAlumno).not.toHaveBeenCalled();
+  });
+
+  it('dado colegioId vacio en cargarRecreos, no deberia llamar al service de franjas', async () => {
+    servicioFranjas.getFranjasHorarias.calls.reset();
+
+    await service.cargarRecreos('');
+
+    expect(servicioFranjas.getFranjasHorarias).not.toHaveBeenCalled();
+  });
+
+  it('dado un movimiento con status desconocido, deberia mapear el estado a CONFIRMADO por default', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({ status: 'STATUS_RARO' }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.estado).toBe('CONFIRMADO');
+  });
+
+  it('dado un movimiento sin pickupSlotStartTime pero con pickupSlotDescription, retiraEn deberia usar la descripcion', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({
+        pickupSlotStartTime: undefined,
+        pickupSlotDescription: 'Primer recreo',
+      }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.retiraEn).toBe('Primer recreo');
+  });
+
+  it('dado un movimiento con solo date, retiraEn deberia formatearlo como HH:mm', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({
+        pickupSlotStartTime: undefined,
+        pickupSlotDescription: undefined,
+        date: '2026-06-15T14:23:00',
+      }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.retiraEn).toBe('14:23');
+  });
+
+  it('dado un movimiento sin date ni pickup, retiraEn deberia ser ""', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({
+        pickupSlotStartTime: undefined,
+        pickupSlotDescription: undefined,
+        date: '',
+      }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.retiraEn).toBe('');
+  });
+
   function givenPendientesDelAlumno(pendientes: Movimiento[]): void {
     servicioMovimientos.getPendientesAlumno.and.returnValue(of(pendientes));
   }

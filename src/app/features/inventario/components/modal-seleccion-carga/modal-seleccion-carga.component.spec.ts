@@ -32,4 +32,12 @@ describe('ModalSeleccionCargaComponent', () => {
     component.onCancel();
     expect(component.closeModal.emit).toHaveBeenCalled();
   });
+
+  it('dado que hago clic en Carga Manual, deberia emitir manualUpload', () => {
+    spyOn(component.manualUpload, 'emit');
+
+    component.onManualUpload();
+
+    expect(component.manualUpload.emit).toHaveBeenCalled();
+  });
 });

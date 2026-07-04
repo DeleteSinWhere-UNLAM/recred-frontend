@@ -1,146 +1,122 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { UsuarioService } from '../../data-access/services/usuario.service';
+import {
+  HijoResumenMother,
+  ResumenSemanalMother,
+  USUARIO_ID_TEST,
+  UsuarioMother,
+} from './resumen-semanal.mother';
 import { ResumenSemanalPage } from './resumen-semanal.page';
 import { ResumenSemanalService } from './services/resumen-semanal.service';
-import { UsuarioService } from '../../data-access/services/usuario.service';
-import { of } from 'rxjs';
-import { Component, Input, signal } from '@angular/core';
-import { ResumenSemanalMother } from './resumen-semanal.mother';
-
-@Component({
-  selector: 'app-navbar',
-  template: '',
-  standalone: true
-})
-class NavbarStub {
-  @Input() userName = '';
-}
 
 describe('ResumenSemanalPage', () => {
   let servicioResumen: jasmine.SpyObj<ResumenSemanalService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(async () => {
-    servicioResumen = jasmine.createSpyObj('ResumenSemanalService', ['getResumen']);
-    
-    servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual'], {
-      esVistaKiosquero: signal(false),
-      esVistaAlumno: signal(false),
-      nombreNavbar: signal('Test User'),
-      homeUrl: signal('/tutor')
-    });
-
-    servicioUsuario.getUsuarioActual.and.returnValue(ResumenSemanalMother.crearUsuario());
+    servicioResumen = jasmine.createSpyObj<ResumenSemanalService>('ResumenSemanalService', [
+      'getResumen',
+    ]);
+    servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['getUsuarioActual']);
+    servicioUsuario.getUsuarioActual.and.returnValue(UsuarioMother.crear());
 
     await TestBed.configureTestingModule({
       imports: [ResumenSemanalPage],
       providers: [
         { provide: ResumenSemanalService, useValue: servicioResumen },
-        { provide: UsuarioService, useValue: servicioUsuario }
-      ]
-    })
-      .overrideComponent(ResumenSemanalPage, {
-        add: {
-          imports: [NavbarStub]
-        }
-      })
-      .compileComponents();
+        { provide: UsuarioService, useValue: servicioUsuario },
+      ],
+    }).compileComponents();
   });
 
-  describe('Cuando el perfil existe en localStorage', () => {
+  afterEach(() => localStorage.clear());
+
+  describe('cuando el perfil existe en localStorage', () => {
     let component: ResumenSemanalPage;
     let fixture: ComponentFixture<ResumenSemanalPage>;
 
     beforeEach(() => {
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
-      servicioResumen.getResumen.and.returnValue(of(ResumenSemanalMother.crearResumen()));
-      
+      givenPerfilEnLocalStorage(USUARIO_ID_TEST);
+      servicioResumen.getResumen.and.returnValue(of(ResumenSemanalMother.crear()));
+
       fixture = TestBed.createComponent(ResumenSemanalPage);
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
 
-    it('debería inicializar el resumen parseando correctamente el JSON desde el servicio', () => {
-      
-      const cantidadHijos = component.hijos.length;
-      const primerMensaje = component.resumenProcesado?.mensajes[0].nombre;
-
+    it('dado un resumen del back, cuando se monta la page, deberia parsear los hijos y los mensajes', () => {
       expect(servicioResumen.getResumen).toHaveBeenCalled();
-      expect(cantidadHijos).toBe(2);
-      expect(primerMensaje).toBe('Juan');
+      expect(component.hijos.length).toBe(2);
+      expect(component.resumenProcesado?.mensajes[0].nombre).toBe('Juan');
     });
 
-    it('debería calcular el total familiar sumando todos los consumos', () => {
-      
-      const total = component.totalFamiliar;
-
-      expect(total).toBe(1500);
+    it('dados dos hijos, cuando se calcula el total familiar, deberia sumar los totalGastado', () => {
+      expect(component.totalFamiliar).toBe(1500);
     });
 
-    it('debería devolver el arreglo de categorías vacío si el hijo no tiene categorías', () => {
-      
+    it('dado un hijo sin categorias, cuando pido las categorias, deberia devolver un array vacio', () => {
       const hijoSinCategorias = component.hijos[1];
-      const categorias = component.getCategorias(hijoSinCategorias.datos);
 
-      expect(categorias).toEqual([]);
+      expect(component.getCategorias(hijoSinCategorias.datos)).toEqual([]);
     });
 
-    it('debería calcular el resumen de hijos ordenado por gasto mayor y calcular su porcentaje del total', () => {
-      
-      const resumenCalculado = component.hijosResumen;
+    it('dados dos hijos, cuando calculo hijosResumen, deberia ordenarlos por gasto descendente con porcentaje', () => {
+      const resumen = component.hijosResumen;
 
-      expect(resumenCalculado.length).toBe(2);
-      expect(resumenCalculado[0].nombre).toBe('Juan');
-      expect(resumenCalculado[0].gasto).toBe(1000);
-      expect(resumenCalculado[0].porcentaje).toBeCloseTo(66.66, 1);
-      expect(resumenCalculado[1].nombre).toBe('Maria');
-      expect(resumenCalculado[1].gasto).toBe(500);
-      expect(resumenCalculado[1].porcentaje).toBeCloseTo(33.33, 1);
+      expect(resumen.length).toBe(2);
+      expect(resumen[0].nombre).toBe('Juan');
+      expect(resumen[0].gasto).toBe(1000);
+      expect(resumen[0].porcentaje).toBeCloseTo(66.66, 1);
+      expect(resumen[1].nombre).toBe('Maria');
+      expect(resumen[1].gasto).toBe(500);
+      expect(resumen[1].porcentaje).toBeCloseTo(33.33, 1);
     });
 
-    it('debería devolver porcentaje cero cuando el gasto total familiar es cero', () => {
-      
-      component.hijos = [{ nombre: 'Cero', datos: ResumenSemanalMother.crearHijoResumen({ totalGastado: 0 }) }];
-      const resumenCalculado = component.hijosResumen;
+    it('dado gasto total familiar cero, cuando calculo hijosResumen, deberia devolver porcentaje 0', () => {
+      component.hijos = [
+        { nombre: 'Cero', datos: HijoResumenMother.crear({ totalGastado: 0 }) },
+      ];
 
-      expect(resumenCalculado[0].porcentaje).toBe(0);
+      expect(component.hijosResumen[0].porcentaje).toBe(0);
     });
 
-    it('debería fallback a cero cuando el hijo tiene gasto nulo', () => {
-      
-      component.hijos = [{ nombre: 'Nulo', datos: ResumenSemanalMother.crearHijoResumen({ totalGastado: undefined as unknown as number }) }];
-      const total = component.totalFamiliar;
-      const gastoPrimerHijo = component.hijosResumen[0].gasto;
+    it('dado un hijo con totalGastado nulo, cuando calculo total y gasto, deberia caer en cero', () => {
+      component.hijos = [
+        {
+          nombre: 'Nulo',
+          datos: HijoResumenMother.crear({ totalGastado: undefined as unknown as number }),
+        },
+      ];
 
-      expect(total).toBe(0);
-      expect(gastoPrimerHijo).toBe(0);
+      expect(component.totalFamiliar).toBe(0);
+      expect(component.hijosResumen[0].gasto).toBe(0);
     });
   });
 
-  describe('Cuando la API o el estado interno varían', () => {
-    it('no debería solicitar el resumen al servicio si el id de usuario no existe en la sesión', () => {
-      
+  describe('cuando no hay perfil o la API varia', () => {
+    it('dado que no hay perfil en localStorage, cuando se monta la page, no deberia pedir el resumen', () => {
       spyOn(localStorage, 'getItem').and.returnValue(null);
+
       const fixture = TestBed.createComponent(ResumenSemanalPage);
-      const component = fixture.componentInstance;
       fixture.detectChanges();
 
       expect(servicioResumen.getResumen).not.toHaveBeenCalled();
-      expect(component.resumen).toBeUndefined();
+      expect(fixture.componentInstance.resumen).toBeUndefined();
     });
 
-    it('debería parsear mensajes como un arreglo vacío si la API devuelve el campo mensaje nulo', () => {
-      
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-456' }));
-      const resumenMalo = ResumenSemanalMother.crearResumen();
-      resumenMalo.resumen = JSON.stringify({ hijos: {}, mensaje: null });
-      servicioResumen.getResumen.and.returnValue(of(resumenMalo));
+    it('dado un resumen con mensaje nulo, cuando se monta la page, deberia parsear los mensajes como lista vacia', () => {
+      givenPerfilEnLocalStorage('user-id-456');
+      servicioResumen.getResumen.and.returnValue(of(ResumenSemanalMother.crearConMensajeNulo()));
+
       const fixture = TestBed.createComponent(ResumenSemanalPage);
-      const component = fixture.componentInstance;
       fixture.detectChanges();
 
-      const mensajesCalculados = component.resumenProcesado?.mensajes;
-
-      expect(mensajesCalculados).toEqual([]);
+      expect(fixture.componentInstance.resumenProcesado?.mensajes).toEqual([]);
     });
   });
+
+  function givenPerfilEnLocalStorage(id: string): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id }));
+  }
 });

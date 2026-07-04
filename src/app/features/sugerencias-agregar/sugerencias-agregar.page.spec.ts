@@ -1,18 +1,13 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { Router } from '@angular/router';
 import { Component, Input } from '@angular/core';
-import { SugerenciasAgregarPage } from './sugerencias-agregar.page';
-import { SugerenciasAgregarPresenter } from './presenter/sugerencias-agregar.presenter';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { SugerenciasAgregarMother } from './sugerencias-agregar.mother';
+import { SugerenciasAgregarPresenter } from './presenter/sugerencias-agregar.presenter';
+import { UsuarioMother } from './sugerencias-agregar.mother';
+import { SugerenciasAgregarPage } from './sugerencias-agregar.page';
 
-@Component({
-  selector: 'app-navbar',
-  template: '',
-  standalone: true
-})
+@Component({ selector: 'app-navbar', template: '', standalone: true })
 class NavbarStub {
   @Input() userName = '';
 }
@@ -25,29 +20,29 @@ describe('SugerenciasAgregarPage', () => {
   let presenter: jasmine.SpyObj<SugerenciasAgregarPresenter>;
 
   beforeEach(async () => {
-    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
-    servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual', 'setHomeUrl']);
-    presenter = jasmine.createSpyObj('SugerenciasAgregarPresenter', ['initialize']);
-
-    servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasAgregarMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasAgregarMother.crearUsuario>[0]));
+    router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
+    servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', [
+      'getUsuarioActual',
+      'setHomeUrl',
+    ]);
+    presenter = jasmine.createSpyObj<SugerenciasAgregarPresenter>('SugerenciasAgregarPresenter', [
+      'initialize',
+    ]);
+    servicioUsuario.getUsuarioActual.and.returnValue(UsuarioMother.crear());
 
     await TestBed.configureTestingModule({
       imports: [SugerenciasAgregarPage],
       providers: [
         { provide: Router, useValue: router },
-        { provide: UsuarioService, useValue: servicioUsuario }
-      ]
+        { provide: UsuarioService, useValue: servicioUsuario },
+      ],
     })
       .overrideComponent(SugerenciasAgregarPage, {
-        remove: {
-          imports: [NavbarComponent]
-        },
+        remove: { imports: [NavbarComponent] },
         add: {
           imports: [NavbarStub],
-          providers: [
-            { provide: SugerenciasAgregarPresenter, useValue: presenter }
-          ]
-        }
+          providers: [{ provide: SugerenciasAgregarPresenter, useValue: presenter }],
+        },
       })
       .compileComponents();
 
@@ -55,40 +50,37 @@ describe('SugerenciasAgregarPage', () => {
     component = fixture.componentInstance;
   });
 
-  it('debería configurar la url de inicio del kiosquero al construirse', () => {
+  afterEach(() => localStorage.clear());
 
-    const urlEsperada = '/kiosquero';
-    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
+  describe('constructor', () => {
+    it('cuando se construye la page, deberia setear la homeUrl del kiosquero', () => {
+      expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
+    });
   });
 
-  it('debería delegar al presenter la inicialización si el usuario existe en sesión', () => {
+  describe('ngOnInit', () => {
+    it('dado un usuario en localStorage, cuando se monta la page, deberia inicializar el presenter', () => {
+      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(UsuarioMother.crear()));
 
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasAgregarMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasAgregarMother.crearUsuario>[0])));
+      fixture.detectChanges();
 
+      expect(presenter.initialize).toHaveBeenCalled();
+    });
 
-    fixture.detectChanges();
+    it('dado que no hay usuario en localStorage, cuando se monta la page, no deberia inicializar el presenter', () => {
+      spyOn(localStorage, 'getItem').and.returnValue(null);
 
-    expect(presenter.initialize).toHaveBeenCalled();
+      fixture.detectChanges();
+
+      expect(presenter.initialize).not.toHaveBeenCalled();
+    });
   });
 
-  it('no debería delegar la inicialización al presenter si no hay usuario en sesión', () => {
+  describe('volver', () => {
+    it('cuando hago click en volver, deberia navegar a /kiosquero', () => {
+      component.volver();
 
-    spyOn(localStorage, 'getItem').and.returnValue(null);
-
-    fixture.detectChanges();
-
-
-    expect(presenter.initialize).not.toHaveBeenCalled();
-  });
-
-  it('debería delegar al router la navegación hacia el home al presionar volver', () => {
-
-    const urlDestino = '/kiosquero';
-
-
-    component.volver();
-
-
-    expect(router.navigateByUrl).toHaveBeenCalledWith(urlDestino);
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+    });
   });
 });

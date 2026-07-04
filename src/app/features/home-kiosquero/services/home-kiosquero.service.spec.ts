@@ -1,56 +1,16 @@
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { PanelKiosquero } from '../models/panel-kiosquero.model';
+import { BUFFET_ID_TEST, FECHA_TEST, PanelKiosqueroMother } from '../home-kiosquero.mother';
 import { HomeKiosqueroService } from './home-kiosquero.service';
 
 describe('HomeKiosqueroService', () => {
+  const KIOSQUEROS = `${environment.apiUrl}/kiosqueros`;
+
   let service: HomeKiosqueroService;
   let httpMock: HttpTestingController;
-
-  const buffetId = 'buffet-123';
-  const date = '2026-06-11';
-  const kiosquerosUrl = `${environment.apiUrl}/kiosqueros`;
-  const panel: PanelKiosquero = {
-    buffetId,
-    date,
-    summary: {
-      totalSold: 12500,
-      totalOrders: 18,
-      deliveredOrders: 14,
-      averageTicket: 892.86,
-      pendingOrders: 3,
-      soldOutProducts: 2,
-    },
-    activity: {
-      salesByTimeSlot: [],
-      salesByCategory: [],
-      ordersByStatus: [],
-      ordersByPurchaseType: [],
-    },
-    products: {
-      topSoldProducts: [],
-      mostReservedProducts: [],
-      productsNeedingRestock: [],
-      soldOutProducts: [],
-    },
-    alerts: {
-      expiredOrders: 1,
-      releasedReservations: 3,
-      refundedCredits: 1500,
-      soldOutEvents: 1,
-      pendingOrders: 3,
-      readyOrders: 2,
-      items: [],
-    },
-    trends: {
-      lastSevenDays: [],
-    },
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -60,52 +20,67 @@ describe('HomeKiosqueroService', () => {
         provideHttpClientTesting(),
       ],
     });
-
     service = TestBed.inject(HomeKiosqueroService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  it('deberia obtener el panel por fecha', () => {
-    service.getPanel(buffetId, date).subscribe((result) => {
-      expect(result).toEqual(panel);
+  describe('getPanel', () => {
+    it('dado un buffet y una fecha, cuando pido el panel, deberia hacer GET con date en query', async () => {
+      const panel = PanelKiosqueroMother.crear();
+
+      const promesa = firstValueFrom(service.getPanel(BUFFET_ID_TEST, FECHA_TEST));
+      const req = thenSeHaceUnGetA(`${KIOSQUEROS}/${BUFFET_ID_TEST}/dashboard?date=${FECHA_TEST}`);
+      req.flush(panel);
+
+      expect(await promesa).toEqual(panel);
     });
 
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/dashboard?date=${date}`,
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush(panel);
+    it('dado un buffet sin fecha, cuando pido el panel, deberia no agregar el query param', async () => {
+      const promesa = firstValueFrom(service.getPanel(BUFFET_ID_TEST));
+
+      const req = httpMock.expectOne(
+        (r) => r.method === 'GET' && r.url === `${KIOSQUEROS}/${BUFFET_ID_TEST}/dashboard`,
+      );
+      expect(req.request.params.has('date')).toBeFalse();
+      req.flush(PanelKiosqueroMother.crear());
+      await promesa;
+    });
   });
 
-  it('deberia permitir consultar sin fecha', () => {
-    service.getPanel(buffetId).subscribe((result) => {
-      expect(result).toEqual(panel);
+  describe('getPanelByRange', () => {
+    it('dado un rango from/to, cuando pido el panel, deberia mandar ambos como query params', async () => {
+      const promesa = firstValueFrom(
+        service.getPanelByRange(BUFFET_ID_TEST, { from: '2026-06-08', to: '2026-06-14' }),
+      );
+
+      const req = thenSeHaceUnGetA(
+        `${KIOSQUEROS}/${BUFFET_ID_TEST}/dashboard?from=2026-06-08&to=2026-06-14`,
+      );
+      req.flush(PanelKiosqueroMother.crear());
+      await promesa;
+    });
+  });
+
+  describe('mocks locales', () => {
+    it('dado que llamo getResumen, deberia devolver los valores hardcodeados del mock', () => {
+      const resumen = service.getResumen();
+
+      expect(resumen.gananciasHoy).toBe(12450);
+      expect(resumen.ventasHoy).toBe(34);
+      expect(resumen.productosSinStock).toBe(5);
+      expect(resumen.pedidosPendientes).toBe(8);
     });
 
-    const req = httpMock.expectOne(`${kiosquerosUrl}/${buffetId}/dashboard`);
-    expect(req.request.method).toBe('GET');
-    expect(req.request.params.has('date')).toBeFalse();
-    req.flush(panel);
+    it('dado que llamo getNombreKiosquero, deberia devolver el nombre mockeado', () => {
+      expect(service.getNombreKiosquero()).toBe('Carlos');
+    });
   });
 
-  it('deberia obtener el dashboard por rango de fechas', () => {
-    service
-      .getPanelByRange(buffetId, {
-        from: '2026-06-08',
-        to: '2026-06-14',
-      })
-      .subscribe((result) => {
-        expect(result).toEqual(panel);
-      });
-
-    const req = httpMock.expectOne(
-      `${kiosquerosUrl}/${buffetId}/dashboard?from=2026-06-08&to=2026-06-14`,
-    );
+  function thenSeHaceUnGetA(url: string) {
+    const req = httpMock.expectOne(url);
     expect(req.request.method).toBe('GET');
-    req.flush(panel);
-  });
+    return req;
+  }
 });
