@@ -49,7 +49,7 @@ describe('RegistroColegio Integration', () => {
     llenarCampo('schoolPhone', '011-1234');
     llenarCampo('schoolCue', '123');
     const select: HTMLSelectElement = fixture.nativeElement.querySelector('#schoolLevelId');
-    select.value = 'secundario';
+    select.value = '44444444-4444-4444-4444-444444444444';
     select.dispatchEvent(new Event('change'));
     llenarCampo('directorFirstName', 'Juan');
     llenarCampo('directorLastName', 'Pérez');
@@ -75,7 +75,7 @@ describe('RegistroColegio Integration', () => {
       schoolEmail: 'test@test.com',
       schoolPhone: '011-1234',
       schoolCue: '123',
-      schoolLevelId: 'secundario',
+      schoolLevelId: '44444444-4444-4444-4444-444444444444',
       directorFirstName: 'Juan',
       directorLastName: 'Pérez',
       directorEmail: 'juan@test.com',
