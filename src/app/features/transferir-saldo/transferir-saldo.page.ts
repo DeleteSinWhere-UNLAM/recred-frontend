@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { TransferirSaldoPresenter } from './presenter/transferir-saldo.presenter';
