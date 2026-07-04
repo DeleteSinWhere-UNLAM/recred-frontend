@@ -3,9 +3,9 @@ import { CanActivateChildFn, CanActivateFn, Router, ActivatedRouteSnapshot, UrlT
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { RolUsuario } from '../../../data-access/models/perfil.model';
 
-async function resolverRol(
+function resolverRol(
   route: ActivatedRouteSnapshot,
-): Promise<boolean | UrlTree> {
+): Promise<boolean | UrlTree> | boolean | UrlTree {
   const router = inject(Router);
   const perfilService = inject(PerfilService);
 
@@ -25,14 +25,15 @@ async function resolverRol(
     return true;
   }
 
-  try {
-    const perfil = await perfilService.asegurarPerfil();
-    if (perfil && allowedRoles.includes(perfil.rol)) {
+  // Intento de validación síncrona usando el perfil en caché
+  const cachedPerfil = perfilService.getPerfil();
+  if (cachedPerfil && cachedPerfil.rol && cachedPerfil.rol.toString() !== 'PENDIENTE') {
+    if (allowedRoles.includes(cachedPerfil.rol)) {
       return true;
     }
 
-    // Redirigir según el rol real si no está autorizado
-    const rolReal = perfil?.rol;
+    // Redirigir de inmediato si ya sabemos que no está autorizado
+    const rolReal = cachedPerfil.rol;
     if (rolReal === 'ALUMNO') {
       return router.createUrlTree(['/alumno']);
     } else if (rolReal === 'VENDEDOR') {
@@ -40,9 +41,29 @@ async function resolverRol(
     } else {
       return router.createUrlTree(['/tutor']);
     }
-  } catch (err) {
-    return router.createUrlTree(['/']);
   }
+
+  // Si no hay caché, realizamos la verificación asíncrona
+  return perfilService.asegurarPerfil().then(
+    (perfil) => {
+      if (perfil && allowedRoles.includes(perfil.rol)) {
+        return true;
+      }
+
+      // Redirigir según el rol real si no está autorizado
+      const rolReal = perfil?.rol;
+      if (rolReal === 'ALUMNO') {
+        return router.createUrlTree(['/alumno']);
+      } else if (rolReal === 'VENDEDOR') {
+        return router.createUrlTree(['/kiosquero']);
+      } else {
+        return router.createUrlTree(['/tutor']);
+      }
+    },
+    () => {
+      return router.createUrlTree(['/']);
+    }
+  );
 }
 
 export const rolGuard: CanActivateFn = (route) => {
