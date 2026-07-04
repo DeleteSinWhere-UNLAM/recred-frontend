@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authChildGuard } from './core/auth/guards/auth.guard';
 import { alumnoContextoGuard } from './core/guards/alumno-contexto.guard';
-import { rolGuard, rolChildGuard, wildcardRedirectGuard } from './core/auth/guards/rol.guard';
+import { rolChildGuard, wildcardRedirectGuard } from './core/auth/guards/rol.guard';
 
 export const routes: Routes = [
   {

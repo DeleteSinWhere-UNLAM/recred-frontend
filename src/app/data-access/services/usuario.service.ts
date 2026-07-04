@@ -2,27 +2,6 @@ import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Usuario } from '../models/usuario.model';
 import { Alumno } from '../models/alumno.model';
 
-function obtenerHomeUrlInicial(): string {
-  if (typeof localStorage === 'undefined') return '/tutor';
-
-  const savedHome = localStorage.getItem('recreopago_homeUrl');
-  if (savedHome) return savedHome;
-
-  try {
-    const perfilRaw = localStorage.getItem('recred.perfil');
-    if (perfilRaw) {
-      const perfil = JSON.parse(perfilRaw);
-      if (perfil.rol === 'ALUMNO') return '/alumno';
-      if (perfil.rol === 'VENDEDOR') return '/kiosquero';
-      if (perfil.rol === 'PADRE') return '/tutor';
-    }
-  } catch {
-    // Ignorar errores de parseo si el localStorage está corrupto
-  }
-
-  return '/tutor';
-}
-
 import { PerfilService } from './perfil.service';
 
 @Injectable({ providedIn: 'root' })
@@ -75,9 +54,11 @@ export class UsuarioService {
 
   setHomeUrl(url: string): void {
     // No-op for security. derived homeUrl reactive logic takes precedence.
+    void url;
   }
 
   setNombreNavbar(nombre: string): void {
     // Derived name reactive logic takes precedence.
+    void nombre;
   }
 }
