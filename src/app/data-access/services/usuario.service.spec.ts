@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { UsuarioService } from './usuario.service';
 
 describe('UsuarioService', () => {
@@ -10,7 +12,13 @@ describe('UsuarioService', () => {
   afterEach(() => localStorage.clear());
 
   function crearService(): UsuarioService {
-    TestBed.configureTestingModule({ providers: [UsuarioService] });
+    TestBed.configureTestingModule({
+      providers: [
+        UsuarioService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    });
     return TestBed.inject(UsuarioService);
   }
 
