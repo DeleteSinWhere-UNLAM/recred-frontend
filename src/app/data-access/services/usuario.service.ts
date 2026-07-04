@@ -22,14 +22,22 @@ export class UsuarioService {
     saldo: 2580,
   };
 
+  private readonly homeUrlState = signal<string>(
+    typeof localStorage !== 'undefined' && localStorage.getItem('recreopago_homeUrl')
+      ? localStorage.getItem('recreopago_homeUrl')!
+      : '/tutor'
+  );
+
   readonly homeUrl: Signal<string> = computed(() => {
-    const rol = this.perfilService.rol();
+    const rol = typeof this.perfilService?.rol === 'function' ? this.perfilService.rol() : null;
     if (rol === 'ALUMNO') return '/alumno';
     if (rol === 'VENDEDOR') return '/kiosquero';
-    return '/tutor';
+    if (rol === 'PADRE') return '/tutor';
+    return this.homeUrlState();
   });
-  readonly esVistaAlumno: Signal<boolean> = computed(() => this.perfilService.rol() === 'ALUMNO');
-  readonly esVistaKiosquero: Signal<boolean> = computed(() => this.perfilService.rol() === 'VENDEDOR');
+
+  readonly esVistaAlumno: Signal<boolean> = computed(() => this.homeUrl() === '/alumno');
+  readonly esVistaKiosquero: Signal<boolean> = computed(() => this.homeUrl() === '/kiosquero');
 
   private readonly nombreNavbarState = signal<string>(
     typeof localStorage !== 'undefined' && localStorage.getItem('recreopago_nombreNavbar')
@@ -37,7 +45,7 @@ export class UsuarioService {
       : this.usuarioActual.nombre
   );
   readonly nombreNavbar: Signal<string> = computed(() => {
-    const perfil = this.perfilService.perfil();
+    const perfil = typeof this.perfilService?.perfil === 'function' ? this.perfilService.perfil() : null;
     if (perfil) {
       return perfil.nombre;
     }
@@ -53,12 +61,16 @@ export class UsuarioService {
   }
 
   setHomeUrl(url: string): void {
-    // No-op for security. derived homeUrl reactive logic takes precedence.
-    void url;
+    this.homeUrlState.set(url);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('recreopago_homeUrl', url);
+    }
   }
 
   setNombreNavbar(nombre: string): void {
-    // Derived name reactive logic takes precedence.
-    void nombre;
+    this.nombreNavbarState.set(nombre);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('recreopago_nombreNavbar', nombre);
+    }
   }
 }
