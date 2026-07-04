@@ -20,4 +20,13 @@ export class BilleteraService {
     const url = `${environment.apiUrl}/wallets/students/${alumnoId}/summary`;
     return this.http.get<BilleteraResumen>(url, { params });
   }
+
+  transferirSaldo(
+    fromStudentId: string,
+    toStudentId: string,
+    amount: number,
+  ): Observable<void> {
+    const url = `${environment.apiUrl}/wallets/transfer`;
+    return this.http.post<void>(url, { fromStudentId, toStudentId, amount });
+  }
 }

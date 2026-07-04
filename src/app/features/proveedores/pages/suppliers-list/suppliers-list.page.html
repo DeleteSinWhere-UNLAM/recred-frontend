@@ -12,7 +12,7 @@
           ofertas.</p>
       </div>
       <div class="suppliers-header__actions">
-        <button class="action-btn action-btn--secondary" (click)="irComparador()">
+        <button class="action-btn action-btn--secondary" (click)="irComparador()" [disabled]="isCompararDisabled()">
           <i class="fa-solid fa-calculator"></i> Comparar Precios
         </button>
         <button class="action-btn action-btn--primary" (click)="openAddModal()">

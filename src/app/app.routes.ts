@@ -85,6 +85,14 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'transferir-saldo', // Route for balance transfer between children
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/transferir-saldo/transferir-saldo.page').then(
+                (m) => m.TransferirSaldoPage,
+              ),
+          },
+          {
             path: 'presupuesto',
             canActivate: [alumnoContextoGuard],
             loadComponent: () =>

@@ -204,7 +204,13 @@
                   @if (order.withdrawalCode) {
                     <div>
                       <small>Clave</small>
-                      <strong class="tp-order__code">{{ order.withdrawalCode }}</strong>
+                      <strong class="tp-order__code">
+                        @if (order.withdrawalStatus === 'RETIRADO' || order.status === 'ENTREGADO') {
+                          {{ order.withdrawalCode }}
+                        } @else {
+                          ••••••••
+                        }
+                      </strong>
                     </div>
                   }
 
