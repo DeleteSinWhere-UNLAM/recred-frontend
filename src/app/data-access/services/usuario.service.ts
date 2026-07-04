@@ -1,4 +1,4 @@
-import { Injectable, Signal, computed, signal } from '@angular/core';
+import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Usuario } from '../models/usuario.model';
 import { Alumno } from '../models/alumno.model';
 
@@ -23,8 +23,12 @@ function obtenerHomeUrlInicial(): string {
   return '/tutor';
 }
 
+import { PerfilService } from './perfil.service';
+
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
+  private readonly perfilService = inject(PerfilService);
+
   private readonly usuarioActual: Usuario = {
     id: 'usuario-1',
     nombre: 'Martín',
@@ -39,17 +43,27 @@ export class UsuarioService {
     saldo: 2580,
   };
 
-  private readonly homeUrlState = signal<string>(obtenerHomeUrlInicial());
-  readonly homeUrl: Signal<string> = this.homeUrlState.asReadonly();
-  readonly esVistaAlumno: Signal<boolean> = computed(() => this.homeUrlState() === '/alumno');
-  readonly esVistaKiosquero: Signal<boolean> = computed(() => this.homeUrlState() === '/kiosquero');
+  readonly homeUrl: Signal<string> = computed(() => {
+    const rol = this.perfilService.rol();
+    if (rol === 'ALUMNO') return '/alumno';
+    if (rol === 'VENDEDOR') return '/kiosquero';
+    return '/tutor';
+  });
+  readonly esVistaAlumno: Signal<boolean> = computed(() => this.perfilService.rol() === 'ALUMNO');
+  readonly esVistaKiosquero: Signal<boolean> = computed(() => this.perfilService.rol() === 'VENDEDOR');
 
   private readonly nombreNavbarState = signal<string>(
     typeof localStorage !== 'undefined' && localStorage.getItem('recreopago_nombreNavbar')
       ? localStorage.getItem('recreopago_nombreNavbar')!
       : this.usuarioActual.nombre
   );
-  readonly nombreNavbar: Signal<string> = this.nombreNavbarState.asReadonly();
+  readonly nombreNavbar: Signal<string> = computed(() => {
+    const perfil = this.perfilService.perfil();
+    if (perfil) {
+      return perfil.nombre;
+    }
+    return this.nombreNavbarState();
+  });
 
   getUsuarioActual(): Usuario {
     return this.usuarioActual;
@@ -60,16 +74,10 @@ export class UsuarioService {
   }
 
   setHomeUrl(url: string): void {
-    this.homeUrlState.set(url);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('recreopago_homeUrl', url);
-    }
+    // No-op for security. derived homeUrl reactive logic takes precedence.
   }
 
   setNombreNavbar(nombre: string): void {
-    this.nombreNavbarState.set(nombre);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('recreopago_nombreNavbar', nombre);
-    }
+    // Derived name reactive logic takes precedence.
   }
 }
