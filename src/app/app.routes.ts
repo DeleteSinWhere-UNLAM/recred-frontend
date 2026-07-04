@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authChildGuard } from './core/auth/guards/auth.guard';
 import { alumnoContextoGuard } from './core/guards/alumno-contexto.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -8,6 +9,23 @@ export const routes: Routes = [
     pathMatch: 'full',
     loadComponent: () =>
       import('./features/landing/landing.page').then((m) => m.LandingPage),
+  },
+  {
+    path: 'registro-colegio',
+    loadComponent: () =>
+      import('./features/registro-colegio/registro-colegio.page').then((m) => m.RegistroColegioPage),
+  },
+  {
+    path: 'recred-admin',
+    canActivate: [authChildGuard, adminGuard],
+    loadComponent: () =>
+      import('./features/recred-admin/recred-admin.page').then((m) => m.RecredAdminPage),
+  },
+  {
+    path: 'directivo',
+    canActivate: [authChildGuard],
+    loadComponent: () =>
+      import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
   },
   {
     path: '',

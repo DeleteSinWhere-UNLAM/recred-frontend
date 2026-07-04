@@ -34,6 +34,8 @@ const MENSAJES_BIENVENIDA: Record<RolUsuario, string> = {
     'Hola. Soy Recredito. Puedo ayudarte con hijos, presupuestos, restricciones y eventos.',
   VENDEDOR:
     'Hola. Soy Recredito. Puedo ayudarte con stock, ventas, productos y pedidos del buffet.',
+  ADMIN: 'Hola. Soy Recredito. En que te puedo ayudar?',
+  DIRECTIVO_COLEGIO: 'Hola. Soy Recredito. En que te puedo ayudar?',
 };
 
 const MENSAJE_BIENVENIDA_DEFAULT = 'Hola. Soy Recredito. En que te puedo ayudar?';
