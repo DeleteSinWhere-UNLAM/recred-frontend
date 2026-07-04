@@ -43,6 +43,17 @@ describe('LandingPresenter', () => {
     await thenInicioLoginRechazaCon('login fallido');
   });
 
+  it('dado ningun override, cuando llamo a CtaLandingMother.crear, deberia devolver el cta primario por defecto', () => {
+    expect(CtaLandingMother.crear()).toEqual(CtaLandingMother.crearPrimario());
+  });
+
+  it('dado la lista mother, deberia devolver las dos ctas en el mismo orden que el presenter', () => {
+    expect(CtaLandingMother.crearLista()).toEqual([
+      CtaLandingMother.crearPrimario(),
+      CtaLandingMother.crearSecundario(),
+    ]);
+  });
+
   function givenQueElAuthServiceFalla(mensaje: string): void {
     servicioAuth.login.and.rejectWith(new Error(mensaje));
   }

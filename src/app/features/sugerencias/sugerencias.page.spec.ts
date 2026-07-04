@@ -1,17 +1,21 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SugerenciasPage } from './sugerencias.page';
-import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
 import { Router } from '@angular/router';
 import { UsuarioService } from '../../data-access/services/usuario.service';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ComboPromotionModalComponent } from './components/combo-promotion-modal/combo-promotion-modal.component';
-import { SugerenciasMother } from './sugerencias.mother';
+import { SugerenciasPresenter } from './presenter/sugerencias.presenter';
+import {
+  SugerenciaProductoMother,
+  USUARIO_ID_TEST,
+  UsuarioMother,
+} from './sugerencias.mother';
+import { SugerenciasPage } from './sugerencias.page';
 
 @Component({
   selector: 'app-combo-promotion-modal',
   standalone: true,
-  template: ''
+  template: '',
 })
 class ComboPromotionModalStub {
   @Input() baseProductName!: string;
@@ -23,7 +27,7 @@ class ComboPromotionModalStub {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  template: ''
+  template: '',
 })
 class NavbarStub {
   @Input() userName!: string;
@@ -37,107 +41,136 @@ describe('SugerenciasPage', () => {
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(async () => {
-    presenter = jasmine.createSpyObj('SugerenciasPresenter', [
+    presenter = jasmine.createSpyObj<SugerenciasPresenter>('SugerenciasPresenter', [
       'initialize',
       'openComboPromotionModal',
       'generatePromotion',
       'closeComboPromotionModal',
-      'seleccionarProducto'
+      'seleccionarProducto',
     ]);
-    
-    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
-    servicioUsuario = jasmine.createSpyObj('UsuarioService', ['setHomeUrl', 'getUsuarioActual']);
-    
-    servicioUsuario.getUsuarioActual.and.returnValue(SugerenciasMother.crearUsuario());
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasMother.crearUsuario()));
+    router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
+    servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', [
+      'setHomeUrl',
+      'getUsuarioActual',
+    ]);
+    servicioUsuario.getUsuarioActual.and.returnValue(UsuarioMother.crear());
 
     await TestBed.configureTestingModule({
       imports: [SugerenciasPage],
       providers: [
         { provide: Router, useValue: router },
-        { provide: UsuarioService, useValue: servicioUsuario }
-      ]
+        { provide: UsuarioService, useValue: servicioUsuario },
+      ],
     })
       .overrideComponent(SugerenciasPage, {
-        remove: {
-          imports: [NavbarComponent, ComboPromotionModalComponent]
-        },
+        remove: { imports: [NavbarComponent, ComboPromotionModalComponent] },
         add: {
           imports: [NavbarStub, ComboPromotionModalStub],
-          providers: [
-            { provide: SugerenciasPresenter, useValue: presenter }
-          ]
-        }
+          providers: [{ provide: SugerenciasPresenter, useValue: presenter }],
+        },
       })
       .compileComponents();
+  });
 
+  afterEach(() => localStorage.clear());
+
+  describe('constructor', () => {
+    it('cuando se construye la page, deberia setear la homeUrl del kiosquero', () => {
+      givenUsuarioEnLocalStorage();
+
+      whenMonto();
+
+      expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
+    });
+  });
+
+  describe('ngOnInit', () => {
+    it('dado un usuario en localStorage, cuando se monta la page, deberia inicializar el presenter con su id', () => {
+      givenUsuarioEnLocalStorage();
+
+      whenMonto();
+
+      expect(presenter.initialize).toHaveBeenCalledWith(USUARIO_ID_TEST);
+    });
+
+    it('dado que no hay usuario en localStorage, cuando se monta la page, no deberia inicializar el presenter', () => {
+      spyOn(localStorage, 'getItem').and.returnValue(null);
+
+      whenMonto();
+
+      expect(presenter.initialize).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('volver', () => {
+    it('cuando hago click en volver, deberia navegar a /kiosquero', () => {
+      givenUsuarioEnLocalStorage();
+      whenMonto();
+
+      component.volver();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+    });
+  });
+
+  describe('seleccionarProducto', () => {
+    it('cuando selecciono una sugerencia, deberia delegar al presenter', () => {
+      givenUsuarioEnLocalStorage();
+      whenMonto();
+
+      const sugerencia = SugerenciaProductoMother.crear();
+      component.seleccionarProducto(sugerencia);
+
+      expect(presenter.seleccionarProducto).toHaveBeenCalledWith(sugerencia);
+    });
+  });
+
+  describe('onGenerarPromocion', () => {
+    it('cuando hago click en generar promocion, deberia pedirle al presenter abrir el modal', () => {
+      givenUsuarioEnLocalStorage();
+      whenMonto();
+
+      component.onGenerarPromocion();
+
+      expect(presenter.openComboPromotionModal).toHaveBeenCalled();
+    });
+  });
+
+  describe('onConfirmPromotion', () => {
+    it('cuando el modal confirma la promocion, deberia delegar al presenter los datos', () => {
+      givenUsuarioEnLocalStorage();
+      whenMonto();
+      const datos = {
+        discountPercentage: 10,
+        startDate: 'hoy',
+        endDate: 'manana',
+        productIds: ['1'],
+      };
+
+      component.onConfirmPromotion(datos);
+
+      expect(presenter.generatePromotion).toHaveBeenCalledWith(datos);
+    });
+  });
+
+  describe('onCloseModal', () => {
+    it('cuando el modal se cierra, deberia pedirle al presenter cerrarlo', () => {
+      givenUsuarioEnLocalStorage();
+      whenMonto();
+
+      component.onCloseModal();
+
+      expect(presenter.closeComboPromotionModal).toHaveBeenCalled();
+    });
+  });
+
+  function givenUsuarioEnLocalStorage(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(UsuarioMother.crear()));
+  }
+
+  function whenMonto(): void {
     fixture = TestBed.createComponent(SugerenciasPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('debería configurar la url de inicio del kiosquero al construirse', () => {
-    
-    const urlEsperada = '/kiosquero';
-    
-    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
-  });
-
-  it('debería delegar al presenter la inicialización cuando el usuario existe en sesión', () => {
-    
-    const idUsuarioEsperado = 'test-id';
-    
-    expect(presenter.initialize).toHaveBeenCalledWith(idUsuarioEsperado);
-  });
-
-  it('no debería delegar la inicialización al presenter cuando el usuario no existe en sesión', () => {
-    
-    presenter.initialize.calls.reset();
-    (localStorage.getItem as jasmine.Spy).and.returnValue(null);
-    
-    component.ngOnInit();
-    
-    expect(presenter.initialize).not.toHaveBeenCalled();
-  });
-
-  it('debería delegar al router la navegación hacia el home al presionar volver', () => {
-    
-    const urlDestino = '/kiosquero';
-    
-    component.volver();
-    
-    expect(router.navigateByUrl).toHaveBeenCalledWith(urlDestino);
-  });
-
-  it('debería delegar al presenter la selección de un producto', () => {
-    
-    const sugerencia = SugerenciasMother.crearSugerencia();
-    
-    component.seleccionarProducto(sugerencia);
-    
-    expect(presenter.seleccionarProducto).toHaveBeenCalledWith(sugerencia);
-  });
-
-  it('debería solicitar al presenter la apertura del modal promocional', () => {
-    
-    component.onGenerarPromocion();
-    
-    expect(presenter.openComboPromotionModal).toHaveBeenCalled();
-  });
-
-  it('debería solicitar al presenter la generación de la promoción confirmada', () => {
-    
-    const datosPromocion = { discountPercentage: 10, startDate: 'hoy', endDate: 'manana', productIds: ['1'] };
-    
-    component.onConfirmPromotion(datosPromocion);
-    
-    expect(presenter.generatePromotion).toHaveBeenCalledWith(datosPromocion);
-  });
-
-  it('debería solicitar al presenter el cierre del modal promocional', () => {
-    
-    component.onCloseModal();
-    
-    expect(presenter.closeComboPromotionModal).toHaveBeenCalled();
-  });
+  }
 });

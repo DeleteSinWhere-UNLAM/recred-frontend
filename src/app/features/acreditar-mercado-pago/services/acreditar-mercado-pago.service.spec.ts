@@ -1,10 +1,13 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { AcreditarMercadoPagoService } from './acreditar-mercado-pago.service';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../../environments/environment';
+import { TopupResponse, TopupResponseMother } from '../acreditar-mercado-pago.mother';
+import { AcreditarMercadoPagoService } from './acreditar-mercado-pago.service';
 
 describe('AcreditarMercadoPagoService', () => {
+  const URL_TOPUP = `${environment.apiUrl}/payments/topup`;
+
   let service: AcreditarMercadoPagoService;
   let httpMock: HttpTestingController;
 
@@ -13,8 +16,8 @@ describe('AcreditarMercadoPagoService', () => {
       providers: [
         AcreditarMercadoPagoService,
         provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(AcreditarMercadoPagoService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -24,20 +27,38 @@ describe('AcreditarMercadoPagoService', () => {
     httpMock.verify();
   });
 
-  it('Dado que se llama a generarLinkPago, debería hacer un POST a la API de payments y retornar el paymentUrl', async () => {
-    const studentId = 'student-123';
-    const amount = 1000;
-    const mockResponse = { paymentUrl: 'https://mp.com/pay' };
+  describe('generarLinkPago', () => {
+    it('dado un alumnoId y un monto, cuando llamo al service, deberia hacer POST /payments/topup con el body esperado', async () => {
+      const promise = whenGeneroLinkPago('alumno-1', 1500);
 
-    const promise = service.generarLinkPago(studentId, amount);
+      const req = thenSeHaceUnPostA(URL_TOPUP);
+      expect(req.request.body).toEqual({ studentId: 'alumno-1', amount: 1500 });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/payments/topup`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ studentId, amount });
-    
-    req.flush(mockResponse);
+      req.flush(TopupResponseMother.crear());
+      await promise;
+    });
 
-    const paymentUrl = await promise;
-    expect(paymentUrl).toBe('https://mp.com/pay');
+    it('dado que el back devuelve un paymentUrl, cuando llamo al service, deberia resolver con esa URL', async () => {
+      const promise = whenGeneroLinkPago('alumno-1', 1500);
+      givenElBackResponde(TopupResponseMother.crear({ paymentUrl: 'https://mp.com/checkout/abc' }));
+
+      const url = await promise;
+      expect(url).toBe('https://mp.com/checkout/abc');
+    });
   });
+
+  function whenGeneroLinkPago(alumnoId: string, monto: number): Promise<string> {
+    return service.generarLinkPago(alumnoId, monto);
+  }
+
+  function givenElBackResponde(respuesta: TopupResponse): void {
+    const req = httpMock.expectOne(URL_TOPUP);
+    req.flush(respuesta);
+  }
+
+  function thenSeHaceUnPostA(url: string) {
+    const req = httpMock.expectOne(url);
+    expect(req.request.method).toBe('POST');
+    return req;
+  }
 });

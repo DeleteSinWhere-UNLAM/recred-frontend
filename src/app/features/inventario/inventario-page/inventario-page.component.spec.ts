@@ -1,49 +1,40 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { InventarioPageComponent } from './inventario-page.component';
-import { ProductoService } from '../services/producto.service';
-import { ToastService } from '../../../shared/services/toast.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
-import { InventarioRealtimeService } from '../services/inventario-realtime.service';
+import { ToastService } from '../../../shared/services/toast.service';
+import { DatosFormularioProducto } from '../components/formulario-producto/formulario-producto.component';
 import { Categoria } from '../models/categoria.interface';
-import { Producto } from '../models/producto.interface';
 import {
+  EventoInventarioRealtime,
   ItemResumenInventario,
   MovimientoStockInventario,
-  EventoInventarioRealtime,
 } from '../models/inventario.interface';
-import { DatosFormularioProducto } from '../components/formulario-producto/formulario-producto.component';
+import { Producto } from '../models/producto.interface';
+import { InventarioRealtimeService } from '../services/inventario-realtime.service';
+import { ProductoService } from '../services/producto.service';
+import { InventarioPageComponent } from './inventario-page.component';
 
-const ID_SIN_TACC       = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
-const ID_SIN_AZUCAR     = '7e113952-93ca-4797-a80d-54f3a31b2165';
-const ID_CONT_LACTEOS   = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+const ID_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
+const ID_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
+const ID_CONT_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+const BUFFET_ID_TEST = 'buffet-test-123';
 
-describe('InventarioPageComponent', () => {
-  let component: InventarioPageComponent;
-  let fixture: ComponentFixture<InventarioPageComponent>;
-  let productServiceMock: jasmine.SpyObj<ProductoService>;
-  let toastServiceMock: jasmine.SpyObj<ToastService>;
-  let perfilServiceMock: jasmine.SpyObj<PerfilService>;
-  let realtimeServiceMock: jasmine.SpyObj<InventarioRealtimeService>;
-  let activatedRouteMock: {
-    snapshot: {
-      queryParamMap: ReturnType<typeof convertToParamMap>;
-    };
-  };
+class CategoriaMother {
+  static crear(override: Partial<Categoria> = {}): Categoria {
+    return { id: 'c1', descripcion: 'Categoria 1', activo: true, ...override };
+  }
 
-  const mockBuffetId = 'buffet-test-123';
+  static crearVarias(): Categoria[] {
+    return [CategoriaMother.crear(), CategoriaMother.crear({ id: 'c2', descripcion: 'Categoria 2' })];
+  }
+}
 
-  const mockCategories: Categoria[] = [
-    { id: 'c1', descripcion: 'Categoria 1', activo: true },
-    { id: 'c2', descripcion: 'Categoria 2', activo: true },
-  ];
-
-  const mockInventory: ItemResumenInventario[] = [
-    {
+class ItemInventarioMother {
+  static crearAlfajor(override: Partial<ItemResumenInventario> = {}): ItemResumenInventario {
+    return {
       productId: '1',
       nombre: 'Alfajor',
       precio: 1200,
@@ -58,8 +49,12 @@ describe('InventarioPageComponent', () => {
       disponible: true,
       bajoStock: false,
       agotado: false,
-    },
-    {
+      ...override,
+    };
+  }
+
+  static crearSandwich(override: Partial<ItemResumenInventario> = {}): ItemResumenInventario {
+    return {
       productId: '2',
       nombre: 'Sandwich',
       precio: 2500,
@@ -74,49 +69,14 @@ describe('InventarioPageComponent', () => {
       disponible: true,
       bajoStock: true,
       agotado: false,
-    },
-  ];
+      ...override,
+    };
+  }
+}
 
-  const createdProduct: Producto = {
-    id: 'new-id',
-    nombre: 'New Producto',
-    descripcion: 'New Desc',
-    precio: 100,
-    peso: 1,
-    requierePreparacion: false,
-    stockActual: 10,
-    categoriaId: 'c1',
-  };
-
-  const mockStockMovements: MovimientoStockInventario[] = [
-    {
-      id: 'movement-old',
-      inventarioId: 'inventory-1',
-      tipo: 'VENTA',
-      cantidad: 2,
-      cantidadAnterior: 10,
-      cantidadNueva: 8,
-      motivo: 'Consumo por venta presencial',
-      usuarioId: 'usuario-1',
-      compraId: 'compra-1',
-      creadoEn: '2026-06-11T10:30:00',
-    },
-    {
-      id: 'movement-new',
-      inventarioId: 'inventory-1',
-      tipo: 'AJUSTE',
-      cantidad: 5,
-      cantidadAnterior: 8,
-      cantidadNueva: 13,
-      motivo: 'Reposición manual',
-      usuarioId: 'usuario-1',
-      compraId: null,
-      creadoEn: '2026-06-11T11:30:00',
-    },
-  ];
-
-  const mockProducts: Producto[] = [
-    {
+class ProductoMother {
+  static crear(override: Partial<Producto> = {}): Producto {
+    return {
       id: '1',
       nombre: 'Producto 1',
       descripcion: 'Desc 1',
@@ -125,367 +85,56 @@ describe('InventarioPageComponent', () => {
       requierePreparacion: false,
       stockActual: 10,
       categoria: { id: 'c1', descripcion: 'Categoria 1' },
-    },
-    {
-      id: '2',
-      nombre: 'Producto 2',
-      descripcion: 'Desc 2',
-      precio: 200,
-      peso: 2,
-      requierePreparacion: true,
-      stockActual: 20,
-    },
-  ];
-
-  const formDataBase: DatosFormularioProducto = {
-    nombre: 'Producto Test',
-    descripcion: 'Descripción test',
-    precio: 100,
-    peso: 1,
-    stockActual: 10,
-    categoriaId: 'c1',
-    nuevaCategoriaNombre: '',
-    requierePreparacion: false,
-    contiene_azucar: false,
-    contiene_mani: false,
-    contiene_lactosa: false,
-    contiene_tacc: false,
-  };
-
-  beforeEach(async () => {
-    productServiceMock = jasmine.createSpyObj('ProductoService', [
-      'getCategories',
-      'getInventoryOverview',
-      'updateInventoryStock',
-      'getProductStockMovements',
-      'getById',
-      'create',
-      'update',
-      'delete',
-    ]);
-    toastServiceMock = jasmine.createSpyObj('ToastService', ['mostrar']);
-    perfilServiceMock = jasmine.createSpyObj('PerfilService', [
-      'obtenerBuffetId',
-      'getPerfil',
-    ]);
-    realtimeServiceMock = jasmine.createSpyObj('InventarioRealtimeService', [
-      'connect',
-      'recordRefetch',
-    ]);
-
-    productServiceMock.getCategories.and.returnValue(of(mockCategories));
-    productServiceMock.getInventoryOverview.and.returnValue(of(mockInventory));
-    productServiceMock.updateInventoryStock.and.returnValue(of({ ok: true }));
-    productServiceMock.getProductStockMovements.and.returnValue(
-      of(mockStockMovements),
-    );
-    productServiceMock.create.and.returnValue(of(createdProduct));
-    productServiceMock.getById.and.returnValue(of(mockProducts[0]));
-    productServiceMock.update.and.returnValue(of(mockProducts[0]));
-    productServiceMock.delete.and.returnValue(of(void 0));
-    perfilServiceMock.obtenerBuffetId.and.returnValue(mockBuffetId);
-    perfilServiceMock.getPerfil.and.returnValue(null);
-    realtimeServiceMock.connect.and.returnValue(new AbortController());
-    activatedRouteMock = {
-      snapshot: {
-        queryParamMap: convertToParamMap({}),
-      },
+      ...override,
     };
+  }
 
-    await TestBed.configureTestingModule({
-      imports: [InventarioPageComponent],
-      providers: [
-        { provide: ProductoService, useValue: productServiceMock },
-        { provide: ToastService, useValue: toastServiceMock },
-        { provide: PerfilService, useValue: perfilServiceMock },
-        { provide: InventarioRealtimeService, useValue: realtimeServiceMock },
-        provideRouter([]),
-        { provide: ActivatedRoute, useValue: activatedRouteMock },
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(InventarioPageComponent);
-    component = fixture.componentInstance;
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('deberia cargar categorias, overview e iniciar SSE al iniciar', () => {
-    fixture.detectChanges();
-
-    expect(productServiceMock.getCategories).toHaveBeenCalled();
-    expect(productServiceMock.getInventoryOverview).toHaveBeenCalledWith(mockBuffetId);
-    expect(realtimeServiceMock.connect).toHaveBeenCalled();
-    expect(component.categories).toEqual(mockCategories);
-    expect(component.products).toEqual(mockInventory);
-  });
-
-  it('deberia abrir el modal de gestion cuando llega productId por query param', () => {
-    activatedRouteMock.snapshot.queryParamMap = convertToParamMap({
-      productId: mockInventory[1].productId,
-    });
-
-    fixture.detectChanges();
-
-    expect(component.inventoryManagementTarget).toEqual(mockInventory[1]);
-    expect(component.getInventoryManagementMode()).toBe('CUPO_DIARIO');
-    expect(component.highlightedProductIds.has(mockInventory[1].productId)).toBeTrue();
-  });
-
-  it('deberia mostrar toast cuando llega una compra nueva por SSE', () => {
-    fixture.detectChanges();
-    const handlers = realtimeServiceMock.connect.calls.mostRecent().args[1] as {
-      onPurchaseCreated: (event: {
-        buffetId: string;
-        type: string;
-        occurredAt: string;
-        message?: string;
-        purchaseTotal?: number;
-      }) => void;
-    };
-    const formattedTotal = new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      currencyDisplay: 'narrowSymbol',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(2500);
-
-    handlers.onPurchaseCreated({
-      buffetId: mockBuffetId,
-      type: 'PURCHASE_CREATED',
-      occurredAt: new Date().toISOString(),
-      message: 'Pedido realizado',
-      purchaseTotal: 2500,
-    });
-
-    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
-      `Pedido realizado - Total: ${formattedTotal}`,
-      'success',
-    );
-  });
-
-  it('deberia mostrar error si falla la carga de inventario', () => {
-    productServiceMock.getInventoryOverview.and.returnValue(
-      throwError(() => new Error('API Error')),
-    );
-
-    fixture.detectChanges();
-
-    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
-      'Error al cargar el inventario',
-      'error',
-    );
-    expect(component.isLoading).toBeFalse();
-  });
-
-  it('deberia filtrar productos con bajo stock', () => {
-    component.products = mockInventory;
-
-    component.setFilter('BAJO_STOCK');
-
-    expect(component.filteredProducts).toEqual([mockInventory[1]]);
-  });
-
-  it('deberia filtrar productos por busqueda de nombre', () => {
-    component.products = mockInventory;
-    component.searchQuery = 'alfa';
-
-    expect(component.filteredProducts).toEqual([mockInventory[0]]);
-  });
-
-  it('deberia combinar busqueda de nombre con filtro de estado', () => {
-    component.products = mockInventory;
-    component.searchQuery = 'sand';
-    component.setFilter('BAJO_STOCK');
-
-    expect(component.filteredProducts).toEqual([mockInventory[1]]);
-  });
-
-  it('deberia filtrar productos con alta reserva', () => {
-    const highReservationProduct: ItemResumenInventario = {
-      ...mockInventory[0],
-      productId: 'alta-reserva',
-      stockDisponible: 3,
-      stockReservado: 4,
-    };
-    const products: ItemResumenInventario[] = [
-      mockInventory[0],
-      highReservationProduct,
-    ];
-    component.products = products;
-
-    component.setFilter('ALTA_RESERVA');
-
-    expect(component.filteredProducts).toEqual([highReservationProduct]);
-  });
-
-  it('deberia filtrar productos no disponibles', () => {
-    const pausedProduct: ItemResumenInventario = {
-      ...mockInventory[0],
-      productId: 'pausado',
-      nombre: 'Producto no disponible',
-      estadoInventario: 'DESACTIVADO',
-      disponible: false,
-      agotado: false,
-    };
-    component.products = [...mockInventory, pausedProduct];
-
-    component.setFilter('PAUSADO');
-
-    expect(component.filteredProducts).toEqual([pausedProduct]);
-    expect(component.pausadosCount).toBe(1);
-  });
-
-  it('deberia calcular disponibles y reservados', () => {
-    component.products = mockInventory;
-
-    expect(component.disponiblesCount).toBe(2);
-    expect(component.reservadosCount).toBe(4);
-    expect(component.altaReservaCount).toBe(0);
-  });
-
-  it('deberia resaltar temporalmente el producto actualizado por SSE', fakeAsync(() => {
-    fixture.detectChanges();
-    const handlers = realtimeServiceMock.connect.calls.mostRecent().args[1] as {
-      onRefresh: (event: EventoInventarioRealtime) => void;
-    };
-
-    handlers.onRefresh({
-      buffetId: mockBuffetId,
-      type: 'STOCK_CHANGED',
-      productId: mockInventory[0].productId,
-      stockActual: 18,
-      stockReservado: 3,
-      stockDisponible: 15,
-      estadoInventario: 'DISPONIBLE',
-      tipoManejoInventario: 'STOCK_EXACTO',
-      occurredAt: new Date().toISOString(),
-    });
-
-    expect(component.highlightedProductIds.has(mockInventory[0].productId)).toBeTrue();
-
-    tick(3000);
-
-    expect(component.highlightedProductIds.has(mockInventory[0].productId)).toBeFalse();
-  }));
-
-  it('deberia inicializar selectedProduct a null y mostrar el formulario de alta', () => {
-    component.openIndividualForm();
-
-    expect(component.selectedProduct).toBeNull();
-    expect(component.isFormVisible).toBeTrue();
-  });
-
-  describe('buildHealthClassificationIds — mapeo correcto de clasificaciones de salud', () => {
-    it('un producto sin TACC, sin azúcar y sin lácteos debe tener Solo Sin TACC y Sin Azúcar', () => {
-      const formData: DatosFormularioProducto = {
-        ...formDataBase,
-        contiene_tacc: false,
-        contiene_azucar: false,
-        contiene_lactosa: false,
-      };
-
-      component.selectedProduct = null;
-      component.handleFormSubmit(formData);
-
-      const payload = productServiceMock.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_TACC);
-      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_AZUCAR);
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
-    });
-
-    it('un producto con TACC no debe tener la clasificación Sin TACC', () => {
-      const formData: DatosFormularioProducto = {
-        ...formDataBase,
-        contiene_tacc: true,
-        contiene_azucar: false,
-        contiene_lactosa: false,
-      };
-
-      component.selectedProduct = null;
-      component.handleFormSubmit(formData);
-
-      const payload = productServiceMock.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
-    });
-
-    it('un producto con azúcar no debe tener la clasificación Sin Azúcar', () => {
-      const formData: DatosFormularioProducto = {
-        ...formDataBase,
-        contiene_tacc: false,
-        contiene_azucar: true,
-        contiene_lactosa: false,
-      };
-
-      component.selectedProduct = null;
-      component.handleFormSubmit(formData);
-
-      const payload = productServiceMock.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
-    });
-
-    it('un producto con lácteos debe tener la clasificación Contiene Lácteos', () => {
-      const formData: DatosFormularioProducto = {
-        ...formDataBase,
-        contiene_tacc: false,
-        contiene_azucar: false,
-        contiene_lactosa: true,
-      };
-
-      component.selectedProduct = null;
-      component.handleFormSubmit(formData);
-
-      const payload = productServiceMock.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).toContain(ID_CONT_LACTEOS);
-    });
-
-    it('un producto con TACC, azúcar y sin lácteos debe tener array vacío de clasificaciones relevantes', () => {
-      const formData: DatosFormularioProducto = {
-        ...formDataBase,
-        contiene_tacc: true,
-        contiene_azucar: true,
-        contiene_lactosa: false,
-      };
-
-      component.selectedProduct = null;
-      component.handleFormSubmit(formData);
-
-      const payload = productServiceMock.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
-    });
-
-    it('las mismas clasificaciones deben enviarse al crear y al actualizar un producto', () => {
-      const formData: DatosFormularioProducto = {
-        ...formDataBase,
-        contiene_tacc: false,
-        contiene_azucar: false,
-        contiene_lactosa: true,
-      };
-
-      component.selectedProduct = null;
-      component.handleFormSubmit(formData);
-      const payloadCreate = productServiceMock.create.calls.mostRecent().args[0];
-
-      component.selectedProduct = mockProducts[0];
-      component.handleFormSubmit(formData);
-      const payloadUpdate = productServiceMock.update.calls.mostRecent().args[1];
-
-      expect(payloadCreate.clasificacionesSaludIds).toEqual(payloadUpdate.clasificacionesSaludIds);
-    });
-  });
-
-  it('deberia crear producto y refrescar overview', () => {
-    spyOn(component, 'loadProducts');
-    const formData: DatosFormularioProducto = {
+  static crearNuevo(): Producto {
+    return ProductoMother.crear({
+      id: 'new-id',
       nombre: 'New Producto',
       descripcion: 'New Desc',
+      categoriaId: 'c1',
+    });
+  }
+}
+
+class MovimientoStockMother {
+  static crearHistorial(): MovimientoStockInventario[] {
+    return [
+      {
+        id: 'movement-old',
+        inventarioId: 'inventory-1',
+        tipo: 'VENTA',
+        cantidad: 2,
+        cantidadAnterior: 10,
+        cantidadNueva: 8,
+        motivo: 'Consumo por venta presencial',
+        usuarioId: 'usuario-1',
+        compraId: 'compra-1',
+        creadoEn: '2026-06-11T10:30:00',
+      },
+      {
+        id: 'movement-new',
+        inventarioId: 'inventory-1',
+        tipo: 'AJUSTE',
+        cantidad: 5,
+        cantidadAnterior: 8,
+        cantidadNueva: 13,
+        motivo: 'Reposición manual',
+        usuarioId: 'usuario-1',
+        compraId: null,
+        creadoEn: '2026-06-11T11:30:00',
+      },
+    ];
+  }
+}
+
+class DatosFormularioMother {
+  static crearBase(override: Partial<DatosFormularioProducto> = {}): DatosFormularioProducto {
+    return {
+      nombre: 'Producto Test',
+      descripcion: 'Descripción test',
       precio: 100,
       peso: 1,
       stockActual: 10,
@@ -496,305 +145,806 @@ describe('InventarioPageComponent', () => {
       contiene_mani: false,
       contiene_lactosa: false,
       contiene_tacc: false,
+      ...override,
     };
+  }
+}
 
-    fixture.detectChanges();
-    component.handleFormSubmit(formData);
+describe('InventarioPageComponent', () => {
+  let component: InventarioPageComponent;
+  let fixture: ComponentFixture<InventarioPageComponent>;
+  let servicioProducto: jasmine.SpyObj<ProductoService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioPerfil: jasmine.SpyObj<PerfilService>;
+  let servicioRealtime: jasmine.SpyObj<InventarioRealtimeService>;
+  let activatedRoute: {
+    snapshot: { queryParamMap: ReturnType<typeof convertToParamMap> };
+  };
 
-    expect(productServiceMock.create).toHaveBeenCalled();
-    expect(productServiceMock.create.calls.mostRecent().args[0].buffetId).toBe(mockBuffetId);
-    expect(component.loadProducts).toHaveBeenCalledWith(false);
-    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
-      'Producto creado exitosamente',
-      'success',
-    );
-  });
+  const categorias = CategoriaMother.crearVarias();
+  const inventario: ItemResumenInventario[] = [
+    ItemInventarioMother.crearAlfajor(),
+    ItemInventarioMother.crearSandwich(),
+  ];
+  const productos: Producto[] = [
+    ProductoMother.crear(),
+    ProductoMother.crear({
+      id: '2',
+      nombre: 'Producto 2',
+      descripcion: 'Desc 2',
+      precio: 200,
+      peso: 2,
+      requierePreparacion: true,
+      stockActual: 20,
+      categoria: undefined,
+    }),
+  ];
+  const movimientosStock = MovimientoStockMother.crearHistorial();
 
-  it('deberia cargar el historial de stock del producto', () => {
-    fixture.detectChanges();
-
-    component.openStockHistory(mockInventory[0]);
-
-    expect(productServiceMock.getProductStockMovements).toHaveBeenCalledWith(
-      mockBuffetId,
-      mockInventory[0].productId,
-    );
-    expect(component.stockMovementTarget).toEqual(mockInventory[0]);
-    expect(component.stockMovements.map((movement) => movement.id)).toEqual([
-      'movement-new',
-      'movement-old',
+  beforeEach(async () => {
+    servicioProducto = jasmine.createSpyObj('ProductoService', [
+      'getCategories',
+      'getInventoryOverview',
+      'updateInventoryStock',
+      'getProductStockMovements',
+      'getById',
+      'create',
+      'update',
+      'delete',
     ]);
-    expect(component.isLoadingStockMovements).toBeFalse();
+    servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId', 'getPerfil']);
+    servicioRealtime = jasmine.createSpyObj('InventarioRealtimeService', [
+      'connect',
+      'recordRefetch',
+    ]);
+
+    servicioProducto.getCategories.and.returnValue(of(categorias));
+    servicioProducto.getInventoryOverview.and.returnValue(of(inventario));
+    servicioProducto.updateInventoryStock.and.returnValue(of({ ok: true }));
+    servicioProducto.getProductStockMovements.and.returnValue(of(movimientosStock));
+    servicioProducto.create.and.returnValue(of(ProductoMother.crearNuevo()));
+    servicioProducto.getById.and.returnValue(of(productos[0]));
+    servicioProducto.update.and.returnValue(of(productos[0]));
+    servicioProducto.delete.and.returnValue(of(void 0));
+    servicioPerfil.obtenerBuffetId.and.returnValue(BUFFET_ID_TEST);
+    servicioPerfil.getPerfil.and.returnValue(null);
+    servicioRealtime.connect.and.returnValue(new AbortController());
+    activatedRoute = { snapshot: { queryParamMap: convertToParamMap({}) } };
+
+    await TestBed.configureTestingModule({
+      imports: [InventarioPageComponent],
+      providers: [
+        { provide: ProductoService, useValue: servicioProducto },
+        { provide: ToastService, useValue: servicioToast },
+        { provide: PerfilService, useValue: servicioPerfil },
+        { provide: InventarioRealtimeService, useValue: servicioRealtime },
+        provideRouter([]),
+        { provide: ActivatedRoute, useValue: activatedRoute },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(InventarioPageComponent);
+    component = fixture.componentInstance;
   });
 
-  it('deberia cerrar el historial de stock', () => {
-    fixture.detectChanges();
-    component.openStockHistory(mockInventory[0]);
-
-    component.closeStockHistory();
-
-    expect(component.stockMovementTarget).toBeNull();
-    expect(component.stockMovements).toEqual([]);
-    expect(component.isLoadingStockMovements).toBeFalse();
-  });
-
-  it('deberia mostrar error si falla la carga del historial', () => {
-    productServiceMock.getProductStockMovements.and.returnValue(
-      throwError(() => new Error('API Error')),
-    );
-
-    fixture.detectChanges();
-    component.openStockHistory(mockInventory[0]);
-
-    expect(component.stockMovements).toEqual([]);
-    expect(component.isLoadingStockMovements).toBeFalse();
-    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
-      'No se pudo cargar el historial del producto',
-      'error',
-    );
-  });
-
-  it('deberia gestionar modo stock exacto reutilizando valores existentes', () => {
-    perfilServiceMock.getPerfil.and.returnValue({
-      id: 'usuario-123',
-      email: 'test@example.com',
-      nombre: 'Test',
-      apellido: 'User',
-      rol: 'VENDEDOR',
+  describe('inicializacion', () => {
+    it('dado el componente, cuando se monta, deberia crearse', () => {
+      expect(component).toBeTruthy();
     });
 
-    const pausedProduct: ItemResumenInventario = {
-      ...mockInventory[0],
-      tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
-      estadoInventario: 'DESACTIVADO',
-      disponible: false,
-      stockActual: 15,
-      stockMinimo: 5,
-    };
+    it('dado un buffetId en el perfil, cuando inicializo, deberia cargar categorias, overview y conectar SSE', () => {
+      whenMonto();
 
-    fixture.detectChanges();
-    component.openInventoryManagement(pausedProduct);
-    component.inventoryManagementForm.patchValue({
-      tipoManejoInventario: 'STOCK_EXACTO',
-      motivo: '',
+      expect(servicioProducto.getCategories).toHaveBeenCalled();
+      expect(servicioProducto.getInventoryOverview).toHaveBeenCalledWith(BUFFET_ID_TEST);
+      expect(servicioRealtime.connect).toHaveBeenCalled();
+      expect(component.categories).toEqual(categorias);
+      expect(component.products).toEqual(inventario);
     });
-    component.onInventoryModeChange();
 
-    component.submitInventoryManagement();
+    it('dado un productId en el query param, cuando inicializo, deberia abrir el modal de gestion y resaltar el producto', () => {
+      activatedRoute.snapshot.queryParamMap = convertToParamMap({
+        productId: inventario[1].productId,
+      });
 
-    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
-      mockBuffetId,
-      pausedProduct.productId,
-      {
-        tipoManejoInventario: 'STOCK_EXACTO',
-        disponible: true,
+      whenMonto();
+
+      expect(component.inventoryManagementTarget).toEqual(inventario[1]);
+      expect(component.getInventoryManagementMode()).toBe('CUPO_DIARIO');
+      expect(component.highlightedProductIds.has(inventario[1].productId)).toBeTrue();
+    });
+
+    it('dado que falla la carga del inventario, deberia mostrar toast de error y dejar isLoading en false', () => {
+      servicioProducto.getInventoryOverview.and.returnValue(throwError(() => new Error('API Error')));
+
+      whenMonto();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Error al cargar el inventario', 'error');
+      expect(component.isLoading).toBeFalse();
+    });
+  });
+
+  describe('eventos SSE', () => {
+    it('dado un evento PURCHASE_CREATED, deberia mostrar el toast con el total formateado', () => {
+      whenMonto();
+      const handlers = servicioRealtime.connect.calls.mostRecent().args[1] as {
+        onPurchaseCreated: (event: EventoInventarioRealtime) => void;
+      };
+      const totalEsperado = new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        currencyDisplay: 'narrowSymbol',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(2500);
+
+      handlers.onPurchaseCreated({
+        buffetId: BUFFET_ID_TEST,
+        type: 'PURCHASE_CREATED',
+        occurredAt: new Date().toISOString(),
+        message: 'Pedido realizado',
+        purchaseTotal: 2500,
+      });
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        `Pedido realizado - Total: ${totalEsperado}`,
+        'success',
+      );
+    });
+
+    it('dado un evento STOCK_CHANGED, deberia resaltar temporalmente el producto por 3 segundos', fakeAsync(() => {
+      whenMonto();
+      const handlers = servicioRealtime.connect.calls.mostRecent().args[1] as {
+        onRefresh: (event: EventoInventarioRealtime) => void;
+      };
+
+      handlers.onRefresh({
+        buffetId: BUFFET_ID_TEST,
+        type: 'STOCK_CHANGED',
+        productId: inventario[0].productId,
+        stockActual: 18,
+        stockReservado: 3,
+        stockDisponible: 15,
         estadoInventario: 'DISPONIBLE',
-        stockActual: 15,
-        stockMinimo: 5,
-        motivo: 'Volver a stock exacto',
-        usuarioId: 'usuario-123',
-      },
-    );
-    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
-      'Inventario actualizado',
-      'success',
-    );
-  });
-
-  it('deberia aplicar el atajo de pausar dentro del modal de gestion', () => {
-    fixture.detectChanges();
-    component.openInventoryManagement(mockInventory[0]);
-
-    component.applyInventoryManagementShortcut('PAUSE');
-    component.submitInventoryManagement();
-
-    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
-      mockBuffetId,
-      mockInventory[0].productId,
-      {
-        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
-        disponible: false,
-        estadoInventario: 'DESACTIVADO',
-        motivo: 'Pausado temporalmente',
-      },
-    );
-  });
-
-  it('deberia cambiar a disponible/no disponible sin pisar stock', () => {
-    fixture.detectChanges();
-    component.openInventoryManagement(mockInventory[0]);
-    component.inventoryManagementForm.patchValue({
-      tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
-      disponible: false,
-      motivo: 'Pausado temporalmente',
-    });
-
-    component.submitInventoryManagement();
-
-    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
-      mockBuffetId,
-      mockInventory[0].productId,
-      {
-        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
-        disponible: false,
-        estadoInventario: 'DESACTIVADO',
-        motivo: 'Pausado temporalmente',
-      },
-    );
-  });
-
-  it('deberia aplicar el atajo disponible con usuarioId', () => {
-    perfilServiceMock.getPerfil.and.returnValue({
-      id: 'usuario-123',
-      email: 'test@example.com',
-      nombre: 'Test',
-      apellido: 'User',
-      rol: 'VENDEDOR',
-    });
-
-    fixture.detectChanges();
-    component.openInventoryManagement({
-      ...mockInventory[0],
-      estadoInventario: 'DESACTIVADO',
-      disponible: false,
-    });
-    component.applyInventoryManagementShortcut('MAKE_AVAILABLE');
-
-    component.submitInventoryManagement();
-
-    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
-      mockBuffetId,
-      mockInventory[0].productId,
-      {
-        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
-        disponible: true,
-        estadoInventario: 'DISPONIBLE',
-        motivo: 'Producto disponible',
-        usuarioId: 'usuario-123',
-      },
-    );
-  });
-
-  it('deberia aplicar el atajo de agotar stock exacto', () => {
-    fixture.detectChanges();
-    component.openInventoryManagement(mockInventory[0]);
-
-    component.applyInventoryManagementShortcut('SOLD_OUT');
-    component.submitInventoryManagement();
-
-    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
-      mockBuffetId,
-      mockInventory[0].productId,
-      {
         tipoManejoInventario: 'STOCK_EXACTO',
-        disponible: true,
-        estadoInventario: 'SIN_STOCK',
-        stockActual: 0,
-        stockMinimo: 5,
-        motivo: 'Marcar agotado',
-      },
-    );
+        occurredAt: new Date().toISOString(),
+      });
+
+      expect(component.highlightedProductIds.has(inventario[0].productId)).toBeTrue();
+
+      tick(3000);
+
+      expect(component.highlightedProductIds.has(inventario[0].productId)).toBeFalse();
+    }));
   });
 
-  it('deberia aplicar el atajo de agotar cupo diario', () => {
-    fixture.detectChanges();
-    component.openInventoryManagement(mockInventory[1]);
-
-    component.applyInventoryManagementShortcut('SOLD_OUT');
-    component.submitInventoryManagement();
-
-    expect(productServiceMock.updateInventoryStock).toHaveBeenCalledWith(
-      mockBuffetId,
-      mockInventory[1].productId,
-      {
-        tipoManejoInventario: 'CUPO_DIARIO',
-        disponible: true,
-        estadoInventario: 'SIN_STOCK',
-        cupoMaximoDiario: 0,
-        motivo: 'Marcar agotado',
-      },
-    );
-  });
-
-  it('deberia mapear errores de gestion por code', () => {
-    const error = new HttpErrorResponse({
-      status: 409,
-      error: {
-        code: 'STOCK_INSUFFICIENT',
-        mensaje: 'No hay stock suficiente...',
-      },
+  describe('filtros y busqueda', () => {
+    beforeEach(() => {
+      component.products = inventario;
     });
-    productServiceMock.updateInventoryStock.and.returnValue(throwError(() => error));
 
-    fixture.detectChanges();
-    component.openInventoryManagement(mockInventory[0]);
-    component.inventoryManagementForm.patchValue({ stockActual: 0 });
-    component.submitInventoryManagement();
+    it('dado el filtro BAJO_STOCK, deberia dejar solo los productos con bajoStock true', () => {
+      component.setFilter('BAJO_STOCK');
 
-    expect(toastServiceMock.mostrar).toHaveBeenCalledWith(
-      'No hay stock suficiente.',
-      'error',
-    );
+      expect(component.filteredProducts).toEqual([inventario[1]]);
+    });
+
+    it('dado un searchQuery por nombre, deberia filtrar por match parcial', () => {
+      component.searchQuery = 'alfa';
+
+      expect(component.filteredProducts).toEqual([inventario[0]]);
+    });
+
+    it('dado busqueda y filtro combinados, deberia aplicar la interseccion', () => {
+      component.searchQuery = 'sand';
+      component.setFilter('BAJO_STOCK');
+
+      expect(component.filteredProducts).toEqual([inventario[1]]);
+    });
+
+    it('dado un producto con alta reserva, el filtro ALTA_RESERVA deberia dejar solo ese', () => {
+      const altaReserva = ItemInventarioMother.crearAlfajor({
+        productId: 'alta-reserva',
+        stockDisponible: 3,
+        stockReservado: 4,
+      });
+      component.products = [inventario[0], altaReserva];
+
+      component.setFilter('ALTA_RESERVA');
+
+      expect(component.filteredProducts).toEqual([altaReserva]);
+    });
+
+    it('dado un producto pausado, el filtro PAUSADO deberia dejar solo ese', () => {
+      const pausado = ItemInventarioMother.crearAlfajor({
+        productId: 'pausado',
+        nombre: 'Producto no disponible',
+        estadoInventario: 'DESACTIVADO',
+        disponible: false,
+        agotado: false,
+      });
+      component.products = [...inventario, pausado];
+
+      component.setFilter('PAUSADO');
+
+      expect(component.filteredProducts).toEqual([pausado]);
+      expect(component.pausadosCount).toBe(1);
+    });
+
+    it('dado inventario cargado, deberia calcular disponibles y reservados', () => {
+      expect(component.disponiblesCount).toBe(2);
+      expect(component.reservadosCount).toBe(4);
+      expect(component.altaReservaCount).toBe(0);
+    });
   });
 
-  describe('Gestión del formulario', () => {
-    it('debería inicializar selectedProduct a null y mostrar el formulario al llamar openIndividualForm', () => {
+  describe('formulario individual', () => {
+    it('dado el componente, cuando llamo openIndividualForm, deberia dejar selectedProduct null y mostrar el form', () => {
       component.openIndividualForm();
+
       expect(component.selectedProduct).toBeNull();
       expect(component.isFormVisible).toBeTrue();
     });
 
-    it('debería asignar selectedProduct y mostrar el formulario al llamar openEditForm', () => {
-      component.openEditForm(mockProducts[0]);
-      expect(component.selectedProduct).toEqual(mockProducts[0]);
+    it('dado un producto, cuando llamo openEditForm, deberia asignarlo y mostrar el form', () => {
+      component.openEditForm(productos[0]);
+
+      expect(component.selectedProduct).toEqual(productos[0]);
       expect(component.isFormVisible).toBeTrue();
     });
 
-    it('debería crear el producto y recargar la lista al enviar un formulario nuevo', () => {
-      spyOn(component, 'loadProducts');
+    it('dado un formulario nuevo, cuando lo envio, deberia crear el producto y recargar la lista', () => {
+      const spyLoadProducts = spyOn(component, 'loadProducts');
       component.selectedProduct = null;
-      component.handleFormSubmit(formDataBase);
 
-      expect(productServiceMock.create).toHaveBeenCalled();
-      expect(productServiceMock.create.calls.mostRecent().args[0].buffetId).toBe(mockBuffetId);
-      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto creado exitosamente', 'success');
+      component.handleFormSubmit(DatosFormularioMother.crearBase());
+
+      expect(servicioProducto.create).toHaveBeenCalled();
+      expect(servicioProducto.create.calls.mostRecent().args[0].buffetId).toBe(BUFFET_ID_TEST);
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Producto creado exitosamente',
+        'success',
+      );
       expect(component.isFormVisible).toBeFalse();
-      expect(component.loadProducts).toHaveBeenCalled();
+      expect(spyLoadProducts).toHaveBeenCalled();
     });
 
-    it('debería mostrar error si la creación falla', () => {
-      productServiceMock.create.and.returnValue(throwError(() => new Error()));
+    it('dado que la creacion falla, deberia mostrar el toast de error', () => {
+      servicioProducto.create.and.returnValue(throwError(() => new Error()));
       component.selectedProduct = null;
-      component.handleFormSubmit(formDataBase);
-      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al crear el producto', 'error');
+
+      component.handleFormSubmit(DatosFormularioMother.crearBase());
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Error al crear el producto', 'error');
     });
 
-    it('debería actualizar el producto al enviar un formulario de edición', () => {
-      spyOn(component, 'loadProducts');
-      component.selectedProduct = mockProducts[0];
-      component.handleFormSubmit(formDataBase);
+    it('dado un producto en edicion, cuando envio el form, deberia actualizarlo', () => {
+      component.selectedProduct = productos[0];
 
-      expect(productServiceMock.update).toHaveBeenCalled();
-      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto actualizado exitosamente', 'success');
+      component.handleFormSubmit(DatosFormularioMother.crearBase());
+
+      expect(servicioProducto.update).toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Producto actualizado exitosamente',
+        'success',
+      );
     });
 
-    it('debería mostrar error si la actualización falla', () => {
-      productServiceMock.update.and.returnValue(throwError(() => new Error()));
-      component.selectedProduct = mockProducts[0];
-      component.handleFormSubmit(formDataBase);
-      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Error al actualizar el producto', 'error');
+    it('dado que la actualizacion falla, deberia mostrar el toast de error', () => {
+      servicioProducto.update.and.returnValue(throwError(() => new Error()));
+      component.selectedProduct = productos[0];
+
+      component.handleFormSubmit(DatosFormularioMother.crearBase());
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Error al actualizar el producto',
+        'error',
+      );
     });
 
-    it('debería eliminar el producto y actualizar la lista al confirmar', () => {
-      productServiceMock.delete.and.returnValue(of(void 0));
-      component.products = [...mockInventory];
-      component.deleteTarget = mockProducts[0];
+    it('dado un producto en deleteTarget, cuando confirmo delete, deberia eliminarlo y sacarlo de la lista', () => {
+      component.products = [...inventario];
+      component.deleteTarget = productos[0];
 
       component.confirmDelete();
 
-      expect(productServiceMock.delete).toHaveBeenCalledWith(mockProducts[0].id);
-      expect(toastServiceMock.mostrar).toHaveBeenCalledWith('Producto eliminado correctamente', 'success');
+      expect(servicioProducto.delete).toHaveBeenCalledWith(productos[0].id);
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Producto eliminado correctamente',
+        'success',
+      );
       expect(component.products.length).toBe(1);
     });
   });
+
+  describe('buildHealthClassificationIds', () => {
+    it('dado un producto sin TACC, sin azucar y sin lacteos, deberia incluir Sin TACC y Sin Azucar', () => {
+      component.selectedProduct = null;
+      component.handleFormSubmit(
+        DatosFormularioMother.crearBase({ contiene_tacc: false, contiene_azucar: false, contiene_lactosa: false }),
+      );
+
+      const payload = servicioProducto.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_TACC);
+      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_AZUCAR);
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
+    });
+
+    it('dado un producto con TACC, no deberia incluir la clasificacion Sin TACC', () => {
+      component.selectedProduct = null;
+      component.handleFormSubmit(
+        DatosFormularioMother.crearBase({ contiene_tacc: true }),
+      );
+
+      const payload = servicioProducto.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
+    });
+
+    it('dado un producto con azucar, no deberia incluir la clasificacion Sin Azucar', () => {
+      component.selectedProduct = null;
+      component.handleFormSubmit(
+        DatosFormularioMother.crearBase({ contiene_azucar: true }),
+      );
+
+      const payload = servicioProducto.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
+    });
+
+    it('dado un producto con lacteos, deberia incluir la clasificacion Contiene Lacteos', () => {
+      component.selectedProduct = null;
+      component.handleFormSubmit(
+        DatosFormularioMother.crearBase({ contiene_lactosa: true }),
+      );
+
+      const payload = servicioProducto.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).toContain(ID_CONT_LACTEOS);
+    });
+
+    it('dado un producto con TACC y azucar sin lacteos, no deberia incluir ninguna de las 3 relevantes', () => {
+      component.selectedProduct = null;
+      component.handleFormSubmit(
+        DatosFormularioMother.crearBase({
+          contiene_tacc: true,
+          contiene_azucar: true,
+          contiene_lactosa: false,
+        }),
+      );
+
+      const payload = servicioProducto.create.calls.mostRecent().args[0];
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
+      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
+    });
+
+    it('dado el mismo producto, deberia enviar las mismas clasificaciones al crear y al actualizar', () => {
+      const datos = DatosFormularioMother.crearBase({ contiene_lactosa: true });
+
+      component.selectedProduct = null;
+      component.handleFormSubmit(datos);
+      const payloadCreate = servicioProducto.create.calls.mostRecent().args[0];
+
+      component.selectedProduct = productos[0];
+      component.handleFormSubmit(datos);
+      const payloadUpdate = servicioProducto.update.calls.mostRecent().args[1];
+
+      expect(payloadCreate.clasificacionesSaludIds).toEqual(payloadUpdate.clasificacionesSaludIds);
+    });
+  });
+
+  describe('historial de stock', () => {
+    it('dado un producto, cuando abro el historial, deberia pedirlo y ordenarlo desc por fecha', () => {
+      whenMonto();
+
+      component.openStockHistory(inventario[0]);
+
+      expect(servicioProducto.getProductStockMovements).toHaveBeenCalledWith(
+        BUFFET_ID_TEST,
+        inventario[0].productId,
+      );
+      expect(component.stockMovementTarget).toEqual(inventario[0]);
+      expect(component.stockMovements.map((m) => m.id)).toEqual([
+        'movement-new',
+        'movement-old',
+      ]);
+      expect(component.isLoadingStockMovements).toBeFalse();
+    });
+
+    it('dado el historial abierto, cuando cierro, deberia limpiar target y movimientos', () => {
+      whenMonto();
+      component.openStockHistory(inventario[0]);
+
+      component.closeStockHistory();
+
+      expect(component.stockMovementTarget).toBeNull();
+      expect(component.stockMovements).toEqual([]);
+      expect(component.isLoadingStockMovements).toBeFalse();
+    });
+
+    it('dado que falla la carga del historial, deberia mostrar el toast de error', () => {
+      servicioProducto.getProductStockMovements.and.returnValue(
+        throwError(() => new Error('API Error')),
+      );
+
+      whenMonto();
+      component.openStockHistory(inventario[0]);
+
+      expect(component.stockMovements).toEqual([]);
+      expect(component.isLoadingStockMovements).toBeFalse();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'No se pudo cargar el historial del producto',
+        'error',
+      );
+    });
+  });
+
+  describe('gestion de inventario', () => {
+    it('dado un producto pausado en modo DISPONIBLE_NO_DISPONIBLE, cuando cambio a STOCK_EXACTO, deberia reutilizar stockActual y stockMinimo', () => {
+      servicioPerfil.getPerfil.and.returnValue({
+        id: 'usuario-123',
+        email: 'test@example.com',
+        nombre: 'Test',
+        apellido: 'User',
+        rol: 'VENDEDOR',
+      });
+      const pausado = ItemInventarioMother.crearAlfajor({
+        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+        estadoInventario: 'DESACTIVADO',
+        disponible: false,
+        stockActual: 15,
+        stockMinimo: 5,
+      });
+
+      whenMonto();
+      component.openInventoryManagement(pausado);
+      component.inventoryManagementForm.patchValue({
+        tipoManejoInventario: 'STOCK_EXACTO',
+        motivo: '',
+      });
+      component.onInventoryModeChange();
+      component.submitInventoryManagement();
+
+      expect(servicioProducto.updateInventoryStock).toHaveBeenCalledWith(
+        BUFFET_ID_TEST,
+        pausado.productId,
+        {
+          tipoManejoInventario: 'STOCK_EXACTO',
+          disponible: true,
+          estadoInventario: 'DISPONIBLE',
+          stockActual: 15,
+          stockMinimo: 5,
+          motivo: 'Volver a stock exacto',
+          usuarioId: 'usuario-123',
+        },
+      );
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Inventario actualizado', 'success');
+    });
+
+    it('dado el modal de gestion abierto, cuando aplico atajo PAUSE, deberia enviar DESACTIVADO', () => {
+      whenMonto();
+      component.openInventoryManagement(inventario[0]);
+
+      component.applyInventoryManagementShortcut('PAUSE');
+      component.submitInventoryManagement();
+
+      expect(servicioProducto.updateInventoryStock).toHaveBeenCalledWith(
+        BUFFET_ID_TEST,
+        inventario[0].productId,
+        {
+          tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+          disponible: false,
+          estadoInventario: 'DESACTIVADO',
+          motivo: 'Pausado temporalmente',
+        },
+      );
+    });
+
+    it('dado el modal en modo DISPONIBLE_NO_DISPONIBLE, cuando lo envio, no deberia pisar stock', () => {
+      whenMonto();
+      component.openInventoryManagement(inventario[0]);
+      component.inventoryManagementForm.patchValue({
+        tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+        disponible: false,
+        motivo: 'Pausado temporalmente',
+      });
+
+      component.submitInventoryManagement();
+
+      expect(servicioProducto.updateInventoryStock).toHaveBeenCalledWith(
+        BUFFET_ID_TEST,
+        inventario[0].productId,
+        {
+          tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+          disponible: false,
+          estadoInventario: 'DESACTIVADO',
+          motivo: 'Pausado temporalmente',
+        },
+      );
+    });
+
+    it('dado un usuario logueado y un producto pausado, cuando aplico MAKE_AVAILABLE, deberia incluir el usuarioId', () => {
+      servicioPerfil.getPerfil.and.returnValue({
+        id: 'usuario-123',
+        email: 'test@example.com',
+        nombre: 'Test',
+        apellido: 'User',
+        rol: 'VENDEDOR',
+      });
+
+      whenMonto();
+      component.openInventoryManagement(
+        ItemInventarioMother.crearAlfajor({ estadoInventario: 'DESACTIVADO', disponible: false }),
+      );
+      component.applyInventoryManagementShortcut('MAKE_AVAILABLE');
+      component.submitInventoryManagement();
+
+      expect(servicioProducto.updateInventoryStock).toHaveBeenCalledWith(
+        BUFFET_ID_TEST,
+        inventario[0].productId,
+        {
+          tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
+          disponible: true,
+          estadoInventario: 'DISPONIBLE',
+          motivo: 'Producto disponible',
+          usuarioId: 'usuario-123',
+        },
+      );
+    });
+
+    it('dado un producto STOCK_EXACTO, cuando aplico atajo SOLD_OUT, deberia setear stockActual 0', () => {
+      whenMonto();
+      component.openInventoryManagement(inventario[0]);
+
+      component.applyInventoryManagementShortcut('SOLD_OUT');
+      component.submitInventoryManagement();
+
+      expect(servicioProducto.updateInventoryStock).toHaveBeenCalledWith(
+        BUFFET_ID_TEST,
+        inventario[0].productId,
+        {
+          tipoManejoInventario: 'STOCK_EXACTO',
+          disponible: true,
+          estadoInventario: 'SIN_STOCK',
+          stockActual: 0,
+          stockMinimo: 5,
+          motivo: 'Marcar agotado',
+        },
+      );
+    });
+
+    it('dado un producto CUPO_DIARIO, cuando aplico atajo SOLD_OUT, deberia setear cupoMaximoDiario 0', () => {
+      whenMonto();
+      component.openInventoryManagement(inventario[1]);
+
+      component.applyInventoryManagementShortcut('SOLD_OUT');
+      component.submitInventoryManagement();
+
+      expect(servicioProducto.updateInventoryStock).toHaveBeenCalledWith(
+        BUFFET_ID_TEST,
+        inventario[1].productId,
+        {
+          tipoManejoInventario: 'CUPO_DIARIO',
+          disponible: true,
+          estadoInventario: 'SIN_STOCK',
+          cupoMaximoDiario: 0,
+          motivo: 'Marcar agotado',
+        },
+      );
+    });
+
+    it('dado un error 409 con code STOCK_INSUFFICIENT, cuando envio la gestion, deberia mapear el mensaje', () => {
+      const error = new HttpErrorResponse({
+        status: 409,
+        error: { code: 'STOCK_INSUFFICIENT', mensaje: 'No hay stock suficiente...' },
+      });
+      servicioProducto.updateInventoryStock.and.returnValue(throwError(() => error));
+
+      whenMonto();
+      component.openInventoryManagement(inventario[0]);
+      component.inventoryManagementForm.patchValue({ stockActual: 0 });
+      component.submitInventoryManagement();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('No hay stock suficiente.', 'error');
+    });
+  });
+
+  describe('busqueda y navegacion adicionales', () => {
+    it('dado un input con valor, setSearchQuery deberia setearlo; sin target no deberia romper', () => {
+      const input = document.createElement('input');
+      input.value = 'alfa';
+
+      component.setSearchQuery({ target: input } as unknown as Event);
+      expect(component.searchQuery).toBe('alfa');
+
+      component.setSearchQuery({ target: null } as unknown as Event);
+      expect(component.searchQuery).toBe('');
+    });
+
+    it('dado un searchQuery seteado, cuando llamo clearSearchQuery, deberia vaciarlo', () => {
+      component.searchQuery = 'algo';
+
+      component.clearSearchQuery();
+
+      expect(component.searchQuery).toBe('');
+    });
+
+    it('cuando llamo irAComparador, deberia navegar a /kiosquero/proveedores/comparador con preselect low-stock', () => {
+      const router = TestBed.inject(Router);
+      const navigateSpy = spyOn(router, 'navigate');
+
+      component.irAComparador();
+
+      expect(navigateSpy).toHaveBeenCalledWith(['/kiosquero/proveedores/comparador'], {
+        queryParams: { preselect: 'low-stock' },
+      });
+    });
+  });
+
+  describe('filtros DISPONIBLE y AGOTADO', () => {
+    beforeEach(() => {
+      component.products = [
+        ItemInventarioMother.crearAlfajor({ productId: 'p-disp', disponible: true, agotado: false, estadoInventario: 'DISPONIBLE' }),
+        ItemInventarioMother.crearAlfajor({ productId: 'p-ago', disponible: false, agotado: true, estadoInventario: 'SIN_STOCK', stockActual: 0 }),
+      ];
+    });
+
+    it('dado el filtro DISPONIBLE, deberia dejar solo los productos disponibles', () => {
+      component.setFilter('DISPONIBLE');
+
+      expect(component.filteredProducts.map((p) => p.productId)).toEqual(['p-disp']);
+    });
+
+    it('dado el filtro AGOTADO, deberia dejar solo los productos agotados', () => {
+      component.setFilter('AGOTADO');
+
+      expect(component.filteredProducts.map((p) => p.productId)).toEqual(['p-ago']);
+    });
+  });
+
+  describe('acciones de creacion/edicion desde overview', () => {
+    it('cuando llamo openCreateForm, deberia abrir el formulario individual sin producto seleccionado', () => {
+      component.openCreateForm();
+
+      expect(component.isFormVisible).toBeTrue();
+      expect(component.selectedProduct).toBeNull();
+    });
+
+    it('dado openEditFormFromInventory, deberia pedir el detalle y abrir el form con el producto', () => {
+      whenMonto();
+      component.openEditFormFromInventory(inventario[0]);
+
+      expect(servicioProducto.getById).toHaveBeenCalledWith(inventario[0].productId);
+      expect(component.isFormVisible).toBeTrue();
+    });
+
+    it('dado openEditFormFromInventory con getById que falla, deberia mostrar toast de error', () => {
+      servicioProducto.getById.and.returnValue(throwError(() => new Error('Not found')));
+
+      component.openEditFormFromInventory(inventario[0]);
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Error al cargar el producto', 'error');
+    });
+  });
+
+  describe('delete flows', () => {
+    beforeEach(() => whenMonto());
+
+    it('dado requestDelete con un producto, deberia setearlo como target', () => {
+      component.requestDelete(productos[0]);
+
+      expect(component.deleteTarget).toEqual(productos[0]);
+    });
+
+    it('dado requestDeleteFromInventory con un item, deberia setearlo como target normalizado', () => {
+      component.requestDeleteFromInventory(inventario[0]);
+
+      expect(component.deleteTarget?.id).toBe(inventario[0].productId);
+    });
+
+    it('dado cancelDelete, deberia limpiar el target', () => {
+      component.deleteTarget = productos[0];
+
+      component.cancelDelete();
+
+      expect(component.deleteTarget).toBeNull();
+    });
+
+    it('dado que confirmDelete falla, deberia mostrar toast de error', () => {
+      servicioProducto.delete.and.returnValue(throwError(() => new Error('boom')));
+      component.deleteTarget = productos[0];
+
+      component.confirmDelete();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Error al eliminar el producto', 'error');
+    });
+
+    it('dado confirmDelete sin target, no deberia llamar al service', () => {
+      component.deleteTarget = null;
+
+      component.confirmDelete();
+
+      expect(servicioProducto.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('branches puntuales', () => {
+    it('dado un producto sin stockReservado, reservadosCount deberia caer al fallback 0', () => {
+      component.products = [
+        ItemInventarioMother.crearAlfajor({ productId: 'p1', stockReservado: null as unknown as number }),
+      ];
+
+      expect(component.reservadosCount).toBe(0);
+    });
+
+    it('dado un producto sin stockActual definido, normalizeEditableProduct via openEditFormFromInventory no deberia romper', () => {
+      whenMonto();
+      servicioProducto.getById.and.returnValue(of(ProductoMother.crear({ stockActual: null as unknown as number })));
+
+      component.openEditFormFromInventory(inventario[0]);
+
+      expect(component.selectedProduct).toBeTruthy();
+    });
+
+    it('dado un evento PURCHASE_CREATED sin message ni total, deberia mostrar "Nueva compra"', () => {
+      whenMonto();
+      const handlers = servicioRealtime.connect.calls.mostRecent().args[1] as {
+        onPurchaseCreated: (event: EventoInventarioRealtime) => void;
+      };
+
+      handlers.onPurchaseCreated({
+        buffetId: BUFFET_ID_TEST,
+        type: 'PURCHASE_CREATED',
+        occurredAt: new Date().toISOString(),
+      });
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/Nueva compra/), 'success');
+    });
+
+    it('dado un producto no en overview, cuando llega STOCK_CHANGED con productId distinto al target del historial, no deberia recargar el historial', fakeAsync(() => {
+      whenMonto();
+      const handlers = servicioRealtime.connect.calls.mostRecent().args[1] as {
+        onRefresh: (event: EventoInventarioRealtime) => void;
+      };
+      servicioProducto.getProductStockMovements.calls.reset();
+
+      handlers.onRefresh({
+        buffetId: BUFFET_ID_TEST,
+        type: 'STOCK_CHANGED',
+        productId: 'inexistente-en-overview',
+        occurredAt: new Date().toISOString(),
+      });
+
+      tick(3000);
+
+      expect(servicioProducto.getProductStockMovements).not.toHaveBeenCalled();
+    }));
+  });
+
+  describe('errores de perfil sin buffetId', () => {
+    it('dado sin buffetId al montar, cuando cargo el inventario, deberia mostrar toast de error', () => {
+      servicioPerfil.obtenerBuffetId.and.returnValue(null);
+
+      whenMonto();
+      component.loadProducts();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        jasmine.stringMatching(/buffet/i),
+        'error',
+      );
+    });
+
+    it('dado que getCategories falla, deberia mostrar el toast de error', () => {
+      servicioProducto.getCategories.and.returnValue(throwError(() => new Error('boom')));
+
+      whenMonto();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(jasmine.stringMatching(/categor/i), 'error');
+    });
+  });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

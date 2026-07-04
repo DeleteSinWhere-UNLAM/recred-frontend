@@ -1,31 +1,16 @@
+import { Component, Input, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { UsuarioService } from '../../data-access/services/usuario.service';
+import { PreferenciaDetectadaCardComponent } from './components/preferencia-detectada-card/preferencia-detectada-card.component';
+import { PreferenciaDetectada } from './models/preferencia-detectada.model';
+import { PreferenciasDetectadasMother } from './preferencias-detectadas.mother';
 import { PreferenciasDetectadasPage } from './preferencias-detectadas.page';
 import { PreferenciasDetectadasService } from './services/preferencias-detectadas.service';
-import { UsuarioService } from '../../data-access/services/usuario.service';
-import { of } from 'rxjs';
-import { Component, Input, signal } from '@angular/core';
-import { PreferenciaDetectada } from './models/preferencia-detectada.model';
-import { PreferenciaDetectadaCardComponent } from './components/preferencia-detectada-card/preferencia-detectada-card.component';
-import { PreferenciasDetectadasMother } from './preferencias-detectadas.mother';
 
-
-
-@Component({
-  selector: 'app-preferencia-detectada-card',
-  template: '',
-  standalone: true
-})
+@Component({ selector: 'app-preferencia-detectada-card', template: '', standalone: true })
 class PreferenciaDetectadaCardStub {
   @Input() preferencia!: PreferenciaDetectada;
-}
-
-@Component({
-  selector: 'app-navbar',
-  template: '',
-  standalone: true
-})
-class NavbarStub {
-  @Input() userName = '';
 }
 
 describe('PreferenciasDetectadasPage', () => {
@@ -34,67 +19,88 @@ describe('PreferenciasDetectadasPage', () => {
 
   beforeEach(async () => {
     servicioPreferencias = jasmine.createSpyObj('PreferenciasDetectadasService', ['getPreferencias']);
-    
     servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual'], {
       esVistaKiosquero: signal(false),
       esVistaAlumno: signal(false),
       nombreNavbar: signal('Test User'),
-      homeUrl: signal('/tutor')
+      homeUrl: signal('/tutor'),
     });
-
     servicioUsuario.getUsuarioActual.and.returnValue(PreferenciasDetectadasMother.crearUsuario());
 
     await TestBed.configureTestingModule({
       imports: [PreferenciasDetectadasPage],
       providers: [
         { provide: PreferenciasDetectadasService, useValue: servicioPreferencias },
-        { provide: UsuarioService, useValue: servicioUsuario }
-      ]
+        { provide: UsuarioService, useValue: servicioUsuario },
+      ],
     })
       .overrideComponent(PreferenciasDetectadasPage, {
-        remove: {
-          imports: [PreferenciaDetectadaCardComponent]
-        },
-        add: {
-          imports: [NavbarStub, PreferenciaDetectadaCardStub]
-        }
+        remove: { imports: [PreferenciaDetectadaCardComponent] },
+        add: { imports: [PreferenciaDetectadaCardStub] },
       })
       .compileComponents();
   });
 
-  describe('Cuando el perfil existe en localStorage', () => {
+  describe('cuando hay perfil en localStorage', () => {
     let component: PreferenciasDetectadasPage;
     let fixture: ComponentFixture<PreferenciasDetectadasPage>;
 
     beforeEach(() => {
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
-      const preferenciasEsperadas = [PreferenciasDetectadasMother.crearPreferencia()];
-      servicioPreferencias.getPreferencias.and.returnValue(of(preferenciasEsperadas));
-      
+      givenPerfilEnLocalStorage('user-id-123');
+      servicioPreferencias.getPreferencias.and.returnValue(
+        of([PreferenciasDetectadasMother.crearPreferencia()]),
+      );
+
       fixture = TestBed.createComponent(PreferenciasDetectadasPage);
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
 
-    it('debería solicitar las preferencias detectadas al servicio y asignarlas al estado', () => {
-      
-      const cantidadPreferencias = component.preferencias.length;
-
+    it('dado el perfil en localStorage, cuando se monta, deberia pedirle las preferencias al service con ese id', () => {
       expect(servicioPreferencias.getPreferencias).toHaveBeenCalledWith('user-id-123');
-      expect(cantidadPreferencias).toBe(1);
+      expect(component.preferencias.length).toBe(1);
+    });
+
+    it('dado preferencias del service, cuando se monta, deberia renderizar una card por preferencia', () => {
+      const cards = (fixture.nativeElement as HTMLElement).querySelectorAll(
+        'app-preferencia-detectada-card',
+      );
+      expect(cards.length).toBe(1);
+    });
+
+    it('dado el UsuarioService, deberia exponer nombreUsuario', () => {
+      expect(component.nombreUsuario).toBe('Test User');
     });
   });
 
-  describe('Cuando la sesión no es válida', () => {
-    it('no debería solicitar las preferencias si el id de usuario no existe', () => {
-      
-      spyOn(localStorage, 'getItem').and.returnValue(null);
+  describe('cuando no hay perfil en localStorage', () => {
+    it('dado sin perfil, cuando se monta, no deberia pedir preferencias ni tener items', () => {
+      givenSinPerfilEnLocalStorage();
+
       const fixture = TestBed.createComponent(PreferenciasDetectadasPage);
-      const component = fixture.componentInstance;
       fixture.detectChanges();
 
       expect(servicioPreferencias.getPreferencias).not.toHaveBeenCalled();
-      expect(component.preferencias.length).toBe(0);
+      expect(fixture.componentInstance.preferencias.length).toBe(0);
+    });
+
+    it('dado sin preferencias, cuando renderizo, deberia mostrar el estado vacio', () => {
+      givenSinPerfilEnLocalStorage();
+
+      const fixture = TestBed.createComponent(PreferenciasDetectadasPage);
+      fixture.detectChanges();
+
+      expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+        'No hay preferencias detectadas.',
+      );
     });
   });
+
+  function givenPerfilEnLocalStorage(usuarioId: string): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: usuarioId }));
+  }
+
+  function givenSinPerfilEnLocalStorage(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+  }
 });

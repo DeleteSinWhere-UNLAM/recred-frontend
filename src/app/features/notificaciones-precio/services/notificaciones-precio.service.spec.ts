@@ -1,12 +1,14 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { NotificacionesPrecioService } from './notificaciones-precio.service';
-import { NotificacionPrecio } from '../models/notificacion-precio.model';
 import { NotificacionesPrecioMother } from '../notificaciones-precio.mother';
+import { NotificacionesPrecioService } from './notificaciones-precio.service';
 
 describe('NotificacionesPrecioService', () => {
+  const USUARIO_ID = 'user-kiosquero-1';
+
   let service: NotificacionesPrecioService;
   let httpMock: HttpTestingController;
 
@@ -15,32 +17,36 @@ describe('NotificacionesPrecioService', () => {
       providers: [
         NotificacionesPrecioService,
         provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(NotificacionesPrecioService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  describe('Obtención de notificaciones', () => {
-    it('debería solicitar las notificaciones de alerta de precio realizando un GET al endpoint correspondiente', () => {
-      
-      const userIdMock = 'user-kiosquero-1';
-      const mockRespuesta: NotificacionPrecio[] = [NotificacionesPrecioMother.crearNotificacion()];
-      let respuestaObtenida: NotificacionPrecio[] | undefined;
+  describe('getNotificaciones', () => {
+    it('dado un usuarioId, cuando pido las notificaciones, deberia hacer GET al endpoint de preferencias con tipo=ALERTA_PRECIO', async () => {
+      const notificaciones = [NotificacionesPrecioMother.crearNotificacion()];
 
-      service.getNotificaciones(userIdMock).subscribe((data) => {
-        respuestaObtenida = data;
-      });
-      const req = httpMock.expectOne(`${environment.apiUrl}/usuarios/${userIdMock}/preferencias?tipo=ALERTA_PRECIO`);
-      req.flush(mockRespuesta);
-
+      const promesa = firstValueFrom(service.getNotificaciones(USUARIO_ID));
+      const req = httpMock.expectOne(
+        `${environment.apiUrl}/usuarios/${USUARIO_ID}/preferencias?tipo=ALERTA_PRECIO`,
+      );
       expect(req.request.method).toBe('GET');
-      expect(respuestaObtenida).toEqual(mockRespuesta);
+      req.flush(notificaciones);
+
+      expect(await promesa).toEqual(notificaciones);
+    });
+
+    it('dado que el back devuelve una lista vacia, cuando pido las notificaciones, deberia resolver con lista vacia', async () => {
+      const promesa = firstValueFrom(service.getNotificaciones(USUARIO_ID));
+      httpMock
+        .expectOne(`${environment.apiUrl}/usuarios/${USUARIO_ID}/preferencias?tipo=ALERTA_PRECIO`)
+        .flush([]);
+
+      expect(await promesa).toEqual([]);
     });
   });
 });

@@ -1,10 +1,14 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { CargaMasivaService, RespuestaCargaMasiva } from './carga-masiva.service';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { RespuestaCargaMasivaMother, RespuestaProductoMasivoMother } from '../inventario.mother';
+import { CargaMasivaService } from './carga-masiva.service';
 
 describe('CargaMasivaService', () => {
+  const URL_BULK = `${environment.apiUrl}/products/bulk-upload`;
+
   let service: CargaMasivaService;
   let httpMock: HttpTestingController;
 
@@ -16,42 +20,43 @@ describe('CargaMasivaService', () => {
         provideHttpClientTesting(),
       ],
     });
-
     service = TestBed.inject(CargaMasivaService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  it('dado que subo un archivo, deberia hacer un POST con formData al endpoint correcto', () => {
-    const mockFile = new File(['dummy content'], 'test.pdf', { type: 'application/pdf' });
-    const mockResponse: RespuestaCargaMasiva = {
-      products: [
-        {
-          nombre: 'Agua Mineral',
-          descripcion: 'Botella individual',
-          precio: 600.0,
-          peso: 500.0,
-          requierePreparacion: false,
-          categoriaId: null,
-          nuevaCategoriaNombre: 'Bebidas',
-          stockActual: 50,
-          saludEtiquetasIds: [],
-          tipoEtiquetasIds: [],
-        }
-      ]
-    };
+  describe('uploadFile', () => {
+    it('dado un archivo, cuando lo subo, deberia hacer POST al endpoint con FormData que contiene el archivo', async () => {
+      const archivo = new File(['dummy'], 'productos.pdf', { type: 'application/pdf' });
 
-    service.uploadFile(mockFile).subscribe((res) => {
-      expect(res).toEqual(mockResponse);
+      const promesa = firstValueFrom(service.uploadFile(archivo));
+
+      const req = httpMock.expectOne(URL_BULK);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body instanceof FormData).toBeTrue();
+      expect((req.request.body as FormData).get('file')).toBe(archivo);
+
+      req.flush(RespuestaCargaMasivaMother.crear());
+      await promesa;
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/products/bulk-upload`);
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body instanceof FormData).toBeTrue();
-    expect((req.request.body as FormData).has('file')).toBeTrue();
-    req.flush(mockResponse);
+    it('dado que el back devuelve productos, cuando subo, deberia resolver con la respuesta parseada', async () => {
+      const respuesta = RespuestaCargaMasivaMother.crear({
+        products: [
+          RespuestaProductoMasivoMother.crear({ nombre: 'Agua' }),
+          RespuestaProductoMasivoMother.crear({ nombre: 'Alfajor', precio: 500 }),
+        ],
+      });
+
+      const promesa = firstValueFrom(
+        service.uploadFile(new File(['x'], 'x.pdf', { type: 'application/pdf' })),
+      );
+      httpMock.expectOne(URL_BULK).flush(respuesta);
+
+      const resultado = await promesa;
+      expect(resultado.products.length).toBe(2);
+      expect(resultado.products[1].precio).toBe(500);
+    });
   });
 });
