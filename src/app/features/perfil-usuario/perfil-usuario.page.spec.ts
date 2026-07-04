@@ -9,7 +9,7 @@ import {
   UsuarioLogueado,
 } from '../../data-access/models/perfil-usuario.model';
 import { PayoutConfig } from '../../data-access/models/payout-config.model';
-import { PayoutConfigService } from '../../data-access/services/payout-config.service';
+import { PayoutConfigService } from '../home-kiosquero/services/payout-config.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { PerfilUsuarioService } from '../../data-access/services/perfil-usuario.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
@@ -191,7 +191,7 @@ describe('PerfilUsuarioPage', () => {
       whenMontoYAvanzoDosTicks();
 
       thenSeSeteoHomeUrl('/kiosquero');
-      thenSePidioLaConfigDeKiosquero('buffet-1');
+      thenSePidioLaConfigDeKiosquero('usuario-1');
     }));
 
     it('dado un alumno logueado, cuando se monta, deberia setear /alumno como home', fakeAsync(() => {
@@ -663,6 +663,8 @@ describe('PerfilUsuarioPage', () => {
 
   function givenSinKiosqueroId(): void {
     servicioPerfil.obtenerBuffetId.and.returnValue(null);
+    (component as unknown as { usuario: WritableSignalLike<unknown> }).usuario.set(null);
+    (component as unknown as { perfil: WritableSignalLike<unknown> }).perfil.set(null);
     servicioPayout.guardarConfiguracion.calls.reset();
     servicioToast.mostrar.calls.reset();
   }

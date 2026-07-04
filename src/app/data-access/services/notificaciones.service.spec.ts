@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 import { NotificacionBackend, NotificacionesService } from './notificaciones.service';
 
 describe('NotificacionesService', () => {
-  const URL = `${environment.apiUrl}/notifications/me?size=5`;
+  const URL = `${environment.apiUrl}/notifications/me?size=50`;
 
   let service: NotificacionesService;
   let httpMock: HttpTestingController;
@@ -25,22 +25,17 @@ describe('NotificacionesService', () => {
       expect(service.cantidad()).toBe(0);
     });
 
-    it('dado que seteo cantidad manualmente, deberia reflejarla cuando la lista esta vacia', () => {
-      service.setCantidad(4);
-
-      expect(service.cantidad()).toBe(4);
-    });
-
-    it('dado cantidad negativa, deberia clampearla a 0', () => {
-      service.setCantidad(-5);
-
-      expect(service.cantidad()).toBe(0);
-    });
-
-    it('dado que hay notificaciones cargadas, cantidad deberia usar el length de la lista', () => {
-      service.agregarNotificacion({ id: '1', titulo: 'x' });
+    it('dado que hay notificaciones no leidas, cantidad deberia contar solo las no leidas', () => {
+      service.agregarNotificacion({ id: '1', titulo: 'x', read: false });
+      service.agregarNotificacion({ id: '2', titulo: 'y', read: true });
 
       expect(service.cantidad()).toBe(1);
+    });
+
+    it('dado que hay notificaciones cargadas todas leidas, cantidad deberia ser 0', () => {
+      service.agregarNotificacion({ id: '1', titulo: 'x', read: true });
+
+      expect(service.cantidad()).toBe(0);
     });
   });
 

@@ -91,8 +91,9 @@ describe('NavbarComponent', () => {
       { alumnos: alumnosSignal.asReadonly() },
     );
     servicioAlumnos.asegurarCargados.and.resolveTo([]);
-    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['perfil']);
+    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['perfil', 'rol']);
     (servicioPerfil.perfil as jasmine.Spy).and.callFake(() => perfilSignal());
+    (servicioPerfil.rol as jasmine.Spy).and.callFake(() => perfilSignal()?.rol ?? null);
     servicioNotif = jasmine.createSpyObj<NotificacionesService>(
       'NotificacionesService',
       ['obtenerNotificaciones'],
@@ -320,13 +321,13 @@ describe('NavbarComponent', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/resumen-semanal');
     });
 
-    it('dado una notif de otro tipo, no deberia navegar', () => {
+    it('dado una notif de otro tipo en vista tutor, deberia cerrar el menu y navegar al fallback /tutor-dashboard', () => {
       interno.menuNotifAbierto.set(true);
 
       interno.clickEnNotificacion({ tipo: 'OTRO' });
 
-      expect(router.navigateByUrl).not.toHaveBeenCalled();
-      expect(interno.menuNotifAbierto()).toBeTrue();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor-dashboard');
+      expect(interno.menuNotifAbierto()).toBeFalse();
     });
   });
 

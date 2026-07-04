@@ -5,7 +5,11 @@ import { of, throwError } from 'rxjs';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { SUPPLIER_ID_TEST, SupplierResponseMother } from '../../proveedores.mother';
+import {
+  ListaPrecioProveedorMother,
+  SUPPLIER_ID_TEST,
+  SupplierResponseMother,
+} from '../../proveedores.mother';
 import { SupplierService } from '../../services/supplier.service';
 import { SuppliersListPage } from './suppliers-list.page';
 
@@ -316,7 +320,13 @@ describe('SuppliersListPage', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
     });
 
-    it('dado la page, cuando llamo irComparador, deberia navegar a /kiosquero/proveedores/comparador', () => {
+    it('dado la page con al menos una lista de precios cargada, cuando llamo irComparador, deberia navegar a /kiosquero/proveedores/comparador', () => {
+      const proveedorConLista = SupplierResponseMother.crear({
+        id: 'sup-con-lista',
+        listasPrecios: [ListaPrecioProveedorMother.crear()],
+      });
+      component.suppliers.set([proveedorConLista]);
+
       component.irComparador();
 
       expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/proveedores/comparador');

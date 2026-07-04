@@ -12,6 +12,7 @@ import { DialogService } from '../../../../shared/services/dialog.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CropModalComponent } from '../../../perfil-usuario/components/crop-modal/crop-modal.component';
 import { MovimientosService } from '../../../movimientos/services/movimientos.service';
+import { PresupuestoService } from '../../../presupuesto/services/presupuesto.service';
 import { AlumnoCardComponent } from './alumno-card.component';
 
 @Component({ selector: 'app-crop-modal', template: '', standalone: true })
@@ -29,11 +30,16 @@ describe('AlumnoCardComponent', () => {
   let servicioToast: jasmine.SpyObj<ToastService>;
   let servicioDialog: jasmine.SpyObj<DialogService>;
   let servicioContexto: jasmine.SpyObj<AlumnoContextoService>;
+  let servicioPresupuesto: jasmine.SpyObj<PresupuestoService>;
   let perfilSignal: WritableSignal<Perfil | null>;
 
   beforeEach(async () => {
-    servicioMovimientos = jasmine.createSpyObj('MovimientosService', ['getPendientesAlumno']);
+    servicioMovimientos = jasmine.createSpyObj('MovimientosService', [
+      'getPendientesAlumno',
+      'getHistorialAlumno',
+    ]);
     servicioMovimientos.getPendientesAlumno.and.returnValue(of([]));
+    servicioMovimientos.getHistorialAlumno.and.returnValue(of([]));
 
     servicioMicrocreditos = jasmine.createSpyObj('MicrocreditosService', ['getActiveCredit']);
     servicioMicrocreditos.getActiveCredit.and.returnValue(of(null));
@@ -43,7 +49,13 @@ describe('AlumnoCardComponent', () => {
 
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
     servicioDialog = jasmine.createSpyObj('DialogService', ['alert', 'confirm']);
-    servicioContexto = jasmine.createSpyObj('AlumnoContextoService', ['setAlumnoId']);
+    servicioContexto = jasmine.createSpyObj(
+      'AlumnoContextoService',
+      ['setAlumnoId'],
+      { alumnoId: signal('').asReadonly() },
+    );
+    servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', ['getPresupuesto']);
+    servicioPresupuesto.getPresupuesto.and.resolveTo(undefined);
 
     perfilSignal = signal<Perfil | null>(PerfilMother.crearTutor());
 
@@ -57,6 +69,7 @@ describe('AlumnoCardComponent', () => {
         { provide: DialogService, useValue: servicioDialog },
         { provide: AlumnoContextoService, useValue: servicioContexto },
         { provide: PerfilService, useValue: { perfil: perfilSignal.asReadonly() } },
+        { provide: PresupuestoService, useValue: servicioPresupuesto },
         provideRouter([]),
       ],
     })
@@ -118,27 +131,37 @@ describe('AlumnoCardComponent', () => {
     });
   });
 
-  describe('budget mock', () => {
-    it('dado un alumno "Eugenio", budgetSpent deberia ser 450 y el porcentaje calculado', () => {
-      component.alumno = AlumnoMother.crear({ nombre: 'Eugenio' });
+  describe('derivaciones de presupuesto', () => {
+    it('dado limit 1000 y spent 450, budgetPercentage deberia ser el 55% restante', () => {
+      givenPresupuesto(1000, 450);
 
-      expect(component.budgetSpent).toBe(450);
-      expect(component.budgetPercentage).toBe(45);
-      expect(component.budgetSpentFormateado).toBe('$450');
-      expect(component.budgetLimitFormateado).toBe('$1000');
+      expect(component.budgetPercentage).toBe(55);
     });
 
-    it('dado un alumno "Adrian", budgetSpent deberia ser 850 y porcentaje 85', () => {
-      component.alumno = AlumnoMother.crear({ nombre: 'Adrian' });
+    it('dado limit 1000 y spent 300, budgetRestanteFormateado deberia formatear 700', () => {
+      givenPresupuesto(1000, 300);
 
-      expect(component.budgetSpent).toBe(850);
-      expect(component.budgetPercentage).toBe(85);
+      expect(component.budgetRestanteFormateado).toContain('$');
+      expect(component.budgetRestanteFormateado).toContain('700');
     });
 
-    it('dado un nombre no reconocido, budgetSpent deberia caer al default 500', () => {
-      component.alumno = AlumnoMother.crear({ nombre: 'DesconocidoX' });
+    it('dado limit 1000, budgetLimitFormateado deberia contener $ y 1.000', () => {
+      givenPresupuesto(1000, 0);
 
-      expect(component.budgetSpent).toBe(500);
+      expect(component.budgetLimitFormateado).toContain('$');
+      expect(component.budgetLimitFormateado).toContain('1.000');
+    });
+
+    it('dado limit 0, budgetPercentage deberia ser 0 (evita division por cero)', () => {
+      givenPresupuesto(0, 100);
+
+      expect(component.budgetPercentage).toBe(0);
+    });
+
+    it('dado spent mayor al limit, budgetRestanteFormateado deberia clampear a 0', () => {
+      givenPresupuesto(1000, 1500);
+
+      expect(component.budgetRestanteFormateado).toContain('0');
     });
   });
 
@@ -302,14 +325,6 @@ describe('AlumnoCardComponent', () => {
       expect(component.iniciales).toBe('');
     });
 
-    it('dado alumnos "Emmanuel" y "Rocio", budgetSpent deberia usar los valores mock', () => {
-      component.alumno = AlumnoMother.crear({ nombre: 'Emmanuel' });
-      expect(component.budgetSpent).toBe(700);
-
-      component.alumno = AlumnoMother.crear({ nombre: 'Rocio' });
-      expect(component.budgetSpent).toBe(600);
-    });
-
     it('dado que getActiveCredit falla, creditoActivo deberia quedar en null', () => {
       servicioMicrocreditos.getActiveCredit.and.returnValue(throwError(() => new Error('sin credito')));
 
@@ -332,6 +347,11 @@ describe('AlumnoCardComponent', () => {
 
   function whenMonto(): void {
     fixture.detectChanges();
+  }
+
+  function givenPresupuesto(limit: number, spent: number): void {
+    component.budgetLimit.set(limit);
+    component.budgetSpent.set(spent);
   }
 
   function crearInputConArchivo(archivo: File): HTMLInputElement {

@@ -177,42 +177,48 @@ describe('OrderDetailsModalComponent', () => {
     });
   });
 
-  describe('confirmDelivery', () => {
-    it('dado un codigo, cuando confirmo la entrega, deberia hacer deliver y emitir ENTREGADO', () => {
-      spyOn(component.advanceStatus, 'emit');
+  describe('validateCode', () => {
+    it('dado un codigo, cuando valido, deberia llamar a deliver y marcar codeValidated', () => {
       compraService.deliver.and.returnValue(of(undefined));
       component.verificationCode = 'ABC123';
 
-      component['confirmDelivery']();
+      component['validateCode']();
 
       expect(compraService.deliver).toHaveBeenCalledWith('order-1', 'ABC123');
-      expect(component.advanceStatus.emit).toHaveBeenCalledWith({
-        orderId: 'order-1',
-        nextStatus: 'ENTREGADO',
-      });
-      expect(component.showVerificationModal).toBeFalse();
+      expect(component.codeValidated).toBeTrue();
+      expect(component.validationError).toBeNull();
     });
 
-    it('dado un codigo vacio, cuando confirmo la entrega, no deberia hacer nada', () => {
+    it('dado un codigo vacio, cuando valido, no deberia llamar a deliver', () => {
       component.verificationCode = '';
 
-      component['confirmDelivery']();
+      component['validateCode']();
 
       expect(compraService.deliver).not.toHaveBeenCalled();
     });
 
-    it('dado que deliver falla, cuando confirmo la entrega, deberia mostrar alerta con codigo invalido', async () => {
+    it('dado que deliver falla, cuando valido, deberia setear validationError', () => {
       compraService.deliver.and.returnValue(throwError(() => new Error('bad code')));
-      dialogService.alert.and.resolveTo(true);
       component.verificationCode = 'BAD';
 
-      component['confirmDelivery']();
-      await fixture.whenStable();
+      component['validateCode']();
 
-      expect(dialogService.alert).toHaveBeenCalledWith(
-        'Código incorrecto. Intente nuevamente.',
-        'Código Inválido',
-      );
+      expect(component.codeValidated).toBeFalse();
+      expect(component.validationError).toBe('Código incorrecto. Por favor, ingréselo nuevamente.');
+    });
+
+    it('dado un codigo validado y estado LISTO, cuando avanzo, deberia emitir ENTREGADO', () => {
+      spyOn(component.advanceStatus, 'emit');
+      component.order = ScheduledPickupMother.crear({ status: 'LISTO' });
+      component.showVerificationModal = true;
+      component.codeValidated = true;
+
+      component['onAdvance']();
+
+      expect(component.advanceStatus.emit).toHaveBeenCalledWith({
+        orderId: 'order-1',
+        nextStatus: 'ENTREGADO',
+      });
     });
   });
 
