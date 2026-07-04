@@ -217,7 +217,118 @@ describe('AlumnoCardComponent', () => {
 
       expect(servicioToast.mostrar).not.toHaveBeenCalled();
     });
+
+    it('dado un input sin files, cuando lo selecciono, no deberia mostrar ningun toast', async () => {
+      const input = document.createElement('input');
+      Object.defineProperty(input, 'files', { value: null, writable: false });
+
+      await component.onFotoSeleccionada({ target: input } as unknown as Event);
+
+      expect(servicioToast.mostrar).not.toHaveBeenCalled();
+    });
   });
+
+  describe('abrirSelectorFoto', () => {
+    it('cuando hago click en la foto, deberia disparar el click del input oculto', () => {
+      whenMonto();
+      const inputFoto = fixture.debugElement.nativeElement.querySelector('input[type="file"]') as HTMLInputElement;
+      const clickSpy = spyOn(inputFoto, 'click');
+
+      component.abrirSelectorFoto();
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('onFotoRecortada y onCancelarRecorte', () => {
+    it('dado un flujo con archivo valido, cuando recorto, deberia subir la foto y mostrar toast success', async () => {
+      const original = new File([''], 'foto.jpg', { type: 'image/jpeg' });
+      await seleccionarArchivo(original);
+
+      await (component as unknown as ProtectedFoto).onFotoRecortada(new Blob(['crop'], { type: 'image/webp' }));
+
+      expect(servicioAlumnos.subirFotoAlumno).toHaveBeenCalled();
+      const [alumnoIdArg, archivoArg] = servicioAlumnos.subirFotoAlumno.calls.mostRecent().args as [string, File];
+      expect(alumnoIdArg).toBe('alumno-1');
+      expect(archivoArg.name).toBe('foto.jpg');
+      expect(archivoArg.type).toBe('image/webp');
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Foto actualizada correctamente.', 'success');
+    });
+
+    it('dado que subirFotoAlumno falla, cuando recorto, deberia mostrar toast de error', async () => {
+      servicioAlumnos.subirFotoAlumno.and.rejectWith(new Error('boom'));
+      await seleccionarArchivo(new File([''], 'foto.jpg', { type: 'image/jpeg' }));
+
+      await (component as unknown as ProtectedFoto).onFotoRecortada(new Blob(['crop'], { type: 'image/webp' }));
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('No se pudo subir la foto. Intentá de nuevo.', 'error');
+    });
+
+    it('dado que no hubo seleccion previa, cuando se dispara onFotoRecortada, no deberia subir nada', async () => {
+      await (component as unknown as ProtectedFoto).onFotoRecortada(new Blob(['crop'], { type: 'image/webp' }));
+
+      expect(servicioAlumnos.subirFotoAlumno).not.toHaveBeenCalled();
+    });
+
+    it('dado que habia un archivo seleccionado, cuando cancelo, deberia limpiar el input y el fotoEvent', async () => {
+      await seleccionarArchivo(new File([''], 'foto.jpg', { type: 'image/jpeg' }));
+      const input = (component as unknown as ProtectedFoto).fotoEvent()!.target as HTMLInputElement;
+      input.value = 'algo';
+
+      (component as unknown as ProtectedFoto).onCancelarRecorte();
+
+      expect(input.value).toBe('');
+      expect((component as unknown as ProtectedFoto).fotoEvent()).toBeNull();
+    });
+
+    it('dado que no hay foto pendiente, cuando cancelo, no deberia romper', () => {
+      expect(() => (component as unknown as ProtectedFoto).onCancelarRecorte()).not.toThrow();
+      expect((component as unknown as ProtectedFoto).fotoEvent()).toBeNull();
+    });
+  });
+
+  describe('derivaciones extra', () => {
+    it('dado un alumno con urlFotoPerfil, fotoPerfil deberia devolverla; sin foto deberia devolver null', () => {
+      component.alumno = AlumnoMother.crear({ urlFotoPerfil: 'https://cdn/foto.png' });
+      expect(component.fotoPerfil).toBe('https://cdn/foto.png');
+
+      component.alumno = AlumnoMother.crear({ urlFotoPerfil: undefined });
+      expect(component.fotoPerfil).toBeNull();
+    });
+
+    it('dado un alumno con nombre vacio, iniciales deberia devolver string vacio', () => {
+      component.alumno = AlumnoMother.crear({ nombre: '' });
+
+      expect(component.iniciales).toBe('');
+    });
+
+    it('dado alumnos "Emmanuel" y "Rocio", budgetSpent deberia usar los valores mock', () => {
+      component.alumno = AlumnoMother.crear({ nombre: 'Emmanuel' });
+      expect(component.budgetSpent).toBe(700);
+
+      component.alumno = AlumnoMother.crear({ nombre: 'Rocio' });
+      expect(component.budgetSpent).toBe(600);
+    });
+
+    it('dado que getActiveCredit falla, creditoActivo deberia quedar en null', () => {
+      servicioMicrocreditos.getActiveCredit.and.returnValue(throwError(() => new Error('sin credito')));
+
+      whenMonto();
+
+      expect(component.creditoActivo()).toBeNull();
+    });
+  });
+
+  interface ProtectedFoto {
+    onFotoRecortada(blob: Blob): Promise<void>;
+    onCancelarRecorte(): void;
+    fotoEvent(): Event | null;
+  }
+
+  async function seleccionarArchivo(archivo: File): Promise<void> {
+    const input = crearInputConArchivo(archivo);
+    await component.onFotoSeleccionada({ target: input } as unknown as Event);
+  }
 
   function whenMonto(): void {
     fixture.detectChanges();
@@ -225,7 +336,7 @@ describe('AlumnoCardComponent', () => {
 
   function crearInputConArchivo(archivo: File): HTMLInputElement {
     const input = document.createElement('input');
-    Object.defineProperty(input, 'files', { value: [archivo], writable: false });
+    Object.defineProperty(input, 'files', { value: [archivo], writable: false, configurable: true });
     return input;
   }
 });

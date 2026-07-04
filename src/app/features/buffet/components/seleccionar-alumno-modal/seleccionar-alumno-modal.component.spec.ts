@@ -99,6 +99,21 @@ describe('SeleccionarAlumnoModalComponent', () => {
       expect((componente as unknown as { iniciales: (a: Alumno) => string }).iniciales(vacio)).toBe('');
     });
 
+    it('dado vista tutor, cuando consulto las iniciales, deberia devolver solo la primera del nombre', () => {
+      const usuarioService = TestBed.inject(UsuarioService);
+      (usuarioService.esVistaAlumno as unknown as { set(v: boolean): void }).set(false);
+
+      expect((componente as unknown as { iniciales: (a: Alumno) => string }).iniciales(alumnoJuan)).toBe('J');
+    });
+
+    it('dado vista tutor con alumno sin nombre, cuando consulto las iniciales, deberia devolver ""', () => {
+      const usuarioService = TestBed.inject(UsuarioService);
+      (usuarioService.esVistaAlumno as unknown as { set(v: boolean): void }).set(false);
+      const vacio = AlumnoMother.crear({ nombre: '', apellido: 'X' });
+
+      expect((componente as unknown as { iniciales: (a: Alumno) => string }).iniciales(vacio)).toBe('');
+    });
+
     it('dado un colegioId existente, cuando consulto su nombre, deberia devolverlo', () => {
       componente.colegios = colegios;
 

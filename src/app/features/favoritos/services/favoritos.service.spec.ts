@@ -191,6 +191,91 @@ describe('FavoritosService', () => {
     });
   });
 
+  describe('mapDtoToProducto — imagenes por defecto', () => {
+    async function fetchConNombre(nombre: string, urlImagen: string | null | undefined = null) {
+      const dto = { ...ProductDTOMother.crear(), id: UUID_PRODUCTO, nombre, urlImagen };
+      const promesa = firstValueFrom(service.getFavoritos(UUID_ALUMNO));
+      httpMock.expectOne(`${environment.apiUrl}/alumnos/${UUID_ALUMNO}/preferencias/favoritos`).flush([dto]);
+      const [producto] = await promesa;
+      return producto;
+    }
+
+    it('dado un nombre "Coca Cola", deberia mapear a la imagen de gaseosa', async () => {
+      const producto = await fetchConNombre('Coca Cola');
+      expect(producto.imagen).toContain('1622483767028');
+    });
+
+    it('dado un nombre "Agua", deberia usar la imagen de agua', async () => {
+      const producto = await fetchConNombre('Agua Mineral');
+      expect(producto.imagen).toContain('1548839140');
+    });
+
+    it('dado un nombre "Empanada", deberia usar la imagen de empanadas', async () => {
+      const producto = await fetchConNombre('Empanada de carne');
+      expect(producto.imagen).toContain('lanacion');
+    });
+
+    it('dado un nombre "Yogur", deberia usar la imagen de yogur', async () => {
+      const producto = await fetchConNombre('Yogur bebible');
+      expect(producto.imagen).toContain('1488477181946');
+    });
+
+    it('dado un nombre "manzana", deberia usar la imagen de manzana/fruta', async () => {
+      const producto = await fetchConNombre('Manzana verde');
+      expect(producto.imagen).toContain('1560806887');
+    });
+
+    it('dado un nombre "pizza", deberia usar la imagen de pizza', async () => {
+      const producto = await fetchConNombre('Pizza margarita');
+      expect(producto.imagen).toContain('1513104890');
+    });
+
+    it('dado un nombre "cereal", deberia usar la imagen de barra', async () => {
+      const producto = await fetchConNombre('Cereal integral');
+      expect(producto.imagen).toContain('1571748982');
+    });
+
+    it('dado un nombre "cookie", deberia usar la imagen de alfajor/factura', async () => {
+      const producto = await fetchConNombre('Cookie chocolate');
+      expect(producto.imagen).toContain('1499636136');
+    });
+
+    it('dado un nombre no reconocido, la imagen deberia quedar vacia', async () => {
+      const producto = await fetchConNombre('Snack raro raro');
+      expect(producto.imagen).toBe('');
+    });
+
+    it('dado un DTO con urlImagen, deberia respetarla', async () => {
+      const producto = await fetchConNombre('Nombre no matcheado', 'https://cdn/foto.png');
+      expect(producto.imagen).toBe('https://cdn/foto.png');
+    });
+
+    it('dado un DTO sin descripcion, categoria ni clasificaciones, deberia usar los fallbacks', async () => {
+      const promesa = firstValueFrom(service.getFavoritos(UUID_ALUMNO));
+      httpMock.expectOne(`${environment.apiUrl}/alumnos/${UUID_ALUMNO}/preferencias/favoritos`).flush([
+        { id: UUID_PRODUCTO, nombre: 'X', precio: 100 },
+      ]);
+      const [producto] = await promesa;
+
+      expect(producto.descripcion).toBe('');
+      expect(producto.categoria.id).toBe('comidas');
+      expect(producto.clasificacionesSalud).toEqual([]);
+      expect(producto.estadoStock).toBe('DISPONIBLE');
+    });
+  });
+
+  describe('agregarFavorito localStorage — duplicados', () => {
+    it('dado un favorito ya guardado en localStorage, cuando lo agrego de nuevo, no deberia duplicarlo', async () => {
+      const producto = ProductoFavoritoMother.crear();
+      localStorage.setItem(`recred.favoritos.${ID_ALUMNO_NO_UUID}`, JSON.stringify([producto]));
+
+      await firstValueFrom(service.agregarFavorito(ID_ALUMNO_NO_UUID, producto));
+
+      const guardado = JSON.parse(localStorage.getItem(`recred.favoritos.${ID_ALUMNO_NO_UUID}`)!);
+      expect(guardado.length).toBe(1);
+    });
+  });
+
   function givenPerfilAlumno(alumnoId: string): void {
     servicioPerfil.getPerfil.and.returnValue(
       PerfilMother.crear({ id: alumnoId, rol: 'ALUMNO' }),

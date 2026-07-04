@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PreferenciaDetectadaCardComponent } from './preferencia-detectada-card.component';
 import { PreferenciasDetectadasMother } from '../../preferencias-detectadas.mother';
-
-
+import { PreferenciaDetectada } from '../../models/preferencia-detectada.model';
+import { PreferenciaDetectadaCardComponent } from './preferencia-detectada-card.component';
 
 describe('PreferenciaDetectadaCardComponent', () => {
   let component: PreferenciaDetectadaCardComponent;
@@ -10,43 +9,86 @@ describe('PreferenciaDetectadaCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PreferenciaDetectadaCardComponent]
+      imports: [PreferenciaDetectadaCardComponent],
     }).compileComponents();
+
+    fixture = TestBed.createComponent(PreferenciaDetectadaCardComponent);
+    component = fixture.componentInstance;
   });
 
-  describe('Inicialización y lógica interna', () => {
-    beforeEach(() => {
-      fixture = TestBed.createComponent(PreferenciaDetectadaCardComponent);
-      component = fixture.componentInstance;
-      component.preferencia = PreferenciasDetectadasMother.crearPreferencia();
+  describe('Estado inicial', () => {
+    it('dado el componente recien creado, expandido deberia arrancar en false', () => {
+      expect(component.expandido).toBeFalse();
+    });
+  });
+
+  describe('render de la preferencia', () => {
+    it('dado una preferencia default, cuando renderizo, deberia mostrar el titulo y el mensaje', () => {
+      whenRenderoCon(PreferenciasDetectadasMother.crearPreferencia());
+
+      const texto = textoRenderizado();
+      expect(texto).toContain('Le gustan los alfajores');
+      expect(texto).toContain('Compra muchos alfajores');
+    });
+
+    it('dado el estado colapsado, deberia mostrar el boton "Ver detalle" y no la razon IA', () => {
+      whenRenderoCon(PreferenciasDetectadasMother.crearPreferencia());
+
+      const texto = textoRenderizado();
+      expect(texto).toContain('Ver detalle');
+      expect(texto).not.toContain('Por frecuencia');
+      expect(queryUno('.card__detalle')).toBeNull();
+    });
+
+    it('dado el estado expandido, deberia mostrar el boton "Ocultar detalle" y la razon IA', () => {
+      whenRenderoCon(PreferenciasDetectadasMother.crearPreferencia());
+      component.expandido = true;
       fixture.detectChanges();
-    });
 
-    it('debería inicializar el componente con la preferencia asignada', () => {
-      
-      const titulo = component.preferencia.titulo;
-
-      expect(component).toBeTruthy();
-      expect(titulo).toBe('Le gustan los alfajores');
-    });
-
-    it('debería inicializar con expandido en falso por defecto', () => {
-      
-      const estadoExpansor = component.expandido;
-
-      expect(estadoExpansor).toBeFalse();
-    });
-
-    it('debería alternar el estado de expandido al llamar a toggleDetalle()', () => {
-      
-      component.toggleDetalle();
-      const estadoTrasPrimerToggle = component.expandido;
-      
-      component.toggleDetalle();
-      const estadoTrasSegundoToggle = component.expandido;
-
-      expect(estadoTrasPrimerToggle).toBeTrue();
-      expect(estadoTrasSegundoToggle).toBeFalse();
+      const texto = textoRenderizado();
+      expect(texto).toContain('Ocultar detalle');
+      expect(texto).toContain('Por frecuencia');
+      expect(queryUno('.card__detalle')).toBeTruthy();
     });
   });
+
+  describe('toggleDetalle', () => {
+    it('dado el estado colapsado, cuando llamo toggleDetalle, deberia expandirlo', () => {
+      whenRenderoCon(PreferenciasDetectadasMother.crearPreferencia());
+
+      component.toggleDetalle();
+
+      expect(component.expandido).toBeTrue();
+    });
+
+    it('dado dos toggles seguidos, deberia volver a colapsarse', () => {
+      whenRenderoCon(PreferenciasDetectadasMother.crearPreferencia());
+
+      component.toggleDetalle();
+      component.toggleDetalle();
+
+      expect(component.expandido).toBeFalse();
+    });
+
+    it('dado el card renderizado, cuando hago click en el boton de detalle, deberia togglear expandido', () => {
+      whenRenderoCon(PreferenciasDetectadasMother.crearPreferencia());
+
+      (queryUno('.card__btn') as HTMLButtonElement).click();
+
+      expect(component.expandido).toBeTrue();
+    });
+  });
+
+  function whenRenderoCon(preferencia: PreferenciaDetectada): void {
+    component.preferencia = preferencia;
+    fixture.detectChanges();
+  }
+
+  function textoRenderizado(): string {
+    return (fixture.nativeElement as HTMLElement).textContent ?? '';
+  }
+
+  function queryUno(selector: string): Element | null {
+    return (fixture.nativeElement as HTMLElement).querySelector(selector);
+  }
 });

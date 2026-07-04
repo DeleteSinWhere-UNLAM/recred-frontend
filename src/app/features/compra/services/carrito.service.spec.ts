@@ -184,6 +184,141 @@ describe('CarritoService', () => {
       expect(resultado.permitido).toBeFalse();
       expect(resultado.razon).toBe('presupuesto');
     });
+
+    it('dado un presupuesto vigente, puedeAgregar deberia delegar a validarAgregar', async () => {
+      await givenPresupuestoCon({ montoLimiteGeneral: 5000, reglasCategoria: [] });
+      const producto = ProductoMother.crear({ precio: 200 });
+
+      expect(service.puedeAgregar(producto, 'alumno-1', 1)).toBeTrue();
+    });
+  });
+
+  describe('helpers y calculos por alumno', () => {
+    it('dado un mismo producto para dos alumnos, cantidadDe deberia contar solo el de ese alumno', () => {
+      const producto = ProductoMother.crear();
+      service.agregar(producto, 'alumno-1', 2);
+      service.agregar(producto, 'alumno-2', 5);
+
+      expect(service.cantidadDe(producto.id, 'alumno-1')).toBe(2);
+      expect(service.cantidadDe(producto.id, 'alumno-2')).toBe(5);
+    });
+
+    it('dado items de un alumno, subtotalAlumno deberia sumar solo los de ese alumno', () => {
+      service.agregar(ProductoMother.crear({ precio: 500 }), 'alumno-1', 2);
+      service.agregar(ProductoMother.crear({ id: 'p2', precio: 300 }), 'alumno-2', 1);
+
+      expect(service.subtotalAlumno('alumno-1')).toBe(1000);
+      expect(service.subtotalAlumno('alumno-2')).toBe(300);
+    });
+
+    it('dado un producto, cuando llamo setCantidadPorProducto sobre un item existente, deberia actualizar su cantidad', () => {
+      const producto = ProductoMother.crear();
+      service.agregar(producto, 'alumno-1', 1);
+
+      service.setCantidadPorProducto(producto, 'alumno-1', 4);
+
+      expect(service.cantidadDe(producto.id, 'alumno-1')).toBe(4);
+    });
+
+    it('dado un producto sin item previo, cuando llamo setCantidadPorProducto con cantidad > 0, deberia agregarlo', () => {
+      const producto = ProductoMother.crear();
+
+      service.setCantidadPorProducto(producto, 'alumno-1', 3);
+
+      expect(service.cantidadDe(producto.id, 'alumno-1')).toBe(3);
+    });
+
+    it('dado un producto sin item previo, cuando llamo setCantidadPorProducto con cantidad 0, no deberia agregar nada', () => {
+      const producto = ProductoMother.crear();
+
+      service.setCantidadPorProducto(producto, 'alumno-1', 0);
+
+      expect(service.cantidadTotal()).toBe(0);
+    });
+
+    it('dado que agrego con cantidad <= 0, no deberia agregar el producto', () => {
+      service.agregar(ProductoMother.crear(), 'alumno-1', 0);
+
+      expect(service.cantidadTotal()).toBe(0);
+    });
+
+    it('dado setCantidad con cantidad <= 0, deberia quitar el item', () => {
+      const producto = ProductoMother.crear();
+      service.agregar(producto, 'alumno-1', 2);
+      const itemId = service.itemsPorAlumno().get('alumno-1')![0].id;
+
+      service.setCantidad(itemId, 0);
+
+      expect(service.cantidadTotal()).toBe(0);
+    });
+
+    it('dado cambiarCantidad sobre un itemId inexistente, no deberia romper', () => {
+      expect(() => service.cambiarCantidad('inexistente', 1)).not.toThrow();
+      expect(service.cantidadTotal()).toBe(0);
+    });
+
+    it('dado setCatalog, deberia guardar el catalogo (verificado indirectamente via validarAgregar)', () => {
+      expect(() => service.setCatalog([ProductoMother.crear()])).not.toThrow();
+    });
+  });
+
+  describe('persistencia en localStorage', () => {
+    it('dado items agregados, deberia persistirlos en localStorage', () => {
+      service.agregar(ProductoMother.crear(), 'alumno-1', 2);
+
+      TestBed.tick();
+
+      const guardado = localStorage.getItem('recred_carrito_items');
+      expect(guardado).toBeTruthy();
+      const items = JSON.parse(guardado!) as { cantidad: number }[];
+      expect(items[0].cantidad).toBe(2);
+    });
+
+    it('dado un JSON corrupto en localStorage, cuando arranca el service, deberia loguear el error y no romper', () => {
+      spyOn(console, 'error');
+      localStorage.setItem('recred_carrito_items', '{ json roto ');
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          CarritoService,
+          { provide: PresupuestoService, useValue: servicioPresupuesto },
+          { provide: MovimientosService, useValue: servicioMovimientos },
+          { provide: AlumnosService, useValue: servicioAlumnos },
+        ],
+      });
+      const fresh = TestBed.inject(CarritoService);
+
+      expect(fresh.items()).toEqual([]);
+      expect(console.error).toHaveBeenCalledWith('Error parseando carrito', jasmine.any(Error));
+    });
+  });
+
+  describe('cargarPresupuestoYConsumo', () => {
+    it('dado alumnoId vacio, no deberia consultar ni presupuesto ni movimientos', async () => {
+      await service.cargarPresupuestoYConsumo('');
+
+      expect(servicioPresupuesto.getPresupuesto).not.toHaveBeenCalled();
+      expect(servicioMovimientos.getHistorialAlumno).not.toHaveBeenCalled();
+    });
+
+    it('dado que el back devuelve budget null, deberia borrarlo del mapa', async () => {
+      servicioPresupuesto.getPresupuesto.and.resolveTo(null as unknown as Presupuesto);
+      servicioMovimientos.getHistorialAlumno.and.returnValue(of([]));
+
+      await service.cargarPresupuestoYConsumo('alumno-1');
+
+      expect(service.budgets().has('alumno-1')).toBeFalse();
+    });
+
+    it('dado que el back falla, deberia loguear y no romper el signal', async () => {
+      spyOn(console, 'error');
+      servicioPresupuesto.getPresupuesto.and.rejectWith(new Error('backend'));
+
+      await service.cargarPresupuestoYConsumo('alumno-1');
+
+      expect(console.error).toHaveBeenCalled();
+    });
   });
 
   function whenAgrego(producto: ReturnType<typeof ProductoMother.crear>, alumnoId: string, cantidad: number): void {

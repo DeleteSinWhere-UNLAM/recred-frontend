@@ -1,158 +1,320 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { PromotionService, Promotion } from '../../../data-access/services/promociones/promotion.service';
+import {
+  Promotion,
+  PromotionService,
+} from '../../../data-access/services/promociones/promotion.service';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { Producto } from '../../inventario/models/producto.interface';
 import { ProductoService } from '../../inventario/services/producto.service';
 import { PromocionesPagePresenter } from './promociones.presenter';
 
+class ProductoMother {
+  static crear(override: Partial<Producto> = {}): Producto {
+    return {
+      id: 'p1',
+      nombre: 'Alfajor',
+      descripcion: '',
+      precio: 1200,
+      peso: 0,
+      requierePreparacion: false,
+      stockActual: 0,
+      ...override,
+    };
+  }
+}
+
+class PromocionMother {
+  static crear(override: Partial<Promotion> = {}): Promotion {
+    return {
+      id: '1',
+      name: 'Promo 1',
+      discountPercentage: 10,
+      productIds: ['p1'],
+      startDate: '2026-06-12T00:00:00Z',
+      endDate: '2026-06-20T00:00:00Z',
+      status: 'ACTIVE',
+      ...override,
+    };
+  }
+}
+
 describe('PromocionesPagePresenter', () => {
   let presenter: PromocionesPagePresenter;
-  let mockPromotionService: jasmine.SpyObj<PromotionService>;
-  let mockProductoService: jasmine.SpyObj<ProductoService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockDialogService: jasmine.SpyObj<DialogService>;
+  let servicioPromocion: jasmine.SpyObj<PromotionService>;
+  let servicioProducto: jasmine.SpyObj<ProductoService>;
+  let router: jasmine.SpyObj<Router>;
+  let servicioDialog: jasmine.SpyObj<DialogService>;
 
   beforeEach(() => {
-    mockPromotionService = jasmine.createSpyObj('PromotionService', ['getPromotions', 'discardPromotion']);
-    mockProductoService = jasmine.createSpyObj('ProductoService', ['getById']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
-    mockDialogService = jasmine.createSpyObj('DialogService', ['confirm']);
+    servicioPromocion = jasmine.createSpyObj('PromotionService', [
+      'getPromotions',
+      'discardPromotion',
+    ]);
+    servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
+    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    servicioDialog = jasmine.createSpyObj('DialogService', ['confirm']);
 
     TestBed.configureTestingModule({
       providers: [
         PromocionesPagePresenter,
-        { provide: PromotionService, useValue: mockPromotionService },
-        { provide: ProductoService, useValue: mockProductoService },
-        { provide: Router, useValue: mockRouter },
-        { provide: DialogService, useValue: mockDialogService }
-      ]
+        { provide: PromotionService, useValue: servicioPromocion },
+        { provide: ProductoService, useValue: servicioProducto },
+        { provide: Router, useValue: router },
+        { provide: DialogService, useValue: servicioDialog },
+      ],
     });
 
     presenter = TestBed.inject(PromocionesPagePresenter);
   });
 
-  it('Dado que se inicializa el presenter, deberia estar en un estado limpio', () => {
-    expect(presenter.isLoading()).toBeFalse();
-    expect(presenter.error()).toBeNull();
-    expect(presenter.promotions()).toEqual([]);
+  describe('inicializacion', () => {
+    it('dado el presenter recien creado, deberia estar en estado limpio', () => {
+      expect(presenter.isLoading()).toBeFalse();
+      expect(presenter.error()).toBeNull();
+      expect(presenter.promotions()).toEqual([]);
+    });
   });
 
-  it('Dado que se solicitan las promociones y la API responde correctamente, deberia actualizar el estado con productos', () => {
-    const mockPromotions: Promotion[] = [
-      { id: '1', name: 'Promo 1', discountPercentage: 10, productIds: ['p1'], startDate: '2026-06-12T00:00:00Z', endDate: '2026-06-20T00:00:00Z', status: 'ACTIVE' }
-    ];
-    const mockProduct = createProduct('p1', 'Alfajor', 1200);
-    mockPromotionService.getPromotions.and.returnValue(of(mockPromotions));
-    mockProductoService.getById.and.returnValue(of(mockProduct));
+  describe('loadPromotions', () => {
+    it('dado una API que responde con promociones y productos, deberia actualizar el estado con los productos resueltos', () => {
+      givenPromocionesDelBack([PromocionMother.crear()]);
+      givenProductoResuelto(ProductoMother.crear());
 
-    presenter.loadPromotions();
+      whenCargoPromociones();
 
-    expect(presenter.isLoading()).toBeFalse();
-    expect(presenter.error()).toBeNull();
-    expect(presenter.promotions().length).toBe(1);
-    expect(presenter.promotions()[0].name).toBe('Promo 1');
-    expect(presenter.promotions()[0].products).toEqual([mockProduct]);
-    expect(mockProductoService.getById).toHaveBeenCalledWith('p1');
+      expect(presenter.isLoading()).toBeFalse();
+      expect(presenter.error()).toBeNull();
+      expect(presenter.promotions().length).toBe(1);
+      expect(presenter.promotions()[0].name).toBe('Promo 1');
+      expect(presenter.promotions()[0].products[0].nombre).toBe('Alfajor');
+      expect(servicioProducto.getById).toHaveBeenCalledWith('p1');
+    });
+
+    it('dado el back devuelve nombres en espanol o snake_case, deberia normalizarlos al modelo interno', () => {
+      const promocionRaw: Record<string, unknown> = {
+        id: '1',
+        nombre: 'Promo Spanish',
+        porcentaje_descuento: 15,
+        productosIds: ['p1'],
+        fechaInicio: '2026-06-12T00:00:00.123456Z',
+        fechaFin: '2026-06-20T00:00:00.654321Z',
+        estado: 'DRAFT',
+      };
+      givenPromocionesDelBack([promocionRaw as unknown as Promotion]);
+      givenProductoResuelto(ProductoMother.crear({ id: 'p1', nombre: 'Jugo', precio: 900 }));
+
+      whenCargoPromociones();
+
+      const result = presenter.promotions()[0];
+      expect(result.name).toBe('Promo Spanish');
+      expect(result.discountPercentage).toBe(15);
+      expect(result.productIds).toEqual(['p1']);
+      expect(result.status).toBe('DRAFT');
+      expect(result.startDate).toContain('2026-06-12T00:00:00Z');
+      expect(result.products[0].nombre).toBe('Jugo');
+    });
+
+    it('dado un producto que no se puede resolver, deberia usar el fallback "Producto no disponible"', () => {
+      givenPromocionesDelBack([PromocionMother.crear()]);
+      servicioProducto.getById.and.returnValue(throwError(() => new Error('Not found')));
+
+      whenCargoPromociones();
+
+      expect(presenter.error()).toBeNull();
+      expect(presenter.promotions()[0].products[0].id).toBe('p1');
+      expect(presenter.promotions()[0].products[0].nombre).toBe('Producto no disponible');
+    });
+
+    it('dado que la API falla al obtener promociones, deberia setear el mensaje de error y dejar la lista vacia', () => {
+      servicioPromocion.getPromotions.and.returnValue(throwError(() => new Error('API Error')));
+
+      whenCargoPromociones();
+
+      expect(presenter.isLoading()).toBeFalse();
+      expect(presenter.error()).toBe(
+        'Ocurrió un error al cargar las promociones. Por favor, intenta nuevamente.',
+      );
+      expect(presenter.promotions().length).toBe(0);
+    });
   });
 
-  it('Dado que el backend devuelve nombres en espanol o snake_case, deberia normalizarlos correctamente', () => {
-    const mockRawPromotions: Record<string, unknown>[] = [
-      { id: '1', nombre: 'Promo Spanish', porcentaje_descuento: 15, productosIds: ['p1'], fechaInicio: '2026-06-12T00:00:00.123456Z', fechaFin: '2026-06-20T00:00:00.654321Z', estado: 'DRAFT' }
-    ];
-    mockPromotionService.getPromotions.and.returnValue(of(mockRawPromotions as unknown as Promotion[]));
-    mockProductoService.getById.and.returnValue(of(createProduct('p1', 'Jugo', 900)));
+  describe('navegacion', () => {
+    it('dado el presenter, cuando hago click en volver, deberia navegar a /kiosquero', () => {
+      presenter.volver();
 
-    presenter.loadPromotions();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+    });
 
-    const result = presenter.promotions()[0];
-    expect(result.name).toBe('Promo Spanish');
-    expect(result.discountPercentage).toBe(15);
-    expect(result.productIds).toEqual(['p1']);
-    expect(result.status).toBe('DRAFT');
-    expect(result.startDate).toContain('2026-06-12T00:00:00Z');
-    expect(result.products[0].nombre).toBe('Jugo');
-  });
+    it('dado el presenter, cuando hago click en nueva promocion, deberia navegar a /sugerencias', () => {
+      presenter.nuevaPromocion();
 
-  it('Dado que un producto de la promocion no se puede resolver, deberia usar un fallback', () => {
-    const mockPromotions: Promotion[] = [
-      { id: '1', name: 'Promo 1', discountPercentage: 10, productIds: ['p1'], startDate: '2026-06-12T00:00:00Z', endDate: '2026-06-20T00:00:00Z', status: 'ACTIVE' }
-    ];
-    mockPromotionService.getPromotions.and.returnValue(of(mockPromotions));
-    mockProductoService.getById.and.returnValue(throwError(() => new Error('Not found')));
-
-    presenter.loadPromotions();
-
-    expect(presenter.error()).toBeNull();
-    expect(presenter.promotions()[0].products[0].id).toBe('p1');
-    expect(presenter.promotions()[0].products[0].nombre).toBe('Producto no disponible');
-  });
-
-  it('Dado que la API falla al obtener promociones, deberia mostrar un mensaje de error', () => {
-    mockPromotionService.getPromotions.and.returnValue(throwError(() => new Error('API Error')));
-
-    presenter.loadPromotions();
-
-    expect(presenter.isLoading()).toBeFalse();
-    expect(presenter.error()).toBe('Ocurrió un error al cargar las promociones. Por favor, intenta nuevamente.');
-    expect(presenter.promotions().length).toBe(0);
-  });
-
-  it('Dado que el usuario hace clic en volver, deberia navegar a kiosquero', () => {
-    presenter.volver();
-    expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
-  });
-
-  it('Dado que el usuario hace clic en nueva promocion, deberia navegar a sugerencias', () => {
-    presenter.nuevaPromocion();
-    expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/sugerencias');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/sugerencias');
+    });
   });
 
   describe('deletePromotion', () => {
-    it('deberia no hacer nada si el usuario cancela la confirmacion', async () => {
-      mockDialogService.confirm.and.returnValue(Promise.resolve(false));
+    it('dado que el usuario cancela la confirmacion, no deberia llamar al service', async () => {
+      servicioDialog.confirm.and.returnValue(Promise.resolve(false));
 
       await presenter.deletePromotion('promo-1');
 
-      expect(mockDialogService.confirm).toHaveBeenCalled();
-      expect(mockPromotionService.discardPromotion).not.toHaveBeenCalled();
+      expect(servicioDialog.confirm).toHaveBeenCalled();
+      expect(servicioPromocion.discardPromotion).not.toHaveBeenCalled();
     });
 
-    it('deberia eliminar la promocion y volver a cargar la lista en caso de exito', async () => {
-      mockDialogService.confirm.and.returnValue(Promise.resolve(true));
-      mockPromotionService.discardPromotion.and.returnValue(of(undefined));
-      mockPromotionService.getPromotions.and.returnValue(of([]));
+    it('dado que el usuario confirma y el borrado es exitoso, deberia descartar y recargar la lista', async () => {
+      servicioDialog.confirm.and.returnValue(Promise.resolve(true));
+      servicioPromocion.discardPromotion.and.returnValue(of(undefined));
+      servicioPromocion.getPromotions.and.returnValue(of([]));
 
       await presenter.deletePromotion('promo-1');
 
-      expect(mockDialogService.confirm).toHaveBeenCalled();
-      expect(mockPromotionService.discardPromotion).toHaveBeenCalledWith('promo-1');
-      expect(mockPromotionService.getPromotions).toHaveBeenCalled();
+      expect(servicioPromocion.discardPromotion).toHaveBeenCalledWith('promo-1');
+      expect(servicioPromocion.getPromotions).toHaveBeenCalled();
     });
 
-    it('deberia setear el estado de error si falla la eliminacion', async () => {
-      mockDialogService.confirm.and.returnValue(Promise.resolve(true));
-      const errorResponse = new Error('Delete failed');
-      mockPromotionService.discardPromotion.and.returnValue(throwError(() => errorResponse));
+    it('dado que el borrado falla, deberia setear el estado de error', async () => {
+      servicioDialog.confirm.and.returnValue(Promise.resolve(true));
+      servicioPromocion.discardPromotion.and.returnValue(throwError(() => new Error('Delete failed')));
 
       await presenter.deletePromotion('promo-1');
 
-      expect(mockDialogService.confirm).toHaveBeenCalled();
-      expect(mockPromotionService.discardPromotion).toHaveBeenCalledWith('promo-1');
       expect(presenter.error()).toBe('Error al eliminar la promoción.');
     });
   });
-});
 
-function createProduct(id: string, nombre: string, precio: number): Producto {
-  return {
-    id,
-    nombre,
-    precio,
-    descripcion: '',
-    peso: 0,
-    requierePreparacion: false,
-    stockActual: 0,
-  };
-}
+  describe('helpers de UI y calculos', () => {
+    it('dado los codigos conocidos, getStatusLabel deberia devolver la etiqueta en espanol', () => {
+      expect(presenter.getStatusLabel('DRAFT')).toBe('Borrador');
+      expect(presenter.getStatusLabel('ACTIVE')).toBe('Activa');
+      expect(presenter.getStatusLabel('REJECTED')).toBe('Rechazada');
+      expect(presenter.getStatusLabel('EXPIRED')).toBe('Vencida');
+    });
+
+    it('dado un status desconocido, getStatusLabel deberia devolver el mismo codigo', () => {
+      expect(presenter.getStatusLabel('CUALQUIERA')).toBe('CUALQUIERA');
+    });
+
+    it('dado una promocion con 5 productos y descuento 20%, calcularia originales, descuentos y visibles', () => {
+      const promo = {
+        ...PromocionMother.crear({ discountPercentage: 20 }),
+        products: [
+          ProductoMother.crear({ id: '1', precio: 1000 }),
+          ProductoMother.crear({ id: '2', precio: 500 }),
+          ProductoMother.crear({ id: '3', precio: 500 }),
+          ProductoMother.crear({ id: '4', precio: 0 }),
+          ProductoMother.crear({ id: '5', precio: 200 }),
+        ],
+      };
+
+      expect(presenter.getOriginalTotal(promo)).toBe(2200);
+      expect(presenter.getDiscountedTotal(promo)).toBe(1760);
+      expect(presenter.getVisibleProducts(promo).length).toBe(3);
+      expect(presenter.getHiddenProductsCount(promo)).toBe(2);
+    });
+
+    it('dado una promocion con 2 productos, getHiddenProductsCount deberia ser 0', () => {
+      const promo = {
+        ...PromocionMother.crear(),
+        products: [ProductoMother.crear({ id: '1' }), ProductoMother.crear({ id: '2' })],
+      };
+
+      expect(presenter.getHiddenProductsCount(promo)).toBe(0);
+    });
+
+    it('dado una promocion sin descuento, getDiscountedTotal deberia ser igual al total original', () => {
+      const promo = {
+        ...PromocionMother.crear({ discountPercentage: 0 }),
+        products: [ProductoMother.crear({ precio: 400 })],
+      };
+
+      expect(presenter.getDiscountedTotal(promo)).toBe(400);
+    });
+
+    it('dado promociones cargadas, hasPromotions deberia devolver true; sin promociones, false', () => {
+      expect(presenter.hasPromotions()).toBeFalse();
+
+      givenPromocionesDelBack([PromocionMother.crear()]);
+      givenProductoResuelto(ProductoMother.crear());
+      whenCargoPromociones();
+
+      expect(presenter.hasPromotions()).toBeTrue();
+    });
+  });
+
+  describe('normalizacion de promociones con nombres alternativos', () => {
+    it('dado que el back devuelve promocion sin nombre reconocible, deberia usar "Sin nombre"', () => {
+      const promocionRaw: Record<string, unknown> = {
+        id: 'promo-1',
+        productIds: [],
+      };
+      givenPromocionesDelBack([promocionRaw as unknown as Promotion]);
+
+      whenCargoPromociones();
+
+      expect(presenter.promotions()[0].name).toBe('Sin nombre');
+      expect(presenter.promotions()[0].discountPercentage).toBe(0);
+      expect(presenter.promotions()[0].status).toBe('UNKNOWN');
+    });
+
+    it('dado promociones con "titulo" en vez de nombre, deberia respetarlo', () => {
+      const promocionRaw: Record<string, unknown> = {
+        id: 'promo-1',
+        titulo: 'Titulo Legacy',
+        productIds: [],
+      };
+      givenPromocionesDelBack([promocionRaw as unknown as Promotion]);
+
+      whenCargoPromociones();
+
+      expect(presenter.promotions()[0].name).toBe('Titulo Legacy');
+    });
+
+    it('dado que los productos vienen como objetos, deberia extraer los ids', () => {
+      const promocionRaw: Record<string, unknown> = {
+        id: 'promo-1',
+        name: 'X',
+        productos: [
+          { id: 'p1' },
+          { productId: 'p2' },
+          { productoId: 'p3' },
+          42,
+          { nada: true },
+        ],
+      };
+      givenPromocionesDelBack([promocionRaw as unknown as Promotion]);
+      servicioProducto.getById.and.callFake((id: string) =>
+        of(ProductoMother.crear({ id, nombre: `Nombre-${id}` })),
+      );
+
+      whenCargoPromociones();
+
+      const promo = presenter.promotions()[0];
+      expect(promo.productIds).toEqual(['p1', 'p2', 'p3']);
+    });
+
+    it('dado una promocion sin productIds, deberia resolverse con products vacio y sin llamar al ProductoService', () => {
+      givenPromocionesDelBack([PromocionMother.crear({ productIds: [] })]);
+      servicioProducto.getById.calls.reset();
+
+      whenCargoPromociones();
+
+      expect(presenter.promotions()[0].products).toEqual([]);
+      expect(servicioProducto.getById).not.toHaveBeenCalled();
+    });
+  });
+
+  function givenPromocionesDelBack(promociones: Promotion[]): void {
+    servicioPromocion.getPromotions.and.returnValue(of(promociones));
+  }
+
+  function givenProductoResuelto(producto: Producto): void {
+    servicioProducto.getById.and.returnValue(of(producto));
+  }
+
+  function whenCargoPromociones(): void {
+    presenter.loadPromotions();
+  }
+});

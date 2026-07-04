@@ -91,4 +91,41 @@ describe('NotificacionSugerenciaSaludableComponent', () => {
     expect(carritoSpy.agregar).not.toHaveBeenCalled();
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
+
+  it('dado un state sin producto, cuando compro, deberia cerrar la notificacion sin llamar al carrito', async () => {
+    (notificacionServiceSpy as { state$: jasmine.Spy }).state$ = jasmine.createSpy('state$').and.returnValue({
+      show: true, sugerenciaId: 'sug-1', titulo: 'x', mensaje: 'y', producto: null, alumnoId: 'alum-1',
+    });
+
+    await component.comprarProducto();
+
+    expect(notificacionServiceSpy.cerrar).toHaveBeenCalled();
+    expect(carritoSpy.agregar).not.toHaveBeenCalled();
+  });
+
+  it('dado un alumno inexistente, cuando compro, deberia mostrar toast de error y cerrar', async () => {
+    alumnosServiceSpy.asegurarCargados.and.returnValue(Promise.resolve([]));
+    alumnosServiceSpy.getAlumnoById.and.returnValue(undefined);
+
+    await component.comprarProducto();
+
+    expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
+      jasmine.stringMatching(/informaci/i),
+      'error',
+    );
+    expect(notificacionServiceSpy.cerrar).toHaveBeenCalled();
+  });
+
+  it('dado que asegurarCargados falla, deberia loguear y mostrar toast generico', async () => {
+    spyOn(console, 'error');
+    alumnosServiceSpy.asegurarCargados.and.rejectWith(new Error('backend caido'));
+
+    await component.comprarProducto();
+
+    expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
+      jasmine.stringMatching(/error/i),
+      'error',
+    );
+    expect(console.error).toHaveBeenCalled();
+  });
 });

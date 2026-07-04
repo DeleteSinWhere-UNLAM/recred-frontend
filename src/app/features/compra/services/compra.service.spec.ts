@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { PerfilMother } from '../../../data-access/services/alumno.mother';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { OrdenAlumnoMother } from '../compra.mother';
+import { Recreo } from '../models/orden-compra.model';
 import { CompraService } from './compra.service';
 
 describe('CompraService', () => {
@@ -156,6 +157,43 @@ describe('CompraService', () => {
       expect(req.request.body).toEqual({ withdrawalCode: 'CODE' });
       req.flush(null);
       await promesa;
+    });
+  });
+
+  describe('procesarPago con fallbacks', () => {
+    it('dado un recreo desconocido, cuando proceso, deberia mapearlo a FIRST_RECESS', async () => {
+      service.iniciarOrden([
+        OrdenAlumnoMother.crear({ recreo: 'RARO' as unknown as Recreo }),
+      ]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      const req = httpMock.expectOne(URL_ADVANCE);
+
+      expect(req.request.body.orders[0].recessTime).toBe('FIRST_RECESS');
+      req.flush({ orderId: 'x', codes: {}, total: 0 });
+      await promesa;
+    });
+
+    it('dado que el back responde sin orderId ni codes, cuando proceso, deberia generar un UUID y usar codigos vacios', async () => {
+      spyOn(crypto, 'randomUUID').and.returnValue('uuid-de-test-4444-1111-1111-1111-111111111111');
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      httpMock.expectOne(URL_ADVANCE).flush({});
+      const pagada = await promesa;
+
+      expect(pagada.id).toBe('uuid-de-test-4444-1111-1111-1111-111111111111');
+      expect(pagada.codigos).toEqual({});
+    });
+
+    it('dado que el back responde sin total, cuando proceso, deberia preservar el total en curso', async () => {
+      service.iniciarOrden([OrdenAlumnoMother.crear({ subtotal: 750 })]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      httpMock.expectOne(URL_ADVANCE).flush({ orderId: 'ok', codes: {} });
+      const pagada = await promesa;
+
+      expect(pagada.total).toBe(750);
     });
   });
 });

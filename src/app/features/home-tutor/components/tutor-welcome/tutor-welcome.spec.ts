@@ -1,14 +1,16 @@
 import { signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AlumnoContextoService } from '../../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../../data-access/models/alumno.model';
 import { AlumnoMother } from '../../../../data-access/services/alumno.mother';
 import { AlumnosService } from '../../../../data-access/services/alumnos.service';
-import { PromotionService } from '../../../../data-access/services/promociones/promotion.service';
+import { Promotion, PromotionService } from '../../../../data-access/services/promociones/promotion.service';
+import { Producto } from '../../../buffet/models/producto.model';
 import { BuffetService } from '../../../buffet/services/buffet.service';
 import { FavoritosService } from '../../../favoritos/services/favoritos.service';
+import { Movimiento } from '../../../movimientos/models/movimiento.model';
 import { MovimientosService } from '../../../movimientos/services/movimientos.service';
 import { TutorWelcome } from './tutor-welcome';
 
@@ -104,6 +106,180 @@ describe('TutorWelcome', () => {
 
       expect(component.ultimosMovimientos().length).toBe(4);
     });
+
+    it('dado un movimiento cuyo studentId matchea un alumno, deberia mapear alumnoNombre desde el alumno', () => {
+      alumnosSignal.set([AlumnoMother.crear({ id: 'alumno-1', nombre: 'Julián' })]);
+      servicioMovimientos.getHistorialTutor.and.returnValue(
+        of([crearMovimiento('m-1', { studentId: 'alumno-1' })]),
+      );
+
+      whenMonto();
+
+      expect(component.ultimosMovimientos()[0].alumnoNombre).toBe('Julián');
+    });
+
+    it('dado un movimiento sin alumno matcheado, deberia usar studentName como fallback', () => {
+      alumnosSignal.set([AlumnoMother.crear({ id: 'alumno-1', nombre: 'Julián' })]);
+      servicioMovimientos.getHistorialTutor.and.returnValue(
+        of([crearMovimientoConStudentName('m-1', 'no-existe', 'Nombre del back')]),
+      );
+
+      whenMonto();
+
+      expect(component.ultimosMovimientos()[0].alumnoNombre).toBe('Nombre del back');
+    });
+
+    it('dado historial null desde el backend, deberia dejar la lista de movimientos vacia', () => {
+      servicioMovimientos.getHistorialTutor.and.returnValue(of(null as unknown as Movimiento[]));
+
+      whenMonto();
+
+      expect(component.ultimosMovimientos()).toEqual([]);
+    });
+
+    it('dado dos alumnos con pendientes, deberia consolidarlos ordenados por fecha desc y limitar a 5', () => {
+      alumnosSignal.set([
+        AlumnoMother.crear({ id: 'a-1', nombre: 'Julián' }),
+        AlumnoMother.crear({ id: 'a-2', nombre: 'Ana' }),
+      ]);
+      servicioMovimientos.getPendientesAlumno.and.callFake((alumnoId: string) => {
+        if (alumnoId === 'a-1') {
+          return of([
+            crearMovimiento('p-1', { date: '2026-07-01T10:00:00' }),
+            crearMovimiento('p-2', { date: '2026-07-03T10:00:00' }),
+          ]);
+        }
+        return of([crearMovimiento('p-3', { date: '2026-07-02T10:00:00' })]);
+      });
+
+      whenMonto();
+
+      const ids = component.pedidosPendientes().map((p) => p.id);
+      expect(ids).toEqual(['p-2', 'p-3', 'p-1']);
+      expect(component.pedidosPendientes()[0].alumnoNombre).toBe('Julián');
+    });
+
+    it('dado alumnos con distintos buffets, deberia consolidar promociones vigentes deduplicadas y limitar a 4', () => {
+      alumnosSignal.set([
+        AlumnoMother.crear({ id: 'a-1', nombre: 'Julián' }),
+        AlumnoMother.crear({ id: 'a-2', nombre: 'Ana' }),
+        AlumnoMother.crear({ id: 'a-3', nombre: 'Pedro' }),
+      ]);
+      servicioBuffet.obtenerBuffetDelAlumno.and.callFake((alumnoId: string) => {
+        if (alumnoId === 'a-3') return of({ id: 'buffet-2', nombre: 'Otro', colegioId: 'c-2' });
+        return of({ id: 'buffet-1', nombre: 'Buffet', colegioId: 'c-1' });
+      });
+      servicioPromos.getPromotions.and.callFake((buffetId: string) => {
+        if (buffetId === 'buffet-1') {
+          return of([
+            crearPromo('promo-1', 'ACTIVE'),
+            crearPromo('promo-2', 'EXPIRED'),
+            crearPromo('promo-3', ''),
+          ]);
+        }
+        return of([
+          crearPromo('promo-4', 'ACTIVE'),
+          crearPromo('promo-5', 'ACTIVE'),
+          crearPromo('promo-6', 'ACTIVE'),
+        ]);
+      });
+
+      whenMonto();
+
+      expect(component.promociones().length).toBe(4);
+      expect(component.promociones().map((p) => p.id)).toEqual([
+        'promo-1',
+        'promo-3',
+        'promo-4',
+        'promo-5',
+      ]);
+    });
+
+    it('dado que solo un alumno tiene buffet valido, no deberia consultar promos dos veces', () => {
+      alumnosSignal.set([
+        AlumnoMother.crear({ id: 'a-1' }),
+        AlumnoMother.crear({ id: 'a-2' }),
+      ]);
+      servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(
+        of({ id: 'buffet-1', nombre: 'Buffet', colegioId: 'c-1' }),
+      );
+
+      whenMonto();
+
+      expect(servicioPromos.getPromotions).toHaveBeenCalledTimes(1);
+      expect(servicioPromos.getPromotions).toHaveBeenCalledWith('buffet-1');
+    });
+
+    it('dado un buffet sin id, no deberia consultar promociones', () => {
+      alumnosSignal.set([AlumnoMother.crear({ id: 'a-1' })]);
+      servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(
+        of({ id: '', nombre: 'Buffet sin id', colegioId: 'c-1' }),
+      );
+
+      whenMonto();
+
+      expect(servicioPromos.getPromotions).not.toHaveBeenCalled();
+    });
+
+    it('dado que obtenerBuffetDelAlumno falla, deberia loggear sin romper', () => {
+      const spyConsole = spyOn(console, 'error');
+      alumnosSignal.set([AlumnoMother.crear({ id: 'a-1' })]);
+      servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(throwError(() => new Error('boom')));
+
+      whenMonto();
+
+      expect(spyConsole).toHaveBeenCalledWith(
+        'Error al obtener buffet:',
+        jasmine.any(Error),
+      );
+    });
+
+    it('dado favoritos de distintos alumnos con producto compartido, deberia mergear alumnoNombre', () => {
+      alumnosSignal.set([
+        AlumnoMother.crear({ id: 'a-1', nombre: 'Julián García' }),
+        AlumnoMother.crear({ id: 'a-2', nombre: 'Ana García' }),
+      ]);
+      servicioFavoritos.getFavoritos.and.callFake((alumnoId: string) => {
+        if (alumnoId === 'a-1') return of([crearProducto('p-compartido'), crearProducto('p-1')]);
+        return of([crearProducto('p-compartido'), crearProducto('p-2')]);
+      });
+
+      whenMonto();
+
+      const favoritos = component.productosFavoritos();
+      expect(favoritos.length).toBe(3);
+      const compartido = favoritos.find((f) => f.producto.id === 'p-compartido');
+      expect(compartido?.alumnoNombre).toBe('Julián, Ana');
+    });
+
+    it('dado favoritos null desde el backend, deberia tolerarlo y setearlo vacio', () => {
+      alumnosSignal.set([AlumnoMother.crear({ id: 'a-1' })]);
+      servicioFavoritos.getFavoritos.and.returnValue(of(null as unknown as Producto[]));
+
+      whenMonto();
+
+      expect(component.productosFavoritos()).toEqual([]);
+    });
+
+    it('dado que getFavoritos falla para uno de los alumnos, deberia loggear y consolidar los del otro', () => {
+      const spyConsole = spyOn(console, 'error');
+      alumnosSignal.set([
+        AlumnoMother.crear({ id: 'a-1', nombre: 'Julián' }),
+        AlumnoMother.crear({ id: 'a-2', nombre: 'Ana' }),
+      ]);
+      servicioFavoritos.getFavoritos.and.callFake((alumnoId: string) => {
+        if (alumnoId === 'a-1') return of([crearProducto('p-1')]);
+        return throwError(() => new Error('boom'));
+      });
+
+      whenMonto();
+
+      expect(spyConsole).toHaveBeenCalledWith(
+        'Error fetching favorites for dashboard:',
+        jasmine.any(Error),
+      );
+      expect(component.productosFavoritos().map((f) => f.producto.id)).toEqual(['p-1']);
+    });
   });
 
   describe('navegacion', () => {
@@ -180,7 +356,7 @@ describe('TutorWelcome', () => {
     fixture.detectChanges();
   }
 
-  function crearMovimiento(id: string): import('../../../movimientos/models/movimiento.model').Movimiento {
+  function crearMovimiento(id: string, override: Partial<Movimiento> = {}): Movimiento {
     return {
       id,
       studentId: 'alumno-1',
@@ -190,6 +366,39 @@ describe('TutorWelcome', () => {
       paymentMethod: 'CREDITO',
       date: '2026-07-15T10:00:00',
       items: [{ productId: 'p-1', productName: 'Alfajor', quantity: 1, unitPrice: 500 }],
+      ...override,
+    };
+  }
+
+  function crearMovimientoConStudentName(id: string, studentId: string, studentName: string): Movimiento {
+    return {
+      ...crearMovimiento(id, { studentId }),
+      studentName,
+    } as Movimiento & { studentName: string };
+  }
+
+  function crearPromo(id: string, status: string): Promotion {
+    return {
+      id,
+      name: `Promo ${id}`,
+      discountPercentage: 10,
+      productIds: [],
+      startDate: '2026-07-01',
+      endDate: '2026-08-01',
+      status,
+    };
+  }
+
+  function crearProducto(id: string): Producto {
+    return {
+      id,
+      nombre: `Producto ${id}`,
+      descripcion: '',
+      precio: 100,
+      categoria: { id: 'c', descripcion: 'C' },
+      clasificacionesSalud: [],
+      imagen: '',
+      estadoStock: 'DISPONIBLE',
     };
   }
 });

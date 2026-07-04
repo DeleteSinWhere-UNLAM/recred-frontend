@@ -144,7 +144,108 @@ describe('TutorHeaderComponent', () => {
 
       expect((component as unknown as { esPremium(): boolean }).esPremium()).toBeFalse();
     });
+
+    it('dado que no hay perfil cargado, esPremium deberia ser false', () => {
+      perfilSignal.set(null);
+
+      expect((component as unknown as { esPremium(): boolean }).esPremium()).toBeFalse();
+    });
   });
+
+  describe('abrirSelectorFoto', () => {
+    it('cuando hago click en el avatar, deberia disparar el click del input oculto', () => {
+      whenMonto();
+      const inputFoto = fixture.debugElement.nativeElement.querySelector('input[type="file"]') as HTMLInputElement;
+      const clickSpy = spyOn(inputFoto, 'click');
+
+      (component as unknown as ComponenteProtegido).abrirSelectorFoto();
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('onFotoSeleccionada sin archivo', () => {
+    it('dado un input sin files, no deberia mostrar ningun toast', async () => {
+      const input = document.createElement('input');
+      Object.defineProperty(input, 'files', { value: null, writable: false });
+
+      await (component as unknown as ComponenteProtegido).onFotoSeleccionada({ target: input } as unknown as Event);
+
+      expect(servicioToast.mostrar).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onFotoRecortada', () => {
+    it('dado un flujo completo con archivo valido, cuando se recorta, deberia subir la foto y mostrar toast de exito', async () => {
+      const original = new File([''], 'foto.jpg', { type: 'image/jpeg' });
+      await seleccionarArchivo(original);
+
+      await (component as unknown as ComponenteProtegido).onFotoRecortada(new Blob(['crop'], { type: 'image/webp' }));
+
+      expect(servicioPerfilUsuario.subirFotoPerfil).toHaveBeenCalled();
+      const archivoSubido = servicioPerfilUsuario.subirFotoPerfil.calls.mostRecent().args[0] as File;
+      expect(archivoSubido.name).toBe('foto.jpg');
+      expect(archivoSubido.type).toBe('image/webp');
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Foto de perfil actualizada.', 'success');
+    });
+
+    it('dado que subirFotoPerfil falla, cuando se recorta, deberia mostrar toast de error', async () => {
+      servicioPerfilUsuario.subirFotoPerfil.and.rejectWith(new Error('boom'));
+      await seleccionarArchivo(new File([''], 'foto.jpg', { type: 'image/jpeg' }));
+
+      await (component as unknown as ComponenteProtegido).onFotoRecortada(new Blob(['crop'], { type: 'image/webp' }));
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('No se pudo subir la foto. Intentá de nuevo.', 'error');
+    });
+
+    it('dado que no hubo seleccion previa, cuando se dispara onFotoRecortada, no deberia subir nada', async () => {
+      await (component as unknown as ComponenteProtegido).onFotoRecortada(new Blob(['crop'], { type: 'image/webp' }));
+
+      expect(servicioPerfilUsuario.subirFotoPerfil).not.toHaveBeenCalled();
+    });
+
+    it('dado que el input pierde el archivo entre seleccion y recorte, cuando se recorta, no deberia subir nada', async () => {
+      await seleccionarArchivo(new File([''], 'foto.jpg', { type: 'image/jpeg' }));
+      const eventoPrevio = (component as unknown as ComponenteProtegido).fotoEvent()!;
+      Object.defineProperty(eventoPrevio.target as HTMLInputElement, 'files', { value: null, configurable: true });
+
+      await (component as unknown as ComponenteProtegido).onFotoRecortada(new Blob(['crop'], { type: 'image/webp' }));
+
+      expect(servicioPerfilUsuario.subirFotoPerfil).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onCancelarRecorte', () => {
+    it('dado que habia un archivo seleccionado, cuando cancelo, deberia limpiar el input y el fotoEvent', async () => {
+      const archivo = new File([''], 'foto.jpg', { type: 'image/jpeg' });
+      await seleccionarArchivo(archivo);
+      const input = (component as unknown as ComponenteProtegido).fotoEvent()!.target as HTMLInputElement;
+      input.value = 'algo';
+
+      (component as unknown as ComponenteProtegido).onCancelarRecorte();
+
+      expect(input.value).toBe('');
+      expect((component as unknown as ComponenteProtegido).fotoEvent()).toBeNull();
+    });
+
+    it('dado que no hay foto pendiente, cuando cancelo, no deberia romper', () => {
+      expect(() => (component as unknown as ComponenteProtegido).onCancelarRecorte()).not.toThrow();
+      expect((component as unknown as ComponenteProtegido).fotoEvent()).toBeNull();
+    });
+  });
+
+  interface ComponenteProtegido {
+    abrirSelectorFoto(): void;
+    onFotoSeleccionada(e: Event): Promise<void>;
+    onFotoRecortada(blob: Blob): Promise<void>;
+    onCancelarRecorte(): void;
+    fotoEvent(): Event | null;
+  }
+
+  async function seleccionarArchivo(archivo: File): Promise<void> {
+    const input = crearInputConArchivo(archivo);
+    await (component as unknown as ComponenteProtegido).onFotoSeleccionada({ target: input } as unknown as Event);
+  }
 
   function whenMonto(): void {
     fixture.detectChanges();
@@ -156,7 +257,7 @@ describe('TutorHeaderComponent', () => {
 
   function crearInputConArchivo(archivo: File): HTMLInputElement {
     const input = document.createElement('input');
-    Object.defineProperty(input, 'files', { value: [archivo], writable: false });
+    Object.defineProperty(input, 'files', { value: [archivo], writable: false, configurable: true });
     return input;
   }
 });

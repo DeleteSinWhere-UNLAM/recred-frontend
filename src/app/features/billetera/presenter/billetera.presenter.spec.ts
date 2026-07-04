@@ -254,6 +254,117 @@ describe('BilleteraPresenter', () => {
 
       expect(presenter.periodoLabel()).toBe('');
     }));
+
+    it('dado un resumen con desde valido y hasta invalida, periodoLabel deberia ser ""', fakeAsync(() => {
+      givenUnResumen({ periodo: { desde: '2024-01-01', hasta: '' } });
+
+      whenInicializo(ALUMNO_ID);
+
+      expect(presenter.periodoLabel()).toBe('');
+    }));
+
+    it('dado un resumen con periodo valido, periodoLabel deberia formatear "desde – hasta"', fakeAsync(() => {
+      givenUnResumen({ periodo: { desde: '2024-01-01', hasta: '2024-01-31' } });
+
+      whenInicializo(ALUMNO_ID);
+
+      const label = presenter.periodoLabel();
+      expect(label).toContain('–');
+      expect(label.length).toBeGreaterThan(5);
+    }));
+  });
+
+  describe('vistas alumno vs tutor', () => {
+    it('dado vista tutor, nombreAlumno deberia devolver solo el nombre (sin apellido)', fakeAsync(() => {
+      givenQueEstoyEnVistaTutor();
+      givenUnAlumno({ nombre: 'Julián', apellido: 'García' });
+
+      whenInicializo(ALUMNO_ID);
+
+      expect(presenter.nombreAlumno()).toBe('Julián');
+    }));
+
+    it('dado vista tutor, iniciales deberia usar solo la primera letra del nombre', fakeAsync(() => {
+      givenQueEstoyEnVistaTutor();
+      givenUnAlumno({ nombre: 'Julián', apellido: 'García' });
+
+      whenInicializo(ALUMNO_ID);
+
+      expect(presenter.iniciales()).toBe('J');
+    }));
+
+    it('dado vista tutor con alumno de nombre vacio, iniciales deberia ser ""', fakeAsync(() => {
+      givenQueEstoyEnVistaTutor();
+      givenUnAlumno({ nombre: '', apellido: 'García' });
+
+      whenInicializo(ALUMNO_ID);
+
+      expect(presenter.iniciales()).toBe('');
+    }));
+
+    it('dado vista alumno con nombre y apellido vacios, iniciales deberia ser ""', fakeAsync(() => {
+      givenQueEstoyEnVistaAlumno();
+      givenUnAlumno({ nombre: '', apellido: '' });
+
+      whenInicializo(ALUMNO_ID);
+
+      expect(presenter.iniciales()).toBe('');
+    }));
+  });
+
+  describe('computeds con resumen en null (sin init)', () => {
+    it('sin resumen cargado, saldoActualFormateado deberia formatear 0 y saldoNegativo deberia ser false', () => {
+      expect(presenter.saldoActualFormateado()).toContain('0');
+      expect(presenter.saldoNegativo()).toBeFalse();
+    });
+
+    it('sin resumen cargado, periodoLabel deberia devolver ""', () => {
+      expect(presenter.periodoLabel()).toBe('');
+    });
+
+    it('sin resumen cargado, montoIngresadoFormateado deberia formatear 0', () => {
+      expect(presenter.montoIngresadoFormateado()).toContain('0');
+    });
+
+    it('sin resumen cargado, montoGastadoFormateado deberia formatear 0', () => {
+      expect(presenter.montoGastadoFormateado()).toContain('0');
+    });
+
+    it('sin resumen cargado, balancePeriodoFormateado deberia devolver "$0" sin signo', () => {
+      const balance = presenter.balancePeriodoFormateado();
+      expect(balance).not.toContain('+');
+      expect(balance).not.toContain('-');
+    });
+
+    it('sin resumen cargado, balancePositivo deberia ser true (0 >= 0)', () => {
+      expect(presenter.balancePositivo()).toBeTrue();
+    });
+
+    it('sin resumen cargado, cantidadCompras deberia ser 0', () => {
+      expect(presenter.cantidadCompras()).toBe(0);
+    });
+
+    it('sin resumen cargado, gastoPorCategoria, gastoPorClasificacionSalud y movimientos deberian ser []', () => {
+      expect(presenter.gastoPorCategoria()).toEqual([]);
+      expect(presenter.gastoPorClasificacionSalud()).toEqual([]);
+      expect(presenter.movimientos()).toEqual([]);
+    });
+  });
+
+  describe('rango semanal — domingo', () => {
+    it('dado que hoy es domingo, aplicarRangoFecha("semana") deberia calcular offset 6 y setear desde en el lunes anterior', fakeAsync(() => {
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(2026, 5, 14, 10, 0, 0));
+
+      try {
+        whenInicializo(ALUMNO_ID);
+        presenter.cambiarFecha('semana');
+
+        expect(presenter.desde()).toBe('2026-06-08');
+      } finally {
+        jasmine.clock().uninstall();
+      }
+    }));
   });
 
   function givenUnAlumno(props: Partial<AlumnoMock> = {}): void {

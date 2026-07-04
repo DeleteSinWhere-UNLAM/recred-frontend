@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { VentaEspontaneaPage } from './venta-espontanea-page';
 
 describe('VentaEspontaneaPage', () => {
@@ -8,16 +7,17 @@ describe('VentaEspontaneaPage', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VentaEspontaneaPage]
-    })
-    .compileComponents();
+      imports: [VentaEspontaneaPage],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(VentaEspontaneaPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('inicializacion', () => {
+    it('dado el componente, cuando se monta, deberia crearse', () => {
+      expect(component).toBeTruthy();
+    });
   });
 });

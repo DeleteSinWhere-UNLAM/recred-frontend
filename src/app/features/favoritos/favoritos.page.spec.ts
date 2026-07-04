@@ -192,6 +192,19 @@ describe('FavoritosPage', () => {
     });
   });
 
+  describe('error path', () => {
+    it('dado que getFavoritos falla, deberia loguear el error y dejar la lista vacia', () => {
+      spyOn(console, 'error');
+      servicioFavoritos.getFavoritos.and.returnValue(throwError(() => new Error('boom')));
+
+      const nuevoFixture = TestBed.createComponent(FavoritosPage);
+      const nuevoComponent = nuevoFixture.componentInstance;
+
+      expect(console.error).toHaveBeenCalledWith('Error al cargar favoritos:', jasmine.any(Error));
+      expect(nuevoComponent.favoritos).toEqual([]);
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }

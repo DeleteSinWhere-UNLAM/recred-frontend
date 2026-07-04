@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { ProductoCardComponent } from './producto-card.component';
 import { CarritoService } from '../../../compra/services/carrito.service';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
@@ -283,6 +283,96 @@ describe('ProductoCardComponent', () => {
 
       const badge = fixture.debugElement.query(By.css('.producto-card__badge')).nativeElement as HTMLElement;
       expect(badge.classList.contains('producto-card__badge--shifted')).toBeTrue();
+    });
+  });
+
+  describe('interacciones y acciones de item', () => {
+    it('dado un click en el corazon de favoritos, deberia emitir toggleFavorito con el producto', () => {
+      const emitSpy = spyOn(component.toggleFavorito, 'emit');
+      const producto = ProductoMother.crear();
+      givenInput('producto', producto);
+      const evento = new MouseEvent('click');
+
+      (component as unknown as { onToggleFavorito(e: Event): void }).onToggleFavorito(evento);
+
+      expect(emitSpy).toHaveBeenCalledWith(producto);
+    });
+
+    it('dado un click en el candado, deberia emitir toggleLock con el producto', () => {
+      const emitSpy = spyOn(component.toggleLock, 'emit');
+      const producto = ProductoMother.crear();
+      givenInput('producto', producto);
+
+      (component as unknown as { onToggleLock(e: Event): void }).onToggleLock(new MouseEvent('click'));
+
+      expect(emitSpy).toHaveBeenCalledWith(producto);
+    });
+
+    it('dado sumar sobre un producto, deberia emitir cambioCantidad con la cantidad actual + 1', () => {
+      const emitSpy = spyOn(component.cambioCantidad, 'emit');
+      servicioCarrito.cantidadDe.and.returnValue(2);
+      givenInput('producto', ProductoMother.crear());
+
+      (component as unknown as { sumar(): void }).sumar();
+
+      expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({ cantidad: 3 }));
+    });
+
+    it('dado restar sobre un producto con cantidad > 0, deberia emitir cambioCantidad con la cantidad - 1', () => {
+      const emitSpy = spyOn(component.cambioCantidad, 'emit');
+      servicioCarrito.cantidadDe.and.returnValue(2);
+      givenInput('producto', ProductoMother.crear());
+
+      (component as unknown as { restar(): void }).restar();
+
+      expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({ cantidad: 1 }));
+    });
+
+    it('dado restar sobre un producto con cantidad 0, no deberia emitir cambioCantidad', () => {
+      const emitSpy = spyOn(component.cambioCantidad, 'emit');
+      servicioCarrito.cantidadDe.and.returnValue(0);
+      givenInput('producto', ProductoMother.crear());
+
+      (component as unknown as { restar(): void }).restar();
+
+      expect(emitSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('mensajeRestriccion con motivo no mapeado', () => {
+    it('dado un motivo que no esta en el MAPA, deberia dejarlo tal cual como fallback', () => {
+      givenInput('producto', ProductoMother.crear({ motivoBloqueo: 'Contiene: Colorantes Artificiales' }));
+
+      expect(component.mensajeRestriccion()).toBe('No apto: Colorantes Artificiales');
+    });
+  });
+
+  describe('esPremium', () => {
+    it('dado esPlanGratuito=false, esPremium deberia ser true', () => {
+      (perfilService.esPlanGratuito as WritableSignal<boolean>).set(false);
+
+      expect((component as unknown as { esPremium(): boolean }).esPremium()).toBeTrue();
+    });
+  });
+
+  describe('onImagenError', () => {
+    it('dado una imagen que falla y no es el fallback, deberia asignar el fallback', () => {
+      const img = document.createElement('img');
+      img.src = 'http://algo/algo.png';
+
+      (component as unknown as { onImagenError(e: Event): void }).onImagenError({ target: img } as unknown as Event);
+
+      expect(img.src).toContain('cloudinary');
+    });
+
+    it('dado una imagen que ya es el fallback, cuando vuelve a fallar, no deberia reasignar', () => {
+      const img = document.createElement('img');
+      img.src = 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+      const setSrcSpy = spyOnProperty(img, 'src', 'set');
+
+      (component as unknown as { onImagenError(e: Event): void }).onImagenError({ target: img } as unknown as Event);
+
+      expect(setSrcSpy).not.toHaveBeenCalled();
     });
   });
 

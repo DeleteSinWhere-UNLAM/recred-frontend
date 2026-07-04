@@ -1,21 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { ReglaCategoria } from '../../models/presupuesto.model';
+import { ReglaCategoriaMother } from '../../presupuesto.mother';
 import {
   CambioPorcentaje,
   ReglaCategoriaItemComponent,
 } from './regla-categoria-item.component';
 
 describe('ReglaCategoriaItemComponent', () => {
-  const reglaMock: ReglaCategoria = {
-    id: 'r-1',
-    categoriaId: 'cat-bebidas',
-    descripcionCategoria: 'Bebidas e Infusiones',
-    porcentajeLimite: 35,
-    montoLimiteCalculado: 350,
-    activo: true,
-  };
-
   let fixture: ComponentFixture<ReglaCategoriaItemComponent>;
   let component: ReglaCategoriaItemComponent;
 
@@ -26,85 +17,99 @@ describe('ReglaCategoriaItemComponent', () => {
 
     fixture = TestBed.createComponent(ReglaCategoriaItemComponent);
     component = fixture.componentInstance;
-    component.regla = reglaMock;
-    fixture.detectChanges();
   });
 
-  it('renderiza descripción, porcentaje y monto', () => {
-    const html = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(html).toContain('Bebidas e Infusiones');
-    expect(html).toContain('Hasta');
-    expect(html).toContain('en Bebidas e Infusiones');
+  describe('render', () => {
+    it('dado una regla, cuando renderizo, deberia mostrar la descripcion de la categoria y el porcentaje en slider e input numerico', () => {
+      component.regla = ReglaCategoriaMother.crear({
+        descripcionCategoria: 'Bebidas e Infusiones',
+        porcentajeLimite: 35,
+      });
+      fixture.detectChanges();
 
-    const slider = fixture.debugElement.query(By.css('input[type="range"]'))
-      .nativeElement as HTMLInputElement;
-    expect(slider.value).toBe('35');
+      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+      expect(texto).toContain('Bebidas e Infusiones');
+      expect(texto).toContain('Hasta');
+      expect(texto).toContain('en Bebidas e Infusiones');
 
-    const numberInput = fixture.debugElement.query(
-      By.css('input[type="number"]'),
-    ).nativeElement as HTMLInputElement;
-    expect(numberInput.value).toBe('35');
+      expect(getSlider().value).toBe('35');
+      expect(getNumberInput().value).toBe('35');
+    });
   });
 
-  it('emite porcentajeChange cuando el slider cambia', () => {
-    let emitido: CambioPorcentaje | undefined;
-    component.porcentajeChange.subscribe((cambio) => (emitido = cambio));
+  describe('emision de porcentajeChange', () => {
+    it('dado que el slider cambia, deberia emitir porcentajeChange con el reglaId y el porcentaje', () => {
+      component.regla = ReglaCategoriaMother.crear({ id: 'r-1' });
+      fixture.detectChanges();
+      let emitido: CambioPorcentaje | undefined;
+      component.porcentajeChange.subscribe((cambio) => (emitido = cambio));
 
-    const slider = fixture.debugElement.query(By.css('input[type="range"]'))
-      .nativeElement as HTMLInputElement;
-    slider.value = '60';
-    slider.dispatchEvent(new Event('input'));
+      const slider = getSlider();
+      slider.value = '60';
+      slider.dispatchEvent(new Event('input'));
 
-    expect(emitido).toEqual({ reglaId: 'r-1', porcentaje: 60 });
+      expect(emitido).toEqual({ reglaId: 'r-1', porcentaje: 60 });
+    });
+
+    it('dado que el input numerico cambia, deberia emitir porcentajeChange con el nuevo valor', () => {
+      component.regla = ReglaCategoriaMother.crear({ id: 'r-1' });
+      fixture.detectChanges();
+      let emitido: CambioPorcentaje | undefined;
+      component.porcentajeChange.subscribe((cambio) => (emitido = cambio));
+
+      const input = getNumberInput();
+      input.value = '12';
+      input.dispatchEvent(new Event('input'));
+
+      expect(emitido).toEqual({ reglaId: 'r-1', porcentaje: 12 });
+    });
   });
 
-  it('emite porcentajeChange cuando el input numérico cambia', () => {
-    let emitido: CambioPorcentaje | undefined;
-    component.porcentajeChange.subscribe((cambio) => (emitido = cambio));
+  describe('eliminar', () => {
+    it('dado una regla, cuando hago click en el boton de eliminar, deberia emitir eliminar con el id', () => {
+      component.regla = ReglaCategoriaMother.crear({ id: 'r-1' });
+      fixture.detectChanges();
+      let emitido: string | undefined;
+      component.eliminar.subscribe((id) => (emitido = id));
 
-    const numberInput = fixture.debugElement.query(
-      By.css('input[type="number"]'),
-    ).nativeElement as HTMLInputElement;
-    numberInput.value = '12';
-    numberInput.dispatchEvent(new Event('input'));
+      (fixture.debugElement.query(By.css('.regla-item__eliminar'))
+        .nativeElement as HTMLButtonElement).click();
 
-    expect(emitido).toEqual({ reglaId: 'r-1', porcentaje: 12 });
+      expect(emitido).toBe('r-1');
+    });
   });
 
-  it('emite eliminar con el id de la regla al tocar el botón', () => {
-    let emitido: string | undefined;
-    component.eliminar.subscribe((id) => (emitido = id));
+  describe('formatear', () => {
+    it('dado un monto, formatear deberia incluir el simbolo $ y separador de miles sin decimales', () => {
+      const resultado = component.formatear(1234);
 
-    const boton = fixture.debugElement.query(By.css('.regla-item__eliminar'))
-      .nativeElement as HTMLButtonElement;
-    boton.click();
-
-    expect(emitido).toBe('r-1');
+      expect(resultado).toContain('1.234');
+      expect(resultado).toContain('$');
+      expect(resultado).not.toContain(',00');
+    });
   });
 
-  it('formatear devuelve el monto con signo peso sin decimales', () => {
-    const resultado = component.formatear(1234);
-    expect(resultado).toContain('1.234');
-    expect(resultado).toContain('$');
-    expect(resultado).not.toContain(',00');
+  describe('handlers sin regla cargada', () => {
+    it('dado que no hay regla cargada, cuando disparo eventos, no deberia emitir nada', () => {
+      const emitirSpy = jasmine.createSpy('porcentajeChange');
+      const eliminarSpy = jasmine.createSpy('eliminar');
+      component.porcentajeChange.subscribe(emitirSpy);
+      component.eliminar.subscribe(eliminarSpy);
+
+      component.onSliderChange({ target: { value: '40' } } as unknown as Event);
+      component.onInputChange({ target: { value: '20' } } as unknown as Event);
+      component.onEliminar();
+
+      expect(emitirSpy).not.toHaveBeenCalled();
+      expect(eliminarSpy).not.toHaveBeenCalled();
+    });
   });
 
-  it('no emite nada si llega un evento sin regla cargada', () => {
-    fixture = TestBed.createComponent(ReglaCategoriaItemComponent);
-    component = fixture.componentInstance;
+  function getSlider(): HTMLInputElement {
+    return fixture.debugElement.query(By.css('input[type="range"]')).nativeElement as HTMLInputElement;
+  }
 
-    const spy = jasmine.createSpy('porcentajeChange');
-    component.porcentajeChange.subscribe(spy);
-    const spyEliminar = jasmine.createSpy('eliminar');
-    component.eliminar.subscribe(spyEliminar);
-
-    component.onSliderChange({
-      target: { value: '40' },
-    } as unknown as Event);
-    component.onInputChange({ target: { value: '20' } } as unknown as Event);
-    component.onEliminar();
-
-    expect(spy).not.toHaveBeenCalled();
-    expect(spyEliminar).not.toHaveBeenCalled();
-  });
+  function getNumberInput(): HTMLInputElement {
+    return fixture.debugElement.query(By.css('input[type="number"]')).nativeElement as HTMLInputElement;
+  }
 });
