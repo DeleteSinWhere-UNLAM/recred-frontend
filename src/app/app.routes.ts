@@ -46,7 +46,7 @@ export const routes: Routes = [
             (m) => m.PerfilUsuarioPage,
           ),
       },
-      // Grupo Padre/Tutor (PADRE)
+
       {
         path: '',
         canActivateChild: [rolChildGuard],
@@ -211,7 +211,7 @@ export const routes: Routes = [
           },
         ]
       },
-      // Grupo Alumno (ALUMNO)
+
       {
         path: '',
         canActivateChild: [rolChildGuard],
@@ -261,7 +261,7 @@ export const routes: Routes = [
           },
         ]
       },
-      // Grupo Kiosquero/Vendedor (VENDEDOR)
+
       {
         path: '',
         canActivateChild: [rolChildGuard],
@@ -346,7 +346,7 @@ export const routes: Routes = [
           },
         ]
       },
-      // Grupo Compartido (PADRE & ALUMNO)
+
       {
         path: '',
         canActivateChild: [rolChildGuard],
