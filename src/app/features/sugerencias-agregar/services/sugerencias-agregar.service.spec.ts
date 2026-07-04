@@ -11,7 +11,6 @@ describe('SugerenciasAgregarService', () => {
   let httpMock: HttpTestingController;
 
   const baseUrl = environment.apiUrl;
-
   const mockResponse: SugerenciaAgregarProducto[] = SugerenciasAgregarMother.crearListaSugerencias();
 
   beforeEach(() => {
@@ -30,17 +29,21 @@ describe('SugerenciasAgregarService', () => {
     httpMock.verify();
   });
 
-  it('debería ser creado', () => {
-    expect(service).toBeTruthy();
+  it('getSugerenciasAgregarProducto debería hacer un GET al endpoint correcto', () => {
+    let respuestaObtenida: SugerenciaAgregarProducto[] | undefined;
+
+    whenPidoSugerencias(data => respuestaObtenida = data);
+    thenLaRespuestaEsCorrecta(() => respuestaObtenida);
   });
 
-  it('getSugerenciasAgregarProducto debería hacer un GET al endpoint correcto', () => {
-    service.getSugerenciasAgregarProducto().subscribe((data) => {
-      expect(data).toEqual(mockResponse);
-    });
+  function whenPidoSugerencias(callback: (data: any) => void): void {
+    service.getSugerenciasAgregarProducto().subscribe(callback);
+  }
 
+  function thenLaRespuestaEsCorrecta(respuesta: () => any): void {
     const req = httpMock.expectOne(`${baseUrl}/sugerencias/agregar-producto`);
     expect(req.request.method).toBe('GET');
     req.flush(mockResponse);
-  });
+    expect(respuesta()).toEqual(mockResponse);
+  }
 });

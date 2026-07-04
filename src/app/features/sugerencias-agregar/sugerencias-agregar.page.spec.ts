@@ -56,39 +56,55 @@ describe('SugerenciasAgregarPage', () => {
   });
 
   it('debería configurar la url de inicio del kiosquero al construirse', () => {
-
-    const urlEsperada = '/kiosquero';
-    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
+    thenHomeUrlFueConfigurada('/kiosquero');
   });
 
   it('debería delegar al presenter la inicialización si el usuario existe en sesión', () => {
-
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasAgregarMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasAgregarMother.crearUsuario>[0])));
-
-
-    fixture.detectChanges();
-
-    expect(presenter.initialize).toHaveBeenCalled();
+    givenUsuarioExisteEnSesion();
+    whenDetectoCambios();
+    thenSeDelegoLaInicializacionAlPresenter();
   });
 
   it('no debería delegar la inicialización al presenter si no hay usuario en sesión', () => {
-
-    spyOn(localStorage, 'getItem').and.returnValue(null);
-
-    fixture.detectChanges();
-
-
-    expect(presenter.initialize).not.toHaveBeenCalled();
+    givenNoExisteUsuarioEnSesion();
+    whenDetectoCambios();
+    thenNoSeDelegoLaInicializacionAlPresenter();
   });
 
   it('debería delegar al router la navegación hacia el home al presionar volver', () => {
-
-    const urlDestino = '/kiosquero';
-
-
-    component.volver();
-
-
-    expect(router.navigateByUrl).toHaveBeenCalledWith(urlDestino);
+    whenPresionoVolver();
+    thenSeNavegaAlHome('/kiosquero');
   });
+
+  function givenUsuarioExisteEnSesion(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(SugerenciasAgregarMother.crearUsuario({ rol: 'KIOSQUERO' } as unknown as Parameters<typeof SugerenciasAgregarMother.crearUsuario>[0])));
+  }
+
+  function givenNoExisteUsuarioEnSesion(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+  }
+
+  function whenDetectoCambios(): void {
+    fixture.detectChanges();
+  }
+
+  function whenPresionoVolver(): void {
+    component.volver();
+  }
+
+  function thenHomeUrlFueConfigurada(url: string): void {
+    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(url);
+  }
+
+  function thenSeDelegoLaInicializacionAlPresenter(): void {
+    expect(presenter.initialize).toHaveBeenCalled();
+  }
+
+  function thenNoSeDelegoLaInicializacionAlPresenter(): void {
+    expect(presenter.initialize).not.toHaveBeenCalled();
+  }
+
+  function thenSeNavegaAlHome(url: string): void {
+    expect(router.navigateByUrl).toHaveBeenCalledWith(url);
+  }
 });

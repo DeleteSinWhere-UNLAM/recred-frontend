@@ -77,67 +77,104 @@ describe('SugerenciasPage', () => {
   });
 
   it('debería configurar la url de inicio del kiosquero al construirse', () => {
-    
-    const urlEsperada = '/kiosquero';
-    
-    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(urlEsperada);
+    thenHomeUrlFueConfigurada('/kiosquero');
   });
 
   it('debería delegar al presenter la inicialización cuando el usuario existe en sesión', () => {
-    
-    const idUsuarioEsperado = 'test-id';
-    
-    expect(presenter.initialize).toHaveBeenCalledWith(idUsuarioEsperado);
+    thenSeDelegoLaInicializacionAlPresenter('test-id');
   });
 
   it('no debería delegar la inicialización al presenter cuando el usuario no existe en sesión', () => {
-    
-    presenter.initialize.calls.reset();
-    (localStorage.getItem as jasmine.Spy).and.returnValue(null);
-    
-    component.ngOnInit();
-    
-    expect(presenter.initialize).not.toHaveBeenCalled();
+    givenNoExisteUsuarioEnSesion();
+    whenElComponenteInicializa();
+    thenNoSeDelegoLaInicializacionAlPresenter();
   });
 
   it('debería delegar al router la navegación hacia el home al presionar volver', () => {
-    
-    const urlDestino = '/kiosquero';
-    
-    component.volver();
-    
-    expect(router.navigateByUrl).toHaveBeenCalledWith(urlDestino);
+    whenElUsuarioPresionaVolver();
+    thenSeNavegaHacia('/kiosquero');
   });
 
   it('debería delegar al presenter la selección de un producto', () => {
-    
     const sugerencia = SugerenciasMother.crearSugerencia();
-    
-    component.seleccionarProducto(sugerencia);
-    
-    expect(presenter.seleccionarProducto).toHaveBeenCalledWith(sugerencia);
+    whenSeSeleccionaUnProducto(sugerencia);
+    thenSeDelegaSeleccionAlPresenter(sugerencia);
   });
 
   it('debería solicitar al presenter la apertura del modal promocional', () => {
-    
-    component.onGenerarPromocion();
-    
-    expect(presenter.openComboPromotionModal).toHaveBeenCalled();
+    whenElUsuarioGeneraPromocion();
+    thenSeSolicitaAbrirModalAlPresenter();
   });
 
   it('debería solicitar al presenter la generación de la promoción confirmada', () => {
-    
     const datosPromocion = { discountPercentage: 10, startDate: 'hoy', endDate: 'manana', productIds: ['1'] };
-    
-    component.onConfirmPromotion(datosPromocion);
-    
-    expect(presenter.generatePromotion).toHaveBeenCalledWith(datosPromocion);
+    whenElUsuarioConfirmaPromocion(datosPromocion);
+    thenSeSolicitaGenerarPromocionAlPresenter(datosPromocion);
   });
 
   it('debería solicitar al presenter el cierre del modal promocional', () => {
-    
-    component.onCloseModal();
-    
-    expect(presenter.closeComboPromotionModal).toHaveBeenCalled();
+    whenElUsuarioCierraElModal();
+    thenSeSolicitaCerrarModalAlPresenter();
   });
+
+  function givenNoExisteUsuarioEnSesion(): void {
+    presenter.initialize.calls.reset();
+    (localStorage.getItem as jasmine.Spy).and.returnValue(null);
+  }
+
+  function whenElComponenteInicializa(): void {
+    component.ngOnInit();
+  }
+
+  function whenElUsuarioPresionaVolver(): void {
+    component.volver();
+  }
+
+  function whenSeSeleccionaUnProducto(sugerencia: any): void {
+    component.seleccionarProducto(sugerencia);
+  }
+
+  function whenElUsuarioGeneraPromocion(): void {
+    component.onGenerarPromocion();
+  }
+
+  function whenElUsuarioConfirmaPromocion(datos: any): void {
+    component.onConfirmPromotion(datos);
+  }
+
+  function whenElUsuarioCierraElModal(): void {
+    component.onCloseModal();
+  }
+
+  function thenHomeUrlFueConfigurada(url: string): void {
+    expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith(url);
+  }
+
+  function thenSeDelegoLaInicializacionAlPresenter(id: string): void {
+    expect(presenter.initialize).toHaveBeenCalledWith(id);
+  }
+
+  function thenNoSeDelegoLaInicializacionAlPresenter(): void {
+    expect(presenter.initialize).not.toHaveBeenCalled();
+  }
+
+  function thenSeNavegaHacia(url: string): void {
+    expect(router.navigateByUrl).toHaveBeenCalledWith(url);
+  }
+
+  function thenSeDelegaSeleccionAlPresenter(sugerencia: any): void {
+    expect(presenter.seleccionarProducto).toHaveBeenCalledWith(sugerencia);
+  }
+
+  function thenSeSolicitaAbrirModalAlPresenter(): void {
+    expect(presenter.openComboPromotionModal).toHaveBeenCalled();
+  }
+
+  function thenSeSolicitaGenerarPromocionAlPresenter(datos: any): void {
+    expect(presenter.generatePromotion).toHaveBeenCalledWith(datos);
+  }
+
+  function thenSeSolicitaCerrarModalAlPresenter(): void {
+    expect(presenter.closeComboPromotionModal).toHaveBeenCalled();
+  }
 });

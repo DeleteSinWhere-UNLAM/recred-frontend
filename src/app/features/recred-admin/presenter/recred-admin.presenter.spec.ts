@@ -29,90 +29,147 @@ describe('RecredAdminPresenter', () => {
   describe('Inicialización', () => {
     it('debería cargar las solicitudes pendientes y emitirlas cuando el servicio responde correctamente', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
       let resultado: SchoolRegistration[] | undefined;
       let cargando: boolean | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => resultado = v);
-      presenter.cargando$.subscribe((v: boolean) => cargando = v);
 
-      presenter.initialize();
-
-      expect(resultado).toEqual(solicitudes);
-      expect(cargando).toBeFalse();
+      givenSolicitudes(solicitudes);
+      whenInicializoPresenter(
+        val => resultado = val,
+        val => cargando = val
+      );
+      thenSeCargaronLasSolicitudes(solicitudes, resultado, cargando);
     });
 
     it('debería emitir el error cuando el servicio falla al cargar', () => {
-      servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')));
       let error: string | null | undefined;
-      presenter.error$.subscribe((v: string | null) => error = v);
 
-      presenter.initialize();
-
-      expect(error).toContain('Error al cargar');
+      givenErrorEnSolicitudes();
+      whenInicializoPresenterConError(val => error = val);
+      thenSeEmitioError(error);
     });
   });
 
   describe('Aprobación de solicitud', () => {
     it('debería aprobar la solicitud, eliminarla de la lista local y mostrar toast de éxito', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
-      servicio.approveRegistration.and.returnValue(of(undefined));
-      presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
 
-      presenter.aprobar('solicitud-1');
-
-      expect(servicio.approveRegistration).toHaveBeenCalledWith('solicitud-1');
-      expect(lista?.length).toBe(1);
-      expect(lista?.[0].id).toBe('solicitud-2');
-      expect(toast.mostrar).toHaveBeenCalledWith(jasmine.stringContaining('aprobado'), 'success');
+      givenAprobacionExitosa(solicitudes);
+      whenAprobarSolicitud('solicitud-1', val => lista = val);
+      thenSolicitudFueAprobada('solicitud-1', 'solicitud-2', lista);
     });
 
     it('debería mostrar toast de error y no modificar la lista cuando el servicio de aprobación falla', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
-      servicio.approveRegistration.and.returnValue(throwError(() => new Error('API Error')));
-      presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
 
-      presenter.aprobar('solicitud-1');
-
-      expect(lista?.length).toBe(2);
-      expect(toast.mostrar).toHaveBeenCalledWith('Error al aprobar la solicitud.', 'error');
+      givenAprobacionFallida(solicitudes);
+      whenAprobarSolicitud('solicitud-1', val => lista = val);
+      thenAprobacionFallo(lista);
     });
   });
 
   describe('Rechazo de solicitud', () => {
     it('debería rechazar la solicitud, eliminarla de la lista local y mostrar toast de éxito', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
-      servicio.rejectRegistration.and.returnValue(of(undefined));
-      presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
 
-      presenter.rechazar('solicitud-2');
-
-      expect(servicio.rejectRegistration).toHaveBeenCalledWith('solicitud-2');
-      expect(lista?.length).toBe(1);
-      expect(lista?.[0].id).toBe('solicitud-1');
-      expect(toast.mostrar).toHaveBeenCalledWith('Solicitud rechazada.', 'success');
+      givenRechazoExitoso(solicitudes);
+      whenRechazarSolicitud('solicitud-2', val => lista = val);
+      thenSolicitudFueRechazada('solicitud-2', 'solicitud-1', lista);
     });
 
     it('debería mostrar toast de error y no modificar la lista cuando el servicio de rechazo falla', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
-      servicio.rejectRegistration.and.returnValue(throwError(() => new Error('API Error')));
-      presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
 
-      presenter.rechazar('solicitud-2');
-
-      expect(lista?.length).toBe(2);
-      expect(toast.mostrar).toHaveBeenCalledWith('Error al rechazar la solicitud.', 'error');
+      givenRechazoFallido(solicitudes);
+      whenRechazarSolicitud('solicitud-2', val => lista = val);
+      thenRechazoFallo(lista);
     });
   });
+
+  function givenSolicitudes(solicitudes: SchoolRegistration[]): void {
+    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+  }
+
+  function givenErrorEnSolicitudes(): void {
+    servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')));
+  }
+
+  function givenAprobacionExitosa(solicitudes: SchoolRegistration[]): void {
+    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+    servicio.approveRegistration.and.returnValue(of(undefined));
+  }
+
+  function givenAprobacionFallida(solicitudes: SchoolRegistration[]): void {
+    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+    servicio.approveRegistration.and.returnValue(throwError(() => new Error('API Error')));
+  }
+
+  function givenRechazoExitoso(solicitudes: SchoolRegistration[]): void {
+    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+    servicio.rejectRegistration.and.returnValue(of(undefined));
+  }
+
+  function givenRechazoFallido(solicitudes: SchoolRegistration[]): void {
+    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+    servicio.rejectRegistration.and.returnValue(throwError(() => new Error('API Error')));
+  }
+
+  function whenInicializoPresenter(cbResultado: (val: any) => void, cbCargando: (val: any) => void): void {
+    presenter.solicitudes$.subscribe(cbResultado);
+    presenter.cargando$.subscribe(cbCargando);
+    presenter.initialize();
+  }
+
+  function whenInicializoPresenterConError(cbError: (val: any) => void): void {
+    presenter.error$.subscribe(cbError);
+    presenter.initialize();
+  }
+
+  function whenAprobarSolicitud(id: string, cbLista: (val: any) => void): void {
+    presenter.initialize();
+    presenter.solicitudes$.subscribe(cbLista);
+    presenter.aprobar(id);
+  }
+
+  function whenRechazarSolicitud(id: string, cbLista: (val: any) => void): void {
+    presenter.initialize();
+    presenter.solicitudes$.subscribe(cbLista);
+    presenter.rechazar(id);
+  }
+
+  function thenSeCargaronLasSolicitudes(solicitudes: SchoolRegistration[], resultado: any, cargando: any): void {
+    expect(resultado).toEqual(solicitudes);
+    expect(cargando).toBeFalse();
+  }
+
+  function thenSeEmitioError(error: any): void {
+    expect(error).toContain('Error al cargar');
+  }
+
+  function thenSolicitudFueAprobada(idAprobado: string, idRestante: string, lista: any): void {
+    expect(servicio.approveRegistration).toHaveBeenCalledWith(idAprobado);
+    expect(lista?.length).toBe(1);
+    expect(lista?.[0].id).toBe(idRestante);
+    expect(toast.mostrar).toHaveBeenCalledWith(jasmine.stringContaining('aprobado'), 'success');
+  }
+
+  function thenAprobacionFallo(lista: any): void {
+    expect(lista?.length).toBe(2);
+    expect(toast.mostrar).toHaveBeenCalledWith('Error al aprobar la solicitud.', 'error');
+  }
+
+  function thenSolicitudFueRechazada(idRechazado: string, idRestante: string, lista: any): void {
+    expect(servicio.rejectRegistration).toHaveBeenCalledWith(idRechazado);
+    expect(lista?.length).toBe(1);
+    expect(lista?.[0].id).toBe(idRestante);
+    expect(toast.mostrar).toHaveBeenCalledWith('Solicitud rechazada.', 'success');
+  }
+
+  function thenRechazoFallo(lista: any): void {
+    expect(lista?.length).toBe(2);
+    expect(toast.mostrar).toHaveBeenCalledWith('Error al rechazar la solicitud.', 'error');
+  }
 });

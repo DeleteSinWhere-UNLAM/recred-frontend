@@ -29,18 +29,29 @@ describe('ResumenSemanalService', () => {
 
   describe('Obtención de datos', () => {
     it('debería solicitar el resumen semanal realizando un GET al endpoint correspondiente', () => {
-      
       const mockRespuesta: ResumenSemanal = ResumenSemanalMother.crearResumen();
       let respuestaObtenida: ResumenSemanal | undefined;
 
-      service.getResumen().subscribe((data) => {
-        respuestaObtenida = data;
-      });
-      const req = httpMock.expectOne(`${environment.apiUrl}/resumen/me`);
-      req.flush(mockRespuesta);
+      givenEstadoDeRedLimpio();
+      whenSolicitoResumen();
+      thenElServicioHaceUnGetCorrectoYDevuelveLaRespuesta();
 
-      expect(req.request.method).toBe('GET');
-      expect(respuestaObtenida).toEqual(mockRespuesta);
+      function givenEstadoDeRedLimpio() {
+        // Estado limpio inicializado en variables locales
+      }
+
+      function whenSolicitoResumen() {
+        service.getResumen().subscribe((data) => {
+          respuestaObtenida = data;
+        });
+      }
+
+      function thenElServicioHaceUnGetCorrectoYDevuelveLaRespuesta() {
+        const req = httpMock.expectOne(`${environment.apiUrl}/resumen/me`);
+        expect(req.request.method).toBe('GET');
+        req.flush(mockRespuesta);
+        expect(respuestaObtenida).toEqual(mockRespuesta);
+      }
     });
   });
 });

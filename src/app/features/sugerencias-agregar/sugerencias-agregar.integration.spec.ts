@@ -53,12 +53,42 @@ describe('SugerenciasAgregar Integration', () => {
   });
 
   it('debería renderizar la lista de oportunidades de stock calculadas por el presenter', () => {
+    givenSugerenciasCargadas();
+    whenSeCreaElComponenteYDetectaCambios();
+    thenSeMuestranOportunidadesDeStock();
+  });
+
+  it('debería visualizar el componente de error cuando el presenter falla al cargar', () => {
+    givenSugerenciasFalla();
+    whenSeCreaElComponenteYDetectaCambios();
+    thenSeMuestraPanelDeError();
+  });
+  
+  it('debería mostrar el empty state cuando el presenter no detecta sugerencias', () => {
+    givenSugerenciasVacias();
+    whenSeCreaElComponenteYDetectaCambios();
+    thenSeMuestraEmptyState();
+  });
+
+  function givenSugerenciasCargadas(): void {
     const sugerencias = SugerenciasAgregarMother.crearListaSugerencias();
     servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(of(sugerencias));
-    fixture = TestBed.createComponent(SugerenciasAgregarPage);
-    
-    fixture.detectChanges();
+  }
 
+  function givenSugerenciasFalla(): void {
+    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('API Error')));
+  }
+
+  function givenSugerenciasVacias(): void {
+    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(of([]));
+  }
+
+  function whenSeCreaElComponenteYDetectaCambios(): void {
+    fixture = TestBed.createComponent(SugerenciasAgregarPage);
+    fixture.detectChanges();
+  }
+
+  function thenSeMuestranOportunidadesDeStock(): void {
     const titulo = fixture.nativeElement.querySelector('h1').textContent;
     const tarjetas = fixture.debugElement.queryAll(By.css('.sa__product-card'));
     const tituloPrimeraTarjeta = tarjetas[0].query(By.css('.sa__card-title strong')).nativeElement.textContent;
@@ -67,27 +97,17 @@ describe('SugerenciasAgregar Integration', () => {
     expect(tarjetas.length).toBe(3);
     expect(tituloPrimeraTarjeta).toContain('Prod C');
     expect(totalIngresos).toContain('$4.000');
-  });
+  }
 
-  it('debería visualizar el componente de error cuando el presenter falla al cargar', () => {
-    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('API Error')));
-    fixture = TestBed.createComponent(SugerenciasAgregarPage);
-    
-    fixture.detectChanges();
-
+  function thenSeMuestraPanelDeError(): void {
     const panelError = fixture.nativeElement.querySelector('.sa__notice--error');
     expect(panelError).toBeTruthy();
     expect(panelError.textContent).toContain('No se pudieron cargar las oportunidades de stock.');
-  });
-  
-  it('debería mostrar el empty state cuando el presenter no detecta sugerencias', () => {
-    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(of([]));
-    fixture = TestBed.createComponent(SugerenciasAgregarPage);
-    
-    fixture.detectChanges();
+  }
 
+  function thenSeMuestraEmptyState(): void {
     const emptyState = fixture.nativeElement.querySelector('.sa__empty-state');
     expect(emptyState).toBeTruthy();
     expect(emptyState.textContent).toContain('Sin oportunidades por ahora');
-  });
+  }
 });

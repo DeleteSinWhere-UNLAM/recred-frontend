@@ -79,12 +79,38 @@ describe('Sugerencias Integration', () => {
   });
 
   it('debería renderizar los indicadores calculados por el presenter basándose en las sugerencias', () => {
+    givenSugerenciasCargadas();
+    whenSeCreaElComponenteYDetectaCambios();
+    thenSeMuestranLosIndicadoresCorrectamente();
+  });
+
+  it('debería graficar correctamente las barras de días sin venta ordenadas por criticidad', () => {
+    givenSugerenciasCargadas();
+    whenSeCreaElComponenteYDetectaCambios();
+    thenSeGraficanLasBarrasCorrectamente();
+  });
+
+  it('debería mostrar el empty state cuando el presenter no detecta sugerencias con baja rotación', () => {
+    givenSugerenciasVacias();
+    whenSeCreaElComponenteYDetectaCambios();
+    thenSeMuestraElEmptyState();
+  });
+
+  function givenSugerenciasCargadas(): void {
     const sugerencias = SugerenciasMother.crearSugerencias();
     servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
-    fixture = TestBed.createComponent(SugerenciasPage);
-    
-    fixture.detectChanges();
+  }
 
+  function givenSugerenciasVacias(): void {
+    servicioSugerencias.getSugerencias.and.returnValue(of([]));
+  }
+
+  function whenSeCreaElComponenteYDetectaCambios(): void {
+    fixture = TestBed.createComponent(SugerenciasPage);
+    fixture.detectChanges();
+  }
+
+  function thenSeMuestranLosIndicadoresCorrectamente(): void {
     const metricProductos = fixture.nativeElement.querySelector('.sg__metric--danger strong').textContent;
     const metricStock = fixture.nativeElement.querySelector('.sg__metric--warning strong').textContent;
     const metricDias = fixture.nativeElement.querySelector('.sg__metric--info strong').textContent;
@@ -93,31 +119,20 @@ describe('Sugerencias Integration', () => {
     expect(metricStock).toContain('30');
     expect(metricDias).toContain('8');
     expect(metricCritico).toContain('Producto 2');
-  });
+  }
 
-  it('debería graficar correctamente las barras de días sin venta ordenadas por criticidad', () => {
-    const sugerencias = SugerenciasMother.crearSugerencias();
-    servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
-    fixture = TestBed.createComponent(SugerenciasPage);
-    
-    fixture.detectChanges();
-
+  function thenSeGraficanLasBarrasCorrectamente(): void {
     const barrasDias = fixture.debugElement.queryAll(By.css('.sg__hbar-row'));
     const etiquetaPrimerBarra = barrasDias[0].query(By.css('.sg__hbar-label strong')).nativeElement.textContent;
     const valorPrimerBarra = barrasDias[0].query(By.css('.sg__hbar-value')).nativeElement.textContent;
     expect(barrasDias.length).toBe(2);
     expect(etiquetaPrimerBarra).toContain('Producto 2');
     expect(valorPrimerBarra).toContain('10');
-  });
+  }
 
-  it('debería mostrar el empty state cuando el presenter no detecta sugerencias con baja rotación', () => {
-    servicioSugerencias.getSugerencias.and.returnValue(of([]));
-    fixture = TestBed.createComponent(SugerenciasPage);
-    
-    fixture.detectChanges();
-
+  function thenSeMuestraElEmptyState(): void {
     const emptyState = fixture.nativeElement.querySelector('.sg__empty-state');
     expect(emptyState).toBeTruthy();
     expect(emptyState.textContent).toContain('Excelente trabajo');
-  });
+  }
 });

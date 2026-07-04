@@ -15,12 +15,17 @@ describe('DirectivoDashboardComponent', () => {
     fixture.detectChanges();
   });
 
-  it('debería crear el componente', () => {
-    expect(component).toBeTruthy();
+  it('debería renderizar el panel principal', () => {
+    whenRenderiza();
+    thenMuestraTituloPanelPrincipal();
   });
 
-  it('debería renderizar el panel principal', () => {
+  function whenRenderiza(): void {
+    fixture.detectChanges();
+  }
+
+  function thenMuestraTituloPanelPrincipal(): void {
     const h2Element = fixture.nativeElement.querySelector('h2');
     expect(h2Element.textContent.trim()).toBe('Panel Principal');
-  });
+  }
 });

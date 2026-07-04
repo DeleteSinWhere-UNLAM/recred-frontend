@@ -20,6 +20,7 @@ export class SugerenciasMother {
         diasSinVenta: 5,
         ventasPeriodo: 100
       },
+      alertas: [],
       ...override
     } as unknown as SugerenciaProducto;
   }

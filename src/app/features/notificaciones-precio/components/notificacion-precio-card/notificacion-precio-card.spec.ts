@@ -15,19 +15,25 @@ describe('NotificacionPrecioCardComponent', () => {
   });
 
   describe('Inicialización', () => {
-    beforeEach(() => {
-      fixture = TestBed.createComponent(NotificacionPrecioCardComponent);
-      component = fixture.componentInstance;
-      component.notificacion = NotificacionesPrecioMother.crearNotificacion();
-      fixture.detectChanges();
-    });
-
     it('debería inicializar el componente con la notificación asignada', () => {
-      
-      const titulo = component.notificacion.titulo;
-
-      expect(component).toBeTruthy();
-      expect(titulo).toBe('Alfajor subió de precio');
+      givenComponenteCreado();
+      whenAsignoNotificacion();
+      thenElComponenteSeInicializaCorrectamente();
     });
   });
+
+  function givenComponenteCreado(): void {
+    fixture = TestBed.createComponent(NotificacionPrecioCardComponent);
+    component = fixture.componentInstance;
+  }
+
+  function whenAsignoNotificacion(): void {
+    component.notificacion = NotificacionesPrecioMother.crearNotificacion();
+    fixture.detectChanges();
+  }
+
+  function thenElComponenteSeInicializaCorrectamente(): void {
+    expect(component).toBeTruthy();
+    expect(component.notificacion.titulo).toBe('Alfajor subió de precio');
+  }
 });

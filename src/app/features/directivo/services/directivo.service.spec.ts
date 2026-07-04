@@ -10,6 +10,10 @@ describe('DirectivoService', () => {
   });
 
   it('debería crearse correctamente', () => {
-    expect(service).toBeTruthy();
+    thenSeCreaCorrectamente();
   });
+
+  function thenSeCreaCorrectamente(): void {
+    expect(service).toBeTruthy();
+  }
 });

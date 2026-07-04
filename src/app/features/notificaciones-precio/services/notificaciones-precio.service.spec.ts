@@ -28,19 +28,30 @@ describe('NotificacionesPrecioService', () => {
 
   describe('Obtención de notificaciones', () => {
     it('debería solicitar las notificaciones de alerta de precio realizando un GET al endpoint correspondiente', () => {
-      
-      const userIdMock = 'user-kiosquero-1';
       const mockRespuesta: NotificacionPrecio[] = [NotificacionesPrecioMother.crearNotificacion()];
       let respuestaObtenida: NotificacionPrecio[] | undefined;
+      const userIdMock = 'user-kiosquero-1';
 
-      service.getNotificaciones(userIdMock).subscribe((data) => {
-        respuestaObtenida = data;
-      });
-      const req = httpMock.expectOne(`${environment.apiUrl}/usuarios/${userIdMock}/preferencias?tipo=ALERTA_PRECIO`);
-      req.flush(mockRespuesta);
+      givenUnUsuarioLogueado();
+      whenSolicitoNotificaciones();
+      thenElServicioHaceUnGetCorrectoYDevuelveLaRespuesta();
 
-      expect(req.request.method).toBe('GET');
-      expect(respuestaObtenida).toEqual(mockRespuesta);
+      function givenUnUsuarioLogueado() {
+        // En este caso, solo preparamos los datos
+      }
+
+      function whenSolicitoNotificaciones() {
+        service.getNotificaciones(userIdMock).subscribe((data) => {
+          respuestaObtenida = data;
+        });
+      }
+
+      function thenElServicioHaceUnGetCorrectoYDevuelveLaRespuesta() {
+        const req = httpMock.expectOne(`${environment.apiUrl}/usuarios/${userIdMock}/preferencias?tipo=ALERTA_PRECIO`);
+        expect(req.request.method).toBe('GET');
+        req.flush(mockRespuesta);
+        expect(respuestaObtenida).toEqual(mockRespuesta);
+      }
     });
   });
 });

@@ -31,6 +31,8 @@ class NavbarStub {
 describe('PreferenciasDetectadasPage', () => {
   let servicioPreferencias: jasmine.SpyObj<PreferenciasDetectadasService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let component: PreferenciasDetectadasPage;
+  let fixture: ComponentFixture<PreferenciasDetectadasPage>;
 
   beforeEach(async () => {
     servicioPreferencias = jasmine.createSpyObj('PreferenciasDetectadasService', ['getPreferencias']);
@@ -63,38 +65,54 @@ describe('PreferenciasDetectadasPage', () => {
   });
 
   describe('Cuando el perfil existe en localStorage', () => {
-    let component: PreferenciasDetectadasPage;
-    let fixture: ComponentFixture<PreferenciasDetectadasPage>;
-
-    beforeEach(() => {
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
-      const preferenciasEsperadas = [PreferenciasDetectadasMother.crearPreferencia()];
-      servicioPreferencias.getPreferencias.and.returnValue(of(preferenciasEsperadas));
-      
-      fixture = TestBed.createComponent(PreferenciasDetectadasPage);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
     it('debería solicitar las preferencias detectadas al servicio y asignarlas al estado', () => {
-      
-      const cantidadPreferencias = component.preferencias.length;
-
-      expect(servicioPreferencias.getPreferencias).toHaveBeenCalledWith('user-id-123');
-      expect(cantidadPreferencias).toBe(1);
+      givenElPerfilExiste();
+      whenSeCreaElComponenteYDetectaCambios();
+      thenSeLlamoASolicitarPreferencias();
     });
   });
 
   describe('Cuando la sesión no es válida', () => {
     it('no debería solicitar las preferencias si el id de usuario no existe', () => {
-      
-      spyOn(localStorage, 'getItem').and.returnValue(null);
-      const fixture = TestBed.createComponent(PreferenciasDetectadasPage);
-      const component = fixture.componentInstance;
-      fixture.detectChanges();
+      givenElPerfilNoExiste();
+      whenSeCreaElComponenteYDetectaCambios();
+      thenNoSeSolicitanPreferencias();
+    });
 
-      expect(servicioPreferencias.getPreferencias).not.toHaveBeenCalled();
-      expect(component.preferencias.length).toBe(0);
+    it('no debería solicitar las preferencias si el perfil no contiene un id', () => {
+      givenElPerfilEstaMalFormado();
+      whenSeCreaElComponenteYDetectaCambios();
+      thenNoSeSolicitanPreferencias();
     });
   });
+
+  function givenElPerfilExiste(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-123' }));
+    const preferenciasEsperadas = [PreferenciasDetectadasMother.crearPreferencia()];
+    servicioPreferencias.getPreferencias.and.returnValue(of(preferenciasEsperadas));
+  }
+
+  function givenElPerfilNoExiste(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+  }
+
+  function givenElPerfilEstaMalFormado(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ role: 'admin' }));
+  }
+
+  function whenSeCreaElComponenteYDetectaCambios(): void {
+    fixture = TestBed.createComponent(PreferenciasDetectadasPage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  }
+
+  function thenSeLlamoASolicitarPreferencias(): void {
+    expect(servicioPreferencias.getPreferencias).toHaveBeenCalledWith('user-id-123');
+    expect(component.preferencias.length).toBe(1);
+  }
+
+  function thenNoSeSolicitanPreferencias(): void {
+    expect(servicioPreferencias.getPreferencias).not.toHaveBeenCalled();
+    expect(component.preferencias.length).toBe(0);
+  }
 });

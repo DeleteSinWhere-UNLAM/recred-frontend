@@ -4,7 +4,7 @@ import { DirectivoPresenter } from './presenter/directivo.presenter';
 import { signal } from '@angular/core';
 import { AuthService } from '../../core/auth/services/auth.service';
 
-describe('DirectivoPage (Humble Object Component)', () => {
+describe('DirectivoPage', () => {
   let component: DirectivoPage;
   let fixture: ComponentFixture<DirectivoPage>;
   let presenterSpy: jasmine.SpyObj<DirectivoPresenter>;
@@ -12,7 +12,6 @@ describe('DirectivoPage (Humble Object Component)', () => {
   let mensajeSignal: ReturnType<typeof signal<string>>;
 
   beforeEach(async () => {
-    
     mensajeSignal = signal('Cargando...');
     presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar'], {
       mensajeBienvenida: mensajeSignal,
@@ -32,27 +31,40 @@ describe('DirectivoPage (Humble Object Component)', () => {
       })
       .compileComponents();
 
-    
     fixture = TestBed.createComponent(DirectivoPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
   it('debería renderizar el mensaje de bienvenida expuesto por el presenter', () => {
-    
-    mensajeSignal.set('Hola bienvenido, Maria');
-    fixture.detectChanges();
-
-    
-    const h1Element = fixture.nativeElement.querySelector('h1');
-    expect(h1Element.textContent.trim()).toBe('Hola bienvenido, Maria');
+    givenMensajeDeBienvenida('Hola bienvenido, Maria');
+    whenSeActualizaLaVista();
+    thenSeMuestraElMensaje('Hola bienvenido, Maria');
   });
 
   it('debería inicializar el presenter en el ngOnInit', () => {
-    
-    component.ngOnInit();
-
-    
-    expect(presenterSpy.inicializar).toHaveBeenCalled();
+    whenSeInicializaElComponente();
+    thenElPresenterEsInicializado();
   });
+
+  function givenMensajeDeBienvenida(mensaje: string): void {
+    mensajeSignal.set(mensaje);
+  }
+
+  function whenSeActualizaLaVista(): void {
+    fixture.detectChanges();
+  }
+
+  function whenSeInicializaElComponente(): void {
+    component.ngOnInit();
+  }
+
+  function thenSeMuestraElMensaje(mensajeEsperado: string): void {
+    const h1Element = fixture.nativeElement.querySelector('h1');
+    expect(h1Element.textContent.trim()).toBe(mensajeEsperado);
+  }
+
+  function thenElPresenterEsInicializado(): void {
+    expect(presenterSpy.inicializar).toHaveBeenCalled();
+  }
 });

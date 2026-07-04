@@ -32,6 +32,8 @@ class NavbarStub {
 describe('NotificacionesPrecioPage', () => {
   let servicioNotificaciones: jasmine.SpyObj<NotificacionesPrecioService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let component: NotificacionesPrecioPage;
+  let fixture: ComponentFixture<NotificacionesPrecioPage>;
 
   beforeEach(async () => {
     servicioNotificaciones = jasmine.createSpyObj('NotificacionesPrecioService', ['getNotificaciones']);
@@ -64,38 +66,54 @@ describe('NotificacionesPrecioPage', () => {
   });
 
   describe('Cuando el perfil de kiosquero existe en localStorage', () => {
-    let component: NotificacionesPrecioPage;
-    let fixture: ComponentFixture<NotificacionesPrecioPage>;
-
-    beforeEach(() => {
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-456' }));
-      const notificacionesEsperadas = [NotificacionesPrecioMother.crearNotificacion()];
-      servicioNotificaciones.getNotificaciones.and.returnValue(of(notificacionesEsperadas));
-      
-      fixture = TestBed.createComponent(NotificacionesPrecioPage);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-    });
-
     it('debería solicitar las notificaciones de precio al servicio y asignarlas al estado', () => {
-      
-      const cantidadNotificaciones = component.notificaciones.length;
-
-      expect(servicioNotificaciones.getNotificaciones).toHaveBeenCalledWith('user-id-456');
-      expect(cantidadNotificaciones).toBe(1);
+      givenElPerfilDeKiosqueroExiste();
+      whenSeCreaElComponenteYDetectaCambios();
+      thenSeLlamoASolicitarNotificaciones();
     });
   });
 
   describe('Cuando la sesión no es válida', () => {
     it('no debería solicitar las notificaciones si el id de usuario no existe', () => {
-      
-      spyOn(localStorage, 'getItem').and.returnValue(null);
-      const fixture = TestBed.createComponent(NotificacionesPrecioPage);
-      const component = fixture.componentInstance;
-      fixture.detectChanges();
+      givenElPerfilNoExiste();
+      whenSeCreaElComponenteYDetectaCambios();
+      thenNoSeSolicitanNotificaciones();
+    });
 
-      expect(servicioNotificaciones.getNotificaciones).not.toHaveBeenCalled();
-      expect(component.notificaciones.length).toBe(0);
+    it('no debería solicitar las notificaciones si el perfil no contiene un id', () => {
+      givenElPerfilEstaMalFormado();
+      whenSeCreaElComponenteYDetectaCambios();
+      thenNoSeSolicitanNotificaciones();
     });
   });
+
+  function givenElPerfilDeKiosqueroExiste(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: 'user-id-456' }));
+    const notificacionesEsperadas = [NotificacionesPrecioMother.crearNotificacion()];
+    servicioNotificaciones.getNotificaciones.and.returnValue(of(notificacionesEsperadas));
+  }
+
+  function givenElPerfilNoExiste(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+  }
+
+  function givenElPerfilEstaMalFormado(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ role: 'admin' }));
+  }
+
+  function whenSeCreaElComponenteYDetectaCambios(): void {
+    fixture = TestBed.createComponent(NotificacionesPrecioPage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  }
+
+  function thenSeLlamoASolicitarNotificaciones(): void {
+    expect(servicioNotificaciones.getNotificaciones).toHaveBeenCalledWith('user-id-456');
+    expect(component.notificaciones.length).toBe(1);
+  }
+
+  function thenNoSeSolicitanNotificaciones(): void {
+    expect(servicioNotificaciones.getNotificaciones).not.toHaveBeenCalled();
+    expect(component.notificaciones.length).toBe(0);
+  }
 });

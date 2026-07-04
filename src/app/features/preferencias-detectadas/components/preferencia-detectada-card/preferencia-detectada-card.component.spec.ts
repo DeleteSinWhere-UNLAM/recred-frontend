@@ -15,38 +15,52 @@ describe('PreferenciaDetectadaCardComponent', () => {
   });
 
   describe('Inicialización y lógica interna', () => {
-    beforeEach(() => {
-      fixture = TestBed.createComponent(PreferenciaDetectadaCardComponent);
-      component = fixture.componentInstance;
-      component.preferencia = PreferenciasDetectadasMother.crearPreferencia();
-      fixture.detectChanges();
-    });
-
     it('debería inicializar el componente con la preferencia asignada', () => {
-      
-      const titulo = component.preferencia.titulo;
-
-      expect(component).toBeTruthy();
-      expect(titulo).toBe('Le gustan los alfajores');
+      givenComponenteCreado();
+      whenAsignoPreferencia();
+      thenElComponenteSeInicializaCorrectamente();
     });
 
     it('debería inicializar con expandido en falso por defecto', () => {
-      
-      const estadoExpansor = component.expandido;
-
-      expect(estadoExpansor).toBeFalse();
+      givenComponenteCreado();
+      whenAsignoPreferencia();
+      thenEstadoExpansorEsFalso();
     });
 
     it('debería alternar el estado de expandido al llamar a toggleDetalle()', () => {
-      
-      component.toggleDetalle();
-      const estadoTrasPrimerToggle = component.expandido;
-      
-      component.toggleDetalle();
-      const estadoTrasSegundoToggle = component.expandido;
-
-      expect(estadoTrasPrimerToggle).toBeTrue();
-      expect(estadoTrasSegundoToggle).toBeFalse();
+      givenComponenteCreado();
+      whenAsignoPreferencia();
+      whenLlamoAToggleDetalle();
+      thenEstadoExpansorEsVerdadero();
+      whenLlamoAToggleDetalle();
+      thenEstadoExpansorEsFalso();
     });
   });
+
+  function givenComponenteCreado(): void {
+    fixture = TestBed.createComponent(PreferenciaDetectadaCardComponent);
+    component = fixture.componentInstance;
+  }
+
+  function whenAsignoPreferencia(): void {
+    component.preferencia = PreferenciasDetectadasMother.crearPreferencia();
+    fixture.detectChanges();
+  }
+
+  function whenLlamoAToggleDetalle(): void {
+    component.toggleDetalle();
+  }
+
+  function thenElComponenteSeInicializaCorrectamente(): void {
+    expect(component).toBeTruthy();
+    expect(component.preferencia.titulo).toBe('Le gustan los alfajores');
+  }
+
+  function thenEstadoExpansorEsFalso(): void {
+    expect(component.expandido).toBeFalse();
+  }
+
+  function thenEstadoExpansorEsVerdadero(): void {
+    expect(component.expandido).toBeTrue();
+  }
 });
