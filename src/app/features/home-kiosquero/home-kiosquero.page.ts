@@ -20,6 +20,7 @@ import { PerfilService } from '../../data-access/services/perfil.service';
 import { Categoria } from '../inventario/models/categoria.interface';
 import { SolicitudCrearProducto } from '../inventario/models/requests/crear-producto-request.interface';
 import { FormularioProductoComponent, DatosFormularioProducto } from '../inventario/components/formulario-producto/formulario-producto.component';
+import { ModalVerificacionCodigoComponent } from './components/modal-verificacion-codigo/modal-verificacion-codigo.component';
 
 const IMAGEN_FALLBACK =
   'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
@@ -28,7 +29,7 @@ const IMAGEN_FALLBACK =
   selector: 'app-home-kiosquero-page',
   templateUrl: './home-kiosquero.page.html',
   styleUrl: './home-kiosquero.page.css',
-  imports: [NavbarComponent, ModalSeleccionCargaComponent, ModalTablaCargaMasivaComponent, FormularioProductoComponent],
+  imports: [NavbarComponent, ModalSeleccionCargaComponent, ModalTablaCargaMasivaComponent, FormularioProductoComponent, ModalVerificacionCodigoComponent],
   providers: [HomeKiosqueroPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -49,6 +50,7 @@ export class HomeKiosqueroPage implements OnInit {
   isProcessingFile = false;
   isManualProductFormVisible = false;
   isSavingManualProduct = false;
+  isVerificationModalVisible = false;
   bulkProductsData: RespuestaProductoMasivo[] = [];
   categories: Categoria[] = [];
 
@@ -81,6 +83,19 @@ export class HomeKiosqueroPage implements OnInit {
     } else {
       this.presenter.ejecutarAccion(action);
     }
+  }
+
+  openVerificationModal(): void {
+    this.isVerificationModalVisible = true;
+  }
+
+  closeVerificationModal(): void {
+    this.isVerificationModalVisible = false;
+  }
+
+  handleOrderDelivered(): void {
+    this.closeVerificationModal();
+    this.presenter.refrescarPanel();
   }
 
   goToIaUpload(): void {

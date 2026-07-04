@@ -97,6 +97,24 @@
                   </button>
                 }
               </div>
+
+              <!-- Botón para entrega rápida de compra anticipada -->
+              <button
+                type="button"
+                class="pv__verify-btn"
+                (click)="openVerificationModal()"
+              >
+                <span class="pv__verify-btn-icon" aria-hidden="true">
+                  <i class="fa-solid fa-key"></i>
+                </span>
+                <span class="pv__verify-btn-body">
+                  <strong>Entregar Compra Anticipada</strong>
+                  <small>Verifica el código de retiro del alumno en mostrador</small>
+                </span>
+                <span class="pv__verify-btn-arrow" aria-hidden="true">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </button>
             </section>
 
             @if (presenter.primaryAction(); as primaryAction) {
@@ -344,5 +362,12 @@
     [buffetId]="buffetId"
     (formSubmit)="handleManualProductSubmit($event)"
     (formCancel)="isManualProductFormVisible = false"
+  />
+}
+
+@if (isVerificationModalVisible) {
+  <app-modal-verificacion-codigo
+    (closeModal)="closeVerificationModal()"
+    (orderDelivered)="handleOrderDelivered()"
   />
 }

@@ -1,0 +1,171 @@
+<div class="mvc__backdrop" tabindex="0" role="button" (click)="onCancel()" (keyup.escape)="onCancel()">
+  <section class="mvc" role="dialog" aria-modal="true" aria-labelledby="mvc-title" tabindex="-1" (click)="$event.stopPropagation()">
+    
+    <!-- HEADER -->
+    <header class="mvc__header">
+      <div>
+        <h3 id="mvc-title" class="mvc__titulo">
+          @if (currentState === 'BUSCAR') { Entrega de Compra Anticipada }
+          @else if (currentState === 'CHECKLIST') { Productos del Pedido }
+          @else { Entrega Confirmada }
+        </h3>
+        <p class="mvc__subtitle">
+          @if (currentState === 'BUSCAR') { Valida el código de retiro del alumno }
+          @else if (currentState === 'CHECKLIST') { Listado de productos comprados }
+          @else { El pedido se entregó correctamente }
+        </p>
+      </div>
+      <button type="button" class="mvc__close" (click)="onCancel()" aria-label="Cerrar" [disabled]="isSubmitting">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <!-- BODY -->
+    <div class="mvc__body">
+      
+      <!-- ESTADO: BUSCAR -->
+      @if (currentState === 'BUSCAR') {
+        <div class="mvc__step-buscar">
+          <div class="mvc__field">
+            <label for="searchCodeInput" class="mvc__label">Código de retiro</label>
+            <div class="mvc__input-wrapper">
+              <i class="fa-solid fa-key mvc__input-icon" aria-hidden="true"></i>
+              <input
+                id="searchCodeInput"
+                type="text"
+                class="mvc__input"
+                placeholder="Ej: ABC123"
+                [(ngModel)]="searchCode"
+                (keyup.enter)="onSearch()"
+                [disabled]="isLoading"
+                maxlength="20"
+                autocomplete="off"
+                autofocus
+              />
+            </div>
+          </div>
+
+          @if (errorMessage) {
+            <div class="mvc__alert mvc__alert--error" role="alert">
+              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+              <span>{{ errorMessage }}</span>
+            </div>
+          }
+
+          <button
+            type="button"
+            class="mvc__btn mvc__btn--primary mvc__btn--large"
+            (click)="onSearch()"
+            [disabled]="!searchCode.trim() || isLoading"
+          >
+            @if (isLoading) {
+              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+              <span>Buscando pedido...</span>
+            } @else {
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              <span>Buscar Pedido</span>
+            }
+          </button>
+        </div>
+      }
+
+      <!-- ESTADO: CHECKLIST -->
+      @if (currentState === 'CHECKLIST' && order) {
+        <div class="mvc__step-checklist">
+          <!-- Datos del alumno -->
+          <div class="mvc__student-card">
+            <div class="mvc__student-avatar" aria-hidden="true">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="mvc__student-info">
+              <small>Alumno</small>
+              <strong>{{ order.studentName }}</strong>
+            </div>
+            <div class="mvc__code-badge">
+              <span>{{ order.withdrawalCode }}</span>
+            </div>
+          </div>
+
+          <!-- Cabecera de la lista -->
+          <div class="mvc__list-header">
+            <span>Productos en el pedido</span>
+          </div>
+
+          <!-- Items checklist -->
+          <div class="mvc__checklist">
+            @for (item of order.items; track item.productId) {
+              <div class="mvc__checklist-item">
+                <div class="mvc__item-details">
+                  <span class="mvc__item-name">{{ item.productName }}</span>
+                  <span class="mvc__item-price">Precio unitario: {{ item.unitPrice | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</span>
+                </div>
+                <div class="mvc__item-quantity">
+                  <span>x{{ item.quantity }}</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (errorMessage) {
+            <div class="mvc__alert mvc__alert--error" role="alert">
+              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+              <span>{{ errorMessage }}</span>
+            </div>
+          }
+
+          <!-- Botones de Acción -->
+          <div class="mvc__footer-actions">
+            <button
+              type="button"
+              class="mvc__btn mvc__btn--secondary"
+              (click)="resetModal()"
+              [disabled]="isSubmitting"
+            >
+              Atrás
+            </button>
+            <button
+              type="button"
+              class="mvc__btn mvc__btn--success"
+              [disabled]="isSubmitting"
+              (click)="onConfirmDelivery()"
+            >
+              @if (isSubmitting) {
+                <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                <span>Registrando...</span>
+              } @else {
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                <span>Confirmar Entrega</span>
+              }
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- ESTADO: EXITO -->
+      @if (currentState === 'EXITO' && order) {
+        <div class="mvc__step-exito">
+          <div class="mvc__success-illustration">
+            <div class="mvc__success-ring"></div>
+            <div class="mvc__success-checkmark">
+              <i class="fa-solid fa-check"></i>
+            </div>
+          </div>
+
+          <h4 class="mvc__success-title">¡Pedido Entregado!</h4>
+          <p class="mvc__success-desc">
+            El pedido con código <strong>{{ order.withdrawalCode }}</strong> perteneciente a <strong>{{ order.studentName }}</strong> ha sido marcado como entregado y finalizado correctamente.
+          </p>
+
+          <button
+            type="button"
+            class="mvc__btn mvc__btn--primary mvc__btn--large"
+            (click)="onCancel()"
+          >
+            Listo, volver al panel
+          </button>
+        </div>
+      }
+
+    </div>
+  </section>
+</div>
