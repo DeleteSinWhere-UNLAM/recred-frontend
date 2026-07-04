@@ -478,7 +478,7 @@
 /* Fila de Movimiento individual */
 .movimientos__fila {
   display: grid;
-  grid-template-columns: 1fr 140px 300px 240px;
+  grid-template-columns: 1fr 120px 180px 200px;
   align-items: center;
   gap: 20px;
   padding: 18px 24px;
@@ -562,7 +562,7 @@
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  min-width: 140px;
+  min-width: 120px;
 }
 
 .movimientos__status-pill {
@@ -599,7 +599,7 @@
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  min-width: 180px;
+  min-width: 160px;
 }
 
 .movimientos__fila-time-label {
@@ -614,7 +614,7 @@
   align-items: center;
   gap: 20px;
   justify-content: flex-end;
-  min-width: 240px;
+  min-width: 200px;
   flex-shrink: 0;
 }
 
@@ -1017,4 +1017,39 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Mini Cancel/Revert Buttons */
+.movimientos__cancel-mini-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid rgba(185, 28, 28, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.movimientos__cancel-mini-btn:hover {
+  background-color: #fecaca;
+  transform: scale(1.05);
+}
+
+.movimientos__cancel-mini-btn:active {
+  transform: scale(0.95);
+}
+
+.movimientos__cancel-mini-btn.revert-btn {
+  background-color: #e0e7ff;
+  color: #4338ca;
+  border-color: rgba(67, 56, 202, 0.2);
+}
+
+.movimientos__cancel-mini-btn.revert-btn:hover {
+  background-color: #c7d2fe;
 }

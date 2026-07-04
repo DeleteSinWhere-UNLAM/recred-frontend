@@ -1,4 +1,4 @@
-﻿:host {
+:host {
   --saldo-bg: linear-gradient(180deg, rgba(255, 248, 224, 0.95), rgba(242, 183, 5, 0.12)), var(--color-superficie);
   --saldo-border: rgba(242, 183, 5, 0.24);
   --saldo-text: var(--color-pizarra);
@@ -2873,7 +2873,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  width: 80%;
+  width: 84%;
 }
 
 .circle-gauge-label-new {
@@ -2886,11 +2886,12 @@
 
 .circle-gauge-amount-new {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--color-menta);
   margin: 1px 0 -1px;
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 .circle-gauge-subtext-new {

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authChildGuard } from './core/auth/guards/auth.guard';
 import { alumnoContextoGuard } from './core/guards/alumno-contexto.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -8,6 +9,23 @@ export const routes: Routes = [
     pathMatch: 'full',
     loadComponent: () =>
       import('./features/landing/landing.page').then((m) => m.LandingPage),
+  },
+  {
+    path: 'registro-colegio',
+    loadComponent: () =>
+      import('./features/registro-colegio/registro-colegio.page').then((m) => m.RegistroColegioPage),
+  },
+  {
+    path: 'recred-admin',
+    canActivate: [authChildGuard, adminGuard],
+    loadComponent: () =>
+      import('./features/recred-admin/recred-admin.page').then((m) => m.RecredAdminPage),
+  },
+  {
+    path: 'directivo',
+    canActivate: [authChildGuard],
+    loadComponent: () =>
+      import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
   },
   {
     path: '',
@@ -34,97 +52,113 @@ export const routes: Routes = [
             loadComponent: () => import('./features/adelanto/adelanto').then((m) => m.AdelantoPage),
           },
           {
-        path: 'restricciones-horarias',
-        canActivate: [alumnoContextoGuard],
-        loadComponent: () =>
-          import('./features/restricciones-horarias/restricciones-horarias.page').then(
-            (m) => m.RestriccionesHorariasPage,
-          ),
-      },
+            path: 'favoritos-alumno',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/favoritos-alumno/favoritos-alumno.page').then(
+                (m) => m.FavoritosAlumnoPage,
+              ),
+          },
           {
-        path: 'restricciones-nutricionales',
-        canActivate: [alumnoContextoGuard],
-        loadComponent: () =>
-          import('./features/restricciones-nutricionales/restricciones-nutricionales.page').then(
-            (m) => m.RestriccionesNutricionalesPage,
-          ),
-      },
+            path: 'restricciones-horarias',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/restricciones-horarias/restricciones-horarias.page').then(
+                (m) => m.RestriccionesHorariasPage,
+              ),
+          },
+          {
+            path: 'restricciones-nutricionales',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/restricciones-nutricionales/restricciones-nutricionales.page').then(
+                (m) => m.RestriccionesNutricionalesPage,
+              ),
+          },
 
           {
-        path: 'acreditar-mercado-pago',
-        canActivate: [alumnoContextoGuard],
-        loadComponent: () =>
-          import('./features/acreditar-mercado-pago/acreditar-mercado-pago.page').then(
-            (m) => m.AcreditarMercadoPagoPage,
-          ),
-      },
+            path: 'acreditar-mercado-pago',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/acreditar-mercado-pago/acreditar-mercado-pago.page').then(
+                (m) => m.AcreditarMercadoPagoPage,
+              ),
+          },
           {
-        path: 'presupuesto',
-        canActivate: [alumnoContextoGuard],
-        loadComponent: () =>
-          import('./features/presupuesto/presupuesto.page').then(
-            (m) => m.PresupuestoPage,
-          ),
-      },
+            path: 'transferir-saldo', // Route for balance transfer between children
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/transferir-saldo/transferir-saldo.page').then(
+                (m) => m.TransferirSaldoPage,
+              ),
+          },
           {
-        path: 'preferencias',
-        loadComponent: () =>
-          import('./features/preferencias/preferencias.page').then(
-            (m) => m.PreferenciasPage,
-          ),
-      },
+            path: 'presupuesto',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/presupuesto/presupuesto.page').then(
+                (m) => m.PresupuestoPage,
+              ),
+          },
           {
-        path: 'prediccion-gasto',
-        loadChildren: () =>
-          import('./features/prediccion-gasto/prediccion-gasto.routes').then(
-            (m) => m.PREDICCION_GASTO_ROUTES,
-          ),
-      },
+            path: 'preferencias',
+            loadComponent: () =>
+              import('./features/preferencias/preferencias.page').then(
+                (m) => m.PreferenciasPage,
+              ),
+          },
           {
-        path: 'estadistica',
-        canActivate: [alumnoContextoGuard],
-        loadComponent: () =>
-          import('./features/estadistica/estadistica.page').then(
-            (m) => m.EstadisticaPage,
-          ),
-      },
+            path: 'prediccion-gasto',
+            loadChildren: () =>
+              import('./features/prediccion-gasto/prediccion-gasto.routes').then(
+                (m) => m.PREDICCION_GASTO_ROUTES,
+              ),
+          },
           {
-        path: 'tutor-movimientos/:alumnoId',
-        canActivate: [alumnoContextoGuard],
-        loadComponent: () =>
-          import('./features/movimientos/movimientos.page').then(
-            (m) => m.MovimientosPage,
-          ),
-      },
+            path: 'estadistica',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/estadistica/estadistica.page').then(
+                (m) => m.EstadisticaPage,
+              ),
+          },
           {
-        path: 'tutor-movimientos',
-        loadComponent: () =>
-          import('./features/movimientos/movimientos.page').then(
-            (m) => m.MovimientosPage,
-          ),
-      },
+            path: 'tutor-movimientos/:alumnoId',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/movimientos/movimientos.page').then(
+                (m) => m.MovimientosPage,
+              ),
+          },
           {
-        path: 'movimientos-pendientes',
-        canActivate: [alumnoContextoGuard],
-        loadComponent: () =>
-          import(
-            './features/movimientos-pendientes/movimientos-pendientes.page'
-          ).then((m) => m.MovimientosPendientesPage),
-      },
+            path: 'tutor-movimientos',
+            loadComponent: () =>
+              import('./features/movimientos/movimientos.page').then(
+                (m) => m.MovimientosPage,
+              ),
+          },
           {
-        path: 'resumen-semanal',
-        loadComponent: () =>
-          import('./features/resumen-semanal/resumen-semanal.page').then(
-            (m) => m.ResumenSemanalPage,
-          ),
-      },
+            path: 'movimientos-pendientes',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import(
+                './features/movimientos-pendientes/movimientos-pendientes.page'
+              ).then((m) => m.MovimientosPendientesPage),
+          },
           {
-        path: 'preferencias-detectadas',
-        loadComponent: () =>
-          import('./features/preferencias-detectadas/preferencias-detectadas.page').then(
-            (m) => m.PreferenciasDetectadasPage,
-          ),
-      },
+            path: 'resumen-semanal',
+            loadComponent: () =>
+              import('./features/resumen-semanal/resumen-semanal.page').then(
+                (m) => m.ResumenSemanalPage,
+              ),
+          },
+          {
+            path: 'preferencias-detectadas',
+            loadComponent: () =>
+              import('./features/preferencias-detectadas/preferencias-detectadas.page').then(
+                (m) => m.PreferenciasDetectadasPage,
+              ),
+          },
         ]
       },
       {
@@ -169,12 +203,12 @@ export const routes: Routes = [
             (m) => m.HomeAlumnoPage,
           ),
       },
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
       {
         path: 'perfil',
         loadComponent: () =>
@@ -288,8 +322,8 @@ export const routes: Routes = [
             (m) => m.inventarioRoutes,
           ),
       },
-      
-      
+
+
       {
         path: 'billetera',
         loadComponent: () =>
@@ -297,9 +331,8 @@ export const routes: Routes = [
             (m) => m.BilleteraPage,
           ),
       },
-      // billetera/:alumnoId eliminado: billetera usa AlumnoContextoService
-      
-      
+
+
       {
         path: 'notificaciones-precio',
         loadComponent: () =>
@@ -307,7 +340,7 @@ export const routes: Routes = [
             (m) => m.NotificacionesPrecioPage,
           ),
       },
-      
+
       {
         path: 'promociones',
         loadComponent: () =>
@@ -315,7 +348,7 @@ export const routes: Routes = [
             (m) => m.PromocionesPageComponent,
           ),
       },
-      
+
       {
         path: 'suscripcion',
         loadComponent: () =>

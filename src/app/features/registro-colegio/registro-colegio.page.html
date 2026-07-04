@@ -1,0 +1,156 @@
+<div class="rc__container">
+  <header class="rc__header">
+    <div class="rc__logo">
+      <img class="rc__logo-img" src="logoHeader.png" alt="Logo RECRED" />
+      <span class="rc__logo-text">RECRED</span>
+    </div>
+    <h1 class="rc__title">Registro de Institución Educativa</h1>
+    <p class="rc__subtitle">Completá los datos de tu colegio para solicitar acceso a la plataforma.</p>
+  </header>
+
+  @if (presenter.enviado$ | async) {
+    <div class="rc__success-panel" id="panel-exito">
+      <div class="rc__success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-dorado);">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <h2 class="rc__success-title">¡Solicitud enviada exitosamente!</h2>
+      <p class="rc__success-msg">
+        Revisaremos los datos de tu institución y nos pondremos en contacto con el director
+        al email indicado para completar el proceso de acceso.
+      </p>
+    </div>
+  } @else {
+    <form class="rc__form" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+
+      <section class="rc__section">
+        <h2 class="rc__section-title">Datos del Colegio</h2>
+
+        <div class="rc__field">
+          <label class="rc__label" for="schoolName">Nombre del colegio *</label>
+          <input id="schoolName" class="rc__input" type="text" formControlName="schoolName" placeholder="Ej: Instituto Técnico San José" />
+          @if (form.get('schoolName')?.invalid && form.get('schoolName')?.touched) {
+            <span class="rc__error">Campo requerido</span>
+          }
+        </div>
+
+        <div class="rc__row">
+          <div class="rc__field">
+            <label class="rc__label" for="schoolEmail">Email institucional *</label>
+            <input id="schoolEmail" class="rc__input" type="email" formControlName="schoolEmail" placeholder="contacto@colegio.edu.ar" />
+            @if (form.get('schoolEmail')?.invalid && form.get('schoolEmail')?.touched) {
+              <span class="rc__error">Email inválido</span>
+            }
+          </div>
+          <div class="rc__field">
+            <label class="rc__label" for="schoolPhone">Teléfono *</label>
+            <input id="schoolPhone" class="rc__input" type="text" formControlName="schoolPhone" placeholder="011-4444-5555" />
+            @if (form.get('schoolPhone')?.invalid && form.get('schoolPhone')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+        </div>
+
+        <div class="rc__row">
+          <div class="rc__field">
+            <label class="rc__label" for="schoolCue">CUE del establecimiento *</label>
+            <input id="schoolCue" class="rc__input" type="text" formControlName="schoolCue" placeholder="Ej: 123456789" />
+            @if (form.get('schoolCue')?.invalid && form.get('schoolCue')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+          <div class="rc__field">
+            <label class="rc__label" for="schoolLevelId">Nivel educativo *</label>
+            <select id="schoolLevelId" class="rc__select" formControlName="schoolLevelId">
+              <option value="" disabled>Seleccioná un nivel</option>
+              @for (nivel of niveles; track nivel.id) {
+                <option [value]="nivel.id">{{ nivel.descripcion }}</option>
+              }
+            </select>
+            @if (form.get('schoolLevelId')?.invalid && form.get('schoolLevelId')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="rc__section">
+        <h2 class="rc__section-title">Datos del Director</h2>
+
+        <div class="rc__row">
+          <div class="rc__field">
+            <label class="rc__label" for="directorFirstName">Nombre *</label>
+            <input id="directorFirstName" class="rc__input" type="text" formControlName="directorFirstName" placeholder="Carlos" />
+            @if (form.get('directorFirstName')?.invalid && form.get('directorFirstName')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+          <div class="rc__field">
+            <label class="rc__label" for="directorLastName">Apellido *</label>
+            <input id="directorLastName" class="rc__input" type="text" formControlName="directorLastName" placeholder="Pérez" />
+            @if (form.get('directorLastName')?.invalid && form.get('directorLastName')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+        </div>
+
+        <div class="rc__row">
+          <div class="rc__field">
+            <label class="rc__label" for="directorEmail">Email personal *</label>
+            <input id="directorEmail" class="rc__input" type="email" formControlName="directorEmail" placeholder="director@email.com" />
+            @if (form.get('directorEmail')?.invalid && form.get('directorEmail')?.touched) {
+              <span class="rc__error">Email inválido</span>
+            }
+          </div>
+          <div class="rc__field">
+            <label class="rc__label" for="directorPhone">Teléfono *</label>
+            <input id="directorPhone" class="rc__input" type="text" formControlName="directorPhone" placeholder="011-15-2222-3333" />
+            @if (form.get('directorPhone')?.invalid && form.get('directorPhone')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+        </div>
+
+        <div class="rc__row">
+          <div class="rc__field">
+            <label class="rc__label" for="directorDni">DNI *</label>
+            <input id="directorDni" class="rc__input" type="text" formControlName="directorDni" placeholder="20123456" />
+            @if (form.get('directorDni')?.invalid && form.get('directorDni')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+          <div class="rc__field">
+            <label class="rc__label" for="directorUsername">Nombre de usuario *</label>
+            <input id="directorUsername" class="rc__input" type="text" formControlName="directorUsername" placeholder="carlosperez" />
+            @if (form.get('directorUsername')?.invalid && form.get('directorUsername')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            }
+          </div>
+        </div>
+      </section>
+
+      @if (presenter.error$ | async; as error) {
+        <div class="rc__error-banner" id="panel-error">{{ error }}</div>
+      }
+
+      <div class="rc__actions">
+        <button
+          id="btn-enviar"
+          type="submit"
+          class="rc__btn"
+          [class.rc__btn--loading]="presenter.cargando$ | async"
+          [disabled]="(presenter.cargando$ | async) === true"
+        >
+          @if ((presenter.cargando$ | async) === false || (presenter.cargando$ | async) === null) {
+            <span>Enviar solicitud</span>
+          } @else {
+            <span>Enviando...</span>
+          }
+        </button>
+      </div>
+
+    </form>
+  }
+</div>

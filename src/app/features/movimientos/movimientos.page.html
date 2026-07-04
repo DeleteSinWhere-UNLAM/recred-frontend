@@ -106,7 +106,7 @@
                 <option value="LISTO">Listo para retirar</option>
                 <option value="ENTREGADO">Entregado</option>
                 <option value="CANCELADO">Cancelado</option>
-                <option value="NO_RETIRADO">No entregado</option>
+                <option value="VENCIDO">Vencido</option>
               </select>
               <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>
             </div>
@@ -280,6 +280,15 @@
                 @for (mov of grupo.movimientos; track mov.id; let last = $last) {
                   <article class="movimientos__fila">
                     <div class="movimientos__fila-left">
+                      @if (!esVistaAlumno() && mov.tipo === 'ANTICIPADA' && (mov.status === 'PENDIENTE' || mov.status === 'EN_PREPARACION')) {
+                        <button type="button" class="movimientos__cancel-mini-btn" aria-label="Cancelar pedido" title="Cancelar pedido" (click)="cancelarPedido(mov.id); $event.stopPropagation()">
+                          <i class="fa-solid fa-xmark"></i>
+                        </button>
+                      } @else if (!esVistaAlumno() && mov.tipo === 'ANTICIPADA' && mov.status === 'CANCELADO') {
+                        <button type="button" class="movimientos__cancel-mini-btn revert-btn" aria-label="Revertir cancelación" title="Revertir cancelación" (click)="revertirCancelacion(mov.id); $event.stopPropagation()">
+                          <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                      }
                       <div class="movimientos__iniciales" [attr.data-alumno]="mov.studentId">
                         @if (getFotoPerfilAlumno(mov.studentId); as url) {
                           <img [src]="url" [alt]="'Foto de ' + getNombreAlumno(mov.studentId)" class="movimientos__avatar-img" />
@@ -342,5 +351,6 @@
     [esVistaAlumno]="esVistaAlumno()"
     (cerrar)="cerrarDetalle()"
     (cancelar)="cancelarPedido($event)"
+    (revertirCancelacion)="revertirCancelacion($event)"
   />
 }

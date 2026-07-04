@@ -178,6 +178,8 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       prompt: 'pedidos del buffet',
     },
   ],
+  ADMIN: [],
+  DIRECTIVO_COLEGIO: [],
 };
 
 export const SUGERENCIAS_COMPRA_PENDIENTE: readonly SugerenciaCapacidad[] = [

@@ -1,4 +1,4 @@
-﻿export interface CategoriaProducto {
+export interface CategoriaProducto {
   id: string;
   descripcion: string;
 }

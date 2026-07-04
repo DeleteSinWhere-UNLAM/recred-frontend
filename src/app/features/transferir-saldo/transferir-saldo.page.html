@@ -1,0 +1,153 @@
+<div class="transferir-page">
+  <main class="transferir-page__content">
+    @if (presenter.cargando() && !presenter.alumnoOrigen()) {
+    <div class="transferir-page__loading">
+      <i class="fa-solid fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
+      <p>Cargando información...</p>
+    </div>
+    } @else {
+    <div class="transferir-page__grid">
+
+      <section class="transferir-page__form-section">
+        <h3>¿Cuánto querés transferir de {{ presenter.alumnoOrigen()?.nombre }}?</h3>
+        <p class="transferir-page__description">
+          Saldo actual: <strong>{{ saldoFormateado }}</strong>. Ingresá el monto, elegí a quién transferirle y confirmá
+          la operación.
+        </p>
+
+        <form class="transferir-page__form" (submit)="onSubmit($event)">
+
+          <div class="transferir-page__input-group">
+            <label for="destino">Transferir a</label>
+            <div class="transferir-page__select-wrapper">
+              <select id="destino" name="destino" [(ngModel)]="destinoAlumnoId" required>
+                <option value="" disabled selected>Elegí un hijo</option>
+                @for (hijo of presenter.otrosHijos(); track hijo.id) {
+                <option [value]="hijo.id">
+                  {{ hijo.nombre }} {{ hijo.apellido }} (Saldo: ${{ hijo.saldo.toLocaleString('es-AR') }})
+                </option>
+                }
+              </select>
+              <div class="transferir-page__select-icon" aria-hidden="true">
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="transferir-page__input-group">
+            <label for="monto">Monto a transferir ($)</label>
+            <div class="transferir-page__input-wrapper">
+              <input type="number" id="monto" name="monto" min="1" step="100" placeholder="Ej: 5000"
+                [(ngModel)]="montoIngresado" required />
+              <div class="transferir-page__input-icon" aria-hidden="true">
+                <i class="fa-solid fa-dollar-sign"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="transferir-page__presets-section">
+            <h4 class="transferir-page__presets-title">Montos sugeridos</h4>
+            <div class="transferir-page__presets-grid">
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(1000)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$1.000</span>
+              </button>
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(2000)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$2.000</span>
+              </button>
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(2500)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$2.500</span>
+              </button>
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(5000)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$5.000</span>
+              </button>
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(7500)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$7.500</span>
+              </button>
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(10000)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$10.000</span>
+              </button>
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(25000)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$25.000</span>
+              </button>
+              <button type="button" class="transferir-page__preset-btn" (click)="selectMonto(50000)">
+                <span class="transferir-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="transferir-page__preset-label">$50.000</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="transferir-page__actions">
+            <button type="submit" class="transferir-page__btn transferir-page__btn--primary"
+              [disabled]="presenter.cargando() || !destinoAlumnoId || montoIngresado <= 0">
+              @if (presenter.cargando()) {
+              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Procesando...
+              } @else {
+              <i class="fa-solid fa-right-left" aria-hidden="true" style="margin-right: 8px;"></i>
+              Transferir
+              }
+            </button>
+
+            <button type="button" class="transferir-page__btn transferir-page__btn--secondary"
+              (click)="presenter.volver()" [disabled]="presenter.cargando()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="transferir-page__history-section">
+        <h3>Historial de transferencias de {{ presenter.alumnoOrigen()?.nombre }}</h3>
+        <p class="transferir-page__history-description">
+          Últimas transferencias (dadas y recibidas) de {{ presenter.nombreCompleto() }}.
+        </p>
+
+        <div class="transferir-page__history-container">
+          @if (transferencias.length === 0) {
+          <div class="transferir-page__history-empty">
+            <i class="fa-solid fa-right-left" aria-hidden="true"></i>
+            <p>No se registran transferencias recientes para {{ presenter.alumnoOrigen()?.nombre }}.</p>
+          </div>
+          } @else {
+          <div class="transferir-page__history-list">
+            @for (tx of transferencias; track tx.id) {
+            <div class="transferir-page__history-item">
+              <div class="transferir-page__history-item-left">
+                <div class="transferir-page__history-icon"
+                  [class.transferir-page__history-icon--enviada]="tx.tipo === 'ENVIADA'"
+                  [class.transferir-page__history-icon--recibida]="tx.tipo === 'RECIBIDA'">
+                  <i class="fa-solid" [class.fa-arrow-up-long]="tx.tipo === 'ENVIADA'"
+                    [class.fa-arrow-down-long]="tx.tipo === 'RECIBIDA'"></i>
+                </div>
+                <div class="transferir-page__history-details">
+                  <span class="transferir-page__history-monto"
+                    [class.transferir-page__history-monto--enviada]="tx.tipo === 'ENVIADA'"
+                    [class.transferir-page__history-monto--recibida]="tx.tipo === 'RECIBIDA'">
+                    {{ tx.montoFormateado }}
+                  </span>
+                  <span class="transferir-page__history-desc">{{ tx.descripcion }}</span>
+                  <span class="transferir-page__history-fecha">{{ tx.fechaFormateada }}</span>
+                </div>
+              </div>
+              <div class="transferir-page__history-status"
+                [class.transferir-page__history-status--enviada]="tx.tipo === 'ENVIADA'"
+                [class.transferir-page__history-status--recibida]="tx.tipo === 'RECIBIDA'">
+                <span>{{ tx.tipo === 'ENVIADA' ? 'ENVIADA' : 'RECIBIDA' }}</span>
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+      </section>
+
+    </div>
+    }
+  </main>
+</div>

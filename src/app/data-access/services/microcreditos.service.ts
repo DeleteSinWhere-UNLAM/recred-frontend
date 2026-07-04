@@ -11,11 +11,11 @@ export interface EnableSchoolCreditRequest {
 export interface SchoolCredit {
   id?: string;
   creditId?: string;
-  studentId: string;
+  studentId?: string;
   amount: number;
   installments: number;
   status: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 @Injectable({

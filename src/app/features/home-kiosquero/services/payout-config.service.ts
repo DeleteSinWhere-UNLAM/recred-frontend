@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { PayoutConfig } from '../models/payout-config.model';
+import { environment } from '../../../../environments/environment';
+import { PayoutConfig } from '../../../data-access/models/payout-config.model';
 
 @Injectable({ providedIn: 'root' })
 export class PayoutConfigService {
