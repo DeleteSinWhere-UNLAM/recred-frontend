@@ -141,6 +141,8 @@ describe('AsistenteVirtualService', () => {
         return `${IA_BASE}/alumnos/me/asistente`;
       case 'ADMIN':
         return `${IA_BASE}/admin/asistente`;
+      case 'DIRECTIVO_COLEGIO':
+        return `${IA_BASE}/directivos/me/asistente`;
     }
   }
 

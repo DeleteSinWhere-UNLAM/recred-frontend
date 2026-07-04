@@ -5,15 +5,18 @@ import { RecredAdminPage } from './recred-admin.page';
 import { RecredAdminService } from './services/recred-admin.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { RecredAdminMother } from './recred-admin.mother';
+import { AuthService } from '../../core/auth/services/auth.service';
 
 describe('RecredAdmin Integration', () => {
   let fixture: ComponentFixture<RecredAdminPage>;
   let servicio: jasmine.SpyObj<RecredAdminService>;
   let toast: jasmine.SpyObj<ToastService>;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
     servicio = jasmine.createSpyObj('RecredAdminService', ['getPendingRegistrations', 'approveRegistration', 'rejectRegistration']);
     toast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
 
     await TestBed.configureTestingModule({
       imports: [RecredAdminPage],
@@ -21,7 +24,15 @@ describe('RecredAdmin Integration', () => {
         { provide: RecredAdminService, useValue: servicio },
         { provide: ToastService, useValue: toast },
       ],
-    }).compileComponents();
+    })
+    .overrideComponent(RecredAdminPage, {
+      add: {
+        providers: [
+          { provide: AuthService, useValue: authServiceSpy }
+        ]
+      }
+    })
+    .compileComponents();
   });
 
   it('debería renderizar las tarjetas con los nombres de los colegios pendientes cuando el servicio responde', () => {

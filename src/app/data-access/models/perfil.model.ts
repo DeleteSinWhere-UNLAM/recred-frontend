@@ -1,4 +1,4 @@
-export type RolUsuario = 'PADRE' | 'ALUMNO' | 'VENDEDOR' | 'ADMIN';
+export type RolUsuario = 'PADRE' | 'ALUMNO' | 'VENDEDOR' | 'ADMIN' | 'DIRECTIVO_COLEGIO';
 
 export interface ReferenciaPerfil {
   readonly id?: string | null;

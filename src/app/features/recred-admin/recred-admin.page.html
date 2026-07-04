@@ -4,9 +4,12 @@
       <h1 class="ra__title">Dashboard Recred Admin</h1>
       <p class="ra__subtitle">Solicitudes de instituciones educativas pendientes de aprobación</p>
     </div>
-    @if (presenter.solicitudes$ | async; as lista) {
-      <div class="ra__badge">{{ lista.length }} pendiente{{ lista.length !== 1 ? 's' : '' }}</div>
-    }
+    <div class="ra__header-actions">
+      @if (presenter.solicitudes$ | async; as lista) {
+        <div class="ra__badge">{{ lista.length }} pendiente{{ lista.length !== 1 ? 's' : '' }}</div>
+      }
+      <button (click)="cerrarSesion()" class="logout-btn">Cerrar Sesión</button>
+    </div>
   </header>
 
   @if (presenter.cargando$ | async) {

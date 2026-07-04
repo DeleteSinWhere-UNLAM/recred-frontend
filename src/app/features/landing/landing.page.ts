@@ -16,6 +16,7 @@ const ROL_A_RUTA: Record<RolUsuario, string> = {
   ALUMNO: '/alumno',
   VENDEDOR: '/kiosquero',
   ADMIN: '/recred-admin',
+  DIRECTIVO_COLEGIO: '/directivo',
 };
 
 @Component({

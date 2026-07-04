@@ -22,6 +22,12 @@ export const routes: Routes = [
       import('./features/recred-admin/recred-admin.page').then((m) => m.RecredAdminPage),
   },
   {
+    path: 'directivo',
+    canActivate: [authChildGuard],
+    loadComponent: () =>
+      import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
+  },
+  {
     path: '',
     canActivateChild: [authChildGuard],
     children: [

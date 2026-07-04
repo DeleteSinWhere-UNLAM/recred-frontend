@@ -2,6 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { RecredAdminPresenter } from './presenter/recred-admin.presenter';
 
+import { AuthService } from '../../core/auth/services/auth.service';
+
 @Component({
   selector: 'app-recred-admin-page',
   standalone: true,
@@ -13,8 +15,13 @@ import { RecredAdminPresenter } from './presenter/recred-admin.presenter';
 })
 export class RecredAdminPage implements OnInit {
   readonly presenter = inject(RecredAdminPresenter);
+  private readonly authService = inject(AuthService);
 
   ngOnInit(): void {
     this.presenter.initialize();
+  }
+
+  public async cerrarSesion(): Promise<void> {
+    await this.authService.logout();
   }
 }

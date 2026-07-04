@@ -179,6 +179,7 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
     },
   ],
   ADMIN: [],
+  DIRECTIVO_COLEGIO: [],
 };
 
 export const SUGERENCIAS_COMPRA_PENDIENTE: readonly SugerenciaCapacidad[] = [
