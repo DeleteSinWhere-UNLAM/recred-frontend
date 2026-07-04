@@ -54,7 +54,6 @@ export class ModalVerificacionCodigoComponent {
       next: (results) => {
         this.isLoading = false;
 
-        // Buscar coincidencia exacta del código de retiro (case-insensitive)
         const found = results.find(
           (r) => r.withdrawalCode && r.withdrawalCode.toUpperCase() === cleanedCode.toUpperCase()
         );
@@ -65,13 +64,11 @@ export class ModalVerificacionCodigoComponent {
           return;
         }
 
-        // Validar el estado del pedido encontrado
         if (found.status === 'ENTREGADO') {
           this.errorMessage = `Este pedido ya fue entregado a ${found.studentName}.`;
         } else if (found.status === 'CANCELADO' || found.status === 'RECHAZADO' || found.status === 'VENCIDO') {
           this.errorMessage = `El pedido se encuentra ${this.getStatusLabel(found.status).toLowerCase()} y no puede ser entregado.`;
         } else {
-          // El pedido existe y es entregable (LISTO, PENDIENTE, EN_PREPARACION)
           this.order = found;
           this.currentState = 'CHECKLIST';
         }
@@ -94,8 +91,6 @@ export class ModalVerificacionCodigoComponent {
     this.isSubmitting = true;
     this.errorMessage = null;
 
-    // 1. Validar el código contra el endpoint de entrega
-    // 2. Cambiar estado del pedido a ENTREGADO
     this.compraService.deliver(this.order.id, this.order.withdrawalCode)
       .pipe(
         switchMap(() => this.trackingService.advanceOrderStatus(this.order!.id, 'ENTREGADO'))
