@@ -85,6 +85,8 @@ export class AsistenteVirtualService {
         return `${this.iaBase}/kiosqueros/me/asistente`;
       case 'ALUMNO':
         return `${this.iaBase}/alumnos/me/asistente`;
+      case 'ADMIN':
+        return `${this.iaBase}/admin/asistente`;
     }
   }
 }
