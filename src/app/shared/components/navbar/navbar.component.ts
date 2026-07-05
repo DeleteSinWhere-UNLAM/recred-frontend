@@ -56,6 +56,7 @@ export class NavbarComponent implements OnInit {
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   protected readonly esVistaKiosquero = this.usuarioService.esVistaKiosquero;
+  protected readonly esVistaDirectivo = this.usuarioService.esVistaDirectivo;
   protected readonly notificaciones = this.notificacionesService.notificaciones;
   protected readonly notifCount = this.notificacionesService.cantidad;
   protected readonly alumnos = this.alumnosService.alumnos;

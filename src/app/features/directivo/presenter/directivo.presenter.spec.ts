@@ -2,19 +2,29 @@ import { DirectivoPresenter } from './directivo.presenter';
 import { DirectivoMother } from '../directivo.mother';
 import { TestBed } from '@angular/core/testing';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { DirectivoService } from '../services/directivo.service';
 import { Perfil } from '../../../data-access/models/perfil.model';
 
 describe('DirectivoPresenter', () => {
   let presenter: DirectivoPresenter;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
+  let directivoServiceSpy: jasmine.SpyObj<DirectivoService>;
 
   beforeEach(() => {
     perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['cargarPerfil']);
+    directivoServiceSpy = jasmine.createSpyObj('DirectivoService', ['obtenerResumenColegio']);
+    directivoServiceSpy.obtenerResumenColegio.and.resolveTo({
+      id: 'colegio-1',
+      nombre: 'Colegio Prueba',
+      cue: '123',
+      buffets: []
+    });
 
     TestBed.configureTestingModule({
       providers: [
         DirectivoPresenter,
         { provide: PerfilService, useValue: perfilServiceSpy },
+        { provide: DirectivoService, useValue: directivoServiceSpy }
       ],
     });
 

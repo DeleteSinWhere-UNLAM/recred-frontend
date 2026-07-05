@@ -1,0 +1,15 @@
+<div class="directivo-container" style="padding: 24px; max-width: 800px; margin: 0 auto;">
+  <h1 style="margin-bottom: 24px;">Asignar Vendedor a Buffet</h1>
+  @if (buffetName) {
+    <p style="margin-bottom: 24px; font-size: 1.125rem; color: #4b5563;">
+      Kiosco seleccionado: <strong>{{ buffetName }}</strong>
+    </p>
+  }
+
+  <app-asignar-vendedor-form
+    [loading]="presenter.loading()"
+    [error]="presenter.error()"
+    (submitForm)="onSubmit($event)"
+    (cancelForm)="presenter.cancelar()"
+  ></app-asignar-vendedor-form>
+</div>

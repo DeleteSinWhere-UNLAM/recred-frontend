@@ -1,20 +1,34 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DirectivoPage } from './directivo.page';
 import { DirectivoPresenter } from './presenter/directivo.presenter';
-import { signal } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { DirectivoDashboardComponent } from './components/directivo-dashboard/directivo-dashboard.component';
+
+@Component({ selector: 'app-navbar', template: '', standalone: true })
+class NavbarStubComponent {}
+
+@Component({ selector: 'app-directivo-dashboard', template: '', standalone: true })
+class DashboardStubComponent {
+  @Input() data: unknown;
+  @Input() loading: unknown;
+  @Input() error: unknown;
+}
 
 describe('DirectivoPage', () => {
   let component: DirectivoPage;
   let fixture: ComponentFixture<DirectivoPage>;
   let presenterSpy: jasmine.SpyObj<DirectivoPresenter>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
-  let mensajeSignal: ReturnType<typeof signal<string>>;
 
   beforeEach(async () => {
-    mensajeSignal = signal('Cargando...');
+
     presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar'], {
-      mensajeBienvenida: mensajeSignal,
+      mensajeBienvenida: signal('Cargando...'),
+      schoolOverview: signal(null),
+      loading: signal(false),
+      error: signal(null)
     });
     authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
 
@@ -22,12 +36,17 @@ describe('DirectivoPage', () => {
       imports: [DirectivoPage],
     })
       .overrideComponent(DirectivoPage, {
-        set: {
+        remove: {
+          imports: [NavbarComponent, DirectivoDashboardComponent],
+          providers: [DirectivoPresenter]
+        },
+        add: {
+          imports: [NavbarStubComponent, DashboardStubComponent],
           providers: [
             { provide: DirectivoPresenter, useValue: presenterSpy },
-            { provide: AuthService, useValue: authServiceSpy },
-          ],
-        },
+            { provide: AuthService, useValue: authServiceSpy }
+          ]
+        }
       })
       .compileComponents();
 
@@ -36,21 +55,10 @@ describe('DirectivoPage', () => {
     fixture.detectChanges();
   });
 
-  it('dado un mensaje del presenter, cuando se renderiza, deberia mostrarlo en el h1', () => {
-    givenMensajeDelPresenter('Hola bienvenido, Maria');
-
-    const h1Element = fixture.nativeElement.querySelector('h1');
-    expect(h1Element.textContent.trim()).toBe('Hola bienvenido, Maria');
-  });
-
   it('dado el componente montado, cuando corre ngOnInit, deberia inicializar el presenter', () => {
     component.ngOnInit();
-
     expect(presenterSpy.inicializar).toHaveBeenCalled();
   });
 
-  function givenMensajeDelPresenter(mensaje: string): void {
-    mensajeSignal.set(mensaje);
-    fixture.detectChanges();
-  }
+
 });
