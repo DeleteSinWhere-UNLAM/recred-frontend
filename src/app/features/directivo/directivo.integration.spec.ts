@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { DirectivoPage } from './directivo.page';
 import { DirectivoPresenter } from './presenter/directivo.presenter';
 import { PerfilService } from '../../data-access/services/perfil.service';
@@ -9,6 +10,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
 import { Component } from '@angular/core';
 import { DirectivoDashboardComponent } from './components/directivo-dashboard/directivo-dashboard.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
 class NavbarStubComponent {}
@@ -25,7 +27,7 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
     directivoServiceSpy = jasmine.createSpyObj('DirectivoService', ['obtenerResumenColegio']);
 
     await TestBed.configureTestingModule({
-      imports: [DirectivoPage],
+      imports: [DirectivoPage, RouterTestingModule],
       providers: [
         DirectivoPresenter,
         { provide: PerfilService, useValue: perfilServiceSpy },
@@ -33,12 +35,11 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
       ],
     })
     .overrideComponent(DirectivoPage, {
-      set: {
-        imports: [NavbarStubComponent, DirectivoDashboardComponent],
-        providers: [
-          DirectivoPresenter,
-          { provide: AuthService, useValue: authServiceSpy }
-        ]
+      remove: {
+        imports: [NavbarComponent]
+      },
+      add: {
+        imports: [NavbarStubComponent]
       }
     })
     .compileComponents();
@@ -57,14 +58,16 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
 
       fixture = TestBed.createComponent(DirectivoPage);
       
-      fixture.componentInstance.ngOnInit();
-      await fixture.whenStable();
-      fixture.detectChanges();
+      fixture.detectChanges(); // Triggers ngOnInit
+      await new Promise(resolve => setTimeout(resolve, 50));
+      fixture.detectChanges(); // Update DOM after promises resolve
 
       const dashboardElement = fixture.nativeElement.querySelector('app-directivo-dashboard');
+      console.log('DASHBOARD HTML:', dashboardElement?.innerHTML);
       expect(dashboardElement).toBeTruthy();
       
-      const headerTitle = fixture.debugElement.query(By.css('.pv__school-card-title'));
+      const headerTitle = fixture.debugElement.query(By.css('#pv-title'));
+      expect(headerTitle).toBeTruthy('headerTitle should exist');
       expect(headerTitle.nativeElement.textContent).toContain('Colegio Integracion');
     });
   });
@@ -75,11 +78,11 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
       directivoServiceSpy.obtenerResumenColegio.and.rejectWith(new HttpErrorResponse({ status: 403 }));
 
       fixture = TestBed.createComponent(DirectivoPage);
-      fixture.componentInstance.ngOnInit();
-      await fixture.whenStable();
-      fixture.detectChanges();
+      fixture.detectChanges(); // Triggers ngOnInit
+      await new Promise(resolve => setTimeout(resolve, 50));
+      fixture.detectChanges(); // Update DOM after promises resolve
 
-      const errorAlert = fixture.debugElement.query(By.css('.pv__alert--error'));
+      const errorAlert = fixture.debugElement.query(By.css('.pv__notice--error'));
       expect(errorAlert).toBeTruthy();
       expect(errorAlert.nativeElement.textContent).toContain('No tienes permisos');
     });
