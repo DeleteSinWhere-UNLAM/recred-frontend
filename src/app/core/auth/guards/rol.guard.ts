@@ -29,14 +29,7 @@ function resolverRol(
       return true;
     }
 
-    const rolReal = cachedPerfil.rol;
-    if (rolReal === 'ALUMNO') {
-      return router.createUrlTree(['/alumno']);
-    } else if (rolReal === 'VENDEDOR') {
-      return router.createUrlTree(['/kiosquero']);
-    } else {
-      return router.createUrlTree(['/tutor']);
-    }
+    return getRedirectTree(cachedPerfil.rol, router);
   }
 
   return perfilService.asegurarPerfil().then(
@@ -45,19 +38,26 @@ function resolverRol(
         return true;
       }
 
-      const rolReal = perfil?.rol;
-      if (rolReal === 'ALUMNO') {
-        return router.createUrlTree(['/alumno']);
-      } else if (rolReal === 'VENDEDOR') {
-        return router.createUrlTree(['/kiosquero']);
-      } else {
-        return router.createUrlTree(['/tutor']);
-      }
+      return getRedirectTree(perfil?.rol, router);
     },
     () => {
       return router.createUrlTree(['/']);
     }
   );
+}
+
+function getRedirectTree(rol: RolUsuario | undefined, router: Router): UrlTree {
+  if (rol === 'ALUMNO') {
+    return router.createUrlTree(['/alumno']);
+  } else if (rol === 'VENDEDOR') {
+    return router.createUrlTree(['/kiosquero']);
+  } else if (rol === 'ADMIN') {
+    return router.createUrlTree(['/recred-admin']);
+  } else if (rol === 'DIRECTIVO_COLEGIO') {
+    return router.createUrlTree(['/directivo']);
+  } else {
+    return router.createUrlTree(['/tutor']);
+  }
 }
 
 export const rolGuard: CanActivateFn = (route) => {
@@ -74,26 +74,12 @@ export const wildcardRedirectGuard: CanActivateFn = () => {
 
   const cachedPerfil = perfilService.getPerfil();
   if (cachedPerfil && cachedPerfil.rol && cachedPerfil.rol.toString() !== 'PENDIENTE') {
-    const rol = cachedPerfil.rol;
-    if (rol === 'ALUMNO') {
-      return router.createUrlTree(['/alumno']);
-    } else if (rol === 'VENDEDOR') {
-      return router.createUrlTree(['/kiosquero']);
-    } else {
-      return router.createUrlTree(['/tutor']);
-    }
+    return getRedirectTree(cachedPerfil.rol, router);
   }
   return perfilService.asegurarPerfil().then(
     (perfil) => {
       if (perfil && perfil.rol && perfil.rol.toString() !== 'PENDIENTE') {
-        const rol = perfil.rol;
-        if (rol === 'ALUMNO') {
-          return router.createUrlTree(['/alumno']);
-        } else if (rol === 'VENDEDOR') {
-          return router.createUrlTree(['/kiosquero']);
-        } else {
-          return router.createUrlTree(['/tutor']);
-        }
+        return getRedirectTree(perfil.rol, router);
       }
       return router.createUrlTree(['/']);
     },
