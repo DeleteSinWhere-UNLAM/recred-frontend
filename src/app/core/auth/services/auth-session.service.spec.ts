@@ -57,12 +57,17 @@ describe('AuthSessionService', () => {
   let obtenerSesionSpy: jasmine.Spy;
 
   beforeEach(() => {
+    localStorage.setItem('CognitoIdentityServiceProvider.mockKey', 'true');
     TestBed.configureTestingModule({
       providers: [AuthSessionService],
     });
 
     service = TestBed.inject(AuthSessionService);
     obtenerSesionSpy = spyOn(service as unknown as ServicioInterno, 'obtenerSesionActual');
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   describe('haySesionAutenticada', () => {

@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { UsuarioService } from './usuario.service';
 
 const KEY_HOME = 'recreopago_homeUrl';
@@ -124,7 +126,13 @@ describe('UsuarioService', () => {
   }
 
   function whenInstancio(): UsuarioService {
-    TestBed.configureTestingModule({ providers: [UsuarioService] });
+    TestBed.configureTestingModule({
+      providers: [
+        UsuarioService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    });
     return TestBed.inject(UsuarioService);
   }
 });
