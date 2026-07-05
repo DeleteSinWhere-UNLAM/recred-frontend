@@ -141,7 +141,7 @@ export class PromocionesPagePresenter {
   }
 
   nuevaPromocion(): void {
-    this.router.navigateByUrl('/sugerencias');
+    this.router.navigateByUrl('/kiosquero/sugerencias');
   }
 
   volver(): void {

@@ -1,0 +1,214 @@
+<app-navbar [userName]="nombreUsuario" />
+
+<main class="inteligencia-comercial">
+  <div class="inteligencia-comercial__contenedor">
+    <button type="button" class="si__volver" (click)="volver()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
+
+    <section class="si__encabezado" aria-labelledby="si-title">
+      <div class="si__encabezado-principal">
+        <span class="si__icono-encabezado" aria-hidden="true">
+          <i class="fa-solid fa-chart-line"></i>
+        </span>
+        <div>
+          <div class="si__fila-titulo">
+            <h1 id="si-title">Inteligencia comercial</h1>
+            <span class="si__insignia-premium">AVANZADO</span>
+          </div>
+          <p>Revisa recomendaciones para incorporar articulos y acciones para recuperar ventas de productos quietos.</p>
+        </div>
+      </div>
+    </section>
+
+    @if (presenter.estaCargando) {
+    <div class="si__aviso" role="status">
+      <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>Cargando inteligencia comercial.</span>
+    </div>
+    }
+
+    @if (presenter.tieneErrores) {
+    <div class="si__aviso si__aviso--warning" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      <span>Algunos datos no pudieron cargarse. Podes revisar cada modulo desde sus vistas originales.</span>
+    </div>
+    }
+
+    <section class="si__metricas" aria-label="Resumen de inteligencia comercial">
+      <article class="si__metrica si__metrica--exito">
+        <span aria-hidden="true"><i class="fa-solid fa-box-open"></i></span>
+        <div>
+          <small>Para incorporar</small>
+          <strong>{{ presenter.resumen.productosParaAgregar }}</strong>
+        </div>
+      </article>
+
+      <article class="si__metrica si__metrica--exito">
+        <span aria-hidden="true"><i class="fa-solid fa-coins"></i></span>
+        <div>
+          <small>Ingreso potencial</small>
+          <strong>{{ presenter.formatearMoneda(presenter.resumen.ingresoPotencial) }}</strong>
+        </div>
+      </article>
+
+      <article class="si__metrica si__metrica--advertencia">
+        <span aria-hidden="true"><i class="fa-solid fa-boxes-stacked"></i></span>
+        <div>
+          <small>Stock inmovilizado</small>
+          <strong>{{ presenter.resumen.stockInmovilizado }}</strong>
+        </div>
+      </article>
+
+      <article class="si__metrica si__metrica--peligro">
+        <span aria-hidden="true"><i class="fa-solid fa-clock-rotate-left"></i></span>
+        <div>
+          <small>Promedio sin venta</small>
+          <strong>{{ presenter.resumen.promedioDiasSinVenta }} dias</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="si__area-trabajo" aria-label="Modulos de inteligencia">
+      <div class="si__pestanias" role="tablist" aria-label="Tipo de oportunidad">
+        <button
+          type="button"
+          role="tab"
+          class="si__pestania"
+          [class.si__pestania--activa]="pestaniaActiva === 'agregar'"
+          [attr.aria-selected]="pestaniaActiva === 'agregar'"
+          (click)="seleccionarPestania('agregar')"
+        >
+          <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+          <span>Oportunidades de stock</span>
+          <strong>{{ presenter.resumen.productosParaAgregar }}</strong>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          class="si__pestania"
+          [class.si__pestania--activa]="pestaniaActiva === 'rotacion'"
+          [attr.aria-selected]="pestaniaActiva === 'rotacion'"
+          (click)="seleccionarPestania('rotacion')"
+        >
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+          <span>Impulsar baja rotacion</span>
+          <strong>{{ presenter.resumen.productosBajaRotacion }}</strong>
+        </button>
+      </div>
+
+      @if (pestaniaActiva === 'agregar') {
+      <section class="si__panel" role="tabpanel" aria-labelledby="agregar-tab">
+        <div class="si__encabezado-panel">
+          <div>
+            <h2>Más vendidos en otros kioscos</h2>
+            <p>Artículos con buena venta en otros buffets que todavía podrías sumar a tu stock.</p>
+          </div>
+          <button type="button" class="si__boton-enlace" (click)="presenter.verOportunidadesStock()">
+            <span>Ver vista completa</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        @if (presenter.principalesOportunidadesAgregar.length > 0) {
+        <div class="si__tarjetas">
+          @for (tarjeta of presenter.principalesOportunidadesAgregar; track tarjeta.id) {
+          <article class="si__tarjeta si__tarjeta--exito">
+            <div class="si__titulo-tarjeta">
+              <span aria-hidden="true"><i class="fa-solid fa-cube"></i></span>
+              <strong>{{ tarjeta.titulo }}</strong>
+            </div>
+            <p>{{ tarjeta.descripcion }}</p>
+            <div class="si__estadisticas-tarjeta">
+              <span>
+                <small>{{ tarjeta.etiquetaMetricaPrincipal }}</small>
+                <strong>{{ tarjeta.valorMetricaPrincipal }}</strong>
+              </span>
+              <span>
+                <small>{{ tarjeta.etiquetaMetricaSecundaria }}</small>
+                <strong>{{ tarjeta.valorMetricaSecundaria }}</strong>
+              </span>
+            </div>
+            <button type="button" class="si__accion-tarjeta" (click)="presenter.darAltaOportunidad(tarjeta.id)">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              <span>Dar alta</span>
+            </button>
+          </article>
+          }
+        </div>
+        } @else if ((presenter.loadingAgregar$ | async) === false) {
+        <div class="si__vacio">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+          <strong>Sin oportunidades para incorporar por ahora</strong>
+          <p>La vista original sigue disponible para revisar el detalle cuando aparezcan nuevas sugerencias.</p>
+        </div>
+        }
+      </section>
+      }
+
+      @if (pestaniaActiva === 'rotacion') {
+      <section class="si__panel" role="tabpanel" aria-labelledby="rotacion-tab">
+        <div class="si__encabezado-panel">
+          <div>
+            <h2>Productos para impulsar con combos</h2>
+            <p>Combinalos con los más vendidos para mejorar sus ventas.</p>
+          </div>
+          <button type="button" class="si__boton-enlace" (click)="presenter.verBajaRotacion()">
+            <span>Ver vista completa</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        @if (presenter.principalesBajaRotacion.length > 0) {
+        <div class="si__tarjetas">
+          @for (tarjeta of presenter.principalesBajaRotacion; track tarjeta.id) {
+          <article
+            class="si__tarjeta"
+            [class.si__tarjeta--advertencia]="tarjeta.tono === 'advertencia'"
+            [class.si__tarjeta--peligro]="tarjeta.tono === 'peligro'"
+          >
+            <div class="si__titulo-tarjeta">
+              <span aria-hidden="true"><i class="fa-solid fa-box-open"></i></span>
+              <strong>{{ tarjeta.titulo }}</strong>
+            </div>
+            <p>{{ tarjeta.descripcion }}</p>
+            <div class="si__estadisticas-tarjeta">
+              <span>
+                <small>{{ tarjeta.etiquetaMetricaPrincipal }}</small>
+                <strong>{{ tarjeta.valorMetricaPrincipal }}</strong>
+              </span>
+              <span>
+                <small>{{ tarjeta.etiquetaMetricaSecundaria }}</small>
+                <strong>{{ tarjeta.valorMetricaSecundaria }}</strong>
+              </span>
+            </div>
+            <button type="button" class="si__accion-tarjeta" (click)="presenter.abrirPromocionParaProducto(tarjeta.id)">
+              <i class="fa-solid fa-tags" aria-hidden="true"></i>
+              <span>Crear promocion</span>
+            </button>
+          </article>
+          }
+        </div>
+        } @else if ((presenter.loadingRotacion$ | async) === false) {
+        <div class="si__vacio">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+          <strong>Sin productos con baja rotacion</strong>
+          <p>Cuando aparezca stock inmovilizado, esta pestaña va a mostrar las acciones sugeridas.</p>
+        </div>
+        }
+      </section>
+      }
+    </section>
+  </div>
+
+  @if (presenter.modalComboAbierto$ | async) {
+  <app-combo-promotion-modal
+    [baseProductName]="(presenter.bajaRotacionSeleccionada$ | async)?.productoOriginal ?? ''"
+    [suggestedProducts]="(presenter.productosSugeridos$ | async) ?? []"
+    (confirmPromotion)="presenter.generarPromocion($event)"
+    (closeModal)="presenter.cerrarModalCombo()"
+  />
+  }
+</main>

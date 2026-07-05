@@ -36,7 +36,7 @@ export class SugerenciasPage implements OnInit {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/kiosquero');
+    this.router.navigateByUrl('/kiosquero/inteligencia-comercial');
   }
 
   onGenerarPromocion(): void {

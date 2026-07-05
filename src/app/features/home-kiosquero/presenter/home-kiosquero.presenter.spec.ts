@@ -116,11 +116,10 @@ describe('HomeKiosqueroPresenter', () => {
         'ver-pedidos',
         'venta-espontanea',
         'cargar-productos',
-        'oportunidades-stock',
         'tracking-pedidos',
         'stock',
+        'inteligencia-comercial',
         'reportes',
-        'sugerencias',
         'recomendaciones',
         'promociones',
         'cierre-diario',
@@ -128,12 +127,11 @@ describe('HomeKiosqueroPresenter', () => {
       ]);
     });
 
-    it('dado el presenter, deberia exponer las 5 acciones destacadas', () => {
+    it('dado el presenter, deberia exponer las 4 acciones destacadas', () => {
       expect(presenter.featuredActions().map((a) => a.id)).toEqual([
         'venta-espontanea',
         'cargar-productos',
-        'oportunidades-stock',
-        'sugerencias',
+        'inteligencia-comercial',
         'cierre-diario',
       ]);
     });
