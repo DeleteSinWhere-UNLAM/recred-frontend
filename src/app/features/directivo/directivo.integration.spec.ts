@@ -5,11 +5,9 @@ import { DirectivoPresenter } from './presenter/directivo.presenter';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { DirectivoService } from './services/directivo.service';
 import { DirectivoMother } from './directivo.mother';
-import { AuthService } from '../../core/auth/services/auth.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { DirectivoDashboardComponent } from './components/directivo-dashboard/directivo-dashboard.component';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
@@ -18,12 +16,10 @@ class NavbarStubComponent {}
 describe('DirectivoPage (Integración: UI + Presenter)', () => {
   let fixture: ComponentFixture<DirectivoPage>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
   let directivoServiceSpy: jasmine.SpyObj<DirectivoService>;
 
   beforeEach(async () => {
     perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['cargarPerfil']);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
     directivoServiceSpy = jasmine.createSpyObj('DirectivoService', ['obtenerResumenColegio']);
 
     await TestBed.configureTestingModule({
