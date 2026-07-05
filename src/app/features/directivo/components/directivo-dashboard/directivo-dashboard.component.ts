@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { SchoolOverview } from '../../models/directivo.model';
+import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
+import { SchoolOverview, Vendedor } from '../../models/directivo.model';
 
 import { RouterModule } from '@angular/router';
 
@@ -15,4 +15,14 @@ export class DirectivoDashboardComponent {
   @Input() data: SchoolOverview | null = null;
   @Input() loading = false;
   @Input() error: string | null = null;
+
+  public vendedorSeleccionado = signal<Vendedor | null>(null);
+
+  public verDetalleVendedor(vendedor: Vendedor): void {
+    this.vendedorSeleccionado.set(vendedor);
+  }
+
+  public cerrarModal(): void {
+    this.vendedorSeleccionado.set(null);
+  }
 }

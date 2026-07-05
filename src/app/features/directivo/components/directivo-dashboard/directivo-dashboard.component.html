@@ -1,61 +1,115 @@
-<div class="dashboard-container">
+<div class="pv">
   <!-- Loading State -->
   @if (loading) {
-    <div class="loading-state">
-      <p>Cargando panel de administración...</p>
+    <div class="pv__notice" role="status">
+      <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>Cargando panel de administración...</span>
     </div>
   }
 
   <!-- Error State -->
   @if (error) {
-    <div class="error-alert">
-      <p>{{ error }}</p>
+    <div class="pv__notice pv__notice--error" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      <span>{{ error }}</span>
     </div>
   }
 
   <!-- Data State -->
   @if (!loading && !error && data) {
-    <header class="school-header">
-      <h2>{{ data.nombre }}</h2>
-      <span class="badge">CUE: {{ data.cue }}</span>
+    <header class="pv__profile-card">
+      <div class="pv__profile-identity">
+        <div class="pv__avatar" aria-hidden="true">
+          <span><i class="fa-solid fa-school"></i></span>
+        </div>
+        <div>
+          <p class="pv__greeting">Panel Administrativo</p>
+          <h1 id="pv-title">{{ data.nombre }}</h1>
+          <p>CUE: {{ data.cue }}</p>
+        </div>
+      </div>
     </header>
-    <section class="buffets-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 style="margin: 0;">Kioscos del Colegio</h3>
-        <button [routerLink]="['/directivo/crear-buffet']" [state]="{ schoolId: data.id }" style="background-color: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500;">
-          + Nuevo Buffet
+
+    <section class="pv__panel" aria-labelledby="kioscos-title">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div class="pv__section-title">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-store"></i>
+          </span>
+          <h2 id="kioscos-title">Kioscos del Colegio</h2>
+        </div>
+        
+        <button type="button" class="pv__featured-card pv__featured-card--menta" style="min-height: auto; padding: 12px 18px; margin: 0; width: max-content; gap: 12px;" [routerLink]="['/directivo/crear-buffet']" [state]="{ schoolId: data.id }">
+          <span class="pv__featured-icon" style="width: 38px; height: 38px; font-size: 16px;" aria-hidden="true">
+            <i class="fa-solid fa-plus"></i>
+          </span>
+          <span class="pv__action-title-container">
+            <strong style="font-size: 15px;">Nuevo Kiosco</strong>
+          </span>
+          <span class="pv__featured-arrow" style="width: 28px; height: 28px;" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
         </button>
       </div>
+
       @if (data.buffets.length === 0) {
-        <div class="empty-state">
-          <p>No hay buffets registrados en este colegio.</p>
+        <div class="pv__ok-state" style="margin-top: 16px;">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-circle-info"></i>
+          </span>
+          <div>
+            <strong>Sin kioscos registrados</strong>
+            <p>No hay buffets registrados en este colegio todavía.</p>
+          </div>
         </div>
       }
+
       @if (data.buffets.length > 0) {
-        <div class="buffets-grid">
+        <div class="pv__operation-grid">
           @for (buffet of data.buffets; track buffet) {
-            <div class="buffet-card">
-              <div class="buffet-header">
-                <h4>{{ buffet.nombre }}</h4>
-                <span class="status-indicator" [class.active]="buffet.activo">
-                  {{ buffet.activo ? 'Activo' : 'Inactivo' }}
+            <div class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
+              <span class="pv__operation-icon" aria-hidden="true">
+                <i class="fa-solid fa-store"></i>
+              </span>
+              
+              <div class="pv__operation-body">
+                <span class="pv__operation-label">
+                  <span class="status-indicator" [class.active]="buffet.activo">
+                    {{ buffet.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
                 </span>
-              </div>
-              <div class="vendedor-info">
-                <h5>Vendedor a cargo:</h5>
+                <strong style="font-size: 20px;">{{ buffet.nombre }}</strong>
+                
                 @if (buffet.vendedor) {
-                  <div class="vendedor-details">
-                    <p><strong>Nombre:</strong> {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}</p>
-                    <p><strong>Email:</strong> {{ buffet.vendedor.email }}</p>
-                    <p><strong>CUIT:</strong> {{ buffet.vendedor.cuit }}</p>
-                  </div>
+                  <small style="margin-top: 8px;">
+                    <i class="fa-solid fa-user-tie"></i> {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
+                  </small>
                 } @else {
-                  <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
-                    <p class="warning-text">Sin vendedor asignado</p>
-                    <button [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }" style="background-color: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
-                      + Asignar Vendedor
-                    </button>
-                  </div>
+                  <small style="margin-top: 8px; color: #d97706;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Sin vendedor
+                  </small>
+                }
+              </div>
+
+              <div class="actions-column" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: max-content;">
+                @if (!buffet.vendedor) {
+                  <button type="button" class="pv__quick-action pv__quick-action--dorado" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
+                    <span>
+                      <strong style="font-size: 13px;">Asignar Vendedor</strong>
+                    </span>
+                    <span class="pv__quick-arrow" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
+                      <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                  </button>
+                } @else {
+                  <button type="button" class="pv__quick-action" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" (click)="verDetalleVendedor(buffet.vendedor)">
+                    <span>
+                      <strong style="font-size: 13px;">Ver Vendedor</strong>
+                    </span>
+                    <span class="pv__quick-arrow pv__quick-arrow--eye" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
+                      <i class="fa-solid fa-eye"></i>
+                    </span>
+                  </button>
                 }
               </div>
             </div>
@@ -65,3 +119,37 @@
     </section>
   }
 </div>
+
+<!-- Modal Vendedor -->
+@if (vendedorSeleccionado()) {
+  <div class="pv-modal-overlay" (click)="cerrarModal()" (keydown.enter)="cerrarModal()" tabindex="0" role="button">
+    <div class="pv-modal" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0" role="dialog" aria-labelledby="modal-title">
+      <header class="pv-modal__header">
+        <div class="pv-modal__title-group">
+          <span class="pv-modal__icon">
+            <i class="fa-solid fa-user-tie"></i>
+          </span>
+          <h2 id="modal-title">Datos del Vendedor</h2>
+        </div>
+        <button class="pv-modal__close" (click)="cerrarModal()" aria-label="Cerrar modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+      
+      <div class="pv-modal__body">
+        <div class="pv-modal__data-row">
+          <small>Nombre completo</small>
+          <p><strong>{{ vendedorSeleccionado()?.nombre }} {{ vendedorSeleccionado()?.apellido }}</strong></p>
+        </div>
+        <div class="pv-modal__data-row">
+          <small>Email</small>
+          <p>{{ vendedorSeleccionado()?.email }}</p>
+        </div>
+        <div class="pv-modal__data-row">
+          <small>CUIT</small>
+          <p>{{ vendedorSeleccionado()?.cuit }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

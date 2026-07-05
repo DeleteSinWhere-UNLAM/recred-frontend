@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DirectivoDashboardComponent } from './directivo-dashboard.component';
 import { By } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 
 describe('DirectivoDashboardComponent', () => {
   let component: DirectivoDashboardComponent;
@@ -9,6 +10,7 @@ describe('DirectivoDashboardComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DirectivoDashboardComponent],
+      providers: [provideRouter([])]
     }).compileComponents();
 
     fixture = TestBed.createComponent(DirectivoDashboardComponent);
@@ -18,14 +20,14 @@ describe('DirectivoDashboardComponent', () => {
   it('debería renderizar mensaje de carga cuando loading es true', () => {
     component.loading = true;
     fixture.detectChanges();
-    const loadingEl = fixture.debugElement.query(By.css('.loading-state'));
+    const loadingEl = fixture.debugElement.query(By.css('.pv__notice[role="status"]'));
     expect(loadingEl).toBeTruthy();
   });
 
   it('debería renderizar error cuando hay un mensaje de error', () => {
     component.error = 'Error fatal';
     fixture.detectChanges();
-    const errorEl = fixture.debugElement.query(By.css('.error-alert'));
+    const errorEl = fixture.debugElement.query(By.css('.pv__notice--error'));
     expect(errorEl.nativeElement.textContent).toContain('Error fatal');
   });
 
@@ -45,10 +47,10 @@ describe('DirectivoDashboardComponent', () => {
     };
     fixture.detectChanges();
     
-    const h2 = fixture.debugElement.query(By.css('h2')).nativeElement;
-    expect(h2.textContent).toContain('Colegio Test');
+    const h1 = fixture.debugElement.query(By.css('#pv-title')).nativeElement;
+    expect(h1.textContent).toContain('Colegio Test');
     
-    const card = fixture.debugElement.query(By.css('.buffet-card'));
+    const card = fixture.debugElement.query(By.css('.pv__operation-card'));
     expect(card).toBeTruthy();
     expect(card.nativeElement.textContent).toContain('Kiosco 1');
   });

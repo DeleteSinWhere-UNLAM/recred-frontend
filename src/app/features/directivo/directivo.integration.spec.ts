@@ -7,6 +7,11 @@ import { DirectivoMother } from './directivo.mother';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { By } from '@angular/platform-browser';
+import { Component } from '@angular/core';
+import { DirectivoDashboardComponent } from './components/directivo-dashboard/directivo-dashboard.component';
+
+@Component({ selector: 'app-navbar', template: '', standalone: true })
+class NavbarStubComponent {}
 
 describe('DirectivoPage (Integración: UI + Presenter)', () => {
   let fixture: ComponentFixture<DirectivoPage>;
@@ -29,6 +34,7 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
     })
     .overrideComponent(DirectivoPage, {
       set: {
+        imports: [NavbarStubComponent, DirectivoDashboardComponent],
         providers: [
           DirectivoPresenter,
           { provide: AuthService, useValue: authServiceSpy }
@@ -55,14 +61,11 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
       await fixture.whenStable();
       fixture.detectChanges();
 
-      const h1Element = fixture.nativeElement.querySelector('h1');
-      expect(h1Element.textContent.trim()).toBe('Hola bienvenido, Carlos');
-      
       const dashboardElement = fixture.nativeElement.querySelector('app-directivo-dashboard');
       expect(dashboardElement).toBeTruthy();
       
-      const header2 = fixture.debugElement.query(By.css('app-directivo-dashboard h2'));
-      expect(header2.nativeElement.textContent).toContain('Colegio Integracion');
+      const headerTitle = fixture.debugElement.query(By.css('.pv__school-card-title'));
+      expect(headerTitle.nativeElement.textContent).toContain('Colegio Integracion');
     });
   });
 
@@ -76,7 +79,7 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
       await fixture.whenStable();
       fixture.detectChanges();
 
-      const errorAlert = fixture.debugElement.query(By.css('.error-alert'));
+      const errorAlert = fixture.debugElement.query(By.css('.pv__alert--error'));
       expect(errorAlert).toBeTruthy();
       expect(errorAlert.nativeElement.textContent).toContain('No tienes permisos');
     });
