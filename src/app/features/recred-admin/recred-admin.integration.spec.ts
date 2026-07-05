@@ -6,13 +6,20 @@ import { RecredAdminService } from './services/recred-admin.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { SchoolRegistration } from './models/solicitud-colegio.model';
 import { RecredAdminMother } from './recred-admin.mother';
-import { AuthService } from '../../core/auth/services/auth.service';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true
+})
+class MockNavbarComponent {}
 
 describe('RecredAdmin Integration', () => {
   let fixture: ComponentFixture<RecredAdminPage>;
   let servicio: jasmine.SpyObj<RecredAdminService>;
   let toast: jasmine.SpyObj<ToastService>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
     servicio = jasmine.createSpyObj('RecredAdminService', [
@@ -21,7 +28,6 @@ describe('RecredAdmin Integration', () => {
       'rejectRegistration',
     ]);
     toast = jasmine.createSpyObj('ToastService', ['mostrar']);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
 
     await TestBed.configureTestingModule({
       imports: [RecredAdminPage],
@@ -31,9 +37,8 @@ describe('RecredAdmin Integration', () => {
       ],
     })
       .overrideComponent(RecredAdminPage, {
-        add: {
-          providers: [{ provide: AuthService, useValue: authServiceSpy }],
-        },
+        remove: { imports: [NavbarComponent] },
+        add: { imports: [MockNavbarComponent] }
       })
       .compileComponents();
   });
@@ -43,13 +48,13 @@ describe('RecredAdmin Integration', () => {
 
     whenMonto();
 
-    const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
-    const titulo = fixture.nativeElement.querySelector('.ra__title').textContent;
-    const badge = fixture.nativeElement.querySelector('.ra__badge').textContent;
-    const primerColegio = tarjetas[0].query(By.css('.ra__school-name')).nativeElement.textContent;
-    expect(titulo).toContain('Dashboard Recred Admin');
+    const tarjetas = fixture.debugElement.queryAll(By.css('.pv__operation-card'));
+    const titulo = fixture.nativeElement.querySelector('h1').textContent;
+    const badge = fixture.nativeElement.querySelector('.pv__section-title span').textContent;
+    const primerColegio = tarjetas[0].query(By.css('.school-name')).nativeElement.textContent;
+    expect(titulo).toContain('Dashboard Recred');
     expect(tarjetas.length).toBe(2);
-    expect(badge).toContain('2 pendientes');
+    expect(badge).toContain('2 Pendientes');
     expect(primerColegio).toContain('Instituto San José');
   });
 
@@ -58,8 +63,8 @@ describe('RecredAdmin Integration', () => {
 
     whenMonto();
 
-    const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
-    const vacio = fixture.nativeElement.querySelector('.ra__empty');
+    const tarjetas = fixture.debugElement.queryAll(By.css('.pv__operation-card'));
+    const vacio = fixture.nativeElement.querySelector('.pv__ok-state');
     expect(tarjetas.length).toBe(0);
     expect(vacio).toBeTruthy();
     expect(vacio.textContent).toContain('No hay solicitudes pendientes');
@@ -70,7 +75,7 @@ describe('RecredAdmin Integration', () => {
 
     whenMonto();
 
-    const panelError = fixture.nativeElement.querySelector('.ra__error');
+    const panelError = fixture.nativeElement.querySelector('.pv__notice--error');
     expect(panelError).toBeTruthy();
     expect(panelError.textContent).toContain('Error al cargar las solicitudes pendientes.');
   });
@@ -82,7 +87,7 @@ describe('RecredAdmin Integration', () => {
 
     whenHagoClickEn('#btn-aprobar-solicitud-1');
 
-    const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
+    const tarjetas = fixture.debugElement.queryAll(By.css('.pv__operation-card'));
     expect(tarjetas.length).toBe(1);
     expect(fixture.nativeElement.querySelector('#card-solicitud-1')).toBeNull();
   });
@@ -94,7 +99,7 @@ describe('RecredAdmin Integration', () => {
 
     whenHagoClickEn('#btn-rechazar-solicitud-2');
 
-    const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
+    const tarjetas = fixture.debugElement.queryAll(By.css('.pv__operation-card'));
     expect(tarjetas.length).toBe(1);
     expect(fixture.nativeElement.querySelector('#card-solicitud-2')).toBeNull();
   });
