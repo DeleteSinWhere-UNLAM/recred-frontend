@@ -35,6 +35,8 @@ export class PurchaseRecommendationsPage implements OnInit {
   recommendations = signal<RecomendacionProveedor[]>([]);
   isLoading = signal<boolean>(false);
   isFetchingRecommendations = signal<boolean>(false);
+  mappedProductIds = signal<Set<string>>(new Set<string>());
+  mappedFilter = signal<string>('TODOS');
 
   // Derived categories list
   readonly categories = computed(() => {
@@ -55,6 +57,7 @@ export class PurchaseRecommendationsPage implements OnInit {
     let list = this.products();
     const query = this.searchQuery().toLowerCase().trim();
     const catId = this.selectedCategory();
+    const mappedOnly = this.mappedFilter() === 'MAPEADOS';
 
     if (query) {
       list = list.filter(p =>
@@ -70,18 +73,53 @@ export class PurchaseRecommendationsPage implements OnInit {
       });
     }
 
-    return list;
+    if (mappedOnly) {
+      list = list.filter(p => this.mappedProductIds().has(p.id));
+    }
+
+    return [...list].sort((a, b) => {
+      const aMapped = this.mappedProductIds().has(a.id);
+      const bMapped = this.mappedProductIds().has(b.id);
+      if (aMapped === bMapped) return 0;
+      return aMapped ? -1 : 1;
+    });
   });
 
   // UI Accordion State
   expandedProductAccordions = signal<Set<string>>(new Set<string>());
 
   ngOnInit(): void {
-    this.loadProducts();
+    this.loadSuppliersAndProducts();
+  }
+
+  loadSuppliersAndProducts(): void {
+    this.isLoading.set(true);
+    this.supplierService.getSuppliers().subscribe({
+      next: (suppliers) => {
+        const mapped = new Set<string>();
+        suppliers.forEach(s => {
+          s.listasPrecios?.forEach(lp => {
+            if (lp.activa && lp.items) {
+              lp.items.forEach(item => {
+                if (item.mappingConfirmado && item.productoInventarioId) {
+                  mapped.add(item.productoInventarioId);
+                }
+              });
+            }
+          });
+        });
+        this.mappedProductIds.set(mapped);
+        this.loadProducts();
+      },
+      error: (err) => {
+        console.error('Error loading suppliers mapping info', err);
+        this.toastService.mostrar('Error al cargar información de mapeos', 'error');
+        this.loadProducts();
+      }
+    });
   }
 
   loadProducts(): void {
-    this.isLoading.set(true);
     this.productService.getAll().subscribe({
       next: (data) => {
         this.products.set(data);
@@ -103,7 +141,7 @@ export class PurchaseRecommendationsPage implements OnInit {
   }
 
   autoSelectLowStock(): void {
-    const lowStock = this.products().filter(p => this.isLowStock(p));
+    const lowStock = this.products().filter(p => this.isLowStock(p) && this.isProductMapped(p.id));
     if (lowStock.length > 0) {
       const selected = new Set<string>();
       lowStock.forEach(p => selected.add(p.id));
@@ -114,6 +152,10 @@ export class PurchaseRecommendationsPage implements OnInit {
 
   isLowStock(product: Producto): boolean {
     return product.stockActual <= 5;
+  }
+
+  isProductMapped(productId: string): boolean {
+    return this.mappedProductIds().has(productId);
   }
 
   toggleProductSelection(productId: string): void {
@@ -133,7 +175,7 @@ export class PurchaseRecommendationsPage implements OnInit {
   selectAllLowStock(): void {
     const selected = new Set(this.selectedProductIds());
     this.filteredProducts().forEach(p => {
-      if (this.isLowStock(p)) {
+      if (this.isLowStock(p) && this.isProductMapped(p.id)) {
         selected.add(p.id);
       }
     });
@@ -143,7 +185,11 @@ export class PurchaseRecommendationsPage implements OnInit {
 
   selectAll(): void {
     const selected = new Set(this.selectedProductIds());
-    this.filteredProducts().forEach(p => selected.add(p.id));
+    this.filteredProducts().forEach(p => {
+      if (this.isProductMapped(p.id)) {
+        selected.add(p.id);
+      }
+    });
     this.selectedProductIds.set(selected);
   }
 

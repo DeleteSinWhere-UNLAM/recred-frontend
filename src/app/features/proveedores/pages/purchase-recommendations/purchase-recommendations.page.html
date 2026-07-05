@@ -41,6 +41,13 @@
             }
           </select>
         </div>
+        <div class="category-box">
+          <select [ngModel]="mappedFilter()" (ngModelChange)="mappedFilter.set($event)" 
+                  class="category-box__select">
+            <option value="TODOS">Todos los productos</option>
+            <option value="MAPEADOS">Solo Mapeados</option>
+          </select>
+        </div>
       </div>
 
       @if (isLoading()) {
@@ -68,25 +75,26 @@
       }
 
       @if (!isLoading() && filteredProducts().length > 0) {
-      <div class="products-grid">
+      <div class="products-list">
         @for (prod of filteredProducts(); track prod.id) {
-        <article class="product-card" [class.product-card--selected]="isProductSelected(prod.id)"
-          (click)="toggleProductSelection(prod.id)" tabindex="0" (keydown.enter)="toggleProductSelection(prod.id)">
-          <div class="product-card__selector">
+        <article class="product-item" [class.product-item--selected]="isProductSelected(prod.id)"
+          [class.product-item--disabled]="!isProductMapped(prod.id)"
+          (click)="isProductMapped(prod.id) && toggleProductSelection(prod.id)" tabindex="0" 
+          (keydown.enter)="isProductMapped(prod.id) && toggleProductSelection(prod.id)">
+          <div class="product-item__left">
             <input type="checkbox" [checked]="isProductSelected(prod.id)"
-              (change)="$event.stopPropagation(); toggleProductSelection(prod.id)" class="product-checkbox" />
+              [disabled]="!isProductMapped(prod.id)"
+              (click)="$event.stopPropagation()"
+              (change)="toggleProductSelection(prod.id)" class="product-checkbox" />
+            <span class="product-item__name">{{ prod.nombre }}</span>
           </div>
-          <div class="product-card__info">
-            <h3 class="product-card__name">{{ prod.nombre }}</h3>
-            <p class="product-card__desc">{{ prod.descripcion || 'Sin descripción' }}</p>
-            <div class="product-card__stock-row">
-              <span class="product-card__stock" [class.product-card__stock--critical]="isLowStock(prod)">
-                Stock: {{ prod.stockActual }} un.
-              </span>
-              @if (isLowStock(prod)) {
-              <span class="badge-critical"><i class="fa-solid fa-triangle-exclamation"></i> Stock Crítico</span>
-              }
-            </div>
+          <div class="product-item__right">
+            <span class="product-item__stock" [class.product-item__stock--critical]="isLowStock(prod)">
+              Stock: {{ prod.stockActual }} un.
+            </span>
+            @if (isLowStock(prod)) {
+            <span class="badge-critical"><i class="fa-solid fa-triangle-exclamation"></i> Bajo Stock</span>
+            }
           </div>
         </article>
         }
