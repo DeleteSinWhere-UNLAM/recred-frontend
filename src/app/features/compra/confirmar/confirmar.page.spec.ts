@@ -41,14 +41,9 @@ interface PresenterFake {
   confirmar: jasmine.Spy;
 }
 
-describe('ConfirmarPage', () => {
-  let fixture: ComponentFixture<ConfirmarPage>;
-  let component: ConfirmarPage;
-  let presenter: PresenterFake;
-  let router: jasmine.SpyObj<Router>;
-
-  async function setup(vacia = false): Promise<void> {
-    presenter = {
+class PresenterFakeMother {
+  static crear(vacia = false): PresenterFake {
+    return {
       ordenes: signal(vacia ? [] : [OrdenAlumnoMother.crear()]),
       total: signal(500),
       vacia: signal(vacia),
@@ -60,12 +55,67 @@ describe('ConfirmarPage', () => {
       recreoLabel: jasmine.createSpy('recreoLabel').and.returnValue('1er Recreo'),
       confirmar: jasmine.createSpy('confirmar'),
     };
+  }
+}
 
+describe('ConfirmarPage', () => {
+  let fixture: ComponentFixture<ConfirmarPage>;
+  let component: ConfirmarPage;
+  let presenter: PresenterFake;
+  let router: jasmine.SpyObj<Router>;
+
+  describe('ngOnInit', () => {
+    it('dado que la orden esta vacia, cuando se monta la page, deberia redirigir a /compra', async () => {
+      await givenPageConfigurada({ vacia: true });
+
+      whenMonto();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/compra');
+    });
+
+    it('dado que hay ordenes, cuando se monta la page, no deberia redirigir', async () => {
+      await givenPageConfigurada({ vacia: false });
+
+      whenMonto();
+
+      expect(router.navigateByUrl).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('lineas', () => {
+    it('dado vista tutor, cuando calculo lineas, deberia mostrar solo el nombre', async () => {
+      await givenPageConfigurada({ vacia: false });
+      whenMonto();
+
+      expect(component['lineas']()[0].nombre).toBe('Nombre');
+    });
+
+    it('dado el subtotal de la orden, cuando calculo lineas, deberia mapearlo correctamente', async () => {
+      await givenPageConfigurada({ vacia: false });
+      whenMonto();
+
+      expect(component['lineas']()[0].subtotal).toBe(500);
+      expect(component['lineas']()[0].incluido).toBeTrue();
+    });
+  });
+
+  describe('formatear', () => {
+    it('dado 1500, cuando formateo, deberia devolver moneda AR', async () => {
+      await givenPageConfigurada({ vacia: false });
+      whenMonto();
+
+      expect(component['formatear'](1500)).toMatch(/\$\s?1\.500/);
+    });
+  });
+
+  async function givenPageConfigurada(opciones: { vacia: boolean }): Promise<void> {
+    presenter = PresenterFakeMother.crear(opciones.vacia);
     router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
 
-    const esVistaAlumno = signal(false);
-    const nombreNavbar = signal('Tutor Test');
-    const usuarioService = { esVistaAlumno, nombreNavbar };
+    const usuarioService = {
+      esVistaAlumno: signal(false),
+      nombreNavbar: signal('Tutor Test'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [ConfirmarPage],
@@ -87,47 +137,7 @@ describe('ConfirmarPage', () => {
     component = fixture.componentInstance;
   }
 
-  describe('ngOnInit', () => {
-    it('dado que la orden esta vacia, cuando se monta la page, deberia redirigir a /compra', async () => {
-      await setup(true);
-
-      fixture.detectChanges();
-
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/compra');
-    });
-
-    it('dado que hay ordenes, cuando se monta la page, no deberia redirigir', async () => {
-      await setup(false);
-
-      fixture.detectChanges();
-
-      expect(router.navigateByUrl).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('lineas', () => {
-    it('dado vista tutor, cuando calculo lineas, deberia mostrar solo el nombre', async () => {
-      await setup(false);
-      fixture.detectChanges();
-
-      expect(component['lineas']()[0].nombre).toBe('Nombre');
-    });
-
-    it('dado el subtotal de la orden, cuando calculo lineas, deberia mapearlo correctamente', async () => {
-      await setup(false);
-      fixture.detectChanges();
-
-      expect(component['lineas']()[0].subtotal).toBe(500);
-      expect(component['lineas']()[0].incluido).toBeTrue();
-    });
-  });
-
-  describe('formatear', () => {
-    it('dado 1500, cuando formateo, deberia devolver moneda AR', async () => {
-      await setup(false);
-      fixture.detectChanges();
-
-      expect(component['formatear'](1500)).toMatch(/\$\s?1\.500/);
-    });
-  });
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

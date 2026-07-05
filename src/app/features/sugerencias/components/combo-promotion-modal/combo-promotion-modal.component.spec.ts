@@ -23,13 +23,13 @@ describe('ComboPromotionModalComponent', () => {
   });
 
   describe('estado inicial', () => {
-    it('cuando se monta, el formulario deberia iniciar valido con valores por defecto', () => {
+    it('cuando se monta el modal, el formulario deberia iniciar valido con valores por defecto', () => {
       expect(component.promotionForm.valid).toBeTrue();
     });
   });
 
   describe('toggleProductSelection', () => {
-    it('dado un producto, cuando hago click en toggle, deberia agregarlo y luego removerlo', () => {
+    it('dado un producto, cuando hago click en toggle dos veces, deberia agregarlo y luego removerlo', () => {
       expect(component.isProductSelected('p1')).toBeFalse();
 
       component.toggleProductSelection('p1');
@@ -43,21 +43,21 @@ describe('ComboPromotionModalComponent', () => {
   });
 
   describe('getDiscountedPrice', () => {
-    it('dado un descuento del 20%, cuando calculo el precio, deberia devolverlo con el descuento aplicado', () => {
-      component.promotionForm.patchValue({ discountPercentage: 20 });
+    it('dado un descuento del 20%, cuando calculo el precio de 100, deberia devolver 80', () => {
+      givenDescuento(20);
 
       expect(component.getDiscountedPrice(100)).toBe(80);
     });
 
-    it('dado descuento nulo, cuando calculo el precio, deberia devolver el original', () => {
-      component.promotionForm.patchValue({ discountPercentage: null });
+    it('dado descuento nulo, cuando calculo el precio de 100, deberia devolver el original', () => {
+      givenDescuento(null);
 
       expect(component.getDiscountedPrice(100)).toBe(100);
     });
   });
 
   describe('onConfirm', () => {
-    it('dado un form valido y productos seleccionados, cuando hago click en confirmar, deberia emitir confirmPromotion', () => {
+    it('dado un form valido y productos seleccionados, cuando confirmo, deberia emitir confirmPromotion', () => {
       spyOn(component.confirmPromotion, 'emit');
       component.promotionForm.patchValue({
         discountPercentage: 15,
@@ -76,7 +76,7 @@ describe('ComboPromotionModalComponent', () => {
       });
     });
 
-    it('dado un form invalido, cuando hago click en confirmar, no deberia emitir', () => {
+    it('dado un form invalido, cuando confirmo, no deberia emitir', () => {
       spyOn(component.confirmPromotion, 'emit');
       component.promotionForm.patchValue({
         discountPercentage: 15,
@@ -90,7 +90,7 @@ describe('ComboPromotionModalComponent', () => {
       expect(component.confirmPromotion.emit).not.toHaveBeenCalled();
     });
 
-    it('dado que no hay productos seleccionados, cuando hago click en confirmar, no deberia emitir', () => {
+    it('dado que no hay productos seleccionados, cuando confirmo, no deberia emitir', () => {
       spyOn(component.confirmPromotion, 'emit');
       component.promotionForm.patchValue({
         discountPercentage: 15,
@@ -113,4 +113,8 @@ describe('ComboPromotionModalComponent', () => {
       expect(component.closeModal.emit).toHaveBeenCalled();
     });
   });
+
+  function givenDescuento(porcentaje: number | null): void {
+    component.promotionForm.patchValue({ discountPercentage: porcentaje });
+  }
 });

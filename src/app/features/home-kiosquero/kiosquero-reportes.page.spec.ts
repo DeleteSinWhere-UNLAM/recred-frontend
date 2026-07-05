@@ -26,6 +26,25 @@ interface PresenterMock {
   reportRangeOptions: unknown[];
 }
 
+class PresenterMother {
+  static crear(): PresenterMock {
+    return {
+      init: jasmine.createSpy('init'),
+      initReportes: jasmine.createSpy('initReportes'),
+      nombreKiosquero: signal(''),
+      isLoading: signal(false),
+      errorMessage: signal<string | null>(null),
+      hasPanelData: signal(false),
+      panel: signal(null),
+      selectedDate: signal('2026-07-03'),
+      selectedRangePreset: signal('TODAY'),
+      reportRangeFrom: signal('2026-06-27'),
+      reportRangeTo: signal('2026-07-03'),
+      reportRangeOptions: [],
+    };
+  }
+}
+
 describe('KiosqueroReportesPage', () => {
   let component: KiosqueroReportesPage;
   let fixture: ComponentFixture<KiosqueroReportesPage>;
@@ -34,7 +53,7 @@ describe('KiosqueroReportesPage', () => {
   let router: Router;
 
   beforeEach(async () => {
-    presenter = crearPresenterMock();
+    presenter = PresenterMother.crear();
     servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['setHomeUrl']);
 
     await TestBed.configureTestingModule({
@@ -65,7 +84,7 @@ describe('KiosqueroReportesPage', () => {
 
   describe('inicializacion', () => {
     it('dado la page, cuando se monta, deberia setear /kiosquero como home y llamar initReportes', () => {
-      fixture.detectChanges();
+      whenMonto();
 
       expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
       expect(presenter.initReportes).toHaveBeenCalled();
@@ -73,38 +92,35 @@ describe('KiosqueroReportesPage', () => {
   });
 
   describe('estados', () => {
-    it('dado el presenter cargando, deberia mostrar "Cargando reportes"', () => {
-      presenter.isLoading.set(true);
+    it('dado el presenter cargando, cuando se renderiza, deberia mostrar "Cargando reportes"', () => {
+      givenPresenterCargando();
 
-      fixture.detectChanges();
+      whenMonto();
 
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).toContain('Cargando reportes');
+      expect(textoDeLaPage()).toContain('Cargando reportes');
     });
 
-    it('dado un error en el presenter, deberia mostrar el mensaje', () => {
-      presenter.errorMessage.set('Fallo la carga');
+    it('dado un error en el presenter, cuando se renderiza, deberia mostrar el mensaje', () => {
+      givenErrorEnPresenter('Fallo la carga');
 
-      fixture.detectChanges();
+      whenMonto();
 
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).toContain('Fallo la carga');
+      expect(textoDeLaPage()).toContain('Fallo la carga');
     });
   });
 
   describe('volver', () => {
     it('dado el boton Volver, cuando hago click, deberia navegar a /kiosquero', () => {
-      fixture.detectChanges();
+      whenMonto();
 
-      const boton = (fixture.nativeElement as HTMLElement).querySelector('.kr__back') as HTMLButtonElement;
-      boton.click();
+      whenHagoClickEnVolver();
 
       expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
     });
   });
 
   describe('onImagenError', () => {
-    it('dado una imagen que falla, deberia setear el src al fallback', () => {
+    it('dado una imagen que falla, cuando se dispara error, deberia setear el src al fallback', () => {
       const img = document.createElement('img');
       img.src = 'https://original/foto.png';
       const event = { target: img } as unknown as Event;
@@ -114,7 +130,7 @@ describe('KiosqueroReportesPage', () => {
       expect(img.src).toContain('logo_sin_fondo_ikciro');
     });
 
-    it('dado una imagen que ya es fallback, no deberia cambiar el src', () => {
+    it('dado una imagen que ya es fallback, cuando se dispara error, no deberia cambiar el src', () => {
       const img = document.createElement('img');
       img.src =
         'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
@@ -127,20 +143,24 @@ describe('KiosqueroReportesPage', () => {
     });
   });
 
-  function crearPresenterMock(): PresenterMock {
-    return {
-      init: jasmine.createSpy('init'),
-      initReportes: jasmine.createSpy('initReportes'),
-      nombreKiosquero: signal(''),
-      isLoading: signal(false),
-      errorMessage: signal<string | null>(null),
-      hasPanelData: signal(false),
-      panel: signal(null),
-      selectedDate: signal('2026-07-03'),
-      selectedRangePreset: signal('TODAY'),
-      reportRangeFrom: signal('2026-06-27'),
-      reportRangeTo: signal('2026-07-03'),
-      reportRangeOptions: [],
-    };
+  function givenPresenterCargando(): void {
+    presenter.isLoading.set(true);
+  }
+
+  function givenErrorEnPresenter(mensaje: string): void {
+    presenter.errorMessage.set(mensaje);
+  }
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
+
+  function whenHagoClickEnVolver(): void {
+    const boton = (fixture.nativeElement as HTMLElement).querySelector('.kr__back') as HTMLButtonElement;
+    boton.click();
+  }
+
+  function textoDeLaPage(): string {
+    return (fixture.nativeElement as HTMLElement).textContent ?? '';
   }
 });

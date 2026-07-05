@@ -7,7 +7,12 @@ import { NavbarComponent } from '../../../../shared/components/navbar/navbar.com
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ProductoInventarioMother } from '../../../inventario/inventario.mother';
 import { ProductoService } from '../../../inventario/services/producto.service';
-import { RecomendacionProveedorMother } from '../../proveedores.mother';
+import {
+  RecomendacionProveedorMother,
+  SupplierResponseMother,
+  ListaPrecioProveedorMother,
+  ItemListaPrecioMother,
+} from '../../proveedores.mother';
 import { SupplierService } from '../../services/supplier.service';
 import { PurchaseRecommendationsPage } from './purchase-recommendations.page';
 
@@ -84,6 +89,19 @@ describe('PurchaseRecommendationsPage', () => {
     servicioSupplier.getPurchaseRecommendations.and.returnValue(
       of([RecomendacionProveedorMother.crear()]),
     );
+    const mockSupplier = SupplierResponseMother.crear({
+      listasPrecios: [
+        ListaPrecioProveedorMother.crear({
+          activa: true,
+          items: [
+            ItemListaPrecioMother.crear({ productoInventarioId: 'prod-agua', mappingConfirmado: true }),
+            ItemListaPrecioMother.crear({ productoInventarioId: 'prod-jugo', mappingConfirmado: true }),
+            ItemListaPrecioMother.crear({ productoInventarioId: 'prod-alfajor', mappingConfirmado: true }),
+          ]
+        })
+      ]
+    });
+    servicioSupplier.getSuppliers.and.returnValue(of([mockSupplier]));
 
     servicioProducto = jasmine.createSpyObj('ProductoService', ['getAll']);
     servicioProducto.getAll.and.returnValue(of([disponibleAgua, bajoStockJugo, disponibleAlfajor]));
@@ -385,6 +403,50 @@ describe('PurchaseRecommendationsPage', () => {
       const html = write.calls.mostRecent().args[0] as string;
       expect(html).toContain('Alfajor');
       expect(html).toContain('Reporte de Compras Recomendadas');
+    });
+  });
+
+  describe('filtros y deshabilitados de mapeo', () => {
+    it('dado productos, si uno no esta mapeado, isProductMapped deberia retornar false y no deberia dejar seleccionarlo', () => {
+      build();
+      whenMonto();
+      // Remove prod-agua from mapped set manually to test unmapped behavior
+      component.mappedProductIds.set(new Set(['prod-jugo', 'prod-alfajor']));
+      
+      expect(component.isProductMapped('prod-agua')).toBeFalse();
+      expect(component.isProductMapped('prod-jugo')).toBeTrue();
+      
+      // selectAll shouldn't select prod-agua
+      component.selectAll();
+      expect(component.selectedProductIds().has('prod-agua')).toBeFalse();
+      expect(component.selectedProductIds().has('prod-jugo')).toBeTrue();
+    });
+
+    it('dado filtro mappedFilter seteado a MAPEADOS, deberia ocultar los no mapeados', () => {
+      build();
+      whenMonto();
+      // Only jugo and alfajor are mapped
+      component.mappedProductIds.set(new Set(['prod-jugo', 'prod-alfajor']));
+      
+      expect(component.filteredProducts().length).toBe(3); // initially all since filter is TODOS
+      
+      component.mappedFilter.set('MAPEADOS');
+      const filtered = component.filteredProducts();
+      expect(filtered.length).toBe(2);
+      expect(filtered.find(p => p.id === 'prod-agua')).toBeUndefined();
+    });
+
+    it('dado una lista mixta de productos, filteredProducts deberia ordenar los mapeados primero', () => {
+      build();
+      whenMonto();
+      // Only alfajor is mapped
+      component.mappedProductIds.set(new Set(['prod-alfajor']));
+      
+      const filtered = component.filteredProducts();
+      // Alfajor should be first
+      expect(filtered[0].id).toBe('prod-alfajor');
+      expect(filtered[1].id).not.toBe('prod-alfajor');
+      expect(filtered[2].id).not.toBe('prod-alfajor');
     });
   });
 

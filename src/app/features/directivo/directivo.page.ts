@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { DirectivoPresenter } from './presenter/directivo.presenter';
 import { DirectivoDashboardComponent } from './components/directivo-dashboard/directivo-dashboard.component';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-directivo-page',
   standalone: true,
-  imports: [DirectivoDashboardComponent],
+  imports: [DirectivoDashboardComponent, NavbarComponent],
   templateUrl: './directivo.page.html',
   styleUrl: './directivo.page.css',
   providers: [DirectivoPresenter],

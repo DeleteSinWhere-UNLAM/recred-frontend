@@ -9,6 +9,7 @@ import { ToastService } from '../../shared/services/toast.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ProductoService } from '../inventario/services/producto.service';
 import { ComboPromotionModalComponent } from './components/combo-promotion-modal/combo-promotion-modal.component';
+import { SugerenciaProducto } from './models/sugerencia-producto.model';
 import { SugerenciasService } from './services/sugerencias.service';
 import { SugerenciaProductoMother, UsuarioMother } from './sugerencias.mother';
 import { SugerenciasPage } from './sugerencias.page';
@@ -32,9 +33,7 @@ describe('Sugerencias Integration', () => {
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
 
   beforeEach(async () => {
-    servicioSugerencias = jasmine.createSpyObj<SugerenciasService>('SugerenciasService', [
-      'getSugerencias',
-    ]);
+    servicioSugerencias = jasmine.createSpyObj<SugerenciasService>('SugerenciasService', ['getSugerencias']);
     servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', [
       'getUsuarioActual',
       'setHomeUrl',
@@ -68,11 +67,10 @@ describe('Sugerencias Integration', () => {
 
   afterEach(() => localStorage.clear());
 
-  it('dadas dos sugerencias, cuando se monta la page, deberia mostrar los indicadores calculados por el presenter', () => {
-    servicioSugerencias.getSugerencias.and.returnValue(of(SugerenciaProductoMother.crearVarias()));
+  it('dado dos sugerencias, cuando se monta la page, deberia mostrar los indicadores calculados por el presenter', () => {
+    givenSugerenciasDelBack(SugerenciaProductoMother.crearVarias());
 
-    fixture = TestBed.createComponent(SugerenciasPage);
-    fixture.detectChanges();
+    whenMonto();
 
     const metricProductos = fixture.nativeElement.querySelector('.sg__metric--danger strong').textContent;
     const metricStock = fixture.nativeElement.querySelector('.sg__metric--warning strong').textContent;
@@ -85,28 +83,33 @@ describe('Sugerencias Integration', () => {
     expect(metricCritico).toContain('Producto 2');
   });
 
-  it('dadas dos sugerencias, cuando se monta la page, deberia graficar las barras de dias sin venta ordenadas por criticidad', () => {
-    servicioSugerencias.getSugerencias.and.returnValue(of(SugerenciaProductoMother.crearVarias()));
+  it('dado dos sugerencias, cuando se monta la page, deberia graficar las barras de dias sin venta ordenadas por criticidad', () => {
+    givenSugerenciasDelBack(SugerenciaProductoMother.crearVarias());
 
-    fixture = TestBed.createComponent(SugerenciasPage);
-    fixture.detectChanges();
+    whenMonto();
 
     const barras = fixture.debugElement.queryAll(By.css('.sg__hbar-row'));
     expect(barras.length).toBe(2);
-    expect(barras[0].query(By.css('.sg__hbar-label strong')).nativeElement.textContent).toContain(
-      'Producto 2',
-    );
+    expect(barras[0].query(By.css('.sg__hbar-label strong')).nativeElement.textContent).toContain('Producto 2');
     expect(barras[0].query(By.css('.sg__hbar-value')).nativeElement.textContent).toContain('10');
   });
 
   it('dado que no hay sugerencias, cuando se monta la page, deberia mostrar el empty state', () => {
-    servicioSugerencias.getSugerencias.and.returnValue(of([]));
+    givenSugerenciasDelBack([]);
 
-    fixture = TestBed.createComponent(SugerenciasPage);
-    fixture.detectChanges();
+    whenMonto();
 
     const emptyState = fixture.nativeElement.querySelector('.sg__empty-state');
     expect(emptyState).toBeTruthy();
     expect(emptyState.textContent).toContain('Excelente trabajo');
   });
+
+  function givenSugerenciasDelBack(sugerencias: SugerenciaProducto[]): void {
+    servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
+  }
+
+  function whenMonto(): void {
+    fixture = TestBed.createComponent(SugerenciasPage);
+    fixture.detectChanges();
+  }
 });

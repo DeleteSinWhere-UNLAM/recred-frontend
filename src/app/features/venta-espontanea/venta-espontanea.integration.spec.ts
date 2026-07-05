@@ -23,6 +23,8 @@ class NavbarStub {
 }
 
 describe('VentaEspontanea Integration', () => {
+  const URL_ALUMNOS = `${environment.apiUrl}/alumnos`;
+
   let fixture: ComponentFixture<VentaEspontaneaPageComponent>;
   let httpMock: HttpTestingController;
   let buffetService: jasmine.SpyObj<BuffetService>;
@@ -35,9 +37,7 @@ describe('VentaEspontanea Integration', () => {
     buffetService.obtenerBuffetDelAlumno.and.returnValue(of(BuffetMother.crear()));
     buffetService.getProductosDelBuffet.and.returnValue(of(ProductoVentaMother.crearVarios()));
 
-    const feriadosService = jasmine.createSpyObj<FeriadosService>('FeriadosService', [
-      'esFeriadoHoy',
-    ]);
+    const feriadosService = jasmine.createSpyObj<FeriadosService>('FeriadosService', ['esFeriadoHoy']);
     feriadosService.esFeriadoHoy.and.returnValue(of({ esFeriado: false }));
 
     await TestBed.configureTestingModule({
@@ -70,19 +70,29 @@ describe('VentaEspontanea Integration', () => {
   });
 
   it('dado que el back devuelve alumnos, cuando se monta la page, deberia pegar a /alumnos y renderizar el titulo', () => {
-    // set a weekday to avoid the "día no laborable" block
-    jasmine.clock().install();
-    jasmine.clock().mockDate(new Date('2026-07-01'));
+    givenEsDiaLaborable('2026-07-01');
 
-    fixture.detectChanges();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/alumnos`);
-    expect(req.request.method).toBe('GET');
-    req.flush(AlumnoResumenMother.crearVarios());
-    fixture.detectChanges();
+    whenMonto();
+    whenElBackDevuelveAlumnos(AlumnoResumenMother.crearVarios());
 
     const titulo = (fixture.nativeElement as HTMLElement).querySelector('.venta__titulo');
     expect(titulo?.textContent).toContain('Venta Espontánea');
     jasmine.clock().uninstall();
   });
+
+  function givenEsDiaLaborable(fechaISO: string): void {
+    jasmine.clock().install();
+    jasmine.clock().mockDate(new Date(fechaISO));
+  }
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
+
+  function whenElBackDevuelveAlumnos(alumnos: ReturnType<typeof AlumnoResumenMother.crearVarios>): void {
+    const req = httpMock.expectOne(URL_ALUMNOS);
+    expect(req.request.method).toBe('GET');
+    req.flush(alumnos);
+    fixture.detectChanges();
+  }
 });

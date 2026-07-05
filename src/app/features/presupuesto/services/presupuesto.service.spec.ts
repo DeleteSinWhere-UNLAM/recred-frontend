@@ -1,5 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../../environments/environment';
 import { PerfilMother } from '../../../data-access/services/alumno.mother';
@@ -15,6 +15,8 @@ import { PresupuestoService } from './presupuesto.service';
 describe('PresupuestoService', () => {
   const API = environment.apiUrl;
   const IA = `${API}/ia`;
+  const URL_BUDGET_ACTIVO = (alumnoId: string): string =>
+    `${API}/budgets/student/${encodeURIComponent(alumnoId)}/active`;
 
   let service: PresupuestoService;
   let httpMock: HttpTestingController;
@@ -22,9 +24,7 @@ describe('PresupuestoService', () => {
 
   beforeEach(() => {
     servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfil']);
-    servicioPerfil.getPerfil.and.returnValue(
-      PerfilMother.crear({ id: 'tutor-1', rol: 'PADRE' }),
-    );
+    servicioPerfil.getPerfil.and.returnValue(PerfilMother.crear({ id: 'tutor-1', rol: 'PADRE' }));
 
     TestBed.configureTestingModule({
       providers: [
@@ -44,7 +44,7 @@ describe('PresupuestoService', () => {
   describe('getPresupuesto', () => {
     it('dado un alumnoId, cuando pido el presupuesto activo, deberia hacer GET /budgets/student/{id}/active y mapear la respuesta', async () => {
       const promesa = service.getPresupuesto('alumno-42');
-      const req = httpMock.expectOne(`${API}/budgets/student/alumno-42/active`);
+      const req = httpMock.expectOne(URL_BUDGET_ACTIVO('alumno-42'));
       expect(req.request.method).toBe('GET');
       req.flush({
         id: 'pres-1',
@@ -73,25 +73,21 @@ describe('PresupuestoService', () => {
 
     it('dado que el back responde 404, cuando pido el presupuesto, deberia resolver con undefined', async () => {
       const promesa = service.getPresupuesto('alumno-x');
-      httpMock
-        .expectOne(`${API}/budgets/student/alumno-x/active`)
-        .flush('not found', { status: 404, statusText: 'Not Found' });
+      httpMock.expectOne(URL_BUDGET_ACTIVO('alumno-x')).flush('not found', { status: 404, statusText: 'Not Found' });
 
       await expectAsync(promesa).toBeResolvedTo(undefined);
     });
 
     it('dado un error 500, cuando pido el presupuesto, deberia rechazar la promesa', async () => {
       const promesa = service.getPresupuesto('alumno-x');
-      httpMock
-        .expectOne(`${API}/budgets/student/alumno-x/active`)
-        .flush('boom', { status: 500, statusText: 'Server Error' });
+      httpMock.expectOne(URL_BUDGET_ACTIVO('alumno-x')).flush('boom', { status: 500, statusText: 'Server Error' });
 
       await expectAsync(promesa).toBeRejected();
     });
 
     it('dado un alumnoId con caracteres especiales, cuando pido el presupuesto, deberia encodearlo en la URL', async () => {
       const promesa = service.getPresupuesto('id con espacio');
-      const req = httpMock.expectOne(`${API}/budgets/student/id%20con%20espacio/active`);
+      const req = httpMock.expectOne(URL_BUDGET_ACTIVO('id con espacio'));
       req.flush(null);
 
       await expectAsync(promesa).toBeResolvedTo(undefined);
@@ -99,7 +95,7 @@ describe('PresupuestoService', () => {
   });
 
   describe('getCategoriasDisponibles', () => {
-    it('dado el back, cuando pido categorias, deberia hacer GET /categories y filtrar las inactivas', async () => {
+    it('dado el back con categorias mixtas, cuando pido categorias, deberia hacer GET /categories y filtrar las inactivas', async () => {
       const promesa = service.getCategoriasDisponibles();
       const req = httpMock.expectOne(`${API}/categories`);
       expect(req.request.method).toBe('GET');
@@ -117,7 +113,7 @@ describe('PresupuestoService', () => {
   });
 
   describe('cargarPrediccion', () => {
-    it('dado un alumnoId y periodo, cuando pido la prediccion, deberia hacer GET a /ia con el periodo y mapear el analisis IA', async () => {
+    it('dado un alumnoId y periodo, cuando pido la prediccion, deberia hacer GET /ia con el periodo y mapear el analisis IA', async () => {
       const promesa = service.cargarPrediccion(ALUMNO_ID_TEST, 'MENSUAL');
       const req = httpMock.expectOne(
         (r) =>
@@ -206,22 +202,19 @@ describe('PresupuestoService', () => {
   });
 
   describe('guardar', () => {
-    it('dado un presupuesto sin id, cuando guardo, deberia hacer POST /budgets con el command mapeado', async () => {
+    it('dado un presupuesto sin id, cuando guardo, deberia hacer POST /budgets con studentId, tutorId, limite, periodo, fechaInicio y las reglas activas', async () => {
       const nuevo = PresupuestoMother.crearVacio();
       nuevo.reglasCategoria = [ReglaCategoriaMother.crear({ porcentajeLimite: 50 })];
 
       const promesa = service.guardar(nuevo);
-      const req = httpMock.expectOne(`${API}/budgets`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({
-        studentId: ALUMNO_ID_TEST,
-        creadorId: 'tutor-1',
-        limitAmount: 4000,
-        period: 'MENSUAL',
-        startDate: '2026-06-01',
-        categoryRules: [{ categoryId: 'cat-bebidas', porcentajeLimite: 50 }],
-      });
-      req.flush({
+      thenSeLlamaPOSTBudgetsCon(
+        ALUMNO_ID_TEST,
+        'tutor-1',
+        4000,
+        'MENSUAL',
+        '2026-06-01',
+        [{ categoryId: 'cat-bebidas', porcentajeLimite: 50 }],
+      ).flush({
         id: 'pres-nuevo',
         alumnoId: ALUMNO_ID_TEST,
         montoLimiteGeneral: 4000,
@@ -277,11 +270,34 @@ describe('PresupuestoService', () => {
     });
 
     it('dado que no hay perfil logueado, cuando guardo, deberia tirar el error de "No hay un usuario logueado"', async () => {
-      servicioPerfil.getPerfil.and.returnValue(null);
+      givenSinPerfilLogueado();
 
       await expectAsync(service.guardar(PresupuestoMother.crear())).toBeRejectedWithError(
         'No hay un usuario logueado para crear el presupuesto.',
       );
     });
   });
+
+  function givenSinPerfilLogueado(): void {
+    servicioPerfil.getPerfil.and.returnValue(null);
+  }
+
+  function thenSeLlamaPOSTBudgetsCon(
+    studentId: string,
+    creadorId: string,
+    limitAmount: number,
+    period: string,
+    startDate: string,
+    categoryRules: { categoryId: string; porcentajeLimite: number }[],
+  ): TestRequest {
+    const req = httpMock.expectOne(`${API}/budgets`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body.studentId).toBe(studentId);
+    expect(req.request.body.creadorId).toBe(creadorId);
+    expect(req.request.body.limitAmount).toBe(limitAmount);
+    expect(req.request.body.period).toBe(period);
+    expect(req.request.body.startDate).toBe(startDate);
+    expect(req.request.body.categoryRules).toEqual(categoryRules);
+    return req;
+  }
 });

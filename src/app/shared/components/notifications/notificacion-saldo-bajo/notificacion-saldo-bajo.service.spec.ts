@@ -9,22 +9,37 @@ describe('NotificacionSaldoBajoService', () => {
     service = TestBed.inject(NotificacionSaldoBajoService);
   });
 
-  it('dado que se inicializa el servicio, debe crearse correctamente', () => {
+  it('dado el TestBed configurado, cuando inyecto el service, deberia crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
-  it('dado que se consulta el estado inicial, debe devolver los valores por defecto', () => {
-    expect(service.state$()).toEqual({ show: false, balance: 0, alumnoId: '' });
+  it('dado el service recien inyectado, cuando consulto el estado, deberia devolver los valores por defecto', () => {
+    thenElEstadoEs(false, 0, '');
   });
 
-  it('dado que se llama a mostrar, debe actualizar el estado con el balance y el alumnoId', () => {
-    service.mostrar(150, 'alumno-123');
-    expect(service.state$()).toEqual({ show: true, balance: 150, alumnoId: 'alumno-123' });
+  it('dado un balance y alumnoId, cuando llamo mostrar, deberia actualizar el estado con esos valores', () => {
+    whenMuestroLaNotificacion(150, 'alumno-123');
+
+    thenElEstadoEs(true, 150, 'alumno-123');
   });
 
-  it('dado que se llama a cerrar, debe ocultar la notificación', () => {
-    service.mostrar(150, 'alumno-123');
+  it('dado el estado mostrado, cuando llamo cerrar, deberia ocultar la notificacion pero preservar balance y alumnoId', () => {
+    whenMuestroLaNotificacion(150, 'alumno-123');
+
+    whenCierroLaNotificacion();
+
+    thenElEstadoEs(false, 150, 'alumno-123');
+  });
+
+  function whenMuestroLaNotificacion(balance: number, alumnoId: string): void {
+    service.mostrar(balance, alumnoId);
+  }
+
+  function whenCierroLaNotificacion(): void {
     service.cerrar();
-    expect(service.state$()).toEqual({ show: false, balance: 150, alumnoId: 'alumno-123' });
-  });
+  }
+
+  function thenElEstadoEs(show: boolean, balance: number, alumnoId: string): void {
+    expect(service.state$()).toEqual({ show, balance, alumnoId });
+  }
 });

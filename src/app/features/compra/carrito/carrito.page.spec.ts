@@ -75,20 +75,106 @@ class GuardarFavoritoModalStub {
   @Output() saveSuccess = new EventEmitter<void>();
 }
 
-interface Perfil {
+interface PerfilTest {
   id: string;
   nombre: string;
   plan?: string;
+}
+
+class PerfilTestMother {
+  static premium(): PerfilTest {
+    return { id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' };
+  }
+  static gratuito(): PerfilTest {
+    return { id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' };
+  }
 }
 
 describe('CarritoPage', () => {
   let fixture: ComponentFixture<CarritoPage>;
   let component: CarritoPage;
   let carritosFavoritosService: jasmine.SpyObj<CarritosFavoritosService>;
-  let perfilSignal: ReturnType<typeof signal<Perfil | null>>;
+  let perfilSignal: ReturnType<typeof signal<PerfilTest | null>>;
 
-  async function setup(perfil: Perfil | null = { id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' }): Promise<void> {
-    perfilSignal = signal<Perfil | null>(perfil);
+  describe('ngOnInit', () => {
+    it('cuando se monta la page, deberia iniciar el presenter y pedir los carritos favoritos', async () => {
+      await givenPageConfigurada();
+
+      whenMonto();
+
+      expect(carritosFavoritosService.getCarritosFavoritos).toHaveBeenCalled();
+      expect(component['cantCarritos']()).toBe(0);
+    });
+
+    it('dado que falla la carga de carritos, cuando se monta, deberia loguear el error sin romper', async () => {
+      spyOn(console, 'error');
+      await givenPageConfigurada();
+      carritosFavoritosService.getCarritosFavoritos.and.returnValue(throwError(() => new Error('boom')));
+
+      whenMonto();
+
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
+
+  describe('esPremium / esPlanGratuito / limiteCarritosAlcanzado', () => {
+    it('dado plan PREMIUM, cuando consulto el plan, esPremium true y sin limite', async () => {
+      await givenPageConfigurada(PerfilTestMother.premium());
+      whenMonto();
+
+      expect(component['esPremium']()).toBeTrue();
+      expect(component['esPlanGratuito']()).toBeFalse();
+      expect(component['limiteCarritosAlcanzado']()).toBeFalse();
+    });
+
+    it('dado plan GRATUITO con 3 carritos, cuando consulto el limite, deberia ser true', async () => {
+      await givenPageConfigurada(PerfilTestMother.gratuito());
+      carritosFavoritosService.getCarritosFavoritos.and.returnValue(
+        of([{}, {}, {}] as unknown as CarritoFavoritoResponse[]),
+      );
+
+      whenMonto();
+
+      expect(component['limiteCarritosAlcanzado']()).toBeTrue();
+    });
+  });
+
+  describe('modal favorito', () => {
+    beforeEach(async () => {
+      await givenPageConfigurada();
+      whenMonto();
+    });
+
+    it('cuando abro el modal, deberia setear items mapeados desde los ItemCarrito y prender la flag', () => {
+      const items = [
+        ItemCarritoMother.crear({ id: 'i-1', cantidad: 2 }),
+        ItemCarritoMother.crear({ id: 'i-2', cantidad: 3 }),
+      ];
+
+      component.abrirModalFavorito('alumno-1', items);
+
+      expect(component.mostrarModalFavorito).toBeTrue();
+      expect(component.favoritoModalAlumnoId).toBe('alumno-1');
+      expect(component.favoritoModalItems.length).toBe(2);
+      expect(component.favoritoModalItems[0].quantity).toBe(2);
+      expect(component.favoritoModalItems[0].productId).toBe(items[0].producto.id);
+    });
+
+    it('cuando cierro el modal, deberia limpiar la flag, alumnoId y items', () => {
+      component.mostrarModalFavorito = true;
+      component.favoritoModalAlumnoId = 'alumno-1';
+      component.favoritoModalItems = [{ productId: 'p1', productName: 'A', price: 1, quantity: 1 }];
+
+      component.cerrarModalFavorito();
+
+      expect(component.mostrarModalFavorito).toBeFalse();
+      expect(component.favoritoModalAlumnoId).toBe('');
+      expect(component.favoritoModalItems).toEqual([]);
+    });
+  });
+
+  async function givenPageConfigurada(perfil: PerfilTest | null = PerfilTestMother.premium()): Promise<void> {
+    perfilSignal = signal<PerfilTest | null>(perfil);
 
     const presenter = {
       init: jasmine.createSpy('init'),
@@ -166,82 +252,7 @@ describe('CarritoPage', () => {
     component = fixture.componentInstance;
   }
 
-  describe('ngOnInit', () => {
-    it('cuando se monta la page, deberia iniciar el presenter y pedir los carritos favoritos', async () => {
-      await setup();
-
-      fixture.detectChanges();
-
-      expect(carritosFavoritosService.getCarritosFavoritos).toHaveBeenCalled();
-      expect(component['cantCarritos']()).toBe(0);
-    });
-
-    it('dado que falla la carga de carritos, cuando se monta, deberia loguear el error sin romper', async () => {
-      spyOn(console, 'error');
-      await setup();
-      carritosFavoritosService.getCarritosFavoritos.and.returnValue(
-        throwError(() => new Error('boom')),
-      );
-
-      fixture.detectChanges();
-
-      expect(console.error).toHaveBeenCalled();
-    });
-  });
-
-  describe('esPremium / esPlanGratuito / limiteCarritosAlcanzado', () => {
-    it('dado plan PREMIUM, esPremium true y sin limite', async () => {
-      await setup({ id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' });
-      fixture.detectChanges();
-
-      expect(component['esPremium']()).toBeTrue();
-      expect(component['esPlanGratuito']()).toBeFalse();
-      expect(component['limiteCarritosAlcanzado']()).toBeFalse();
-    });
-
-    it('dado plan GRATUITO con 3 carritos, limiteCarritosAlcanzado deberia ser true', async () => {
-      await setup({ id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' });
-      carritosFavoritosService.getCarritosFavoritos.and.returnValue(
-        of([{}, {}, {}] as unknown as CarritoFavoritoResponse[]),
-      );
-
-      fixture.detectChanges();
-
-      expect(component['limiteCarritosAlcanzado']()).toBeTrue();
-    });
-  });
-
-  describe('modal favorito', () => {
-    beforeEach(async () => {
-      await setup();
-      fixture.detectChanges();
-    });
-
-    it('cuando abro el modal, deberia setear items mapeados desde los ItemCarrito y prender la flag', () => {
-      const items = [
-        ItemCarritoMother.crear({ id: 'i-1', cantidad: 2 }),
-        ItemCarritoMother.crear({ id: 'i-2', cantidad: 3 }),
-      ];
-
-      component.abrirModalFavorito('alumno-1', items);
-
-      expect(component.mostrarModalFavorito).toBeTrue();
-      expect(component.favoritoModalAlumnoId).toBe('alumno-1');
-      expect(component.favoritoModalItems.length).toBe(2);
-      expect(component.favoritoModalItems[0].quantity).toBe(2);
-      expect(component.favoritoModalItems[0].productId).toBe(items[0].producto.id);
-    });
-
-    it('cuando cierro el modal, deberia limpiar la flag, alumnoId y items', () => {
-      component.mostrarModalFavorito = true;
-      component.favoritoModalAlumnoId = 'alumno-1';
-      component.favoritoModalItems = [{ productId: 'p1', productName: 'A', price: 1, quantity: 1 }];
-
-      component.cerrarModalFavorito();
-
-      expect(component.mostrarModalFavorito).toBeFalse();
-      expect(component.favoritoModalAlumnoId).toBe('');
-      expect(component.favoritoModalItems).toEqual([]);
-    });
-  });
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

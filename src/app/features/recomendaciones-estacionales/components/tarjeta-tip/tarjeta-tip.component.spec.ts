@@ -22,11 +22,8 @@ describe('TarjetaTipComponent', () => {
       expect(queryUno('.tip-card__texto')?.textContent).toContain('Prueba de tip promocional');
     });
 
-    it('dado hasAction en true, cuando renderizo, deberia mostrar un boton clickeable', () => {
-      component.hasAction = true;
-      component.actionText = 'Crear promocion';
-
-      fixture.detectChanges();
+    it('dado hasAction en true, cuando renderizo, deberia mostrar un boton clickeable con el texto de accion', () => {
+      givenAccionConTexto('Crear promocion');
 
       const boton = (fixture.nativeElement as HTMLElement).querySelector('button');
       expect(boton).toBeTruthy();
@@ -36,9 +33,7 @@ describe('TarjetaTipComponent', () => {
 
   describe('eventos', () => {
     it('dado hasAction en true, cuando hago click en el boton de accion, deberia emitir actionClick', () => {
-      component.hasAction = true;
-      component.actionText = 'Crear promocion';
-      fixture.detectChanges();
+      givenAccionConTexto('Crear promocion');
       spyOn(component.actionClick, 'emit');
 
       (queryUno('button') as HTMLButtonElement).click();
@@ -54,6 +49,12 @@ describe('TarjetaTipComponent', () => {
       expect(component.actionClick.emit).toHaveBeenCalled();
     });
   });
+
+  function givenAccionConTexto(texto: string): void {
+    component.hasAction = true;
+    component.actionText = texto;
+    fixture.detectChanges();
+  }
 
   function queryUno(selector: string): Element | null {
     return (fixture.nativeElement as HTMLElement).querySelector(selector);
