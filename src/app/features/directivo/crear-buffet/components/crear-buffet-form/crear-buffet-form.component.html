@@ -1,0 +1,33 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="registro-form">
+  @if (error) {
+    <div class="error-alert">
+      {{ error }}
+    </div>
+  }
+
+  <fieldset>
+    <legend>Datos del Kiosco/Buffet</legend>
+    <div class="form-group">
+      <label for="buffetName">Nombre del Kiosco/Buffet *</label>
+      <input id="buffetName" formControlName="buffetName" type="text" placeholder="Ej. Kiosco Central" />
+      @if (form.get('buffetName')?.touched && form.get('buffetName')?.invalid) {
+        <span class="error-text">Este campo es requerido.</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="expirationDate">Fecha de Vencimiento Habilitación *</label>
+      <input id="expirationDate" formControlName="expirationDate" type="date" />
+      @if (form.get('expirationDate')?.touched && form.get('expirationDate')?.invalid) {
+        <span class="error-text">Este campo es requerido.</span>
+      }
+    </div>
+  </fieldset>
+
+  <div class="actions">
+    <button type="button" class="btn-cancel" (click)="cancelForm.emit()" [disabled]="loading">Cancelar</button>
+    <button type="submit" class="btn-submit" [disabled]="loading">
+      {{ loading ? 'Registrando...' : 'Registrar Kiosco' }}
+    </button>
+  </div>
+</form>

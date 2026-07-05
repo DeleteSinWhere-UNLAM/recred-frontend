@@ -1,0 +1,58 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="registro-form">
+  @if (error) {
+    <div class="error-alert">
+      {{ error }}
+    </div>
+  }
+
+  <fieldset>
+    <legend>Datos del Vendedor Responsable</legend>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">Nombre *</label>
+        <input id="firstName" formControlName="firstName" type="text" />
+      </div>
+      <div class="form-group">
+        <label for="lastName">Apellido *</label>
+        <input id="lastName" formControlName="lastName" type="text" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="username">Nombre de Usuario *</label>
+        <input id="username" formControlName="username" type="text" placeholder="Ej. jperez_kiosco" />
+      </div>
+      <div class="form-group">
+        <label for="email">Correo Electrónico *</label>
+        <input id="email" formControlName="email" type="email" />
+        @if (form.get('email')?.touched && form.get('email')?.hasError('email')) {
+          <span class="error-text">Formato inválido.</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="dni">DNI *</label>
+        <input id="dni" formControlName="dni" type="text" />
+      </div>
+      <div class="form-group">
+        <label for="cuit">CUIT *</label>
+        <input id="cuit" formControlName="cuit" type="text" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Teléfono *</label>
+      <input id="phone" formControlName="phone" type="tel" />
+    </div>
+  </fieldset>
+
+  <div class="actions">
+    <button type="button" class="btn-cancel" (click)="cancelForm.emit()" [disabled]="loading">Cancelar</button>
+    <button type="submit" class="btn-submit" [disabled]="loading">
+      {{ loading ? 'Asignando...' : 'Asignar Vendedor' }}
+    </button>
+  </div>
+</form>

@@ -1,4 +1,67 @@
-<div class="dashboard-card">
-  <h2>Panel Principal</h2>
-  <p>Próximamente: Indicadores y reportes del colegio.</p>
+<div class="dashboard-container">
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state">
+      <p>Cargando panel de administración...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error) {
+    <div class="error-alert">
+      <p>{{ error }}</p>
+    </div>
+  }
+
+  <!-- Data State -->
+  @if (!loading && !error && data) {
+    <header class="school-header">
+      <h2>{{ data.nombre }}</h2>
+      <span class="badge">CUE: {{ data.cue }}</span>
+    </header>
+    <section class="buffets-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0;">Kioscos del Colegio</h3>
+        <button [routerLink]="['/directivo/crear-buffet']" [state]="{ schoolId: data.id }" style="background-color: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 500;">
+          + Nuevo Buffet
+        </button>
+      </div>
+      @if (data.buffets.length === 0) {
+        <div class="empty-state">
+          <p>No hay buffets registrados en este colegio.</p>
+        </div>
+      }
+      @if (data.buffets.length > 0) {
+        <div class="buffets-grid">
+          @for (buffet of data.buffets; track buffet) {
+            <div class="buffet-card">
+              <div class="buffet-header">
+                <h4>{{ buffet.nombre }}</h4>
+                <span class="status-indicator" [class.active]="buffet.activo">
+                  {{ buffet.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+              <div class="vendedor-info">
+                <h5>Vendedor a cargo:</h5>
+                @if (buffet.vendedor) {
+                  <div class="vendedor-details">
+                    <p><strong>Nombre:</strong> {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}</p>
+                    <p><strong>Email:</strong> {{ buffet.vendedor.email }}</p>
+                    <p><strong>CUIT:</strong> {{ buffet.vendedor.cuit }}</p>
+                  </div>
+                } @else {
+                  <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+                    <p class="warning-text">Sin vendedor asignado</p>
+                    <button [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }" style="background-color: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
+                      + Asignar Vendedor
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
 </div>

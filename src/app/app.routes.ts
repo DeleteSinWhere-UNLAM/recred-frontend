@@ -25,8 +25,23 @@ export const routes: Routes = [
   {
     path: 'directivo',
     canActivate: [authChildGuard],
-    loadComponent: () =>
-      import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
+      },
+      {
+        path: 'crear-buffet',
+        loadComponent: () =>
+          import('./features/directivo/crear-buffet/crear-buffet.page').then((m) => m.CrearBuffetPage),
+      },
+      {
+        path: 'asignar-vendedor',
+        loadComponent: () =>
+          import('./features/directivo/asignar-vendedor/asignar-vendedor.page').then((m) => m.AsignarVendedorPage),
+      }
+    ]
   },
   {
     path: '',
