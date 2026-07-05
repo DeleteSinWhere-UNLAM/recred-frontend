@@ -29,8 +29,8 @@
         <p>Aún no tienes alumnos asignados a tu cuenta.</p>
       </div>
     } @else {
-      <div class="grid grid-cols-[480px_1fr] max-lg:grid-cols-1 gap-8 max-sm:gap-6 items-stretch flex-1 min-h-0 max-lg:min-h-max overflow-hidden max-lg:overflow-visible">
-        <div class="flex flex-col gap-6 overflow-y-auto max-lg:overflow-visible pr-2" style="scrollbar-width: none;">
+      <div class="grid grid-cols-[480px_1fr] max-lg:grid-cols-1 gap-8 max-sm:gap-6 items-stretch flex-1 min-h-0 max-lg:min-h-max overflow-hidden max-lg:overflow-visible min-w-0">
+        <div class="flex flex-col gap-6 overflow-y-auto max-lg:overflow-visible pr-2 min-w-0" style="scrollbar-width: none;">
           @for (grupo of grupos(); track grupo.colegio.id) {
             <app-colegio-section
               [colegio]="grupo.colegio"
@@ -39,8 +39,8 @@
             />
           }
         </div>
-        <div class="rounded-[20px] shadow-[var(--shadow-card)] h-full max-lg:h-auto flex flex-col overflow-hidden max-lg:overflow-visible p-2 pr-0 max-sm:min-h-[300px] max-sm:p-1 max-sm:pr-0 bg-[var(--color-superficie)]">
-          <div class="flex-1 overflow-y-auto max-lg:overflow-visible p-4 pl-6 pr-4 max-sm:p-3 max-sm:pl-4 flex flex-col custom-scrollbar">
+        <div class="rounded-[20px] shadow-[var(--shadow-card)] h-full max-lg:h-auto flex flex-col overflow-hidden p-2 max-sm:min-h-[300px] max-sm:p-0 bg-[var(--color-superficie)] min-w-0">
+          <div class="flex-1 overflow-y-auto max-lg:overflow-visible p-4 max-sm:p-2 flex flex-col custom-scrollbar min-w-0">
             <router-outlet></router-outlet>
           </div>
         </div>
