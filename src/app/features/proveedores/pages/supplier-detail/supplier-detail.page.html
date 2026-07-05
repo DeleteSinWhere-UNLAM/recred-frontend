@@ -137,6 +137,10 @@
                     <button class="btn-action btn-action--map" title="Revisar mapeos de productos">
                       Mapeo <i class="fa-solid fa-arrow-right"></i>
                     </button>
+                    } @else {
+                    <span class="btn-action btn-action--mapped" title="Lista ya mapeada">
+                      Mapeado
+                    </span>
                     }
                     <button class="btn-action btn-action--hide" (click)="ocultarTemporalmente(list.id, $event)"
                       title="Ocultar temporalmente">

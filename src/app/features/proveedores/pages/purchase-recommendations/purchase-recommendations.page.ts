@@ -10,6 +10,30 @@ import { NavbarComponent } from '../../../../shared/components/navbar/navbar.com
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { CurrencyPipe } from '@angular/common';
 
+export interface RecommendationOption {
+  proveedorId: string;
+  nombreProveedor: string;
+  precio: number;
+  unidad: string;
+  precioUnitario: number;
+  isRecommended: boolean;
+}
+
+export interface ChosenRecommendation {
+  supplierId: string;
+  supplierName: string;
+  price: number;
+  unit: string;
+  unitPrice: number;
+}
+
+export interface GroupedRecommendation {
+  nombreProducto: string;
+  mejorPrecio: number;
+  unidad: string;
+  mejorPrecioUnitario: number;
+}
+
 @Component({
   selector: 'app-purchase-recommendations',
   standalone: true,
@@ -35,6 +59,14 @@ export class PurchaseRecommendationsPage implements OnInit {
   recommendations = signal<RecomendacionProveedor[]>([]);
   isLoading = signal<boolean>(false);
   isFetchingRecommendations = signal<boolean>(false);
+  mappedProductIds = signal<Set<string>>(new Set<string>());
+  mappedFilter = signal<string>('TODOS');
+
+  chosenRecommendations = signal<Map<string, ChosenRecommendation>>(new Map());
+
+  // Alternatives Modal state
+  isAlternativesModalOpen = signal<boolean>(false);
+  activeAlternativesProductId = signal<string | null>(null);
 
   // Derived categories list
   readonly categories = computed(() => {
@@ -55,6 +87,7 @@ export class PurchaseRecommendationsPage implements OnInit {
     let list = this.products();
     const query = this.searchQuery().toLowerCase().trim();
     const catId = this.selectedCategory();
+    const mappedOnly = this.mappedFilter() === 'MAPEADOS';
 
     if (query) {
       list = list.filter(p =>
@@ -70,18 +103,164 @@ export class PurchaseRecommendationsPage implements OnInit {
       });
     }
 
-    return list;
+    if (mappedOnly) {
+      list = list.filter(p => this.mappedProductIds().has(p.id));
+    }
+
+    return [...list].sort((a, b) => {
+      const aMapped = this.mappedProductIds().has(a.id);
+      const bMapped = this.mappedProductIds().has(b.id);
+      if (aMapped === bMapped) return 0;
+      return aMapped ? -1 : 1;
+    });
   });
 
   // UI Accordion State
   expandedProductAccordions = signal<Set<string>>(new Set<string>());
 
+  hasRecommendation(productId: string): boolean {
+    const rec = this.recommendations().find(r => r.productoInventarioId === productId);
+    return !!(rec && rec.proveedorRecomendadoId);
+  }
+
+  hasNoQuote(productId: string): boolean {
+    const rec = this.recommendations().find(r => r.productoInventarioId === productId);
+    return !!(rec && !rec.proveedorRecomendadoId);
+  }
+
+  getChosenSupplierName(productId: string): string {
+    return this.chosenRecommendations().get(productId)?.supplierName || '';
+  }
+
+  getChosenPrice(productId: string): number {
+    return this.chosenRecommendations().get(productId)?.price || 0;
+  }
+
+  getChosenUnit(productId: string): string {
+    return this.chosenRecommendations().get(productId)?.unit || '';
+  }
+
+  hasChosenEquivalent(productId: string): boolean {
+    const chosen = this.chosenRecommendations().get(productId);
+    return !!(chosen && chosen.unitPrice !== chosen.price);
+  }
+
+  getChosenUnitPrice(productId: string): number {
+    return this.chosenRecommendations().get(productId)?.unitPrice || 0;
+  }
+
+  hasAlternatives(productId: string): boolean {
+    const rec = this.recommendations().find(r => r.productoInventarioId === productId);
+    return !!(rec && rec.alternativas && rec.alternativas.length > 0);
+  }
+
+  // Modal Methods
+  openAlternativesModal(productId: string, event: Event): void {
+    event.stopPropagation();
+    this.activeAlternativesProductId.set(productId);
+    this.isAlternativesModalOpen.set(true);
+  }
+
+  closeAlternativesModal(event?: Event): void {
+    if (event) {
+      const target = event.target as HTMLElement;
+      if (!target.classList.contains('modal-overlay')) {
+        return;
+      }
+    }
+    this.isAlternativesModalOpen.set(false);
+    this.activeAlternativesProductId.set(null);
+  }
+
+  chooseAlternative(productId: string, option: RecommendationOption): void {
+    const chosen = new Map(this.chosenRecommendations());
+    chosen.set(productId, {
+      supplierId: option.proveedorId,
+      supplierName: option.nombreProveedor,
+      price: option.precio,
+      unit: option.unidad,
+      unitPrice: option.precioUnitario
+    });
+    this.chosenRecommendations.set(chosen);
+    this.toastService.mostrar(`Se seleccionó la oferta de ${option.nombreProveedor}`, 'success');
+    this.closeAlternativesModal();
+  }
+
+  getAllOptionsForProduct(productId: string): RecommendationOption[] {
+    const rec = this.recommendations().find(r => r.productoInventarioId === productId);
+    if (!rec) return [];
+
+    const options: RecommendationOption[] = [];
+    if (rec.proveedorRecomendadoId) {
+      options.push({
+        proveedorId: rec.proveedorRecomendadoId,
+        nombreProveedor: rec.nombreProveedorRecomendado,
+        precio: rec.mejorPrecio,
+        unidad: rec.unidad,
+        precioUnitario: rec.mejorPrecioUnitario || rec.mejorPrecio,
+        isRecommended: true
+      });
+    }
+
+    if (rec.alternativas) {
+      rec.alternativas.forEach(alt => {
+        options.push({
+          proveedorId: alt.proveedorId,
+          nombreProveedor: alt.nombreProveedor,
+          precio: alt.precio,
+          unidad: alt.unidad,
+          precioUnitario: alt.precioUnitario || alt.precio,
+          isRecommended: false
+        });
+      });
+    }
+
+    return options;
+  }
+
+  isCurrentChosenOption(productId: string, option: RecommendationOption): boolean {
+    const chosen = this.chosenRecommendations().get(productId);
+    return !!(chosen && chosen.supplierId === option.proveedorId && chosen.price === option.precio && chosen.unit === option.unidad);
+  }
+
+  getActiveProductName(): string {
+    const id = this.activeAlternativesProductId();
+    if (!id) return '';
+    return this.products().find(p => p.id === id)?.nombre || '';
+  }
+
   ngOnInit(): void {
-    this.loadProducts();
+    this.loadSuppliersAndProducts();
+  }
+
+  loadSuppliersAndProducts(): void {
+    this.isLoading.set(true);
+    this.supplierService.getSuppliers().subscribe({
+      next: (suppliers) => {
+        const mapped = new Set<string>();
+        suppliers.forEach(s => {
+          s.listasPrecios?.forEach(lp => {
+            if (lp.activa && lp.items) {
+              lp.items.forEach(item => {
+                if (item.mappingConfirmado && item.productoInventarioId) {
+                  mapped.add(item.productoInventarioId);
+                }
+              });
+            }
+          });
+        });
+        this.mappedProductIds.set(mapped);
+        this.loadProducts();
+      },
+      error: (err) => {
+        console.error('Error loading suppliers mapping info', err);
+        this.toastService.mostrar('Error al cargar información de mapeos', 'error');
+        this.loadProducts();
+      }
+    });
   }
 
   loadProducts(): void {
-    this.isLoading.set(true);
     this.productService.getAll().subscribe({
       next: (data) => {
         this.products.set(data);
@@ -103,7 +282,7 @@ export class PurchaseRecommendationsPage implements OnInit {
   }
 
   autoSelectLowStock(): void {
-    const lowStock = this.products().filter(p => this.isLowStock(p));
+    const lowStock = this.products().filter(p => this.isLowStock(p) && this.isProductMapped(p.id));
     if (lowStock.length > 0) {
       const selected = new Set<string>();
       lowStock.forEach(p => selected.add(p.id));
@@ -114,6 +293,10 @@ export class PurchaseRecommendationsPage implements OnInit {
 
   isLowStock(product: Producto): boolean {
     return product.stockActual <= 5;
+  }
+
+  isProductMapped(productId: string): boolean {
+    return this.mappedProductIds().has(productId);
   }
 
   toggleProductSelection(productId: string): void {
@@ -133,7 +316,7 @@ export class PurchaseRecommendationsPage implements OnInit {
   selectAllLowStock(): void {
     const selected = new Set(this.selectedProductIds());
     this.filteredProducts().forEach(p => {
-      if (this.isLowStock(p)) {
+      if (this.isLowStock(p) && this.isProductMapped(p.id)) {
         selected.add(p.id);
       }
     });
@@ -143,7 +326,11 @@ export class PurchaseRecommendationsPage implements OnInit {
 
   selectAll(): void {
     const selected = new Set(this.selectedProductIds());
-    this.filteredProducts().forEach(p => selected.add(p.id));
+    this.filteredProducts().forEach(p => {
+      if (this.isProductMapped(p.id)) {
+        selected.add(p.id);
+      }
+    });
     this.selectedProductIds.set(selected);
   }
 
@@ -170,6 +357,22 @@ export class PurchaseRecommendationsPage implements OnInit {
           return aHas ? -1 : 1;
         });
         this.recommendations.set(sorted);
+
+        // Initialize chosen recommendations with backend suggestions
+        const chosenMap = new Map<string, ChosenRecommendation>();
+        results.forEach(rec => {
+          if (rec.proveedorRecomendadoId) {
+            chosenMap.set(rec.productoInventarioId, {
+              supplierId: rec.proveedorRecomendadoId,
+              supplierName: rec.nombreProveedorRecomendado,
+              price: rec.mejorPrecio,
+              unit: rec.unidad,
+              unitPrice: rec.mejorPrecioUnitario || rec.mejorPrecio
+            });
+          }
+        });
+        this.chosenRecommendations.set(chosenMap);
+
         this.isFetchingRecommendations.set(false);
         this.expandedProductAccordions.set(new Set<string>()); // Reset accordions
         this.toastService.mostrar('Comparación finalizada con éxito', 'success');
@@ -186,18 +389,22 @@ export class PurchaseRecommendationsPage implements OnInit {
     const list = this.recommendations();
     if (list.length === 0) return;
 
+    const chosen = this.chosenRecommendations();
     let csvContent = '\uFEFF'; // BOM to support Excel Spanish characters
     csvContent += 'Producto;Proveedor Recomendado;Precio de Compra;Unidad;Precio Unitario\n';
 
     list.forEach((rec) => {
-      const bestPrice = rec.mejorPrecio || 0;
-      const unitPrice = rec.mejorPrecioUnitario || bestPrice;
-      const hasQuote = !!rec.proveedorRecomendadoId;
+      const chosenOpt = chosen.get(rec.productoInventarioId);
+      const hasQuote = !!chosenOpt;
+      const bestPrice = hasQuote ? chosenOpt.price : 0;
+      const unitPrice = hasQuote ? chosenOpt.unitPrice : 0;
+      const supplierName = hasQuote ? chosenOpt.supplierName : 'Sin cotización';
+      const unitStr = hasQuote ? chosenOpt.unit : '';
 
       csvContent += `"${rec.nombreProducto.replace(/"/g, '""')}";` +
-        `"${hasQuote ? rec.nombreProveedorRecomendado.replace(/"/g, '""') : 'Sin cotización'}";` +
+        `"${supplierName.replace(/"/g, '""')}";` +
         `"${hasQuote ? bestPrice : ''}";` +
-        `"${rec.unidad || ''}";` +
+        `"${unitStr}";` +
         `"${hasQuote ? unitPrice : ''}"\n`;
     });
 
@@ -217,6 +424,30 @@ export class PurchaseRecommendationsPage implements OnInit {
       return;
     }
 
+    const chosen = this.chosenRecommendations();
+
+    // Group chosen recommendations by supplier name
+    const grouped = new Map<string, GroupedRecommendation[]>();
+    const noQuote: RecomendacionProveedor[] = [];
+
+    list.forEach(rec => {
+      const chosenOpt = chosen.get(rec.productoInventarioId);
+      if (chosenOpt) {
+        const supplierName = chosenOpt.supplierName || 'Proveedor Desconocido';
+        if (!grouped.has(supplierName)) {
+          grouped.set(supplierName, []);
+        }
+        grouped.get(supplierName)!.push({
+          nombreProducto: rec.nombreProducto,
+          mejorPrecio: chosenOpt.price,
+          unidad: chosenOpt.unit,
+          mejorPrecioUnitario: chosenOpt.unitPrice
+        });
+      } else {
+        noQuote.push(rec);
+      }
+    });
+
     const dateStr = new Date().toLocaleDateString('es-AR');
     let html = `
       <html>
@@ -226,7 +457,9 @@ export class PurchaseRecommendationsPage implements OnInit {
           body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 40px; color: #334155; line-height: 1.5; }
           h1 { color: #4A6FA5; margin-bottom: 5px; font-size: 24px; }
           p { margin-top: 0; color: #64748B; font-size: 14px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+          .supplier-section { margin-top: 35px; page-break-inside: avoid; }
+          .supplier-title { color: #2C3E50; border-bottom: 2px solid #BDC3C7; padding-bottom: 6px; margin-bottom: 12px; font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; }
           th, td { border: 1px solid #E2E8F0; padding: 12px 15px; text-align: left; font-size: 14px; }
           th { background-color: #F8FAFC; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
           tr:nth-child(even) { background-color: #F8FAFC; }
@@ -243,42 +476,80 @@ export class PurchaseRecommendationsPage implements OnInit {
       <body>
         <h1>Reporte de Compras Recomendadas</h1>
         <p>Generado el: ${dateStr}</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Proveedor Recomendado</th>
-              <th class="text-right">Precio de Compra</th>
-              <th>Unidad</th>
-              <th class="text-right">Precio Unitario</th>
-            </tr>
-          </thead>
-          <tbody>
     `;
 
-    list.forEach(rec => {
-      const hasQuote = !!rec.proveedorRecomendadoId;
-      const formattedPrice = hasQuote ? `$${rec.mejorPrecio.toFixed(2)}` : '-';
-      const formattedUnitPrice = hasQuote ? `$${(rec.mejorPrecioUnitario || rec.mejorPrecio).toFixed(2)}` : '-';
+    // Render grouped tables
+    grouped.forEach((items, supplierName) => {
+      html += `
+        <div class="supplier-section">
+          <h2 class="supplier-title">Proveedor: ${supplierName}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="text-right">Precio de Compra</th>
+                <th>Unidad</th>
+                <th class="text-right">Precio Unitario</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      items.forEach(item => {
+        const formattedPrice = `$${item.mejorPrecio.toFixed(2)}`;
+        const formattedUnitPrice = `$${item.mejorPrecioUnitario.toFixed(2)}`;
+
+        html += `
+          <tr>
+            <td><strong>${item.nombreProducto}</strong></td>
+            <td class="text-right price">${formattedPrice}</td>
+            <td>${item.unidad || 'unidad'}</td>
+            <td class="text-right price">${formattedUnitPrice}</td>
+          </tr>
+        `;
+      });
 
       html += `
-        <tr>
-          <td><strong>${rec.nombreProducto}</strong></td>
-          <td>
-            <span class="badge ${hasQuote ? 'badge-success' : 'badge-warning'}">
-              ${hasQuote ? rec.nombreProveedorRecomendado : 'Sin cotización'}
-            </span>
-          </td>
-          <td class="text-right price">${formattedPrice}</td>
-          <td>${rec.unidad || 'unidad'}</td>
-          <td class="text-right price">${formattedUnitPrice}</td>
-        </tr>
+            </tbody>
+          </table>
+        </div>
       `;
     });
 
+    // Render unquoted items if any
+    if (noQuote.length > 0) {
+      html += `
+        <div class="supplier-section">
+          <h2 class="supplier-title">Sin Cotización</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      noQuote.forEach(rec => {
+        html += `
+          <tr>
+            <td><strong>${rec.nombreProducto}</strong></td>
+            <td>
+              <span class="badge badge-warning">Sin cotización</span>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
     html += `
-          </tbody>
-        </table>
         <script>
           window.onload = function() {
             window.print();
