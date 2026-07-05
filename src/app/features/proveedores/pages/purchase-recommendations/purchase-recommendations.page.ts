@@ -263,6 +263,22 @@ export class PurchaseRecommendationsPage implements OnInit {
       return;
     }
 
+    // Group recommendations by supplier name
+    const grouped = new Map<string, RecomendacionProveedor[]>();
+    const noQuote: RecomendacionProveedor[] = [];
+
+    list.forEach(rec => {
+      if (rec.proveedorRecomendadoId) {
+        const supplierName = rec.nombreProveedorRecomendado || 'Proveedor Desconocido';
+        if (!grouped.has(supplierName)) {
+          grouped.set(supplierName, []);
+        }
+        grouped.get(supplierName)!.push(rec);
+      } else {
+        noQuote.push(rec);
+      }
+    });
+
     const dateStr = new Date().toLocaleDateString('es-AR');
     let html = `
       <html>
@@ -272,7 +288,9 @@ export class PurchaseRecommendationsPage implements OnInit {
           body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 40px; color: #334155; line-height: 1.5; }
           h1 { color: #4A6FA5; margin-bottom: 5px; font-size: 24px; }
           p { margin-top: 0; color: #64748B; font-size: 14px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+          .supplier-section { margin-top: 35px; page-break-inside: avoid; }
+          .supplier-title { color: #2C3E50; border-bottom: 2px solid #BDC3C7; padding-bottom: 6px; margin-bottom: 12px; font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; }
           th, td { border: 1px solid #E2E8F0; padding: 12px 15px; text-align: left; font-size: 14px; }
           th { background-color: #F8FAFC; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
           tr:nth-child(even) { background-color: #F8FAFC; }
@@ -289,42 +307,80 @@ export class PurchaseRecommendationsPage implements OnInit {
       <body>
         <h1>Reporte de Compras Recomendadas</h1>
         <p>Generado el: ${dateStr}</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Proveedor Recomendado</th>
-              <th class="text-right">Precio de Compra</th>
-              <th>Unidad</th>
-              <th class="text-right">Precio Unitario</th>
-            </tr>
-          </thead>
-          <tbody>
     `;
 
-    list.forEach(rec => {
-      const hasQuote = !!rec.proveedorRecomendadoId;
-      const formattedPrice = hasQuote ? `$${rec.mejorPrecio.toFixed(2)}` : '-';
-      const formattedUnitPrice = hasQuote ? `$${(rec.mejorPrecioUnitario || rec.mejorPrecio).toFixed(2)}` : '-';
+    // Render grouped tables
+    grouped.forEach((items, supplierName) => {
+      html += `
+        <div class="supplier-section">
+          <h2 class="supplier-title">Proveedor: ${supplierName}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="text-right">Precio de Compra</th>
+                <th>Unidad</th>
+                <th class="text-right">Precio Unitario</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      items.forEach(rec => {
+        const formattedPrice = `$${rec.mejorPrecio.toFixed(2)}`;
+        const formattedUnitPrice = `$${(rec.mejorPrecioUnitario || rec.mejorPrecio).toFixed(2)}`;
+
+        html += `
+          <tr>
+            <td><strong>${rec.nombreProducto}</strong></td>
+            <td class="text-right price">${formattedPrice}</td>
+            <td>${rec.unidad || 'unidad'}</td>
+            <td class="text-right price">${formattedUnitPrice}</td>
+          </tr>
+        `;
+      });
 
       html += `
-        <tr>
-          <td><strong>${rec.nombreProducto}</strong></td>
-          <td>
-            <span class="badge ${hasQuote ? 'badge-success' : 'badge-warning'}">
-              ${hasQuote ? rec.nombreProveedorRecomendado : 'Sin cotización'}
-            </span>
-          </td>
-          <td class="text-right price">${formattedPrice}</td>
-          <td>${rec.unidad || 'unidad'}</td>
-          <td class="text-right price">${formattedUnitPrice}</td>
-        </tr>
+            </tbody>
+          </table>
+        </div>
       `;
     });
 
+    // Render unquoted items if any
+    if (noQuote.length > 0) {
+      html += `
+        <div class="supplier-section">
+          <h2 class="supplier-title">Sin Cotización</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      noQuote.forEach(rec => {
+        html += `
+          <tr>
+            <td><strong>${rec.nombreProducto}</strong></td>
+            <td>
+              <span class="badge badge-warning">Sin cotización</span>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
     html += `
-          </tbody>
-        </table>
         <script>
           window.onload = function() {
             window.print();
