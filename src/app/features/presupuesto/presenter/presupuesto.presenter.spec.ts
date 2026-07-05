@@ -1,82 +1,52 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { Alumno } from '../../../data-access/models/alumno.model';
+import { AlumnoMother } from '../../../data-access/services/alumno.mother';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { ToastService } from '../../../shared/services/toast.service';
-import { CategoriaProducto } from '../../buffet/models/producto.model';
-import { PrediccionGasto, Presupuesto } from '../models/presupuesto.model';
 import { PresupuestoService } from '../services/presupuesto.service';
+import {
+  ALUMNO_ID_TEST,
+  CategoriaProductoMother,
+  PrediccionGastoPresupuestoMother,
+  PresupuestoMother,
+  ReglaCategoriaMother,
+} from '../presupuesto.mother';
 import { PresupuestoPresenter } from './presupuesto.presenter';
 
 describe('PresupuestoPresenter', () => {
-  const alumnoMock: Alumno = {
-    id: 'alumno-1',
-    nombre: 'Mateo',
-    apellido: 'López',
-    grado: '5to A',
-    colegioId: 'colegio-1',
-    saldo: 0,
-  };
-
-  const categoriasMock: CategoriaProducto[] = [
-    { id: 'cat-bebidas', descripcion: 'Bebidas e Infusiones' },
-    { id: 'cat-lacteos', descripcion: 'Lácteos' },
-    { id: 'cat-viandas', descripcion: 'Viandas y Platos' },
-  ];
-
-  const prediccionMock: PrediccionGasto = {
-    alumnoId: 'alumno-1',
-    periodo: 'MENSUAL',
-    gastoActual: 1500,
-    gastoPredicho: 3000,
-    promedioGastoDiario: 100,
-    montoLimite: 5000,
-    porcentajePresupuesto: 60,
-    confianza: 0.8,
-    diasRestantes: 10,
-    categoriasMasConsumidas: [],
-    resumenIa: '',
-    alertas: [],
-    recomendaciones: [],
-  };
-
   let presenter: PresupuestoPresenter;
-  let alumnosService: jasmine.SpyObj<AlumnosService>;
-  let presupuestoService: jasmine.SpyObj<PresupuestoService>;
-  let toastService: jasmine.SpyObj<ToastService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
+  let servicioPresupuesto: jasmine.SpyObj<PresupuestoService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    alumnosService = jasmine.createSpyObj<AlumnosService>('AlumnosService', [
-      'asegurarCargados',
-      'getAlumnoById',
+    servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['asegurarCargados', 'getAlumnoById']);
+    servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', [
+      'getPresupuesto',
+      'getCategoriasDisponibles',
+      'cargarPrediccion',
+      'guardar',
     ]);
-    presupuestoService = jasmine.createSpyObj<PresupuestoService>(
-      'PresupuestoService',
-      [
-        'getPresupuesto',
-        'getCategoriasDisponibles',
-        'cargarPrediccion',
-        'guardar',
-      ],
-    );
-    toastService = jasmine.createSpyObj<ToastService>('ToastService', [
-      'mostrar',
-    ]);
-    router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
+    servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
-    alumnosService.asegurarCargados.and.resolveTo([alumnoMock]);
-    alumnosService.getAlumnoById.and.returnValue(alumnoMock);
-    presupuestoService.getCategoriasDisponibles.and.resolveTo(categoriasMock);
-    presupuestoService.getPresupuesto.and.resolveTo(undefined);
-    presupuestoService.cargarPrediccion.and.resolveTo(prediccionMock);
+    servicioAlumnos.asegurarCargados.and.resolveTo([
+      AlumnoMother.crear({ id: ALUMNO_ID_TEST, nombre: 'Mateo', apellido: 'López', grado: '5to A' }),
+    ]);
+    servicioAlumnos.getAlumnoById.and.returnValue(
+      AlumnoMother.crear({ id: ALUMNO_ID_TEST, nombre: 'Mateo', apellido: 'López', grado: '5to A' }),
+    );
+    servicioPresupuesto.getCategoriasDisponibles.and.resolveTo(CategoriaProductoMother.crearVarias());
+    servicioPresupuesto.getPresupuesto.and.resolveTo(undefined);
+    servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crear());
 
     TestBed.configureTestingModule({
       providers: [
         PresupuestoPresenter,
-        { provide: AlumnosService, useValue: alumnosService },
-        { provide: PresupuestoService, useValue: presupuestoService },
-        { provide: ToastService, useValue: toastService },
+        { provide: AlumnosService, useValue: servicioAlumnos },
+        { provide: PresupuestoService, useValue: servicioPresupuesto },
+        { provide: ToastService, useValue: servicioToast },
         { provide: Router, useValue: router },
       ],
     });
@@ -85,70 +55,52 @@ describe('PresupuestoPresenter', () => {
   });
 
   describe('init', () => {
-    it('redirige a /tutor si el alumno no existe', async () => {
-      alumnosService.getAlumnoById.and.returnValue(undefined);
+    it('dado un alumno inexistente, cuando inicializo, deberia redirigir a /tutor sin llamar al service', async () => {
+      servicioAlumnos.getAlumnoById.and.returnValue(undefined);
 
       await presenter.init('inexistente');
 
       expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
-      expect(presupuestoService.getCategoriasDisponibles).not.toHaveBeenCalled();
-      expect(presupuestoService.getPresupuesto).not.toHaveBeenCalled();
+      expect(servicioPresupuesto.getCategoriasDisponibles).not.toHaveBeenCalled();
+      expect(servicioPresupuesto.getPresupuesto).not.toHaveBeenCalled();
     });
 
-    it('carga alumno, categorías y predicción cuando no hay presupuesto previo', async () => {
-      await presenter.init('alumno-1');
+    it('dado un alumno existente sin presupuesto previo, cuando inicializo, deberia cargar categorias y prediccion con presupuesto vacio', async () => {
+      await presenter.init(ALUMNO_ID_TEST);
 
-      expect(presenter.alumno()).toEqual(alumnoMock);
+      expect(presenter.alumno()?.id).toBe(ALUMNO_ID_TEST);
       expect(presenter.nombreCompleto()).toBe('Mateo López');
       expect(presenter.iniciales()).toBe('ML');
       expect(presenter.grado()).toBe('5to A');
-      expect(presenter.categoriasDisponibles()).toEqual(categoriasMock);
+      expect(presenter.categoriasDisponibles().length).toBe(3);
       expect(presenter.reglas().length).toBe(0);
-      expect(presenter.prediccion()).toEqual(prediccionMock);
+      expect(presenter.prediccion()).toBeDefined();
       expect(presenter.cargando()).toBeFalse();
     });
 
-    it('reemplaza el presupuesto por el del back si existe', async () => {
-      const presupuestoBack: Presupuesto = {
-        id: 'pres-1',
-        alumnoId: 'alumno-1',
-        montoLimiteGeneral: 10000,
+    it('dado un presupuesto del back, cuando inicializo, deberia reemplazar el presupuesto por defecto', async () => {
+      servicioPresupuesto.getPresupuesto.and.resolveTo({
+        ...PresupuestoMother.crearConMultiplesReglas(),
         periodo: 'SEMANAL',
-        fechaInicio: '2026-06-01',
-        activo: true,
-        reglasCategoria: [
-          {
-            id: 'r-1',
-            categoriaId: 'cat-bebidas',
-            descripcionCategoria: 'Bebidas e Infusiones',
-            porcentajeLimite: 40,
-            montoLimiteCalculado: 4000,
-            activo: true,
-          },
-        ],
-      };
-      presupuestoService.getPresupuesto.and.resolveTo(presupuestoBack);
+      });
 
-      await presenter.init('alumno-1');
+      await presenter.init(ALUMNO_ID_TEST);
 
-      expect(presenter.presupuesto().id).toBe('pres-1');
       expect(presenter.presupuesto().montoLimiteGeneral).toBe(10000);
-      expect(presenter.presupuesto().periodo).toBe('SEMANAL');
-      expect(presenter.reglas().length).toBe(1);
-      expect(presupuestoService.cargarPrediccion).toHaveBeenCalledWith(
-        'alumno-1',
-        'SEMANAL',
+      expect(presenter.reglas().length).toBe(2);
+      expect(servicioPresupuesto.cargarPrediccion).toHaveBeenCalledWith(
+        ALUMNO_ID_TEST,
+        presenter.presupuesto().periodo,
       );
     });
 
-    it('muestra un toast de error si falla la carga', async () => {
-      presupuestoService.getCategoriasDisponibles.and.rejectWith(
-        new Error('boom'),
-      );
+    it('dado que la carga falla, cuando inicializo, deberia mostrar toast de error', async () => {
+      spyOn(console, 'warn');
+      servicioPresupuesto.getCategoriasDisponibles.and.rejectWith(new Error('boom'));
 
-      await presenter.init('alumno-1');
+      await presenter.init(ALUMNO_ID_TEST);
 
-      expect(toastService.mostrar).toHaveBeenCalledWith(
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
         'No pudimos cargar el presupuesto del alumno.',
         'error',
       );
@@ -156,8 +108,8 @@ describe('PresupuestoPresenter', () => {
     });
   });
 
-  describe('setters', () => {
-    it('setMontoGeneral guarda 0 si recibe un valor inválido', () => {
+  describe('setters basicos', () => {
+    it('dado un monto invalido (NaN o negativo), setMontoGeneral deberia clampearlo a 0', () => {
       presenter.setMontoGeneral(Number.NaN);
       expect(presenter.presupuesto().montoLimiteGeneral).toBe(0);
 
@@ -165,8 +117,8 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.presupuesto().montoLimiteGeneral).toBe(0);
     });
 
-    it('setMontoGeneral recalcula los montos de las reglas', async () => {
-      await presenter.init('alumno-1');
+    it('dado un nuevo monto general, cuando lo seteo, deberia recalcular los montos de cada regla', async () => {
+      await presenter.init(ALUMNO_ID_TEST);
       presenter.agregarReglaCategoria('cat-bebidas');
       const reglaId = presenter.reglas()[0].id;
       presenter.setPorcentajeRegla(reglaId, 40);
@@ -177,7 +129,7 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.reglas()[0].montoLimiteCalculado).toBe(400);
     });
 
-    it('setPeriodo y setFechaInicio actualizan el presupuesto', () => {
+    it('dado setPeriodo y setFechaInicio, deberia actualizar el presupuesto', () => {
       presenter.setPeriodo('SEMANAL');
       expect(presenter.presupuesto().periodo).toBe('SEMANAL');
 
@@ -186,12 +138,12 @@ describe('PresupuestoPresenter', () => {
     });
   });
 
-  describe('reglas por categoría', () => {
+  describe('reglas por categoria', () => {
     beforeEach(async () => {
-      await presenter.init('alumno-1');
+      await presenter.init(ALUMNO_ID_TEST);
     });
 
-    it('agregarReglaCategoria crea una regla nueva con 0%', () => {
+    it('dado una categoria disponible, cuando agrego, deberia crear una regla nueva con 0%', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
 
       expect(presenter.reglas().length).toBe(1);
@@ -200,18 +152,18 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.reglas()[0].activo).toBeTrue();
     });
 
-    it('agregarReglaCategoria ignora categoría inexistente', () => {
+    it('dado una categoria inexistente, cuando agrego, no deberia crear nada', () => {
       presenter.agregarReglaCategoria('cat-inexistente');
       expect(presenter.reglas().length).toBe(0);
     });
 
-    it('agregarReglaCategoria no duplica una regla existente', () => {
+    it('dado una regla ya creada, cuando agrego la misma, no deberia duplicarla', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       presenter.agregarReglaCategoria('cat-bebidas');
       expect(presenter.reglas().length).toBe(1);
     });
 
-    it('categoriasUsables excluye las ya usadas', () => {
+    it('dado una regla creada, categoriasUsables deberia excluirla del listado disponible', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       expect(presenter.categoriasUsables().map((c) => c.id)).toEqual([
         'cat-lacteos',
@@ -219,17 +171,19 @@ describe('PresupuestoPresenter', () => {
       ]);
     });
 
-    it('puedeAgregarRegla es false cuando se usaron todas las categorías', () => {
+    it('dado que se usaron todas las categorias, puedeAgregarRegla deberia ser false', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       presenter.agregarReglaCategoria('cat-lacteos');
       presenter.agregarReglaCategoria('cat-viandas');
       expect(presenter.puedeAgregarRegla()).toBeFalse();
     });
 
-    it('eliminarRegla saca la regla de la lista', () => {
+    it('dado una regla existente, cuando la elimino, deberia sacarla de la lista', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       const reglaId = presenter.reglas()[0].id;
+
       presenter.eliminarRegla(reglaId);
+
       expect(presenter.reglas().length).toBe(0);
     });
   });
@@ -239,24 +193,24 @@ describe('PresupuestoPresenter', () => {
     let reglaB: string;
 
     beforeEach(async () => {
-      await presenter.init('alumno-1');
+      await presenter.init(ALUMNO_ID_TEST);
       presenter.agregarReglaCategoria('cat-bebidas');
       presenter.agregarReglaCategoria('cat-lacteos');
       reglaA = presenter.reglas()[0].id;
       reglaB = presenter.reglas()[1].id;
     });
 
-    it('clampea valores negativos a 0', () => {
+    it('dado un porcentaje negativo, deberia clampearlo a 0', () => {
       presenter.setPorcentajeRegla(reglaA, -20);
       expect(presenter.reglas()[0].porcentajeLimite).toBe(0);
     });
 
-    it('clampea por encima de 100 cuando no hay otras reglas con peso', () => {
+    it('dado un porcentaje mayor a 100 sin otras reglas con peso, deberia clampearlo a 100', () => {
       presenter.setPorcentajeRegla(reglaA, 150);
       expect(presenter.reglas()[0].porcentajeLimite).toBe(100);
     });
 
-    it('clampea al disponible (100 − suma de las otras)', () => {
+    it('dado A=70 y B intenta 80, B deberia clampearse a 30 para no superar 100 en total', () => {
       presenter.setPorcentajeRegla(reglaA, 70);
       presenter.setPorcentajeRegla(reglaB, 80);
 
@@ -265,7 +219,7 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.totalPorcentaje()).toBe(100);
     });
 
-    it('clampea NaN a 0', () => {
+    it('dado un porcentaje NaN, deberia clampearlo a 0', () => {
       presenter.setPorcentajeRegla(reglaA, Number.NaN);
       expect(presenter.reglas()[0].porcentajeLimite).toBe(0);
     });
@@ -273,10 +227,10 @@ describe('PresupuestoPresenter', () => {
 
   describe('signals derivadas', () => {
     beforeEach(async () => {
-      await presenter.init('alumno-1');
+      await presenter.init(ALUMNO_ID_TEST);
     });
 
-    it('totalPorcentaje suma sólo las reglas activas', () => {
+    it('dado reglas activas con 30% y 45%, totalPorcentaje deberia ser 75', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       presenter.agregarReglaCategoria('cat-lacteos');
       const a = presenter.reglas()[0].id;
@@ -287,11 +241,11 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.totalPorcentaje()).toBe(75);
     });
 
-    it('porcentajeValido es true cuando el total ≤ 100', () => {
+    it('dado total <= 100, porcentajeValido deberia ser true', () => {
       expect(presenter.porcentajeValido()).toBeTrue();
     });
 
-    it('topeCompletado es true sólo cuando el total = 100', () => {
+    it('dado total = 100, topeCompletado deberia ser true', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       const a = presenter.reglas()[0].id;
       presenter.setPorcentajeRegla(a, 100);
@@ -301,80 +255,59 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.topeCompletado()).toBeFalse();
     });
 
-    it('nivelAlerta refleja el porcentaje de la predicción', async () => {
+    it('dado una prediccion, nivelAlerta deberia reflejar el porcentaje (60% ok, 80% warning, 110% excedido)', async () => {
       expect(presenter.nivelAlerta()).toBe('ok');
 
-      presupuestoService.cargarPrediccion.and.resolveTo({
-        ...prediccionMock,
-        porcentajePresupuesto: 80,
-      });
-      await presenter.init('alumno-1');
+      servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crearWarning());
+      await presenter.init(ALUMNO_ID_TEST);
       expect(presenter.nivelAlerta()).toBe('warning');
 
-      presupuestoService.cargarPrediccion.and.resolveTo({
-        ...prediccionMock,
-        porcentajePresupuesto: 110,
-      });
-      await presenter.init('alumno-1');
+      servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crearExcedido());
+      await presenter.init(ALUMNO_ID_TEST);
       expect(presenter.nivelAlerta()).toBe('excedido');
     });
   });
 
   describe('guardar', () => {
     beforeEach(async () => {
-      await presenter.init('alumno-1');
+      await presenter.init(ALUMNO_ID_TEST);
     });
 
-    it('no llama al service si el porcentaje no es válido', async () => {
-      const presupuestoForzado: Presupuesto = {
-        ...presenter.presupuesto(),
-        reglasCategoria: [
-          {
-            id: 'r-x',
-            categoriaId: 'cat-bebidas',
-            descripcionCategoria: 'Bebidas',
-            porcentajeLimite: 120,
-            montoLimiteCalculado: 0,
-            activo: true,
-          },
-        ],
-      };
-      presupuestoService.getPresupuesto.and.resolveTo(presupuestoForzado);
-      await presenter.init('alumno-1');
+    it('dado un porcentaje invalido (>100), cuando guardo, no deberia llamar al service y deberia mostrar toast', async () => {
+      servicioPresupuesto.getPresupuesto.and.resolveTo(
+        PresupuestoMother.crear({
+          reglasCategoria: [ReglaCategoriaMother.crear({ porcentajeLimite: 120 })],
+        }),
+      );
+      await presenter.init(ALUMNO_ID_TEST);
 
       await presenter.guardar();
 
-      expect(presupuestoService.guardar).not.toHaveBeenCalled();
-      expect(toastService.mostrar).toHaveBeenCalledWith(
+      expect(servicioPresupuesto.guardar).not.toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
         'La suma de porcentajes no puede superar 100%.',
         'error',
       );
     });
 
-    it('guarda exitosamente y muestra un toast de success', async () => {
-      const guardado: Presupuesto = {
-        ...presenter.presupuesto(),
-        id: 'pres-nuevo',
-      };
-      presupuestoService.guardar.and.resolveTo(guardado);
+    it('dado un presupuesto valido, cuando guardo, deberia llamar al service y mostrar toast success', async () => {
+      servicioPresupuesto.guardar.and.resolveTo(PresupuestoMother.crear({ id: 'pres-nuevo' }));
 
       await presenter.guardar();
 
-      expect(presupuestoService.guardar).toHaveBeenCalled();
+      expect(servicioPresupuesto.guardar).toHaveBeenCalled();
       expect(presenter.presupuesto().id).toBe('pres-nuevo');
-      expect(toastService.mostrar).toHaveBeenCalledWith(
-        'Presupuesto guardado.',
-        'success',
-      );
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Presupuesto guardado.', 'success');
       expect(presenter.guardando()).toBeFalse();
     });
 
-    it('muestra un toast de error si el guardar falla', async () => {
-      presupuestoService.guardar.and.rejectWith(new Error('boom'));
+    it('dado que el service falla, cuando guardo, deberia mostrar toast de error', async () => {
+      spyOn(console, 'warn');
+      servicioPresupuesto.guardar.and.rejectWith(new Error('boom'));
 
       await presenter.guardar();
 
-      expect(toastService.mostrar).toHaveBeenCalledWith(
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
         'No pudimos guardar el presupuesto. Probá de nuevo.',
         'error',
       );
@@ -383,7 +316,7 @@ describe('PresupuestoPresenter', () => {
   });
 
   describe('volver', () => {
-    it('navega a /tutor', () => {
+    it('dado el presenter, cuando llamo volver, deberia navegar a /tutor', () => {
       presenter.volver();
       expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
     });

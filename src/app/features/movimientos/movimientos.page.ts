@@ -248,6 +248,18 @@ export class MovimientosPage implements OnInit {
         }
         this.cargarHistorial();
       });
+
+      if (this.route.queryParamMap) {
+        this.route.queryParamMap.subscribe((queryParams) => {
+          const purchaseId = queryParams.get('id');
+          if (purchaseId && this.rawMovimientos().length > 0) {
+            const found = this.rawMovimientos().find((m) => m.id === purchaseId);
+            if (found) {
+              this.abrirDetalle(found);
+            }
+          }
+        });
+      }
     });
   }
 
@@ -266,6 +278,15 @@ export class MovimientosPage implements OnInit {
           [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         );
         this.cargando.set(false);
+
+        // Check if there is an order ID in query params to open the modal
+        const purchaseId = this.route.snapshot?.queryParamMap?.get('id');
+        if (purchaseId) {
+          const found = this.rawMovimientos().find((m) => m.id === purchaseId);
+          if (found) {
+            this.abrirDetalle(found);
+          }
+        }
       },
       error: (err) => {
         console.error('Error al cargar movimientos:', err);
@@ -321,7 +342,7 @@ export class MovimientosPage implements OnInit {
         LISTO: 'Listo para retirar',
         ENTREGADO: 'Entregado',
         CANCELADO: 'Cancelado',
-        NO_RETIRADO: 'No entregado',
+        VENCIDO: 'Vencido',
       };
       const label = map[this.filtroEstado()] || this.filtroEstado();
       chips.push({ id: 'estado', label: `Estado: ${label}` });
@@ -463,6 +484,38 @@ export class MovimientosPage implements OnInit {
         error: (err) => {
           console.error('Error al cancelar el pedido:', err);
           this.toastService.mostrar('Error al cancelar el pedido', 'error');
+        }
+      });
+    }
+  }
+
+  async revertirCancelacion(id: string): Promise<void> {
+    const confirmed = await this.dialogService.confirm('¿Estás seguro de que deseas revertir la cancelación de este pedido?', 'Revertir Cancelación');
+    if (confirmed) {
+      this.movimientosService.revertirCancelacionCompra(id).subscribe({
+        next: () => {
+          this.toastService.mostrar('Cancelación revertida exitosamente', 'success');
+          
+          this.rawMovimientos.update((list) =>
+            list.map((m) =>
+              m.id === id
+                ? { ...m, status: 'PENDIENTE', statusLabel: 'A Preparar' }
+                : m
+            )
+          );
+          
+          const openModal = this.modalMovimiento();
+          if (openModal && openModal.id === id) {
+            this.modalMovimiento.set({
+              ...openModal,
+              status: 'PENDIENTE',
+              statusLabel: 'A Preparar'
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error al revertir la cancelación:', err);
+          this.toastService.mostrar('Error al revertir la cancelación', 'error');
         }
       });
     }

@@ -320,13 +320,12 @@ export class BuffetPresenter {
       spentCartGeneral += item.producto.precio * item.cantidad;
     }
 
-    const limiteTeorico = alumno.saldo + spentPastGeneral;
-    const montoLimiteGeneral = Math.min(budget.montoLimiteGeneral, limiteTeorico);
+    const montoLimiteGeneral = budget.montoLimiteGeneral;
+    const montoConsumidoGeneral = spentPastGeneral + spentCartGeneral;
     const montoDisponibleGeneral = Math.max(
       0,
-      Math.min(alumno.saldo - spentCartGeneral, budget.montoLimiteGeneral - spentPastGeneral - spentCartGeneral)
+      budget.montoLimiteGeneral - spentPastGeneral - spentCartGeneral
     );
-    const montoConsumidoGeneral = montoLimiteGeneral - montoDisponibleGeneral;
     const porcentajeConsumidoGeneral = montoLimiteGeneral > 0
       ? Math.round((montoConsumidoGeneral / montoLimiteGeneral) * 100)
       : 0;
@@ -414,7 +413,7 @@ export class BuffetPresenter {
     const favs = this.favoritosState();
     const esAlumno = this.usuarioService.esVistaAlumno();
 
-    return this.productosState().filter((producto) => {
+    const filtered = this.productosState().filter((producto) => {
       if (esAlumno) {
         if (producto.bloqueado) {
           return false;
@@ -445,6 +444,14 @@ export class BuffetPresenter {
         return false;
       }
       return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const aBlocked = !!(a.bloqueado || a.bloqueadoPorRestriccion || a.estadoStock === 'SIN_STOCK');
+      const bBlocked = !!(b.bloqueado || b.bloqueadoPorRestriccion || b.estadoStock === 'SIN_STOCK');
+      if (aBlocked && !bBlocked) return 1;
+      if (!aBlocked && bBlocked) return -1;
+      return 0;
     });
   });
 
@@ -566,6 +573,7 @@ export class BuffetPresenter {
     }
 
     this.fechaSeleccionadaState.set(adjustedFecha);
+    void this.carritoService.cargarPresupuestoYConsumo(alumno.id);
 
     const recreoActual = this.recreoSeleccionadoState();
     const opciones = this.recreosDisponibles();

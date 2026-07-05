@@ -81,7 +81,13 @@
             <div class="pedido-item__avatar">{{ pedido.alumnoNombre.charAt(0) }}</div>
             <div class="pedido-item__info">
               <span class="pedido-item__name">Para {{ pedido.alumnoNombre }}</span>
-              <span class="pedido-item__desc">{{ pedido.items[0]?.productName || 'Varios ítems' }}</span>
+              <span class="pedido-item__desc">
+                {{ getCantidadProductos(pedido) }} {{ getCantidadProductos(pedido) === 1 ? 'producto' : 'productos' }} - 
+                <a class="pedido-item__ver-mas" (click)="verDetallePedido(pedido)" role="button" tabindex="0">Ver más</a>
+                @if (pedido.withdrawalCode) {
+                  • Clave: <strong>{{ pedido.withdrawalCode }}</strong>
+                }
+              </span>
             </div>
             <div class="pedido-item__status">
               <span class="status-badge"
@@ -123,8 +129,12 @@
             </div>
             <div class="mov-item__info">
               <span class="mov-item__title">
-                {{ mov.paymentMethod === 'MERCADO_PAGO' ? 'Recarga de Saldo' : (mov.items[0]?.productName || 'Compra
-                Buffet') }}
+                @if (mov.paymentMethod === 'MERCADO_PAGO') {
+                  Recarga de Saldo
+                } @else {
+                  {{ getCantidadProductos(mov) }} {{ getCantidadProductos(mov) === 1 ? 'producto' : 'productos' }} - 
+                  <a class="pedido-item__ver-mas" (click)="verDetallePedido(mov)" role="button" tabindex="0">Ver más</a>
+                }
               </span>
               <span class="mov-item__date">
                 {{ formatDate(mov.date) }}

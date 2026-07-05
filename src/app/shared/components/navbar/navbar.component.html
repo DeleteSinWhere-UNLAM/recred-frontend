@@ -16,7 +16,7 @@
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span class="max-xl:hidden">Panel de Control</span>
         @if (esPremium()) {
-        <span class="pv__premium-badge">AVANZADO</span>
+        <span class="navbar__premium-badge">AVANZADO</span>
         }
       </a>
       <a class="navbar__movimientos-link" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" tabindex="0" style="cursor: pointer;">
@@ -73,14 +73,26 @@
         </button>
         @if (menuNotifAbierto()) {
         <div class="navbar__menu navbar__menu--notif" role="menu">
-          <p class="navbar__menu-titulo">Notificaciones</p>
-          @if (notifCount() === 0) {
+          <div class="navbar__notif-header">
+            <p class="navbar__menu-titulo">Notificaciones</p>
+            @if (notifCount() > 0) {
+            <button type="button" class="navbar__notif-marcar-todas"
+              (click)="marcarTodasComoLeidas()"
+              title="Marcar todas como leídas">
+              <i class="fa-solid fa-check-double" aria-hidden="true"></i>
+              <span>Marcar todas</span>
+            </button>
+            }
+          </div>
+          @if (notificaciones().length === 0) {
           <p class="navbar__menu-vacio">No tenés notificaciones nuevas.</p>
           } @else {
           <div class="navbar__notif-list">
             @for (notif of notificaciones(); track notif.id || $index) {
             <button type="button" class="navbar__notif-item"
-              [class.navbar__notif-item--clickable]="notif.tipo === 'RESUMEN_SEMANAL'"
+              [class.navbar__notif-item--clickable]="true"
+              [class.navbar__notif-item--unread]="!notif.read"
+              [class.navbar__notif-item--read]="notif.read"
               (click)="clickEnNotificacion(notif)">
               <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
               <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>

@@ -10,17 +10,22 @@
     <header class="mov-modal__header" [class.mov-modal__header--pedido]="movimiento.tipo === 'ANTICIPADA'">
       @if (movimiento.tipo === 'ANTICIPADA') {
         <div class="mov-modal__title-section">
+          <h3 id="modal-titulo" class="mov-modal__titulo">Detalle del Pedido</h3>
+        </div>
+        <div class="mov-modal__header-right">
           <span class="mov-modal__header-badge" [attr.data-status]="movimiento.status">
             {{ movimiento.statusLabel || movimiento.status }}
           </span>
-          <h3 id="modal-titulo" class="mov-modal__titulo">Detalle del Pedido</h3>
+          <button type="button" class="mov-modal__close-btn" (click)="onCerrar()" aria-label="Cerrar modal">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
         </div>
       } @else {
         <h3 id="modal-titulo" class="mov-modal__titulo">Detalles del Movimiento</h3>
+        <button type="button" class="mov-modal__close-btn" (click)="onCerrar()" aria-label="Cerrar modal">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
       }
-      <button type="button" class="mov-modal__close-btn" (click)="onCerrar()" aria-label="Cerrar modal">
-        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-      </button>
     </header>
 
     <div class="mov-modal__body">
@@ -40,10 +45,6 @@
             <div>
               <span class="mov-modal__label">Franja Horaria</span>
               <span class="mov-modal__value">{{ movimiento.pickupSlotDescription || 'Por definir' }}</span>
-            </div>
-            <div>
-              <span class="mov-modal__label">Método de Pago</span>
-              <span class="mov-modal__value">{{ movimiento.paymentMethod }}</span>
             </div>
           </div>
         </section>
@@ -256,7 +257,11 @@
       <footer class="mov-modal__footer--pedido">
         @if (puedoCancelar()) {
           <button type="button" class="mov-modal__btn--danger" [disabled]="esFechaLimiteSuperada()" (click)="onCancelar()">
-            <i class="fa-solid fa-ban"></i> Cancelar Pedido
+            <i class="fa-solid fa-xmark"></i> Cancelar Pedido
+          </button>
+        } @else if (estaCancelado()) {
+          <button type="button" class="mov-modal__btn--danger" (click)="onRevertirCancelacion()">
+            <i class="fa-solid fa-rotate-left"></i> Revertir cancelación
           </button>
         }
         <button type="button" class="mov-modal__btn--secondary" (click)="onCerrar()">

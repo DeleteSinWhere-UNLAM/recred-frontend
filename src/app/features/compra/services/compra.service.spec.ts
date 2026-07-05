@@ -1,102 +1,199 @@
-import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import { CompraService } from './compra.service';
-import { OrdenAlumno } from '../models/orden-compra.model';
-import { Alumno } from '../../../data-access/models/alumno.model';
-import { PerfilService } from '../../../data-access/services/perfil.service';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { PerfilMother } from '../../../data-access/services/alumno.mother';
+import { PerfilService } from '../../../data-access/services/perfil.service';
+import { OrdenAlumnoMother } from '../compra.mother';
+import { Recreo } from '../models/orden-compra.model';
+import { CompraService } from './compra.service';
 
 describe('CompraService', () => {
+  const URL_ADVANCE = `${environment.apiUrl}/purchases/advance`;
+
   let service: CompraService;
   let httpMock: HttpTestingController;
-  let perfilSpy: jasmine.SpyObj<PerfilService>;
-
-  const mockOrdenes: OrdenAlumno[] = [
-    {
-      alumno: { id: 'alumno-1', nombre: 'Juan', apellido: 'Perez', saldo: 100 } as unknown as Alumno,
-      buffetId: '0f8fad5b-d9cb-469f-a165-70867728950e',
-      items: [],
-      fecha: '2026-06-11',
-      recreo: 'PRIMER_RECREO',
-      subtotal: 50
-    }
-  ];
+  let servicioPerfil: jasmine.SpyObj<PerfilService>;
 
   beforeEach(() => {
-    perfilSpy = jasmine.createSpyObj<PerfilService>('PerfilService', [
-      'getPerfil',
-    ]);
-    perfilSpy.getPerfil.and.returnValue({
-      id: 'usuario-1',
-      email: 'padre@test.com',
-      nombre: 'Padre',
-      apellido: 'Test',
-      rol: 'PADRE',
-    });
+    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfil']);
+    servicioPerfil.getPerfil.and.returnValue(
+      PerfilMother.crear({ id: 'padre-1', rol: 'PADRE' }),
+    );
 
     TestBed.configureTestingModule({
       providers: [
         CompraService,
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: PerfilService, useValue: perfilSpy },
-      ]
+        { provide: PerfilService, useValue: servicioPerfil },
+      ],
     });
 
     service = TestBed.inject(CompraService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+  describe('iniciarOrden', () => {
+    it('dado que no hay sugerencia pendiente, cuando inicio, la orden deberia no tener sugerenciaId', () => {
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
 
-  it('debe iniciar una orden sin sugerenciaId si no hay una pendiente', () => {
-    service.iniciarOrden(mockOrdenes);
-    const orden = service.ordenEnCurso();
-    expect(orden?.sugerenciaId).toBeUndefined();
-  });
-
-  it('debe iniciar una orden con sugerenciaId si hay una pendiente', () => {
-    service.setSugerenciaPendiente('sug-123');
-    service.iniciarOrden(mockOrdenes);
-    const orden = service.ordenEnCurso();
-    expect(orden?.sugerenciaId).toBe('sug-123');
-  });
-
-  it('debe limpiar la sugerencia pendiente después de iniciar la orden', () => {
-    service.setSugerenciaPendiente('sug-123');
-    service.iniciarOrden(mockOrdenes);
-
-    service.iniciarOrden(mockOrdenes);
-    const orden = service.ordenEnCurso();
-    expect(orden?.sugerenciaId).toBeUndefined();
-  });
-
-  it('debe priorizar sugerenciaId pasado por parámetro sobre la pendiente', () => {
-    service.setSugerenciaPendiente('sug-pendiente');
-    service.iniciarOrden(mockOrdenes, 'sug-explicita');
-    const orden = service.ordenEnCurso();
-    expect(orden?.sugerenciaId).toBe('sug-explicita');
-  });
-  it('debe enviar buffetId en cada orden al procesar el pago', (done) => {
-    service.iniciarOrden(mockOrdenes);
-
-    service.procesarPago().subscribe({
-      next: () => done(),
+      expect(service.ordenEnCurso()?.sugerenciaId).toBeUndefined();
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/purchases/advance`);
-    expect(req.request.body.orders[0].buffetId).toBe(mockOrdenes[0].buffetId);
-    expect(req.request.body.orders[0].studentId).toBe('alumno-1');
-    req.flush({ orderId: 'orden-1', codes: {}, total: 50 });
+    it('dado una sugerencia pendiente, cuando inicio sin pasar id, deberia usar la pendiente', () => {
+      service.setSugerenciaPendiente('sug-pendiente');
+
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      expect(service.ordenEnCurso()?.sugerenciaId).toBe('sug-pendiente');
+    });
+
+    it('dado una sugerencia pendiente ya consumida, cuando inicio otra, no deberia arrastrarla', () => {
+      service.setSugerenciaPendiente('sug-pendiente');
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      expect(service.ordenEnCurso()?.sugerenciaId).toBeUndefined();
+    });
+
+    it('dado un id explicito y una pendiente, cuando inicio, deberia priorizar el explicito', () => {
+      service.setSugerenciaPendiente('sug-pendiente');
+
+      service.iniciarOrden([OrdenAlumnoMother.crear()], 'sug-explicita');
+
+      expect(service.ordenEnCurso()?.sugerenciaId).toBe('sug-explicita');
+    });
+
+    it('dado ordenes con distintos subtotales, cuando inicio, deberia calcular el total como suma de subtotales', () => {
+      const ordenes = [
+        OrdenAlumnoMother.crear({ subtotal: 500 }),
+        OrdenAlumnoMother.crear({ subtotal: 300 }),
+      ];
+
+      service.iniciarOrden(ordenes);
+
+      expect(service.ordenEnCurso()?.total).toBe(800);
+    });
+  });
+
+  describe('procesarPago', () => {
+    it('dado sin orden en curso, cuando proceso, deberia devolver una orden vacia sin llamar al back', async () => {
+      const resultado = await firstValueFrom(service.procesarPago());
+
+      expect(resultado.ordenes).toEqual([]);
+      httpMock.expectNone(URL_ADVANCE);
+    });
+
+    it('dado un tutor y ordenes, cuando proceso, deberia hacer POST con buyerType TUTOR y mapear recessTime', async () => {
+      service.iniciarOrden([
+        OrdenAlumnoMother.crear({
+          alumno: { ...OrdenAlumnoMother.crear().alumno, id: 'alumno-1' },
+          buffetId: 'buffet-x',
+          recreo: 'SEGUNDO_RECREO',
+        }),
+      ]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      const req = httpMock.expectOne(URL_ADVANCE);
+
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body.orders[0].buffetId).toBe('buffet-x');
+      expect(req.request.body.orders[0].studentId).toBe('alumno-1');
+      expect(req.request.body.orders[0].buyerType).toBe('TUTOR');
+      expect(req.request.body.orders[0].recessTime).toBe('SECOND_RECESS');
+
+      req.flush({ orderId: 'orden-1', codes: { 'alumno-1': 'ABC' }, total: 500 });
+      const pagada = await promesa;
+      expect(pagada.id).toBe('orden-1');
+      expect(pagada.codigos).toEqual({ 'alumno-1': 'ABC' });
+      expect(service.ultimaOrden()?.id).toBe('orden-1');
+      expect(service.ordenEnCurso()).toBeNull();
+    });
+
+    it('dado un rol ALUMNO, cuando proceso, deberia mandar buyerType STUDENT', async () => {
+      servicioPerfil.getPerfil.and.returnValue(
+        PerfilMother.crear({ id: 'alumno-x', rol: 'ALUMNO' }),
+      );
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      const req = httpMock.expectOne(URL_ADVANCE);
+      expect(req.request.body.orders[0].buyerType).toBe('STUDENT');
+      req.flush({ orderId: 'x', codes: {}, total: 0 });
+      await promesa;
+    });
+
+    it('dado que no hay perfil, cuando proceso, deberia tirar el error de usuario no autenticado', () => {
+      servicioPerfil.getPerfil.and.returnValue(null);
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      expect(() => service.procesarPago()).toThrowError(
+        'Usuario no autenticado o sin perfil.',
+      );
+    });
+  });
+
+  describe('cancelarOrden', () => {
+    it('dado una orden en curso, cuando cancelo, deberia dejar la orden en null', () => {
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      service.cancelarOrden();
+
+      expect(service.ordenEnCurso()).toBeNull();
+    });
+  });
+
+  describe('deliver', () => {
+    it('dado un purchaseId y un code, cuando entrego, deberia hacer POST /purchases/{id}/deliver con el withdrawalCode', async () => {
+      const promesa = firstValueFrom(service.deliver('compra-1', 'CODE'));
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/purchases/compra-1/deliver`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ withdrawalCode: 'CODE' });
+      req.flush(null);
+      await promesa;
+    });
+  });
+
+  describe('procesarPago con fallbacks', () => {
+    it('dado un recreo desconocido, cuando proceso, deberia mapearlo a FIRST_RECESS', async () => {
+      service.iniciarOrden([
+        OrdenAlumnoMother.crear({ recreo: 'RARO' as unknown as Recreo }),
+      ]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      const req = httpMock.expectOne(URL_ADVANCE);
+
+      expect(req.request.body.orders[0].recessTime).toBe('FIRST_RECESS');
+      req.flush({ orderId: 'x', codes: {}, total: 0 });
+      await promesa;
+    });
+
+    it('dado que el back responde sin orderId ni codes, cuando proceso, deberia generar un UUID y usar codigos vacios', async () => {
+      spyOn(crypto, 'randomUUID').and.returnValue('uuid-de-test-4444-1111-1111-1111-111111111111');
+      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      httpMock.expectOne(URL_ADVANCE).flush({});
+      const pagada = await promesa;
+
+      expect(pagada.id).toBe('uuid-de-test-4444-1111-1111-1111-111111111111');
+      expect(pagada.codigos).toEqual({});
+    });
+
+    it('dado que el back responde sin total, cuando proceso, deberia preservar el total en curso', async () => {
+      service.iniciarOrden([OrdenAlumnoMother.crear({ subtotal: 750 })]);
+
+      const promesa = firstValueFrom(service.procesarPago());
+      httpMock.expectOne(URL_ADVANCE).flush({ orderId: 'ok', codes: {} });
+      const pagada = await promesa;
+
+      expect(pagada.total).toBe(750);
+    });
   });
 });

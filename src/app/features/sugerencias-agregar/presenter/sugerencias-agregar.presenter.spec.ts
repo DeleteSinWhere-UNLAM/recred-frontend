@@ -1,155 +1,125 @@
 import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
-import { SugerenciasAgregarPresenter } from './sugerencias-agregar.presenter';
+import { firstValueFrom, of, throwError } from 'rxjs';
+import { SugerenciaAgregarProductoMother } from '../sugerencias-agregar.mother';
 import { SugerenciasAgregarService } from '../services/sugerencias-agregar.service';
-import { SugerenciaAgregarProducto } from '../models/sugerencia-agregar.model';
-import { SugerenciasAgregarMother } from '../sugerencias-agregar.mother';
-
+import { SugerenciasAgregarPresenter } from './sugerencias-agregar.presenter';
 
 describe('SugerenciasAgregarPresenter', () => {
   let presenter: SugerenciasAgregarPresenter;
   let servicio: jasmine.SpyObj<SugerenciasAgregarService>;
 
   beforeEach(() => {
-    servicio = jasmine.createSpyObj('SugerenciasAgregarService', ['getSugerenciasAgregarProducto']);
+    servicio = jasmine.createSpyObj<SugerenciasAgregarService>('SugerenciasAgregarService', [
+      'getSugerenciasAgregarProducto',
+    ]);
     TestBed.configureTestingModule({
       providers: [
         SugerenciasAgregarPresenter,
-        { provide: SugerenciasAgregarService, useValue: servicio }
-      ]
+        { provide: SugerenciasAgregarService, useValue: servicio },
+      ],
     });
     presenter = TestBed.inject(SugerenciasAgregarPresenter);
   });
 
-  describe('Inicialización', () => {
-    it('debería solicitar las sugerencias al servicio y actualizar el estado cuando sea exitoso', () => {
-      // Arrange
-      const sugerenciasEsperadas = SugerenciasAgregarMother.crearListaSugerencias();
-      servicio.getSugerenciasAgregarProducto.and.returnValue(of(sugerenciasEsperadas));
-      
-      let sugerenciasEmitidas: SugerenciaAgregarProducto[] | undefined;
-      let isLoadingEmitido: boolean | undefined;
-      let errorEmitido: string | null | undefined;
-      
-      presenter.sugerencias$.subscribe(val => sugerenciasEmitidas = val);
-      presenter.isLoading$.subscribe(val => isLoadingEmitido = val);
-      presenter.error$.subscribe(val => errorEmitido = val);
+  describe('initialize', () => {
+    it('dado un back exitoso, cuando inicializo, deberia emitir las sugerencias y bajar isLoading', async () => {
+      const sugerencias = SugerenciaAgregarProductoMother.crearVarias();
+      servicio.getSugerenciasAgregarProducto.and.returnValue(of(sugerencias));
 
-      // Act
       presenter.initialize();
 
-      // Assert
       expect(servicio.getSugerenciasAgregarProducto).toHaveBeenCalled();
-      expect(sugerenciasEmitidas).toEqual(sugerenciasEsperadas);
-      expect(isLoadingEmitido).toBeFalse();
-      expect(errorEmitido).toBeNull();
+      expect(await firstValueFrom(presenter.sugerencias$)).toEqual(sugerencias);
+      expect(await firstValueFrom(presenter.isLoading$)).toBeFalse();
+      expect(await firstValueFrom(presenter.error$)).toBeNull();
     });
 
-    it('debería actualizar el estado de error cuando el servicio falle', () => {
-      // Arrange
-      servicio.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('Error de red')));
-      
-      let errorEmitido: string | null | undefined;
-      let isLoadingEmitido: boolean | undefined;
-      
-      presenter.error$.subscribe(val => errorEmitido = val);
-      presenter.isLoading$.subscribe(val => isLoadingEmitido = val);
+    it('dado que el back falla, cuando inicializo, deberia emitir el mensaje de error y bajar isLoading', async () => {
+      servicio.getSugerenciasAgregarProducto.and.returnValue(
+        throwError(() => new Error('Error de red')),
+      );
 
-      // Act
       presenter.initialize();
 
-      // Assert
-      expect(errorEmitido).toBe('No se pudieron cargar las oportunidades de stock.');
-      expect(isLoadingEmitido).toBeFalse();
+      expect(await firstValueFrom(presenter.error$)).toBe(
+        'No se pudieron cargar las oportunidades de stock.',
+      );
+      expect(await firstValueFrom(presenter.isLoading$)).toBeFalse();
     });
   });
 
-  describe('KPIs Computados', () => {
+  describe('KPIs computados', () => {
     beforeEach(() => {
-      servicio.getSugerenciasAgregarProducto.and.returnValue(of(SugerenciasAgregarMother.crearListaSugerencias()));
+      servicio.getSugerenciasAgregarProducto.and.returnValue(
+        of(SugerenciaAgregarProductoMother.crearVarias()),
+      );
       presenter.initialize();
     });
 
-    it('debería calcular el total de productos analizados', () => {
-      
-      const total = presenter.totalProductos;
-
-      expect(total).toBe(3);
+    it('dadas tres sugerencias, cuando leo totalProductos, deberia devolver 3', () => {
+      expect(presenter.totalProductos).toBe(3);
     });
 
-    it('debería sumar las ventas totales de todas las sugerencias', () => {
-      
-      const total = presenter.totalVentas;
-
-      expect(total).toBe(35);
+    it('dadas tres sugerencias, cuando leo totalVentas, deberia sumar los totalSales', () => {
+      expect(presenter.totalVentas).toBe(35);
     });
 
-    it('debería calcular los ingresos totales esperados', () => {
-      
-      const total = presenter.totalIngresos;
-
-      expect(total).toBe(4000);
+    it('dadas tres sugerencias, cuando leo totalIngresos, deberia sumar los totalRevenue', () => {
+      expect(presenter.totalIngresos).toBe(4000);
     });
 
-    it('debería sumar la cantidad de clientes únicos afectados', () => {
-      
-      const total = presenter.totalClientes;
-
-      expect(total).toBe(17);
+    it('dadas tres sugerencias, cuando leo totalClientes, deberia sumar los totalCustomers', () => {
+      expect(presenter.totalClientes).toBe(17);
     });
 
-    it('debería formatear correctamente la etiqueta del total de ingresos', () => {
-      
-      const etiqueta = presenter.totalIngresosLabel;
-
-      expect(etiqueta).toBe('$4.000');
+    it('dado el total de ingresos, cuando pido su label, deberia formatearlo como moneda AR sin decimales', () => {
+      expect(presenter.totalIngresosLabel).toBe('$4.000');
     });
   });
 
-  describe('Datos de Gráficos y Tarjetas', () => {
+  describe('chartData y productCards', () => {
     beforeEach(() => {
-      servicio.getSugerenciasAgregarProducto.and.returnValue(of(SugerenciasAgregarMother.crearListaSugerencias()));
+      servicio.getSugerenciasAgregarProducto.and.returnValue(
+        of(SugerenciaAgregarProductoMother.crearVarias()),
+      );
       presenter.initialize();
     });
 
-    it('debería generar los datos del gráfico ordenados por ingreso mayor y calcular el porcentaje relativo', () => {
-      
+    it('cuando leo chartData, deberia ordenar por ingreso descendente y calcular ingresoPercent relativo al maximo', () => {
       const datos = presenter.chartData;
-      
+
       expect(datos.length).toBe(3);
       expect(datos[0].nombre).toBe('Prod C');
       expect(datos[0].ingresos).toBe(2000);
-      expect(datos[0].ingresoPercent).toBe(100); 
+      expect(datos[0].ingresoPercent).toBe(100);
       expect(datos[1].ingresoPercent).toBe(50);
     });
 
-    it('debería generar las tarjetas de productos mapeando correctamente todos los campos', () => {
-      
+    it('cuando leo productCards, deberia mapear los campos con el mensaje original de cada sugerencia', () => {
       const tarjetas = presenter.productCards;
-      
+
       expect(tarjetas.length).toBe(3);
       expect(tarjetas[0].nombre).toBe('Prod C');
       expect(tarjetas[0].ingresoPercent).toBe(100);
       expect(tarjetas[0].mensaje).toBe('Msg 3');
     });
+
+    it('dada una lista vacia, cuando leo chartData y productCards, deberia devolver arrays vacios', () => {
+      servicio.getSugerenciasAgregarProducto.and.returnValue(of([]));
+      presenter.initialize();
+
+      expect(presenter.chartData).toEqual([]);
+      expect(presenter.productCards).toEqual([]);
+    });
   });
 
-  describe('Helpers de Formateo', () => {
-    
-    // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
-    it('debería formatear valores numéricos a moneda local sin decimales', () => {
-      
-      const formateado = presenter.formatCurrency(1500);
-
-      expect(formateado).toBe('$1.500');
+  describe('formatCurrency', () => {
+    it('dado 1500, cuando formateo, deberia devolver $1.500', () => {
+      expect(presenter.formatCurrency(1500)).toBe('$1.500');
     });
 
-    // ARCHITECTURE WARNING: Este formateo debería delegarse a un Pipe en la vista
-    it('debería formatear cero correctamente', () => {
-      
-      const formateado = presenter.formatCurrency(0);
-
-      expect(formateado).toBe('$0');
+    it('dado 0, cuando formateo, deberia devolver $0', () => {
+      expect(presenter.formatCurrency(0)).toBe('$0');
     });
   });
 });

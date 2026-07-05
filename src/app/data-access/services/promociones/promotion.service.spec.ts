@@ -95,5 +95,70 @@ describe('PromotionService', () => {
       expect(req.request.body).toEqual({ ...mockPromo, buffetId: 'buffet-123' });
       req.flush(mockResponse);
     });
+
+    it('Dado que la promocion trae buffetId explicito, deberia usarlo en el payload y no tocar el perfil', () => {
+      const promo: Partial<Promotion> = { name: 'Con buffet', buffetId: 'buffet-explicit' };
+
+      service.createPromotion(promo).subscribe();
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/promotions`);
+      expect(req.request.body).toEqual({ ...promo, buffetId: 'buffet-explicit' });
+      expect(mockPerfilService.obtenerBuffetId).not.toHaveBeenCalled();
+      req.flush({});
+    });
+
+    it('Dado que no hay buffetId en la promo ni en el perfil, deberia mandar string vacio', () => {
+      mockPerfilService.obtenerBuffetId.and.returnValue(null);
+      const promo: Partial<Promotion> = { name: 'Sin buffet' };
+
+      service.createPromotion(promo).subscribe();
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/promotions`);
+      expect((req.request.body as { buffetId: string }).buffetId).toBe('');
+      req.flush({});
+    });
+  });
+
+  describe('getPromotions', () => {
+    it('Dado un buffetId explicito, deberia hacer GET a /promotions/buffet/:id sin consultar el perfil', () => {
+      service.getPromotions('buffet-42').subscribe();
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/buffet/buffet-42`);
+      expect(req.request.method).toBe('GET');
+      expect(mockPerfilService.obtenerBuffetId).not.toHaveBeenCalled();
+      req.flush([]);
+    });
+
+    it('Dado ningun argumento, deberia usar el buffetId del perfil', () => {
+      mockPerfilService.obtenerBuffetId.and.returnValue('buffet-perfil');
+
+      service.getPromotions().subscribe();
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/buffet/buffet-perfil`);
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+  });
+
+  describe('getPromotionById', () => {
+    it('Dado un id, deberia hacer GET a /promotions/:id', () => {
+      const mockPromo: Promotion = {
+        id: 'p-1',
+        name: 'Test',
+        discountPercentage: 5,
+        productIds: [],
+        startDate: '2026-06-01',
+        endDate: '2026-06-30',
+        status: 'ACTIVE',
+      };
+
+      service.getPromotionById('p-1').subscribe((res) => {
+        expect(res).toEqual(mockPromo);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/p-1`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPromo);
+    });
   });
 });

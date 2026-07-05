@@ -244,7 +244,7 @@ export class BuffetPage implements OnInit {
     const texto = busqueda.trim().toLowerCase();
     const esAlumno = this.esVistaAlumno();
 
-    return promos.filter(p => {
+    const filtered = promos.filter(p => {
       // En la vista del alumno, ocultar solo las bloqueadas por el tutor
       if (esAlumno) {
         if (p.bloqueada) return false;
@@ -259,6 +259,14 @@ export class BuffetPage implements OnInit {
         return false;
       }
       return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const aBlocked = !!(a.bloqueada || a.bloqueadaPorRestriccion);
+      const bBlocked = !!(b.bloqueada || b.bloqueadaPorRestriccion);
+      if (aBlocked && !bBlocked) return 1;
+      if (!aBlocked && bBlocked) return -1;
+      return 0;
     });
   });
 
