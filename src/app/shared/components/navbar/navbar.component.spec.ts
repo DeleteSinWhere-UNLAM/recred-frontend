@@ -57,6 +57,7 @@ describe('NavbarComponent', () => {
   let esVistaAlumnoSignal: ReturnType<typeof signal<boolean>>;
   let esVistaKiosqueroSignal: ReturnType<typeof signal<boolean>>;
   let esVistaDirectivoSignal: ReturnType<typeof signal<boolean>>;
+  let esVistaAdminSignal: ReturnType<typeof signal<boolean>>;
   let notificacionesSignal: ReturnType<typeof signal<Notificacion[]>>;
   let notifCantidadSignal: ReturnType<typeof signal<number>>;
   let alumnosSignal: ReturnType<typeof signal<ReturnType<typeof AlumnoMother.crear>[]>>;
@@ -68,6 +69,7 @@ describe('NavbarComponent', () => {
     esVistaAlumnoSignal = signal(false);
     esVistaKiosqueroSignal = signal(false);
     esVistaDirectivoSignal = signal(false);
+    esVistaAdminSignal = signal(false);
     notificacionesSignal = signal<Notificacion[]>([]);
     notifCantidadSignal = signal(0);
     alumnosSignal = signal([AlumnoMother.crear({ id: 'alumno-1' })]);
@@ -86,6 +88,7 @@ describe('NavbarComponent', () => {
       esVistaAlumno: esVistaAlumnoSignal.asReadonly(),
       esVistaKiosquero: esVistaKiosqueroSignal.asReadonly(),
       esVistaDirectivo: esVistaDirectivoSignal.asReadonly(),
+      esVistaAdmin: esVistaAdminSignal.asReadonly(),
     });
     servicioUsuario.homeUrl.and.returnValue('/tutor');
     servicioAlumnos = jasmine.createSpyObj<AlumnosService>(
