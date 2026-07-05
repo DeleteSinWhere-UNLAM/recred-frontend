@@ -3,8 +3,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { ScheduledPickup } from '../models/tracking-pedidos.model';
 import { ORDER_ID_TEST, ScheduledPickupMother } from '../tracking-pedidos.mother';
 import { TrackingPedidosService } from './tracking-pedidos.service';
+
+type GetScheduledPickupsFiltros = Parameters<TrackingPedidosService['getScheduledPickups']>[0];
 
 describe('TrackingPedidosService', () => {
   const URL_PICKUPS = `${environment.apiUrl}/buffet/scheduled-pickups`;
@@ -32,8 +35,8 @@ describe('TrackingPedidosService', () => {
     it('dado que no paso filtros, cuando pido los pickups, deberia hacer GET sin query params', async () => {
       const pickups = ScheduledPickupMother.crearVarios();
 
-      const promesa = firstValueFrom(service.getScheduledPickups());
-      const req = httpMock.expectOne((r) => r.url === URL_PICKUPS);
+      const promesa = whenPidoLosPickups();
+      const req = thenSeHizoGetAPickups();
       expect(req.request.method).toBe('GET');
       expect(req.request.params.keys().length).toBe(0);
       req.flush(pickups);
@@ -41,18 +44,16 @@ describe('TrackingPedidosService', () => {
       expect(await promesa).toEqual(pickups);
     });
 
-    it('dados filtros completos, cuando pido los pickups, deberia mandarlos como query params', async () => {
-      const promesa = firstValueFrom(
-        service.getScheduledPickups({
-          fecha: '2026-07-03',
-          status: 'PENDIENTE',
-          estadoRetiro: 'PROGRAMADO',
-          franjaId: 'ts-001',
-          search: 'juan',
-        }),
-      );
+    it('dado filtros completos, cuando pido los pickups, deberia mandarlos como query params', async () => {
+      const promesa = whenPidoLosPickups({
+        fecha: '2026-07-03',
+        status: 'PENDIENTE',
+        estadoRetiro: 'PROGRAMADO',
+        franjaId: 'ts-001',
+        search: 'juan',
+      });
 
-      const req = httpMock.expectOne((r) => r.url === URL_PICKUPS);
+      const req = thenSeHizoGetAPickups();
       expect(req.request.params.get('fecha')).toBe('2026-07-03');
       expect(req.request.params.get('status')).toBe('PENDIENTE');
       expect(req.request.params.get('estadoRetiro')).toBe('PROGRAMADO');
@@ -64,11 +65,8 @@ describe('TrackingPedidosService', () => {
     });
 
     it('dado que el back devuelve error, cuando pido los pickups, deberia rechazar la promesa', async () => {
-      const promesa = firstValueFrom(service.getScheduledPickups());
-      httpMock.expectOne((r) => r.url === URL_PICKUPS).flush('boom', {
-        status: 500,
-        statusText: 'Server Error',
-      });
+      const promesa = whenPidoLosPickups();
+      thenSeHizoGetAPickups().flush('boom', { status: 500, statusText: 'Server Error' });
 
       await expectAsync(promesa).toBeRejected();
     });
@@ -87,7 +85,7 @@ describe('TrackingPedidosService', () => {
   });
 
   describe('cancelOrder', () => {
-    it('dado un orderId, cuando cancelo, deberia hacer PUT a /purchases/{id}/cancel con body vacio', async () => {
+    it('dado un orderId, cuando cancelo, deberia hacer PUT /purchases/{id}/cancel con body vacio', async () => {
       const promesa = firstValueFrom(service.cancelOrder(ORDER_ID_TEST));
       const req = httpMock.expectOne(URL_CANCEL);
       expect(req.request.method).toBe('PUT');
@@ -97,4 +95,12 @@ describe('TrackingPedidosService', () => {
       await promesa;
     });
   });
+
+  function whenPidoLosPickups(filtros?: GetScheduledPickupsFiltros): Promise<ScheduledPickup[]> {
+    return firstValueFrom(service.getScheduledPickups(filtros));
+  }
+
+  function thenSeHizoGetAPickups(): ReturnType<HttpTestingController['expectOne']> {
+    return httpMock.expectOne((r) => r.url === URL_PICKUPS);
+  }
 });

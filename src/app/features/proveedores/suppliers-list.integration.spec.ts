@@ -68,15 +68,15 @@ describe('SuppliersList Integration', () => {
   });
 
   it('dado 2 proveedores del service, cuando se monta, deberia renderizar sus nombres en la lista', () => {
-    fixture.detectChanges();
+    whenMonto();
 
     const texto = textoRenderizado();
     expect(texto).toContain('Distribuidora Norte');
     expect(texto).toContain('Golosinas del Sur');
   });
 
-  it('dado la lista cargada, cuando el kiosquero borra un proveedor confirmando el delete, deberia refetchear el listado', () => {
-    fixture.detectChanges();
+  it('dado la lista cargada, cuando el kiosquero confirma el delete de un proveedor, deberia refetchear el listado', () => {
+    whenMonto();
 
     fixture.componentInstance.openDeleteModal(norte, new Event('click'));
     fixture.componentInstance.confirmDelete();
@@ -90,7 +90,7 @@ describe('SuppliersList Integration', () => {
   });
 
   it('dado la lista, cuando aplico busqueda, deberia dejar solo los proveedores que matchean', () => {
-    fixture.detectChanges();
+    whenMonto();
 
     fixture.componentInstance.onSearchChange('Norte');
 
@@ -98,13 +98,17 @@ describe('SuppliersList Integration', () => {
     expect(fixture.componentInstance.filteredSuppliers()[0].id).toBe('sup-1');
   });
 
-  it('dado la page montada, cuando el kiosquero toca volver al home, deberia navegar a /kiosquero', () => {
-    fixture.detectChanges();
+  it('dado la page montada, cuando hago click en volver al home, deberia navegar a /kiosquero', () => {
+    whenMonto();
 
     fixture.componentInstance.volverHome();
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
   });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 
   function textoRenderizado(): string {
     return (fixture.nativeElement as HTMLElement).textContent ?? '';

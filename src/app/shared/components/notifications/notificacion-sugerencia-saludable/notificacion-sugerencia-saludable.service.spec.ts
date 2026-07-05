@@ -1,6 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { NotificacionSugerenciaSaludableService } from './notificacion-sugerencia-saludable.service';
 import { Producto } from '../../../../features/buffet/models/producto.model';
+import { NotificacionSugerenciaSaludableService } from './notificacion-sugerencia-saludable.service';
+
+class ProductoSugerenciaMother {
+  static crear(): Producto {
+    return { id: 'prod-1', nombre: 'Manzana Roja', precio: 150.0 } as unknown as Producto;
+  }
+}
 
 describe('NotificacionSugerenciaSaludableService', () => {
   let service: NotificacionSugerenciaSaludableService;
@@ -10,24 +16,53 @@ describe('NotificacionSugerenciaSaludableService', () => {
     service = TestBed.inject(NotificacionSugerenciaSaludableService);
   });
 
-  it('dado que se inicializa el servicio, debe crearse correctamente', () => {
+  it('dado el TestBed configurado, cuando inyecto el service, deberia crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
-  it('dado que se consulta el estado inicial, debe devolver los valores por defecto', () => {
-    expect(service.state$()).toEqual({ show: false, sugerenciaId: '', titulo: '', mensaje: '', producto: null, alumnoId: '' });
+  it('dado el service recien inyectado, cuando consulto el estado, deberia devolver los valores por defecto', () => {
+    thenElEstadoEs(false, '', '', '', null, '');
   });
 
-  it('dado que se llama a mostrar, debe actualizar el estado', () => {
-    const mockProducto = { id: 'prod-1', nombre: 'Manzana Roja', precio: 150.00 } as unknown as Producto;
-    service.mostrar('sug-1', 'Titulo', 'Mensaje', mockProducto, 'alum-1');
-    expect(service.state$()).toEqual({ show: true, sugerenciaId: 'sug-1', titulo: 'Titulo', mensaje: 'Mensaje', producto: mockProducto, alumnoId: 'alum-1' });
+  it('dado los datos de la sugerencia, cuando llamo mostrar, deberia actualizar el estado', () => {
+    const producto = ProductoSugerenciaMother.crear();
+
+    whenMuestroLaSugerencia('sug-1', 'Titulo', 'Mensaje', producto, 'alum-1');
+
+    thenElEstadoEs(true, 'sug-1', 'Titulo', 'Mensaje', producto, 'alum-1');
   });
 
-  it('dado que se llama a cerrar, debe ocultar la notificación', () => {
-    const mockProducto = { id: 'prod-1', nombre: 'Manzana Roja', precio: 150.00 } as unknown as Producto;
-    service.mostrar('sug-1', 'Titulo', 'Mensaje', mockProducto, 'alum-1');
+  it('dado el estado mostrado, cuando llamo cerrar, deberia ocultar la notificacion pero preservar los datos', () => {
+    const producto = ProductoSugerenciaMother.crear();
+    whenMuestroLaSugerencia('sug-1', 'Titulo', 'Mensaje', producto, 'alum-1');
+
+    whenCierroLaSugerencia();
+
+    thenElEstadoEs(false, 'sug-1', 'Titulo', 'Mensaje', producto, 'alum-1');
+  });
+
+  function whenMuestroLaSugerencia(
+    sugerenciaId: string,
+    titulo: string,
+    mensaje: string,
+    producto: Producto,
+    alumnoId: string,
+  ): void {
+    service.mostrar(sugerenciaId, titulo, mensaje, producto, alumnoId);
+  }
+
+  function whenCierroLaSugerencia(): void {
     service.cerrar();
-    expect(service.state$()).toEqual({ show: false, sugerenciaId: 'sug-1', titulo: 'Titulo', mensaje: 'Mensaje', producto: mockProducto, alumnoId: 'alum-1' });
-  });
+  }
+
+  function thenElEstadoEs(
+    show: boolean,
+    sugerenciaId: string,
+    titulo: string,
+    mensaje: string,
+    producto: Producto | null,
+    alumnoId: string,
+  ): void {
+    expect(service.state$()).toEqual({ show, sugerenciaId, titulo, mensaje, producto, alumnoId });
+  }
 });

@@ -48,90 +48,75 @@ describe('AsistentePanelComponent', () => {
   });
 
   describe('selector de fecha de retiro', () => {
-    it('emite la fecha seleccionada cuando no es anterior al minimo', () => {
-      spyOn(component.fechaRetiro, 'emit');
-      component.mostrarSelectorFechaRetiro = true;
-      component.fechaRetiroMinima = '2026-07-03';
-      fixture.detectChanges();
+    it('dado el selector visible con fecha minima 2026-07-03, cuando cambio la fecha al minimo, deberia emitirla', () => {
+      givenSpyEnFechaRetiro();
+      givenSelectorVisibleConMinimo('2026-07-03');
 
-      const input = buscarInputFecha();
-      input.value = '2026-07-03';
-      input.dispatchEvent(new Event('change'));
+      whenCambioLaFechaEnElSelector('2026-07-03');
 
-      expect(component.fechaRetiro.emit).toHaveBeenCalledOnceWith('2026-07-03');
+      thenSeEmitioFechaRetiro('2026-07-03');
     });
 
-    it('no emite fechas anteriores al minimo', () => {
-      spyOn(component.fechaRetiro, 'emit');
-      component.mostrarSelectorFechaRetiro = true;
-      component.fechaRetiroMinima = '2026-07-03';
-      fixture.detectChanges();
+    it('dado el selector visible con fecha minima 2026-07-03, cuando elijo una anterior, no deberia emitirla', () => {
+      givenSpyEnFechaRetiro();
+      givenSelectorVisibleConMinimo('2026-07-03');
 
-      const input = buscarInputFecha();
-      input.value = '2026-07-02';
-      input.dispatchEvent(new Event('change'));
+      whenCambioLaFechaEnElSelector('2026-07-02');
 
-      expect(component.fechaRetiro.emit).not.toHaveBeenCalled();
+      thenNoSeEmitioFechaRetiro();
     });
 
-    it('no emite cuando esta deshabilitado', () => {
-      spyOn(component.fechaRetiro, 'emit');
-      component.mostrarSelectorFechaRetiro = true;
-      component.deshabilitado = true;
-      fixture.detectChanges();
+    it('dado el selector visible pero deshabilitado, cuando cambio la fecha, no deberia emitirla', () => {
+      givenSpyEnFechaRetiro();
+      givenSelectorVisibleYDeshabilitado();
 
-      const input = buscarInputFecha();
-      input.value = '2026-07-10';
-      input.dispatchEvent(new Event('change'));
+      whenCambioLaFechaEnElSelector('2026-07-10');
 
-      expect(component.fechaRetiro.emit).not.toHaveBeenCalled();
+      thenNoSeEmitioFechaRetiro();
     });
 
-    it('no emite cuando el valor viene vacio', () => {
-      spyOn(component.fechaRetiro, 'emit');
-      component.mostrarSelectorFechaRetiro = true;
-      fixture.detectChanges();
+    it('dado el selector visible, cuando el valor viene vacio, no deberia emitirlo', () => {
+      givenSpyEnFechaRetiro();
+      givenSelectorVisible();
 
-      const input = buscarInputFecha();
-      input.value = '';
-      input.dispatchEvent(new Event('change'));
+      whenCambioLaFechaEnElSelector('');
 
-      expect(component.fechaRetiro.emit).not.toHaveBeenCalled();
+      thenNoSeEmitioFechaRetiro();
     });
   });
 
   describe('emisiones simples', () => {
-    it('onCerrar y onEscape deberian emitir el evento cerrar', () => {
+    it('cuando llamo onCerrar y onEscape, deberia emitir cerrar dos veces', () => {
       spyOn(component.cerrar, 'emit');
 
-      (component as unknown as ProtegidoAsistente).onCerrar();
-      (component as unknown as ProtegidoAsistente).onEscape();
+      whenLlamoProtegido('onCerrar');
+      whenLlamoProtegido('onEscape');
 
       expect(component.cerrar.emit).toHaveBeenCalledTimes(2);
     });
 
-    it('onEnviar deberia reemitir el texto al output enviar', () => {
+    it('cuando llamo onEnviar con "hola", deberia reemitirlo al output enviar', () => {
       spyOn(component.enviar, 'emit');
 
-      (component as unknown as ProtegidoAsistente).onEnviar('hola');
+      whenLlamoOnEnviar('hola');
 
       expect(component.enviar.emit).toHaveBeenCalledWith('hola');
     });
 
-    it('onSugerencia deberia reemitir el prompt al output sugerencia', () => {
+    it('cuando llamo onSugerencia con un prompt, deberia reemitirlo al output sugerencia', () => {
       spyOn(component.sugerencia, 'emit');
 
-      (component as unknown as ProtegidoAsistente).onSugerencia('saldo');
+      whenLlamoOnSugerencia('saldo');
 
       expect(component.sugerencia.emit).toHaveBeenCalledWith('saldo');
     });
 
-    it('onNuevaConversacion y onVerHistorial deberian emitir sus outputs', () => {
+    it('cuando llamo onNuevaConversacion y onVerHistorial, deberian emitir sus outputs', () => {
       spyOn(component.nuevaConversacion, 'emit');
       spyOn(component.verHistorial, 'emit');
 
-      (component as unknown as ProtegidoAsistente).onNuevaConversacion();
-      (component as unknown as ProtegidoAsistente).onVerHistorial();
+      whenLlamoProtegido('onNuevaConversacion');
+      whenLlamoProtegido('onVerHistorial');
 
       expect(component.nuevaConversacion.emit).toHaveBeenCalled();
       expect(component.verHistorial.emit).toHaveBeenCalled();
@@ -139,81 +124,146 @@ describe('AsistentePanelComponent', () => {
   });
 
   describe('acciones y opciones', () => {
-    it('dado opciones vacias, onToggleAcciones deberia no cambiar el estado', () => {
-      component.opciones = [];
+    it('dado opciones vacias, cuando toggleo acciones, no deberia cambiar el estado', () => {
+      givenOpciones([]);
 
-      const antes = (component as unknown as ProtegidoAsistente).accionesAbiertas_();
-      (component as unknown as ProtegidoAsistente).onToggleAcciones();
+      const antes = protegido().accionesAbiertas_();
+      whenLlamoProtegido('onToggleAcciones');
 
-      expect((component as unknown as ProtegidoAsistente).accionesAbiertas_()).toBe(antes);
+      expect(protegido().accionesAbiertas_()).toBe(antes);
     });
 
-    it('dado opciones no vacias, onToggleAcciones deberia flipear la flag', () => {
-      component.opciones = [SugerenciaCapacidadMother.crear()];
+    it('dado opciones no vacias, cuando toggleo acciones dos veces, deberia flipear la flag', () => {
+      givenOpciones([SugerenciaCapacidadMother.crear()]);
 
-      (component as unknown as ProtegidoAsistente).onToggleAcciones();
-      expect((component as unknown as ProtegidoAsistente).accionesAbiertas_()).toBeFalse();
+      whenLlamoProtegido('onToggleAcciones');
+      expect(protegido().accionesAbiertas_()).toBeFalse();
 
-      (component as unknown as ProtegidoAsistente).onToggleAcciones();
-      expect((component as unknown as ProtegidoAsistente).accionesAbiertas_()).toBeTrue();
+      whenLlamoProtegido('onToggleAcciones');
+      expect(protegido().accionesAbiertas_()).toBeTrue();
     });
 
-    it('dado deshabilitado true, onOpcion no deberia emitir sugerencia', () => {
+    it('dado deshabilitado true, cuando hago click en una opcion, no deberia emitir sugerencia', () => {
       spyOn(component.sugerencia, 'emit');
-      component.deshabilitado = true;
+      givenDeshabilitado();
 
-      (component as unknown as ProtegidoAsistente).onOpcion(SugerenciaCapacidadMother.crear());
+      whenLlamoOnOpcion(SugerenciaCapacidadMother.crear());
 
       expect(component.sugerencia.emit).not.toHaveBeenCalled();
     });
 
-    it('dado deshabilitado false, onOpcion deberia cerrar acciones y emitir el prompt', () => {
+    it('dado deshabilitado false, cuando hago click en una opcion, deberia cerrar acciones y emitir el prompt', () => {
       spyOn(component.sugerencia, 'emit');
-      component.opciones = [SugerenciaCapacidadMother.crear()];
+      givenOpciones([SugerenciaCapacidadMother.crear()]);
 
-      (component as unknown as ProtegidoAsistente).onOpcion(SugerenciaCapacidadMother.crear({ prompt: 'ir' }));
+      whenLlamoOnOpcion(SugerenciaCapacidadMother.crear({ prompt: 'ir' }));
 
-      expect((component as unknown as ProtegidoAsistente).accionesAbiertas_()).toBeFalse();
+      expect(protegido().accionesAbiertas_()).toBeFalse();
       expect(component.sugerencia.emit).toHaveBeenCalledWith('ir');
     });
   });
 
   describe('trackers', () => {
-    it('trackById deberia devolver el id del mensaje', () => {
+    it('cuando llamo trackById con un mensaje, deberia devolver su id', () => {
       const mensaje = { id: 'mensaje-1' } as MensajeAsistente;
 
-      expect((component as unknown as ProtegidoAsistente).trackById(0, mensaje)).toBe('mensaje-1');
+      expect(protegido().trackById(0, mensaje)).toBe('mensaje-1');
     });
 
-    it('trackByGrupo y trackByOpcion deberian devolver el id respectivo', () => {
-      expect((component as unknown as ProtegidoAsistente).trackByGrupo(0, { id: 'cuenta' })).toBe('cuenta');
-      expect((component as unknown as ProtegidoAsistente).trackByOpcion(0, SugerenciaCapacidadMother.crear({ id: 'op-x' }))).toBe('op-x');
+    it('cuando llamo trackByGrupo y trackByOpcion, deberian devolver el id respectivo', () => {
+      expect(protegido().trackByGrupo(0, { id: 'cuenta' })).toBe('cuenta');
+      expect(protegido().trackByOpcion(0, SugerenciaCapacidadMother.crear({ id: 'op-x' }))).toBe('op-x');
     });
   });
 
   describe('crearGruposOpciones', () => {
-    it('dado opciones de distintas capacidades, deberia agruparlas por grupo en el orden esperado', () => {
-      component.opciones = [
+    it('dado opciones de distintas capacidades, cuando leo gruposOpciones, deberian estar en el orden esperado', () => {
+      givenOpciones([
         SugerenciaCapacidadMother.crear({ id: 'saldo', capacidad: 'SALDO' }),
         SugerenciaCapacidadMother.crear({ id: 'compras', capacidad: 'COMPRAS' }),
         SugerenciaCapacidadMother.crear({ id: 'stock', capacidad: 'STOCK' }),
         SugerenciaCapacidadMother.crear({ id: 'raro', capacidad: undefined }),
-      ];
+      ]);
 
-      const grupos = (component as unknown as ProtegidoAsistente).gruposOpciones();
+      const grupos = protegido().gruposOpciones();
 
       expect(grupos.map((g) => g.id)).toEqual(['cuenta', 'compras', 'buffet', 'general']);
       expect(grupos.find((g) => g.id === 'general')?.opciones.map((o) => o.id)).toEqual(['raro']);
     });
 
-    it('dado que no hay opciones para ciertos grupos, esos grupos deberian omitirse', () => {
-      component.opciones = [SugerenciaCapacidadMother.crear({ capacidad: 'SALDO' })];
+    it('dado opciones solo de la capacidad SALDO, cuando leo gruposOpciones, deberia devolver solo el grupo cuenta', () => {
+      givenOpciones([SugerenciaCapacidadMother.crear({ capacidad: 'SALDO' })]);
 
-      const grupos = (component as unknown as ProtegidoAsistente).gruposOpciones();
+      const grupos = protegido().gruposOpciones();
 
       expect(grupos.map((g) => g.id)).toEqual(['cuenta']);
     });
   });
+
+  function protegido(): ProtegidoAsistente {
+    return component as unknown as ProtegidoAsistente;
+  }
+
+  function givenSpyEnFechaRetiro(): void {
+    spyOn(component.fechaRetiro, 'emit');
+  }
+
+  function givenSelectorVisible(): void {
+    component.mostrarSelectorFechaRetiro = true;
+    fixture.detectChanges();
+  }
+
+  function givenSelectorVisibleConMinimo(minimo: string): void {
+    component.mostrarSelectorFechaRetiro = true;
+    component.fechaRetiroMinima = minimo;
+    fixture.detectChanges();
+  }
+
+  function givenSelectorVisibleYDeshabilitado(): void {
+    component.mostrarSelectorFechaRetiro = true;
+    component.deshabilitado = true;
+    fixture.detectChanges();
+  }
+
+  function givenOpciones(opciones: SugerenciaCapacidad[]): void {
+    component.opciones = opciones;
+  }
+
+  function givenDeshabilitado(): void {
+    component.deshabilitado = true;
+  }
+
+  function whenCambioLaFechaEnElSelector(valor: string): void {
+    const input = buscarInputFecha();
+    input.value = valor;
+    input.dispatchEvent(new Event('change'));
+  }
+
+  function whenLlamoProtegido(
+    metodo: 'onCerrar' | 'onEscape' | 'onNuevaConversacion' | 'onVerHistorial' | 'onToggleAcciones',
+  ): void {
+    protegido()[metodo]();
+  }
+
+  function whenLlamoOnEnviar(texto: string): void {
+    protegido().onEnviar(texto);
+  }
+
+  function whenLlamoOnSugerencia(prompt: string): void {
+    protegido().onSugerencia(prompt);
+  }
+
+  function whenLlamoOnOpcion(opcion: SugerenciaCapacidad): void {
+    protegido().onOpcion(opcion);
+  }
+
+  function thenSeEmitioFechaRetiro(fecha: string): void {
+    expect(component.fechaRetiro.emit).toHaveBeenCalledOnceWith(fecha);
+  }
+
+  function thenNoSeEmitioFechaRetiro(): void {
+    expect(component.fechaRetiro.emit).not.toHaveBeenCalled();
+  }
 
   function buscarInputFecha(): HTMLInputElement {
     const input = fixture.nativeElement.querySelector(

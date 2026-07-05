@@ -12,7 +12,11 @@ describe('RecredAdminPresenter', () => {
   let toast: jasmine.SpyObj<ToastService>;
 
   beforeEach(() => {
-    servicio = jasmine.createSpyObj('RecredAdminService', ['getPendingRegistrations', 'approveRegistration', 'rejectRegistration']);
+    servicio = jasmine.createSpyObj('RecredAdminService', [
+      'getPendingRegistrations',
+      'approveRegistration',
+      'rejectRegistration',
+    ]);
     toast = jasmine.createSpyObj('ToastService', ['mostrar']);
 
     TestBed.configureTestingModule({
@@ -26,14 +30,14 @@ describe('RecredAdminPresenter', () => {
     presenter = TestBed.inject(RecredAdminPresenter);
   });
 
-  describe('Inicialización', () => {
-    it('debería cargar las solicitudes pendientes y emitirlas cuando el servicio responde correctamente', () => {
+  describe('Inicializacion', () => {
+    it('dado que el servicio responde con solicitudes, cuando inicializo, deberia emitirlas y dejar cargando en false', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+      givenSolicitudesPendientes(solicitudes);
       let resultado: SchoolRegistration[] | undefined;
       let cargando: boolean | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => resultado = v);
-      presenter.cargando$.subscribe((v: boolean) => cargando = v);
+      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => (resultado = v));
+      presenter.cargando$.subscribe((v: boolean) => (cargando = v));
 
       presenter.initialize();
 
@@ -41,10 +45,10 @@ describe('RecredAdminPresenter', () => {
       expect(cargando).toBeFalse();
     });
 
-    it('debería emitir el error cuando el servicio falla al cargar', () => {
-      servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')));
+    it('dado que el servicio falla al cargar, cuando inicializo, deberia emitir el error', () => {
+      givenGetPendingRegistrationsFalla();
       let error: string | null | undefined;
-      presenter.error$.subscribe((v: string | null) => error = v);
+      presenter.error$.subscribe((v: string | null) => (error = v));
 
       presenter.initialize();
 
@@ -52,14 +56,14 @@ describe('RecredAdminPresenter', () => {
     });
   });
 
-  describe('Aprobación de solicitud', () => {
-    it('debería aprobar la solicitud, eliminarla de la lista local y mostrar toast de éxito', () => {
+  describe('Aprobacion de solicitud', () => {
+    it('dado una lista cargada, cuando apruebo una solicitud, deberia sacarla de la lista y mostrar toast de exito', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+      givenSolicitudesPendientes(solicitudes);
       servicio.approveRegistration.and.returnValue(of(undefined));
       presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
+      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => (lista = v));
 
       presenter.aprobar('solicitud-1');
 
@@ -69,13 +73,13 @@ describe('RecredAdminPresenter', () => {
       expect(toast.mostrar).toHaveBeenCalledWith(jasmine.stringContaining('aprobado'), 'success');
     });
 
-    it('debería mostrar toast de error y no modificar la lista cuando el servicio de aprobación falla', () => {
+    it('dado que approveRegistration falla, cuando apruebo, deberia mostrar toast de error y no modificar la lista', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+      givenSolicitudesPendientes(solicitudes);
       servicio.approveRegistration.and.returnValue(throwError(() => new Error('API Error')));
       presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
+      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => (lista = v));
 
       presenter.aprobar('solicitud-1');
 
@@ -85,13 +89,13 @@ describe('RecredAdminPresenter', () => {
   });
 
   describe('Rechazo de solicitud', () => {
-    it('debería rechazar la solicitud, eliminarla de la lista local y mostrar toast de éxito', () => {
+    it('dado una lista cargada, cuando rechazo una solicitud, deberia sacarla de la lista y mostrar toast de exito', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+      givenSolicitudesPendientes(solicitudes);
       servicio.rejectRegistration.and.returnValue(of(undefined));
       presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
+      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => (lista = v));
 
       presenter.rechazar('solicitud-2');
 
@@ -101,13 +105,13 @@ describe('RecredAdminPresenter', () => {
       expect(toast.mostrar).toHaveBeenCalledWith('Solicitud rechazada.', 'success');
     });
 
-    it('debería mostrar toast de error y no modificar la lista cuando el servicio de rechazo falla', () => {
+    it('dado que rejectRegistration falla, cuando rechazo, deberia mostrar toast de error y no modificar la lista', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
-      servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+      givenSolicitudesPendientes(solicitudes);
       servicio.rejectRegistration.and.returnValue(throwError(() => new Error('API Error')));
       presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
-      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => lista = v);
+      presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => (lista = v));
 
       presenter.rechazar('solicitud-2');
 
@@ -115,4 +119,12 @@ describe('RecredAdminPresenter', () => {
       expect(toast.mostrar).toHaveBeenCalledWith('Error al rechazar la solicitud.', 'error');
     });
   });
+
+  function givenSolicitudesPendientes(solicitudes: SchoolRegistration[]): void {
+    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+  }
+
+  function givenGetPendingRegistrationsFalla(): void {
+    servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')));
+  }
 });

@@ -28,22 +28,22 @@ describe('AuthService', () => {
   });
 
   describe('isAutenticado', () => {
-    it('dado que hay sesion, deberia devolver true', async () => {
-      servicioSesion.haySesionAutenticada.and.resolveTo(true);
+    it('dado que hay sesion, cuando consulto isAutenticado, deberia devolver true', async () => {
+      givenSesionAutenticada(true);
 
       expect(await service.isAutenticado()).toBeTrue();
     });
 
-    it('dado que no hay sesion, deberia devolver false', async () => {
-      servicioSesion.haySesionAutenticada.and.resolveTo(false);
+    it('dado que no hay sesion, cuando consulto isAutenticado, deberia devolver false', async () => {
+      givenSesionAutenticada(false);
 
       expect(await service.isAutenticado()).toBeFalse();
     });
   });
 
   describe('login', () => {
-    it('dado que ya hay sesion autenticada, cuando hago login, no deberia limpiar el perfil ni intentar la redireccion', async () => {
-      servicioSesion.haySesionAutenticada.and.resolveTo(true);
+    it('dado que ya hay sesion autenticada, cuando hago login, no deberia limpiar el perfil ni redirigir', async () => {
+      givenSesionAutenticada(true);
 
       await service.login();
 
@@ -52,8 +52,8 @@ describe('AuthService', () => {
   });
 
   describe('esperarAutenticacion', () => {
-    it('dado una sesion disponible, deberia devolver true y pasar los reintentos configurados', async () => {
-      servicioSesion.esperarSesionAutenticada.and.resolveTo({} as never);
+    it('dado una sesion disponible, cuando espero, deberia devolver true y pasar los reintentos configurados', async () => {
+      givenEsperarSesionResuelveCon({} as never);
 
       const resultado = await service.esperarAutenticacion();
 
@@ -64,8 +64,8 @@ describe('AuthService', () => {
       });
     });
 
-    it('dado que la sesion nunca aparece, deberia devolver false', async () => {
-      servicioSesion.esperarSesionAutenticada.and.resolveTo(null);
+    it('dado que la sesion nunca aparece, cuando espero, deberia devolver false', async () => {
+      givenEsperarSesionResuelveCon(null);
 
       expect(await service.esperarAutenticacion()).toBeFalse();
     });
@@ -73,15 +73,27 @@ describe('AuthService', () => {
 
   describe('getSub', () => {
     it('dado el service, cuando pido el sub, deberia delegar a obtenerSub del session service', async () => {
-      servicioSesion.obtenerSub.and.resolveTo('sub-123');
+      givenSubDelSessionService('sub-123');
 
       expect(await service.getSub()).toBe('sub-123');
     });
 
-    it('dado que el session service no tiene sub, deberia devolver undefined', async () => {
-      servicioSesion.obtenerSub.and.resolveTo(undefined);
+    it('dado que el session service no tiene sub, cuando pido el sub, deberia devolver undefined', async () => {
+      givenSubDelSessionService(undefined);
 
       expect(await service.getSub()).toBeUndefined();
     });
   });
+
+  function givenSesionAutenticada(autenticada: boolean): void {
+    servicioSesion.haySesionAutenticada.and.resolveTo(autenticada);
+  }
+
+  function givenEsperarSesionResuelveCon(valor: Awaited<ReturnType<AuthSessionService['esperarSesionAutenticada']>>): void {
+    servicioSesion.esperarSesionAutenticada.and.resolveTo(valor);
+  }
+
+  function givenSubDelSessionService(sub: string | undefined): void {
+    servicioSesion.obtenerSub.and.resolveTo(sub);
+  }
 });

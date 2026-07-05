@@ -67,27 +67,14 @@ describe('AlumnosService', () => {
   });
 
   describe('crearHijo', () => {
-    it('dado un payload con espacios alrededor de los campos, cuando creo un hijo, deberia hacer POST con el body trimmeado y agregar el alumno al estado', async () => {
-      const payloadConEspacios = CrearHijoRequestMother.create({
-        username: ' user ',
-        nombre: ' N ',
-        apellido: ' A ',
-        email: ' e@e.com ',
-        dni: ' 123 ',
-        gradoId: ' g1 ',
-      });
-      const dtoRespuesta = StudentDtoMother.create({ id: 'new-1' });
+    it('dado un payload con espacios alrededor de los campos, cuando creo un hijo, deberia hacer POST con los valores trimmeados y agregar el alumno al estado', async () => {
+      const payloadConEspacios = givenPayloadConValoresConEspacios(' user ', ' N ', ' A ', ' e@e.com ', ' 123 ', ' g1 ');
 
       const promesa = whenCreoUnHijo(payloadConEspacios);
 
-      thenSeHizoPostHijosConBody({
-        username: 'user',
-        nombre: 'N',
-        apellido: 'A',
-        email: 'e@e.com',
-        dni: '123',
-        gradoId: 'g1',
-      }).flush(dtoRespuesta);
+      thenSeLlamaAlPOSTHijosCon('user', 'N', 'A', 'e@e.com', '123', 'g1').flush(
+        StudentDtoMother.create({ id: 'new-1' }),
+      );
 
       const alumno = await promesa;
       expect(alumno.id).toBe('new-1');
@@ -385,10 +372,33 @@ describe('AlumnosService', () => {
     return service.cargarPerfilAlumno();
   }
 
-  function thenSeHizoPostHijosConBody(body: CrearHijoRequest): TestRequest {
+  function givenPayloadConValoresConEspacios(
+    username: string,
+    nombre: string,
+    apellido: string,
+    email: string,
+    dni: string,
+    gradoId: string,
+  ): CrearHijoRequest {
+    return CrearHijoRequestMother.create({ username, nombre, apellido, email, dni, gradoId });
+  }
+
+  function thenSeLlamaAlPOSTHijosCon(
+    username: string,
+    nombre: string,
+    apellido: string,
+    email: string,
+    dni: string,
+    gradoId: string,
+  ): TestRequest {
     const req = httpMock.expectOne(URL_HIJOS_TUTOR_POST);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(body);
+    expect(req.request.body.username).toBe(username);
+    expect(req.request.body.nombre).toBe(nombre);
+    expect(req.request.body.apellido).toBe(apellido);
+    expect(req.request.body.email).toBe(email);
+    expect(req.request.body.dni).toBe(dni);
+    expect(req.request.body.gradoId).toBe(gradoId);
     return req;
   }
 

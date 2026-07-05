@@ -54,23 +54,21 @@ describe('TablaProductoComponent', () => {
   });
 
   describe('getModeLabel', () => {
-    it('dado STOCK_EXACTO, deberia devolver "Stock exacto"', () => {
+    it('dado STOCK_EXACTO, cuando pido el label, deberia devolver "Stock exacto"', () => {
       expect(component.getModeLabel('STOCK_EXACTO')).toBe('Stock exacto');
     });
 
-    it('dado DISPONIBLE_NO_DISPONIBLE, deberia devolver "Disponible / No disponible"', () => {
-      expect(component.getModeLabel('DISPONIBLE_NO_DISPONIBLE')).toBe(
-        'Disponible / No disponible',
-      );
+    it('dado DISPONIBLE_NO_DISPONIBLE, cuando pido el label, deberia devolver "Disponible / No disponible"', () => {
+      expect(component.getModeLabel('DISPONIBLE_NO_DISPONIBLE')).toBe('Disponible / No disponible');
     });
 
-    it('dado CUPO_DIARIO, deberia devolver "Cupo diario"', () => {
+    it('dado CUPO_DIARIO, cuando pido el label, deberia devolver "Cupo diario"', () => {
       expect(component.getModeLabel('CUPO_DIARIO')).toBe('Cupo diario');
     });
   });
 
   describe('getStatusLabel y getStockValue', () => {
-    it('dado un producto DISPONIBLE_NO_DISPONIBLE apagado con estado SIN_STOCK, deberia mostrar "No disponible" en label y valor', () => {
+    it('dado un producto DISPONIBLE_NO_DISPONIBLE apagado y SIN_STOCK, cuando pido labels, deberia mostrar "No disponible"', () => {
       const producto = ItemResumenInventarioMother.crear({
         tipoManejoInventario: 'DISPONIBLE_NO_DISPONIBLE',
         estadoInventario: 'SIN_STOCK',
@@ -86,19 +84,19 @@ describe('TablaProductoComponent', () => {
       expect(component.getAvailabilityLabel(producto)).toBe('Estado operativo');
     });
 
-    it('dado un producto SIN_STOCK con stock exacto, deberia mostrar "Agotado" en label', () => {
+    it('dado un producto SIN_STOCK con stock exacto, cuando pido el label, deberia mostrar "Agotado"', () => {
       const producto = ItemResumenInventarioMother.crearAgotado();
 
       expect(component.getStatusLabel(producto)).toBe('Agotado');
     });
 
-    it('dado un producto BAJO_STOCK, deberia mostrar "Bajo stock" en label', () => {
+    it('dado un producto BAJO_STOCK, cuando pido el label, deberia mostrar "Bajo stock"', () => {
       const producto = ItemResumenInventarioMother.crearBajoStock();
 
       expect(component.getStatusLabel(producto)).toBe('Bajo stock');
     });
 
-    it('dado CUPO_DIARIO, getStockValue deberia mostrar el cupoDisponibleDia', () => {
+    it('dado CUPO_DIARIO con cupoDisponibleDia 8, cuando pido el stockValue, deberia mostrar "8"', () => {
       const producto = ItemResumenInventarioMother.crear({
         tipoManejoInventario: 'CUPO_DIARIO',
         cupoMaximoDiario: 20,
@@ -108,7 +106,7 @@ describe('TablaProductoComponent', () => {
       expect(component.getStockValue(producto)).toBe('8');
     });
 
-    it('dado stockDisponible null en STOCK_EXACTO, getStockValue deberia mostrar "-"', () => {
+    it('dado stockDisponible null en STOCK_EXACTO, cuando pido el stockValue, deberia mostrar "-"', () => {
       const producto = ItemResumenInventarioMother.crear({ stockDisponible: null });
 
       expect(component.getStockValue(producto)).toBe('-');
@@ -116,21 +114,21 @@ describe('TablaProductoComponent', () => {
   });
 
   describe('highlight', () => {
-    it('dado un producto y un set de ids marcados que contiene el suyo, isHighlighted deberia ser true', () => {
-      component.highlightedProductIds = new Set(['producto-1']);
+    it('dado un set de ids marcados que contiene el del producto, cuando consulto isHighlighted, deberia ser true', () => {
+      givenIdsMarcados(['producto-1']);
 
       expect(component.isHighlighted(ItemResumenInventarioMother.crear())).toBeTrue();
     });
 
-    it('dado un producto no marcado, isHighlighted deberia ser false', () => {
-      component.highlightedProductIds = new Set(['otro']);
+    it('dado un producto no marcado, cuando consulto isHighlighted, deberia ser false', () => {
+      givenIdsMarcados(['otro']);
 
       expect(component.isHighlighted(ItemResumenInventarioMother.crear())).toBeFalse();
     });
   });
 
   describe('onImagenError', () => {
-    it('dado un src distinto al fallback, deberia reemplazarlo por IMAGEN_FALLBACK', () => {
+    it('dado un src distinto al fallback, cuando se dispara error, deberia reemplazarlo por IMAGEN_FALLBACK', () => {
       const img = document.createElement('img');
       img.src = 'ruta-mala.png';
 
@@ -139,7 +137,7 @@ describe('TablaProductoComponent', () => {
       expect(img.src).toContain('logo_sin_fondo');
     });
 
-    it('dado un src que ya es el fallback, no deberia volver a asignarlo (evita loop)', () => {
+    it('dado un src que ya es el fallback, cuando se dispara error, no deberia volver a asignarlo (evita loop)', () => {
       const img = document.createElement('img');
       img.src = 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
       const previo = img.src;
@@ -149,4 +147,8 @@ describe('TablaProductoComponent', () => {
       expect(img.src).toBe(previo);
     });
   });
+
+  function givenIdsMarcados(ids: string[]): void {
+    component.highlightedProductIds = new Set(ids);
+  }
 });

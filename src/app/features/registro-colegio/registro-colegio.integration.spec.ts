@@ -6,6 +6,20 @@ import { RegistroColegioPage } from './registro-colegio.page';
 import { RegistroColegioService } from './services/registro-colegio.service';
 import { ToastService } from '../../shared/services/toast.service';
 
+const CAMPOS_FORM_VALIDOS = {
+  schoolName: 'Instituto Test',
+  schoolEmail: 'test@test.com',
+  schoolPhone: '011-1234',
+  schoolCue: '123',
+  schoolLevelId: '44444444-4444-4444-4444-444444444444',
+  directorFirstName: 'Juan',
+  directorLastName: 'Pérez',
+  directorEmail: 'juan@test.com',
+  directorPhone: '15-1234',
+  directorDni: '12345678',
+  directorUsername: 'juanperez',
+};
+
 describe('RegistroColegio Integration', () => {
   let fixture: ComponentFixture<RegistroColegioPage>;
   let servicio: jasmine.SpyObj<RegistroColegioService>;
@@ -27,7 +41,7 @@ describe('RegistroColegio Integration', () => {
     fixture.detectChanges();
   });
 
-  it('debería renderizar el formulario con el título y el selector de niveles educativos', () => {
+  it('dado el componente montado, cuando se renderiza, deberia mostrar el formulario con titulo y selector de niveles', () => {
     const titulo = fixture.nativeElement.querySelector('.rc__title').textContent;
     const select = fixture.nativeElement.querySelector('#schoolLevelId');
     const opciones = fixture.debugElement.queryAll(By.css('#schoolLevelId option'));
@@ -37,30 +51,11 @@ describe('RegistroColegio Integration', () => {
     expect(opciones.length).toBeGreaterThan(1);
   });
 
-  it('debería mostrar el panel de éxito y ocultar el formulario cuando el servicio responde correctamente', () => {
-    servicio.submitRegistration.and.returnValue(of(undefined));
-    const llenarCampo = (id: string, val: string) => {
-      const el: HTMLInputElement = fixture.nativeElement.querySelector(`#${id}`);
-      el.value = val;
-      el.dispatchEvent(new Event('input'));
-    };
-    llenarCampo('schoolName', 'Instituto Test');
-    llenarCampo('schoolEmail', 'test@test.com');
-    llenarCampo('schoolPhone', '011-1234');
-    llenarCampo('schoolCue', '123');
-    const select: HTMLSelectElement = fixture.nativeElement.querySelector('#schoolLevelId');
-    select.value = '44444444-4444-4444-4444-444444444444';
-    select.dispatchEvent(new Event('change'));
-    llenarCampo('directorFirstName', 'Juan');
-    llenarCampo('directorLastName', 'Pérez');
-    llenarCampo('directorEmail', 'juan@test.com');
-    llenarCampo('directorPhone', '15-1234');
-    llenarCampo('directorDni', '12345678');
-    llenarCampo('directorUsername', 'juanperez');
-    fixture.detectChanges();
+  it('dado el form completo, cuando envio y el servicio responde OK, deberia mostrar el panel de exito y ocultar el form', () => {
+    givenSubmitRegistrationResuelveOk();
+    whenCompletoFormEnDOM();
 
-    fixture.nativeElement.querySelector('#btn-enviar').click();
-    fixture.detectChanges();
+    whenHagoClickEnEnviar();
 
     const panelExito = fixture.nativeElement.querySelector('#panel-exito');
     const form = fixture.nativeElement.querySelector('.rc__form');
@@ -68,28 +63,54 @@ describe('RegistroColegio Integration', () => {
     expect(form).toBeNull();
   });
 
-  it('debería mostrar el banner de error cuando el servicio falla', () => {
-    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Error 500')));
-    fixture.componentInstance.form.patchValue({
-      schoolName: 'Instituto Test',
-      schoolEmail: 'test@test.com',
-      schoolPhone: '011-1234',
-      schoolCue: '123',
-      schoolLevelId: '44444444-4444-4444-4444-444444444444',
-      directorFirstName: 'Juan',
-      directorLastName: 'Pérez',
-      directorEmail: 'juan@test.com',
-      directorPhone: '15-1234',
-      directorDni: '12345678',
-      directorUsername: 'juanperez',
-    });
-    fixture.detectChanges();
+  it('dado el form completo, cuando envio y el servicio falla, deberia mostrar el banner de error', () => {
+    givenSubmitRegistrationFalla();
+    whenCompletoFormViaPatchValue();
 
-    fixture.nativeElement.querySelector('#btn-enviar').click();
-    fixture.detectChanges();
+    whenHagoClickEnEnviar();
 
     const panelError = fixture.nativeElement.querySelector('#panel-error');
     expect(panelError).toBeTruthy();
     expect(panelError.textContent).toContain('error al enviar');
   });
+
+  function givenSubmitRegistrationResuelveOk(): void {
+    servicio.submitRegistration.and.returnValue(of(undefined));
+  }
+
+  function givenSubmitRegistrationFalla(): void {
+    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Error 500')));
+  }
+
+  function whenCompletoFormEnDOM(): void {
+    const llenarCampo = (id: string, val: string): void => {
+      const el = fixture.nativeElement.querySelector(`#${id}`) as HTMLInputElement;
+      el.value = val;
+      el.dispatchEvent(new Event('input'));
+    };
+    llenarCampo('schoolName', CAMPOS_FORM_VALIDOS.schoolName);
+    llenarCampo('schoolEmail', CAMPOS_FORM_VALIDOS.schoolEmail);
+    llenarCampo('schoolPhone', CAMPOS_FORM_VALIDOS.schoolPhone);
+    llenarCampo('schoolCue', CAMPOS_FORM_VALIDOS.schoolCue);
+    const select = fixture.nativeElement.querySelector('#schoolLevelId') as HTMLSelectElement;
+    select.value = CAMPOS_FORM_VALIDOS.schoolLevelId;
+    select.dispatchEvent(new Event('change'));
+    llenarCampo('directorFirstName', CAMPOS_FORM_VALIDOS.directorFirstName);
+    llenarCampo('directorLastName', CAMPOS_FORM_VALIDOS.directorLastName);
+    llenarCampo('directorEmail', CAMPOS_FORM_VALIDOS.directorEmail);
+    llenarCampo('directorPhone', CAMPOS_FORM_VALIDOS.directorPhone);
+    llenarCampo('directorDni', CAMPOS_FORM_VALIDOS.directorDni);
+    llenarCampo('directorUsername', CAMPOS_FORM_VALIDOS.directorUsername);
+    fixture.detectChanges();
+  }
+
+  function whenCompletoFormViaPatchValue(): void {
+    fixture.componentInstance.form.patchValue(CAMPOS_FORM_VALIDOS);
+    fixture.detectChanges();
+  }
+
+  function whenHagoClickEnEnviar(): void {
+    fixture.nativeElement.querySelector('#btn-enviar').click();
+    fixture.detectChanges();
+  }
 });

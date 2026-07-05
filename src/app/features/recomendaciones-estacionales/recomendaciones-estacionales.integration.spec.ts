@@ -87,7 +87,7 @@ describe('RecomendacionesEstacionales Integration', () => {
   });
 
   it('dado geolocation ok y una respuesta con sugerencias, cuando se monta la page, deberia renderizar el titulo y las tarjetas', () => {
-    fixture.detectChanges();
+    whenMonto();
 
     const texto = textoRenderizado();
     expect(texto).toContain('Sugerencias de stock');
@@ -96,23 +96,29 @@ describe('RecomendacionesEstacionales Integration', () => {
     expect(servicioRecomendaciones.getSeasonalRecommendations).toHaveBeenCalledWith(LAT_TEST, LNG_TEST);
   });
 
-  it('dado un tip promocional en la respuesta, deberia renderizar la tip-card', () => {
-    fixture.detectChanges();
+  it('dado un tip promocional en la respuesta, cuando se monta, deberia renderizar la tip-card', () => {
+    whenMonto();
 
     const tipCard = (fixture.nativeElement as HTMLElement).querySelector('app-tip-card');
     expect(tipCard).toBeTruthy();
     expect(textoRenderizado()).toContain('Aprovecha el invierno');
   });
 
-  it('dado una respuesta sin sugerencias, deberia mostrar el estado vacio', () => {
-    servicioRecomendaciones.getSeasonalRecommendations.and.returnValue(
-      of(RecomendacionesResponseMother.crearVacio()),
-    );
+  it('dado una respuesta sin sugerencias, cuando se monta, deberia mostrar el estado vacio', () => {
+    givenRecomendacionesDelBack(RecomendacionesResponseMother.crearVacio());
 
-    fixture.detectChanges();
+    whenMonto();
 
     expect(textoRenderizado()).toContain('No hay sugerencias disponibles');
   });
+
+  function givenRecomendacionesDelBack(response: ReturnType<typeof RecomendacionesResponseMother.crear>): void {
+    servicioRecomendaciones.getSeasonalRecommendations.and.returnValue(of(response));
+  }
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 
   function textoRenderizado(): string {
     return (fixture.nativeElement as HTMLElement).textContent ?? '';

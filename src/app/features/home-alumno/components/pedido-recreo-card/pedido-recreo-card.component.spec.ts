@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PedidoEnCursoMother, RecreoMother } from '../../home-alumno.mother';
+import { PedidoEnCurso } from '../../models/pedido-en-curso.model';
+import { Recreo } from '../../models/recreo.model';
 import { PedidoRecreoCardComponent } from './pedido-recreo-card.component';
 
 describe('PedidoRecreoCardComponent', () => {
@@ -19,23 +21,18 @@ describe('PedidoRecreoCardComponent', () => {
 
   describe('sin pedido', () => {
     beforeEach(() => {
-      component.pedido = undefined;
-      fixture.detectChanges();
+      givenPedido(undefined);
     });
 
-    it('dado sin pedido, deberia mostrar el estado vacio con el mensaje de invitar al buffet', () => {
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).toContain('Todavía no pediste nada para hoy');
+    it('dado sin pedido, cuando se renderiza, deberia mostrar el estado vacio con el mensaje de invitar al buffet', () => {
+      expect(textoDeLaCard()).toContain('Todavía no pediste nada para hoy');
     });
 
     it('dado sin pedido, cuando hago click en el CTA "Ir al buffet", deberia emitir verPedido', () => {
       const spy = jasmine.createSpy('verPedido');
       component.verPedido.subscribe(spy);
 
-      const boton = (fixture.nativeElement as HTMLElement).querySelector(
-        '.pedido-recreo__cta',
-      ) as HTMLButtonElement;
-      boton.click();
+      whenHagoClickEnElCTA();
 
       expect(spy).toHaveBeenCalled();
     });
@@ -43,17 +40,15 @@ describe('PedidoRecreoCardComponent', () => {
 
   describe('con pedido', () => {
     beforeEach(() => {
-      component.pedido = PedidoEnCursoMother.crear();
-      fixture.detectChanges();
+      givenPedido(PedidoEnCursoMother.crear());
     });
 
-    it('dado un pedido, deberia mostrar los items resumidos', () => {
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).toContain('Sándwich JyQ');
+    it('dado un pedido, cuando se renderiza, deberia mostrar los items resumidos', () => {
+      expect(textoDeLaCard()).toContain('Sándwich JyQ');
     });
 
-    it('dado un pedido, deberia mostrar el total formateado y el horario de retiro', () => {
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    it('dado un pedido, cuando se renderiza, deberia mostrar el total formateado y el horario de retiro', () => {
+      const texto = textoDeLaCard();
       expect(texto).toContain('$ 1500');
       expect(texto).toContain('Retirás 10:30');
     });
@@ -62,32 +57,47 @@ describe('PedidoRecreoCardComponent', () => {
       const spy = jasmine.createSpy('verPedido');
       component.verPedido.subscribe(spy);
 
-      const boton = (fixture.nativeElement as HTMLElement).querySelector(
-        '.pedido-recreo__cta',
-      ) as HTMLButtonElement;
-      boton.click();
+      whenHagoClickEnElCTA();
 
       expect(spy).toHaveBeenCalled();
     });
   });
 
   describe('recreo', () => {
-    it('dado un recreo, deberia mostrar el nombre y las horas', () => {
-      component.recreo = RecreoMother.crear();
-      fixture.detectChanges();
+    it('dado un recreo, cuando se renderiza, deberia mostrar el nombre y las horas', () => {
+      givenRecreo(RecreoMother.crear());
 
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+      const texto = textoDeLaCard();
       expect(texto).toContain('Primer recreo');
       expect(texto).toContain('10:15');
       expect(texto).toContain('10:30');
     });
 
-    it('dado sin recreo, deberia mostrar "Sin recreo a la vista"', () => {
-      component.recreo = undefined;
-      fixture.detectChanges();
+    it('dado sin recreo, cuando se renderiza, deberia mostrar "Sin recreo a la vista"', () => {
+      givenRecreo(undefined);
 
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).toContain('Sin recreo a la vista');
+      expect(textoDeLaCard()).toContain('Sin recreo a la vista');
     });
   });
+
+  function givenPedido(pedido: PedidoEnCurso | undefined): void {
+    component.pedido = pedido;
+    fixture.detectChanges();
+  }
+
+  function givenRecreo(recreo: Recreo | undefined): void {
+    component.recreo = recreo;
+    fixture.detectChanges();
+  }
+
+  function whenHagoClickEnElCTA(): void {
+    const boton = (fixture.nativeElement as HTMLElement).querySelector(
+      '.pedido-recreo__cta',
+    ) as HTMLButtonElement;
+    boton.click();
+  }
+
+  function textoDeLaCard(): string {
+    return (fixture.nativeElement as HTMLElement).textContent ?? '';
+  }
 });

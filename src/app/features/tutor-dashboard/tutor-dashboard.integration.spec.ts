@@ -7,7 +7,7 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { DialogService } from '../../shared/services/dialog.service';
 import { SmartChartWidget } from './components/smart-chart-widget/smart-chart-widget';
-import { ChildDashboardSummary } from './models/tutor-dashboard.model';
+import { ChildDashboardSummary, TutorGlobalDashboardSummary } from './models/tutor-dashboard.model';
 import { TutorDashboardService } from './services/tutor-dashboard.service';
 import { TutorGlobalDashboardSummaryMother } from './tutor-dashboard.mother';
 import { TutorDashboardComponent } from './tutor-dashboard.component';
@@ -72,23 +72,27 @@ describe('TutorDashboard Integration', () => {
   afterEach(() => localStorage.clear());
 
   it('dado el back respondiendo con hijos, cuando se monta la page, deberia setear globalSummary y bajar isLoading', () => {
-    dashboardService.getGlobalDashboard.and.returnValue(
-      of(TutorGlobalDashboardSummaryMother.crear()),
-    );
+    givenDashboardDelBack(TutorGlobalDashboardSummaryMother.crear());
 
-    fixture.detectChanges();
+    whenMonto();
 
     expect(fixture.componentInstance.globalSummary?.children.length).toBe(2);
     expect(fixture.componentInstance.isLoading).toBeFalse();
   });
 
   it('dado que el back devuelve sin dashboardConfig, cuando se monta la page, deberia usar el layout default de 5 items', () => {
-    dashboardService.getGlobalDashboard.and.returnValue(
-      of(TutorGlobalDashboardSummaryMother.crear()),
-    );
+    givenDashboardDelBack(TutorGlobalDashboardSummaryMother.crear());
 
-    fixture.detectChanges();
+    whenMonto();
 
     expect(fixture.componentInstance.dashboardItems.length).toBe(5);
   });
+
+  function givenDashboardDelBack(dashboard: TutorGlobalDashboardSummary): void {
+    dashboardService.getGlobalDashboard.and.returnValue(of(dashboard));
+  }
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

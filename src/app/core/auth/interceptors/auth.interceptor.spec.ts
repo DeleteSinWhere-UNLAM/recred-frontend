@@ -9,6 +9,7 @@ import { authInterceptor } from './auth.interceptor';
 describe('authInterceptor', () => {
   const URL_API = `${environment.apiUrl}/algo`;
   const URL_EXTERNA = 'https://otro-servidor.com/x';
+  const URL_INVENTARIO = 'https://18-119-187-167.sslip.io/algo';
 
   let http: HttpClient;
   let httpMock: HttpTestingController;
@@ -33,8 +34,8 @@ describe('authInterceptor', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('dado una URL externa (no API propia), deberia pasar sin autorizacion', async () => {
-    const promesa = firstValueFrom(http.get(URL_EXTERNA));
+  it('dado una URL externa (no API propia), cuando hago request, deberia pasar sin autorizacion', async () => {
+    const promesa = whenHagoGet(URL_EXTERNA);
 
     const req = httpMock.expectOne(URL_EXTERNA);
     expect(req.request.headers.get('Authorization')).toBeNull();
@@ -43,10 +44,10 @@ describe('authInterceptor', () => {
     expect(servicioSesion.obtenerAccessTokenParaApi).not.toHaveBeenCalled();
   });
 
-  it('dado un token disponible, deberia agregar el Authorization Bearer', async () => {
-    servicioSesion.obtenerAccessTokenParaApi.and.resolveTo('token-1');
+  it('dado un token disponible, cuando hago request a la API, deberia agregar el Authorization Bearer', async () => {
+    givenTokensDisponibles('token-1');
 
-    const promesa = firstValueFrom(http.get(URL_API));
+    const promesa = whenHagoGet(URL_API);
     await flushMicros();
     const req = httpMock.expectOne(URL_API);
 
@@ -55,22 +56,17 @@ describe('authInterceptor', () => {
     await promesa;
   });
 
-  it('dado que no hay token disponible, deberia rechazar la request con el error de token', async () => {
+  it('dado que no hay token disponible, cuando hago request, deberia rechazar con el error de token', async () => {
     spyOn(console, 'error');
-    servicioSesion.obtenerAccessTokenParaApi.and.resolveTo(null);
+    givenTokensDisponibles(null);
 
-    await expectAsync(firstValueFrom(http.get(URL_API))).toBeRejectedWithError(
-      /token de Cognito/,
-    );
+    await expectAsync(whenHagoGet(URL_API)).toBeRejectedWithError(/token de Cognito/);
   });
 
-  it('dado un 401, deberia reintentar la request con un token refrescado', async () => {
-    servicioSesion.obtenerAccessTokenParaApi.and.returnValues(
-      Promise.resolve('token-viejo'),
-      Promise.resolve('token-nuevo'),
-    );
+  it('dado un 401, cuando hago request, deberia reintentar con un token refrescado', async () => {
+    givenTokensDisponibles('token-viejo', 'token-nuevo');
 
-    const promesa = firstValueFrom(http.get(URL_API));
+    const promesa = whenHagoGet(URL_API);
     await flushMicros();
     const primerReq = httpMock.expectOne(URL_API);
     primerReq.flush('no autorizado', { status: 401, statusText: 'Unauthorized' });
@@ -83,23 +79,20 @@ describe('authInterceptor', () => {
     await promesa;
   });
 
-  it('dado que el refresh del token tampoco funciona, deberia propagar el 401 original', async () => {
-    servicioSesion.obtenerAccessTokenParaApi.and.returnValues(
-      Promise.resolve('token-viejo'),
-      Promise.resolve(null),
-    );
+  it('dado que el refresh del token tampoco funciona, cuando hago request, deberia propagar el 401 original', async () => {
+    givenTokensDisponibles('token-viejo', null);
 
-    const promesa = firstValueFrom(http.get(URL_API));
+    const promesa = whenHagoGet(URL_API);
     await flushMicros();
     httpMock.expectOne(URL_API).flush('no autorizado', { status: 401, statusText: 'Unauthorized' });
 
     await expectAsync(promesa).toBeRejectedWith(jasmine.any(HttpErrorResponse));
   });
 
-  it('dado un error != 401, no deberia reintentar', async () => {
-    servicioSesion.obtenerAccessTokenParaApi.and.resolveTo('token-1');
+  it('dado un error != 401, cuando hago request, no deberia reintentar', async () => {
+    givenTokensDisponibles('token-1');
 
-    const promesa = firstValueFrom(http.get(URL_API));
+    const promesa = whenHagoGet(URL_API);
     await flushMicros();
     httpMock.expectOne(URL_API).flush('server error', { status: 500, statusText: 'Server Error' });
 
@@ -107,25 +100,25 @@ describe('authInterceptor', () => {
     expect(servicioSesion.obtenerAccessTokenParaApi).toHaveBeenCalledTimes(1);
   });
 
-  it('dado el dominio de inventario, deberia autenticar la request igual que la API propia', async () => {
-    servicioSesion.obtenerAccessTokenParaApi.and.resolveTo('inv-token');
+  it('dado el dominio de inventario, cuando hago request, deberia autenticar como la API propia', async () => {
+    givenTokensDisponibles('inv-token');
 
-    const promesa = firstValueFrom(http.get('https://18-119-187-167.sslip.io/algo'));
+    const promesa = whenHagoGet(URL_INVENTARIO);
     await flushMicros();
-    const req = httpMock.expectOne('https://18-119-187-167.sslip.io/algo');
+    const req = httpMock.expectOne(URL_INVENTARIO);
 
     expect(req.request.headers.get('Authorization')).toBe('Bearer inv-token');
     req.flush({});
     await promesa;
   });
 
-  it('dado que new URL tira excepcion, deberia caer al fallback con startsWith y autenticar igual', async () => {
-    servicioSesion.obtenerAccessTokenParaApi.and.resolveTo('token-fallback');
+  it('dado que new URL tira excepcion, cuando hago request a la API propia, el fallback deberia autenticarla', async () => {
+    givenTokensDisponibles('token-fallback');
     const originalURL = window.URL;
-    (window as unknown as { URL: unknown }).URL = function () { throw new Error('URL invalido'); };
+    givenNewUrlRompe();
 
     try {
-      const promesa = firstValueFrom(http.get(URL_API));
+      const promesa = whenHagoGet(URL_API);
       await flushMicros();
       const req = httpMock.expectOne(URL_API);
 
@@ -137,16 +130,15 @@ describe('authInterceptor', () => {
     }
   });
 
-  it('dado que new URL falla y la URL es del dominio de inventario, el fallback deberia autenticarla', async () => {
-    servicioSesion.obtenerAccessTokenParaApi.and.resolveTo('inv-fallback');
+  it('dado que new URL falla y la URL es del dominio de inventario, cuando hago request, el fallback deberia autenticarla', async () => {
+    givenTokensDisponibles('inv-fallback');
     const originalURL = window.URL;
-    (window as unknown as { URL: unknown }).URL = function () { throw new Error('URL invalido'); };
-    const URL_INV = 'https://18-119-187-167.sslip.io/algo';
+    givenNewUrlRompe();
 
     try {
-      const promesa = firstValueFrom(http.get(URL_INV));
+      const promesa = whenHagoGet(URL_INVENTARIO);
       await flushMicros();
-      const req = httpMock.expectOne(URL_INV);
+      const req = httpMock.expectOne(URL_INVENTARIO);
 
       expect(req.request.headers.get('Authorization')).toBe('Bearer inv-fallback');
       req.flush({});
@@ -155,6 +147,22 @@ describe('authInterceptor', () => {
       (window as unknown as { URL: unknown }).URL = originalURL;
     }
   });
+
+  function givenTokensDisponibles(...tokens: (string | null)[]): void {
+    servicioSesion.obtenerAccessTokenParaApi.and.returnValues(
+      ...tokens.map((t) => Promise.resolve(t)),
+    );
+  }
+
+  function givenNewUrlRompe(): void {
+    (window as unknown as { URL: unknown }).URL = function () {
+      throw new Error('URL invalido');
+    };
+  }
+
+  function whenHagoGet(url: string): Promise<unknown> {
+    return firstValueFrom(http.get(url));
+  }
 
   async function flushMicros(): Promise<void> {
     await Promise.resolve();

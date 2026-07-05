@@ -36,6 +36,16 @@ class AuthSessionMother {
   static crearVacia(): AuthSession {
     return {} as AuthSession;
   }
+
+  static crearConIdTokenPayload(payload: Record<string, unknown>): AuthSession {
+    return {
+      userSub: 'sub-1',
+      tokens: {
+        accessToken: { toString: () => 'a', payload: {} },
+        idToken: { toString: () => 'i', payload },
+      },
+    } as unknown as AuthSession;
+  }
 }
 
 interface ServicioInterno {
@@ -56,43 +66,43 @@ describe('AuthSessionService', () => {
   });
 
   describe('haySesionAutenticada', () => {
-    it('dado una sesion con accessToken e idToken, deberia devolver true', async () => {
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearCompleta());
+    it('dado una sesion con accessToken e idToken, cuando la consulto, deberia devolver true', async () => {
+      givenSesion(AuthSessionMother.crearCompleta());
 
       expect(await service.haySesionAutenticada()).toBeTrue();
     });
 
-    it('dado una sesion sin accessToken, deberia devolver false', async () => {
+    it('dado una sesion sin accessToken, cuando la consulto, deberia devolver false', async () => {
       spyOn(console, 'warn');
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearSinAccessToken());
+      givenSesion(AuthSessionMother.crearSinAccessToken());
 
       expect(await service.haySesionAutenticada()).toBeFalse();
     });
 
-    it('dado una sesion null, deberia devolver false', async () => {
+    it('dado una sesion null, cuando la consulto, deberia devolver false', async () => {
       spyOn(console, 'warn');
-      obtenerSesionSpy.and.resolveTo(null);
+      givenSesion(null);
 
       expect(await service.haySesionAutenticada()).toBeFalse();
     });
   });
 
   describe('esperarSesionAutenticada', () => {
-    it('dado una sesion completa al primer intento, deberia devolverla', async () => {
+    it('dado una sesion completa al primer intento, cuando espero, deberia devolverla', async () => {
       const session = AuthSessionMother.crearCompleta();
-      obtenerSesionSpy.and.resolveTo(session);
+      givenSesion(session);
 
       expect(await service.esperarSesionAutenticada()).toBe(session);
       expect(obtenerSesionSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('dado que la sesion aparece al 3er intento, deberia devolverla despues de reintentar', fakeAsync(async () => {
+    it('dado que la sesion aparece al 3er intento, cuando espero, deberia devolverla despues de reintentar', fakeAsync(async () => {
       spyOn(console, 'warn');
       const session = AuthSessionMother.crearCompleta();
-      obtenerSesionSpy.and.returnValues(
-        Promise.resolve(AuthSessionMother.crearVacia()),
-        Promise.resolve(AuthSessionMother.crearVacia()),
-        Promise.resolve(session),
+      givenSecuenciaDeSesiones(
+        AuthSessionMother.crearVacia(),
+        AuthSessionMother.crearVacia(),
+        session,
       );
 
       let resultado: AuthSession | null | undefined;
@@ -110,9 +120,9 @@ describe('AuthSessionService', () => {
       expect(obtenerSesionSpy).toHaveBeenCalledTimes(3);
     }));
 
-    it('dado que la sesion nunca aparece, deberia devolver null tras agotar los reintentos', fakeAsync(async () => {
+    it('dado que la sesion nunca aparece, cuando espero, deberia devolver null tras agotar los reintentos', fakeAsync(async () => {
       spyOn(console, 'warn');
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearVacia());
+      givenSesion(AuthSessionMother.crearVacia());
 
       let resultado: AuthSession | null | undefined;
       service.esperarSesionAutenticada({ reintentos: 2, intervaloMs: 5 }).then((s) => {
@@ -129,8 +139,8 @@ describe('AuthSessionService', () => {
       expect(obtenerSesionSpy).toHaveBeenCalledTimes(3);
     }));
 
-    it('dado forceRefresh, deberia pasar el flag a obtenerSesionActual', async () => {
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearCompleta());
+    it('dado forceRefresh true, cuando espero, deberia pasar el flag a obtenerSesionActual', async () => {
+      givenSesion(AuthSessionMother.crearCompleta());
 
       await service.esperarSesionAutenticada({ forceRefresh: true });
 
@@ -139,61 +149,61 @@ describe('AuthSessionService', () => {
   });
 
   describe('obtenerAccessTokenParaApi', () => {
-    it('dado una sesion completa, deberia devolver el accessToken como string', async () => {
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearCompleta());
+    it('dado una sesion completa, cuando pido el access token, deberia devolverlo como string', async () => {
+      givenSesion(AuthSessionMother.crearCompleta());
 
       expect(await service.obtenerAccessTokenParaApi()).toBe('access-token');
     });
 
-    it('dado que no hay sesion, deberia devolver null', async () => {
+    it('dado que no hay sesion, cuando pido el access token, deberia devolver null', async () => {
       spyOn(console, 'warn');
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearVacia());
+      givenSesion(AuthSessionMother.crearVacia());
 
       expect(await service.obtenerAccessTokenParaApi({ reintentos: 0 })).toBeNull();
     });
   });
 
   describe('obtenerIdToken', () => {
-    it('dado una sesion completa, deberia devolver el idToken como string', async () => {
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearCompleta());
+    it('dado una sesion completa, cuando pido el id token, deberia devolverlo como string', async () => {
+      givenSesion(AuthSessionMother.crearCompleta());
 
       expect(await service.obtenerIdToken()).toBe('id-token');
     });
 
-    it('dado que no hay sesion, deberia devolver null', async () => {
+    it('dado que no hay sesion, cuando pido el id token, deberia devolver null', async () => {
       spyOn(console, 'warn');
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearVacia());
+      givenSesion(AuthSessionMother.crearVacia());
 
       expect(await service.obtenerIdToken({ reintentos: 0 })).toBeNull();
     });
   });
 
   describe('obtenerSub', () => {
-    it('dado una sesion con userSub, deberia devolverlo', async () => {
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearCompleta());
+    it('dado una sesion con userSub, cuando pido el sub, deberia devolverlo', async () => {
+      givenSesion(AuthSessionMother.crearCompleta());
 
       expect(await service.obtenerSub()).toBe('sub-123');
     });
 
-    it('dado una sesion sin userSub pero con sub en idToken, deberia devolver el del idToken', async () => {
+    it('dado una sesion sin userSub pero con sub en idToken, cuando pido el sub, deberia devolver el del idToken', async () => {
       const session = {
         tokens: { idToken: { payload: { sub: 'sub-del-token' } } },
       } as unknown as AuthSession;
-      obtenerSesionSpy.and.resolveTo(session);
+      givenSesion(session);
 
       expect(await service.obtenerSub()).toBe('sub-del-token');
     });
 
-    it('dado una sesion vacia, deberia devolver undefined', async () => {
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearVacia());
+    it('dado una sesion vacia, cuando pido el sub, deberia devolver undefined', async () => {
+      givenSesion(AuthSessionMother.crearVacia());
 
       expect(await service.obtenerSub()).toBeUndefined();
     });
   });
 
   describe('obtenerAtributosUsuario', () => {
-    it('dado una sesion con given_name y family_name, deberia devolver los atributos mapeados', async () => {
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearCompleta());
+    it('dado una sesion con given_name y family_name, cuando pido los atributos, deberia devolverlos mapeados', async () => {
+      givenSesion(AuthSessionMother.crearCompleta());
 
       const attrs = await service.obtenerAtributosUsuario();
 
@@ -203,40 +213,27 @@ describe('AuthSessionService', () => {
       expect(attrs.apellido).toBe('García');
     });
 
-    it('dado given_name ausente, deberia usar name como fallback', async () => {
-      const session = {
-        userSub: 'sub-1',
-        tokens: {
-          accessToken: { toString: () => 'a', payload: {} },
-          idToken: {
-            toString: () => 'i',
-            payload: { sub: 'sub-1', email: 'x@y.com', name: 'Nombre Completo' },
-          },
-        },
-      } as unknown as AuthSession;
-      obtenerSesionSpy.and.resolveTo(session);
+    it('dado given_name ausente, cuando pido los atributos, deberia usar name como fallback', async () => {
+      givenSesion(AuthSessionMother.crearConIdTokenPayload({
+        sub: 'sub-1',
+        email: 'x@y.com',
+        name: 'Nombre Completo',
+      }));
 
       const attrs = await service.obtenerAtributosUsuario();
 
       expect(attrs.nombre).toBe('Nombre Completo');
     });
 
-    it('dado sesion sin payload, deberia devolver objeto vacio', async () => {
+    it('dado sesion sin payload, cuando pido los atributos, deberia devolver objeto vacio', async () => {
       spyOn(console, 'warn');
-      obtenerSesionSpy.and.resolveTo(AuthSessionMother.crearVacia());
+      givenSesion(AuthSessionMother.crearVacia());
 
       expect(await service.obtenerAtributosUsuario()).toEqual({});
     });
 
-    it('dado atributos vacios en el payload, deberia devolverlos como undefined', async () => {
-      const session = {
-        userSub: 'sub-1',
-        tokens: {
-          accessToken: { toString: () => 'a', payload: {} },
-          idToken: { toString: () => 'i', payload: { sub: '', email: '  ' } },
-        },
-      } as unknown as AuthSession;
-      obtenerSesionSpy.and.resolveTo(session);
+    it('dado atributos vacios en el payload, cuando pido los atributos, deberia devolverlos como undefined', async () => {
+      givenSesion(AuthSessionMother.crearConIdTokenPayload({ sub: '', email: '  ' }));
 
       const attrs = await service.obtenerAtributosUsuario();
 
@@ -244,6 +241,14 @@ describe('AuthSessionService', () => {
       expect(attrs.email).toBeUndefined();
     });
   });
+
+  function givenSesion(session: AuthSession | null): void {
+    obtenerSesionSpy.and.resolveTo(session);
+  }
+
+  function givenSecuenciaDeSesiones(...sesiones: (AuthSession | null)[]): void {
+    obtenerSesionSpy.and.returnValues(...sesiones.map((s) => Promise.resolve(s)));
+  }
 
   function flushMicrotasks(): Promise<void> {
     return new Promise((resolve) => resolve());

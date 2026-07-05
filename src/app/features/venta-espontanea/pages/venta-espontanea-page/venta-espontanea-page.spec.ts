@@ -12,12 +12,17 @@ describe('VentaEspontaneaPage', () => {
 
     fixture = TestBed.createComponent(VentaEspontaneaPage);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   describe('inicializacion', () => {
     it('dado el componente, cuando se monta, deberia crearse', () => {
+      whenMonto();
+
       expect(component).toBeTruthy();
     });
   });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

@@ -4,6 +4,14 @@ import { environment } from '../../../../environments/environment';
 import { EventoInventarioRealtime } from '../models/inventario.interface';
 import { InventarioRealtimeService } from './inventario-realtime.service';
 
+interface HandlersInventario {
+  onOpen?: () => void;
+  onClose?: () => void;
+  onRefresh: (event: EventoInventarioRealtime) => void;
+  onPurchaseCreated?: (event: EventoInventarioRealtime) => void;
+  onError?: (error: unknown) => void;
+}
+
 interface ServicioInterno {
   parsePayload: (data: string) => EventoInventarioRealtime | null;
   normalizeEventType: (type: string | undefined) => string | null;
@@ -69,33 +77,31 @@ describe('InventarioRealtimeService', () => {
 
   describe('connect', () => {
     it('dado un handler para un buffet, cuando llamo connect, deberia devolver un AbortController', () => {
-      const controller = service.connect('buffet-1', { onRefresh: jasmine.createSpy() });
+      const controller = whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
 
       expect(controller).toBeInstanceOf(AbortController);
     });
 
     it('dado el primer subscriber, cuando llamo connect, deberia pedir el token de la sesion', () => {
-      service.connect('buffet-1', { onRefresh: jasmine.createSpy() });
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
 
-      expect(servicioAuth.obtenerAccessTokenParaApi).toHaveBeenCalled();
+      thenSePidioElTokenDeSesion(1);
     });
 
     it('dado varios subscribers al mismo buffet, cuando conecto de nuevo, no deberia pedir un token nuevo', () => {
-      service.connect('buffet-1', { onRefresh: jasmine.createSpy() });
-      service.connect('buffet-1', { onRefresh: jasmine.createSpy() });
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
 
-      expect(servicioAuth.obtenerAccessTokenParaApi).toHaveBeenCalledTimes(1);
+      thenSePidioElTokenDeSesion(1);
     });
 
     it('dado un subscriber activo, cuando aborto su controller, deberia sacarlo de la lista', () => {
       const onRefresh = jasmine.createSpy();
-      const controller = service.connect('buffet-1', { onRefresh });
+      const controller = whenConectoAlBuffet('buffet-1', { onRefresh });
 
       controller.abort();
 
-      const evento = EventoInventarioMother.crearRefresh();
-      interno.notifyRefresh(evento);
-
+      whenDisparoNotifyRefresh(EventoInventarioMother.crearRefresh());
       expect(onRefresh).not.toHaveBeenCalled();
     });
   });
@@ -114,7 +120,7 @@ describe('InventarioRealtimeService', () => {
       onClose = jasmine.createSpy('onClose');
       onError = jasmine.createSpy('onError');
 
-      service.connect('buffet-1', {
+      whenConectoAlBuffet('buffet-1', {
         onRefresh,
         onPurchaseCreated,
         onOpen,
@@ -123,70 +129,70 @@ describe('InventarioRealtimeService', () => {
       });
     });
 
-    it('dado un notifyRefresh interno, deberia llamar onRefresh de cada subscriber', () => {
+    it('dado un notifyRefresh interno, cuando se dispara, deberia llamar onRefresh de cada subscriber', () => {
       const evento = EventoInventarioMother.crearRefresh();
 
-      interno.notifyRefresh(evento);
+      whenDisparoNotifyRefresh(evento);
 
       expect(onRefresh).toHaveBeenCalledWith(evento);
     });
 
-    it('dado un notifyPurchaseCreated interno, deberia llamar onPurchaseCreated', () => {
+    it('dado un notifyPurchaseCreated interno, cuando se dispara, deberia llamar onPurchaseCreated', () => {
       const evento = EventoInventarioMother.crearPurchase();
 
-      interno.notifyPurchaseCreated(evento);
+      whenDisparoNotifyPurchaseCreated(evento);
 
       expect(onPurchaseCreated).toHaveBeenCalledWith(evento);
     });
 
-    it('dado un notifyOpen interno, deberia llamar onOpen', () => {
-      interno.notifyOpen();
+    it('dado un notifyOpen interno, cuando se dispara, deberia llamar onOpen', () => {
+      whenDisparoNotifyOpen();
 
       expect(onOpen).toHaveBeenCalled();
     });
 
-    it('dado un notifyClose interno, deberia llamar onClose', () => {
-      interno.notifyClose();
+    it('dado un notifyClose interno, cuando se dispara, deberia llamar onClose', () => {
+      whenDisparoNotifyClose();
 
       expect(onClose).toHaveBeenCalled();
     });
 
-    it('dado un notifyError interno, deberia llamar onError con el error', () => {
+    it('dado un notifyError interno, cuando se dispara, deberia llamar onError con el error', () => {
       const error = new Error('boom');
 
-      interno.notifyError(error);
+      whenDisparoNotifyError(error);
 
       expect(onError).toHaveBeenCalledWith(error);
     });
   });
 
   describe('normalizeEventType', () => {
-    it('dado un tipo con espacios y guiones, deberia devolverlo en UPPER_SNAKE', () => {
-      expect(interno.normalizeEventType('stock changed')).toBe('STOCK_CHANGED');
-      expect(interno.normalizeEventType('low-stock')).toBe('LOW_STOCK');
-      expect(interno.normalizeEventType('  order_updated  ')).toBe('ORDER_UPDATED');
+    it('dado un tipo con espacios y guiones, cuando lo normalizo, deberia devolverlo en UPPER_SNAKE', () => {
+      expect(whenNormalizoEventType('stock changed')).toBe('STOCK_CHANGED');
+      expect(whenNormalizoEventType('low-stock')).toBe('LOW_STOCK');
+      expect(whenNormalizoEventType('  order_updated  ')).toBe('ORDER_UPDATED');
     });
 
-    it('dado un tipo vacio o undefined, deberia devolver null', () => {
-      expect(interno.normalizeEventType('')).toBeNull();
-      expect(interno.normalizeEventType(undefined)).toBeNull();
-      expect(interno.normalizeEventType('   ')).toBeNull();
+    it('dado un tipo vacio o undefined, cuando lo normalizo, deberia devolver null', () => {
+      expect(whenNormalizoEventType('')).toBeNull();
+      expect(whenNormalizoEventType(undefined)).toBeNull();
+      expect(whenNormalizoEventType('   ')).toBeNull();
     });
   });
 
   describe('parsePayload', () => {
-    it('dado un JSON valido, deberia devolver el objeto parseado', () => {
+    it('dado un JSON valido, cuando lo parseo, deberia devolver el objeto parseado', () => {
       const raw = JSON.stringify(EventoInventarioMother.crearRefresh());
 
-      const parsed = interno.parsePayload(raw);
+      const parsed = whenParseoElPayload(raw);
 
       expect(parsed?.type).toBe('STOCK_CHANGED');
     });
 
-    it('dado un JSON invalido, deberia loguear warn y devolver null', () => {
+    it('dado un JSON invalido, cuando lo parseo, deberia loguear warn y devolver null', () => {
       spyOn(console, 'warn');
 
-      const parsed = interno.parsePayload('no-es-json');
+      const parsed = whenParseoElPayload('no-es-json');
 
       expect(parsed).toBeNull();
       expect(console.warn).toHaveBeenCalled();
@@ -196,9 +202,9 @@ describe('InventarioRealtimeService', () => {
   describe('cambio de buffet', () => {
     it('dado subscribers en buffet-1, cuando conecto a buffet-2, deberia notificar close a los del buffet-1', () => {
       const onClose = jasmine.createSpy();
-      service.connect('buffet-1', { onRefresh: jasmine.createSpy(), onClose });
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy(), onClose });
 
-      service.connect('buffet-2', { onRefresh: jasmine.createSpy() });
+      whenConectoAlBuffet('buffet-2', { onRefresh: jasmine.createSpy() });
 
       expect(onClose).toHaveBeenCalled();
     });
@@ -207,27 +213,27 @@ describe('InventarioRealtimeService', () => {
   describe('disconnect', () => {
     it('dado subscribers activos, cuando llamo disconnect, deberia limpiar la lista de subscribers', () => {
       const onRefresh = jasmine.createSpy();
-      service.connect('buffet-1', { onRefresh });
+      whenConectoAlBuffet('buffet-1', { onRefresh });
 
-      service.disconnect();
+      whenLlamoDisconnect();
 
-      interno.notifyRefresh(EventoInventarioMother.crearRefresh());
+      whenDisparoNotifyRefresh(EventoInventarioMother.crearRefresh());
       expect(onRefresh).not.toHaveBeenCalled();
     });
   });
 
   describe('recordRefetch', () => {
-    it('deberia poder llamarse sin romper', () => {
+    it('dado el service, cuando llamo recordRefetch, no deberia romper', () => {
       expect(() => service.recordRefetch('inventario')).not.toThrow();
     });
   });
 
   describe('metricas por ventana', () => {
-    it('dado un recordSseEvent, cuando pasan 60s, deberia loguear el resumen y limpiar el contador', fakeAsync(() => {
+    it('dado tres recordSseEvent, cuando pasan 60s, deberia loguear el resumen y limpiar el contador', fakeAsync(() => {
       const infoSpy = spyOn(console, 'info');
-      interno.recordSseEvent('STOCK_CHANGED');
-      interno.recordSseEvent('STOCK_CHANGED');
-      interno.recordSseEvent('LOW_STOCK');
+      whenRegistroEventoSse('STOCK_CHANGED');
+      whenRegistroEventoSse('STOCK_CHANGED');
+      whenRegistroEventoSse('LOW_STOCK');
 
       tick(60000);
 
@@ -237,10 +243,10 @@ describe('InventarioRealtimeService', () => {
       );
     }));
 
-    it('dado varios recordSseEvent seguidos, deberia programar el timeout una sola vez', fakeAsync(() => {
+    it('dado varios recordSseEvent seguidos, cuando pasan 60s, deberia loguear una sola vez', fakeAsync(() => {
       const infoSpy = spyOn(console, 'info');
-      interno.recordSseEvent('STOCK_CHANGED');
-      interno.recordSseEvent('STOCK_CHANGED');
+      whenRegistroEventoSse('STOCK_CHANGED');
+      whenRegistroEventoSse('STOCK_CHANGED');
 
       tick(60000);
 
@@ -260,7 +266,7 @@ describe('InventarioRealtimeService', () => {
       );
     }));
 
-    it('dado logMetrics con un map vacio, no deberia loguear nada', () => {
+    it('dado un map vacio, cuando llamo logMetrics, no deberia loguear nada', () => {
       const infoSpy = spyOn(console, 'info');
 
       interno.logMetrics('label', new Map());
@@ -268,13 +274,13 @@ describe('InventarioRealtimeService', () => {
       expect(infoSpy).not.toHaveBeenCalled();
     });
 
-    it('dado environment.production true, recordSseEvent deberia no acumular ni programar timeout', fakeAsync(() => {
+    it('dado environment.production true, cuando llamo recordSseEvent, no deberia acumular ni programar timeout', fakeAsync(() => {
       const infoSpy = spyOn(console, 'info');
       const original = environment.production;
       environment.production = true;
 
       try {
-        interno.recordSseEvent('STOCK_CHANGED');
+        whenRegistroEventoSse('STOCK_CHANGED');
         tick(60000);
         expect(infoSpy).not.toHaveBeenCalled();
       } finally {
@@ -285,7 +291,7 @@ describe('InventarioRealtimeService', () => {
 
   describe('idle disconnect', () => {
     it('dado subscribers activos, cuando aborto el ultimo, deberia cerrar la conexion compartida despues del timeout', fakeAsync(() => {
-      const controller = service.connect('buffet-1', { onRefresh: jasmine.createSpy() });
+      const controller = whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
       interno.sharedAbortController = new AbortController();
       const abortSpy = spyOn(interno.sharedAbortController, 'abort').and.callThrough();
 
@@ -296,13 +302,13 @@ describe('InventarioRealtimeService', () => {
       expect(interno.sharedAbortController).toBeNull();
     }));
 
-    it('dado el timeout de idle, si vuelve a haber subscribers, no deberia cerrar la conexion', fakeAsync(() => {
-      const controller = service.connect('buffet-1', { onRefresh: jasmine.createSpy() });
+    it('dado el timeout de idle, cuando vuelve a haber subscribers, no deberia cerrar la conexion', fakeAsync(() => {
+      const controller = whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
       interno.sharedAbortController = new AbortController();
       const abortSpy = spyOn(interno.sharedAbortController, 'abort').and.callThrough();
 
       controller.abort();
-      service.connect('buffet-1', { onRefresh: jasmine.createSpy() });
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
       tick(30000);
 
       expect(abortSpy).not.toHaveBeenCalled();
@@ -314,17 +320,17 @@ describe('InventarioRealtimeService', () => {
       interno.status = 'connected';
       const onOpen = jasmine.createSpy('onOpen');
 
-      service.connect('buffet-1', { onRefresh: jasmine.createSpy(), onOpen });
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy(), onOpen });
 
       expect(onOpen).toHaveBeenCalled();
     });
   });
 
   describe('startConnection sin token', () => {
-    it('dado que el auth no devuelve token, deberia notificar error y quedar desconectado', fakeAsync(() => {
+    it('dado que el auth no devuelve token, cuando conecto, deberia notificar error y quedar desconectado', fakeAsync(() => {
       servicioAuth.obtenerAccessTokenParaApi.and.resolveTo(null);
       const onError = jasmine.createSpy('onError');
-      service.connect('buffet-1', { onRefresh: jasmine.createSpy(), onError });
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy(), onError });
 
       flush();
 
@@ -333,7 +339,7 @@ describe('InventarioRealtimeService', () => {
       expect(interno.status).toBe('disconnected');
     }));
 
-    it('dado que se aborta antes de obtener el token, no deberia notificar error', fakeAsync(() => {
+    it('dado que se aborta antes de obtener el token, cuando resuelve, no deberia notificar error', fakeAsync(() => {
       let resolveToken!: (value: string | null) => void;
       servicioAuth.obtenerAccessTokenParaApi.and.returnValue(
         new Promise((res) => {
@@ -341,7 +347,7 @@ describe('InventarioRealtimeService', () => {
         }),
       );
       const onError = jasmine.createSpy('onError');
-      const controller = service.connect('buffet-1', { onRefresh: jasmine.createSpy(), onError });
+      const controller = whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy(), onError });
 
       controller.abort();
       service.disconnect();
@@ -351,4 +357,48 @@ describe('InventarioRealtimeService', () => {
       expect(onError).not.toHaveBeenCalled();
     }));
   });
+
+  function whenConectoAlBuffet(buffetId: string, handlers: HandlersInventario): AbortController {
+    return service.connect(buffetId, handlers);
+  }
+
+  function whenLlamoDisconnect(): void {
+    service.disconnect();
+  }
+
+  function whenDisparoNotifyRefresh(evento: EventoInventarioRealtime): void {
+    interno.notifyRefresh(evento);
+  }
+
+  function whenDisparoNotifyPurchaseCreated(evento: EventoInventarioRealtime): void {
+    interno.notifyPurchaseCreated(evento);
+  }
+
+  function whenDisparoNotifyOpen(): void {
+    interno.notifyOpen();
+  }
+
+  function whenDisparoNotifyClose(): void {
+    interno.notifyClose();
+  }
+
+  function whenDisparoNotifyError(error: unknown): void {
+    interno.notifyError(error);
+  }
+
+  function whenNormalizoEventType(type: string | undefined): string | null {
+    return interno.normalizeEventType(type);
+  }
+
+  function whenParseoElPayload(raw: string): EventoInventarioRealtime | null {
+    return interno.parsePayload(raw);
+  }
+
+  function whenRegistroEventoSse(eventType: string): void {
+    interno.recordSseEvent(eventType);
+  }
+
+  function thenSePidioElTokenDeSesion(veces: number): void {
+    expect(servicioAuth.obtenerAccessTokenParaApi).toHaveBeenCalledTimes(veces);
+  }
 });

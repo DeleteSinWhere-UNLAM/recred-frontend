@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { SugerenciaAgregarProducto } from './models/sugerencia-agregar.model';
 import { SugerenciasAgregarService } from './services/sugerencias-agregar.service';
 import {
   SugerenciaAgregarProductoMother,
@@ -51,21 +52,17 @@ describe('SugerenciasAgregar Integration', () => {
 
   afterEach(() => localStorage.clear());
 
-  it('dadas tres sugerencias, cuando se monta la page, deberia renderizar las oportunidades y el total de ingresos', () => {
-    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(
-      of(SugerenciaAgregarProductoMother.crearVarias()),
-    );
+  it('dado tres sugerencias del back, cuando se monta la page, deberia renderizar las oportunidades y el total de ingresos', () => {
+    givenSugerenciasDelBack(SugerenciaAgregarProductoMother.crearVarias());
 
-    fixture = TestBed.createComponent(SugerenciasAgregarPage);
-    fixture.detectChanges();
+    whenMonto();
 
     const titulo = fixture.nativeElement.querySelector('h1').textContent;
     const tarjetas = fixture.debugElement.queryAll(By.css('.sa__product-card'));
     const tituloPrimeraTarjeta = tarjetas[0]
       .query(By.css('.sa__card-title strong'))
       .nativeElement.textContent;
-    const totalIngresos = fixture.nativeElement.querySelector('.sa__metric--warning strong')
-      .textContent;
+    const totalIngresos = fixture.nativeElement.querySelector('.sa__metric--warning strong').textContent;
 
     expect(titulo).toContain('Oportunidades de Stock');
     expect(tarjetas.length).toBe(3);
@@ -74,12 +71,9 @@ describe('SugerenciasAgregar Integration', () => {
   });
 
   it('dado que falla el service, cuando se monta la page, deberia mostrar el panel de error', () => {
-    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(
-      throwError(() => new Error('API Error')),
-    );
+    givenSugerenciasServiceFalla();
 
-    fixture = TestBed.createComponent(SugerenciasAgregarPage);
-    fixture.detectChanges();
+    whenMonto();
 
     const panelError = fixture.nativeElement.querySelector('.sa__notice--error');
     expect(panelError).toBeTruthy();
@@ -87,13 +81,25 @@ describe('SugerenciasAgregar Integration', () => {
   });
 
   it('dado que no hay sugerencias, cuando se monta la page, deberia mostrar el empty state', () => {
-    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(of([]));
+    givenSugerenciasDelBack([]);
 
-    fixture = TestBed.createComponent(SugerenciasAgregarPage);
-    fixture.detectChanges();
+    whenMonto();
 
     const emptyState = fixture.nativeElement.querySelector('.sa__empty-state');
     expect(emptyState).toBeTruthy();
     expect(emptyState.textContent).toContain('Sin oportunidades por ahora');
   });
+
+  function givenSugerenciasDelBack(sugerencias: SugerenciaAgregarProducto[]): void {
+    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(of(sugerencias));
+  }
+
+  function givenSugerenciasServiceFalla(): void {
+    servicioSugerencias.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('API Error')));
+  }
+
+  function whenMonto(): void {
+    fixture = TestBed.createComponent(SugerenciasAgregarPage);
+    fixture.detectChanges();
+  }
 });

@@ -14,7 +14,11 @@ interface ServicioInterno {
   sendTokenToBackend: (token: string) => void;
 }
 
+type PermisoNotificacion = 'granted' | 'denied' | 'default';
+
 describe('NotificationService', () => {
+  const URL_DISPOSITIVOS = `${environment.apiUrl}/dispositivos`;
+
   let service: NotificationService;
   let interno: ServicioInterno;
   let httpMock: HttpTestingController;
@@ -66,19 +70,18 @@ describe('NotificationService', () => {
   });
 
   describe('inicializacion', () => {
-    it('dado el service inyectado, deberia crearse correctamente', () => {
+    it('dado el service inyectado, cuando lo consulto, deberia crearse correctamente', () => {
       expect(service).toBeTruthy();
     });
   });
 
   describe('requestNotificationPermission', () => {
     it('dado permission granted, cuando pido permiso, deberia registrar el token y escuchar foreground', async () => {
-      requestPermissionSpy.and.resolveTo('granted');
+      givenPermisoDeNotificacion('granted');
       const spyRegistrar = spyOn(interno, 'handleTokenRegistration');
       const spyEscuchar = spyOn(interno, 'listenToForegroundMessages');
 
-      service.requestNotificationPermission();
-      await Promise.resolve();
+      await whenPidoPermiso();
 
       expect(requestPermissionSpy).toHaveBeenCalled();
       expect(spyRegistrar).toHaveBeenCalled();
@@ -86,24 +89,22 @@ describe('NotificationService', () => {
     });
 
     it('dado permission denied, cuando pido permiso, no deberia registrar el token pero si escuchar foreground', async () => {
-      requestPermissionSpy.and.resolveTo('denied');
+      givenPermisoDeNotificacion('denied');
       const spyRegistrar = spyOn(interno, 'handleTokenRegistration');
       const spyEscuchar = spyOn(interno, 'listenToForegroundMessages');
 
-      service.requestNotificationPermission();
-      await Promise.resolve();
+      await whenPidoPermiso();
 
       expect(spyRegistrar).not.toHaveBeenCalled();
       expect(spyEscuchar).toHaveBeenCalled();
     });
 
     it('dado permission default, cuando pido permiso, no deberia registrar el token pero si escuchar foreground', async () => {
-      requestPermissionSpy.and.resolveTo('default');
+      givenPermisoDeNotificacion('default');
       const spyRegistrar = spyOn(interno, 'handleTokenRegistration');
       const spyEscuchar = spyOn(interno, 'listenToForegroundMessages');
 
-      service.requestNotificationPermission();
-      await Promise.resolve();
+      await whenPidoPermiso();
 
       expect(spyRegistrar).not.toHaveBeenCalled();
       expect(spyEscuchar).toHaveBeenCalled();
@@ -111,29 +112,45 @@ describe('NotificationService', () => {
   });
 
   describe('sendTokenToBackend', () => {
-    it('dado un token, deberia hacer POST a /dispositivos con el fcmToken', () => {
+    it('dado un token, cuando lo mando al back, deberia hacer POST /dispositivos con el fcmToken', () => {
       spyOn(console, 'log');
 
-      interno.sendTokenToBackend('token-123');
+      whenMandoTokenAlBackend('token-123');
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/dispositivos`);
+      const req = httpMock.expectOne(URL_DISPOSITIVOS);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({ fcmToken: 'token-123' });
       req.flush({});
       expect(console.log).toHaveBeenCalledWith(jasmine.stringMatching(/FCM Token registrado/i));
     });
 
-    it('dado que el POST falla, deberia loguear el error', () => {
+    it('dado que el POST falla, cuando lo mando al back, deberia loguear el error', () => {
       spyOn(console, 'error');
 
-      interno.sendTokenToBackend('token-fail');
+      whenMandoTokenAlBackend('token-fail');
 
-      httpMock.expectOne(`${environment.apiUrl}/dispositivos`).flush('boom', {
+      httpMock.expectOne(URL_DISPOSITIVOS).flush('boom', {
         status: 500,
         statusText: 'Server Error',
       });
 
-      expect(console.error).toHaveBeenCalledWith(jasmine.stringMatching(/Error registrando FCM/i), jasmine.anything());
+      expect(console.error).toHaveBeenCalledWith(
+        jasmine.stringMatching(/Error registrando FCM/i),
+        jasmine.anything(),
+      );
     });
   });
+
+  function givenPermisoDeNotificacion(estado: PermisoNotificacion): void {
+    requestPermissionSpy.and.resolveTo(estado);
+  }
+
+  async function whenPidoPermiso(): Promise<void> {
+    service.requestNotificationPermission();
+    await Promise.resolve();
+  }
+
+  function whenMandoTokenAlBackend(token: string): void {
+    interno.sendTokenToBackend(token);
+  }
 });
