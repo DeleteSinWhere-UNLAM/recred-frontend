@@ -906,7 +906,7 @@ export class HomeKiosqueroPresenter {
     },
     {
       id: 'inteligencia-comercial',
-      titulo: 'Inteligencia comercial',
+      titulo: 'Diagnostico comercial',
       descripcion: 'Detecta productos para sumar o impulsar',
       icono: 'fa-chart-line',
       ruta: '/kiosquero/inteligencia-comercial',

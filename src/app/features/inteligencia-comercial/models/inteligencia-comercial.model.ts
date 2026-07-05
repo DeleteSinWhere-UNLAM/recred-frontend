@@ -1,5 +1,3 @@
-export type PestaniaInteligenciaComercial = 'agregar' | 'rotacion';
-
 export interface ResumenInteligenciaComercial {
   productosParaAgregar: number;
   ingresoPotencial: number;

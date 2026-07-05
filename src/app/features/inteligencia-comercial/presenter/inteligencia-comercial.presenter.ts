@@ -222,7 +222,7 @@ export class InteligenciaComercialPresenter {
   get principalesOportunidadesAgregar(): TarjetaOportunidadComercial[] {
     const oportunidades = [...this.oportunidadesAgregarState.getValue()]
       .sort((a, b) => b.metadata.totalRevenue - a.metadata.totalRevenue)
-      .slice(0, 4);
+      .slice(0, 5);
 
     return oportunidades.map((oportunidad) => ({
       id: oportunidad.id,
@@ -239,7 +239,7 @@ export class InteligenciaComercialPresenter {
   get principalesBajaRotacion(): TarjetaOportunidadComercial[] {
     const sugerencias = [...this.bajaRotacionState.getValue()]
       .sort((a, b) => b.estadisticasVenta.diasSinVenta - a.estadisticasVenta.diasSinVenta)
-      .slice(0, 4);
+      .slice(0, 5);
 
     return sugerencias.map((sugerencia) => ({
       id: sugerencia.estadisticasVenta.productoId,

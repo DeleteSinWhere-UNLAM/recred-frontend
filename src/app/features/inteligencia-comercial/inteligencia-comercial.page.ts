@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ComboPromotionModalComponent } from '../sugerencias/components/combo-promotion-modal/combo-promotion-modal.component';
-import { PestaniaInteligenciaComercial } from './models/inteligencia-comercial.model';
 import { InteligenciaComercialPresenter } from './presenter/inteligencia-comercial.presenter';
 
 @Component({
@@ -22,7 +21,6 @@ export class InteligenciaComercialPage implements OnInit {
   private readonly router = inject(Router);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
-  pestaniaActiva: PestaniaInteligenciaComercial = 'agregar';
 
   constructor() {
     this.usuarioService.setHomeUrl('/kiosquero');
@@ -30,10 +28,6 @@ export class InteligenciaComercialPage implements OnInit {
 
   ngOnInit(): void {
     this.presenter.inicializar();
-  }
-
-  seleccionarPestania(pestania: PestaniaInteligenciaComercial): void {
-    this.pestaniaActiva = pestania;
   }
 
   volver(): void {

@@ -77,7 +77,7 @@ describe('InteligenciaComercial Integration', () => {
     fixture.detectChanges();
 
     const texto = fixture.nativeElement.textContent;
-    expect(texto).toContain('Inteligencia comercial');
+    expect(texto).toContain('Diagnostico comercial');
     expect(texto).toContain('Para incorporar');
     expect(texto).toContain('$4.000');
     expect(texto).toContain('Stock inmovilizado');
@@ -86,11 +86,7 @@ describe('InteligenciaComercial Integration', () => {
     const cardsAgregar = fixture.debugElement.queryAll(By.css('.si__tarjeta--exito'));
     expect(cardsAgregar.length).toBe(3);
 
-    const tabs = fixture.debugElement.queryAll(By.css('.si__pestania'));
-    tabs[1].nativeElement.click();
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.textContent).toContain('Productos con baja rotacion');
+    expect(fixture.nativeElement.textContent).toContain('Impulsar baja rotacion');
     expect(fixture.nativeElement.textContent).toContain('Producto 2');
   });
 

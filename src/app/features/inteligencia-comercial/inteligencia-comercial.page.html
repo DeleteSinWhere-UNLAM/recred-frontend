@@ -14,10 +14,10 @@
         </span>
         <div>
           <div class="si__fila-titulo">
-            <h1 id="si-title">Inteligencia comercial</h1>
+            <h1 id="si-title">Diagnostico comercial</h1>
             <span class="si__insignia-premium">AVANZADO</span>
           </div>
-          <p>Revisa recomendaciones para incorporar articulos y acciones para recuperar ventas de productos quietos.</p>
+          <p>Revisa oportunidades de stock y acciones para recuperar ventas de productos quietos en una sola vista.</p>
         </div>
       </div>
     </section>
@@ -25,7 +25,7 @@
     @if (presenter.estaCargando) {
     <div class="si__aviso" role="status">
       <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-      <span>Cargando inteligencia comercial.</span>
+      <span>Cargando diagnostico comercial.</span>
     </div>
     }
 
@@ -36,7 +36,7 @@
     </div>
     }
 
-    <section class="si__metricas" aria-label="Resumen de inteligencia comercial">
+    <section class="si__metricas" aria-label="Resumen de diagnostico comercial">
       <article class="si__metrica si__metrica--exito">
         <span aria-hidden="true"><i class="fa-solid fa-box-open"></i></span>
         <div>
@@ -70,41 +70,29 @@
       </article>
     </section>
 
-    <section class="si__area-trabajo" aria-label="Modulos de inteligencia">
-      <div class="si__pestanias" role="tablist" aria-label="Tipo de oportunidad">
-        <button
-          type="button"
-          role="tab"
-          class="si__pestania"
-          [class.si__pestania--activa]="pestaniaActiva === 'agregar'"
-          [attr.aria-selected]="pestaniaActiva === 'agregar'"
-          (click)="seleccionarPestania('agregar')"
-        >
-          <i class="fa-solid fa-rocket" aria-hidden="true"></i>
-          <span>Oportunidades de stock</span>
-          <strong>{{ presenter.resumen.productosParaAgregar }}</strong>
-        </button>
-
-        <button
-          type="button"
-          role="tab"
-          class="si__pestania"
-          [class.si__pestania--activa]="pestaniaActiva === 'rotacion'"
-          [attr.aria-selected]="pestaniaActiva === 'rotacion'"
-          (click)="seleccionarPestania('rotacion')"
-        >
-          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-          <span>Impulsar baja rotacion</span>
-          <strong>{{ presenter.resumen.productosBajaRotacion }}</strong>
-        </button>
+    <section class="si__area-trabajo" aria-label="Diagnostico comercial">
+      <div class="si__diagnostico-header">
+        <div>
+          <span>Diagnostico comercial</span>
+          <h2>Oportunidades para decidir que reponer y que impulsar</h2>
+        </div>
+        <div class="si__diagnostico-contadores" aria-label="Resumen de oportunidades">
+          <span>
+            <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+            {{ presenter.resumen.productosParaAgregar }} stock
+          </span>
+          <span>
+            <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+            {{ presenter.resumen.productosBajaRotacion }} baja rotacion
+          </span>
+        </div>
       </div>
 
-      @if (pestaniaActiva === 'agregar') {
-      <section class="si__panel" role="tabpanel" aria-labelledby="agregar-tab">
+      <section class="si__panel" aria-label="Oportunidades de stock">
         <div class="si__encabezado-panel">
           <div>
-            <h2>Más vendidos en otros kioscos</h2>
-            <p>Artículos con buena venta en otros buffets que todavía podrías sumar a tu stock.</p>
+            <h2>Oportunidades de stock</h2>
+            <p>Articulos con buena venta en otros buffets que todavia podrias sumar a tu stock.</p>
           </div>
           <button type="button" class="si__boton-enlace" (click)="presenter.verOportunidadesStock()">
             <span>Ver vista completa</span>
@@ -146,14 +134,12 @@
         </div>
         }
       </section>
-      }
 
-      @if (pestaniaActiva === 'rotacion') {
-      <section class="si__panel" role="tabpanel" aria-labelledby="rotacion-tab">
+      <section class="si__panel si__panel--separado" aria-label="Impulsar baja rotacion">
         <div class="si__encabezado-panel">
           <div>
-            <h2>Productos para impulsar con combos</h2>
-            <p>Combinalos con los más vendidos para mejorar sus ventas.</p>
+            <h2>Impulsar baja rotacion</h2>
+            <p>Combinalos con los mas vendidos para mejorar sus ventas.</p>
           </div>
           <button type="button" class="si__boton-enlace" (click)="presenter.verBajaRotacion()">
             <span>Ver vista completa</span>
@@ -195,11 +181,10 @@
         <div class="si__vacio">
           <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
           <strong>Sin productos con baja rotacion</strong>
-          <p>Cuando aparezca stock inmovilizado, esta pestaña va a mostrar las acciones sugeridas.</p>
+          <p>Cuando aparezca stock inmovilizado, esta seccion va a mostrar las acciones sugeridas.</p>
         </div>
         }
       </section>
-      }
     </section>
   </div>
 
