@@ -54,16 +54,16 @@ describe('TablaProductoComponent', () => {
   });
 
   describe('getModeLabel', () => {
-    it('dado STOCK_EXACTO, cuando pido el label, deberia devolver "Stock exacto"', () => {
-      expect(component.getModeLabel('STOCK_EXACTO')).toBe('Stock exacto');
+    it('dado STOCK_EXACTO, cuando pido el label, deberia devolver "Control por unidades"', () => {
+      expect(component.getModeLabel('STOCK_EXACTO')).toBe('Control por unidades');
     });
 
     it('dado DISPONIBLE_NO_DISPONIBLE, cuando pido el label, deberia devolver "Disponible / No disponible"', () => {
       expect(component.getModeLabel('DISPONIBLE_NO_DISPONIBLE')).toBe('Disponible / No disponible');
     });
 
-    it('dado CUPO_DIARIO, cuando pido el label, deberia devolver "Cupo diario"', () => {
-      expect(component.getModeLabel('CUPO_DIARIO')).toBe('Cupo diario');
+    it('dado CUPO_DIARIO, cuando pido el label, deberia devolver "Límite diario de venta"', () => {
+      expect(component.getModeLabel('CUPO_DIARIO')).toBe('Límite diario de venta');
     });
   });
 
@@ -96,20 +96,54 @@ describe('TablaProductoComponent', () => {
       expect(component.getStatusLabel(producto)).toBe('Bajo stock');
     });
 
-    it('dado CUPO_DIARIO con cupoDisponibleDia 8, cuando pido el stockValue, deberia mostrar "8"', () => {
+    it('dado CUPO_DIARIO con cupoDisponibleDia 8, cuando pido los labels, deberia separar cupo diario de stock fisico', () => {
       const producto = ItemResumenInventarioMother.crear({
         tipoManejoInventario: 'CUPO_DIARIO',
         cupoMaximoDiario: 20,
         cupoDisponibleDia: 8,
+        stockActual: 14,
+        stockReservado: 12,
+        stockMinimo: 4,
       });
 
       expect(component.getStockValue(producto)).toBe('8');
+      expect(component.getAvailabilityLabel(producto)).toBe('Disponible hoy');
+      expect(component.getAvailabilityPercent(producto)).toBe(40);
+      expect(component.getAvailabilitySecondaryStartLabel(producto)).toBe('Usado hoy');
+      expect(component.getAvailabilitySecondaryStartValue(producto)).toBe('12');
+      expect(component.getAvailabilitySecondaryEndLabel(producto)).toBe('Límite');
+      expect(component.getAvailabilitySecondaryEndValue(producto)).toBe('20');
+      expect(component.getPrimaryStockMetricLabel(producto)).toBe('Stock físico');
+      expect(component.getSecondaryStockMetricLabel(producto)).toBe('Reservado');
+      expect(component.getSecondaryStockMetricValue(producto)).toBe('12');
+      expect(component.getTertiaryStockMetricLabel(producto)).toBe('Alerta en');
+      expect(component.getTertiaryStockMetricValue(producto)).toBe('4');
     });
 
     it('dado stockDisponible null en STOCK_EXACTO, cuando pido el stockValue, deberia mostrar "-"', () => {
       const producto = ItemResumenInventarioMother.crear({ stockDisponible: null });
 
       expect(component.getStockValue(producto)).toBe('-');
+    });
+
+    it('dado STOCK_EXACTO, cuando pido labels secundarios, deberia mantener la lectura de stock fisico', () => {
+      const producto = ItemResumenInventarioMother.crear({
+        stockActual: 14,
+        stockDisponible: 2,
+        stockReservado: 12,
+        stockMinimo: 4,
+      });
+
+      expect(component.getAvailabilityLabel(producto)).toBe('Disponible');
+      expect(component.getAvailabilitySecondaryStartLabel(producto)).toBe('Reservado');
+      expect(component.getAvailabilitySecondaryStartValue(producto)).toBe('12');
+      expect(component.getAvailabilitySecondaryEndLabel(producto)).toBe('Total');
+      expect(component.getAvailabilitySecondaryEndValue(producto)).toBe('14');
+      expect(component.getPrimaryStockMetricLabel(producto)).toBe('Stock actual');
+      expect(component.getSecondaryStockMetricLabel(producto)).toBe('Alerta en');
+      expect(component.getSecondaryStockMetricValue(producto)).toBe('4');
+      expect(component.getTertiaryStockMetricLabel(producto)).toBe('Reserva');
+      expect(component.getTertiaryStockMetricValue(producto)).toBe('86%');
     });
   });
 
