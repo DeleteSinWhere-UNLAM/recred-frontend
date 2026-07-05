@@ -491,6 +491,12 @@
   transform: translateX(2px);
 }
 
+.btn-action--mapped {
+  color: var(--color-menta);
+  font-weight: 700;
+  cursor: default;
+}
+
 .btn-action--hide {
   color: var(--color-texto-claro);
   border: 1px solid var(--color-borde);
