@@ -69,7 +69,7 @@
             @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
               <div
                 class="product-card__bar"
-                [attr.aria-label]="'Disponibilidad ' + getAvailabilityPercent(product) + '%'"
+                [attr.aria-label]="getAvailabilityBarLabel(product)"
               >
                 <span
                   class="product-card__bar-fill"
@@ -81,8 +81,8 @@
               </div>
 
               <div class="product-card__split">
-                <span>Reservado {{ formatNullable(product.stockReservado) }}</span>
-                <span>Total {{ getAvailabilityBase(product) }}</span>
+                <span>{{ getAvailabilitySecondaryStartLabel(product) }} {{ getAvailabilitySecondaryStartValue(product) }}</span>
+                <span>{{ getAvailabilitySecondaryEndLabel(product) }} {{ getAvailabilitySecondaryEndValue(product) }}</span>
               </div>
             }
           </section>
@@ -90,16 +90,16 @@
           @if (product.tipoManejoInventario !== 'DISPONIBLE_NO_DISPONIBLE') {
             <dl class="product-card__metrics">
               <div class="product-card__metric">
-                <dt>Actual</dt>
+                <dt>{{ getPrimaryStockMetricLabel(product) }}</dt>
                 <dd>{{ formatNullable(product.stockActual) }}</dd>
               </div>
               <div class="product-card__metric">
-                <dt>Mínimo</dt>
-                <dd>{{ formatNullable(product.stockMinimo) }}</dd>
+                <dt>{{ getSecondaryStockMetricLabel(product) }}</dt>
+                <dd>{{ getSecondaryStockMetricValue(product) }}</dd>
               </div>
               <div class="product-card__metric">
-                <dt>Reserva</dt>
-                <dd>{{ getReservationPercent(product) }}%</dd>
+                <dt>{{ getTertiaryStockMetricLabel(product) }}</dt>
+                <dd>{{ getTertiaryStockMetricValue(product) }}</dd>
               </div>
             </dl>
           }

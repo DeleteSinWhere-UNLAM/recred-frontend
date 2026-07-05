@@ -1,0 +1,57 @@
+
+> recreopago@0.0.0 start
+> node set-env.js --development && ng serve --host 127.0.0.1 --port 4202
+
+◇ injected env (15) from .env // tip: ⌘ suppress logs { quiet: true }
+Generando archivos de entorno (DEV) en C:\Users\patri\Desktop\Mate\tpi\recred-frontend\src\environments: environment.ts, environment.development.ts
+✅ Archivo environment.ts generado correctamente.
+✅ Archivo environment.development.ts generado correctamente.
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m                         [2m | [22m [1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m                          [2m | [22m[36m218.22 kB[39m[2m | [22m
+[32mchunk-H2TAPCAJ.js[39m  [2m | [22m[2m-[22m                             [2m | [22m [36m17.65 kB[39m[2m | [22m
+[32mchunk-JFPSUD5I.js[39m  [2m | [22m[2m-[22m                             [2m | [22m [36m10.00 kB[39m[2m | [22m
+[32mchunk-FHJD2F3F.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m8.08 kB[39m[2m | [22m
+[32mchunk-VSNJDEVV.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m6.62 kB[39m[2m | [22m
+[32mchunk-7LMEBMSF.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m6.21 kB[39m[2m | [22m
+[32mchunk-GKEC7VQ6.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m4.85 kB[39m[2m | [22m
+[32mstyles.css[39m         [2m | [22m[2mstyles[22m                        [2m | [22m  [36m3.79 kB[39m[2m | [22m
+[32mchunk-XE6JDJ4C.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m3.74 kB[39m[2m | [22m
+[32mchunk-UNGLV2IO.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m3.68 kB[39m[2m | [22m
+[32mchunk-GDDYZ5BG.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m3.16 kB[39m[2m | [22m
+[32mchunk-QEQEZWB2.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m1.96 kB[39m[2m | [22m
+[32mchunk-TVEZATNI.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m1.75 kB[39m[2m | [22m
+[32mchunk-Y5RQAIA6.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m1.50 kB[39m[2m | [22m
+[32mchunk-QOSYB3L3.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m1.45 kB[39m[2m | [22m
+[32mchunk-HX3AEIEA.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m1.43 kB[39m[2m | [22m
+[32mchunk-TN3UTTYF.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m1.36 kB[39m[2m | [22m
+[32mchunk-XXTWWX23.js[39m  [2m | [22m[2m-[22m                             [2m | [22m  [36m1.19 kB[39m[2m | [22m
+[32mchunk-ZRLLFF7W.js[39m  [2m | [22m[2m-[22m                             [2m | [22m[36m949 bytes[39m[2m | [22m
+[32mpolyfills.js[39m       [2m | [22m[2mpolyfills[22m                     [2m | [22m [36m95 bytes[39m[2m | [22m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m                 [2m | [22m[1m297.68 kB[22m
+
+[1mLazy chunk files[22m   [2m | [22m[1mNames[22m                         [2m | [22m [1mRaw size[22m
+[32mchunk-34RWDLHP.js[39m  [2m | [22m[2mcierre-diario-page[22m            [2m | [22m[36m365.79 kB[39m[2m | [22m
+[32mchunk-EIVOFZ4Q.js[39m  [2m | [22m[2mbuffet-page[22m                   [2m | [22m[36m357.23 kB[39m[2m | [22m
+[32mchunk-BPXHKF3J.js[39m  [2m | [22m[2mhome-kiosquero-page[22m           [2m | [22m[36m256.74 kB[39m[2m | [22m
+[32mchunk-2BLJ4GV6.js[39m  [2m | [22m[2minventario-routes[22m             [2m | [22m[36m240.05 kB[39m[2m | [22m
+[32mchunk-QDFBTCS2.js[39m  [2m | [22m[2mkiosquero-reportes-page[22m       [2m | [22m[36m212.89 kB[39m[2m | [22m
+[32mchunk-J6THMBPS.js[39m  [2m | [22m[2mtutor-dashboard-component[22m     [2m | [22m[36m158.61 kB[39m[2m | [22m
+[32mchunk-5O5M3HWE.js[39m  [2m | [22m[2msugerencias-page[22m              [2m | [22m[36m154.71 kB[39m[2m | [22m
+[32mchunk-CKAJ27AU.js[39m  [2m | [22m[2mtracking-pedidos-page[22m         [2m | [22m[36m141.18 kB[39m[2m | [22m
+[32mchunk-DF2H4RGJ.js[39m  [2m | [22m[2mrecomendaciones-page-component[22m[2m | [22m[36m140.26 kB[39m[2m | [22m
+[32mchunk-HSBEGHYF.js[39m  [2m | [22m[2mhome-tutor-page[22m               [2m | [22m[36m139.68 kB[39m[2m | [22m
+[32mchunk-4BFBGWY3.js[39m  [2m | [22m[2mcarrito-page[22m                  [2m | [22m[36m133.22 kB[39m[2m | [22m
+[32mchunk-VD2YEPNA.js[39m  [2m | [22m[2mmovimientos-page[22m              [2m | [22m[36m115.89 kB[39m[2m | [22m
+[32mchunk-B5LJVK5E.js[39m  [2m | [22m[2mpurchase-recommendations-page[22m [2m | [22m[36m113.69 kB[39m[2m | [22m
+[32mchunk-WTCNZDNB.js[39m  [2m | [22m[2mhome-alumno-page[22m              [2m | [22m[36m108.74 kB[39m[2m | [22m
+[32mchunk-RL63NLZU.js[39m  [2m | [22m[2mperfil-usuario-page[22m           [2m | [22m [36m98.86 kB[39m[2m | [22m
+[2m...and 64 more lazy chunks files. Use "--verbose" to show all the files.[22m
+
+Application bundle generation complete. [8.004 seconds] - 2026-07-05T21:19:24.965Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m4202[22m/[39m
