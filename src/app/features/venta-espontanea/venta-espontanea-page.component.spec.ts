@@ -6,7 +6,7 @@ import { of, throwError } from 'rxjs';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { DialogService } from '../../shared/services/dialog.service';
 import { FeriadosService } from '../../shared/services/feriados.service';
-import { VentaEspontaneaService } from './services/venta-espontanea';
+import { ProductoVenta, VentaEspontaneaService } from './services/venta-espontanea';
 import {
   ALUMNO_ID_TEST,
   AlumnoResumenMother,
@@ -73,11 +73,10 @@ describe('VentaEspontaneaPageComponent', () => {
 
   describe('ngOnInit', () => {
     it('cuando se monta en dia laborable, deberia cargar los alumnos y verificar el dia laborable', () => {
-      jasmine.clock().install();
-      jasmine.clock().mockDate(new Date(2026, 6, 1));
+      givenFechaMockeada(new Date(2026, 6, 1));
 
       try {
-        fixture.detectChanges();
+        whenMonto();
 
         expect(service.cargarAlumnos).toHaveBeenCalled();
         expect(feriadosService.esFeriadoHoy).toHaveBeenCalled();
@@ -89,8 +88,7 @@ describe('VentaEspontaneaPageComponent', () => {
 
   describe('verificarDiaLaborable', () => {
     it('dado un domingo, cuando verifico el dia, deberia bloquear la venta', () => {
-      jasmine.clock().install();
-      jasmine.clock().mockDate(new Date('2026-07-05'));
+      givenFechaMockeada(new Date('2026-07-05'));
 
       component.verificarDiaLaborable();
 
@@ -101,8 +99,7 @@ describe('VentaEspontaneaPageComponent', () => {
     });
 
     it('dado un feriado, cuando verifico el dia, deberia setear el mensaje con el motivo', () => {
-      jasmine.clock().install();
-      jasmine.clock().mockDate(new Date('2026-07-01'));
+      givenFechaMockeada(new Date('2026-07-01'));
       feriadosService.esFeriadoHoy.and.returnValue(
         of({ esFeriado: true, motivo: 'Día de la Independencia' }),
       );
@@ -115,7 +112,7 @@ describe('VentaEspontaneaPageComponent', () => {
     });
 
     it('dado que ya estaba habilitado en localStorage, cuando verifico, deberia setear la flag en true', () => {
-      localStorage.setItem('recred_habilitar_fines_semana', 'true');
+      givenFinesDeSemanaHabilitados();
 
       component.verificarDiaLaborable();
 
@@ -144,28 +141,28 @@ describe('VentaEspontaneaPageComponent', () => {
   });
 
   describe('isBloqueado y getMotivoBloqueo', () => {
-    it('dado un producto bloqueado, isBloqueado deberia ser true y motivo "Bloqueado por el tutor"', () => {
+    it('dado un producto bloqueado por el tutor, cuando consulto, isBloqueado deberia ser true con su motivo', () => {
       const p = ProductoVentaMother.crearBloqueado();
 
       expect(component.isBloqueado(p)).toBeTrue();
       expect(component.getMotivoBloqueo(p)).toBe('Bloqueado por el tutor');
     });
 
-    it('dado un producto sin stock, motivo deberia ser "Sin stock disponible"', () => {
+    it('dado un producto sin stock, cuando consulto, el motivo deberia ser "Sin stock disponible"', () => {
       const p = ProductoVentaMother.crearSinStock();
 
       expect(component.isBloqueado(p)).toBeTrue();
       expect(component.getMotivoBloqueo(p)).toBe('Sin stock disponible');
     });
 
-    it('dado un producto que supera presupuesto, motivo deberia ser "Supera límite de presupuesto"', () => {
+    it('dado un producto que supera presupuesto, cuando consulto, el motivo deberia ser "Supera límite de presupuesto"', () => {
       const p = ProductoVentaMother.crearSuperaPresupuesto();
 
       expect(component.isBloqueado(p)).toBeTrue();
       expect(component.getMotivoBloqueo(p)).toBe('Supera límite de presupuesto');
     });
 
-    it('dado un producto libre, isBloqueado deberia ser false', () => {
+    it('dado un producto libre, cuando consulto, isBloqueado deberia ser false', () => {
       const p = ProductoVentaMother.crear();
 
       expect(component.isBloqueado(p)).toBeFalse();
@@ -173,7 +170,7 @@ describe('VentaEspontaneaPageComponent', () => {
   });
 
   describe('filtrarAlumnos', () => {
-    beforeEach(() => fixture.detectChanges());
+    beforeEach(() => whenMonto());
 
     it('dado un query "juan", cuando filtro, deberia devolver solo el alumno Juan', () => {
       component.busquedaAlumno = 'juan';
@@ -213,7 +210,7 @@ describe('VentaEspontaneaPageComponent', () => {
       expect(service.cargarProductosDelAlumno).toHaveBeenCalledWith(alumno.id);
     });
 
-    it('cuando cambio de alumno, deberia resetear alumnoSeleccionado y carrito', () => {
+    it('dado un alumno seleccionado, cuando cambio de alumno, deberia resetear alumnoSeleccionado y carrito', () => {
       component.alumnoSeleccionado.set(AlumnoResumenMother.crear());
 
       component.cambiarAlumno();
@@ -224,7 +221,7 @@ describe('VentaEspontaneaPageComponent', () => {
   });
 
   describe('toggleEscaneo y onCodeResult', () => {
-    beforeEach(() => fixture.detectChanges());
+    beforeEach(() => whenMonto());
 
     it('cuando toggleo el escaneo, deberia invertir la flag', () => {
       expect(component.escaneando()).toBeFalse();
@@ -249,7 +246,7 @@ describe('VentaEspontaneaPageComponent', () => {
   });
 
   describe('carrito', () => {
-    beforeEach(() => fixture.detectChanges());
+    beforeEach(() => whenMonto());
 
     it('dado un producto, cuando sumo, deberia agregarlo con cantidad 1', () => {
       const p = ProductoVentaMother.crear();
@@ -259,7 +256,7 @@ describe('VentaEspontaneaPageComponent', () => {
       expect(component.getCantidad(p)).toBe(1);
     });
 
-    it('dado un producto con cantidad 2, cuando resto, deberia bajar a 1; y de 1 a 0 deberia eliminarlo', () => {
+    it('dado un producto con cantidad 2, cuando resto dos veces, deberia bajar a 1 y despues eliminarlo', () => {
       const p = ProductoVentaMother.crear();
       component.sumar(p);
       component.sumar(p);
@@ -272,7 +269,7 @@ describe('VentaEspontaneaPageComponent', () => {
       expect(component.carrito().has(p.id)).toBeFalse();
     });
 
-    it('dados dos productos con cantidades, cuando pido getTotal, deberia sumar precio * cantidad', () => {
+    it('dado dos productos con cantidades, cuando pido getTotal, deberia sumar precio * cantidad', () => {
       const productos = ProductoVentaMother.crearVarios();
       service.productos.set(productos);
       component.sumar(productos[0]);
@@ -284,7 +281,7 @@ describe('VentaEspontaneaPageComponent', () => {
   });
 
   describe('confirmarVenta', () => {
-    beforeEach(() => fixture.detectChanges());
+    beforeEach(() => whenMonto());
 
     it('dado que no hay alumno seleccionado, cuando confirmo, no deberia llamar al service', () => {
       component.confirmarVenta();
@@ -300,11 +297,8 @@ describe('VentaEspontaneaPageComponent', () => {
       expect(service.procesarVenta).not.toHaveBeenCalled();
     });
 
-    it('dado un alumno y carrito con items, cuando confirmo con éxito, deberia mostrar alerta y navegar a /kiosquero', async () => {
-      component.alumnoSeleccionado.set(AlumnoResumenMother.crear());
-      const productos = ProductoVentaMother.crearVarios();
-      service.productos.set(productos);
-      component.sumar(productos[0]);
+    it('dado un alumno y carrito con items, cuando confirmo con exito, deberia mostrar alerta y navegar a /kiosquero', async () => {
+      givenCarritoConItems();
 
       component.confirmarVenta();
       await fixture.whenStable();
@@ -315,11 +309,8 @@ describe('VentaEspontaneaPageComponent', () => {
       expect(component.procesando()).toBeFalse();
     });
 
-    it('dado que el service falla, cuando confirmo, deberia mostrar el mensaje de error del back', () => {
-      component.alumnoSeleccionado.set(AlumnoResumenMother.crear());
-      const productos = ProductoVentaMother.crearVarios();
-      service.productos.set(productos);
-      component.sumar(productos[0]);
+    it('dado que el service falla con mensaje del back, cuando confirmo, deberia mostrar ese mensaje', () => {
+      givenCarritoConItems();
       service.procesarVenta.and.returnValue(
         throwError(() => ({ error: { mensaje: 'Saldo insuficiente' } })),
       );
@@ -331,10 +322,7 @@ describe('VentaEspontaneaPageComponent', () => {
     });
 
     it('dado que el service falla sin mensaje del back, cuando confirmo, deberia usar el err.message', () => {
-      component.alumnoSeleccionado.set(AlumnoResumenMother.crear());
-      const productos = ProductoVentaMother.crearVarios();
-      service.productos.set(productos);
-      component.sumar(productos[0]);
+      givenCarritoConItems();
       service.procesarVenta.and.returnValue(throwError(() => new Error('Timeout')));
 
       component.confirmarVenta();
@@ -342,4 +330,25 @@ describe('VentaEspontaneaPageComponent', () => {
       expect(component.mensajeError()).toBe('Timeout');
     });
   });
+
+  function givenFechaMockeada(fecha: Date): void {
+    jasmine.clock().install();
+    jasmine.clock().mockDate(fecha);
+  }
+
+  function givenFinesDeSemanaHabilitados(): void {
+    localStorage.setItem('recred_habilitar_fines_semana', 'true');
+  }
+
+  function givenCarritoConItems(): ProductoVenta[] {
+    component.alumnoSeleccionado.set(AlumnoResumenMother.crear());
+    const productos = ProductoVentaMother.crearVarios();
+    service.productos.set(productos);
+    component.sumar(productos[0]);
+    return productos;
+  }
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

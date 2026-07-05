@@ -24,8 +24,10 @@ describe('DirectivoService', () => {
     httpMock.verify();
   });
 
-  it('debería crearse correctamente', () => {
-    expect(service).toBeTruthy();
+  it('dado el TestBed configurado, cuando inyecto el service, deberia crearse correctamente', () => {
+    whenInyectoElService();
+
+    thenElServiceExiste();
   });
 
   it('debería hacer un GET a /colegios/me y devolver los datos', async () => {
@@ -67,4 +69,12 @@ describe('DirectivoService', () => {
     const result = await promise;
     expect(result).toEqual(mockData);
   });
+
+  function whenInyectoElService(): DirectivoService {
+    return service;
+  }
+
+  function thenElServiceExiste(): void {
+    expect(service).toBeTruthy();
+  }
 });

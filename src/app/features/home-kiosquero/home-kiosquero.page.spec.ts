@@ -88,6 +88,28 @@ class ProductoMasivoMother {
   }
 }
 
+class AccionKiosqueroMother {
+  static cargarProductos(): AccionKiosquero {
+    return {
+      id: 'cargar-productos',
+      titulo: 'Cargar productos',
+      descripcion: 'Sumá stock',
+      icono: 'fa-upload',
+      ruta: '',
+    };
+  }
+
+  static verPedidos(): AccionKiosquero {
+    return {
+      id: 'ver-pedidos',
+      titulo: 'Ver pedidos',
+      descripcion: 'Gestioná las órdenes',
+      icono: 'fa-clipboard-list',
+      ruta: '/kiosquero/pedidos',
+    };
+  }
+}
+
 interface PresenterMock {
   init: jasmine.Spy;
   ejecutarAccion: jasmine.Spy;
@@ -98,6 +120,22 @@ interface PresenterMock {
   isLoading: ReturnType<typeof signal<boolean>>;
   errorMessage: ReturnType<typeof signal<string | null>>;
   hasPanelData: ReturnType<typeof signal<boolean>>;
+}
+
+class PresenterMother {
+  static crear(): PresenterMock {
+    return {
+      init: jasmine.createSpy('init'),
+      ejecutarAccion: jasmine.createSpy('ejecutarAccion'),
+      nombreKiosquero: signal(''),
+      urlFotoPerfil: signal<string | null>(null),
+      iniciales: signal(''),
+      saludo: signal(''),
+      isLoading: signal(false),
+      errorMessage: signal<string | null>(null),
+      hasPanelData: signal(false),
+    };
+  }
 }
 
 describe('HomeKiosqueroPage', () => {
@@ -111,24 +149,8 @@ describe('HomeKiosqueroPage', () => {
   let servicioToast: jasmine.SpyObj<ToastService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
 
-  const accionCargarProductos: AccionKiosquero = {
-    id: 'cargar-productos',
-    titulo: 'Cargar productos',
-    descripcion: 'Sumá stock',
-    icono: 'fa-upload',
-    ruta: '',
-  };
-
-  const accionVerPedidos: AccionKiosquero = {
-    id: 'ver-pedidos',
-    titulo: 'Ver pedidos',
-    descripcion: 'Gestioná las órdenes',
-    icono: 'fa-clipboard-list',
-    ruta: '/kiosquero/pedidos',
-  };
-
   beforeEach(async () => {
-    presenter = crearPresenterMock();
+    presenter = PresenterMother.crear();
     servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['setHomeUrl']);
     servicioProducto = jasmine.createSpyObj<ProductoService>('ProductoService', [
       'getCategories',
@@ -186,7 +208,7 @@ describe('HomeKiosqueroPage', () => {
   });
 
   describe('inicializacion', () => {
-    it('dado ngOnInit, deberia setear /kiosquero como home, iniciar el presenter y cargar categorias', () => {
+    it('dado la page, cuando corre ngOnInit, deberia setear /kiosquero como home, iniciar el presenter y cargar categorias', () => {
       component.ngOnInit();
 
       expect(servicioUsuario.setHomeUrl).toHaveBeenCalledWith('/kiosquero');
@@ -194,17 +216,17 @@ describe('HomeKiosqueroPage', () => {
       expect(servicioProducto.getCategories).toHaveBeenCalled();
     });
 
-    it('dado que la carga de categorias devuelve datos, deberia guardarlas en el componente', () => {
+    it('dado que la carga de categorias devuelve datos, cuando corre ngOnInit, deberia guardarlas en el componente', () => {
       const categorias: Categoria[] = [{ id: 'c1', descripcion: 'Cat', activo: true }];
-      servicioProducto.getCategories.and.returnValue(of(categorias));
+      givenCategoriasDelBack(categorias);
 
       component.ngOnInit();
 
       expect(component.categories).toEqual(categorias);
     });
 
-    it('dado que la carga de categorias falla, deberia mostrar el toast de error', () => {
-      servicioProducto.getCategories.and.returnValue(throwError(() => new Error('boom')));
+    it('dado que la carga de categorias falla, cuando corre ngOnInit, deberia mostrar el toast de error', () => {
+      givenGetCategoriesFalla();
 
       component.ngOnInit();
 
@@ -213,17 +235,18 @@ describe('HomeKiosqueroPage', () => {
   });
 
   describe('onActionClick', () => {
-    it('dado la accion cargar-productos, cuando la selecciono, deberia abrir el modal de seleccion de carga', () => {
-      component.onActionClick(accionCargarProductos);
+    it('dado la accion cargar-productos, cuando hago click, deberia abrir el modal de seleccion de carga', () => {
+      component.onActionClick(AccionKiosqueroMother.cargarProductos());
 
       expect(component.isUploadModalVisible).toBeTrue();
       expect(presenter.ejecutarAccion).not.toHaveBeenCalled();
     });
 
-    it('dado otra accion, cuando la selecciono, deberia delegar al presenter', () => {
-      component.onActionClick(accionVerPedidos);
+    it('dado otra accion, cuando hago click, deberia delegar al presenter', () => {
+      const accion = AccionKiosqueroMother.verPedidos();
+      component.onActionClick(accion);
 
-      expect(presenter.ejecutarAccion).toHaveBeenCalledWith(accionVerPedidos);
+      expect(presenter.ejecutarAccion).toHaveBeenCalledWith(accion);
     });
   });
 
@@ -282,7 +305,7 @@ describe('HomeKiosqueroPage', () => {
       expect(servicioToast.mostrar).toHaveBeenCalledWith('Archivo procesado correctamente', 'success');
     });
 
-    it('dado que el upload falla, deberia mostrar el toast de error', () => {
+    it('dado que el upload falla, cuando lo proceso, deberia mostrar el toast de error', () => {
       servicioCargaMasiva.uploadFile.and.returnValue(throwError(() => new Error('boom')));
 
       component.handleFileUpload(new File([''], 'test.csv'));
@@ -293,8 +316,8 @@ describe('HomeKiosqueroPage', () => {
   });
 
   describe('handleBulkProductsSave', () => {
-    it('dado sin buffetId, deberia mostrar el toast de error y no llamar al service', () => {
-      servicioPerfil.obtenerBuffetId.and.returnValue(null);
+    it('dado sin buffetId, cuando guardo bulk, deberia mostrar el toast de error y no llamar al service', () => {
+      givenSinBuffetId();
 
       component.handleBulkProductsSave([ProductoMasivoMother.crear()]);
 
@@ -305,7 +328,7 @@ describe('HomeKiosqueroPage', () => {
       expect(servicioProducto.createBulk).not.toHaveBeenCalled();
     });
 
-    it('dado productos validos y buffetId, deberia armar los requests con el buffet, guardar y navegar', () => {
+    it('dado productos validos y buffetId, cuando guardo bulk, deberia armar los requests con el buffet, guardar y navegar', () => {
       const productos = [ProductoMasivoMother.crear()];
 
       component.handleBulkProductsSave(productos);
@@ -317,7 +340,7 @@ describe('HomeKiosqueroPage', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/admin-productos');
     });
 
-    it('dado una categoria NEW normalizada, deberia usar la misma capitalizacion para nombres iguales', () => {
+    it('dado una categoria NEW normalizada, cuando guardo bulk, deberia usar la misma capitalizacion para nombres iguales', () => {
       const productos = [
         ProductoMasivoMother.crear({ categoriaId: 'NEW', nuevaCategoriaNombre: '  Bebidas  ' }),
         ProductoMasivoMother.crear({ categoriaId: 'NEW', nuevaCategoriaNombre: 'bebidas' }),
@@ -330,7 +353,7 @@ describe('HomeKiosqueroPage', () => {
       expect(requests[1].nuevaCategoriaNombre).toBe('Bebidas');
     });
 
-    it('dado que createBulk falla, deberia mostrar el toast de error', () => {
+    it('dado que createBulk falla, cuando guardo bulk, deberia mostrar el toast de error', () => {
       servicioProducto.createBulk.and.returnValue(throwError(() => new Error('boom')));
 
       component.handleBulkProductsSave([ProductoMasivoMother.crear()]);
@@ -341,8 +364,8 @@ describe('HomeKiosqueroPage', () => {
   });
 
   describe('handleManualProductSubmit', () => {
-    it('dado sin buffetId, deberia mostrar el toast de error y no llamar al service', () => {
-      servicioPerfil.obtenerBuffetId.and.returnValue(null);
+    it('dado sin buffetId, cuando guardo manual, deberia mostrar el toast de error y no llamar al service', () => {
+      givenSinBuffetId();
 
       component.handleManualProductSubmit(DatosFormularioMother.crearBase());
 
@@ -353,7 +376,7 @@ describe('HomeKiosqueroPage', () => {
       expect(servicioProducto.create).not.toHaveBeenCalled();
     });
 
-    it('dado un producto sin TACC, sin azucar y sin lacteos, deberia incluir Sin TACC y Sin Azucar en la payload', () => {
+    it('dado un producto sin TACC, sin azucar y sin lacteos, cuando guardo, deberia incluir Sin TACC y Sin Azucar en la payload', () => {
       component.handleManualProductSubmit(DatosFormularioMother.crearBase());
 
       const payload = servicioProducto.create.calls.mostRecent().args[0];
@@ -361,7 +384,7 @@ describe('HomeKiosqueroPage', () => {
       expect(payload.clasificacionesSaludIds).toContain('7e113952-93ca-4797-a80d-54f3a31b2165');
     });
 
-    it('dado creacion exitosa, deberia cerrar el form, mostrar toast y navegar', () => {
+    it('dado creacion exitosa, cuando guardo manual, deberia cerrar el form, mostrar toast y navegar', () => {
       component.isManualProductFormVisible = true;
 
       component.handleManualProductSubmit(DatosFormularioMother.crearBase());
@@ -371,7 +394,7 @@ describe('HomeKiosqueroPage', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/admin-productos');
     });
 
-    it('dado que la creacion falla, deberia mostrar el toast de error', () => {
+    it('dado que la creacion falla, cuando guardo manual, deberia mostrar el toast de error', () => {
       servicioProducto.create.and.returnValue(throwError(() => new Error('boom')));
 
       component.handleManualProductSubmit(DatosFormularioMother.crearBase());
@@ -382,7 +405,7 @@ describe('HomeKiosqueroPage', () => {
   });
 
   describe('onImagenError', () => {
-    it('dado una imagen que falla, deberia setear el src al fallback', () => {
+    it('dado una imagen que falla, cuando se dispara error, deberia setear el src al fallback', () => {
       const img = document.createElement('img');
       img.src = 'https://original/foto.png';
 
@@ -402,17 +425,15 @@ describe('HomeKiosqueroPage', () => {
     });
   });
 
-  function crearPresenterMock(): PresenterMock {
-    return {
-      init: jasmine.createSpy('init'),
-      ejecutarAccion: jasmine.createSpy('ejecutarAccion'),
-      nombreKiosquero: signal(''),
-      urlFotoPerfil: signal<string | null>(null),
-      iniciales: signal(''),
-      saludo: signal(''),
-      isLoading: signal(false),
-      errorMessage: signal<string | null>(null),
-      hasPanelData: signal(false),
-    };
+  function givenCategoriasDelBack(categorias: Categoria[]): void {
+    servicioProducto.getCategories.and.returnValue(of(categorias));
+  }
+
+  function givenGetCategoriesFalla(): void {
+    servicioProducto.getCategories.and.returnValue(throwError(() => new Error('boom')));
+  }
+
+  function givenSinBuffetId(): void {
+    servicioPerfil.obtenerBuffetId.and.returnValue(null);
   }
 });

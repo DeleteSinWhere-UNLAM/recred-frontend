@@ -1,14 +1,44 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { PromotionService, Promotion } from './promotion.service';
 import { environment } from '../../../../environments/environment';
 import { PerfilService } from '../perfil.service';
 
 describe('PromotionService', () => {
+  const URL_PROMOTIONS = `${environment.apiUrl}/promotions`;
+  const URL_PROMOTION_BY_ID = (id: string): string => `${URL_PROMOTIONS}/${id}`;
+  const URL_PROMOTIONS_POR_BUFFET = (buffetId: string): string => `${URL_PROMOTIONS}/buffet/${buffetId}`;
+
   let service: PromotionService;
   let httpMock: HttpTestingController;
   let mockPerfilService: jasmine.SpyObj<PerfilService>;
+
+  class PromotionMother {
+    static crear(override: Partial<Promotion> = {}): Promotion {
+      return {
+        id: 'promo-123',
+        name: 'Promo Test',
+        discountPercentage: 10,
+        productIds: [],
+        startDate: '2026-06-12',
+        endDate: '2026-06-20',
+        status: 'ACTIVE',
+        ...override,
+      } as Promotion;
+    }
+
+    static crearParcial(override: Partial<Promotion> = {}): Partial<Promotion> {
+      return {
+        name: 'Promo Test',
+        discountPercentage: 10,
+        productIds: ['prod-1'],
+        startDate: '2026-06-12',
+        endDate: '2026-06-20',
+        ...override,
+      };
+    }
+  }
 
   beforeEach(() => {
     mockPerfilService = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
@@ -17,8 +47,8 @@ describe('PromotionService', () => {
         PromotionService,
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: PerfilService, useValue: mockPerfilService }
-      ]
+        { provide: PerfilService, useValue: mockPerfilService },
+      ],
     });
     service = TestBed.inject(PromotionService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -29,136 +59,144 @@ describe('PromotionService', () => {
   });
 
   describe('approvePromotion', () => {
-    it('Dado que se llama a approvePromotion con un ID válido, debería hacer un PUT a /promotions/:id con status ACTIVE y buffetId', () => {
-      const mockId = 'promo-123';
-      const mockBuffetId = 'buffet-123';
-      const mockResponse: Promotion = {
-        id: mockId,
-        name: 'Promo Test',
-        discountPercentage: 10,
-        productIds: [],
-        startDate: '2026-06-12',
-        endDate: '2026-06-20',
-        status: 'ACTIVE',
-        buffetId: mockBuffetId
-      };
+    it('dado un id valido y un buffetId, cuando apruebo, deberia hacer PUT /promotions/:id mandando status ACTIVE y ese buffetId', () => {
+      const promo = PromotionMother.crear({ buffetId: 'buffet-123' });
 
-      service.approvePromotion(mockId, mockBuffetId).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-      });
+      whenApruebo(promo.id, 'buffet-123');
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/${mockId}`);
-      expect(req.request.method).toBe('PUT');
-      expect(req.request.body).toEqual({ status: 'ACTIVE', buffetId: mockBuffetId });
-      req.flush(mockResponse);
+      thenSeHizoPutPromotionCon(promo.id, 'ACTIVE', 'buffet-123').flush(promo);
     });
   });
 
   describe('discardPromotion', () => {
-    it('Dado que se llama a discardPromotion con un ID válido, debería hacer un DELETE a /promotions/:id', () => {
-      const mockId = 'promo-123';
+    it('dado un id valido, cuando descarto, deberia hacer DELETE /promotions/:id', () => {
+      whenDescarto('promo-123');
 
-      service.discardPromotion(mockId).subscribe(response => {
-        expect(response).toBeNull();
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/${mockId}`);
-      expect(req.request.method).toBe('DELETE');
-      req.flush(null);
+      thenSeHizoDeletePromotion('promo-123').flush(null);
     });
   });
 
   describe('createPromotion', () => {
-    it('Dado que se llama a createPromotion con una promoción, debería hacer un POST a /promotions con buffetId', () => {
-      mockPerfilService.obtenerBuffetId.and.returnValue('buffet-123');
-      const mockPromo: Partial<Promotion> = {
-        name: 'Promo Test',
-        discountPercentage: 10,
-        productIds: ['prod-1'],
-        startDate: '2026-06-12',
-        endDate: '2026-06-20'
-      };
+    it('dado una promocion sin buffetId, cuando la creo, deberia hacer POST /promotions con el buffetId del perfil', () => {
+      givenBuffetIdEnPerfil('buffet-123');
+      const promo = PromotionMother.crearParcial();
+      const response = PromotionMother.crear({ ...promo, buffetId: 'buffet-123' });
 
-      const mockResponse: Promotion = {
-        ...mockPromo,
-        id: 'promo-123',
-        status: 'ACTIVE',
-        buffetId: 'buffet-123'
-      } as Promotion;
+      whenCreo(promo);
 
-      service.createPromotion(mockPromo).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ ...mockPromo, buffetId: 'buffet-123' });
-      req.flush(mockResponse);
+      thenSeHizoPostPromotionCon({ ...promo, buffetId: 'buffet-123' }).flush(response);
     });
 
-    it('Dado que la promocion trae buffetId explicito, deberia usarlo en el payload y no tocar el perfil', () => {
+    it('dado una promocion con buffetId explicito, cuando la creo, deberia usarlo y no tocar el perfil', () => {
       const promo: Partial<Promotion> = { name: 'Con buffet', buffetId: 'buffet-explicit' };
 
-      service.createPromotion(promo).subscribe();
+      whenCreo(promo);
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions`);
-      expect(req.request.body).toEqual({ ...promo, buffetId: 'buffet-explicit' });
+      thenSeHizoPostPromotionCon({ ...promo, buffetId: 'buffet-explicit' }).flush({});
       expect(mockPerfilService.obtenerBuffetId).not.toHaveBeenCalled();
-      req.flush({});
     });
 
-    it('Dado que no hay buffetId en la promo ni en el perfil, deberia mandar string vacio', () => {
-      mockPerfilService.obtenerBuffetId.and.returnValue(null);
+    it('dado que no hay buffetId en la promo ni en el perfil, cuando la creo, deberia mandar string vacio', () => {
+      givenBuffetIdEnPerfil(null);
       const promo: Partial<Promotion> = { name: 'Sin buffet' };
 
-      service.createPromotion(promo).subscribe();
+      whenCreo(promo);
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions`);
-      expect((req.request.body as { buffetId: string }).buffetId).toBe('');
-      req.flush({});
+      thenElBuffetIdDelPostEs('').flush({});
     });
   });
 
   describe('getPromotions', () => {
-    it('Dado un buffetId explicito, deberia hacer GET a /promotions/buffet/:id sin consultar el perfil', () => {
-      service.getPromotions('buffet-42').subscribe();
+    it('dado un buffetId explicito, cuando pido las promociones, deberia hacer GET /promotions/buffet/:id sin consultar el perfil', () => {
+      whenPidoPromocionesConBuffet('buffet-42');
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/buffet/buffet-42`);
-      expect(req.request.method).toBe('GET');
+      thenSeHizoGetPromotionsDelBuffet('buffet-42').flush([]);
       expect(mockPerfilService.obtenerBuffetId).not.toHaveBeenCalled();
-      req.flush([]);
     });
 
-    it('Dado ningun argumento, deberia usar el buffetId del perfil', () => {
-      mockPerfilService.obtenerBuffetId.and.returnValue('buffet-perfil');
+    it('dado ningun argumento, cuando pido las promociones, deberia usar el buffetId del perfil', () => {
+      givenBuffetIdEnPerfil('buffet-perfil');
 
-      service.getPromotions().subscribe();
+      whenPidoPromocionesSinBuffet();
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/buffet/buffet-perfil`);
-      expect(req.request.method).toBe('GET');
-      req.flush([]);
+      thenSeHizoGetPromotionsDelBuffet('buffet-perfil').flush([]);
     });
   });
 
   describe('getPromotionById', () => {
-    it('Dado un id, deberia hacer GET a /promotions/:id', () => {
-      const mockPromo: Promotion = {
-        id: 'p-1',
-        name: 'Test',
-        discountPercentage: 5,
-        productIds: [],
-        startDate: '2026-06-01',
-        endDate: '2026-06-30',
-        status: 'ACTIVE',
-      };
+    it('dado un id, cuando pido la promocion, deberia hacer GET /promotions/:id', () => {
+      const promo = PromotionMother.crear({ id: 'p-1', discountPercentage: 5, startDate: '2026-06-01', endDate: '2026-06-30' });
 
-      service.getPromotionById('p-1').subscribe((res) => {
-        expect(res).toEqual(mockPromo);
-      });
+      whenPidoPromocionPorId('p-1');
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/promotions/p-1`);
-      expect(req.request.method).toBe('GET');
-      req.flush(mockPromo);
+      thenSeHizoGetPromotionPorId('p-1').flush(promo);
     });
   });
+
+  function givenBuffetIdEnPerfil(buffetId: string | null): void {
+    mockPerfilService.obtenerBuffetId.and.returnValue(buffetId);
+  }
+
+  function whenApruebo(id: string, buffetId: string): void {
+    service.approvePromotion(id, buffetId).subscribe();
+  }
+
+  function whenDescarto(id: string): void {
+    service.discardPromotion(id).subscribe();
+  }
+
+  function whenCreo(promo: Partial<Promotion>): void {
+    service.createPromotion(promo).subscribe();
+  }
+
+  function whenPidoPromocionesConBuffet(buffetId: string): void {
+    service.getPromotions(buffetId).subscribe();
+  }
+
+  function whenPidoPromocionesSinBuffet(): void {
+    service.getPromotions().subscribe();
+  }
+
+  function whenPidoPromocionPorId(id: string): void {
+    service.getPromotionById(id).subscribe();
+  }
+
+  function thenSeHizoPutPromotionCon(id: string, status: string, buffetId: string): TestRequest {
+    const req = httpMock.expectOne(URL_PROMOTION_BY_ID(id));
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body.status).toBe(status);
+    expect(req.request.body.buffetId).toBe(buffetId);
+    return req;
+  }
+
+  function thenSeHizoDeletePromotion(id: string): TestRequest {
+    const req = httpMock.expectOne(URL_PROMOTION_BY_ID(id));
+    expect(req.request.method).toBe('DELETE');
+    return req;
+  }
+
+  function thenSeHizoPostPromotionCon(expectedBody: Partial<Promotion>): TestRequest {
+    const req = httpMock.expectOne(URL_PROMOTIONS);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(expectedBody);
+    return req;
+  }
+
+  function thenElBuffetIdDelPostEs(buffetId: string): TestRequest {
+    const req = httpMock.expectOne(URL_PROMOTIONS);
+    expect((req.request.body as { buffetId: string }).buffetId).toBe(buffetId);
+    return req;
+  }
+
+  function thenSeHizoGetPromotionsDelBuffet(buffetId: string): TestRequest {
+    const req = httpMock.expectOne(URL_PROMOTIONS_POR_BUFFET(buffetId));
+    expect(req.request.method).toBe('GET');
+    return req;
+  }
+
+  function thenSeHizoGetPromotionPorId(id: string): TestRequest {
+    const req = httpMock.expectOne(URL_PROMOTION_BY_ID(id));
+    expect(req.request.method).toBe('GET');
+    return req;
+  }
 });

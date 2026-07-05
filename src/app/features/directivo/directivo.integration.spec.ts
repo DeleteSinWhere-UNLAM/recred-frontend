@@ -3,6 +3,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DirectivoPage } from './directivo.page';
 import { DirectivoPresenter } from './presenter/directivo.presenter';
 import { PerfilService } from '../../data-access/services/perfil.service';
+import { Perfil } from '../../data-access/models/perfil.model';
 import { DirectivoService } from './services/directivo.service';
 import { DirectivoMother } from './directivo.mother';
 import { By } from '@angular/platform-browser';
@@ -11,9 +12,9 @@ import { Component } from '@angular/core';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
-class NavbarStubComponent {}
+class NavbarStubComponent { }
 
-describe('DirectivoPage (Integración: UI + Presenter)', () => {
+describe('DirectivoPage Integration', () => {
   let fixture: ComponentFixture<DirectivoPage>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
   let directivoServiceSpy: jasmine.SpyObj<DirectivoService>;
@@ -30,15 +31,15 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
         { provide: DirectivoService, useValue: directivoServiceSpy },
       ],
     })
-    .overrideComponent(DirectivoPage, {
-      remove: {
-        imports: [NavbarComponent]
-      },
-      add: {
-        imports: [NavbarStubComponent]
-      }
-    })
-    .compileComponents();
+      .overrideComponent(DirectivoPage, {
+        remove: {
+          imports: [NavbarComponent]
+        },
+        add: {
+          imports: [NavbarStubComponent]
+        }
+      })
+      .compileComponents();
   });
 
   describe('Flujo Principal (Happy Path)', () => {
@@ -53,7 +54,7 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
       });
 
       fixture = TestBed.createComponent(DirectivoPage);
-      
+
       fixture.detectChanges(); // Triggers ngOnInit
       await new Promise(resolve => setTimeout(resolve, 50));
       fixture.detectChanges(); // Update DOM after promises resolve
@@ -61,7 +62,7 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
       const dashboardElement = fixture.nativeElement.querySelector('app-directivo-dashboard');
       console.log('DASHBOARD HTML:', dashboardElement?.innerHTML);
       expect(dashboardElement).toBeTruthy();
-      
+
       const headerTitle = fixture.debugElement.query(By.css('#pv-title'));
       expect(headerTitle).toBeTruthy('headerTitle should exist');
       expect(headerTitle.nativeElement.textContent).toContain('Colegio Integracion');
@@ -83,4 +84,15 @@ describe('DirectivoPage (Integración: UI + Presenter)', () => {
       expect(errorAlert.nativeElement.textContent).toContain('No tienes permisos');
     });
   });
+
+  function givenPerfilDelDirectivo(perfil: Perfil): void {
+    perfilServiceSpy.cargarPerfil.and.resolveTo(perfil);
+  }
+
+  async function whenMontoYInicializo(): Promise<void> {
+    fixture = TestBed.createComponent(DirectivoPage);
+    fixture.componentInstance.ngOnInit();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
 });

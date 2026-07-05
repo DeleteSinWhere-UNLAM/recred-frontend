@@ -17,6 +17,11 @@ describe('DirectivoDashboardComponent', () => {
     component = fixture.componentInstance;
   });
 
+  it('dado el componente, cuando se monta, deberia crearse', () => {
+    whenMonto();
+    expect(component).toBeTruthy();
+  });
+
   it('debería renderizar mensaje de carga cuando loading es true', () => {
     component.loading = true;
     fixture.detectChanges();
@@ -54,4 +59,8 @@ describe('DirectivoDashboardComponent', () => {
     expect(card).toBeTruthy();
     expect(card.nativeElement.textContent).toContain('Kiosco 1');
   });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

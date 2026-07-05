@@ -10,10 +10,19 @@ import { CarritosFavoritosService } from '../../../carritos-favoritos/services/c
 import { CarritoFavoritoResponse } from '../../../carritos-favoritos/models/carritos-favoritos.model';
 import { GuardarFavoritoModalComponent } from './guardar-favorito-modal.component';
 
-interface Perfil {
+interface PerfilTest {
   id: string;
   nombre: string;
   plan?: string;
+}
+
+class PerfilTestMother {
+  static premium(): PerfilTest {
+    return { id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' };
+  }
+  static gratuito(): PerfilTest {
+    return { id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' };
+  }
 }
 
 describe('GuardarFavoritoModalComponent', () => {
@@ -25,12 +34,151 @@ describe('GuardarFavoritoModalComponent', () => {
   };
   let carritosFavoritosService: jasmine.SpyObj<CarritosFavoritosService>;
   let toastService: jasmine.SpyObj<ToastService>;
-  let perfilSignal: ReturnType<typeof signal<Perfil | null>>;
+  let perfilSignal: ReturnType<typeof signal<PerfilTest | null>>;
   let esVistaAlumnoSignal: ReturnType<typeof signal<boolean>>;
 
-  async function setup(perfil: Perfil | null = { id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' }): Promise<void> {
+  describe('ngOnInit', () => {
+    it('dado el modal, cuando se monta, deberia asegurar que los alumnos esten cargados e inicializar nombre/alumnoId', async () => {
+      await givenComponentConfigurado();
+      component.initialNombre = 'Desayuno';
+      component.initialAlumnoId = 'alumno-1';
+
+      whenMonto();
+
+      expect(alumnosService.asegurarCargados).toHaveBeenCalled();
+      expect(component.nombre).toBe('Desayuno');
+      expect(component.alumnoId).toBe('alumno-1');
+    });
+
+    it('dado plan GRATUITO y no hay cartId, cuando se monta y tengo 3 carritos, deberia marcar limitReached', async () => {
+      await givenComponentConfigurado(PerfilTestMother.gratuito());
+      givenCarritosFavoritosDelBack([{}, {}, {}] as CarritoFavoritoResponse[]);
+
+      whenMonto();
+
+      expect(component.limitReached).toBeTrue();
+    });
+
+    it('dado plan PREMIUM, cuando se monta, no deberia pedir carritos favoritos para validar limite', async () => {
+      await givenComponentConfigurado(PerfilTestMother.premium());
+
+      whenMonto();
+
+      expect(carritosFavoritosService.getCarritosFavoritos).not.toHaveBeenCalled();
+    });
+
+    it('dado un cartId (editando), cuando se monta, no deberia validar limite ni marcar limitReached', async () => {
+      await givenComponentConfigurado(PerfilTestMother.gratuito());
+      component.cartId = 'existing-cart';
+      givenCarritosFavoritosDelBack([{}, {}, {}] as CarritoFavoritoResponse[]);
+
+      whenMonto();
+
+      expect(carritosFavoritosService.getCarritosFavoritos).not.toHaveBeenCalled();
+      expect(component.limitReached).toBeFalse();
+    });
+  });
+
+  describe('total', () => {
+    it('dado items, cuando pido el total, deberia sumar price * quantity', async () => {
+      await givenComponentConfigurado();
+      component.items = [
+        { productId: 'p1', productName: 'A', price: 100, quantity: 2 },
+        { productId: 'p2', productName: 'B', price: 50, quantity: 3 },
+      ];
+
+      expect(component.total).toBe(350);
+    });
+  });
+
+  describe('onSave', () => {
+    beforeEach(async () => {
+      await givenComponentConfigurado();
+      whenMonto();
+      component.nombre = 'Mi carrito';
+      component.alumnoId = 'alumno-1';
+      component.items = [{ productId: 'p1', productName: 'A', price: 100, quantity: 2 }];
+    });
+
+    it('dado un nombre vacio, cuando guardo, deberia mostrar toast de error y no llamar al service', () => {
+      component.nombre = '   ';
+
+      component.onSave();
+
+      thenSeMostroToast('Por favor, ingresá un nombre para el carrito', 'error');
+      expect(carritosFavoritosService.saveCarritoFavorito).not.toHaveBeenCalled();
+    });
+
+    it('dado sin alumnoId, cuando guardo, deberia mostrar toast de error', () => {
+      component.alumnoId = '';
+
+      component.onSave();
+
+      thenSeMostroToast('Por favor, seleccioná un hijo', 'error');
+      expect(carritosFavoritosService.saveCarritoFavorito).not.toHaveBeenCalled();
+    });
+
+    it('dado sin items, cuando guardo, deberia mostrar toast de error', () => {
+      component.items = [];
+
+      component.onSave();
+
+      thenSeMostroToast('No hay productos en el carrito para guardar', 'error');
+    });
+
+    it('dado un carrito nuevo, cuando guardo con exito, deberia mostrar toast + emitir saveSuccess + closeModal', () => {
+      spyOn(component.saveSuccess, 'emit');
+      spyOn(component.closeModal, 'emit');
+
+      component.onSave();
+
+      expect(carritosFavoritosService.saveCarritoFavorito).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          id: null,
+          nombre: 'Mi carrito',
+          alumnoId: 'alumno-1',
+          items: [{ productId: 'p1', quantity: 2 }],
+        }),
+      );
+      thenSeMostroToast('Carrito guardado como favorito con éxito', 'success');
+      expect(component.saveSuccess.emit).toHaveBeenCalled();
+      expect(component.closeModal.emit).toHaveBeenCalled();
+    });
+
+    it('dado un cartId (editando), cuando guardo con exito, deberia mostrar toast de actualizado', () => {
+      component.cartId = 'existing';
+
+      component.onSave();
+
+      thenSeMostroToast('Carrito favorito actualizado con éxito', 'success');
+    });
+
+    it('dado que el service falla, cuando guardo, deberia mostrar toast de error y dejar isSaving en false', () => {
+      spyOn(console, 'error');
+      carritosFavoritosService.saveCarritoFavorito.and.returnValue(throwError(() => new Error('boom')));
+
+      component.onSave();
+
+      thenSeMostroToast('Hubo un error al guardar el carrito favorito', 'error');
+      expect(component.isSaving).toBeFalse();
+    });
+  });
+
+  describe('onClose', () => {
+    it('cuando hago click en cerrar, deberia emitir closeModal', async () => {
+      await givenComponentConfigurado();
+      whenMonto();
+      spyOn(component.closeModal, 'emit');
+
+      component.onClose();
+
+      expect(component.closeModal.emit).toHaveBeenCalled();
+    });
+  });
+
+  async function givenComponentConfigurado(perfil: PerfilTest | null = PerfilTestMother.premium()): Promise<void> {
     esVistaAlumnoSignal = signal(false);
-    perfilSignal = signal<Perfil | null>(perfil);
+    perfilSignal = signal<PerfilTest | null>(perfil);
 
     alumnosService = {
       alumnos: signal([AlumnoMother.crearHijoDelTutor()]),
@@ -64,163 +212,15 @@ describe('GuardarFavoritoModalComponent', () => {
     component.items = [];
   }
 
-  describe('ngOnInit', () => {
-    it('cuando se monta, deberia asegurar que los alumnos esten cargados e inicializar nombre/alumnoId', async () => {
-      await setup();
-      component.initialNombre = 'Desayuno';
-      component.initialAlumnoId = 'alumno-1';
+  function givenCarritosFavoritosDelBack(carritos: CarritoFavoritoResponse[]): void {
+    carritosFavoritosService.getCarritosFavoritos.and.returnValue(of(carritos));
+  }
 
-      fixture.detectChanges();
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 
-      expect(alumnosService.asegurarCargados).toHaveBeenCalled();
-      expect(component.nombre).toBe('Desayuno');
-      expect(component.alumnoId).toBe('alumno-1');
-    });
-
-    it('dado plan GRATUITO y no hay cartId, cuando se monta y tengo 3 carritos, deberia marcar limitReached', async () => {
-      await setup({ id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' });
-      carritosFavoritosService.getCarritosFavoritos.and.returnValue(
-        of([{}, {}, {}] as CarritoFavoritoResponse[]),
-      );
-
-      fixture.detectChanges();
-
-      expect(component.limitReached).toBeTrue();
-    });
-
-    it('dado plan PREMIUM, cuando se monta, no deberia pedir carritos favoritos para validar limite', async () => {
-      await setup({ id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' });
-
-      fixture.detectChanges();
-
-      expect(carritosFavoritosService.getCarritosFavoritos).not.toHaveBeenCalled();
-    });
-
-    it('dado un cartId (editando), cuando se monta, no deberia validar limite ni marcar limitReached', async () => {
-      await setup({ id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' });
-      component.cartId = 'existing-cart';
-      carritosFavoritosService.getCarritosFavoritos.and.returnValue(
-        of([{}, {}, {}] as CarritoFavoritoResponse[]),
-      );
-
-      fixture.detectChanges();
-
-      expect(carritosFavoritosService.getCarritosFavoritos).not.toHaveBeenCalled();
-      expect(component.limitReached).toBeFalse();
-    });
-  });
-
-  describe('total', () => {
-    it('dados items, cuando pido el total, deberia sumar price * quantity', async () => {
-      await setup();
-      component.items = [
-        { productId: 'p1', productName: 'A', price: 100, quantity: 2 },
-        { productId: 'p2', productName: 'B', price: 50, quantity: 3 },
-      ];
-
-      expect(component.total).toBe(350);
-    });
-  });
-
-  describe('onSave', () => {
-    beforeEach(async () => {
-      await setup();
-      fixture.detectChanges();
-      component.nombre = 'Mi carrito';
-      component.alumnoId = 'alumno-1';
-      component.items = [{ productId: 'p1', productName: 'A', price: 100, quantity: 2 }];
-    });
-
-    it('dado un nombre vacio, cuando guardo, deberia mostrar toast de error y no llamar al service', () => {
-      component.nombre = '   ';
-
-      component.onSave();
-
-      expect(toastService.mostrar).toHaveBeenCalledWith(
-        'Por favor, ingresá un nombre para el carrito',
-        'error',
-      );
-      expect(carritosFavoritosService.saveCarritoFavorito).not.toHaveBeenCalled();
-    });
-
-    it('dado sin alumnoId, cuando guardo, deberia mostrar toast de error', () => {
-      component.alumnoId = '';
-
-      component.onSave();
-
-      expect(toastService.mostrar).toHaveBeenCalledWith('Por favor, seleccioná un hijo', 'error');
-      expect(carritosFavoritosService.saveCarritoFavorito).not.toHaveBeenCalled();
-    });
-
-    it('dado sin items, cuando guardo, deberia mostrar toast de error', () => {
-      component.items = [];
-
-      component.onSave();
-
-      expect(toastService.mostrar).toHaveBeenCalledWith(
-        'No hay productos en el carrito para guardar',
-        'error',
-      );
-    });
-
-    it('dado un carrito nuevo, cuando guardo con exito, deberia mostrar toast + emitir saveSuccess + closeModal', () => {
-      spyOn(component.saveSuccess, 'emit');
-      spyOn(component.closeModal, 'emit');
-
-      component.onSave();
-
-      expect(carritosFavoritosService.saveCarritoFavorito).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          id: null,
-          nombre: 'Mi carrito',
-          alumnoId: 'alumno-1',
-          items: [{ productId: 'p1', quantity: 2 }],
-        }),
-      );
-      expect(toastService.mostrar).toHaveBeenCalledWith(
-        'Carrito guardado como favorito con éxito',
-        'success',
-      );
-      expect(component.saveSuccess.emit).toHaveBeenCalled();
-      expect(component.closeModal.emit).toHaveBeenCalled();
-    });
-
-    it('dado un cartId (editando), cuando guardo con exito, deberia mostrar toast de actualizado', () => {
-      component.cartId = 'existing';
-
-      component.onSave();
-
-      expect(toastService.mostrar).toHaveBeenCalledWith(
-        'Carrito favorito actualizado con éxito',
-        'success',
-      );
-    });
-
-    it('dado que el service falla, cuando guardo, deberia mostrar toast de error y dejar isSaving en false', () => {
-      spyOn(console, 'error');
-      carritosFavoritosService.saveCarritoFavorito.and.returnValue(
-        throwError(() => new Error('boom')),
-      );
-
-      component.onSave();
-
-      expect(toastService.mostrar).toHaveBeenCalledWith(
-        'Hubo un error al guardar el carrito favorito',
-        'error',
-      );
-      expect(component.isSaving).toBeFalse();
-    });
-  });
-
-  describe('onClose', () => {
-    it('cuando hago click en cerrar, deberia emitir closeModal', async () => {
-      await setup();
-      fixture.detectChanges();
-      spyOn(component.closeModal, 'emit');
-
-      component.onClose();
-
-      expect(component.closeModal.emit).toHaveBeenCalled();
-    });
-  });
+  function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error' | 'info'): void {
+    expect(toastService.mostrar).toHaveBeenCalledWith(mensaje, tipo);
+  }
 });

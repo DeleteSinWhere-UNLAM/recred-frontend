@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 import { RecredAdminPage } from './recred-admin.page';
 import { RecredAdminService } from './services/recred-admin.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { SchoolRegistration } from './models/solicitud-colegio.model';
 import { RecredAdminMother } from './recred-admin.mother';
 import { AuthService } from '../../core/auth/services/auth.service';
 
@@ -14,7 +15,11 @@ describe('RecredAdmin Integration', () => {
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-    servicio = jasmine.createSpyObj('RecredAdminService', ['getPendingRegistrations', 'approveRegistration', 'rejectRegistration']);
+    servicio = jasmine.createSpyObj('RecredAdminService', [
+      'getPendingRegistrations',
+      'approveRegistration',
+      'rejectRegistration',
+    ]);
     toast = jasmine.createSpyObj('ToastService', ['mostrar']);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
 
@@ -25,22 +30,18 @@ describe('RecredAdmin Integration', () => {
         { provide: ToastService, useValue: toast },
       ],
     })
-    .overrideComponent(RecredAdminPage, {
-      add: {
-        providers: [
-          { provide: AuthService, useValue: authServiceSpy }
-        ]
-      }
-    })
-    .compileComponents();
+      .overrideComponent(RecredAdminPage, {
+        add: {
+          providers: [{ provide: AuthService, useValue: authServiceSpy }],
+        },
+      })
+      .compileComponents();
   });
 
-  it('debería renderizar las tarjetas con los nombres de los colegios pendientes cuando el servicio responde', () => {
-    const solicitudes = RecredAdminMother.crearListaSolicitudes();
-    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
-    fixture = TestBed.createComponent(RecredAdminPage);
+  it('dado que el back devuelve solicitudes pendientes, cuando se monta la page, deberia renderizar las tarjetas con nombres', () => {
+    givenSolicitudesPendientes(RecredAdminMother.crearListaSolicitudes());
 
-    fixture.detectChanges();
+    whenMonto();
 
     const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
     const titulo = fixture.nativeElement.querySelector('.ra__title').textContent;
@@ -52,11 +53,10 @@ describe('RecredAdmin Integration', () => {
     expect(primerColegio).toContain('Instituto San José');
   });
 
-  it('debería mostrar el estado vacío cuando no hay solicitudes pendientes', () => {
-    servicio.getPendingRegistrations.and.returnValue(of([]));
-    fixture = TestBed.createComponent(RecredAdminPage);
+  it('dado que no hay solicitudes pendientes, cuando se monta la page, deberia mostrar el estado vacio', () => {
+    givenSolicitudesPendientes([]);
 
-    fixture.detectChanges();
+    whenMonto();
 
     const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
     const vacio = fixture.nativeElement.querySelector('.ra__empty');
@@ -65,46 +65,56 @@ describe('RecredAdmin Integration', () => {
     expect(vacio.textContent).toContain('No hay solicitudes pendientes');
   });
 
-  it('debería mostrar el error cuando el servicio falla al cargar las solicitudes', () => {
-    servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')));
-    fixture = TestBed.createComponent(RecredAdminPage);
+  it('dado que el servicio falla al cargar, cuando se monta la page, deberia mostrar el panel de error', () => {
+    givenGetPendingRegistrationsFalla();
 
-    fixture.detectChanges();
+    whenMonto();
 
     const panelError = fixture.nativeElement.querySelector('.ra__error');
     expect(panelError).toBeTruthy();
     expect(panelError.textContent).toContain('Error al cargar las solicitudes pendientes.');
   });
 
-  it('debería eliminar la tarjeta del DOM al aprobar una solicitud exitosamente', () => {
-    const solicitudes = RecredAdminMother.crearListaSolicitudes();
-    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+  it('dado la lista renderizada, cuando hago click en aprobar, deberia sacar la tarjeta del DOM', () => {
+    givenSolicitudesPendientes(RecredAdminMother.crearListaSolicitudes());
     servicio.approveRegistration.and.returnValue(of(undefined));
-    fixture = TestBed.createComponent(RecredAdminPage);
-    fixture.detectChanges();
+    whenMonto();
 
-    const btnAprobar = fixture.nativeElement.querySelector('#btn-aprobar-solicitud-1');
-    btnAprobar.click();
-    fixture.detectChanges();
+    whenHagoClickEn('#btn-aprobar-solicitud-1');
 
     const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
     expect(tarjetas.length).toBe(1);
     expect(fixture.nativeElement.querySelector('#card-solicitud-1')).toBeNull();
   });
 
-  it('debería eliminar la tarjeta del DOM al rechazar una solicitud exitosamente', () => {
-    const solicitudes = RecredAdminMother.crearListaSolicitudes();
-    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+  it('dado la lista renderizada, cuando hago click en rechazar, deberia sacar la tarjeta del DOM', () => {
+    givenSolicitudesPendientes(RecredAdminMother.crearListaSolicitudes());
     servicio.rejectRegistration.and.returnValue(of(undefined));
-    fixture = TestBed.createComponent(RecredAdminPage);
-    fixture.detectChanges();
+    whenMonto();
 
-    const btnRechazar = fixture.nativeElement.querySelector('#btn-rechazar-solicitud-2');
-    btnRechazar.click();
-    fixture.detectChanges();
+    whenHagoClickEn('#btn-rechazar-solicitud-2');
 
     const tarjetas = fixture.debugElement.queryAll(By.css('.ra__card'));
     expect(tarjetas.length).toBe(1);
     expect(fixture.nativeElement.querySelector('#card-solicitud-2')).toBeNull();
   });
+
+  function givenSolicitudesPendientes(solicitudes: SchoolRegistration[]): void {
+    servicio.getPendingRegistrations.and.returnValue(of(solicitudes));
+  }
+
+  function givenGetPendingRegistrationsFalla(): void {
+    servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')));
+  }
+
+  function whenMonto(): void {
+    fixture = TestBed.createComponent(RecredAdminPage);
+    fixture.detectChanges();
+  }
+
+  function whenHagoClickEn(selector: string): void {
+    const btn = fixture.nativeElement.querySelector(selector);
+    btn.click();
+    fixture.detectChanges();
+  }
 });

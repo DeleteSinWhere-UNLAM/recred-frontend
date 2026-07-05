@@ -138,25 +138,25 @@ describe('NavbarComponent', () => {
 
   describe('esPremium', () => {
     it('dado un perfil PREMIUM, esPremium deberia ser true', () => {
-      perfilSignal.and.returnValue({ plan: 'PREMIUM' });
+      givenPerfil({ plan: 'PREMIUM' });
 
       expect(interno.esPremium()).toBeTrue();
     });
 
     it('dado un perfil AVANZADO, esPremium deberia ser true', () => {
-      perfilSignal.and.returnValue({ plan: 'AVANZADO' });
+      givenPerfil({ plan: 'AVANZADO' });
 
       expect(interno.esPremium()).toBeTrue();
     });
 
     it('dado un perfil basico, esPremium deberia ser false', () => {
-      perfilSignal.and.returnValue({ plan: 'GRATIS' });
+      givenPerfil({ plan: 'GRATIS' });
 
       expect(interno.esPremium()).toBeFalse();
     });
 
     it('dado sin perfil, esPremium deberia ser false', () => {
-      perfilSignal.and.returnValue(null);
+      givenPerfil(null);
 
       expect(interno.esPremium()).toBeFalse();
     });
@@ -448,4 +448,9 @@ describe('NavbarComponent', () => {
       expect(interno.menuAbierto()).toBeFalse();
     });
   });
+
+  function givenPerfil(perfil: unknown): void {
+    perfilSignal.and.returnValue(perfil);
+  }
+
 });

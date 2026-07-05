@@ -11,6 +11,8 @@ import {
 import { ResumenSemanalPage } from './resumen-semanal.page';
 
 describe('ResumenSemanal Integration', () => {
+  const URL_RESUMEN = `${environment.apiUrl}/resumen/me`;
+
   let fixture: ComponentFixture<ResumenSemanalPage>;
   let httpMock: HttpTestingController;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
@@ -37,15 +39,10 @@ describe('ResumenSemanal Integration', () => {
   });
 
   it('dado un perfil en localStorage, cuando se monta la page, deberia pegar a /resumen/me y renderizar el gasto total', async () => {
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify({ id: USUARIO_ID_TEST }));
+    givenPerfilEnLocalStorage({ id: USUARIO_ID_TEST });
 
-    fixture = TestBed.createComponent(ResumenSemanalPage);
-    fixture.detectChanges();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/resumen/me`);
-    expect(req.request.method).toBe('GET');
-    req.flush(ResumenSemanalMother.crear());
-    fixture.detectChanges();
+    whenMonto();
+    whenElBackDevuelveResumen(ResumenSemanalMother.crear());
 
     const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(texto).toContain('$1500');
@@ -53,12 +50,31 @@ describe('ResumenSemanal Integration', () => {
   });
 
   it('dado que no hay perfil, cuando se monta la page, no deberia hacer requests HTTP', () => {
-    spyOn(localStorage, 'getItem').and.returnValue(null);
+    givenSinPerfilEnLocalStorage();
 
-    fixture = TestBed.createComponent(ResumenSemanalPage);
-    fixture.detectChanges();
+    whenMonto();
 
-    httpMock.expectNone(`${environment.apiUrl}/resumen/me`);
+    httpMock.expectNone(URL_RESUMEN);
     expect(fixture.componentInstance.resumen).toBeUndefined();
   });
+
+  function givenPerfilEnLocalStorage(perfil: { id: string }): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(perfil));
+  }
+
+  function givenSinPerfilEnLocalStorage(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+  }
+
+  function whenMonto(): void {
+    fixture = TestBed.createComponent(ResumenSemanalPage);
+    fixture.detectChanges();
+  }
+
+  function whenElBackDevuelveResumen(resumen: ReturnType<typeof ResumenSemanalMother.crear>): void {
+    const req = httpMock.expectOne(URL_RESUMEN);
+    expect(req.request.method).toBe('GET');
+    req.flush(resumen);
+    fixture.detectChanges();
+  }
 });

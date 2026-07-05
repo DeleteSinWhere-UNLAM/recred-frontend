@@ -41,28 +41,25 @@ describe('AccionCardComponent', () => {
   });
 
   describe('render', () => {
-    it('dado una accion, deberia mostrar titulo y descripcion', () => {
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    it('dado una accion, cuando se renderiza, deberia mostrar titulo y descripcion', () => {
+      const texto = textoDeLaCard();
+
       expect(texto).toContain('Ver pedidos');
       expect(texto).toContain('Gestioná las órdenes del día');
     });
 
-    it('dado una accion con color menta, deberia aplicar la clase accion-card--menta', () => {
-      const button = (fixture.nativeElement as HTMLElement).querySelector('button');
-      expect(button?.classList.contains('accion-card--menta')).toBeTrue();
+    it('dado una accion con color menta, cuando se renderiza, deberia aplicar la clase accion-card--menta', () => {
+      expect(buttonDeLaCard()?.classList.contains('accion-card--menta')).toBeTrue();
     });
 
-    it('dado una accion premium, deberia mostrar el badge AVANZADO', () => {
-      fixture.componentRef.setInput('accion', AccionKiosqueroMother.crearPremium());
-      fixture.detectChanges();
+    it('dado una accion premium, cuando se renderiza, deberia mostrar el badge AVANZADO', () => {
+      givenAccion(AccionKiosqueroMother.crearPremium());
 
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).toContain('AVANZADO');
+      expect(textoDeLaCard()).toContain('AVANZADO');
     });
 
-    it('dado una accion no premium, no deberia mostrar el badge AVANZADO', () => {
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).not.toContain('AVANZADO');
+    it('dado una accion no premium, cuando se renderiza, no deberia mostrar el badge AVANZADO', () => {
+      expect(textoDeLaCard()).not.toContain('AVANZADO');
     });
   });
 
@@ -71,9 +68,22 @@ describe('AccionCardComponent', () => {
       const spy = jasmine.createSpy('seleccionar');
       component.seleccionar.subscribe(spy);
 
-      (fixture.nativeElement as HTMLElement).querySelector('button')!.click();
+      buttonDeLaCard()!.click();
 
       expect(spy).toHaveBeenCalledWith(component.accion);
     });
   });
+
+  function givenAccion(accion: AccionKiosquero): void {
+    fixture.componentRef.setInput('accion', accion);
+    fixture.detectChanges();
+  }
+
+  function textoDeLaCard(): string {
+    return (fixture.nativeElement as HTMLElement).textContent ?? '';
+  }
+
+  function buttonDeLaCard(): HTMLButtonElement | null {
+    return (fixture.nativeElement as HTMLElement).querySelector('button');
+  }
 });

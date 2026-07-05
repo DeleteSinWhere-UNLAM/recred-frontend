@@ -6,11 +6,18 @@ import { environment } from '../../../../environments/environment';
 import { PerfilMother } from '../../../data-access/services/alumno.mother';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { OrdenAlumnoMother } from '../compra.mother';
-import { Recreo } from '../models/orden-compra.model';
+import { OrdenAlumno, OrdenCompra, Recreo } from '../models/orden-compra.model';
 import { CompraService } from './compra.service';
+
+interface BackendPurchaseResponse {
+  orderId?: string;
+  codes?: Record<string, string>;
+  total?: number;
+}
 
 describe('CompraService', () => {
   const URL_ADVANCE = `${environment.apiUrl}/purchases/advance`;
+  const URL_DELIVER = (id: string): string => `${environment.apiUrl}/purchases/${id}/deliver`;
 
   let service: CompraService;
   let httpMock: HttpTestingController;
@@ -18,9 +25,7 @@ describe('CompraService', () => {
 
   beforeEach(() => {
     servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfil']);
-    servicioPerfil.getPerfil.and.returnValue(
-      PerfilMother.crear({ id: 'padre-1', rol: 'PADRE' }),
-    );
+    givenPerfilLogueado(PerfilMother.crear({ id: 'padre-1', rol: 'PADRE' }));
 
     TestBed.configureTestingModule({
       providers: [
@@ -39,34 +44,34 @@ describe('CompraService', () => {
 
   describe('iniciarOrden', () => {
     it('dado que no hay sugerencia pendiente, cuando inicio, la orden deberia no tener sugerenciaId', () => {
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
-      expect(service.ordenEnCurso()?.sugerenciaId).toBeUndefined();
+      thenLaSugerenciaIdEnCursoEs(undefined);
     });
 
     it('dado una sugerencia pendiente, cuando inicio sin pasar id, deberia usar la pendiente', () => {
-      service.setSugerenciaPendiente('sug-pendiente');
+      givenSugerenciaPendiente('sug-pendiente');
 
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
-      expect(service.ordenEnCurso()?.sugerenciaId).toBe('sug-pendiente');
+      thenLaSugerenciaIdEnCursoEs('sug-pendiente');
     });
 
     it('dado una sugerencia pendiente ya consumida, cuando inicio otra, no deberia arrastrarla', () => {
-      service.setSugerenciaPendiente('sug-pendiente');
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      givenSugerenciaPendiente('sug-pendiente');
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
-      expect(service.ordenEnCurso()?.sugerenciaId).toBeUndefined();
+      thenLaSugerenciaIdEnCursoEs(undefined);
     });
 
     it('dado un id explicito y una pendiente, cuando inicio, deberia priorizar el explicito', () => {
-      service.setSugerenciaPendiente('sug-pendiente');
+      givenSugerenciaPendiente('sug-pendiente');
 
-      service.iniciarOrden([OrdenAlumnoMother.crear()], 'sug-explicita');
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()], 'sug-explicita');
 
-      expect(service.ordenEnCurso()?.sugerenciaId).toBe('sug-explicita');
+      thenLaSugerenciaIdEnCursoEs('sug-explicita');
     });
 
     it('dado ordenes con distintos subtotales, cuando inicio, deberia calcular el total como suma de subtotales', () => {
@@ -75,9 +80,9 @@ describe('CompraService', () => {
         OrdenAlumnoMother.crear({ subtotal: 300 }),
       ];
 
-      service.iniciarOrden(ordenes);
+      whenInicioOrdenCon(ordenes);
 
-      expect(service.ordenEnCurso()?.total).toBe(800);
+      thenElTotalEnCursoEs(800);
     });
   });
 
@@ -89,8 +94,8 @@ describe('CompraService', () => {
       httpMock.expectNone(URL_ADVANCE);
     });
 
-    it('dado un tutor y ordenes, cuando proceso, deberia hacer POST con buyerType TUTOR y mapear recessTime', async () => {
-      service.iniciarOrden([
+    it('dado un tutor y una orden con buffet SEGUNDO_RECREO, cuando proceso, deberia mandar buffetId, studentId, buyerType TUTOR y recessTime SECOND_RECESS', async () => {
+      whenInicioOrdenCon([
         OrdenAlumnoMother.crear({
           alumno: { ...OrdenAlumnoMother.crear().alumno, id: 'alumno-1' },
           buffetId: 'buffet-x',
@@ -99,15 +104,10 @@ describe('CompraService', () => {
       ]);
 
       const promesa = firstValueFrom(service.procesarPago());
-      const req = httpMock.expectOne(URL_ADVANCE);
 
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body.orders[0].buffetId).toBe('buffet-x');
-      expect(req.request.body.orders[0].studentId).toBe('alumno-1');
-      expect(req.request.body.orders[0].buyerType).toBe('TUTOR');
-      expect(req.request.body.orders[0].recessTime).toBe('SECOND_RECESS');
+      const req = thenLaPrimeraOrdenDelPOSTLlevaValores('buffet-x', 'alumno-1', 'TUTOR', 'SECOND_RECESS');
 
-      req.flush({ orderId: 'orden-1', codes: { 'alumno-1': 'ABC' }, total: 500 });
+      whenElBackAdvanceResponde(req, { orderId: 'orden-1', codes: { 'alumno-1': 'ABC' }, total: 500 });
       const pagada = await promesa;
       expect(pagada.id).toBe('orden-1');
       expect(pagada.codigos).toEqual({ 'alumno-1': 'ABC' });
@@ -116,31 +116,28 @@ describe('CompraService', () => {
     });
 
     it('dado un rol ALUMNO, cuando proceso, deberia mandar buyerType STUDENT', async () => {
-      servicioPerfil.getPerfil.and.returnValue(
-        PerfilMother.crear({ id: 'alumno-x', rol: 'ALUMNO' }),
-      );
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      givenPerfilLogueado(PerfilMother.crear({ id: 'alumno-x', rol: 'ALUMNO' }));
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
       const promesa = firstValueFrom(service.procesarPago());
-      const req = httpMock.expectOne(URL_ADVANCE);
-      expect(req.request.body.orders[0].buyerType).toBe('STUDENT');
-      req.flush({ orderId: 'x', codes: {}, total: 0 });
+
+      const req = thenLaPrimeraOrdenDelPOSTTieneBuyerType('STUDENT');
+
+      whenElBackAdvanceResponde(req, { orderId: 'x', codes: {}, total: 0 });
       await promesa;
     });
 
     it('dado que no hay perfil, cuando proceso, deberia tirar el error de usuario no autenticado', () => {
-      servicioPerfil.getPerfil.and.returnValue(null);
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      givenPerfilLogueado(null);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
-      expect(() => service.procesarPago()).toThrowError(
-        'Usuario no autenticado o sin perfil.',
-      );
+      expect(() => service.procesarPago()).toThrowError('Usuario no autenticado o sin perfil.');
     });
   });
 
   describe('cancelarOrden', () => {
     it('dado una orden en curso, cuando cancelo, deberia dejar la orden en null', () => {
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
       service.cancelarOrden();
 
@@ -152,7 +149,7 @@ describe('CompraService', () => {
     it('dado un purchaseId y un code, cuando entrego, deberia hacer POST /purchases/{id}/deliver con el withdrawalCode', async () => {
       const promesa = firstValueFrom(service.deliver('compra-1', 'CODE'));
 
-      const req = httpMock.expectOne(`${environment.apiUrl}/purchases/compra-1/deliver`);
+      const req = httpMock.expectOne(URL_DELIVER('compra-1'));
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({ withdrawalCode: 'CODE' });
       req.flush(null);
@@ -162,24 +159,22 @@ describe('CompraService', () => {
 
   describe('procesarPago con fallbacks', () => {
     it('dado un recreo desconocido, cuando proceso, deberia mapearlo a FIRST_RECESS', async () => {
-      service.iniciarOrden([
-        OrdenAlumnoMother.crear({ recreo: 'RARO' as unknown as Recreo }),
-      ]);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear({ recreo: 'RARO' as unknown as Recreo })]);
 
       const promesa = firstValueFrom(service.procesarPago());
-      const req = httpMock.expectOne(URL_ADVANCE);
+      const req = thenSeHizoPostAdvance();
 
       expect(req.request.body.orders[0].recessTime).toBe('FIRST_RECESS');
-      req.flush({ orderId: 'x', codes: {}, total: 0 });
+      whenElBackAdvanceResponde(req, { orderId: 'x', codes: {}, total: 0 });
       await promesa;
     });
 
     it('dado que el back responde sin orderId ni codes, cuando proceso, deberia generar un UUID y usar codigos vacios', async () => {
       spyOn(crypto, 'randomUUID').and.returnValue('uuid-de-test-4444-1111-1111-1111-111111111111');
-      service.iniciarOrden([OrdenAlumnoMother.crear()]);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear()]);
 
       const promesa = firstValueFrom(service.procesarPago());
-      httpMock.expectOne(URL_ADVANCE).flush({});
+      whenElBackAdvanceRespondeCon({});
       const pagada = await promesa;
 
       expect(pagada.id).toBe('uuid-de-test-4444-1111-1111-1111-111111111111');
@@ -187,13 +182,72 @@ describe('CompraService', () => {
     });
 
     it('dado que el back responde sin total, cuando proceso, deberia preservar el total en curso', async () => {
-      service.iniciarOrden([OrdenAlumnoMother.crear({ subtotal: 750 })]);
+      whenInicioOrdenCon([OrdenAlumnoMother.crear({ subtotal: 750 })]);
 
       const promesa = firstValueFrom(service.procesarPago());
-      httpMock.expectOne(URL_ADVANCE).flush({ orderId: 'ok', codes: {} });
+      whenElBackAdvanceRespondeCon({ orderId: 'ok', codes: {} });
       const pagada = await promesa;
 
       expect(pagada.total).toBe(750);
     });
   });
+
+  function givenPerfilLogueado(perfil: ReturnType<typeof PerfilMother.crear> | null): void {
+    servicioPerfil.getPerfil.and.returnValue(perfil);
+  }
+
+  function givenSugerenciaPendiente(sugerenciaId: string): void {
+    service.setSugerenciaPendiente(sugerenciaId);
+  }
+
+  function whenInicioOrdenCon(ordenes: OrdenAlumno[], sugerenciaId?: string): void {
+    service.iniciarOrden(ordenes, sugerenciaId);
+  }
+
+  function whenElBackAdvanceResponde(
+    req: ReturnType<HttpTestingController['expectOne']>,
+    body: BackendPurchaseResponse,
+  ): void {
+    req.flush(body);
+  }
+
+  function whenElBackAdvanceRespondeCon(body: BackendPurchaseResponse): void {
+    httpMock.expectOne(URL_ADVANCE).flush(body);
+  }
+
+  function thenLaSugerenciaIdEnCursoEs(esperada: OrdenCompra['sugerenciaId']): void {
+    expect(service.ordenEnCurso()?.sugerenciaId).toBe(esperada);
+  }
+
+  function thenElTotalEnCursoEs(total: number): void {
+    expect(service.ordenEnCurso()?.total).toBe(total);
+  }
+
+  function thenSeHizoPostAdvance(): ReturnType<HttpTestingController['expectOne']> {
+    const req = httpMock.expectOne(URL_ADVANCE);
+    expect(req.request.method).toBe('POST');
+    return req;
+  }
+
+  function thenLaPrimeraOrdenDelPOSTLlevaValores(
+    buffetId: string,
+    studentId: string,
+    buyerType: string,
+    recessTime: string,
+  ): ReturnType<HttpTestingController['expectOne']> {
+    const req = thenSeHizoPostAdvance();
+    expect(req.request.body.orders[0].buffetId).toBe(buffetId);
+    expect(req.request.body.orders[0].studentId).toBe(studentId);
+    expect(req.request.body.orders[0].buyerType).toBe(buyerType);
+    expect(req.request.body.orders[0].recessTime).toBe(recessTime);
+    return req;
+  }
+
+  function thenLaPrimeraOrdenDelPOSTTieneBuyerType(
+    buyerType: string,
+  ): ReturnType<HttpTestingController['expectOne']> {
+    const req = thenSeHizoPostAdvance();
+    expect(req.request.body.orders[0].buyerType).toBe(buyerType);
+    return req;
+  }
 });

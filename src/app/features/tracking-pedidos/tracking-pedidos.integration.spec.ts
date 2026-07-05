@@ -67,22 +67,30 @@ describe('TrackingPedidos Integration', () => {
   });
 
   it('dado que el back devuelve pickups, cuando se monta la page, deberia mostrar el titulo y las metricas', () => {
-    trackingService.getScheduledPickups.and.returnValue(of(ScheduledPickupMother.crearVarios()));
+    givenPickupsDelBack(ScheduledPickupMother.crearVarios());
 
-    fixture.detectChanges();
+    whenMonto();
 
-    const html = (fixture.nativeElement as HTMLElement);
+    const html = fixture.nativeElement as HTMLElement;
     expect(html.querySelector('#tracking-title')?.textContent).toContain('Seguimiento de pedidos');
     const metricas = html.querySelectorAll('.tp-metric');
     expect(metricas.length).toBeGreaterThan(0);
   });
 
   it('dado que no hay pickups, cuando se monta la page, no deberia romper el render', () => {
-    trackingService.getScheduledPickups.and.returnValue(of([]));
+    givenPickupsDelBack([]);
 
-    fixture.detectChanges();
+    whenMonto();
 
     expect(fixture.componentInstance).toBeTruthy();
     expect(trackingService.getScheduledPickups).toHaveBeenCalled();
   });
+
+  function givenPickupsDelBack(pickups: ScheduledPickup[]): void {
+    trackingService.getScheduledPickups.and.returnValue(of(pickups));
+  }
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

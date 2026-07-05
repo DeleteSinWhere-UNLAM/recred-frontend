@@ -19,6 +19,8 @@ class NavbarStub {
 
 describe('Favoritos Integration', () => {
   const URL_LISTAR = `${environment.apiUrl}/alumnos/${UUID_ALUMNO}/preferencias/favoritos`;
+  const URL_ELIMINAR = (productoId: string): string =>
+    `${environment.apiUrl}/alumnos/${UUID_ALUMNO}/preferencias/favoritos/${productoId}`;
 
   let fixture: ComponentFixture<FavoritosPage>;
   let httpMock: HttpTestingController;
@@ -29,10 +31,7 @@ describe('Favoritos Integration', () => {
   let router: Router;
 
   beforeEach(async () => {
-    servicioPerfil = jasmine.createSpyObj('PerfilService', [
-      'obtenerAlumnoId',
-      'getPerfil',
-    ]);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId', 'getPerfil']);
     servicioPerfil.obtenerAlumnoId.and.returnValue(UUID_ALUMNO);
     servicioPerfil.getPerfil.and.returnValue(null);
 
@@ -84,25 +83,18 @@ describe('Favoritos Integration', () => {
   });
 
   it('dado un alumno con UUID, cuando se monta la page, deberia pedir favoritos al back y renderizar el nombre de cada uno', () => {
-    fixture.detectChanges();
-
-    httpMock.expectOne(URL_LISTAR).flush([ProductDTOMother.crear({ nombre: 'Alfajor Triple' })]);
-    fixture.detectChanges();
+    whenMontoYElBackDevuelveFavoritos([ProductDTOMother.crear({ nombre: 'Alfajor Triple' })]);
 
     const nombre = queryUno('.favoritos-fav-card__nombre')?.textContent?.trim() ?? '';
     expect(nombre).toContain('Alfajor Triple');
   });
 
-  it('dado un favorito cargado, cuando llamo quitarFavorito, deberia hacer DELETE al back y sacarlo de la lista', () => {
-    fixture.detectChanges();
-    httpMock.expectOne(URL_LISTAR).flush([ProductDTOMother.crear()]);
-    fixture.detectChanges();
+  it('dado un favorito cargado, cuando quito un favorito, deberia hacer DELETE al back y sacarlo de la lista', () => {
+    whenMontoYElBackDevuelveFavoritos([ProductDTOMother.crear()]);
 
     fixture.componentInstance.quitarFavorito(UUID_PRODUCTO);
 
-    const req = httpMock.expectOne(
-      `${environment.apiUrl}/alumnos/${UUID_ALUMNO}/preferencias/favoritos/${UUID_PRODUCTO}`,
-    );
+    const req = httpMock.expectOne(URL_ELIMINAR(UUID_PRODUCTO));
     expect(req.request.method).toBe('DELETE');
     req.flush({});
 
@@ -110,17 +102,21 @@ describe('Favoritos Integration', () => {
     expect(servicioToast.mostrar).toHaveBeenCalledWith('Producto quitado de favoritos', 'success');
   });
 
-  it('dado que el back falla al listar favoritos y no hay nada en localStorage, deberia mostrar lista vacia', () => {
+  it('dado que el back falla al listar favoritos y no hay nada en localStorage, cuando se monta la page, deberia mostrar lista vacia', () => {
     spyOn(console, 'warn');
     fixture.detectChanges();
 
-    httpMock
-      .expectOne(URL_LISTAR)
-      .flush('boom', { status: 500, statusText: 'Server Error' });
+    httpMock.expectOne(URL_LISTAR).flush('boom', { status: 500, statusText: 'Server Error' });
     fixture.detectChanges();
 
     expect(fixture.componentInstance.favoritos).toEqual([]);
   });
+
+  function whenMontoYElBackDevuelveFavoritos(favoritos: ReturnType<typeof ProductDTOMother.crear>[]): void {
+    fixture.detectChanges();
+    httpMock.expectOne(URL_LISTAR).flush(favoritos);
+    fixture.detectChanges();
+  }
 
   function queryUno(selector: string): Element | null {
     return (fixture.nativeElement as HTMLElement).querySelector(selector);

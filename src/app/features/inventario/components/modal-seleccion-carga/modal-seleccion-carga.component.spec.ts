@@ -7,7 +7,7 @@ describe('ModalSeleccionCargaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalSeleccionCargaComponent]
+      imports: [ModalSeleccionCargaComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ModalSeleccionCargaComponent);
@@ -15,29 +15,55 @@ describe('ModalSeleccionCargaComponent', () => {
     fixture.detectChanges();
   });
 
-  it('dado que hago clic en Carga Asistida, deberia emitir el evento iaUpload', () => {
-    spyOn(component.iaUpload, 'emit');
+  it('dado el modal, cuando hago click en Carga Asistida, deberia emitir el evento iaUpload', () => {
+    const spyEmit = spyOn(component.iaUpload, 'emit');
+
+    whenHagoClickEnCargaAsistida();
+
+    thenSeEmitio(spyEmit);
+  });
+
+  it('dado el modal, cuando hago click en Carga Masiva, deberia emitir el evento bulkUpload', () => {
+    const spyEmit = spyOn(component.bulkUpload, 'emit');
+
+    whenHagoClickEnCargaMasiva();
+
+    thenSeEmitio(spyEmit);
+  });
+
+  it('dado el modal, cuando hago click en Cancelar o presiono esc/backdrop, deberia emitir closeModal', () => {
+    const spyEmit = spyOn(component.closeModal, 'emit');
+
+    whenHagoClickEnCancelar();
+
+    thenSeEmitio(spyEmit);
+  });
+
+  it('dado el modal, cuando hago click en Carga Manual, deberia emitir manualUpload', () => {
+    const spyEmit = spyOn(component.manualUpload, 'emit');
+
+    whenHagoClickEnCargaManual();
+
+    thenSeEmitio(spyEmit);
+  });
+
+  function whenHagoClickEnCargaAsistida(): void {
     component.onIaUpload();
-    expect(component.iaUpload.emit).toHaveBeenCalled();
-  });
+  }
 
-  it('dado que hago clic en Carga Masiva, deberia emitir el evento bulkUpload', () => {
-    spyOn(component.bulkUpload, 'emit');
+  function whenHagoClickEnCargaMasiva(): void {
     component.onBulkUpload();
-    expect(component.bulkUpload.emit).toHaveBeenCalled();
-  });
+  }
 
-  it('dado que hago clic en Cancelar o presiono esc/backdrop, deberia emitir el evento cancel', () => {
-    spyOn(component.closeModal, 'emit');
-    component.onCancel();
-    expect(component.closeModal.emit).toHaveBeenCalled();
-  });
-
-  it('dado que hago clic en Carga Manual, deberia emitir manualUpload', () => {
-    spyOn(component.manualUpload, 'emit');
-
+  function whenHagoClickEnCargaManual(): void {
     component.onManualUpload();
+  }
 
-    expect(component.manualUpload.emit).toHaveBeenCalled();
-  });
+  function whenHagoClickEnCancelar(): void {
+    component.onCancel();
+  }
+
+  function thenSeEmitio(spyEmit: jasmine.Spy): void {
+    expect(spyEmit).toHaveBeenCalled();
+  }
 });

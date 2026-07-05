@@ -16,13 +16,14 @@ class DashboardStubComponent {
   @Input() error: unknown;
 }
 
-describe('DirectivoPage (Humble Object Component)', () => {
+describe('DirectivoPage', () => {
   let component: DirectivoPage;
   let fixture: ComponentFixture<DirectivoPage>;
   let presenterSpy: jasmine.SpyObj<DirectivoPresenter>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
+
     presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar'], {
       mensajeBienvenida: signal('Cargando...'),
       schoolOverview: signal(null),
@@ -54,8 +55,10 @@ describe('DirectivoPage (Humble Object Component)', () => {
     fixture.detectChanges();
   });
 
-  it('debería inicializar el presenter en el ngOnInit', () => {
+  it('dado el componente montado, cuando corre ngOnInit, deberia inicializar el presenter', () => {
     component.ngOnInit();
     expect(presenterSpy.inicializar).toHaveBeenCalled();
   });
+
+
 });

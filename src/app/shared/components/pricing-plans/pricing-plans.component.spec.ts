@@ -16,7 +16,7 @@ describe('PricingPlansComponent', () => {
   });
 
   describe('plans segun userType', () => {
-    it('dado userType padre (default), deberia armar los 3 planes con features de padre', () => {
+    it('dado userType padre (default), cuando pido los planes, deberia armar los 3 con features de padre', () => {
       const planes = component.plans();
 
       expect(planes.length).toBe(3);
@@ -26,9 +26,8 @@ describe('PricingPlansComponent', () => {
       expect(avanzado.features.map((f) => f.name)).not.toContain('Carga de stock masiva');
     });
 
-    it('dado userType kiosquero, deberia armar los planes con features de kiosquero', () => {
-      fixture.componentRef.setInput('userType', 'kiosquero');
-      fixture.detectChanges();
+    it('dado userType kiosquero, cuando pido los planes, deberia armarlos con features de kiosquero', () => {
+      givenUserType('kiosquero');
 
       const planes = component.plans();
 
@@ -38,38 +37,34 @@ describe('PricingPlansComponent', () => {
       expect(avanzado.features.map((f) => f.name)).not.toContain('Promociones exclusivas');
     });
 
-    it('dado el plan basico, deberia tener solo las 3 features basicas incluidas', () => {
+    it('dado el plan basico, cuando lo miro, deberia tener solo las 3 features basicas incluidas', () => {
       const basico = component.plans()[0];
 
       const incluidas = basico.features.filter((f) => f.included).map((f) => f.name);
-      expect(incluidas).toEqual([
-        'Funciones esenciales',
-        'Soporte general',
-        'Notificaciones',
-      ]);
+      expect(incluidas).toEqual(['Funciones esenciales', 'Soporte general', 'Notificaciones']);
     });
 
-    it('dado el plan intermedio, deberia estar marcado como destacado y tener 5 features incluidas', () => {
+    it('dado el plan intermedio, cuando lo miro, deberia estar destacado y tener 5 features incluidas', () => {
       const intermedio = component.plans()[1];
 
       expect(intermedio.isHighlighted).toBeTrue();
       expect(intermedio.features.filter((f) => f.included).length).toBe(5);
     });
 
-    it('dado el plan avanzado, deberia tener todas las features incluidas', () => {
+    it('dado el plan avanzado, cuando lo miro, deberia tener todas las features incluidas', () => {
       const avanzado = component.plans()[2];
 
       expect(avanzado.features.every((f) => f.included)).toBeTrue();
     });
 
-    it('dado los precios, el anual deberia ser mensual * 12 * 0.8 (20% descuento)', () => {
+    it('dado los precios, cuando comparo mensual y anual, el anual deberia ser mensual * 12 * 0.8 (20% descuento)', () => {
       const intermedio = component.plans()[1];
 
       expect(intermedio.priceMonthly).toBe(5500);
       expect(intermedio.priceAnnual).toBe(5500 * 12 * 0.8);
     });
 
-    it('dado el plan basico, priceMonthly y priceAnnual deberian ser 0', () => {
+    it('dado el plan basico, cuando pido los precios, priceMonthly y priceAnnual deberian ser 0', () => {
       const basico = component.plans()[0];
 
       expect(basico.priceMonthly).toBe(0);
@@ -104,9 +99,8 @@ describe('PricingPlansComponent', () => {
       expect(spy).toHaveBeenCalledWith('Plan seleccionado:', 'intermedio', '| Usuario:', 'padre');
     });
 
-    it('dado un planId y userType kiosquero, deberia loguearlo con "kiosquero"', () => {
-      fixture.componentRef.setInput('userType', 'kiosquero');
-      fixture.detectChanges();
+    it('dado un planId y userType kiosquero, cuando lo selecciono, deberia loguearlo con "kiosquero"', () => {
+      givenUserType('kiosquero');
       const spy = spyOn(console, 'log');
 
       component.selectPlan('avanzado');
@@ -122,7 +116,7 @@ describe('PricingPlansComponent', () => {
       expect(cards.length).toBe(3);
     });
 
-    it('dado el plan intermedio destacado, deberia agregar la clase highlighted a su card', () => {
+    it('dado el plan intermedio destacado, cuando se renderiza, deberia agregar la clase highlighted a su card', () => {
       const cards = (fixture.nativeElement as HTMLElement).querySelectorAll('.pricing-card');
 
       expect(cards[0].classList.contains('highlighted')).toBeFalse();
@@ -130,14 +124,14 @@ describe('PricingPlansComponent', () => {
       expect(cards[2].classList.contains('highlighted')).toBeFalse();
     });
 
-    it('dado isAnnualGlobal false, deberia mostrar el precio mensual con "/ mes"', () => {
+    it('dado isAnnualGlobal false, cuando se renderiza, deberia mostrar el precio mensual con "/ mes"', () => {
       const cards = (fixture.nativeElement as HTMLElement).querySelectorAll('.pricing-card');
       const period = cards[1].querySelector('.period');
 
       expect(period?.textContent?.trim()).toBe('/ mes');
     });
 
-    it('dado isAnnualGlobal true, deberia mostrar el precio anual con "/ año" y el banner de ahorro', () => {
+    it('dado isAnnualGlobal true, cuando se renderiza, deberia mostrar el precio anual con "/ año" y el banner de ahorro', () => {
       component.isAnnualGlobal.set(true);
       fixture.detectChanges();
 
@@ -150,7 +144,7 @@ describe('PricingPlansComponent', () => {
       expect(banner?.textContent).toContain('Ahorrás');
     });
 
-    it('dado isAnnualGlobal true pero plan basico con precio 0, deberia mostrar "/ mes" y el banner invisible', () => {
+    it('dado isAnnualGlobal true pero plan basico con precio 0, cuando se renderiza, deberia mostrar "/ mes" y el banner invisible', () => {
       component.isAnnualGlobal.set(true);
       fixture.detectChanges();
 
@@ -160,7 +154,7 @@ describe('PricingPlansComponent', () => {
       expect(basico.querySelector('.saving-banner')?.classList.contains('invisible')).toBeTrue();
     });
 
-    it('dado un click en Seleccionar Plan, deberia llamar selectPlan con el id de la card', () => {
+    it('dado el boton Seleccionar Plan, cuando hago click, deberia llamar selectPlan con el id de la card', () => {
       const spySelect = spyOn(component, 'selectPlan');
 
       const boton = (fixture.nativeElement as HTMLElement).querySelectorAll('.btn-select')[1] as HTMLButtonElement;
@@ -180,4 +174,9 @@ describe('PricingPlansComponent', () => {
       expect(spyToggle).toHaveBeenCalled();
     });
   });
+
+  function givenUserType(userType: 'padre' | 'kiosquero'): void {
+    fixture.componentRef.setInput('userType', userType);
+    fixture.detectChanges();
+  }
 });
