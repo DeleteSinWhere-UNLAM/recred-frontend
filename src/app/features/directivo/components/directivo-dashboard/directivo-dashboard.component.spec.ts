@@ -12,15 +12,22 @@ describe('DirectivoDashboardComponent', () => {
 
     fixture = TestBed.createComponent(DirectivoDashboardComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('debería crear el componente', () => {
+  it('dado el componente, cuando se monta, deberia crearse', () => {
+    whenMonto();
+
     expect(component).toBeTruthy();
   });
 
-  it('debería renderizar el panel principal', () => {
+  it('dado el componente, cuando se renderiza, deberia mostrar el titulo Panel Principal', () => {
+    whenMonto();
+
     const h2Element = fixture.nativeElement.querySelector('h2');
     expect(h2Element.textContent.trim()).toBe('Panel Principal');
   });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

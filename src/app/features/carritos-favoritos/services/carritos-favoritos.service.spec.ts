@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { HttpRequest, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
@@ -7,10 +7,11 @@ import {
   CarritoFavoritoResponseMother,
   SaveCarritoFavoritoRequestMother,
 } from '../carritos-favoritos.mother';
+import { CarritoFavoritoResponse } from '../models/carritos-favoritos.model';
 import { CarritosFavoritosService } from './carritos-favoritos.service';
 
 describe('CarritosFavoritosService', () => {
-  const BASE = `${environment.apiUrl}/carritos-favoritos`;
+  const URL_CARRITOS = `${environment.apiUrl}/carritos-favoritos`;
 
   let service: CarritosFavoritosService;
   let httpMock: HttpTestingController;
@@ -23,17 +24,13 @@ describe('CarritosFavoritosService', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
   describe('getCarritosFavoritos', () => {
     it('dado sin filtros, cuando pido los carritos, deberia hacer GET al base sin query params', async () => {
-      const promesa = firstValueFrom(service.getCarritosFavoritos());
+      const promesa = whenPidoCarritos();
 
-      const req = httpMock.expectOne(
-        (r) => r.method === 'GET' && r.url === BASE,
-      );
+      const req = thenSeHizoGetAlBase();
       expect(req.request.params.keys().length).toBe(0);
       req.flush([CarritoFavoritoResponseMother.crear()]);
 
@@ -42,24 +39,18 @@ describe('CarritosFavoritosService', () => {
     });
 
     it('dado un alumnoId, cuando pido los carritos, deberia agregarlo como query param', async () => {
-      const promesa = firstValueFrom(service.getCarritosFavoritos('alumno-1'));
+      const promesa = whenPidoCarritos('alumno-1');
 
-      const req = httpMock.expectOne(
-        (r) => r.method === 'GET' && r.url === BASE,
-      );
+      const req = thenSeHizoGetAlBase();
       expect(req.request.params.get('alumnoId')).toBe('alumno-1');
       req.flush([]);
       await promesa;
     });
 
     it('dado alumnoId y productoId, cuando pido los carritos, deberia mandar ambos query params', async () => {
-      const promesa = firstValueFrom(
-        service.getCarritosFavoritos('alumno-1', 'prod-1'),
-      );
+      const promesa = whenPidoCarritos('alumno-1', 'prod-1');
 
-      const req = httpMock.expectOne(
-        (r) => r.method === 'GET' && r.url === BASE,
-      );
+      const req = thenSeHizoGetAlBase();
       expect(req.request.params.get('alumnoId')).toBe('alumno-1');
       expect(req.request.params.get('productoId')).toBe('prod-1');
       req.flush([]);
@@ -72,7 +63,7 @@ describe('CarritosFavoritosService', () => {
       const request = SaveCarritoFavoritoRequestMother.crear({ nombre: 'Merienda' });
       const promesa = firstValueFrom(service.saveCarritoFavorito(request));
 
-      const req = httpMock.expectOne(BASE);
+      const req = httpMock.expectOne(URL_CARRITOS);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(request);
       req.flush(CarritoFavoritoResponseMother.crear({ nombre: 'Merienda' }));
@@ -86,10 +77,20 @@ describe('CarritosFavoritosService', () => {
     it('dado un id, cuando elimino, deberia hacer DELETE /base/{id}', async () => {
       const promesa = firstValueFrom(service.deleteCarritoFavorito('carrito-42'));
 
-      const req = httpMock.expectOne(`${BASE}/carrito-42`);
+      const req = httpMock.expectOne(`${URL_CARRITOS}/carrito-42`);
       expect(req.request.method).toBe('DELETE');
       req.flush(null);
       await promesa;
     });
   });
+
+  function whenPidoCarritos(alumnoId?: string, productoId?: string): Promise<CarritoFavoritoResponse[]> {
+    return firstValueFrom(service.getCarritosFavoritos(alumnoId, productoId));
+  }
+
+  function thenSeHizoGetAlBase(): ReturnType<HttpTestingController['expectOne']> {
+    return httpMock.expectOne(
+      (r: HttpRequest<unknown>) => r.method === 'GET' && r.url === URL_CARRITOS,
+    );
+  }
 });

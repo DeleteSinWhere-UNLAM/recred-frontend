@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AccionRapida } from '../../models/accion-rapida.model';
 import { AccionRapidaMother } from '../../home-alumno.mother';
 import { AccionTileComponent } from './accion-tile.component';
 
@@ -19,27 +20,26 @@ describe('AccionTileComponent', () => {
 
   describe('render', () => {
     it('dado una accion, cuando se monta, deberia mostrar el label y la descripcion', () => {
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+      const texto = textoDelTile();
+
       expect(texto).toContain('Ir al buffet');
       expect(texto).toContain('Hacé tu pedido');
     });
 
-    it('dado una accion con color menta, deberia aplicar la clase accion-tile--menta', () => {
-      const button = (fixture.nativeElement as HTMLElement).querySelector('button');
+    it('dado una accion con color menta, cuando se monta, deberia aplicar la clase accion-tile--menta', () => {
+      const button = buttonDelTile();
+
       expect(button?.classList.contains('accion-tile--menta')).toBeTrue();
     });
 
-    it('dado una accion sin ruta, deberia mostrar el badge "Próximamente"', () => {
-      fixture.componentRef.setInput('accion', AccionRapidaMother.crearBuffet({ ruta: null }));
-      fixture.detectChanges();
+    it('dado una accion sin ruta, cuando se monta, deberia mostrar el badge "Próximamente"', () => {
+      givenAccionCon(AccionRapidaMother.crearBuffet({ ruta: null }));
 
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).toContain('Próximamente');
+      expect(textoDelTile()).toContain('Próximamente');
     });
 
-    it('dado una accion con ruta, no deberia mostrar el badge "Próximamente"', () => {
-      const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-      expect(texto).not.toContain('Próximamente');
+    it('dado una accion con ruta, cuando se monta, no deberia mostrar el badge "Próximamente"', () => {
+      expect(textoDelTile()).not.toContain('Próximamente');
     });
   });
 
@@ -48,9 +48,26 @@ describe('AccionTileComponent', () => {
       const spy = jasmine.createSpy('seleccionar');
       component.seleccionar.subscribe(spy);
 
-      (fixture.nativeElement as HTMLElement).querySelector('button')!.click();
+      whenHagoClickEnElTile();
 
       expect(spy).toHaveBeenCalledWith(component.accion);
     });
   });
+
+  function givenAccionCon(accion: AccionRapida): void {
+    fixture.componentRef.setInput('accion', accion);
+    fixture.detectChanges();
+  }
+
+  function whenHagoClickEnElTile(): void {
+    buttonDelTile()!.click();
+  }
+
+  function textoDelTile(): string {
+    return (fixture.nativeElement as HTMLElement).textContent ?? '';
+  }
+
+  function buttonDelTile(): HTMLButtonElement | null {
+    return (fixture.nativeElement as HTMLElement).querySelector('button');
+  }
 });

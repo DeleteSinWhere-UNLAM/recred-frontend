@@ -13,6 +13,7 @@ import {
   RestriccionHorariaMother,
   TimeSlotMother,
 } from '../restricciones-horarias.mother';
+import { RestriccionHoraria } from '../models/restriccion-horaria.model';
 import { FranjasHorariasService } from '../services/franjas-horarias.service';
 import { RestriccionesHorariasService } from '../services/restricciones-horarias.service';
 import { RestriccionesHorariasPresenter } from './restricciones-horarias.presenter';
@@ -87,7 +88,7 @@ describe('RestriccionesHorariasPresenter', () => {
     });
 
     it('dado que el alumno no existe, cuando inicializo, no deberia pedir franjas ni restricciones', async () => {
-      alumnosService.getAlumnoById.and.returnValue(undefined);
+      givenAlumnoInexistente();
 
       await presenter.init('inexistente');
 
@@ -98,7 +99,7 @@ describe('RestriccionesHorariasPresenter', () => {
 
     it('dado que el back falla, cuando inicializo, deberia dejar cargando en false', async () => {
       spyOn(console, 'error');
-      franjasService.getFranjasHorarias.and.rejectWith(new Error('boom'));
+      givenGetFranjasFalla();
 
       await presenter.init(ALUMNO_ID_TEST);
 
@@ -108,7 +109,7 @@ describe('RestriccionesHorariasPresenter', () => {
 
   describe('franjasConRestricciones', () => {
     it('dado un alumno con restricciones activas, cuando proyecto, deberia agruparlas por franja', async () => {
-      restriccionesService.getRestriccionesPorAlumno.and.resolveTo([
+      givenRestriccionesDelAlumno([
         RestriccionHorariaMother.crearPorCategoria({ timeSlotId: 'ts-001' }),
         RestriccionHorariaMother.crearPorSalud({ timeSlotId: 'ts-002' }),
       ]);
@@ -123,9 +124,7 @@ describe('RestriccionesHorariasPresenter', () => {
     });
 
     it('dado un bloqueo total, cuando proyecto la franja, deberia marcar tieneBloqueoTotal', async () => {
-      restriccionesService.getRestriccionesPorAlumno.and.resolveTo([
-        RestriccionHorariaMother.crearBloqueoTotal({ timeSlotId: 'ts-001' }),
-      ]);
+      givenRestriccionesDelAlumno([RestriccionHorariaMother.crearBloqueoTotal({ timeSlotId: 'ts-001' })]);
 
       await presenter.init(ALUMNO_ID_TEST);
 
@@ -135,9 +134,7 @@ describe('RestriccionesHorariasPresenter', () => {
     });
 
     it('dado que una categoria ya esta restringida, cuando proyecto, no deberia estar entre las disponibles', async () => {
-      restriccionesService.getRestriccionesPorAlumno.and.resolveTo([
-        RestriccionHorariaMother.crearPorCategoria({ timeSlotId: 'ts-001' }),
-      ]);
+      givenRestriccionesDelAlumno([RestriccionHorariaMother.crearPorCategoria({ timeSlotId: 'ts-001' })]);
 
       await presenter.init(ALUMNO_ID_TEST);
 
@@ -148,7 +145,7 @@ describe('RestriccionesHorariasPresenter', () => {
     });
 
     it('dado una restriccion inactiva, cuando proyecto, no deberia incluirla', async () => {
-      restriccionesService.getRestriccionesPorAlumno.and.resolveTo([
+      givenRestriccionesDelAlumno([
         RestriccionHorariaMother.crearPorCategoria({ timeSlotId: 'ts-001', activa: false }),
       ]);
 
@@ -159,7 +156,7 @@ describe('RestriccionesHorariasPresenter', () => {
   });
 
   describe('agregarRestriccion', () => {
-    it('dada una categoria, cuando la agrego, deberia sumarla al draft con categoryId seteado', async () => {
+    it('dado una categoria, cuando la agrego, deberia sumarla al draft con categoryId seteado', async () => {
       await presenter.init(ALUMNO_ID_TEST);
 
       presenter.agregarRestriccion('ts-001', 'CATEGORIA', 'cat-bebidas');
@@ -177,7 +174,7 @@ describe('RestriccionesHorariasPresenter', () => {
       expect(presenter.franjasConRestricciones()[0].tieneBloqueoTotal).toBeTrue();
     });
 
-    it('dado que no hay alumno, cuando agrego, no deberia hacer nada', () => {
+    it('dado que no hay alumno, cuando agrego una restriccion, no deberia hacer nada', () => {
       presenter.agregarRestriccion('ts-001', 'CATEGORIA', 'cat-bebidas');
 
       expect(presenter.franjasConRestricciones().length).toBe(0);
@@ -185,8 +182,8 @@ describe('RestriccionesHorariasPresenter', () => {
   });
 
   describe('quitarRestriccion', () => {
-    it('dada una restriccion, cuando la quito, deberia sacarla del draft', async () => {
-      restriccionesService.getRestriccionesPorAlumno.and.resolveTo([
+    it('dado una restriccion cargada, cuando la quito, deberia sacarla del draft', async () => {
+      givenRestriccionesDelAlumno([
         RestriccionHorariaMother.crearPorCategoria({ id: 'restriccion-cat', timeSlotId: 'ts-001' }),
       ]);
       await presenter.init(ALUMNO_ID_TEST);
@@ -198,14 +195,14 @@ describe('RestriccionesHorariasPresenter', () => {
   });
 
   describe('getNombreCategoria y getNombreSalud', () => {
-    it('dado un id de categoria conocido, deberia devolver su descripcion', async () => {
+    it('dado un id de categoria conocido, cuando pido el nombre, deberia devolver su descripcion', async () => {
       await presenter.init(ALUMNO_ID_TEST);
 
       expect(presenter.getNombreCategoria('cat-bebidas')).toBe('Bebidas');
       expect(presenter.getNombreCategoria('cat-inexistente')).toBe('Categoría');
     });
 
-    it('dado un id de salud conocido, deberia devolver su descripcion', async () => {
+    it('dado un id de salud conocido, cuando pido el nombre, deberia devolver su descripcion', async () => {
       await presenter.init(ALUMNO_ID_TEST);
 
       expect(presenter.getNombreSalud('salud-tacc')).toBe('Sin TACC');
@@ -221,12 +218,10 @@ describe('RestriccionesHorariasPresenter', () => {
       expect(restriccionesService.crearRestriccion).not.toHaveBeenCalled();
     });
 
-    it('dada una restriccion nueva manejable, cuando guardo, deberia hacer POST y mostrar alerta de exito', async () => {
+    it('dado una restriccion nueva manejable, cuando guardo, deberia hacer POST y mostrar alerta de exito', async () => {
       await presenter.init(ALUMNO_ID_TEST);
       presenter.agregarRestriccion('ts-001', 'CATEGORIA', 'cat-bebidas');
-      restriccionesService.crearRestriccion.and.resolveTo(
-        RestriccionHorariaMother.crearPorCategoria(),
-      );
+      restriccionesService.crearRestriccion.and.resolveTo(RestriccionHorariaMother.crearPorCategoria());
 
       const resultado = await presenter.guardarCambios();
 
@@ -237,12 +232,12 @@ describe('RestriccionesHorariasPresenter', () => {
       expect(resultado).toBeTrue();
     });
 
-    it('dada una restriccion manejable eliminada, cuando guardo, deberia hacer PATCH de disable', async () => {
+    it('dado una restriccion manejable eliminada, cuando guardo, deberia hacer PATCH de disable', async () => {
       const restriccionExistente = RestriccionHorariaMother.crearPorCategoria({
         id: 'restriccion-cat',
         timeSlotId: 'ts-001',
       });
-      restriccionesService.getRestriccionesPorAlumno.and.resolveTo([restriccionExistente]);
+      givenRestriccionesDelAlumno([restriccionExistente]);
       await presenter.init(ALUMNO_ID_TEST);
       presenter.quitarRestriccion('restriccion-cat');
 
@@ -266,4 +261,16 @@ describe('RestriccionesHorariasPresenter', () => {
       );
     });
   });
+
+  function givenAlumnoInexistente(): void {
+    alumnosService.getAlumnoById.and.returnValue(undefined);
+  }
+
+  function givenGetFranjasFalla(): void {
+    franjasService.getFranjasHorarias.and.rejectWith(new Error('boom'));
+  }
+
+  function givenRestriccionesDelAlumno(restricciones: RestriccionHoraria[]): void {
+    restriccionesService.getRestriccionesPorAlumno.and.resolveTo(restricciones);
+  }
 });

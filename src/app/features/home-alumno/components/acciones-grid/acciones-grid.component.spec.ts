@@ -38,11 +38,13 @@ describe('AccionesGridComponent', () => {
   describe('render', () => {
     it('dado una lista de acciones, cuando se monta, deberia renderizar el titulo', () => {
       const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+
       expect(texto).toContain('¿Qué querés hacer hoy?');
     });
 
-    it('dado 2 acciones, deberia renderizar 2 app-accion-tile', () => {
+    it('dado 2 acciones, cuando se monta, deberia renderizar 2 app-accion-tile', () => {
       const tiles = fixture.debugElement.queryAll(By.directive(AccionTileStub));
+
       expect(tiles.length).toBe(2);
     });
   });
@@ -51,12 +53,16 @@ describe('AccionesGridComponent', () => {
     it('dado una accion, cuando un tile emite seleccionar, deberia reemitir por accion', () => {
       const spy = jasmine.createSpy('accion');
       component.accion.subscribe(spy);
-      const tile = fixture.debugElement.query(By.directive(AccionTileStub))
-        .componentInstance as AccionTileStub;
 
-      tile.seleccionar.emit(component.acciones[0]);
+      whenElTileEmiteSeleccionar(component.acciones[0]);
 
       expect(spy).toHaveBeenCalledWith(component.acciones[0]);
     });
   });
+
+  function whenElTileEmiteSeleccionar(accion: AccionRapida): void {
+    const tile = fixture.debugElement.query(By.directive(AccionTileStub))
+      .componentInstance as AccionTileStub;
+    tile.seleccionar.emit(accion);
+  }
 });

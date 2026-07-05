@@ -4,7 +4,7 @@ import { DirectivoPresenter } from './presenter/directivo.presenter';
 import { signal } from '@angular/core';
 import { AuthService } from '../../core/auth/services/auth.service';
 
-describe('DirectivoPage (Humble Object Component)', () => {
+describe('DirectivoPage', () => {
   let component: DirectivoPage;
   let fixture: ComponentFixture<DirectivoPage>;
   let presenterSpy: jasmine.SpyObj<DirectivoPresenter>;
@@ -12,7 +12,6 @@ describe('DirectivoPage (Humble Object Component)', () => {
   let mensajeSignal: ReturnType<typeof signal<string>>;
 
   beforeEach(async () => {
-    
     mensajeSignal = signal('Cargando...');
     presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar'], {
       mensajeBienvenida: mensajeSignal,
@@ -26,33 +25,32 @@ describe('DirectivoPage (Humble Object Component)', () => {
         set: {
           providers: [
             { provide: DirectivoPresenter, useValue: presenterSpy },
-            { provide: AuthService, useValue: authServiceSpy }
+            { provide: AuthService, useValue: authServiceSpy },
           ],
         },
       })
       .compileComponents();
 
-    
     fixture = TestBed.createComponent(DirectivoPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('debería renderizar el mensaje de bienvenida expuesto por el presenter', () => {
-    
-    mensajeSignal.set('Hola bienvenido, Maria');
-    fixture.detectChanges();
+  it('dado un mensaje del presenter, cuando se renderiza, deberia mostrarlo en el h1', () => {
+    givenMensajeDelPresenter('Hola bienvenido, Maria');
 
-    
     const h1Element = fixture.nativeElement.querySelector('h1');
     expect(h1Element.textContent.trim()).toBe('Hola bienvenido, Maria');
   });
 
-  it('debería inicializar el presenter en el ngOnInit', () => {
-    
+  it('dado el componente montado, cuando corre ngOnInit, deberia inicializar el presenter', () => {
     component.ngOnInit();
 
-    
     expect(presenterSpy.inicializar).toHaveBeenCalled();
   });
+
+  function givenMensajeDelPresenter(mensaje: string): void {
+    mensajeSignal.set(mensaje);
+    fixture.detectChanges();
+  }
 });

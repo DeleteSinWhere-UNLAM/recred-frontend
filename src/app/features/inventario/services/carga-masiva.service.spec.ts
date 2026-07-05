@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { RespuestaCargaMasivaMother, RespuestaProductoMasivoMother } from '../inventario.mother';
-import { CargaMasivaService } from './carga-masiva.service';
+import { CargaMasivaService, RespuestaCargaMasiva } from './carga-masiva.service';
 
 describe('CargaMasivaService', () => {
   const URL_BULK = `${environment.apiUrl}/products/bulk-upload`;
@@ -30,7 +30,7 @@ describe('CargaMasivaService', () => {
     it('dado un archivo, cuando lo subo, deberia hacer POST al endpoint con FormData que contiene el archivo', async () => {
       const archivo = new File(['dummy'], 'productos.pdf', { type: 'application/pdf' });
 
-      const promesa = firstValueFrom(service.uploadFile(archivo));
+      const promesa = whenSuboElArchivo(archivo);
 
       const req = httpMock.expectOne(URL_BULK);
       expect(req.request.method).toBe('POST');
@@ -49,9 +49,7 @@ describe('CargaMasivaService', () => {
         ],
       });
 
-      const promesa = firstValueFrom(
-        service.uploadFile(new File(['x'], 'x.pdf', { type: 'application/pdf' })),
-      );
+      const promesa = whenSuboElArchivo(new File(['x'], 'x.pdf', { type: 'application/pdf' }));
       httpMock.expectOne(URL_BULK).flush(respuesta);
 
       const resultado = await promesa;
@@ -59,4 +57,8 @@ describe('CargaMasivaService', () => {
       expect(resultado.products[1].precio).toBe(500);
     });
   });
+
+  function whenSuboElArchivo(archivo: File): Promise<RespuestaCargaMasiva> {
+    return firstValueFrom(service.uploadFile(archivo));
+  }
 });

@@ -45,8 +45,8 @@ describe('ExitoPresenter', () => {
       expect(presenter.vacia()).toBeFalse();
     });
 
-    it('dado sin ultima orden, vacia deberia ser true y ordenes vacio', () => {
-      ultimaOrden.set(null);
+    it('dado sin ultima orden, cuando leo el estado, vacia deberia ser true y ordenes vacio', () => {
+      givenSinUltimaOrden();
 
       expect(presenter.vacia()).toBeTrue();
       expect(presenter.ordenes()).toEqual([]);
@@ -55,11 +55,11 @@ describe('ExitoPresenter', () => {
   });
 
   describe('codigoDe', () => {
-    it('dado un alumnoId con codigo, deberia devolverlo', () => {
+    it('dado un alumnoId con codigo, cuando lo pido, deberia devolverlo', () => {
       expect(presenter.codigoDe('alumno-1')).toBe('ABC123');
     });
 
-    it('dado un alumnoId sin codigo, deberia devolver el placeholder "----"', () => {
+    it('dado un alumnoId sin codigo, cuando lo pido, deberia devolver el placeholder "----"', () => {
       expect(presenter.codigoDe('alumno-sin-codigo')).toBe('----');
     });
   });
@@ -68,7 +68,7 @@ describe('ExitoPresenter', () => {
     it('dado el presenter, cuando vuelvo al inicio, deberia navegar a la homeUrl del usuario', () => {
       presenter.volverInicio();
 
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
+      thenSeNavegoA('/tutor');
     });
 
     it('dado el presenter, cuando voy a ver pendientes, deberia navegar a /movimientos con el filtro de estado', () => {
@@ -79,4 +79,12 @@ describe('ExitoPresenter', () => {
       });
     });
   });
+
+  function givenSinUltimaOrden(): void {
+    ultimaOrden.set(null);
+  }
+
+  function thenSeNavegoA(url: string): void {
+    expect(router.navigateByUrl).toHaveBeenCalledWith(url);
+  }
 });

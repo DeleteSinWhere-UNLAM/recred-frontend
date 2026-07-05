@@ -31,12 +31,14 @@ describe('PresupuestoPresenter', () => {
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
-    servicioAlumnos.asegurarCargados.and.resolveTo([
-      AlumnoMother.crear({ id: ALUMNO_ID_TEST, nombre: 'Mateo', apellido: 'López', grado: '5to A' }),
-    ]);
-    servicioAlumnos.getAlumnoById.and.returnValue(
-      AlumnoMother.crear({ id: ALUMNO_ID_TEST, nombre: 'Mateo', apellido: 'López', grado: '5to A' }),
-    );
+    const alumnoTest = AlumnoMother.crear({
+      id: ALUMNO_ID_TEST,
+      nombre: 'Mateo',
+      apellido: 'López',
+      grado: '5to A',
+    });
+    servicioAlumnos.asegurarCargados.and.resolveTo([alumnoTest]);
+    servicioAlumnos.getAlumnoById.and.returnValue(alumnoTest);
     servicioPresupuesto.getCategoriasDisponibles.and.resolveTo(CategoriaProductoMother.crearVarias());
     servicioPresupuesto.getPresupuesto.and.resolveTo(undefined);
     servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crear());
@@ -56,7 +58,7 @@ describe('PresupuestoPresenter', () => {
 
   describe('init', () => {
     it('dado un alumno inexistente, cuando inicializo, deberia redirigir a /tutor sin llamar al service', async () => {
-      servicioAlumnos.getAlumnoById.and.returnValue(undefined);
+      givenAlumnoInexistente();
 
       await presenter.init('inexistente');
 
@@ -65,7 +67,7 @@ describe('PresupuestoPresenter', () => {
       expect(servicioPresupuesto.getPresupuesto).not.toHaveBeenCalled();
     });
 
-    it('dado un alumno existente sin presupuesto previo, cuando inicializo, deberia cargar categorias y prediccion con presupuesto vacio', async () => {
+    it('dado un alumno existente sin presupuesto previo, cuando inicializo, deberia cargar categorias y prediccion', async () => {
       await presenter.init(ALUMNO_ID_TEST);
 
       expect(presenter.alumno()?.id).toBe(ALUMNO_ID_TEST);
@@ -79,10 +81,7 @@ describe('PresupuestoPresenter', () => {
     });
 
     it('dado un presupuesto del back, cuando inicializo, deberia reemplazar el presupuesto por defecto', async () => {
-      servicioPresupuesto.getPresupuesto.and.resolveTo({
-        ...PresupuestoMother.crearConMultiplesReglas(),
-        periodo: 'SEMANAL',
-      });
+      givenPresupuestoDelBack({ ...PresupuestoMother.crearConMultiplesReglas(), periodo: 'SEMANAL' });
 
       await presenter.init(ALUMNO_ID_TEST);
 
@@ -96,7 +95,7 @@ describe('PresupuestoPresenter', () => {
 
     it('dado que la carga falla, cuando inicializo, deberia mostrar toast de error', async () => {
       spyOn(console, 'warn');
-      servicioPresupuesto.getCategoriasDisponibles.and.rejectWith(new Error('boom'));
+      givenGetCategoriasFalla();
 
       await presenter.init(ALUMNO_ID_TEST);
 
@@ -109,7 +108,7 @@ describe('PresupuestoPresenter', () => {
   });
 
   describe('setters basicos', () => {
-    it('dado un monto invalido (NaN o negativo), setMontoGeneral deberia clampearlo a 0', () => {
+    it('dado un monto invalido (NaN o negativo), cuando lo seteo, deberia clampearlo a 0', () => {
       presenter.setMontoGeneral(Number.NaN);
       expect(presenter.presupuesto().montoLimiteGeneral).toBe(0);
 
@@ -129,7 +128,7 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.reglas()[0].montoLimiteCalculado).toBe(400);
     });
 
-    it('dado setPeriodo y setFechaInicio, deberia actualizar el presupuesto', () => {
+    it('dado el presenter, cuando llamo setPeriodo y setFechaInicio, deberia actualizar el presupuesto', () => {
       presenter.setPeriodo('SEMANAL');
       expect(presenter.presupuesto().periodo).toBe('SEMANAL');
 
@@ -143,7 +142,7 @@ describe('PresupuestoPresenter', () => {
       await presenter.init(ALUMNO_ID_TEST);
     });
 
-    it('dado una categoria disponible, cuando agrego, deberia crear una regla nueva con 0%', () => {
+    it('dado una categoria disponible, cuando agrego una regla, deberia crearla con 0%', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
 
       expect(presenter.reglas().length).toBe(1);
@@ -152,29 +151,30 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.reglas()[0].activo).toBeTrue();
     });
 
-    it('dado una categoria inexistente, cuando agrego, no deberia crear nada', () => {
+    it('dado una categoria inexistente, cuando agrego una regla, no deberia crear nada', () => {
       presenter.agregarReglaCategoria('cat-inexistente');
+
       expect(presenter.reglas().length).toBe(0);
     });
 
     it('dado una regla ya creada, cuando agrego la misma, no deberia duplicarla', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       presenter.agregarReglaCategoria('cat-bebidas');
+
       expect(presenter.reglas().length).toBe(1);
     });
 
-    it('dado una regla creada, categoriasUsables deberia excluirla del listado disponible', () => {
+    it('dado una regla creada, cuando consulto categoriasUsables, deberia excluirla del listado disponible', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
-      expect(presenter.categoriasUsables().map((c) => c.id)).toEqual([
-        'cat-lacteos',
-        'cat-viandas',
-      ]);
+
+      expect(presenter.categoriasUsables().map((c) => c.id)).toEqual(['cat-lacteos', 'cat-viandas']);
     });
 
-    it('dado que se usaron todas las categorias, puedeAgregarRegla deberia ser false', () => {
+    it('dado que se usaron todas las categorias, cuando consulto puedeAgregarRegla, deberia ser false', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       presenter.agregarReglaCategoria('cat-lacteos');
       presenter.agregarReglaCategoria('cat-viandas');
+
       expect(presenter.puedeAgregarRegla()).toBeFalse();
     });
 
@@ -200,17 +200,19 @@ describe('PresupuestoPresenter', () => {
       reglaB = presenter.reglas()[1].id;
     });
 
-    it('dado un porcentaje negativo, deberia clampearlo a 0', () => {
+    it('dado un porcentaje negativo, cuando lo seteo, deberia clampearlo a 0', () => {
       presenter.setPorcentajeRegla(reglaA, -20);
+
       expect(presenter.reglas()[0].porcentajeLimite).toBe(0);
     });
 
-    it('dado un porcentaje mayor a 100 sin otras reglas con peso, deberia clampearlo a 100', () => {
+    it('dado un porcentaje mayor a 100 sin otras reglas, cuando lo seteo, deberia clampearlo a 100', () => {
       presenter.setPorcentajeRegla(reglaA, 150);
+
       expect(presenter.reglas()[0].porcentajeLimite).toBe(100);
     });
 
-    it('dado A=70 y B intenta 80, B deberia clampearse a 30 para no superar 100 en total', () => {
+    it('dado A=70 y luego intento setear B=80, cuando lo hago, B deberia clampearse a 30 para no superar 100 en total', () => {
       presenter.setPorcentajeRegla(reglaA, 70);
       presenter.setPorcentajeRegla(reglaB, 80);
 
@@ -219,8 +221,9 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.totalPorcentaje()).toBe(100);
     });
 
-    it('dado un porcentaje NaN, deberia clampearlo a 0', () => {
+    it('dado un porcentaje NaN, cuando lo seteo, deberia clampearlo a 0', () => {
       presenter.setPorcentajeRegla(reglaA, Number.NaN);
+
       expect(presenter.reglas()[0].porcentajeLimite).toBe(0);
     });
   });
@@ -230,7 +233,7 @@ describe('PresupuestoPresenter', () => {
       await presenter.init(ALUMNO_ID_TEST);
     });
 
-    it('dado reglas activas con 30% y 45%, totalPorcentaje deberia ser 75', () => {
+    it('dado reglas activas con 30% y 45%, cuando pido totalPorcentaje, deberia ser 75', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       presenter.agregarReglaCategoria('cat-lacteos');
       const a = presenter.reglas()[0].id;
@@ -241,11 +244,11 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.totalPorcentaje()).toBe(75);
     });
 
-    it('dado total <= 100, porcentajeValido deberia ser true', () => {
+    it('dado total <= 100, cuando consulto porcentajeValido, deberia ser true', () => {
       expect(presenter.porcentajeValido()).toBeTrue();
     });
 
-    it('dado total = 100, topeCompletado deberia ser true', () => {
+    it('dado total = 100, cuando consulto topeCompletado, deberia ser true (y false cuando bajo a 90)', () => {
       presenter.agregarReglaCategoria('cat-bebidas');
       const a = presenter.reglas()[0].id;
       presenter.setPorcentajeRegla(a, 100);
@@ -255,7 +258,7 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.topeCompletado()).toBeFalse();
     });
 
-    it('dado una prediccion, nivelAlerta deberia reflejar el porcentaje (60% ok, 80% warning, 110% excedido)', async () => {
+    it('dado una prediccion, cuando consulto nivelAlerta, deberia reflejar el porcentaje (60% ok, 80% warning, 110% excedido)', async () => {
       expect(presenter.nivelAlerta()).toBe('ok');
 
       servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crearWarning());
@@ -274,7 +277,7 @@ describe('PresupuestoPresenter', () => {
     });
 
     it('dado un porcentaje invalido (>100), cuando guardo, no deberia llamar al service y deberia mostrar toast', async () => {
-      servicioPresupuesto.getPresupuesto.and.resolveTo(
+      givenPresupuestoDelBack(
         PresupuestoMother.crear({
           reglasCategoria: [ReglaCategoriaMother.crear({ porcentajeLimite: 120 })],
         }),
@@ -318,7 +321,20 @@ describe('PresupuestoPresenter', () => {
   describe('volver', () => {
     it('dado el presenter, cuando llamo volver, deberia navegar a /tutor', () => {
       presenter.volver();
+
       expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
     });
   });
+
+  function givenAlumnoInexistente(): void {
+    servicioAlumnos.getAlumnoById.and.returnValue(undefined);
+  }
+
+  function givenPresupuestoDelBack(presupuesto: ReturnType<typeof PresupuestoMother.crear>): void {
+    servicioPresupuesto.getPresupuesto.and.resolveTo(presupuesto);
+  }
+
+  function givenGetCategoriasFalla(): void {
+    servicioPresupuesto.getCategoriasDisponibles.and.rejectWith(new Error('boom'));
+  }
 });

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of, throwError } from 'rxjs';
+import { SugerenciaAgregarProducto } from '../models/sugerencia-agregar.model';
 import { SugerenciaAgregarProductoMother } from '../sugerencias-agregar.mother';
 import { SugerenciasAgregarService } from '../services/sugerencias-agregar.service';
 import { SugerenciasAgregarPresenter } from './sugerencias-agregar.presenter';
@@ -24,7 +25,7 @@ describe('SugerenciasAgregarPresenter', () => {
   describe('initialize', () => {
     it('dado un back exitoso, cuando inicializo, deberia emitir las sugerencias y bajar isLoading', async () => {
       const sugerencias = SugerenciaAgregarProductoMother.crearVarias();
-      servicio.getSugerenciasAgregarProducto.and.returnValue(of(sugerencias));
+      givenSugerenciasDelBack(sugerencias);
 
       presenter.initialize();
 
@@ -35,9 +36,7 @@ describe('SugerenciasAgregarPresenter', () => {
     });
 
     it('dado que el back falla, cuando inicializo, deberia emitir el mensaje de error y bajar isLoading', async () => {
-      servicio.getSugerenciasAgregarProducto.and.returnValue(
-        throwError(() => new Error('Error de red')),
-      );
+      givenSugerenciasServiceFalla();
 
       presenter.initialize();
 
@@ -50,25 +49,23 @@ describe('SugerenciasAgregarPresenter', () => {
 
   describe('KPIs computados', () => {
     beforeEach(() => {
-      servicio.getSugerenciasAgregarProducto.and.returnValue(
-        of(SugerenciaAgregarProductoMother.crearVarias()),
-      );
+      givenSugerenciasDelBack(SugerenciaAgregarProductoMother.crearVarias());
       presenter.initialize();
     });
 
-    it('dadas tres sugerencias, cuando leo totalProductos, deberia devolver 3', () => {
+    it('dado tres sugerencias, cuando leo totalProductos, deberia devolver 3', () => {
       expect(presenter.totalProductos).toBe(3);
     });
 
-    it('dadas tres sugerencias, cuando leo totalVentas, deberia sumar los totalSales', () => {
+    it('dado tres sugerencias, cuando leo totalVentas, deberia sumar los totalSales', () => {
       expect(presenter.totalVentas).toBe(35);
     });
 
-    it('dadas tres sugerencias, cuando leo totalIngresos, deberia sumar los totalRevenue', () => {
+    it('dado tres sugerencias, cuando leo totalIngresos, deberia sumar los totalRevenue', () => {
       expect(presenter.totalIngresos).toBe(4000);
     });
 
-    it('dadas tres sugerencias, cuando leo totalClientes, deberia sumar los totalCustomers', () => {
+    it('dado tres sugerencias, cuando leo totalClientes, deberia sumar los totalCustomers', () => {
       expect(presenter.totalClientes).toBe(17);
     });
 
@@ -79,9 +76,7 @@ describe('SugerenciasAgregarPresenter', () => {
 
   describe('chartData y productCards', () => {
     beforeEach(() => {
-      servicio.getSugerenciasAgregarProducto.and.returnValue(
-        of(SugerenciaAgregarProductoMother.crearVarias()),
-      );
+      givenSugerenciasDelBack(SugerenciaAgregarProductoMother.crearVarias());
       presenter.initialize();
     });
 
@@ -104,8 +99,8 @@ describe('SugerenciasAgregarPresenter', () => {
       expect(tarjetas[0].mensaje).toBe('Msg 3');
     });
 
-    it('dada una lista vacia, cuando leo chartData y productCards, deberia devolver arrays vacios', () => {
-      servicio.getSugerenciasAgregarProducto.and.returnValue(of([]));
+    it('dado una lista vacia, cuando leo chartData y productCards, deberia devolver arrays vacios', () => {
+      givenSugerenciasDelBack([]);
       presenter.initialize();
 
       expect(presenter.chartData).toEqual([]);
@@ -122,4 +117,12 @@ describe('SugerenciasAgregarPresenter', () => {
       expect(presenter.formatCurrency(0)).toBe('$0');
     });
   });
+
+  function givenSugerenciasDelBack(sugerencias: SugerenciaAgregarProducto[]): void {
+    servicio.getSugerenciasAgregarProducto.and.returnValue(of(sugerencias));
+  }
+
+  function givenSugerenciasServiceFalla(): void {
+    servicio.getSugerenciasAgregarProducto.and.returnValue(throwError(() => new Error('Error de red')));
+  }
 });

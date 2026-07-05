@@ -5,8 +5,25 @@ import { DialogService } from '../../../../shared/services/dialog.service';
 import { CompraService } from '../../../compra/services/compra.service';
 import { Producto } from '../../../inventario/models/producto.interface';
 import { ProductoService } from '../../../inventario/services/producto.service';
+import { EstadoCompra } from '../../models/tracking-pedidos.model';
 import { ScheduledPickupMother } from '../../tracking-pedidos.mother';
 import { OrderDetailsModalComponent } from './order-details-modal.component';
+
+class PromotionMother {
+  static crear(override: Partial<Promotion> = {}): Promotion {
+    return {
+      productIds: ['p1'],
+      discountPercentage: 20,
+      ...override,
+    } as unknown as Promotion;
+  }
+}
+
+class ProductoMother {
+  static crear(override: Partial<Producto> = {}): Producto {
+    return { id: 'p1', precio: 100, ...override } as unknown as Producto;
+  }
+}
 
 describe('OrderDetailsModalComponent', () => {
   let component: OrderDetailsModalComponent;
@@ -63,10 +80,8 @@ describe('OrderDetailsModalComponent', () => {
 
   describe('togglePromoDetails', () => {
     it('dado un productoId no cargado, cuando toggle, deberia pedir la promocion y sus productos', () => {
-      const promo = { productIds: ['p1'], discountPercentage: 20 } as unknown as Promotion;
-      const producto = { id: 'p1', precio: 100 } as unknown as Producto;
-      promotionService.getPromotionById.and.returnValue(of(promo));
-      productService.getById.and.returnValue(of(producto));
+      givenPromotionDelBack(PromotionMother.crear({ productIds: ['p1'], discountPercentage: 20 }));
+      givenProductoDelBack(ProductoMother.crear({ id: 'p1', precio: 100 }));
 
       component.togglePromoDetails('promo-1');
 
@@ -96,8 +111,7 @@ describe('OrderDetailsModalComponent', () => {
     });
 
     it('dado una promocion sin productos, cuando toggle, deberia dejar products vacio sin cargar loading', () => {
-      const promo = { productIds: [], discountPercentage: 10 } as unknown as Promotion;
-      promotionService.getPromotionById.and.returnValue(of(promo));
+      givenPromotionDelBack(PromotionMother.crear({ productIds: [], discountPercentage: 10 }));
 
       component.togglePromoDetails('promo-1');
 
@@ -107,35 +121,33 @@ describe('OrderDetailsModalComponent', () => {
   });
 
   describe('getPromoOriginalPrice / getPromoDiscountedPrice', () => {
-    it('dado varios productos cargados, deberia sumar los precios originales', () => {
-      component.promosLoaded.set('promo-1', {
-        promotion: { discountPercentage: 20 } as unknown as Promotion,
+    it('dado varios productos cargados, cuando pido el precio original, deberia sumarlos', () => {
+      givenPromoCargadaCon({
+        promotion: PromotionMother.crear({ discountPercentage: 20 }),
         products: [{ precio: 100 } as Producto, { precio: 50 } as Producto],
-        loading: false,
-        error: false,
       });
 
       expect(component.getPromoOriginalPrice('promo-1')).toBe(150);
       expect(component.getPromoDiscountedPrice('promo-1')).toBe(120);
     });
 
-    it('dado un promo id inexistente, deberia devolver 0', () => {
+    it('dado un promo id inexistente, cuando pido el precio, deberia devolver 0', () => {
       expect(component.getPromoOriginalPrice('inexistente')).toBe(0);
       expect(component.getPromoDiscountedPrice('inexistente')).toBe(0);
     });
   });
 
   describe('nextStatusText y canAdvance / canCancel', () => {
-    it('dado PENDIENTE, deberia decir "Iniciar preparación" y permitir avanzar/cancelar', () => {
-      component.order = ScheduledPickupMother.crear({ status: 'PENDIENTE' });
+    it('dado PENDIENTE, cuando consulto el estado, deberia decir "Iniciar preparación" y permitir avanzar/cancelar', () => {
+      givenOrdenEnEstado('PENDIENTE');
 
       expect(component.nextStatusText()).toBe('Iniciar preparación');
       expect(component.canAdvance()).toBeTrue();
       expect(component.canCancel()).toBeTrue();
     });
 
-    it('dado ENTREGADO, deberia devolver texto vacio y no permitir avanzar ni cancelar', () => {
-      component.order = ScheduledPickupMother.crear({ status: 'ENTREGADO' });
+    it('dado ENTREGADO, cuando consulto el estado, deberia devolver texto vacio y no permitir avanzar ni cancelar', () => {
+      givenOrdenEnEstado('ENTREGADO');
 
       expect(component.nextStatusText()).toBe('');
       expect(component.canAdvance()).toBeFalse();
@@ -146,7 +158,7 @@ describe('OrderDetailsModalComponent', () => {
   describe('onAdvance', () => {
     it('dado un estado PENDIENTE, cuando hago click en avanzar, deberia emitir advanceStatus con EN_PREPARACION', () => {
       spyOn(component.advanceStatus, 'emit');
-      component.order = ScheduledPickupMother.crear({ status: 'PENDIENTE' });
+      givenOrdenEnEstado('PENDIENTE');
 
       component['onAdvance']();
 
@@ -158,7 +170,7 @@ describe('OrderDetailsModalComponent', () => {
 
     it('dado un estado LISTO, cuando hago click en avanzar, deberia abrir el modal de verificacion', () => {
       spyOn(component.advanceStatus, 'emit');
-      component.order = ScheduledPickupMother.crear({ status: 'LISTO' });
+      givenOrdenEnEstado('LISTO');
 
       component['onAdvance']();
 
@@ -169,7 +181,7 @@ describe('OrderDetailsModalComponent', () => {
     it('dado que esta actualizando, cuando hago click en avanzar, no deberia emitir', () => {
       spyOn(component.advanceStatus, 'emit');
       component.isUpdating = true;
-      component.order = ScheduledPickupMother.crear({ status: 'PENDIENTE' });
+      givenOrdenEnEstado('PENDIENTE');
 
       component['onAdvance']();
 
@@ -209,7 +221,7 @@ describe('OrderDetailsModalComponent', () => {
 
     it('dado un codigo validado y estado LISTO, cuando avanzo, deberia emitir ENTREGADO', () => {
       spyOn(component.advanceStatus, 'emit');
-      component.order = ScheduledPickupMother.crear({ status: 'LISTO' });
+      givenOrdenEnEstado('LISTO');
       component.showVerificationModal = true;
       component.codeValidated = true;
 
@@ -262,39 +274,35 @@ describe('OrderDetailsModalComponent', () => {
   });
 
   describe('nextStatusText — estados intermedios', () => {
-    it('dado EN_PREPARACION, deberia decir "Marcar como listo"', () => {
-      component.order = ScheduledPickupMother.crear({ status: 'EN_PREPARACION' });
+    it('dado EN_PREPARACION, cuando consulto el estado, deberia decir "Marcar como listo"', () => {
+      givenOrdenEnEstado('EN_PREPARACION');
 
       expect(component.nextStatusText()).toBe('Marcar como listo');
     });
 
-    it('dado LISTO, deberia decir "Entregar pedido"', () => {
-      component.order = ScheduledPickupMother.crear({ status: 'LISTO' });
+    it('dado LISTO, cuando consulto el estado, deberia decir "Entregar pedido"', () => {
+      givenOrdenEnEstado('LISTO');
 
       expect(component.nextStatusText()).toBe('Entregar pedido');
     });
   });
 
   describe('onBackdropClick', () => {
-    it('dado un click en el backdrop (target === currentTarget), deberia cerrar el modal', () => {
+    it('dado un click en el backdrop (target === currentTarget), cuando hago click, deberia cerrar el modal', () => {
       spyOn(component.closeModal, 'emit');
       const backdrop = document.createElement('div');
-      const event = new MouseEvent('click');
-      Object.defineProperty(event, 'target', { value: backdrop });
-      Object.defineProperty(event, 'currentTarget', { value: backdrop });
+      const event = crearMouseEventCon(backdrop, backdrop);
 
       component['onBackdropClick'](event);
 
       expect(component.closeModal.emit).toHaveBeenCalled();
     });
 
-    it('dado un click en un hijo del backdrop (target !== currentTarget), no deberia cerrar el modal', () => {
+    it('dado un click en un hijo del backdrop (target !== currentTarget), cuando hago click, no deberia cerrar el modal', () => {
       spyOn(component.closeModal, 'emit');
       const backdrop = document.createElement('div');
       const child = document.createElement('div');
-      const event = new MouseEvent('click');
-      Object.defineProperty(event, 'target', { value: child });
-      Object.defineProperty(event, 'currentTarget', { value: backdrop });
+      const event = crearMouseEventCon(child, backdrop);
 
       component['onBackdropClick'](event);
 
@@ -305,7 +313,7 @@ describe('OrderDetailsModalComponent', () => {
   describe('onAdvance — EN_PREPARACION', () => {
     it('dado un estado EN_PREPARACION, cuando avanzo, deberia emitir advanceStatus con LISTO', () => {
       spyOn(component.advanceStatus, 'emit');
-      component.order = ScheduledPickupMother.crear({ status: 'EN_PREPARACION' });
+      givenOrdenEnEstado('EN_PREPARACION');
 
       component['onAdvance']();
 
@@ -317,7 +325,7 @@ describe('OrderDetailsModalComponent', () => {
   });
 
   describe('onCancel — isUpdating', () => {
-    it('dado que isUpdating es true, no deberia mostrar el confirm ni emitir', async () => {
+    it('dado que isUpdating es true, cuando cancelo, no deberia mostrar el confirm ni emitir', async () => {
       spyOn(component.cancelOrder, 'emit');
       component.isUpdating = true;
 
@@ -330,12 +338,7 @@ describe('OrderDetailsModalComponent', () => {
 
   describe('togglePromoDetails — branches faltantes', () => {
     it('dado un productoId ya cargado en promosLoaded, cuando toggle (expandir de nuevo), no deberia volver a pedirlo', () => {
-      component.promosLoaded.set('promo-1', {
-        promotion: null,
-        products: [],
-        loading: false,
-        error: false,
-      });
+      givenPromoCargadaCon({ promotion: null, products: [] });
 
       component.togglePromoDetails('promo-1');
 
@@ -343,9 +346,8 @@ describe('OrderDetailsModalComponent', () => {
       expect(promotionService.getPromotionById).not.toHaveBeenCalled();
     });
 
-    it('dado una promocion sin productIds (undefined), deberia tratarla como sin productos', () => {
-      const promo = { discountPercentage: 10 } as unknown as Promotion;
-      promotionService.getPromotionById.and.returnValue(of(promo));
+    it('dado una promocion sin productIds (undefined), cuando toggle, deberia tratarla como sin productos', () => {
+      givenPromotionDelBack({ discountPercentage: 10 } as unknown as Promotion);
 
       component.togglePromoDetails('promo-1');
 
@@ -353,9 +355,8 @@ describe('OrderDetailsModalComponent', () => {
       expect(component.promosLoaded.get('promo-1')?.loading).toBeFalse();
     });
 
-    it('dado un forkJoin que emite error, deberia marcar error true en promosLoaded', () => {
-      const promo = { productIds: ['p1'], discountPercentage: 0 } as unknown as Promotion;
-      promotionService.getPromotionById.and.returnValue(of(promo));
+    it('dado un forkJoin que emite error, cuando toggle, deberia marcar error true en promosLoaded', () => {
+      givenPromotionDelBack(PromotionMother.crear({ productIds: ['p1'], discountPercentage: 0 }));
       const rareObservable = {
         pipe: () => throwError(() => new Error('forkjoin-boom')),
       } as unknown as ReturnType<typeof productService.getById>;
@@ -368,9 +369,8 @@ describe('OrderDetailsModalComponent', () => {
       expect(data?.loading).toBeFalse();
     });
 
-it('dado que un producto del forkJoin falla, deberia filtrarlo y quedar solo los validos', () => {
-      const promo = { productIds: ['p1', 'p2'], discountPercentage: 0 } as unknown as Promotion;
-      promotionService.getPromotionById.and.returnValue(of(promo));
+    it('dado que un producto del forkJoin falla, cuando toggle, deberia filtrarlo y quedar solo los validos', () => {
+      givenPromotionDelBack(PromotionMother.crear({ productIds: ['p1', 'p2'], discountPercentage: 0 }));
       productService.getById.and.callFake((id: string) => {
         if (id === 'p1') return of({ id: 'p1', precio: 100 } as unknown as Producto);
         return throwError(() => new Error('boom'));
@@ -385,26 +385,50 @@ it('dado que un producto del forkJoin falla, deberia filtrarlo y quedar solo los
   });
 
   describe('getPromoOriginalPrice / getPromoDiscountedPrice — fallbacks', () => {
-    it('dado un producto sin precio, no deberia sumarlo', () => {
-      component.promosLoaded.set('promo-1', {
-        promotion: { discountPercentage: 10 } as unknown as Promotion,
+    it('dado un producto sin precio, cuando pido el precio original, no deberia sumarlo', () => {
+      givenPromoCargadaCon({
+        promotion: PromotionMother.crear({ discountPercentage: 10 }),
         products: [{} as Producto, { precio: 500 } as Producto],
-        loading: false,
-        error: false,
       });
 
       expect(component.getPromoOriginalPrice('promo-1')).toBe(500);
     });
 
-    it('dado una promocion sin discountPercentage, deberia usar 0 (sin descuento)', () => {
-      component.promosLoaded.set('promo-1', {
+    it('dado una promocion sin discountPercentage, cuando pido el precio, deberia usar 0 (sin descuento)', () => {
+      givenPromoCargadaCon({
         promotion: {} as unknown as Promotion,
         products: [{ precio: 500 } as Producto],
-        loading: false,
-        error: false,
       });
 
       expect(component.getPromoDiscountedPrice('promo-1')).toBe(500);
     });
   });
+
+  function givenOrdenEnEstado(status: EstadoCompra): void {
+    component.order = ScheduledPickupMother.crear({ status });
+  }
+
+  function givenPromotionDelBack(promotion: Promotion): void {
+    promotionService.getPromotionById.and.returnValue(of(promotion));
+  }
+
+  function givenProductoDelBack(producto: Producto): void {
+    productService.getById.and.returnValue(of(producto));
+  }
+
+  function givenPromoCargadaCon(data: { promotion: Promotion | null; products: Producto[] }): void {
+    component.promosLoaded.set('promo-1', {
+      promotion: data.promotion,
+      products: data.products,
+      loading: false,
+      error: false,
+    });
+  }
+
+  function crearMouseEventCon(target: Element, currentTarget: Element): MouseEvent {
+    const event = new MouseEvent('click');
+    Object.defineProperty(event, 'target', { value: target });
+    Object.defineProperty(event, 'currentTarget', { value: currentTarget });
+    return event;
+  }
 });

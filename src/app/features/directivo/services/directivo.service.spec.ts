@@ -9,7 +9,17 @@ describe('DirectivoService', () => {
     service = TestBed.inject(DirectivoService);
   });
 
-  it('debería crearse correctamente', () => {
-    expect(service).toBeTruthy();
+  it('dado el TestBed configurado, cuando inyecto el service, deberia crearse correctamente', () => {
+    whenInyectoElService();
+
+    thenElServiceExiste();
   });
+
+  function whenInyectoElService(): DirectivoService {
+    return service;
+  }
+
+  function thenElServiceExiste(): void {
+    expect(service).toBeTruthy();
+  }
 });
