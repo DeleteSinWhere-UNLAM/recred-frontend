@@ -4,11 +4,35 @@ import { FormsModule } from '@angular/forms';
 import { SupplierService } from '../../services/supplier.service';
 import { ProductoService } from '../../../inventario/services/producto.service';
 import { Producto } from '../../../inventario/models/producto.interface';
-import { RecomendacionProveedor, AlternativaProveedor } from '../../models/proveedores.interfaces';
+import { RecomendacionProveedor } from '../../models/proveedores.interfaces';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { CurrencyPipe } from '@angular/common';
+
+export interface RecommendationOption {
+  proveedorId: string;
+  nombreProveedor: string;
+  precio: number;
+  unidad: string;
+  precioUnitario: number;
+  isRecommended: boolean;
+}
+
+export interface ChosenRecommendation {
+  supplierId: string;
+  supplierName: string;
+  price: number;
+  unit: string;
+  unitPrice: number;
+}
+
+export interface GroupedRecommendation {
+  nombreProducto: string;
+  mejorPrecio: number;
+  unidad: string;
+  mejorPrecioUnitario: number;
+}
 
 @Component({
   selector: 'app-purchase-recommendations',
@@ -38,8 +62,7 @@ export class PurchaseRecommendationsPage implements OnInit {
   mappedProductIds = signal<Set<string>>(new Set<string>());
   mappedFilter = signal<string>('TODOS');
 
-  // Chosen alternative suppliers state
-  chosenRecommendations = signal<Map<string, { supplierId: string; supplierName: string; price: number; unit: string; unitPrice: number }>>(new Map());
+  chosenRecommendations = signal<Map<string, ChosenRecommendation>>(new Map());
 
   // Alternatives Modal state
   isAlternativesModalOpen = signal<boolean>(false);
@@ -138,12 +161,18 @@ export class PurchaseRecommendationsPage implements OnInit {
     this.isAlternativesModalOpen.set(true);
   }
 
-  closeAlternativesModal(): void {
+  closeAlternativesModal(event?: Event): void {
+    if (event) {
+      const target = event.target as HTMLElement;
+      if (!target.classList.contains('modal-overlay')) {
+        return;
+      }
+    }
     this.isAlternativesModalOpen.set(false);
     this.activeAlternativesProductId.set(null);
   }
 
-  chooseAlternative(productId: string, option: any): void {
+  chooseAlternative(productId: string, option: RecommendationOption): void {
     const chosen = new Map(this.chosenRecommendations());
     chosen.set(productId, {
       supplierId: option.proveedorId,
@@ -157,11 +186,11 @@ export class PurchaseRecommendationsPage implements OnInit {
     this.closeAlternativesModal();
   }
 
-  getAllOptionsForProduct(productId: string): any[] {
+  getAllOptionsForProduct(productId: string): RecommendationOption[] {
     const rec = this.recommendations().find(r => r.productoInventarioId === productId);
     if (!rec) return [];
 
-    const options: any[] = [];
+    const options: RecommendationOption[] = [];
     if (rec.proveedorRecomendadoId) {
       options.push({
         proveedorId: rec.proveedorRecomendadoId,
@@ -189,7 +218,7 @@ export class PurchaseRecommendationsPage implements OnInit {
     return options;
   }
 
-  isCurrentChosenOption(productId: string, option: any): boolean {
+  isCurrentChosenOption(productId: string, option: RecommendationOption): boolean {
     const chosen = this.chosenRecommendations().get(productId);
     return !!(chosen && chosen.supplierId === option.proveedorId && chosen.price === option.precio && chosen.unit === option.unidad);
   }
@@ -330,7 +359,7 @@ export class PurchaseRecommendationsPage implements OnInit {
         this.recommendations.set(sorted);
 
         // Initialize chosen recommendations with backend suggestions
-        const chosenMap = new Map<string, any>();
+        const chosenMap = new Map<string, ChosenRecommendation>();
         results.forEach(rec => {
           if (rec.proveedorRecomendadoId) {
             chosenMap.set(rec.productoInventarioId, {
@@ -398,8 +427,8 @@ export class PurchaseRecommendationsPage implements OnInit {
     const chosen = this.chosenRecommendations();
 
     // Group chosen recommendations by supplier name
-    const grouped = new Map<string, any[]>();
-    const noQuote: any[] = [];
+    const grouped = new Map<string, GroupedRecommendation[]>();
+    const noQuote: RecomendacionProveedor[] = [];
 
     list.forEach(rec => {
       const chosenOpt = chosen.get(rec.productoInventarioId);

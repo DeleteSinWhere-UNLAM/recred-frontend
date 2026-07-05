@@ -152,7 +152,7 @@
 
       <!-- Right Column: Pricing Card (Separate, Aligned) -->
       @if (hasRecommendation(prod.id)) {
-        <article class="price-item" (click)="$event.stopPropagation()">
+        <article class="price-item">
           <div class="pricing-details">
             <div class="pricing-supplier">
               <span class="supplier-badge"><i class="fa-solid fa-truck-field"></i> {{ getChosenSupplierName(prod.id) }}</span>
@@ -178,7 +178,7 @@
           }
         </article>
       } @else if (hasNoQuote(prod.id)) {
-        <article class="price-item price-item--unquoted" (click)="$event.stopPropagation()">
+        <article class="price-item price-item--unquoted">
           <span class="badge-unquoted-small"><i class="fa-solid fa-triangle-exclamation"></i> Sin cotización</span>
         </article>
       } @else {
@@ -192,8 +192,8 @@
 
   <!-- Alternatives Modal -->
   @if (isAlternativesModalOpen() && activeAlternativesProductId()) {
-  <div class="modal-overlay" (click)="closeAlternativesModal()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
+  <div class="modal-overlay" (click)="closeAlternativesModal($event)" (keydown.enter)="closeAlternativesModal($event)" tabindex="0" role="button" aria-label="Cerrar modal">
+    <div class="modal-card">
       <header class="modal-header">
         <h3 class="modal-title">Alternativas para {{ getActiveProductName() }}</h3>
         <button class="modal-close-btn" (click)="closeAlternativesModal()" aria-label="Cerrar modal">
