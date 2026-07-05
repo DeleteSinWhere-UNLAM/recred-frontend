@@ -3,7 +3,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DirectivoPage } from './directivo.page';
 import { DirectivoPresenter } from './presenter/directivo.presenter';
 import { PerfilService } from '../../data-access/services/perfil.service';
-import { Perfil } from '../../data-access/models/perfil.model';
 import { DirectivoService } from './services/directivo.service';
 import { DirectivoMother } from './directivo.mother';
 import { By } from '@angular/platform-browser';
@@ -85,14 +84,5 @@ describe('DirectivoPage Integration', () => {
     });
   });
 
-  function givenPerfilDelDirectivo(perfil: Perfil): void {
-    perfilServiceSpy.cargarPerfil.and.resolveTo(perfil);
-  }
 
-  async function whenMontoYInicializo(): Promise<void> {
-    fixture = TestBed.createComponent(DirectivoPage);
-    fixture.componentInstance.ngOnInit();
-    await fixture.whenStable();
-    fixture.detectChanges();
-  }
 });
