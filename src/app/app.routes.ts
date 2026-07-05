@@ -225,12 +225,6 @@ export const routes: Routes = [
               ),
           },
           {
-            path: 'buffet',
-            canActivate: [alumnoContextoGuard],
-            loadComponent: () =>
-              import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
-          },
-          {
             path: 'favoritos',
             loadComponent: () =>
               import('./features/favoritos/favoritos.page').then(
@@ -253,11 +247,6 @@ export const routes: Routes = [
             path: 'habitos',
             loadComponent: () =>
               import('./features/habitos/habitos.page').then((m) => m.HabitosPage),
-          },
-          {
-            path: 'compra',
-            loadChildren: () =>
-              import('./features/compra/compra.routes').then((m) => m.compraRoutes),
           },
         ]
       },
@@ -352,6 +341,17 @@ export const routes: Routes = [
         canActivateChild: [rolChildGuard],
         data: { roles: ['PADRE', 'ALUMNO'] },
         children: [
+          {
+            path: 'buffet',
+            canActivate: [alumnoContextoGuard],
+            loadComponent: () =>
+              import('./features/buffet/buffet.page').then((m) => m.BuffetPage),
+          },
+          {
+            path: 'compra',
+            loadChildren: () =>
+              import('./features/compra/compra.routes').then((m) => m.compraRoutes),
+          },
           {
             path: 'billetera',
             loadComponent: () =>
