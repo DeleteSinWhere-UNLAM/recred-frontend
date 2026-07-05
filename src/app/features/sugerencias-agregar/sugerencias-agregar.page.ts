@@ -33,6 +33,6 @@ export class SugerenciasAgregarPage implements OnInit {
   }
 
   volver(): void {
-    this.router.navigateByUrl('/kiosquero');
+    this.router.navigateByUrl('/kiosquero/inteligencia-comercial');
   }
 }

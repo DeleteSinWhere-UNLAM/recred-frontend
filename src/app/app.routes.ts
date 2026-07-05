@@ -301,6 +301,20 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'kiosquero/inteligencia-comercial',
+            loadComponent: () =>
+              import('./features/inteligencia-comercial/inteligencia-comercial.page').then(
+                (m) => m.InteligenciaComercialPage,
+              ),
+          },
+          {
+            path: 'kiosquero/sugerencias',
+            loadComponent: () =>
+              import('./features/sugerencias/sugerencias.page').then(
+                (m) => m.SugerenciasPage,
+              ),
+          },
+          {
             path: 'cargar-producto-ia',
             loadChildren: () =>
               import('./features/cargar-producto-ia/cargar-producto-ia.routes').then(
