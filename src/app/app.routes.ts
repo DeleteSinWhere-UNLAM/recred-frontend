@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 import { authChildGuard } from './core/auth/guards/auth.guard';
 import { alumnoContextoGuard } from './core/guards/alumno-contexto.guard';
-import { rolChildGuard, wildcardRedirectGuard } from './core/auth/guards/rol.guard';
-import { adminGuard } from './core/guards/admin.guard';
+import { rolGuard, rolChildGuard, wildcardRedirectGuard } from './core/auth/guards/rol.guard';
 
 export const routes: Routes = [
   {
@@ -18,13 +17,15 @@ export const routes: Routes = [
   },
   {
     path: 'recred-admin',
-    canActivate: [authChildGuard, adminGuard],
+    canActivate: [authChildGuard, rolGuard],
+    data: { roles: ['ADMIN'] },
     loadComponent: () =>
       import('./features/recred-admin/recred-admin.page').then((m) => m.RecredAdminPage),
   },
   {
     path: 'directivo',
-    canActivate: [authChildGuard],
+    canActivate: [authChildGuard, rolGuard],
+    data: { roles: ['DIRECTIVO_COLEGIO'] },
     loadComponent: () =>
       import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
   },
@@ -196,13 +197,6 @@ export const routes: Routes = [
               ),
           },
           {
-            path: 'suscripcion',
-            loadComponent: () =>
-              import('./features/premium-plans/premium-plans.page').then(
-                (m) => m.PremiumPlansPage,
-              ),
-          },
-          {
             path: 'notificaciones-precio',
             loadComponent: () =>
               import('./features/notificaciones-precio/notificaciones-precio.page').then(
@@ -229,13 +223,6 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./features/favoritos/favoritos.page').then(
                 (m) => m.FavoritosPage,
-              ),
-          },
-          {
-            path: 'sugerencias',
-            loadComponent: () =>
-              import('./features/sugerencias/sugerencias.page').then(
-                (m) => m.SugerenciasPage,
               ),
           },
           {
@@ -331,6 +318,28 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./features/sugerencias-agregar/sugerencias-agregar.page').then(
                 (m) => m.SugerenciasAgregarPage,
+              ),
+          },
+          {
+            path: 'sugerencias',
+            loadComponent: () =>
+              import('./features/sugerencias/sugerencias.page').then(
+                (m) => m.SugerenciasPage,
+              ),
+          },
+        ]
+      },
+
+      {
+        path: '',
+        canActivateChild: [rolChildGuard],
+        data: { roles: ['PADRE', 'VENDEDOR'] },
+        children: [
+          {
+            path: 'suscripcion',
+            loadComponent: () =>
+              import('./features/premium-plans/premium-plans.page').then(
+                (m) => m.PremiumPlansPage,
               ),
           },
         ]
