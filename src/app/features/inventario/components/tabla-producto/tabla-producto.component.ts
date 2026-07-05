@@ -38,9 +38,9 @@ export class TablaProductoComponent {
 
   getModeLabel(mode: TipoManejoInventario): string {
     const labels: Record<TipoManejoInventario, string> = {
-      STOCK_EXACTO: 'Stock exacto',
+      STOCK_EXACTO: 'Control por unidades',
       DISPONIBLE_NO_DISPONIBLE: 'Disponible / No disponible',
-      CUPO_DIARIO: 'Cupo diario',
+      CUPO_DIARIO: 'Límite diario de venta',
     };
 
     return labels[mode];
@@ -91,17 +91,83 @@ export class TablaProductoComponent {
   }
 
   getAvailabilityLabel(product: ItemResumenInventario): string {
-    return product.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE'
-      ? 'Estado operativo'
-      : 'Disponible';
+    if (product.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE') {
+      return 'Estado operativo';
+    }
+
+    if (product.tipoManejoInventario === 'CUPO_DIARIO') {
+      return 'Disponible hoy';
+    }
+
+    return 'Disponible';
   }
 
   getAvailabilityPercent(product: ItemResumenInventario): number {
+    if (product.tipoManejoInventario === 'CUPO_DIARIO') {
+      return this.getDailyQuotaPercent(product);
+    }
+
     return Math.round(obtenerRatioDisponibilidad(product) * 100);
+  }
+
+  getAvailabilityBarLabel(product: ItemResumenInventario): string {
+    return `${this.getAvailabilityLabel(product)} ${this.getAvailabilityPercent(product)}%`;
   }
 
   getReservationPercent(product: ItemResumenInventario): number {
     return Math.round(obtenerRatioReserva(product) * 100);
+  }
+
+  getAvailabilitySecondaryStartLabel(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? 'Usado hoy'
+      : 'Reservado';
+  }
+
+  getAvailabilitySecondaryStartValue(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? this.formatNullable(this.getDailyQuotaUsed(product))
+      : this.formatNullable(product.stockReservado);
+  }
+
+  getAvailabilitySecondaryEndLabel(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO' ? 'Límite' : 'Total';
+  }
+
+  getAvailabilitySecondaryEndValue(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? this.formatNullable(product.cupoMaximoDiario)
+      : this.getAvailabilityBase(product);
+  }
+
+  getPrimaryStockMetricLabel(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? 'Stock físico'
+      : 'Stock actual';
+  }
+
+  getSecondaryStockMetricLabel(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? 'Reservado'
+      : 'Alerta en';
+  }
+
+  getSecondaryStockMetricValue(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? this.formatNullable(product.stockReservado)
+      : this.formatNullable(product.stockMinimo);
+  }
+
+  getTertiaryStockMetricLabel(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? 'Alerta en'
+      : 'Reserva';
+  }
+
+  getTertiaryStockMetricValue(product: ItemResumenInventario): string {
+    return product.tipoManejoInventario === 'CUPO_DIARIO'
+      ? this.formatNullable(product.stockMinimo)
+      : `${this.getReservationPercent(product)}%`;
   }
 
   getAvailabilityBase(product: ItemResumenInventario): string {
@@ -148,6 +214,34 @@ export class TablaProductoComponent {
     return value !== null && value !== undefined && Number.isFinite(value) && value > 0
       ? value
       : 0;
+  }
+
+  private getDailyQuotaPercent(product: ItemResumenInventario): number {
+    const max = this.getNumericStock(product.cupoMaximoDiario);
+
+    if (max <= 0) {
+      return 0;
+    }
+
+    const available = Math.min(this.getNumericStock(product.cupoDisponibleDia), max);
+
+    return Math.round((available / max) * 100);
+  }
+
+  private getDailyQuotaUsed(product: ItemResumenInventario): number | null {
+    if (
+      product.cupoMaximoDiario === null ||
+      product.cupoDisponibleDia === null ||
+      !Number.isFinite(product.cupoMaximoDiario) ||
+      !Number.isFinite(product.cupoDisponibleDia)
+    ) {
+      return null;
+    }
+
+    const max = Math.max(product.cupoMaximoDiario, 0);
+    const available = Math.min(Math.max(product.cupoDisponibleDia, 0), max);
+
+    return max - available;
   }
 }
 

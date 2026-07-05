@@ -153,11 +153,11 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   readonly inventoryModeOptions: OpcionModoInventario[] = [
     {
       id: 'STOCK_EXACTO',
-      label: 'Stock exacto',
+      label: 'Control por unidades',
     },
     {
       id: 'CUPO_DIARIO',
-      label: 'Cupo diario',
+      label: 'Límite diario de venta',
     },
     {
       id: 'DISPONIBLE_NO_DISPONIBLE',
@@ -961,7 +961,6 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     return 'Ocurrió un error inesperado al actualizar el inventario.';
   }
 }
-
 
 
 
