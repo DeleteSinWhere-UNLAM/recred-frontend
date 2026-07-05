@@ -14,25 +14,25 @@
       @if (!esVistaAlumno() && !esVistaKiosquero()) {
       <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-        <span>Panel de Control</span>
+        <span class="max-xl:hidden">Panel de Control</span>
         @if (esPremium()) {
         <span class="pv__premium-badge">AVANZADO</span>
         }
       </a>
       <a class="navbar__movimientos-link" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" tabindex="0" style="cursor: pointer;">
         <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-        <span>Ver movimientos</span>
+        <span class="max-xl:hidden">Ver movimientos</span>
       </a>
       <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']">
         <i class="fa-regular fa-heart" aria-hidden="true"></i>
-        <span>Carritos Favoritos</span>
+        <span class="max-xl:hidden">Carritos Favoritos</span>
       </a>
       }
 
       @if (esVistaKiosquero()) {
       <a class="navbar__kiosk-link navbar__kiosk-link--premium" [routerLink]="['/kiosquero/reportes']">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-        <span>Panel de control</span>
+        <span class="max-xl:hidden">Panel de control</span>
         <span class="navbar__premium-badge">AVANZADO</span>
       </a>
       <div class="navbar__kiosk-tools-wrap">

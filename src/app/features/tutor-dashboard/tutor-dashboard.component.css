@@ -1,13 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-.tutor-dashboard {
-  font-family: 'Inter', sans-serif;
-  padding: 1.5rem;
-  background: var(--body-gradient), var(--color-fondo);
-  min-height: 100vh;
-  color: var(--color-texto-oscuro);
-}
-
 /* Dashboard Top Actions */
 .dashboard-top-actions {
   display: flex;
@@ -1171,11 +1163,7 @@
   background-color: rgba(242, 183, 5, 0.4) !important;
 }
 
-@media (max-width: 768px) {
-  .tutor-dashboard {
-    padding: 1rem;
-  }
-}
+
 
 @media (max-width: 600px) {
   .global-header {
