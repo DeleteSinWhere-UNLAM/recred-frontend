@@ -1,8 +1,11 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartData, ChartType, Chart } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
 import { Movimiento } from '../../../movimientos/models/movimiento.model';
+
+Chart.register(zoomPlugin);
 
 @Component({
   selector: 'app-tendencia-card',
@@ -18,6 +21,21 @@ export class TendenciaCardComponent implements OnChanges {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: 'x'
+        },
+        zoom: {
+          wheel: {
+            enabled: true
+          },
+          pinch: {
+            enabled: true
+          },
+          mode: 'x'
+        }
+      },
       legend: { display: false },
       tooltip: {
         callbacks: {
