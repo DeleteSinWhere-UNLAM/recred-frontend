@@ -8,6 +8,8 @@ import {
   PerfilService,
   UsuarioSinPerfilError,
 } from '../../data-access/services/perfil.service';
+import { InvitacionTokenStorageService } from '../aceptar-invitacion-tutor/services/invitacion-token-storage.service';
+import { InvitacionesTutorService } from '../directivo/services/invitaciones-tutor.service';
 import { LandingCtaButtonComponent } from './components/landing-cta-button/landing-cta-button.component';
 import { LandingPresenter } from './presenter/landing.presenter';
 
@@ -33,8 +35,11 @@ export class LandingPage implements OnInit, OnDestroy {
   private readonly perfilService = inject(PerfilService);
   private readonly alumnosService = inject(AlumnosService);
   private readonly router = inject(Router);
+  private readonly invitacionTokenStorage = inject(InvitacionTokenStorageService);
+  private readonly invitacionesTutorService = inject(InvitacionesTutorService);
 
   protected readonly cargando = signal<boolean>(true);
+  protected readonly errorInvitacion = signal<string | null>(null);
 
   private hubUnsubscribe?: () => void;
   private redirigiendo = false;
@@ -107,7 +112,24 @@ export class LandingPage implements OnInit, OnDestroy {
       return;
     }
 
+    await this.consumirInvitacionTutorPendiente();
     await this.redirigirSegunPerfil();
+  }
+
+  private async consumirInvitacionTutorPendiente(): Promise<void> {
+    const token = this.invitacionTokenStorage.leer();
+    if (!token) return;
+
+    try {
+      await this.invitacionesTutorService.aceptarInvitacion(token);
+    } catch (err) {
+      console.error('Error aceptando invitación de tutor', err);
+      this.errorInvitacion.set(
+        'No pudimos asociar tu invitación. Verificá que estés usando el mismo email al que se envió el mail.',
+      );
+    } finally {
+      this.invitacionTokenStorage.limpiar();
+    }
   }
 
   protected onCtaClick(): void {

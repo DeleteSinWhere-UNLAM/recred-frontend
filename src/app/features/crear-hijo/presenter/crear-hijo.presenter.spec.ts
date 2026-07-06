@@ -24,7 +24,7 @@ describe('CrearHijoPresenter', () => {
   beforeEach(() => {
     servicioAlumnos = jasmine.createSpyObj<AlumnosService>('AlumnosService', ['crearHijo']);
     servicioColegios = jasmine.createSpyObj<ColegiosService>('ColegiosService', [
-      'obtenerColegios',
+      'obtenerColegiosDelTutor',
       'obtenerGradosPorColegio',
     ]);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
@@ -80,7 +80,7 @@ describe('CrearHijoPresenter', () => {
 
       expect(presenter.colegios()).toEqual([]);
       expect(presenter.cargandoColegios()).toBeFalse();
-      thenSeMostroToast('No se pudieron cargar los colegios.', 'error');
+      thenSeMostroToast('No se pudieron cargar tus colegios asociados.', 'error');
     });
   });
 
@@ -175,7 +175,7 @@ describe('CrearHijoPresenter', () => {
   });
 
   function givenColegiosDelBack(colegios: ReturnType<typeof ColegioMother.crearLista>): void {
-    servicioColegios.obtenerColegios.and.resolveTo(colegios);
+    servicioColegios.obtenerColegiosDelTutor.and.resolveTo(colegios);
   }
 
   function givenGradosDelBack(grados: ReturnType<typeof GradoMother.crearLista>): void {
@@ -183,7 +183,7 @@ describe('CrearHijoPresenter', () => {
   }
 
   function givenQueElBackDeColegiosFalla(): void {
-    servicioColegios.obtenerColegios.and.rejectWith(new HttpErrorResponse({ status: 500 }));
+    servicioColegios.obtenerColegiosDelTutor.and.rejectWith(new HttpErrorResponse({ status: 500 }));
   }
 
   function givenQueElBackDeGradosFalla(): void {
@@ -230,7 +230,7 @@ describe('CrearHijoPresenter', () => {
   }
 
   function thenSeLlamoObtenerColegiosVecesIgualA(cantidad: number): void {
-    expect(servicioColegios.obtenerColegios).toHaveBeenCalledTimes(cantidad);
+    expect(servicioColegios.obtenerColegiosDelTutor).toHaveBeenCalledTimes(cantidad);
   }
 
   function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error'): void {

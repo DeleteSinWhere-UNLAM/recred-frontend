@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  effect,
   inject,
   computed,
 } from '@angular/core';
@@ -103,6 +104,13 @@ export class CrearHijoPage implements OnInit {
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
     this.usuarioService.setNombreNavbar(this.nombreUsuario);
+
+    effect(() => {
+      const colegios = this.presenter.colegios();
+      if (colegios.length === 1 && !this.form.controls.colegioId.value) {
+        this.form.controls.colegioId.setValue(colegios[0].id);
+      }
+    });
   }
 
   ngOnInit(): void {

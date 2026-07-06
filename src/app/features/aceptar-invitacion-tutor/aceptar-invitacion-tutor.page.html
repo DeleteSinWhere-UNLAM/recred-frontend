@@ -1,0 +1,59 @@
+<div class="page">
+  <div class="page__container">
+    <header class="brand">
+      <span class="brand__logo">RC</span>
+      <span class="brand__name">Recred</span>
+    </header>
+
+    @if (presenter.loading()) {
+      <section class="card card--estado" role="status">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <h1>Validando tu invitación...</h1>
+      </section>
+    } @else if (presenter.error(); as errorMsg) {
+      <section class="card card--estado card--error" role="alert">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <h1>No podemos usar este link</h1>
+        <p>{{ errorMsg }}</p>
+      </section>
+    } @else if (presenter.invitacion(); as invitacion) {
+      <section class="card">
+        <div class="card__hero">
+          <i class="fa-solid fa-envelope-open-text"></i>
+          <h1>¡Bienvenida/o a Recred!</h1>
+          <p>
+            <strong>{{ invitacion.schoolName }}</strong> te invitó a asociarte como tutor.
+          </p>
+        </div>
+
+        <dl class="datos">
+          <div>
+            <dt>Colegio</dt>
+            <dd>{{ invitacion.schoolName }}</dd>
+          </div>
+          <div>
+            <dt>Email invitado</dt>
+            <dd>{{ invitacion.email }}</dd>
+          </div>
+        </dl>
+
+        <div class="aviso">
+          <i class="fa-solid fa-circle-info"></i>
+          <p>
+            Vas a iniciar sesión o registrarte con el email <strong>{{ invitacion.email }}</strong>.
+            Usá ese mismo email para que podamos asociarte al colegio.
+          </p>
+        </div>
+
+        <button type="button" class="btn btn--primary" (click)="onIniciarLogin()">
+          Continuar con Recred
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <p class="pie">
+          Si ya tenés cuenta, iniciá sesión con el mismo email para agregar este colegio.
+        </p>
+      </section>
+    }
+  </div>
+</div>

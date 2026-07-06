@@ -11,6 +11,12 @@
   </div>
 } @else {
   <div class="landing-container">
+    @if (errorInvitacion(); as errMsg) {
+      <div class="landing__aviso-error" role="alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ errMsg }}</span>
+      </div>
+    }
     <div class="landing">
     <header class="landing__header">
       <img

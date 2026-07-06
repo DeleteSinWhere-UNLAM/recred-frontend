@@ -24,11 +24,11 @@ describe('CrearHijoPage', () => {
 
   beforeEach(async () => {
     servicioColegios = jasmine.createSpyObj<ColegiosService>('ColegiosService', [
-      'obtenerColegios',
+      'obtenerColegiosDelTutor',
       'obtenerGradosPorColegio',
       'getColegios',
     ]);
-    servicioColegios.obtenerColegios.and.resolveTo(ColegioMother.crearLista());
+    servicioColegios.obtenerColegiosDelTutor.and.resolveTo(ColegioMother.crearLista());
     servicioColegios.obtenerGradosPorColegio.and.resolveTo(GradoMother.crearLista());
     servicioColegios.getColegios.and.returnValue(ColegioMother.crearLista());
 
