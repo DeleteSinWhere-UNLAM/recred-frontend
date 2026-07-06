@@ -115,34 +115,34 @@ export class FavoritosService {
     };
   }
 
-  private obtenerImagenProducto(nombre: string): string {
+  obtenerImagenProducto(nombre: string): string {
     const n = nombre.toLowerCase();
     if (n.includes('coca') || n.includes('gaseosa')) {
-      return 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Coca-Cola_glass_bottle.jpg';
     }
     if (n.includes('agua')) {
-      return 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Bottled_water.jpg';
     }
     if (n.includes('sandwich') || n.includes('tostado')) {
-      return 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Ham_and_cheese_sandwich.jpg';
     }
     if (n.includes('empanada')) {
-      return 'https://resizer.glanacion.com/resizer/v2/12072023-empanadas-argentinas-de-sabores-express-BUHGBZQ5FVAITHTZSF3WOFNTFA?auth=f3392dcb14acedb9c3b4a0cf827c58b6c35708303fb388f708f46599c8ac1ac4&width=768&height=576&quality=70&smart=true';
+      return 'https://upload.wikimedia.org/wikipedia/commons/0/07/Empanadas_tucumanas.jpg';
     }
     if (n.includes('alfajor') || n.includes('cookie') || n.includes('factura') || n.includes('medialuna')) {
-      return 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/2/22/Alfajores_de_maicena_y_dulce_de_leche.jpg';
     }
     if (n.includes('cereal') || n.includes('turron') || n.includes('barra')) {
-      return 'https://images.unsplash.com/photo-1571748982800-fa51082c2224?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/3/30/Cereal_bar.jpg';
     }
     if (n.includes('yogur')) {
-      return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Yogurt_with_strawberries.jpg';
     }
     if (n.includes('manzana') || n.includes('fruta')) {
-      return 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg';
     }
     if (n.includes('pizza')) {
-      return 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80';
+      return 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg';
     }
     return '';
   }

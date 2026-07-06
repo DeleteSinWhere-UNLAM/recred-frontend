@@ -42,14 +42,21 @@ export class EstadisticaPresenter {
     return nivelAlertaDePorcentaje(p.porcentajePresupuesto);
   });
 
-  init(alumnoId: string): void {
+  async init(alumnoId: string): Promise<void> {
     const alumno = this.alumnosService.getAlumnoById(alumnoId);
     if (!alumno) {
       this.router.navigateByUrl('/tutor');
       return;
     }
     this.alumnoState.set(alumno);
-    this.prediccionState.set(this.presupuestoService.getPrediccion(alumnoId));
+    
+    try {
+      const prediccion = await this.presupuestoService.cargarPrediccion(alumnoId, 'MENSUAL');
+      this.prediccionState.set(prediccion);
+    } catch (e) {
+      console.error('Error al cargar la predicción:', e);
+      this.prediccionState.set(undefined);
+    }
   }
 
   volver(): void {

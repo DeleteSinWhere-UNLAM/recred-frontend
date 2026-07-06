@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 
@@ -20,10 +20,15 @@ export class PreferenciasPage {
   private readonly usuarioService = inject(UsuarioService);
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
 
   preferencias: Preferencia[] = [];
+
+  get alumnoId(): string | undefined {
+    return this.contextoService.alumnoId() || undefined;
+  }
 
   constructor() {
     this.usuarioService.setHomeUrl('/tutor');
@@ -31,7 +36,8 @@ export class PreferenciasPage {
     effect(() => {
       const alumnoId = this.contextoService.alumnoId() || undefined;
       this.preferenciasService.getPreferencias(alumnoId).subscribe((data) => {
-        this.preferencias = data;
+        this.preferencias = data ?? [];
+        this.cdr.markForCheck();
       });
     });
   }
