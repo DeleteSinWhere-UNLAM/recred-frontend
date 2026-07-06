@@ -4,6 +4,7 @@ import { firstValueFrom, of, throwError } from 'rxjs';
 import { PromotionService, Promotion } from '../../../data-access/services/promociones/promotion.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ProductoService } from '../../inventario/services/producto.service';
+import { SugerenciaProducto } from '../models/sugerencia-producto.model';
 import { SugerenciasService } from '../services/sugerencias.service';
 import {
   ComboSuggestionMother,
@@ -47,9 +48,9 @@ describe('SugerenciasPresenter', () => {
   });
 
   describe('initialize', () => {
-    it('dadas dos sugerencias del back, cuando inicializo, deberia emitirlas y seleccionar la primera', async () => {
+    it('dado dos sugerencias del back, cuando inicializo, deberia emitirlas y seleccionar la primera', async () => {
       const sugerencias = SugerenciaProductoMother.crearVarias();
-      servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
+      givenSugerenciasDelBack(sugerencias);
 
       presenter.initialize('user-1');
 
@@ -62,8 +63,8 @@ describe('SugerenciasPresenter', () => {
       expect(presenter.productoMasCritico?.productoOriginal).toBe('Producto 2');
     });
 
-    it('dada una lista vacia del back, cuando inicializo, no deberia seleccionar ningun producto', async () => {
-      servicioSugerencias.getSugerencias.and.returnValue(of([]));
+    it('dado una lista vacia del back, cuando inicializo, no deberia seleccionar ningun producto', async () => {
+      givenSugerenciasDelBack([]);
 
       presenter.initialize('user-1');
 
@@ -75,7 +76,7 @@ describe('SugerenciasPresenter', () => {
   });
 
   describe('openComboPromotionModal', () => {
-    it('dada una sugerencia seleccionada, cuando abro el modal, deberia pedir combos y abrirlo', async () => {
+    it('dado una sugerencia seleccionada, cuando abro el modal, deberia pedir combos y abrirlo', async () => {
       presenter.seleccionarProducto(SugerenciaProductoMother.crear());
       servicioSugerencias.getComboSuggestions.and.returnValue(of(ComboSuggestionMother.crear()));
 
@@ -110,7 +111,7 @@ describe('SugerenciasPresenter', () => {
       productIds: ['c1'],
     };
 
-    it('dada una promocion valida, cuando genero, deberia crearla, notificar y redirigir a /promociones', async () => {
+    it('dado una promocion valida, cuando genero, deberia crearla, notificar y redirigir a /promociones', async () => {
       presenter.seleccionarProducto(SugerenciaProductoMother.crear());
       servicioProducto.getById.and.returnValue(of(ProductoMother.crear()));
       servicioPromociones.createPromotion.and.returnValue(of({} as Promotion));
@@ -142,8 +143,8 @@ describe('SugerenciasPresenter', () => {
   });
 
   describe('graficos', () => {
-    it('dadas dos sugerencias, cuando pido chartDiasSinVenta, deberia ordenar por dias descendente con porcentajes', () => {
-      servicioSugerencias.getSugerencias.and.returnValue(of(SugerenciaProductoMother.crearVarias()));
+    it('dado dos sugerencias, cuando pido chartDiasSinVenta, deberia ordenar por dias descendente con porcentajes', () => {
+      givenSugerenciasDelBack(SugerenciaProductoMother.crearVarias());
       presenter.initialize('user-1');
 
       const chart = presenter.chartDiasSinVenta;
@@ -155,8 +156,8 @@ describe('SugerenciasPresenter', () => {
       expect(chart[1].percent).toBe(50);
     });
 
-    it('dadas dos sugerencias, cuando pido chartStockVsVentas, deberia calcular porcentajes relativos al maximo', () => {
-      servicioSugerencias.getSugerencias.and.returnValue(of(SugerenciaProductoMother.crearVarias()));
+    it('dado dos sugerencias, cuando pido chartStockVsVentas, deberia calcular porcentajes relativos al maximo', () => {
+      givenSugerenciasDelBack(SugerenciaProductoMother.crearVarias());
       presenter.initialize('user-1');
 
       const chart = presenter.chartStockVsVentas;
@@ -168,12 +169,16 @@ describe('SugerenciasPresenter', () => {
       expect(chart[0].ventasPercent).toBe(50);
     });
 
-    it('dada una lista vacia, cuando pido los graficos, deberia devolver arrays vacios', () => {
-      servicioSugerencias.getSugerencias.and.returnValue(of([]));
+    it('dado una lista vacia, cuando pido los graficos, deberia devolver arrays vacios', () => {
+      givenSugerenciasDelBack([]);
       presenter.initialize('user-1');
 
       expect(presenter.chartDiasSinVenta).toEqual([]);
       expect(presenter.chartStockVsVentas).toEqual([]);
     });
   });
+
+  function givenSugerenciasDelBack(sugerencias: SugerenciaProducto[]): void {
+    servicioSugerencias.getSugerencias.and.returnValue(of(sugerencias));
+  }
 });

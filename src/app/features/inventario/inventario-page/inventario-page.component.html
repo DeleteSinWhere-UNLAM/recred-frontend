@@ -166,6 +166,7 @@
         [categories]="categories"
         [isSaving]="isSaving"
         [buffetId]="buffetId"
+        [datosIniciales]="datosInicialesProducto"
         (formSubmit)="handleFormSubmit($event)"
         (formCancel)="closeForm()">
       </app-product-form>
@@ -241,7 +242,7 @@
                 (click)="applyInventoryManagementShortcut('PAUSE')"
               >
                 <i class="fa-solid fa-pause" aria-hidden="true"></i>
-                <span>Pausar</span>
+                <span>Pausar venta</span>
               </button>
               <button
                 type="button"
@@ -249,7 +250,7 @@
                 (click)="applyInventoryManagementShortcut('SOLD_OUT')"
               >
                 <i class="fa-solid fa-ban" aria-hidden="true"></i>
-                <span>Agotar</span>
+                <span>Marcar agotado</span>
               </button>
             </div>
 
@@ -269,7 +270,7 @@
                     type="number"
                     min="0"
                     step="1"
-                    placeholder="Conservar"
+                    placeholder="Dejar igual"
                   >
                   @if (hasInventoryManagementError('stockActual')) {
                     <span class="quick-action-modal__error">Ingresa stock actual</span>
@@ -290,7 +291,7 @@
                     type="number"
                     min="0"
                     step="1"
-                    placeholder="Conservar"
+                    placeholder="Dejar igual"
                   >
                   @if (hasInventoryManagementError('stockMinimo')) {
                     <span class="quick-action-modal__error">Ingresa una cantidad</span>
@@ -314,7 +315,7 @@
                   type="number"
                   min="0"
                   step="1"
-                  placeholder="Conservar"
+                  placeholder="Dejar igual"
                 >
                 @if (hasInventoryManagementError('cupoMaximoDiario')) {
                   <span class="quick-action-modal__error">Ingresa un cupo válido</span>
@@ -334,7 +335,7 @@
             }
 
             <div class="quick-action-modal__group">
-              <label for="inventory-management-motivo" class="quick-action-modal__label">Motivo</label>
+              <label for="inventory-management-motivo" class="quick-action-modal__label">Nota del cambio</label>
               <textarea
                 id="inventory-management-motivo"
                 class="quick-action-modal__textarea"
@@ -409,7 +410,7 @@
 
           <div class="stock-history-modal__summary" aria-label="Stock actual del producto">
             <div>
-              <span>Actual</span>
+              <span>Stock actual</span>
               <strong>{{ formatStockMovementNumber(target.stockActual) }}</strong>
             </div>
             <div>

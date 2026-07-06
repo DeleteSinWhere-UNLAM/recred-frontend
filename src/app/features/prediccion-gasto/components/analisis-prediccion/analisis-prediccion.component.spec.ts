@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AnalisisIa } from '../../models/analisis-ia.interface';
 import {
   AnalisisIaMother,
   CategoriaMasConsumidaMother,
@@ -20,11 +21,11 @@ describe('AnalisisPrediccionComponent', () => {
 
   describe('categorias mas consumidas', () => {
     it('dado categorias, cuando renderizo, deberia mostrar la descripcion y el monto de cada una', () => {
-      component.categoriasMasConsumidas = [
+      givenCategorias([
         CategoriaMasConsumidaMother.crear({ descripcion: 'Bebidas', montoTotal: 1500 }),
         CategoriaMasConsumidaMother.crear({ descripcion: 'Snacks', montoTotal: 800 }),
-      ];
-      component.analisisIa = AnalisisIaMother.crear();
+      ]);
+      givenAnalisisIa(AnalisisIaMother.crear());
       fixture.detectChanges();
 
       const texto = textoRenderizado();
@@ -34,9 +35,9 @@ describe('AnalisisPrediccionComponent', () => {
       expect(texto).toContain('800.00');
     });
 
-    it('dado sin categorias, deberia mostrar el mensaje de "No hay suficientes datos"', () => {
-      component.categoriasMasConsumidas = [];
-      component.analisisIa = AnalisisIaMother.crear();
+    it('dado sin categorias, cuando renderizo, deberia mostrar el mensaje de "No hay suficientes datos"', () => {
+      givenCategorias([]);
+      givenAnalisisIa(AnalisisIaMother.crear());
       fixture.detectChanges();
 
       expect(textoRenderizado()).toContain('No hay suficientes datos de categorías');
@@ -45,10 +46,10 @@ describe('AnalisisPrediccionComponent', () => {
 
   describe('analisis IA', () => {
     it('dado analisisIa, cuando renderizo, deberia mostrar el resumen y el modelo', () => {
-      component.analisisIa = AnalisisIaMother.crear({
+      givenAnalisisIa(AnalisisIaMother.crear({
         resumen: 'Estas dentro del presupuesto.',
         modelo: 'gpt-4o-mini',
-      });
+      }));
       fixture.detectChanges();
 
       const texto = textoRenderizado();
@@ -56,8 +57,8 @@ describe('AnalisisPrediccionComponent', () => {
       expect(texto).toContain('gpt-4o-mini');
     });
 
-    it('dado alertas, deberia renderizar el bloque "Alertas" con cada item', () => {
-      component.analisisIa = AnalisisIaMother.crearConAlertas();
+    it('dado alertas en el analisis, cuando renderizo, deberia renderizar el bloque "Alertas" con cada item', () => {
+      givenAnalisisIa(AnalisisIaMother.crearConAlertas());
       fixture.detectChanges();
 
       const texto = textoRenderizado();
@@ -65,17 +66,17 @@ describe('AnalisisPrediccionComponent', () => {
       expect(texto).toContain('Categoria Golosinas supera el 60%');
     });
 
-    it('dado sin alertas, no deberia renderizar el bloque de Alertas', () => {
-      component.analisisIa = AnalisisIaMother.crearVacio();
+    it('dado sin alertas, cuando renderizo, no deberia mostrar el bloque de Alertas', () => {
+      givenAnalisisIa(AnalisisIaMother.crearVacio());
       fixture.detectChanges();
 
       expect(queryUno('.prediction-analysis__lista--alerta')).toBeNull();
     });
 
-    it('dado recomendaciones, deberia renderizar el bloque "Recomendaciones" con cada item', () => {
-      component.analisisIa = AnalisisIaMother.crear({
+    it('dado recomendaciones, cuando renderizo, deberia mostrar el bloque "Recomendaciones" con cada item', () => {
+      givenAnalisisIa(AnalisisIaMother.crear({
         recomendaciones: ['Reducir bebidas azucaradas', 'Aumentar frutas'],
-      });
+      }));
       fixture.detectChanges();
 
       const texto = textoRenderizado();
@@ -84,13 +85,21 @@ describe('AnalisisPrediccionComponent', () => {
       expect(texto).toContain('Aumentar frutas');
     });
 
-    it('dado analisisIa null, deberia mostrar el mensaje de "No hay un análisis disponible"', () => {
-      component.analisisIa = null;
+    it('dado analisisIa null, cuando renderizo, deberia mostrar el mensaje de "No hay un análisis disponible"', () => {
+      givenAnalisisIa(null);
       fixture.detectChanges();
 
       expect(textoRenderizado()).toContain('No hay un análisis disponible');
     });
   });
+
+  function givenCategorias(categorias: ReturnType<typeof CategoriaMasConsumidaMother.crear>[]): void {
+    component.categoriasMasConsumidas = categorias;
+  }
+
+  function givenAnalisisIa(analisis: AnalisisIa | null): void {
+    component.analisisIa = analisis;
+  }
 
   function textoRenderizado(): string {
     return (fixture.nativeElement as HTMLElement).textContent ?? '';

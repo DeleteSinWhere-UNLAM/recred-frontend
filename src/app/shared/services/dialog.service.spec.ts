@@ -11,64 +11,59 @@ describe('DialogService', () => {
 
   describe('confirm', () => {
     it('dado el service, cuando llamo confirm, deberia activar el dialog con showCancel true y titulo default "Confirmar"', () => {
-      void service.confirm('¿Seguro?');
+      whenLlamoConfirm('¿Seguro?');
 
-      const active = service.activeDialog();
-      expect(active).not.toBeNull();
-      expect(active?.title).toBe('Confirmar');
-      expect(active?.message).toBe('¿Seguro?');
-      expect(active?.confirmText).toBe('Aceptar');
-      expect(active?.cancelText).toBe('Cancelar');
-      expect(active?.showCancel).toBeTrue();
+      thenElDialogActivoTiene({
+        title: 'Confirmar',
+        message: '¿Seguro?',
+        confirmText: 'Aceptar',
+        cancelText: 'Cancelar',
+        showCancel: true,
+      });
     });
 
-    it('dado textos custom, deberia guardarlos en el dialog activo', () => {
-      void service.confirm('Ir?', 'Salir', 'Sí, salir', 'Cancelar');
+    it('dado textos custom, cuando llamo confirm, deberia guardarlos en el dialog activo', () => {
+      whenLlamoConfirm('Ir?', 'Salir', 'Sí, salir', 'Cancelar');
 
-      const active = service.activeDialog();
-      expect(active?.title).toBe('Salir');
-      expect(active?.confirmText).toBe('Sí, salir');
+      thenElDialogActivoTiene({ title: 'Salir', confirmText: 'Sí, salir' });
     });
 
     it('dado un confirm abierto, cuando llamo handleConfirm, deberia resolver true y cerrar el dialog', async () => {
-      const promesa = service.confirm('¿?');
+      const promesa = whenLlamoConfirm('¿?');
 
-      service.handleConfirm();
+      whenHandleConfirm();
 
       expect(await promesa).toBeTrue();
-      expect(service.activeDialog()).toBeNull();
+      thenNoHayDialogActivo();
     });
 
     it('dado un confirm abierto, cuando llamo handleDismiss, deberia resolver false y cerrar el dialog', async () => {
-      const promesa = service.confirm('¿?');
+      const promesa = whenLlamoConfirm('¿?');
 
-      service.handleDismiss();
+      whenHandleDismiss();
 
       expect(await promesa).toBeFalse();
-      expect(service.activeDialog()).toBeNull();
+      thenNoHayDialogActivo();
     });
   });
 
   describe('alert', () => {
     it('dado el service, cuando llamo alert, deberia activar el dialog con showCancel false y titulo default "Alerta"', () => {
-      void service.alert('Hola');
+      whenLlamoAlert('Hola');
 
-      const active = service.activeDialog();
-      expect(active?.title).toBe('Alerta');
-      expect(active?.message).toBe('Hola');
-      expect(active?.showCancel).toBeFalse();
+      thenElDialogActivoTiene({ title: 'Alerta', message: 'Hola', showCancel: false });
     });
 
-    it('dado titulo custom, deberia usarlo', () => {
-      void service.alert('Ok', 'Aviso');
+    it('dado un titulo custom, cuando llamo alert, deberia usarlo', () => {
+      whenLlamoAlert('Ok', 'Aviso');
 
-      expect(service.activeDialog()?.title).toBe('Aviso');
+      thenElDialogActivoTiene({ title: 'Aviso' });
     });
 
     it('dado un alert abierto, cuando llamo handleConfirm, deberia resolver true', async () => {
-      const promesa = service.alert('Hola');
+      const promesa = whenLlamoAlert('Hola');
 
-      service.handleConfirm();
+      whenHandleConfirm();
 
       expect(await promesa).toBeTrue();
     });
@@ -76,13 +71,43 @@ describe('DialogService', () => {
 
   describe('handlers sin dialog activo', () => {
     it('dado sin dialog activo, cuando llamo handleConfirm, no deberia romper', () => {
-      expect(() => service.handleConfirm()).not.toThrow();
-      expect(service.activeDialog()).toBeNull();
+      expect(() => whenHandleConfirm()).not.toThrow();
+      thenNoHayDialogActivo();
     });
 
     it('dado sin dialog activo, cuando llamo handleDismiss, no deberia romper', () => {
-      expect(() => service.handleDismiss()).not.toThrow();
-      expect(service.activeDialog()).toBeNull();
+      expect(() => whenHandleDismiss()).not.toThrow();
+      thenNoHayDialogActivo();
     });
   });
+
+  function whenLlamoConfirm(mensaje: string, title?: string, confirmText?: string, cancelText?: string): Promise<boolean> {
+    return service.confirm(mensaje, title, confirmText, cancelText);
+  }
+
+  function whenLlamoAlert(mensaje: string, title?: string): Promise<boolean> {
+    return service.alert(mensaje, title);
+  }
+
+  function whenHandleConfirm(): void {
+    service.handleConfirm();
+  }
+
+  function whenHandleDismiss(): void {
+    service.handleDismiss();
+  }
+
+  function thenElDialogActivoTiene(expected: Partial<{ title: string; message: string; confirmText: string; cancelText: string; showCancel: boolean }>): void {
+    const active = service.activeDialog();
+    expect(active).not.toBeNull();
+    if (expected.title !== undefined) expect(active?.title).toBe(expected.title);
+    if (expected.message !== undefined) expect(active?.message).toBe(expected.message);
+    if (expected.confirmText !== undefined) expect(active?.confirmText).toBe(expected.confirmText);
+    if (expected.cancelText !== undefined) expect(active?.cancelText).toBe(expected.cancelText);
+    if (expected.showCancel !== undefined) expect(active?.showCancel).toBe(expected.showCancel);
+  }
+
+  function thenNoHayDialogActivo(): void {
+    expect(service.activeDialog()).toBeNull();
+  }
 });

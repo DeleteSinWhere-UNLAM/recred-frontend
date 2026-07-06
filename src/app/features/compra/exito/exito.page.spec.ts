@@ -32,14 +32,9 @@ interface PresenterFake {
   verPendientes: jasmine.Spy;
 }
 
-describe('ExitoPage', () => {
-  let fixture: ComponentFixture<ExitoPage>;
-  let component: ExitoPage;
-  let presenter: PresenterFake;
-  let router: jasmine.SpyObj<Router>;
-
-  async function setup(vacia = false): Promise<void> {
-    presenter = {
+class PresenterFakeMother {
+  static crear(vacia = false): PresenterFake {
+    return {
       ordenes: signal(vacia ? [] : [OrdenAlumnoMother.crear()]),
       codigos: signal({ 'alumno-1': 'ABC123' }),
       total: signal(500),
@@ -48,7 +43,62 @@ describe('ExitoPage', () => {
       volverInicio: jasmine.createSpy('volverInicio'),
       verPendientes: jasmine.createSpy('verPendientes'),
     };
+  }
+}
 
+describe('ExitoPage', () => {
+  let fixture: ComponentFixture<ExitoPage>;
+  let component: ExitoPage;
+  let presenter: PresenterFake;
+  let router: jasmine.SpyObj<Router>;
+
+  describe('ngOnInit', () => {
+    it('dado que la orden esta vacia, cuando se monta la page, deberia redirigir al homeUrl del usuario', async () => {
+      await givenPageConfigurada({ vacia: true });
+
+      whenMonto();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
+    });
+
+    it('dado que hay orden, cuando se monta la page, no deberia redirigir', async () => {
+      await givenPageConfigurada({ vacia: false });
+
+      whenMonto();
+
+      expect(router.navigateByUrl).not.toHaveBeenCalled();
+    });
+
+    it('dado que hay orden, cuando se monta la page, deberia intentar reproducir el sonido de exito', async () => {
+      await givenPageConfigurada({ vacia: false });
+
+      whenMonto();
+
+      expect(Audio.prototype.play).toHaveBeenCalled();
+    });
+  });
+
+  describe('totalFormateado', () => {
+    it('dado total del presenter, cuando lo formateo, deberia devolverlo en moneda AR', async () => {
+      await givenPageConfigurada({ vacia: false });
+      whenMonto();
+
+      expect(component['totalFormateado']).toMatch(/\$\s?500/);
+    });
+  });
+
+  describe('audio.play falla', () => {
+    it('dado que audio.play rechaza, cuando se monta la page, deberia catchear el error silenciosamente', async () => {
+      await givenPageConfigurada({ vacia: false });
+      (Audio.prototype.play as jasmine.Spy).and.rejectWith(new Error('AutoplayBlocked'));
+
+      expect(() => whenMonto()).not.toThrow();
+      await fixture.whenStable();
+    });
+  });
+
+  async function givenPageConfigurada(opciones: { vacia: boolean }): Promise<void> {
+    presenter = PresenterFakeMother.crear(opciones.vacia);
     router = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
 
     const usuarioService = {
@@ -78,48 +128,7 @@ describe('ExitoPage', () => {
     spyOn(Audio.prototype, 'play').and.resolveTo();
   }
 
-  describe('ngOnInit', () => {
-    it('dado que la orden esta vacia, cuando se monta la page, deberia redirigir al homeUrl del usuario', async () => {
-      await setup(true);
-
-      fixture.detectChanges();
-
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
-    });
-
-    it('dado que hay orden, cuando se monta la page, no deberia redirigir', async () => {
-      await setup(false);
-
-      fixture.detectChanges();
-
-      expect(router.navigateByUrl).not.toHaveBeenCalled();
-    });
-
-    it('dado que hay orden, cuando se monta la page, deberia intentar reproducir el sonido de exito', async () => {
-      await setup(false);
-
-      fixture.detectChanges();
-
-      expect(Audio.prototype.play).toHaveBeenCalled();
-    });
-  });
-
-  describe('totalFormateado', () => {
-    it('dado total del presenter, deberia devolverlo en moneda AR', async () => {
-      await setup(false);
-      fixture.detectChanges();
-
-      expect(component['totalFormateado']).toMatch(/\$\s?500/);
-    });
-  });
-
-  describe('audio.play falla', () => {
-    it('dado que audio.play rechaza, deberia catch el error silenciosamente sin romper', async () => {
-      await setup(false);
-      (Audio.prototype.play as jasmine.Spy).and.rejectWith(new Error('AutoplayBlocked'));
-
-      expect(() => fixture.detectChanges()).not.toThrow();
-      await fixture.whenStable();
-    });
-  });
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

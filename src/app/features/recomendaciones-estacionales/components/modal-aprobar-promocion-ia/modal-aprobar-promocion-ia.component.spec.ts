@@ -23,7 +23,7 @@ describe('ModalAprobarPromocionIaComponent', () => {
   });
 
   describe('Estado inicial', () => {
-    it('dado el modal recien montado, deberia inicializar el form con el descuento sugerido y sin productos seleccionados', () => {
+    it('dado el modal recien montado, cuando lo leo, deberia inicializar el form con el descuento sugerido y sin productos seleccionados', () => {
       expect(component.promotionForm).toBeDefined();
       expect(component.promotionForm.get('discountPercentage')?.value).toBe(20);
       expect(component.selectedProductIds.size).toBe(0);
@@ -47,14 +47,14 @@ describe('ModalAprobarPromocionIaComponent', () => {
   });
 
   describe('getDiscountedPrice', () => {
-    it('dado un descuento del 20%, el precio final de $1000 deberia ser $800', () => {
-      component.promotionForm.patchValue({ discountPercentage: 20 });
+    it('dado un descuento del 20%, cuando calculo el precio de $1000, deberia devolver $800', () => {
+      givenDescuento(20);
 
       expect(component.getDiscountedPrice(1000)).toBe(800);
     });
 
-    it('dado un descuento del 50%, el precio final de $500 deberia ser $250', () => {
-      component.promotionForm.patchValue({ discountPercentage: 50 });
+    it('dado un descuento del 50%, cuando calculo el precio de $500, deberia devolver $250', () => {
+      givenDescuento(50);
 
       expect(component.getDiscountedPrice(500)).toBe(250);
     });
@@ -108,4 +108,8 @@ describe('ModalAprobarPromocionIaComponent', () => {
       expect(component.closeModal.emit).toHaveBeenCalled();
     });
   });
+
+  function givenDescuento(porcentaje: number): void {
+    component.promotionForm.patchValue({ discountPercentage: porcentaje });
+  }
 });

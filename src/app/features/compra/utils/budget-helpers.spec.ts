@@ -1,3 +1,4 @@
+import { Producto } from '../../buffet/models/producto.model';
 import { ProductoMother } from '../../buffet/buffet.mother';
 import {
   getPeriodRange,
@@ -7,7 +8,7 @@ import {
 
 describe('budget-helpers', () => {
   describe('getPeriodRange', () => {
-    it('dado periodo DIARIO, deberia dar el dia completo (00:00 a 23:59:59)', () => {
+    it('dado periodo DIARIO, cuando pido el rango, deberia dar el dia completo (00:00 a 23:59:59)', () => {
       const ref = new Date('2026-07-15T10:30:00');
 
       const { start, end } = getPeriodRange('DIARIO', ref);
@@ -20,7 +21,7 @@ describe('budget-helpers', () => {
       expect(end.getMinutes()).toBe(59);
     });
 
-    it('dado periodo SEMANAL desde un miercoles, deberia arrancar el lunes y terminar el domingo', () => {
+    it('dado periodo SEMANAL desde un miercoles, cuando pido el rango, deberia arrancar el lunes y terminar el domingo', () => {
       const miercoles = new Date('2026-07-15T10:30:00');
 
       const { start, end } = getPeriodRange('SEMANAL', miercoles);
@@ -29,7 +30,7 @@ describe('budget-helpers', () => {
       expect(end.getDay()).toBe(0);
     });
 
-    it('dado periodo SEMANAL desde un domingo, deberia arrancar el lunes previo', () => {
+    it('dado periodo SEMANAL desde un domingo, cuando pido el rango, deberia arrancar el lunes previo', () => {
       const domingo = new Date('2026-07-12T10:30:00');
 
       const { start } = getPeriodRange('SEMANAL', domingo);
@@ -37,7 +38,7 @@ describe('budget-helpers', () => {
       expect(start.getDay()).toBe(1);
     });
 
-    it('dado periodo QUINCENAL con dia <=15, deberia ir del 1 al 15', () => {
+    it('dado periodo QUINCENAL con dia <=15, cuando pido el rango, deberia ir del 1 al 15', () => {
       const ref = new Date('2026-07-10T10:30:00');
 
       const { start, end } = getPeriodRange('QUINCENAL', ref);
@@ -46,7 +47,7 @@ describe('budget-helpers', () => {
       expect(end.getDate()).toBe(15);
     });
 
-    it('dado periodo QUINCENAL con dia >15, deberia ir del 16 al fin de mes', () => {
+    it('dado periodo QUINCENAL con dia >15, cuando pido el rango, deberia ir del 16 al fin de mes', () => {
       const ref = new Date('2026-07-20T10:30:00');
 
       const { start, end } = getPeriodRange('QUINCENAL', ref);
@@ -55,7 +56,7 @@ describe('budget-helpers', () => {
       expect(end.getDate()).toBe(31);
     });
 
-    it('dado periodo MENSUAL, deberia ir del 1 al ultimo dia del mes', () => {
+    it('dado periodo MENSUAL, cuando pido el rango, deberia ir del 1 al ultimo dia del mes', () => {
       const ref = new Date('2026-07-15T10:30:00');
 
       const { start, end } = getPeriodRange('MENSUAL', ref);
@@ -64,7 +65,7 @@ describe('budget-helpers', () => {
       expect(end.getDate()).toBe(31);
     });
 
-    it('dado periodo MENSUAL en febrero de bisiesto, deberia terminar el 29', () => {
+    it('dado periodo MENSUAL en febrero de bisiesto, cuando pido el rango, deberia terminar el 29', () => {
       const ref = new Date('2028-02-15T10:30:00');
 
       const { end } = getPeriodRange('MENSUAL', ref);
@@ -73,7 +74,7 @@ describe('budget-helpers', () => {
       expect(end.getDate()).toBe(29);
     });
 
-    it('dado sin referenceDate, deberia usar new Date() por default', () => {
+    it('dado sin referenceDate, cuando pido el rango, deberia usar new Date() por default', () => {
       const { start, end } = getPeriodRange('DIARIO');
 
       const hoy = new Date();
@@ -83,63 +84,67 @@ describe('budget-helpers', () => {
   });
 
   describe('getProductCategory', () => {
-    it('dado un producto en el catalogo, deberia devolver el id de su categoria', () => {
-      const catalog = [
+    it('dado un producto en el catalogo, cuando pido su categoria, deberia devolver el id', () => {
+      const catalog = givenCatalogoCon([
         ProductoMother.crear({ id: 'p1', categoria: { id: 'bebidas', descripcion: 'Bebidas' } }),
-      ];
+      ]);
 
       expect(getProductCategory('p1', 'Agua', catalog)).toBe('bebidas');
     });
 
-    it('dado un producto sin categoria, deberia devolver string vacio', () => {
-      const catalog = [
+    it('dado un producto sin categoria, cuando pido su categoria, deberia devolver string vacio', () => {
+      const catalog = givenCatalogoCon([
         ProductoMother.crear({ id: 'p1', categoria: { id: '', descripcion: '' } }),
-      ];
+      ]);
 
       expect(getProductCategory('p1', 'X', catalog)).toBe('');
     });
 
-    it('dado un producto que no esta en el catalogo, deberia devolver string vacio', () => {
+    it('dado un producto que no esta en el catalogo, cuando pido su categoria, deberia devolver string vacio', () => {
       expect(getProductCategory('desconocido', 'X', [])).toBe('');
     });
   });
 
   describe('isSameCategory', () => {
-    it('dado ids iguales (mismo case), deberia devolver true', () => {
+    it('dado ids iguales (mismo case), cuando comparo, deberia devolver true', () => {
       expect(isSameCategory('bebidas', 'Bebidas', 'bebidas', 'Bebidas')).toBeTrue();
     });
 
-    it('dado ids iguales con distinto case, deberia devolver true (case insensitive)', () => {
+    it('dado ids iguales con distinto case, cuando comparo, deberia devolver true (case insensitive)', () => {
       expect(isSameCategory('BEBIDAS', 'Bebidas', 'bebidas', 'Bebidas')).toBeTrue();
     });
 
-    it('dado ids distintos pero descripciones que se contienen mutuamente, deberia devolver true', () => {
+    it('dado ids distintos pero descripciones que se contienen mutuamente, cuando comparo, deberia devolver true', () => {
       expect(isSameCategory('id1', 'Bebidas frías', 'id2', 'bebidas')).toBeTrue();
       expect(isSameCategory('id1', 'bebidas', 'id2', 'Bebidas Frías')).toBeTrue();
     });
 
-    it('dado descripciones con tildes, deberia normalizarlas y matchear', () => {
+    it('dado descripciones con tildes, cuando comparo, deberia normalizarlas y matchear', () => {
       expect(isSameCategory('id1', 'Café Frío', 'id2', 'cafe frio')).toBeTrue();
     });
 
-    it('dado descripciones completamente distintas, deberia devolver false', () => {
+    it('dado descripciones completamente distintas, cuando comparo, deberia devolver false', () => {
       expect(isSameCategory('id1', 'Bebidas', 'id2', 'Comidas')).toBeFalse();
     });
 
-    it('dado prodCatId vacio, deberia devolver false', () => {
+    it('dado prodCatId vacio, cuando comparo, deberia devolver false', () => {
       expect(isSameCategory('', 'X', 'id2', 'Y')).toBeFalse();
     });
 
-    it('dado ruleCatId vacio, deberia devolver false', () => {
+    it('dado ruleCatId vacio, cuando comparo, deberia devolver false', () => {
       expect(isSameCategory('id1', 'X', '', 'Y')).toBeFalse();
     });
 
-    it('dado ids distintos y prodCatDesc vacio, deberia devolver false', () => {
+    it('dado ids distintos y prodCatDesc vacio, cuando comparo, deberia devolver false', () => {
       expect(isSameCategory('id1', '', 'id2', 'Y')).toBeFalse();
     });
 
-    it('dado ids distintos y ruleCatDesc vacio, deberia devolver false', () => {
+    it('dado ids distintos y ruleCatDesc vacio, cuando comparo, deberia devolver false', () => {
       expect(isSameCategory('id1', 'X', 'id2', '')).toBeFalse();
     });
   });
+
+  function givenCatalogoCon(productos: Producto[]): Producto[] {
+    return productos;
+  }
 });

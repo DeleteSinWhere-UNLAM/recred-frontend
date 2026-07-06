@@ -51,48 +51,46 @@ describe('ConfirmarPresenter', () => {
       expect(presenter.vacia()).toBeFalse();
     });
 
-    it('dado sin orden en curso, vacia deberia ser true', () => {
-      ordenEnCurso.set(null);
+    it('dado sin orden en curso, cuando leo vacia, deberia ser true', () => {
+      givenSinOrdenEnCurso();
 
       expect(presenter.vacia()).toBeTrue();
     });
   });
 
   describe('advertenciaSaldo', () => {
-    it('dado todos los alumnos con saldo suficiente, no deberia haber advertencia', () => {
+    it('dado todos los alumnos con saldo suficiente, cuando pido la advertencia, no deberia haber ninguna', () => {
       expect(presenter.advertenciaSaldo()).toBeNull();
     });
 
-    it('dado un alumno con saldo insuficiente, deberia listar su nombre en la advertencia', () => {
-      ordenEnCurso.set(
-        OrdenCompraMother.crear({
-          ordenes: [OrdenAlumnoMother.crearSinSaldo()],
-        }),
-      );
+    it('dado un alumno con saldo insuficiente, cuando pido la advertencia, deberia listar su nombre', () => {
+      givenOrdenEnCurso(OrdenCompraMother.crear({
+        ordenes: [OrdenAlumnoMother.crearSinSaldo()],
+      }));
 
       expect(presenter.advertenciaSaldo()).toContain('Saldo insuficiente');
     });
   });
 
   describe('recreoLabel', () => {
-    it('dado PRIMER_RECREO, deberia devolver el label en espanol', () => {
+    it('dado PRIMER_RECREO, cuando pido el label, deberia devolverlo en espanol', () => {
       expect(presenter.recreoLabel('PRIMER_RECREO')).toBe('1er Recreo');
     });
   });
 
   describe('formatearFecha', () => {
-    it('dado una fecha ISO, deberia devolverla como dd-MM-yyyy', () => {
+    it('dado una fecha ISO, cuando formateo, deberia devolverla como dd-MM-yyyy', () => {
       expect(presenter.formatearFecha('2026-07-15')).toBe('15-07-2026');
     });
 
-    it('dado string vacio, deberia devolver string vacio', () => {
+    it('dado string vacio, cuando formateo, deberia devolver string vacio', () => {
       expect(presenter.formatearFecha('')).toBe('');
     });
   });
 
   describe('confirmar', () => {
     it('dado una orden sin sugerencia, cuando confirmo, deberia procesar pago, limpiar carrito y navegar a /compra/exito', () => {
-      servicioCompra.procesarPago.and.returnValue(of(OrdenCompraMother.crearPagada()));
+      givenProcesarPagoResuelveCon(OrdenCompraMother.crearPagada());
 
       presenter.confirmar();
 
@@ -103,9 +101,9 @@ describe('ConfirmarPresenter', () => {
     });
 
     it('dado una orden con sugerenciaId, cuando confirmo, deberia primero comprar la sugerencia y despues procesar pago', () => {
-      ordenEnCurso.set(OrdenCompraMother.crear({ sugerenciaId: 'sug-123' }));
+      givenOrdenEnCurso(OrdenCompraMother.crear({ sugerenciaId: 'sug-123' }));
       servicioSugerencias.comprarSugerencia.and.returnValue(of(undefined));
-      servicioCompra.procesarPago.and.returnValue(of(OrdenCompraMother.crearPagada()));
+      givenProcesarPagoResuelveCon(OrdenCompraMother.crearPagada());
 
       presenter.confirmar();
 
@@ -124,7 +122,7 @@ describe('ConfirmarPresenter', () => {
     });
 
     it('dado sin orden en curso, cuando confirmo, no deberia hacer nada', () => {
-      ordenEnCurso.set(null);
+      givenSinOrdenEnCurso();
 
       presenter.confirmar();
 
@@ -140,4 +138,16 @@ describe('ConfirmarPresenter', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/compra');
     });
   });
+
+  function givenOrdenEnCurso(orden: OrdenCompra): void {
+    ordenEnCurso.set(orden);
+  }
+
+  function givenSinOrdenEnCurso(): void {
+    ordenEnCurso.set(null);
+  }
+
+  function givenProcesarPagoResuelveCon(orden: OrdenCompra): void {
+    servicioCompra.procesarPago.and.returnValue(of(orden));
+  }
 });

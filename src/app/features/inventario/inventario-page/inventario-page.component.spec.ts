@@ -257,6 +257,36 @@ describe('InventarioPageComponent', () => {
       expect(component.highlightedProductIds.has(inventario[1].productId)).toBeTrue();
     });
 
+    it('dado datos de producto en query params, cuando inicializo, deberia abrir el alta simple precompletada', () => {
+      const router = TestBed.inject(Router);
+      const navigateSpy = spyOn(router, 'navigate');
+      activatedRoute.snapshot.queryParamMap = convertToParamMap({
+        origen: 'oportunidad-stock',
+        nombreProducto: 'Prod C',
+        precioProducto: '400',
+      });
+
+      whenMonto();
+
+      expect(component.isFormVisible).toBeTrue();
+      expect(component.selectedProduct).toBeNull();
+      expect(component.datosInicialesProducto).toEqual({
+        nombre: 'Prod C',
+        descripcion: 'Producto sugerido para incorporar al stock.',
+        precio: 400,
+        peso: 0,
+        stockActual: 0,
+      });
+      expect(navigateSpy).toHaveBeenCalledWith([], {
+        queryParams: {
+          origen: null,
+          nombreProducto: null,
+          precioProducto: null,
+        },
+        queryParamsHandling: 'merge',
+      });
+    });
+
     it('dado que falla la carga del inventario, deberia mostrar toast de error y dejar isLoading en false', () => {
       servicioProducto.getInventoryOverview.and.returnValue(throwError(() => new Error('API Error')));
 

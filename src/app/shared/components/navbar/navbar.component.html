@@ -15,7 +15,7 @@
     </button>
 
     <nav class="navbar__actions" [class.navbar__actions--open]="menuMobileAbierto()" aria-label="Acciones principales">
-      @if (!esVistaAlumno() && !esVistaKiosquero()) {
+      @if (!esVistaAlumno() && !esVistaKiosquero() && !esVistaDirectivo() && !esVistaAdmin()) {
       <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']" title="Ir al panel de control">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span class="max-xl:hidden">Panel de Control</span>
@@ -108,7 +108,7 @@
         }
       </div>
 
-      @if (!esVistaKiosquero()) {
+      @if (!esVistaKiosquero() && !esVistaDirectivo() && !esVistaAdmin()) {
       <button type="button" class="navbar__cart" (click)="irAlCarrito()"
         [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'" title="Ver carrito de compras">
         <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
@@ -144,7 +144,7 @@
             <i class="fa-solid fa-wallet" aria-hidden="true"></i>
             <span>Mi billetera</span>
           </button>
-          } @else if (!esVistaKiosquero()) {
+          } @else if (!esVistaKiosquero() && !esVistaDirectivo() && !esVistaAdmin()) {
           <button type="button" class="navbar__menu-item" role="menuitem" [attr.aria-expanded]="menuBilleteraAbierto()"
             aria-haspopup="menu" (click)="toggleMenuBilletera()">
             <i class="fa-solid fa-wallet" aria-hidden="true"></i>
@@ -168,7 +168,7 @@
           </div>
           }
           }
-          @if (!esVistaAlumno()) {
+          @if (!esVistaAlumno() && !esVistaDirectivo() && !esVistaAdmin()) {
           <button type="button" class="navbar__menu-item" role="menuitem" (click)="irAPremium()">
             <i class="fa-solid fa-star" aria-hidden="true"></i>
             <span>Suscripción</span>

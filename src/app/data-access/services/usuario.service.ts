@@ -33,11 +33,15 @@ export class UsuarioService {
     if (rol === 'ALUMNO') return '/alumno';
     if (rol === 'VENDEDOR') return '/kiosquero';
     if (rol === 'PADRE') return '/tutor';
+    if (rol === 'DIRECTIVO_COLEGIO') return '/directivo';
+    if (rol === 'ADMIN') return '/recred-admin';
     return this.homeUrlState();
   });
 
   readonly esVistaAlumno: Signal<boolean> = computed(() => this.homeUrl() === '/alumno');
   readonly esVistaKiosquero: Signal<boolean> = computed(() => this.homeUrl() === '/kiosquero');
+  readonly esVistaDirectivo: Signal<boolean> = computed(() => this.homeUrl() === '/directivo');
+  readonly esVistaAdmin: Signal<boolean> = computed(() => this.homeUrl() === '/recred-admin');
 
   private readonly nombreNavbarState = signal<string>(
     typeof localStorage !== 'undefined' && localStorage.getItem('recreopago_nombreNavbar')

@@ -3,64 +3,52 @@ import { ThemeService } from './theme.service';
 
 describe('ThemeService', () => {
   beforeEach(() => {
-    localStorage.removeItem('theme');
-    document.documentElement.removeAttribute('data-theme');
+    limpiarEstadoDeTheme();
   });
 
   afterEach(() => {
-    localStorage.removeItem('theme');
-    document.documentElement.removeAttribute('data-theme');
+    limpiarEstadoDeTheme();
   });
 
-  function instanciar(): ThemeService {
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({ providers: [ThemeService] });
-    return TestBed.inject(ThemeService);
-  }
-
   describe('estado inicial', () => {
-    it('dado localStorage con "light", deberia inicializar en light', () => {
-      localStorage.setItem('theme', 'light');
+    it('dado localStorage con "light", cuando instancio, deberia inicializar en light', () => {
+      givenLocalStorageTheme('light');
 
-      const service = instanciar();
+      const service = whenInstancio();
 
-      expect(service.theme()).toBe('light');
+      thenElThemeEs(service, 'light');
     });
 
-    it('dado localStorage con "dark", deberia inicializar en dark', () => {
-      localStorage.setItem('theme', 'dark');
+    it('dado localStorage con "dark", cuando instancio, deberia inicializar en dark', () => {
+      givenLocalStorageTheme('dark');
 
-      const service = instanciar();
+      const service = whenInstancio();
 
-      expect(service.theme()).toBe('dark');
+      thenElThemeEs(service, 'dark');
     });
 
-    it('dado localStorage vacio y prefers-color-scheme dark, deberia inicializar en dark', () => {
-      spyOn(window, 'matchMedia').and.returnValue({
-        matches: true,
-      } as MediaQueryList);
+    it('dado localStorage vacio y prefers-color-scheme dark, cuando instancio, deberia inicializar en dark', () => {
+      givenPrefiereEsquemaOscuro(true);
 
-      const service = instanciar();
+      const service = whenInstancio();
 
-      expect(service.theme()).toBe('dark');
+      thenElThemeEs(service, 'dark');
     });
 
-    it('dado localStorage vacio y prefers-color-scheme light, deberia inicializar en light', () => {
-      spyOn(window, 'matchMedia').and.returnValue({
-        matches: false,
-      } as MediaQueryList);
+    it('dado localStorage vacio y prefers-color-scheme light, cuando instancio, deberia inicializar en light', () => {
+      givenPrefiereEsquemaOscuro(false);
 
-      const service = instanciar();
+      const service = whenInstancio();
 
-      expect(service.theme()).toBe('light');
+      thenElThemeEs(service, 'light');
     });
   });
 
   describe('effect', () => {
-    it('dado el service, al instanciarse deberia setear data-theme en el documentElement y guardar en localStorage', () => {
-      localStorage.setItem('theme', 'dark');
+    it('dado el service instanciado, cuando corre el effect, deberia setear data-theme y guardar en localStorage', () => {
+      givenLocalStorageTheme('dark');
 
-      const service = instanciar();
+      const service = whenInstancio();
       TestBed.tick();
 
       expect(document.documentElement.getAttribute('data-theme')).toBe('light');
@@ -70,21 +58,44 @@ describe('ThemeService', () => {
 
   describe('toggleTheme', () => {
     it('dado theme light, cuando hago toggle, deberia pasar a dark', () => {
-      localStorage.setItem('theme', 'light');
-      const service = instanciar();
+      givenLocalStorageTheme('light');
+      const service = whenInstancio();
 
       service.toggleTheme();
 
-      expect(service.theme()).toBe('dark');
+      thenElThemeEs(service, 'dark');
     });
 
     it('dado theme dark, cuando hago toggle, deberia pasar a light', () => {
-      localStorage.setItem('theme', 'dark');
-      const service = instanciar();
+      givenLocalStorageTheme('dark');
+      const service = whenInstancio();
 
       service.toggleTheme();
 
-      expect(service.theme()).toBe('light');
+      thenElThemeEs(service, 'light');
     });
   });
+
+  function limpiarEstadoDeTheme(): void {
+    localStorage.removeItem('theme');
+    document.documentElement.removeAttribute('data-theme');
+  }
+
+  function givenLocalStorageTheme(valor: 'light' | 'dark'): void {
+    localStorage.setItem('theme', valor);
+  }
+
+  function givenPrefiereEsquemaOscuro(matches: boolean): void {
+    spyOn(window, 'matchMedia').and.returnValue({ matches } as MediaQueryList);
+  }
+
+  function whenInstancio(): ThemeService {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [ThemeService] });
+    return TestBed.inject(ThemeService);
+  }
+
+  function thenElThemeEs(service: ThemeService, esperado: 'light' | 'dark'): void {
+    expect(service.theme()).toBe(esperado);
+  }
 });

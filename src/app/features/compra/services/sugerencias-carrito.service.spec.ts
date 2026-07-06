@@ -4,14 +4,26 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SugerenciaCarritoMother } from '../compra.mother';
-import { SugerenciaCarritoRequest } from '../models/sugerencia-carrito.model';
+import { SugerenciaCarrito, SugerenciaCarritoRequest } from '../models/sugerencia-carrito.model';
 import { SugerenciasCarritoService } from './sugerencias-carrito.service';
 
 describe('SugerenciasCarritoService', () => {
-  const URL = `${environment.apiUrl}/cart-suggestions`;
+  const URL_CART_SUGGESTIONS = `${environment.apiUrl}/cart-suggestions`;
 
   let service: SugerenciasCarritoService;
   let httpMock: HttpTestingController;
+
+  class SugerenciaCarritoRequestMother {
+    static crear(override: Partial<SugerenciaCarritoRequest> = {}): SugerenciaCarritoRequest {
+      return {
+        studentId: 'alumno-1',
+        buffetId: 'buffet-1',
+        items: [{ productId: 'prod-1', quantity: 2 }],
+        limit: 5,
+        ...override,
+      };
+    }
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -28,17 +40,12 @@ describe('SugerenciasCarritoService', () => {
   afterEach(() => httpMock.verify());
 
   describe('obtenerSugerencias', () => {
-    it('dado un request con studentId, buffetId e items, cuando pido sugerencias, deberia hacer POST a /cart-suggestions con el body', async () => {
-      const request: SugerenciaCarritoRequest = {
-        studentId: 'alumno-1',
-        buffetId: 'buffet-1',
-        items: [{ productId: 'prod-1', quantity: 2 }],
-        limit: 5,
-      };
+    it('dado un request con studentId, buffetId e items, cuando pido sugerencias, deberia hacer POST /cart-suggestions con el body', async () => {
+      const request = SugerenciaCarritoRequestMother.crear();
       const sugerencias = [SugerenciaCarritoMother.crear()];
 
-      const promesa = firstValueFrom(service.obtenerSugerencias(request));
-      const req = httpMock.expectOne(URL);
+      const promesa = whenPidoSugerencias(request);
+      const req = httpMock.expectOne(URL_CART_SUGGESTIONS);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(request);
       req.flush(sugerencias);
@@ -47,12 +54,16 @@ describe('SugerenciasCarritoService', () => {
     });
 
     it('dado que el back devuelve error, cuando pido sugerencias, deberia rechazar la promesa', async () => {
-      const promesa = firstValueFrom(
-        service.obtenerSugerencias({ studentId: 'a', buffetId: 'b', items: [] }),
+      const promesa = whenPidoSugerencias(
+        SugerenciaCarritoRequestMother.crear({ items: [], limit: undefined }),
       );
-      httpMock.expectOne(URL).flush('boom', { status: 500, statusText: 'Server Error' });
+      httpMock.expectOne(URL_CART_SUGGESTIONS).flush('boom', { status: 500, statusText: 'Server Error' });
 
       await expectAsync(promesa).toBeRejected();
     });
   });
+
+  function whenPidoSugerencias(request: SugerenciaCarritoRequest): Promise<SugerenciaCarrito[]> {
+    return firstValueFrom(service.obtenerSugerencias(request));
+  }
 });

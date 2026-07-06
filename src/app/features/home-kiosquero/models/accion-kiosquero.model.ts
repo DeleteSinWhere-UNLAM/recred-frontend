@@ -6,6 +6,7 @@ export type AccionKiosqueroId =
   | 'cierre-diario'
   | 'reportes'
   | 'stock'
+  | 'inteligencia-comercial'
   | 'sugerencias'
   | 'recomendaciones'
   | 'recomendaciones-estacionales'

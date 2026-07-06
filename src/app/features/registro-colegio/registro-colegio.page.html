@@ -61,18 +61,7 @@
               <span class="rc__error">Campo requerido</span>
             }
           </div>
-          <div class="rc__field">
-            <label class="rc__label" for="schoolLevelId">Nivel educativo *</label>
-            <select id="schoolLevelId" class="rc__select" formControlName="schoolLevelId">
-              <option value="" disabled>Seleccioná un nivel</option>
-              @for (nivel of niveles; track nivel.id) {
-                <option [value]="nivel.id">{{ nivel.descripcion }}</option>
-              }
-            </select>
-            @if (form.get('schoolLevelId')?.invalid && form.get('schoolLevelId')?.touched) {
-              <span class="rc__error">Campo requerido</span>
-            }
-          </div>
+
         </div>
       </section>
 

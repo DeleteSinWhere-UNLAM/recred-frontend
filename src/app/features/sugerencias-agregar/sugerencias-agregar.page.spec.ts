@@ -60,27 +60,39 @@ describe('SugerenciasAgregarPage', () => {
 
   describe('ngOnInit', () => {
     it('dado un usuario en localStorage, cuando se monta la page, deberia inicializar el presenter', () => {
-      spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(UsuarioMother.crear()));
+      givenUsuarioEnLocalStorage(UsuarioMother.crear());
 
-      fixture.detectChanges();
+      whenMonto();
 
       expect(presenter.initialize).toHaveBeenCalled();
     });
 
     it('dado que no hay usuario en localStorage, cuando se monta la page, no deberia inicializar el presenter', () => {
-      spyOn(localStorage, 'getItem').and.returnValue(null);
+      givenSinUsuarioEnLocalStorage();
 
-      fixture.detectChanges();
+      whenMonto();
 
       expect(presenter.initialize).not.toHaveBeenCalled();
     });
   });
 
   describe('volver', () => {
-    it('cuando hago click en volver, deberia navegar a /kiosquero', () => {
+    it('cuando hago click en volver, deberia navegar a inteligencia comercial', () => {
       component.volver();
 
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/inteligencia-comercial');
     });
   });
+
+  function givenUsuarioEnLocalStorage(usuario: ReturnType<typeof UsuarioMother.crear>): void {
+    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(usuario));
+  }
+
+  function givenSinUsuarioEnLocalStorage(): void {
+    spyOn(localStorage, 'getItem').and.returnValue(null);
+  }
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

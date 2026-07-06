@@ -56,6 +56,8 @@ describe('NavbarComponent', () => {
   let cartCountSignal: ReturnType<typeof signal<number>>;
   let esVistaAlumnoSignal: ReturnType<typeof signal<boolean>>;
   let esVistaKiosqueroSignal: ReturnType<typeof signal<boolean>>;
+  let esVistaDirectivoSignal: ReturnType<typeof signal<boolean>>;
+  let esVistaAdminSignal: ReturnType<typeof signal<boolean>>;
   let notificacionesSignal: ReturnType<typeof signal<Notificacion[]>>;
   let notifCantidadSignal: ReturnType<typeof signal<number>>;
   let alumnosSignal: ReturnType<typeof signal<ReturnType<typeof AlumnoMother.crear>[]>>;
@@ -66,6 +68,8 @@ describe('NavbarComponent', () => {
     cartCountSignal = signal(0);
     esVistaAlumnoSignal = signal(false);
     esVistaKiosqueroSignal = signal(false);
+    esVistaDirectivoSignal = signal(false);
+    esVistaAdminSignal = signal(false);
     notificacionesSignal = signal<Notificacion[]>([]);
     notifCantidadSignal = signal(0);
     alumnosSignal = signal([AlumnoMother.crear({ id: 'alumno-1' })]);
@@ -83,6 +87,8 @@ describe('NavbarComponent', () => {
     servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl'], {
       esVistaAlumno: esVistaAlumnoSignal.asReadonly(),
       esVistaKiosquero: esVistaKiosqueroSignal.asReadonly(),
+      esVistaDirectivo: esVistaDirectivoSignal.asReadonly(),
+      esVistaAdmin: esVistaAdminSignal.asReadonly(),
     });
     servicioUsuario.homeUrl.and.returnValue('/tutor');
     servicioAlumnos = jasmine.createSpyObj<AlumnosService>(
@@ -135,25 +141,25 @@ describe('NavbarComponent', () => {
 
   describe('esPremium', () => {
     it('dado un perfil PREMIUM, esPremium deberia ser true', () => {
-      perfilSignal.and.returnValue({ plan: 'PREMIUM' });
+      givenPerfil({ plan: 'PREMIUM' });
 
       expect(interno.esPremium()).toBeTrue();
     });
 
     it('dado un perfil AVANZADO, esPremium deberia ser true', () => {
-      perfilSignal.and.returnValue({ plan: 'AVANZADO' });
+      givenPerfil({ plan: 'AVANZADO' });
 
       expect(interno.esPremium()).toBeTrue();
     });
 
     it('dado un perfil basico, esPremium deberia ser false', () => {
-      perfilSignal.and.returnValue({ plan: 'GRATIS' });
+      givenPerfil({ plan: 'GRATIS' });
 
       expect(interno.esPremium()).toBeFalse();
     });
 
     it('dado sin perfil, esPremium deberia ser false', () => {
-      perfilSignal.and.returnValue(null);
+      givenPerfil(null);
 
       expect(interno.esPremium()).toBeFalse();
     });
@@ -445,4 +451,9 @@ describe('NavbarComponent', () => {
       expect(interno.menuAbierto()).toBeFalse();
     });
   });
+
+  function givenPerfil(perfil: unknown): void {
+    perfilSignal.and.returnValue(perfil);
+  }
+
 });

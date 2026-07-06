@@ -2,14 +2,30 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../environments/environment';
-import { PerfilUsuario } from '../models/perfil-usuario.model';
+import { PerfilUsuario, UsuarioLogueado } from '../models/perfil-usuario.model';
 import { PerfilService } from './perfil.service';
 import { PerfilUsuarioService } from './perfil-usuario.service';
 
 describe('PerfilUsuarioService', () => {
+  const URL_USUARIO_LOGUEADO = `${environment.apiUrl}/users/me`;
+  const URL_PERFIL = `${environment.apiUrl}/users/me/profile`;
+  const URL_FOTO = `${environment.apiUrl}/users/me/profile/foto`;
+
   let service: PerfilUsuarioService;
   let httpMock: HttpTestingController;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
+
+  class UsuarioLogueadoMother {
+    static crear(override: Partial<UsuarioLogueado> = {}): UsuarioLogueado {
+      return { id: 'u1', email: 'a@b.com', ...override } as UsuarioLogueado;
+    }
+  }
+
+  class PerfilUsuarioMother {
+    static crear(override: Partial<PerfilUsuario> = {}): PerfilUsuario {
+      return { id: 'p1', firstName: 'Ana', ...override } as PerfilUsuario;
+    }
+  }
 
   beforeEach(() => {
     servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['actualizarDatosUsuario']);
@@ -28,48 +44,48 @@ describe('PerfilUsuarioService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('obtenerUsuarioLogueado hace GET /users/me', async () => {
+  it('dado el service, cuando pido el usuario logueado, deberia hacer GET /users/me', async () => {
     const promesa = service.obtenerUsuarioLogueado();
-    const req = httpMock.expectOne(`${environment.apiUrl}/users/me`);
+    const req = httpMock.expectOne(URL_USUARIO_LOGUEADO);
 
     expect(req.request.method).toBe('GET');
-    req.flush({ id: 'u1', email: 'a@b.com' });
+    req.flush(UsuarioLogueadoMother.crear());
 
     const usuario = await promesa;
     expect(usuario.id).toBe('u1');
   });
 
-  it('obtenerPerfil hace GET /users/me/profile y sincroniza con PerfilService', async () => {
-    const perfil = { id: 'p1', firstName: 'Ana' } as unknown as PerfilUsuario;
+  it('dado el service, cuando pido el perfil, deberia hacer GET /users/me/profile y sincronizar con PerfilService', async () => {
+    const perfil = PerfilUsuarioMother.crear();
 
     const promesa = service.obtenerPerfil();
-    httpMock.expectOne(`${environment.apiUrl}/users/me/profile`).flush(perfil);
+    httpMock.expectOne(URL_PERFIL).flush(perfil);
 
     expect(await promesa).toEqual(perfil);
-    expect(servicioPerfil.actualizarDatosUsuario).toHaveBeenCalledWith(perfil);
+    thenSeSincronizoConPerfilService(perfil);
   });
 
-  it('actualizarPerfil hace PATCH y actualiza los datos del PerfilService', async () => {
+  it('dado unos cambios, cuando actualizo el perfil, deberia hacer PATCH y actualizar el PerfilService', async () => {
     const cambios = { firstName: 'Nombre' };
-    const perfil = { id: 'p1', firstName: 'Nombre' } as unknown as PerfilUsuario;
+    const perfil = PerfilUsuarioMother.crear({ firstName: 'Nombre' });
 
     const promesa = service.actualizarPerfil(cambios);
-    const req = httpMock.expectOne(`${environment.apiUrl}/users/me/profile`);
+    const req = httpMock.expectOne(URL_PERFIL);
 
     expect(req.request.method).toBe('PATCH');
     expect(req.request.body).toEqual(cambios);
     req.flush(perfil);
 
     await promesa;
-    expect(servicioPerfil.actualizarDatosUsuario).toHaveBeenCalledWith(perfil);
+    thenSeSincronizoConPerfilService(perfil);
   });
 
-  it('subirFotoPerfil hace POST /users/me/profile/foto con FormData y sincroniza', async () => {
+  it('dado un archivo, cuando subo la foto de perfil, deberia hacer POST con FormData y sincronizar', async () => {
     const archivo = new File([''], 'foto.jpg', { type: 'image/jpeg' });
-    const perfil = { id: 'p1', urlFotoPerfil: 'https://cdn/foto.jpg' } as unknown as PerfilUsuario;
+    const perfil = PerfilUsuarioMother.crear({ urlFotoPerfil: 'https://cdn/foto.jpg' });
 
     const promesa = service.subirFotoPerfil(archivo);
-    const req = httpMock.expectOne(`${environment.apiUrl}/users/me/profile/foto`);
+    const req = httpMock.expectOne(URL_FOTO);
 
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toBeInstanceOf(FormData);
@@ -78,6 +94,10 @@ describe('PerfilUsuarioService', () => {
     req.flush(perfil);
 
     expect(await promesa).toEqual(perfil);
-    expect(servicioPerfil.actualizarDatosUsuario).toHaveBeenCalledWith(perfil);
+    thenSeSincronizoConPerfilService(perfil);
   });
+
+  function thenSeSincronizoConPerfilService(perfil: PerfilUsuario): void {
+    expect(servicioPerfil.actualizarDatosUsuario).toHaveBeenCalledWith(perfil);
+  }
 });

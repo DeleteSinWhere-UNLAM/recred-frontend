@@ -62,16 +62,19 @@ describe('AccionesGridComponent (home-kiosquero)', () => {
   describe('render', () => {
     it('dado el grid, cuando se monta, deberia renderizar el titulo "Tus herramientas"', () => {
       const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
+
       expect(texto).toContain('Tus herramientas');
     });
 
-    it('dado 2 acciones, deberia renderizar 2 app-accion-card', () => {
+    it('dado 2 acciones, cuando se monta, deberia renderizar 2 app-accion-card', () => {
       const cards = fixture.debugElement.queryAll(By.directive(AccionCardStub));
+
       expect(cards.length).toBe(2);
     });
 
-    it('dado una accion destacada, deberia aplicar la clase acciones-grid__item--full', () => {
+    it('dado una accion destacada, cuando se monta, deberia aplicar la clase acciones-grid__item--full', () => {
       const cards = (fixture.nativeElement as HTMLElement).querySelectorAll('app-accion-card');
+
       expect(cards[1].classList.contains('acciones-grid__item--full')).toBeTrue();
       expect(cards[0].classList.contains('acciones-grid__item--full')).toBeFalse();
     });
@@ -81,12 +84,16 @@ describe('AccionesGridComponent (home-kiosquero)', () => {
     it('dado una accion, cuando la card emite seleccionar, deberia reemitir por accion', () => {
       const spy = jasmine.createSpy('accion');
       component.accion.subscribe(spy);
-      const card = fixture.debugElement.query(By.directive(AccionCardStub))
-        .componentInstance as AccionCardStub;
 
-      card.seleccionar.emit(component.acciones[0]);
+      whenLaCardEmiteSeleccionar(component.acciones[0]);
 
       expect(spy).toHaveBeenCalledWith(component.acciones[0]);
     });
   });
+
+  function whenLaCardEmiteSeleccionar(accion: AccionKiosquero): void {
+    const card = fixture.debugElement.query(By.directive(AccionCardStub))
+      .componentInstance as AccionCardStub;
+    card.seleccionar.emit(accion);
+  }
 });

@@ -12,7 +12,7 @@ import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { TablaProductoComponent } from '../components/tabla-producto/tabla-producto.component';
-import { FormularioProductoComponent, DatosFormularioProducto } from '../components/formulario-producto/formulario-producto.component';
+import { FormularioProductoComponent, DatosFormularioProducto, DatosInicialesProducto } from '../components/formulario-producto/formulario-producto.component';
 import { ModalConfirmarEliminarComponent } from '../components/modal-confirmar-eliminar/modal-confirmar-eliminar.component';
 import { InventarioRealtimeService } from '../services/inventario-realtime.service';
 import {
@@ -131,6 +131,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   isRefreshing = false;
   isSaving = false;
   isFormVisible = false;
+  datosInicialesProducto: DatosInicialesProducto | null = null;
   selectedProduct: Producto | null = null;
   deleteTarget: Producto | null = null;
   activeFilter: FiltroInventario = 'TODOS';
@@ -153,11 +154,11 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   readonly inventoryModeOptions: OpcionModoInventario[] = [
     {
       id: 'STOCK_EXACTO',
-      label: 'Stock exacto',
+      label: 'Control por unidades',
     },
     {
       id: 'CUPO_DIARIO',
-      label: 'Cupo diario',
+      label: 'Límite diario de venta',
     },
     {
       id: 'DISPONIBLE_NO_DISPONIBLE',
@@ -193,6 +194,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     this.buffetId = this.obtenerBuffetIdActual();
     this.inventoryManagementProductIdFromQuery =
       this.route.snapshot.queryParamMap.get('productId');
+    this.abrirAltaProductoDesdeQuery();
     this.loadCategories();
     this.loadProducts();
 
@@ -347,11 +349,13 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
 
   openIndividualForm(): void {
     this.selectedProduct = null;
+    this.datosInicialesProducto = null;
     this.isFormVisible = true;
   }
 
   openEditForm(product: Producto): void {
     this.selectedProduct = product;
+    this.datosInicialesProducto = null;
     this.isFormVisible = true;
   }
 
@@ -369,6 +373,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   closeForm(): void {
     this.isFormVisible = false;
     this.selectedProduct = null;
+    this.datosInicialesProducto = null;
   }
 
   handleFormSubmit(data: DatosFormularioProducto): void {
@@ -865,6 +870,33 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     this.inventoryManagementProductIdFromQuery = null;
   }
 
+  private abrirAltaProductoDesdeQuery(): void {
+    const nombreProducto = this.route.snapshot.queryParamMap.get('nombreProducto');
+    if (!nombreProducto) {
+      return;
+    }
+
+    const precioProducto = Number(this.route.snapshot.queryParamMap.get('precioProducto') ?? 0);
+    this.selectedProduct = null;
+    this.datosInicialesProducto = {
+      nombre: nombreProducto,
+      descripcion: 'Producto sugerido para incorporar al stock.',
+      precio: Number.isFinite(precioProducto) ? precioProducto : 0,
+      peso: 0,
+      stockActual: 0,
+    };
+    this.isFormVisible = true;
+
+    this.router.navigate([], {
+      queryParams: {
+        origen: null,
+        nombreProducto: null,
+        precioProducto: null,
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
+
   private normalizeEditableProduct(product: Producto): Producto {
     // Asegurar que los campos numéricos sean números
     return {
@@ -961,7 +993,6 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     return 'Ocurrió un error inesperado al actualizar el inventario.';
   }
 }
-
 
 
 
