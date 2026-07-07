@@ -3,13 +3,14 @@ import { AlumnoContextoService } from '../../core/services/alumno-contexto.servi
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { } from '../../shared/components/navbar/navbar.component';
 import { PrediccionCardComponent } from './components/prediccion-card/prediccion-card.component';
+import { TendenciaCardComponent } from './components/tendencia-card/tendencia-card.component';
 import { EstadisticaPresenter } from './presenter/estadistica.presenter';
 
 @Component({
   selector: 'app-estadistica-page',
   templateUrl: './estadistica.page.html',
   styleUrl: './estadistica.page.css',
-  imports: [ PrediccionCardComponent],
+  imports: [ PrediccionCardComponent, TendenciaCardComponent],
   providers: [EstadisticaPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

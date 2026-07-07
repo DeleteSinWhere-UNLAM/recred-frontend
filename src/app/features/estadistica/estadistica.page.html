@@ -21,9 +21,15 @@
       </div>
     </header>
 
-    <app-prediccion-card
-      [prediccion]="presenter.prediccion()"
-      [nivel]="presenter.nivelAlerta()"
-    />
+    <div class="estadistica__graficos">
+      <app-prediccion-card
+        [prediccion]="presenter.prediccion()"
+        [nivel]="presenter.nivelAlerta()"
+      />
+
+      <app-tendencia-card
+        [historial]="presenter.historial()"
+      />
+    </div>
   </div>
 </main>

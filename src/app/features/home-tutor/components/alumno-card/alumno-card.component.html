@@ -42,7 +42,7 @@
   </header>
 
 
-  <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
+    <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
 
     <a class="alumno-card__btn alumno-card__btn--menta" (click)="navegar('/acreditar-mercado-pago')"
       [class.active]="isActive('/acreditar-mercado-pago')">
@@ -52,12 +52,12 @@
       <span class="alumno-card__btn-label">Acreditar</span>
     </a>
 
-    <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')"
-      [class.active]="isActive('/restricciones-nutricionales')">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-shield"></i>
-      </span>
-      <span class="alumno-card__btn-label">Restricciones</span>
+    <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')"
+      [class.active]="isActive('/restricciones-horarias')">
+    <span class="alumno-card__btn-icono" aria-hidden="true">
+      <i class="fa-solid fa-clock"></i>
+    </span>
+    <span class="alumno-card__btn-label">Horarios</span>
     </a>
 
     <a class="alumno-card__btn alumno-card__btn--gris" (click)="navegar('/tutor-movimientos')"
@@ -71,20 +71,21 @@
 
   <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
     <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
-      <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')"
-        [class.active]="isActive('/restricciones-horarias')">
+
+      <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')"
+        [class.active]="isActive('/restricciones-nutricionales')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
-          <i class="fa-solid fa-clock"></i>
+          <i class="fa-solid fa-shield"></i>
         </span>
-        <span class="alumno-card__btn-label">Horarios</span>
+        <span class="alumno-card__btn-label">Restricciones</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
-        [class.active]="isActive('/presupuesto')">
+      <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')"
+        [class.active]="isActive('/favoritos-alumno')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
-          <i class="fa-solid fa-piggy-bank"></i>
+          <i class="fa-solid fa-heart"></i>
         </span>
-        <span class="alumno-card__btn-label">Presupuesto</span>
+        <span class="alumno-card__btn-label">Favoritos</span>
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--pizarra" (click)="navegar('/estadistica')"
@@ -121,6 +122,14 @@
         <span class="alumno-card__btn-label">Preferencias</span>
       </a>
 
+      <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
+        [class.active]="isActive('/presupuesto')">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-piggy-bank"></i>
+        </span>
+        <span class="alumno-card__btn-label">Presupuesto</span>
+      </a>
+
       @if (esPadre) {
       <a class="alumno-card__btn alumno-card__btn--menta" title="Adelanto" (click)="navegar('/adelanto')"
         [class.active]="isActive('/adelanto')">
@@ -137,14 +146,6 @@
         <span class="alumno-card__btn-label">Transferir</span>
       </a>
       }
-
-      <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')"
-        [class.active]="isActive('/favoritos-alumno')">
-        <span class="alumno-card__btn-icono" aria-hidden="true">
-          <i class="fa-solid fa-heart"></i>
-        </span>
-        <span class="alumno-card__btn-label">Favoritos</span>
-      </a>
     </div>
   </div>
 

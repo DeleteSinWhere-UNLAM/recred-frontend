@@ -5,13 +5,35 @@
     </h3>
 
     @if (categoriasMasConsumidas && categoriasMasConsumidas.length > 0) {
-      <div class="prediction-analysis__tags">
-        @for (cat of categoriasMasConsumidas; track cat.descripcion) {
-          <span class="prediction-analysis__tag">
-            <span>{{ cat.descripcion }}</span>
-            <strong>{{ cat.montoTotal | number:'1.2-2' }} $</strong>
-          </span>
-        }
+      <div class="prediction-analysis__categorias-grid">
+        <div class="prediction-analysis__chart-container" style="height: 250px; position: relative;">
+          <canvas baseChart
+            [data]="doughnutChartData"
+            [options]="doughnutChartOptions"
+            [type]="doughnutChartType">
+          </canvas>
+        </div>
+        
+        <div class="prediction-analysis__table-container">
+          <table class="prediction-analysis__table">
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th class="right-align">Total</th>
+                <th class="right-align">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cat of categoriasMasConsumidas; track cat.descripcion) {
+                <tr>
+                  <td>{{ cat.descripcion }}</td>
+                  <td class="right-align font-mono">{{ formatearDinero(cat.montoTotal) }}</td>
+                  <td class="right-align font-mono">{{ (cat.montoTotal / totalCategorias * 100).toFixed(1) }}%</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     } @else {
       <p class="prediction-analysis__vacio">

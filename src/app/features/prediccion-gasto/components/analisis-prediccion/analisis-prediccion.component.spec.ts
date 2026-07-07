@@ -5,6 +5,7 @@ import {
   CategoriaMasConsumidaMother,
 } from '../../prediccion-gasto.mother';
 import { AnalisisPrediccionComponent } from './analisis-prediccion.component';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 describe('AnalisisPrediccionComponent', () => {
   let component: AnalisisPrediccionComponent;
@@ -13,6 +14,7 @@ describe('AnalisisPrediccionComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AnalisisPrediccionComponent],
+      providers: [provideCharts(withDefaultRegisterables())]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AnalisisPrediccionComponent);
@@ -30,9 +32,9 @@ describe('AnalisisPrediccionComponent', () => {
 
       const texto = textoRenderizado();
       expect(texto).toContain('Bebidas');
-      expect(texto).toContain('1,500.00');
+      expect(texto).toContain('1.500');
       expect(texto).toContain('Snacks');
-      expect(texto).toContain('800.00');
+      expect(texto).toContain('800');
     });
 
     it('dado sin categorias, cuando renderizo, deberia mostrar el mensaje de "No hay suficientes datos"', () => {

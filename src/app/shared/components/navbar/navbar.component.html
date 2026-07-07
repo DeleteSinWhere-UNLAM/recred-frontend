@@ -10,29 +10,33 @@
       </a>
     </div>
 
-    <nav class="navbar__actions" aria-label="Acciones principales">
+    <button type="button" class="navbar__burger" (click)="toggleMenuMobile()" [attr.aria-expanded]="menuMobileAbierto()" aria-label="Abrir menú">
+      <i class="fa-solid" [class.fa-bars]="!menuMobileAbierto()" [class.fa-xmark]="menuMobileAbierto()" aria-hidden="true"></i>
+    </button>
+
+    <nav class="navbar__actions" [class.navbar__actions--open]="menuMobileAbierto()" aria-label="Acciones principales">
       @if (!esVistaAlumno() && !esVistaKiosquero() && !esVistaDirectivo() && !esVistaAdmin()) {
-      <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']">
+      <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']" title="Ir al panel de control">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-        <span>Panel de Control</span>
+        <span class="max-xl:hidden">Panel de Control</span>
         @if (esPremium()) {
         <span class="navbar__premium-badge">AVANZADO</span>
         }
       </a>
-      <a class="navbar__movimientos-link" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" tabindex="0" style="cursor: pointer;">
+      <a class="navbar__movimientos-link" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" tabindex="0" style="cursor: pointer;" title="Ver historial de movimientos">
         <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-        <span>Ver movimientos</span>
+        <span class="max-xl:hidden">Ver movimientos</span>
       </a>
-      <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']">
+      <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']" title="Gestionar carritos favoritos">
         <i class="fa-regular fa-heart" aria-hidden="true"></i>
-        <span>Carritos Favoritos</span>
+        <span class="max-xl:hidden">Carritos Favoritos</span>
       </a>
       }
 
       @if (esVistaKiosquero()) {
       <a class="navbar__kiosk-link navbar__kiosk-link--premium" [routerLink]="['/kiosquero/reportes']">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-        <span>Panel de control</span>
+        <span class="max-xl:hidden">Panel de control</span>
         <span class="navbar__premium-badge">AVANZADO</span>
       </a>
       <div class="navbar__kiosk-tools-wrap">
@@ -62,7 +66,7 @@
       <div class="navbar__notif-wrap">
         <button type="button" class="navbar__notif" [class.navbar__notif--wide]="esVistaKiosquero()"
           [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'" [attr.aria-expanded]="menuNotifAbierto()"
-          aria-haspopup="menu" (click)="toggleNotificaciones()">
+          aria-haspopup="menu" (click)="toggleNotificaciones()" title="Ver notificaciones">
           <i class="fa-solid fa-bell" aria-hidden="true"></i>
           @if (esVistaKiosquero()) {
           <span>Notificaciones</span>
@@ -106,7 +110,7 @@
 
       @if (!esVistaKiosquero() && !esVistaDirectivo() && !esVistaAdmin()) {
       <button type="button" class="navbar__cart" (click)="irAlCarrito()"
-        [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'">
+        [attr.aria-label]="'Carrito, ' + cartCount() + ' ítems'" title="Ver carrito de compras">
         <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
         @if (cartCount() > 0) {
         <span class="navbar__cart-badge">{{ cartCount() }}</span>
@@ -126,7 +130,7 @@
 
       <div class="navbar__perfil-wrap">
         <button type="button" class="navbar__perfil" aria-label="Mi perfil" [attr.aria-expanded]="menuAbierto()"
-          aria-haspopup="menu" (click)="toggleMenu()">
+          aria-haspopup="menu" (click)="toggleMenu()" title="Opciones de perfil y sesión">
           <i class="fa-solid fa-user" aria-hidden="true"></i>
         </button>
         @if (menuAbierto()) {

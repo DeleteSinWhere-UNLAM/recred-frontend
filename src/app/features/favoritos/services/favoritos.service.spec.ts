@@ -202,42 +202,42 @@ describe('FavoritosService', () => {
 
     it('dado un nombre "Coca Cola", deberia mapear a la imagen de gaseosa', async () => {
       const producto = await fetchConNombre('Coca Cola');
-      expect(producto.imagen).toContain('1622483767028');
+      expect(producto.imagen).toContain('Coca-Cola');
     });
 
     it('dado un nombre "Agua", deberia usar la imagen de agua', async () => {
       const producto = await fetchConNombre('Agua Mineral');
-      expect(producto.imagen).toContain('1548839140');
+      expect(producto.imagen).toContain('Bottled_water');
     });
 
     it('dado un nombre "Empanada", deberia usar la imagen de empanadas', async () => {
       const producto = await fetchConNombre('Empanada de carne');
-      expect(producto.imagen).toContain('lanacion');
+      expect(producto.imagen).toContain('Empanadas');
     });
 
     it('dado un nombre "Yogur", deberia usar la imagen de yogur', async () => {
       const producto = await fetchConNombre('Yogur bebible');
-      expect(producto.imagen).toContain('1488477181946');
+      expect(producto.imagen).toContain('Yogurt');
     });
 
     it('dado un nombre "manzana", deberia usar la imagen de manzana/fruta', async () => {
       const producto = await fetchConNombre('Manzana verde');
-      expect(producto.imagen).toContain('1560806887');
+      expect(producto.imagen).toContain('Apple');
     });
 
     it('dado un nombre "pizza", deberia usar la imagen de pizza', async () => {
       const producto = await fetchConNombre('Pizza margarita');
-      expect(producto.imagen).toContain('1513104890');
+      expect(producto.imagen).toContain('pizza');
     });
 
     it('dado un nombre "cereal", deberia usar la imagen de barra', async () => {
       const producto = await fetchConNombre('Cereal integral');
-      expect(producto.imagen).toContain('1571748982');
+      expect(producto.imagen).toContain('Cereal');
     });
 
     it('dado un nombre "cookie", deberia usar la imagen de alfajor/factura', async () => {
       const producto = await fetchConNombre('Cookie chocolate');
-      expect(producto.imagen).toContain('1499636136');
+      expect(producto.imagen).toContain('Alfajores');
     });
 
     it('dado un nombre no reconocido, la imagen deberia quedar vacia', async () => {

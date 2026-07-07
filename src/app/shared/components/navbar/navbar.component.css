@@ -1,3 +1,7 @@
+:host {
+  display: contents;
+}
+
 .navbar {
   position: sticky;
   top: 0;
@@ -547,14 +551,20 @@
   }
 }
 
+@media (max-width: 768px) {
+  .navbar__logo-text {
+    display: none; /* Hide redundant text earlier to prevent overlap */
+  }
+
+  .navbar__actions .navbar__premium-badge {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .navbar__inner {
     padding-right: 16px;
     padding-left: 16px;
-  }
-
-  .navbar__logo-text {
-    display: none; /* Hide redundant text to prevent overlap on mobile */
   }
 
   .navbar__logo-img {
@@ -582,10 +592,6 @@
   .navbar__dashboard-link span,
   .navbar__movimientos-link span,
   .navbar__carritos-favoritos-link span {
-    display: none;
-  }
-
-  .navbar__actions .navbar__premium-badge {
     display: none;
   }
 
@@ -1025,5 +1031,112 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   box-shadow: 0 2px 5px rgba(212, 175, 55, 0.35);
   text-transform: uppercase;
+}
+
+/* Hamburguesa Menu Mobile */
+.navbar__burger {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  margin-left: auto;
+}
+.navbar__burger:hover, .navbar__burger:active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 514px) {
+  .navbar__burger {
+    display: block;
+  }
+  
+  .navbar:not(.navbar--kiosquero) .navbar__actions {
+    display: none;
+  }
+  
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #0c3670, #123f80);
+    padding: 20px 20px 40px 20px;
+    gap: 12px;
+    box-shadow: 0 12px 30px rgba(15, 52, 117, 0.6);
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: stretch;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  
+  /* Enlaces de texto ocupan el 100% */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > a {
+    width: 100% !important;
+    height: 48px !important;
+    justify-content: flex-start;
+    padding: 0 16px !important;
+  }
+
+  /* Los 3 botones finales comparten la última fila */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > div,
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > button.navbar__cart {
+    flex: 1;
+    width: auto !important;
+    height: 48px !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Asegurar que los botones internos se estiren al 100% de sus contenedores */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__notif,
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__perfil {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px !important;
+  }
+  
+  /* Si un botón abre su menú, lo forzamos a ocupar el 100% para que empuje el contenido hacia abajo */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > div:has(.navbar__menu) {
+    flex-basis: 100% !important;
+    height: auto !important;
+    flex-direction: column;
+    background: transparent !important;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .max-xl\:hidden {
+    display: inline-block !important;
+    margin-left: 12px;
+  }
+  
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-top: 12px;
+    margin-bottom: 24px;
+    width: 100%;
+    min-width: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    background: var(--color-superficie);
+  }
+  
+  /* Ocultar el piquito superior del menú en la versión móvil */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu::before {
+    display: none;
+  }
 }
 

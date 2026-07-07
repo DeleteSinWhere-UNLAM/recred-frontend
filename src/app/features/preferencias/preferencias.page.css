@@ -11,6 +11,7 @@
   flex-direction: column;
   flex: 1;
   justify-content: center;
+  min-width: 0;
 }
 
 .preferencias__container {
@@ -19,6 +20,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .preferencias__volver {
@@ -61,6 +63,7 @@
   border-radius: 20px;
   padding: 16px 20px;
   box-shadow: var(--shadow-card);
+  min-width: 0;
 }
 
 .preferencias__icono {
@@ -99,6 +102,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .preferencias__seccion-titulo {
@@ -127,6 +131,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  min-width: 0;
 }
 
 .preferencias__vacio {

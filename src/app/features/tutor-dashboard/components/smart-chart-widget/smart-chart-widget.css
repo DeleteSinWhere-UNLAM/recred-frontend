@@ -15,6 +15,7 @@
   background-color: #4a6fa5fa;
   cursor: grab;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -26,6 +27,7 @@
 
 .header-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   align-items: center;
   margin-left: auto;
@@ -43,6 +45,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .close-btn:hover {
@@ -59,6 +62,7 @@
   background-color: white;
   outline: none;
   transition: border-color 0.2s;
+  flex-shrink: 0;
 }
 
 .custom-select:focus {
@@ -73,7 +77,6 @@
 
 .smart-card-body {
   flex: 1;
-  padding: 16px;
   position: relative;
   min-height: 0; /* Important for chart.js to shrink */
   display: flex;

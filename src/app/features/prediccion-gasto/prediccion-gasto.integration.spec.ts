@@ -4,6 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { PrediccionGastoPageComponent } from './prediccion-gasto-page/prediccion-gasto-page.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import {
   ALUMNO_ID_TEST,
   PrediccionGastoMother,
@@ -82,6 +85,9 @@ describe('PrediccionGasto Integration', () => {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: { get: () => null } } },
         },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideCharts(withDefaultRegisterables()),
       ],
     }).compileComponents();
 
