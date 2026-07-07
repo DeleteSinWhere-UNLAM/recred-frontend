@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
@@ -41,7 +43,7 @@ describe('ImportarTutoresPage', () => {
 
     await TestBed.configureTestingModule({
       imports: [ImportarTutoresPage],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     })
       .overrideComponent(ImportarTutoresPage, {
         add: { providers: [{ provide: ImportarTutoresPresenter, useValue: presenterStub }] },

@@ -1,4 +1,5 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { InvitacionesTutorService } from '../services/invitaciones-tutor.service';
@@ -11,21 +12,22 @@ import {
 describe('InvitarTutor Integration', () => {
   let fixture: ComponentFixture<InvitarTutorPage>;
   let servicioInvitaciones: jasmine.SpyObj<InvitacionesTutorService>;
-  let router: jasmine.SpyObj<Router>;
+  let navigateSpy: jasmine.Spy;
 
   beforeEach(async () => {
     servicioInvitaciones = jasmine.createSpyObj('InvitacionesTutorService', ['invitarTutor']);
-    router = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [InvitarTutorPage],
       providers: [
         provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: InvitacionesTutorService, useValue: servicioInvitaciones },
-        { provide: Router, useValue: router },
       ],
     }).compileComponents();
 
+    navigateSpy = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
     fixture = TestBed.createComponent(InvitarTutorPage);
   });
 
@@ -61,7 +63,7 @@ describe('InvitarTutor Integration', () => {
 
     whenHagoClickEn('.btn--secondary');
 
-    expect(router.navigate).toHaveBeenCalledWith(['/directivo']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/directivo']);
   });
 
   function givenElBackDevuelve(invitacion: ReturnType<typeof InvitacionTutorMother.creada>): void {

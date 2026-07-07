@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { ImportarTutoresPresenter } from './presenter/importar-tutores.presenter';
 
 @Component({
   selector: 'app-importar-tutores-page',
   standalone: true,
-  imports: [],
+  imports: [NavbarComponent],
   templateUrl: './importar-tutores.page.html',
   styleUrl: './importar-tutores.page.css',
   providers: [ImportarTutoresPresenter],

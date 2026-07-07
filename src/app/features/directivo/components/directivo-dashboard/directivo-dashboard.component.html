@@ -51,6 +51,71 @@
           </span>
         </button>
       </div>
+
+      @if (data.buffets.length === 0) {
+        <div class="pv__ok-state" style="margin-top: 16px;">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-circle-info"></i>
+          </span>
+          <div>
+            <strong>Sin kioscos registrados</strong>
+            <p>No hay buffets registrados en este colegio todavía.</p>
+          </div>
+        </div>
+      }
+
+      @if (data.buffets.length > 0) {
+        <div class="pv__operation-grid">
+          @for (buffet of data.buffets; track buffet) {
+            <div class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
+              <span class="pv__operation-icon" aria-hidden="true">
+                <i class="fa-solid fa-store"></i>
+              </span>
+
+              <div class="pv__operation-body">
+                <span class="pv__operation-label">
+                  <span class="status-indicator" [class.active]="buffet.activo">
+                    {{ buffet.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </span>
+                <strong style="font-size: 20px;">{{ buffet.nombre }}</strong>
+
+                @if (buffet.vendedor) {
+                  <small style="margin-top: 8px;">
+                    <i class="fa-solid fa-user-tie"></i> {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
+                  </small>
+                } @else {
+                  <small style="margin-top: 8px; color: #d97706;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Sin vendedor
+                  </small>
+                }
+              </div>
+
+              <div class="actions-column" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: max-content;">
+                @if (!buffet.vendedor) {
+                  <button type="button" class="pv__quick-action pv__quick-action--dorado" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
+                    <span>
+                      <strong style="font-size: 13px;">Asignar Vendedor</strong>
+                    </span>
+                    <span class="pv__quick-arrow" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
+                      <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                  </button>
+                } @else {
+                  <button type="button" class="pv__quick-action" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" (click)="verDetalleVendedor(buffet.vendedor)">
+                    <span>
+                      <strong style="font-size: 13px;">Ver Vendedor</strong>
+                    </span>
+                    <span class="pv__quick-arrow pv__quick-arrow--eye" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
+                      <i class="fa-solid fa-eye"></i>
+                    </span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
     </section>
 
     <section class="pv__panel" aria-labelledby="tutores-title">
@@ -90,71 +155,6 @@
           </span>
         </button>
       </div>
-
-      @if (data.buffets.length === 0) {
-        <div class="pv__ok-state" style="margin-top: 16px;">
-          <span aria-hidden="true">
-            <i class="fa-solid fa-circle-info"></i>
-          </span>
-          <div>
-            <strong>Sin kioscos registrados</strong>
-            <p>No hay buffets registrados en este colegio todavía.</p>
-          </div>
-        </div>
-      }
-
-      @if (data.buffets.length > 0) {
-        <div class="pv__operation-grid">
-          @for (buffet of data.buffets; track buffet) {
-            <div class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
-              <span class="pv__operation-icon" aria-hidden="true">
-                <i class="fa-solid fa-store"></i>
-              </span>
-              
-              <div class="pv__operation-body">
-                <span class="pv__operation-label">
-                  <span class="status-indicator" [class.active]="buffet.activo">
-                    {{ buffet.activo ? 'Activo' : 'Inactivo' }}
-                  </span>
-                </span>
-                <strong style="font-size: 20px;">{{ buffet.nombre }}</strong>
-                
-                @if (buffet.vendedor) {
-                  <small style="margin-top: 8px;">
-                    <i class="fa-solid fa-user-tie"></i> {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
-                  </small>
-                } @else {
-                  <small style="margin-top: 8px; color: #d97706;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Sin vendedor
-                  </small>
-                }
-              </div>
-
-              <div class="actions-column" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: max-content;">
-                @if (!buffet.vendedor) {
-                  <button type="button" class="pv__quick-action pv__quick-action--dorado" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
-                    <span>
-                      <strong style="font-size: 13px;">Asignar Vendedor</strong>
-                    </span>
-                    <span class="pv__quick-arrow" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
-                      <i class="fa-solid fa-arrow-right"></i>
-                    </span>
-                  </button>
-                } @else {
-                  <button type="button" class="pv__quick-action" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" (click)="verDetalleVendedor(buffet.vendedor)">
-                    <span>
-                      <strong style="font-size: 13px;">Ver Vendedor</strong>
-                    </span>
-                    <span class="pv__quick-arrow pv__quick-arrow--eye" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
-                      <i class="fa-solid fa-eye"></i>
-                    </span>
-                  </button>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      }
     </section>
   }
 </div>

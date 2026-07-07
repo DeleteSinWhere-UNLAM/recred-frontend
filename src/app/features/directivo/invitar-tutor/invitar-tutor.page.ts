@@ -5,6 +5,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { InvitarTutorPresenter } from './presenter/invitar-tutor.presenter';
 
 type InvitarTutorForm = FormGroup<{
@@ -17,7 +18,7 @@ type InvitarTutorForm = FormGroup<{
 @Component({
   selector: 'app-invitar-tutor-page',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NavbarComponent],
   templateUrl: './invitar-tutor.page.html',
   styleUrl: './invitar-tutor.page.css',
   providers: [InvitarTutorPresenter],

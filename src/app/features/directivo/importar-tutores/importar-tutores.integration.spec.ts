@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { InvitacionesTutorService } from '../services/invitaciones-tutor.service';
@@ -10,21 +12,21 @@ import {
 describe('ImportarTutores Integration', () => {
   let fixture: ComponentFixture<ImportarTutoresPage>;
   let servicioInvitaciones: jasmine.SpyObj<InvitacionesTutorService>;
-  let router: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
     servicioInvitaciones = jasmine.createSpyObj('InvitacionesTutorService', ['importarCsv']);
-    router = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [ImportarTutoresPage],
       providers: [
         provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: InvitacionesTutorService, useValue: servicioInvitaciones },
-        { provide: Router, useValue: router },
       ],
     }).compileComponents();
 
+    spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
     fixture = TestBed.createComponent(ImportarTutoresPage);
   });
 
