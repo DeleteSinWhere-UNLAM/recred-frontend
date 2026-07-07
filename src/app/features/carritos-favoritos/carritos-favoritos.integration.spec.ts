@@ -135,12 +135,14 @@ describe('CarritosFavoritos Integration', () => {
     expect(queryUno('.grupo-hijo-card')).toBeFalsy();
   });
 
-  it('dado el plan gratuito y 3+ carritos, cuando se monta, deberia mostrar el aviso de limite', async () => {
+  it('dado el plan gratuito y 5 carritos, cuando se monta, deberia mostrar el aviso de limite', async () => {
     servicioCarritos.getCarritosFavoritos.and.returnValue(
       of([
         CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-1' }),
         CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-2' }),
         CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-3' }),
+        CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-4' }),
+        CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-5' }),
       ]),
     );
 

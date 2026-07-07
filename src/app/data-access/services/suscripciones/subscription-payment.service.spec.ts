@@ -10,7 +10,7 @@ import {
 
 describe('SubscriptionPaymentService', () => {
   const URL_USER_SUBSCRIPTION = `${environment.apiUrl}/payments/subscriptions/user`;
-  const URL_SCHOOL_SUBSCRIPTION_PAYMENT = `${environment.apiUrl}/schools/subscriptions/payments`;
+  const URL_SCHOOL_SUBSCRIPTION_PAYMENT = `${environment.apiUrl}/payments/subscriptions/school`;
 
   let service: SubscriptionPaymentService;
   let httpMock: HttpTestingController;
@@ -53,7 +53,7 @@ describe('SubscriptionPaymentService', () => {
     await expectAsync(promise).toBeResolvedTo(respuesta);
   });
 
-  it('dado un colegio, cuando creo el pago de licencia, deberia hacer POST a schools/subscriptions/payments', async () => {
+  it('dado un colegio, cuando creo el pago de licencia, deberia hacer POST a payments/subscriptions/school', async () => {
     const promise = service.crearPagoSuscripcionColegio({
       colegioId: 'colegio-1',
     });
@@ -87,11 +87,9 @@ describe('SubscriptionPaymentService', () => {
     override: Partial<CrearPagoSuscripcionColegioResponse> = {},
   ): CrearPagoSuscripcionColegioResponse {
     return {
-      paymentId: 'pago-1',
-      preferenceId: 'pref-1',
-      checkoutUrl: 'https://www.mercadopago.com/school-checkout',
-      estado: 'PENDIENTE',
-      monto: 20,
+      paymentUrl: 'https://www.mercadopago.com/school-checkout',
+      price: 20,
+      currency: 'USD',
       ...override,
     };
   }

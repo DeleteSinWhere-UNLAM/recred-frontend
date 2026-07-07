@@ -98,11 +98,9 @@ describe('DirectivoPresenter', () => {
 
   function givenPagoLicenciaResuelve(): void {
     subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio.and.resolveTo({
-      paymentId: 'pago-1',
-      preferenceId: 'pref-1',
-      checkoutUrl: 'https://www.mercadopago.com/school-checkout',
-      estado: 'PENDIENTE',
-      monto: 20,
+      paymentUrl: 'https://www.mercadopago.com/school-checkout',
+      price: 20,
+      currency: 'USD',
     });
   }
 

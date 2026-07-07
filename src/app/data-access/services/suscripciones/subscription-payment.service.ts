@@ -25,12 +25,10 @@ export interface CrearPagoSuscripcionColegioRequest {
 }
 
 export interface CrearPagoSuscripcionColegioResponse {
-  paymentId: string;
-  preferenceId: string;
-  checkoutUrl: string;
-  estado: string;
-  monto: number;
-  paymentUrl?: string;
+  paymentUrl: string;
+  price: number;
+  currency: string;
+  checkoutUrl?: string;
 }
 
 @Injectable({ providedIn: 'root' })
