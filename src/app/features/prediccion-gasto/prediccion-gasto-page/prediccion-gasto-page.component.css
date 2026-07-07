@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .prediction-page__volver {
@@ -51,6 +52,7 @@
   border-radius: 20px;
   padding: 16px 20px;
   box-shadow: var(--shadow-card);
+  min-width: 0;
 }
 
 .prediction-page__icono {
@@ -98,6 +100,7 @@
   font-size: 14px;
   color: var(--color-texto-claro);
   text-align: center;
+  min-width: 0;
 }
 
 .prediction-page__spinner {

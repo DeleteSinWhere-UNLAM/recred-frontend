@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { } from '../../../shared/components/navbar/navbar.component';
@@ -24,6 +24,7 @@ export class PrediccionGastoPageComponent {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   predictionData: PrediccionGasto | null = null;
   isLoading = false;
@@ -38,6 +39,7 @@ export class PrediccionGastoPageComponent {
         this.predictionData = null;
         this.errorMessage =
           'No se encontro el alumno para obtener la prediccion de gastos.';
+        this.cdr.markForCheck();
         return;
       }
 
@@ -56,6 +58,7 @@ export class PrediccionGastoPageComponent {
     if (!alumnoId) {
       this.errorMessage =
         'No se encontro el alumno para obtener la prediccion de gastos.';
+      this.cdr.markForCheck();
       return;
     }
 
@@ -71,17 +74,20 @@ export class PrediccionGastoPageComponent {
     this.isLoading = true;
     this.errorMessage = null;
     this.predictionData = null;
+    this.cdr.markForCheck();
 
     this.predictionService.getPrediction(alumnoId).subscribe({
       next: (data) => {
         this.predictionData = data;
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.errorMessage =
           'No se pudo cargar la prediccion de gastos. Por favor, intenta de nuevo mas tarde.';
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
     });
   }

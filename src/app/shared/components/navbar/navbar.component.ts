@@ -70,6 +70,7 @@ export class NavbarComponent implements OnInit {
   protected readonly menuNotifAbierto = signal(false);
   protected readonly menuKiosqueroAbierto = signal(false);
   protected readonly menuBilleteraAbierto = signal(false);
+  protected readonly menuMobileAbierto = signal(false);
   protected readonly temaActivo = this.themeService.theme;
 
   protected toggleTema(): void {
@@ -77,16 +78,19 @@ export class NavbarComponent implements OnInit {
   }
 
   protected irAlCarrito(): void {
+    this.menuMobileAbierto.set(false);
     this.router.navigateByUrl('/compra');
   }
 
   protected irAMovimientos(): void {
+    this.menuMobileAbierto.set(false);
     this.contextoService.limpiar();
     void this.router.navigateByUrl('/movimientos');
   }
 
   protected irAInicio(event: Event): void {
     event.preventDefault();
+    this.menuMobileAbierto.set(false);
     this.router.navigateByUrl(this.usuarioService.homeUrl());
   }
 
@@ -97,6 +101,15 @@ export class NavbarComponent implements OnInit {
       this.menuKiosqueroAbierto.set(false);
     } else {
       this.menuBilleteraAbierto.set(false);
+    }
+  }
+
+  protected toggleMenuMobile(): void {
+    this.menuMobileAbierto.update((abierto) => !abierto);
+    if (this.menuMobileAbierto()) {
+      this.menuAbierto.set(false);
+      this.menuNotifAbierto.set(false);
+      this.menuKiosqueroAbierto.set(false);
     }
   }
 
@@ -301,7 +314,8 @@ export class NavbarComponent implements OnInit {
       !this.menuAbierto() &&
       !this.menuNotifAbierto() &&
       !this.menuKiosqueroAbierto() &&
-      !this.menuBilleteraAbierto()
+      !this.menuBilleteraAbierto() &&
+      !this.menuMobileAbierto()
     ) {
       return;
     }
@@ -312,6 +326,7 @@ export class NavbarComponent implements OnInit {
       this.menuNotifAbierto.set(false);
       this.menuKiosqueroAbierto.set(false);
       this.menuBilleteraAbierto.set(false);
+      this.menuMobileAbierto.set(false);
     }
   }
 
@@ -321,5 +336,6 @@ export class NavbarComponent implements OnInit {
     if (this.menuNotifAbierto()) this.menuNotifAbierto.set(false);
     if (this.menuKiosqueroAbierto()) this.menuKiosqueroAbierto.set(false);
     if (this.menuBilleteraAbierto()) this.menuBilleteraAbierto.set(false);
+    if (this.menuMobileAbierto()) this.menuMobileAbierto.set(false);
   }
 }

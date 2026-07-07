@@ -10,6 +10,11 @@ import { PrediccionCardComponent } from './components/prediccion-card/prediccion
 import { EstadisticaPage } from './estadistica.page';
 import { PrediccionGastoMother } from './estadistica.mother';
 import { EstadisticaPresenter } from './presenter/estadistica.presenter';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { MovimientosService } from '../movimientos/services/movimientos.service';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-prediccion-card',
@@ -19,6 +24,7 @@ import { EstadisticaPresenter } from './presenter/estadistica.presenter';
 class PrediccionCardStub {
   @Input() prediccion: PrediccionGasto | undefined;
   @Input() nivel: NivelAlerta = 'ok';
+  @Input() alumnoId!: string;
 }
 
 interface PresenterFake {
@@ -31,6 +37,9 @@ interface PresenterFake {
   urlFotoPerfil: WritableSignal<string | null>;
   iniciales: WritableSignal<string>;
   nivelAlerta: WritableSignal<NivelAlerta>;
+  historial: WritableSignal<unknown[]>;
+  categoriasMasConsumidas: WritableSignal<unknown[]>;
+  analisisIa: WritableSignal<unknown>;
 }
 
 describe('EstadisticaPage', () => {
@@ -39,6 +48,7 @@ describe('EstadisticaPage', () => {
   let presenterFake: PresenterFake;
   let alumnoIdSignal: WritableSignal<string>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let servicioMovimientos: jasmine.SpyObj<MovimientosService>;
 
   beforeEach(async () => {
     presenterFake = crearPresenterFake();
@@ -49,6 +59,9 @@ describe('EstadisticaPage', () => {
       nombre: 'Tutor Test',
     } as ReturnType<UsuarioService['getUsuarioActual']>);
 
+    servicioMovimientos = jasmine.createSpyObj('MovimientosService', ['getHistorialAlumno']);
+    servicioMovimientos.getHistorialAlumno.and.returnValue(of([]));
+
     await TestBed.configureTestingModule({
       imports: [EstadisticaPage],
       providers: [
@@ -57,6 +70,10 @@ describe('EstadisticaPage', () => {
           useValue: { alumnoId: alumnoIdSignal.asReadonly() },
         },
         { provide: UsuarioService, useValue: servicioUsuario },
+        { provide: MovimientosService, useValue: servicioMovimientos },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideCharts(withDefaultRegisterables()),
       ],
     })
       .overrideComponent(EstadisticaPage, {
@@ -164,6 +181,9 @@ describe('EstadisticaPage', () => {
       urlFotoPerfil: signal<string | null>(null),
       iniciales: signal(''),
       nivelAlerta: signal<NivelAlerta>('ok'),
+      historial: signal([]),
+      categoriasMasConsumidas: signal([]),
+      analisisIa: signal(null),
     }) as unknown as PresenterFake;
   }
 

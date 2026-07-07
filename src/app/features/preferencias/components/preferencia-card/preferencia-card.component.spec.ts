@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Preferencia } from '../../models/preferencia.model';
 import { PreferenciaMother } from '../../preferencias.mother';
 import { PreferenciaCardComponent } from './preferencia-card.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('PreferenciaCardComponent', () => {
   let component: PreferenciaCardComponent;
@@ -10,6 +12,7 @@ describe('PreferenciaCardComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PreferenciaCardComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PreferenciaCardComponent);

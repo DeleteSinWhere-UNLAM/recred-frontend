@@ -15,9 +15,9 @@ import { PreferenciasService } from './preferencias.service';
 
 describe('PreferenciasService', () => {
   const URL_ALUMNO = (id: string): string =>
-    `${environment.apiUrl}/alumnos/${id}/preferencias?ultima=true`;
+    `${environment.apiUrl}/alumnos/${id}/preferencias`;
   const URL_USUARIO = (id: string): string =>
-    `${environment.apiUrl}/usuarios/${id}/preferencias?ultima=true`;
+    `${environment.apiUrl}/usuarios/${id}/preferencias`;
 
   let service: PreferenciasService;
   let httpMock: HttpTestingController;

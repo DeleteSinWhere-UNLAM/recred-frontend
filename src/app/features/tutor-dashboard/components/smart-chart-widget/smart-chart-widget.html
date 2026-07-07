@@ -1,8 +1,8 @@
 <div class="smart-card">
   <div class="smart-card-header">
-    <div class="header-title" style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
-      <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
-      <h3 style="margin:0; font-size: 1.17em; color: white; white-space: nowrap;">Gráficos</h3>
+    <div class="header-title" style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+      <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; color: #ffffff; font-size: 1.2rem; flex-shrink: 0;" title="Arrastrar tarjeta"></i>
+      <h3 style="margin:0; font-size: 1.17em; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">Gráficos</h3>
     </div>
     <div class="header-controls">
       <select class="custom-select child-select" [(ngModel)]="selectedChildId" (change)="onConfigChange()">
@@ -33,11 +33,13 @@
   </div>
 
   <div class="smart-card-body">
-    <canvas baseChart
-      [data]="chartData"
-      [options]="chartOptions"
-      [plugins]="chartPlugins"
-      [type]="selectedChartType">
-    </canvas>
+    <div style="position: absolute; top: 16px; left: 16px; right: 16px; bottom: 16px;">
+      <canvas baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [plugins]="chartPlugins"
+        [type]="selectedChartType">
+      </canvas>
+    </div>
   </div>
 </div>
