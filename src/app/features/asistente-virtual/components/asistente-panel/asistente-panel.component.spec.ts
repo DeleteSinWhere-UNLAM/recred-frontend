@@ -152,6 +152,14 @@ describe('AsistentePanelComponent', () => {
       expect(component.sugerencia.emit).not.toHaveBeenCalled();
     });
 
+    it('dado una opcion bloqueada, cuando hago click, no deberia emitir sugerencia', () => {
+      spyOn(component.sugerencia, 'emit');
+
+      whenLlamoOnOpcion(SugerenciaCapacidadMother.crear({ bloqueada: true }));
+
+      expect(component.sugerencia.emit).not.toHaveBeenCalled();
+    });
+
     it('dado deshabilitado false, cuando hago click en una opcion, deberia cerrar acciones y emitir el prompt', () => {
       spyOn(component.sugerencia, 'emit');
       givenOpciones([SugerenciaCapacidadMother.crear()]);

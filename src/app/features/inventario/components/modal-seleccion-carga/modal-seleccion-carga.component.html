@@ -18,27 +18,41 @@
     </header>
 
     <div class="upload-selection-modal__body">
-      <button type="button" class="upload-selection-modal__option" (click)="onIaUpload()">
+      <button type="button" class="upload-selection-modal__option"
+        [class.upload-selection-modal__option--locked]="opcionBloqueada('INTERMEDIO')"
+        [attr.aria-disabled]="opcionBloqueada('INTERMEDIO')" (click)="onIaUpload()">
         <div class="upload-selection-modal__icon" aria-hidden="true">
           <i class="fa-solid fa-cloud-arrow-up"></i>
         </div>
         <div class="upload-selection-modal__text">
           <strong class="upload-selection-modal__option-title">
             Carga Inteligente
-            <span class="upload-selection-modal__premium-badge">AVANZADO</span>
+            <span class="upload-selection-modal__premium-badge">
+              @if (opcionBloqueada('INTERMEDIO')) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              }
+              Intermedio
+            </span>
           </strong>
           <span class="upload-selection-modal__option-desc">Alta asistida usando foto y procesado automático</span>
         </div>
         <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
       </button>
-      <button type="button" class="upload-selection-modal__option" (click)="onBulkUpload()">
+      <button type="button" class="upload-selection-modal__option"
+        [class.upload-selection-modal__option--locked]="opcionBloqueada('AVANZADO')"
+        [attr.aria-disabled]="opcionBloqueada('AVANZADO')" (click)="onBulkUpload()">
         <div class="upload-selection-modal__icon" aria-hidden="true">
           <i class="fa-solid fa-boxes-stacked"></i>
         </div>
         <div class="upload-selection-modal__text">
           <strong class="upload-selection-modal__option-title">
             Carga masiva
-            <span class="upload-selection-modal__premium-badge">AVANZADO</span>
+            <span class="upload-selection-modal__premium-badge">
+              @if (opcionBloqueada('AVANZADO')) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              }
+              Avanzado
+            </span>
           </strong>
           <span class="upload-selection-modal__option-desc">Sube un archivo PDF para procesar múltiples productos a la
             vez</span>

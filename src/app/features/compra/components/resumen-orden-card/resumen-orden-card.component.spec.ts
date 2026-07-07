@@ -19,11 +19,15 @@ describe('ResumenOrdenCardComponent', () => {
 
   beforeEach(async () => {
     perfilSignal = signal<Perfil | null>({ id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' });
+    const esPlanGratuito = () => {
+      const plan = perfilSignal()?.plan?.toUpperCase();
+      return plan !== 'INTERMEDIO' && plan !== 'AVANZADO';
+    };
 
     await TestBed.configureTestingModule({
       imports: [ResumenOrdenCardComponent],
       providers: [
-        { provide: PerfilService, useValue: { perfil: perfilSignal } },
+        { provide: PerfilService, useValue: { perfil: perfilSignal, esPlanGratuito } },
       ],
     }).compileComponents();
 
@@ -119,8 +123,8 @@ describe('ResumenOrdenCardComponent', () => {
   });
 
   describe('esPremium', () => {
-    it('dado plan PREMIUM, esPremium deberia ser true y el CTA tiene la clase --premium', () => {
-      perfilSignal.set({ id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' });
+    it('dado plan INTERMEDIO, esPremium deberia ser true y el CTA tiene la clase --premium', () => {
+      perfilSignal.set({ id: 'p-1', nombre: 'Tutor', plan: 'INTERMEDIO' });
       component.lineas = [];
 
       whenMonto();

@@ -5,7 +5,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { ActivatedRoute, ParamMap, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
-import { AlumnoMother, PerfilMother } from '../../data-access/services/alumno.mother';
+import { AlumnoMother } from '../../data-access/services/alumno.mother';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
@@ -78,7 +78,7 @@ describe('MovimientosPage', () => {
       'asegurarCargados',
       'getAlumnoById',
     ]);
-    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerAlumnoId']);
+    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerAlumnoId', 'esPlanGratuito']);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
     servicioDialog = jasmine.createSpyObj<DialogService>('DialogService', ['confirm', 'alert']);
     servicioDialog.confirm.and.resolveTo(true);
@@ -95,6 +95,7 @@ describe('MovimientosPage', () => {
     });
 
     servicioPerfil.obtenerAlumnoId.and.returnValue('alumno-1');
+    servicioPerfil.esPlanGratuito.and.returnValue(true);
     servicioMovimientos.getHistorialTutor.and.returnValue(of(movimientos));
     servicioMovimientos.getHistorialAlumno.and.returnValue(of([mov1, mov3]));
     servicioMovimientos.cancelarCompra.and.returnValue(of(undefined));
@@ -550,11 +551,8 @@ describe('MovimientosPage', () => {
   });
 
   describe('esPremium', () => {
-    it('dado un perfil con plan PREMIUM, esPremium deberia ser true', fakeAsync(() => {
-      Object.defineProperty(servicioPerfil, 'perfil', {
-        value: signal(PerfilMother.crear({ plan: 'PREMIUM' })).asReadonly(),
-        writable: true,
-      });
+    it('dado un perfil con plan INTERMEDIO, esPremium deberia ser true', fakeAsync(() => {
+      servicioPerfil.esPlanGratuito.and.returnValue(false);
       whenMonto();
       tick();
 
@@ -562,10 +560,7 @@ describe('MovimientosPage', () => {
     }));
 
     it('dado un perfil con plan GRATIS, esPremium deberia ser false', fakeAsync(() => {
-      Object.defineProperty(servicioPerfil, 'perfil', {
-        value: signal(PerfilMother.crear({ plan: 'GRATIS' })).asReadonly(),
-        writable: true,
-      });
+      servicioPerfil.esPlanGratuito.and.returnValue(true);
       whenMonto();
       tick();
 

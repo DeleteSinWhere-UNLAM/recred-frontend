@@ -70,11 +70,29 @@
           @if (esTutor() || esKiosquero()) {
           <div>
             <dt>Plan</dt>
-            <dd>{{ esPremium() ? 'Avanzado' : 'Gratuito' }}</dd>
+            <dd>{{ planActualLabel() }}</dd>
           </div>
           <div>
             <dt>Vigencia</dt>
-            <dd>{{ esPremium() ? vigenciaPlan() : 'Sin vencimiento' }}</dd>
+            <dd>{{ vigenciaPlan() }}</dd>
+          </div>
+          }
+          @if (esDirectivo()) {
+          <div>
+            <dt>Licencia colegio</dt>
+            <dd>USD 20 / mes</dd>
+          </div>
+          <div>
+            <dt>Estado licencia</dt>
+            <dd>{{ estadoLicenciaColegio() }}</dd>
+          </div>
+          <div>
+            <dt>Vigencia licencia</dt>
+            <dd>{{ vigenciaLicenciaColegio() }}</dd>
+          </div>
+          <div>
+            <dt>Restante</dt>
+            <dd>{{ restanteLicenciaColegio() }}</dd>
           </div>
           }
           @if (esKiosquero()) {

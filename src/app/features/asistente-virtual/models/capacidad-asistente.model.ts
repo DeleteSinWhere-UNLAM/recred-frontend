@@ -31,6 +31,8 @@ export interface SugerenciaCapacidad {
   readonly tipo?: TipoSugerenciaAsistente;
   readonly tipoAccion?: string | null;
   readonly premium?: boolean;
+  readonly bloqueada?: boolean;
+  readonly planRequerido?: 'INTERMEDIO' | 'AVANZADO';
 }
 
 export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<

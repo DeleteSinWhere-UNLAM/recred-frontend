@@ -104,7 +104,7 @@ describe('BuffetPage', () => {
       nombreNavbar: 'Juan',
       esVistaAlumno: signal(false),
     });
-    servicioPerfil = jasmine.createSpyObj('PerfilService', ['rol']);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', ['rol', 'esPlanGratuito']);
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['asegurarCargados'], {
       alumnos: signal([{ id: 'a1', nombre: 'Juan' }]),
     });
@@ -113,6 +113,7 @@ describe('BuffetPage', () => {
     presenter = crearPresenterMock();
 
     servicioPerfil.rol.and.returnValue('PADRE');
+    servicioPerfil.esPlanGratuito.and.returnValue(false);
     servicioAlumnos.asegurarCargados.and.resolveTo([]);
     servicioColegios.getColegios.and.returnValue([]);
 

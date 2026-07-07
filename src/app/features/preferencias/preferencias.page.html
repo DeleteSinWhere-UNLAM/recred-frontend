@@ -24,7 +24,7 @@
       @if (preferencias.length > 0) {
         <div class="preferencias__lista">
           @for (p of preferencias; track p.productoId) {
-            <app-preferencia-card [preferencia]="p" />
+            <app-preferencia-card [preferencia]="p" [alumnoId]="alumnoId" />
           }
         </div>
       } @else {

@@ -18,6 +18,22 @@ export interface SchoolOverview {
   nombre: string;
   cue: string;
   buffets: Buffet[];
+  licencia?: LicenciaColegio | null;
+  suscripcion?: LicenciaColegio | null;
+  estadoLicencia?: string | null;
+  fechaVencimientoLicencia?: string | null;
+  fechaVencimientoSuscripcion?: string | null;
+  licenciaFechaVencimiento?: string | null;
+  fechaVencimientoPlan?: string | null;
+}
+
+export interface LicenciaColegio {
+  estado?: string | null;
+  fechaInicio?: string | null;
+  fechaVencimiento?: string | null;
+  fechaGraciaHasta?: string | null;
+  monto?: number | null;
+  moneda?: string | null;
 }
 
 export interface CrearBuffetRequest {

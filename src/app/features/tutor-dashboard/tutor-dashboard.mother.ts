@@ -106,7 +106,7 @@ export class TutorGlobalDashboardSummaryMother {
       totalBalance: 2300,
       totalDebt: 0,
       children: ChildDashboardSummaryMother.crearVarios(),
-      plan: 'PREMIUM',
+      plan: 'AVANZADO',
       ...override,
     };
   }

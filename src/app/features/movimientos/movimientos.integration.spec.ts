@@ -62,8 +62,9 @@ describe('Movimientos Integration', () => {
     });
     servicioAlumnos.getAlumnoById.and.returnValue(alumno);
 
-    servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId', 'perfil']);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId', 'perfil', 'esPlanGratuito']);
     servicioPerfil.obtenerAlumnoId.and.returnValue('alumno-1');
+    servicioPerfil.esPlanGratuito.and.returnValue(false);
 
     servicioDialog = jasmine.createSpyObj('DialogService', ['confirm']);
     servicioDialog.confirm.and.resolveTo(true);

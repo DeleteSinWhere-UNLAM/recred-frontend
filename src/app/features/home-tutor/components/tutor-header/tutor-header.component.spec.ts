@@ -31,7 +31,16 @@ describe('TutorHeaderComponent', () => {
       providers: [
         { provide: PerfilUsuarioService, useValue: servicioPerfilUsuario },
         { provide: ToastService, useValue: servicioToast },
-        { provide: PerfilService, useValue: { perfil: perfilSignal.asReadonly() } },
+        {
+          provide: PerfilService,
+          useValue: {
+            perfil: perfilSignal.asReadonly(),
+            esPlanGratuito: () => {
+              const plan = perfilSignal()?.plan?.toUpperCase();
+              return plan !== 'INTERMEDIO' && plan !== 'AVANZADO';
+            },
+          },
+        },
       ],
     })
       .overrideComponent(TutorHeaderComponent, {
@@ -124,9 +133,9 @@ describe('TutorHeaderComponent', () => {
   });
 
   describe('esPremium', () => {
-    it('dado plan PREMIUM, esPremium deberia ser true', () => {
-      const premium = { ...PerfilMother.crearTutor(), plan: 'PREMIUM' } as Perfil;
-      perfilSignal.set(premium);
+    it('dado plan INTERMEDIO, esPremium deberia ser true', () => {
+      const intermedio = { ...PerfilMother.crearTutor(), plan: 'INTERMEDIO' } as Perfil;
+      perfilSignal.set(intermedio);
 
       expect((component as unknown as { esPremium(): boolean }).esPremium()).toBeTrue();
     });

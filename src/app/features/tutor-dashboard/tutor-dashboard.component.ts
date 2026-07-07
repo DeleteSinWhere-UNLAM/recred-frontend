@@ -144,11 +144,15 @@ export class TutorDashboardComponent implements OnInit {
   }
   
   get esPlanGratuito(): boolean {
-    return this.perfilService.perfil()?.plan !== 'PREMIUM';
+    return this.perfilService.esPlanGratuito();
   }
 
   get esPremium(): boolean {
     return !this.esPlanGratuito;
+  }
+
+  get tienePlanAvanzado(): boolean {
+    return this.perfilService.perfil()?.plan?.toUpperCase() === 'AVANZADO';
   }
 
   get puedeAgregarTarjeta(): boolean {
@@ -157,7 +161,7 @@ export class TutorDashboardComponent implements OnInit {
 
   // Drag and Drop Logic
   onDragStart(event: DragEvent, child: ChildDashboardSummary): void {
-    if (this.esPlanGratuito) {
+    if (!this.tienePlanAvanzado) {
       event.preventDefault();
       return;
     }
@@ -199,8 +203,8 @@ export class TutorDashboardComponent implements OnInit {
     const target = event.currentTarget as HTMLElement;
     target.classList.remove('drag-over');
 
-    if (this.esPlanGratuito) {
-      await this.dialogService.alert('La transferencia entre hijos no está permitida en cuentas gratuitas.', 'Plan Gratuito');
+    if (!this.tienePlanAvanzado) {
+      await this.dialogService.alert('La transferencia entre hijos esta disponible con plan Avanzado.', 'Plan Avanzado');
       return;
     }
 
@@ -241,8 +245,8 @@ export class TutorDashboardComponent implements OnInit {
 
   // Button Transfer Logic
   openTransferModal(sourceChild: ChildDashboardSummary): void {
-    if (this.esPlanGratuito) {
-      this.dialogService.alert('La transferencia entre hijos no está permitida en cuentas gratuitas.', 'Plan Gratuito');
+    if (!this.tienePlanAvanzado) {
+      this.dialogService.alert('La transferencia entre hijos esta disponible con plan Avanzado.', 'Plan Avanzado');
       return;
     }
     
@@ -305,10 +309,11 @@ export class TutorDashboardComponent implements OnInit {
 
   initGrid() {
     this.gridConfig = {
-      gridType: 'fit',
-      compactType: 'none',
+      gridType: 'verticalFixed',
+      compactType: 'compactUp&Left',
       margin: 16,
       outerMargin: true,
+      mobileBreakpoint: 768,
       minCols: 3,
       maxCols: 3,
       maxItemCols: 3,
@@ -316,6 +321,9 @@ export class TutorDashboardComponent implements OnInit {
       minItemRows: 1,
       minRows: 1,
       maxRows: 100,
+      setGridSize: true,
+      fixedRowHeight: 120,
+      keepFixedHeightInMobile: true,
       draggable: {
         enabled: true,
         ignoreContent: true, // only drag from header
@@ -380,8 +388,21 @@ export class TutorDashboardComponent implements OnInit {
   }
 
   private getNextPosition() {
-    const maxY = this.dashboardItems.reduce((max, item) => Math.max(max, item.y + item.rows), 0);
-    return { x: 0, y: maxY };
+    for (let y = 0; y < 100; y += 3) {
+      for (let x = 0; x < 3; x++) {
+        const isOccupied = this.dashboardItems.some(item => {
+          const itemCols = item.cols || 1;
+          const itemRows = item.rows || 3;
+          const overlapX = x < (item.x + itemCols) && (x + 1) > item.x;
+          const overlapY = y < (item.y + itemRows) && (y + 3) > item.y;
+          return overlapX && overlapY;
+        });
+        if (!isOccupied) {
+          return { x, y };
+        }
+      }
+    }
+    return { x: 0, y: 0 };
   }
 
   addSmartCard() {

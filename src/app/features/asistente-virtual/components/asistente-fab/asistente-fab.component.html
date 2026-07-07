@@ -2,11 +2,17 @@
   type="button"
   class="asistente-fab"
   [class.asistente-fab--oculto]="oculto"
+  [class.asistente-fab--locked]="bloqueado"
   (click)="onClick()"
-  aria-label="Abrir asistente Recredito"
+  [attr.aria-label]="bloqueado ? 'Asistente bloqueado por plan' : 'Abrir asistente Recredito'"
 >
   <span class="asistente-fab__halo" aria-hidden="true"></span>
   <span class="asistente-fab__emoji" aria-hidden="true">🤖</span>
+  @if (bloqueado && !oculto) {
+    <span class="asistente-fab__lock" aria-hidden="true">
+      <i class="fa-solid fa-lock"></i>
+    </span>
+  }
   @if (mostrarBadge && !oculto) {
     <span class="asistente-fab__badge" aria-hidden="true">¡Hola!</span>
   }

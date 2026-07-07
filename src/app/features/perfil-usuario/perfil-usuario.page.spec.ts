@@ -27,10 +27,13 @@ interface WritableSignalLike<T> {
 interface PerfilUsuarioOverride {
   firstName?: string;
   lastName?: string;
-  role?: 'PADRE' | 'ALUMNO' | 'VENDEDOR';
+  role?: 'PADRE' | 'ALUMNO' | 'VENDEDOR' | 'DIRECTIVO_COLEGIO';
   phone?: string | null;
   documentNumber?: string | null;
   urlFotoPerfil?: string | null;
+  fechaVencimientoPlan?: string | null;
+  estadoLicenciaColegio?: string | null;
+  fechaVencimientoLicenciaColegio?: string | null;
 }
 
 interface ToastEsperado {
@@ -147,7 +150,7 @@ describe('PerfilUsuarioPage', () => {
 
     givenUsuarioLogueado(UsuarioLogueadoMother.crear());
     givenPerfilCargado(PerfilUsuarioMother.crear());
-    servicioPerfil.perfil.and.returnValue({ plan: 'PREMIUM' } as never);
+    servicioPerfil.perfil.and.returnValue({ plan: 'AVANZADO' } as never);
 
     await TestBed.configureTestingModule({
       imports: [PerfilUsuarioPage],
@@ -200,6 +203,14 @@ describe('PerfilUsuarioPage', () => {
       whenMontoYAvanzo();
 
       thenSeSeteoHomeUrl('/alumno');
+    }));
+
+    it('dado un directivo logueado, cuando se monta, deberia setear /directivo como home', fakeAsync(() => {
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+
+      whenMontoYAvanzo();
+
+      thenSeSeteoHomeUrl('/directivo');
     }));
 
     it('dado que la carga falla, cuando se monta, deberia setear el mensaje de error', fakeAsync(() => {
@@ -403,6 +414,7 @@ describe('PerfilUsuarioPage', () => {
       thenRolLabelEs('PADRE', 'Tutor');
       thenRolLabelEs('ALUMNO', 'Alumno');
       thenRolLabelEs('VENDEDOR', 'Kiosquero');
+      thenRolLabelEs('DIRECTIVO_COLEGIO', 'Directivo');
       thenRolLabelEs(undefined, 'Usuario');
     });
 
@@ -593,6 +605,56 @@ describe('PerfilUsuarioPage', () => {
 
       thenEsPremiumEs(false);
     }));
+
+    it('dado plan INTERMEDIO, esPremium deberia ser true', fakeAsync(() => {
+      givenPlanUsuario('INTERMEDIO');
+
+      whenMontoYAvanzo();
+
+      thenEsPremiumEs(true);
+    }));
+
+    it('dado plan INTERMEDIO, planActualLabel deberia ser Intermedio', fakeAsync(() => {
+      givenPlanUsuario('INTERMEDIO');
+
+      whenMontoYAvanzo();
+
+      thenPlanActualLabelEs('Intermedio');
+    }));
+
+    it('dado perfil con fechaVencimientoPlan, vigenciaPlan deberia formatearla', fakeAsync(() => {
+      givenPlanUsuario('INTERMEDIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({
+        fechaVencimientoPlan: '2026-08-05T22:48:39.49749',
+      }));
+
+      whenMontoYAvanzo();
+
+      thenVigenciaPlanEs('05/08/2026');
+    }));
+
+    it('dado plan pago sin fechaVencimientoPlan, vigenciaPlan deberia mostrar Sin vencimiento', fakeAsync(() => {
+      givenPlanUsuario('AVANZADO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({ fechaVencimientoPlan: null }));
+
+      whenMontoYAvanzo();
+
+      thenVigenciaPlanEs('Sin vencimiento');
+    }));
+
+    it('dado directivo con fechaVencimientoLicenciaColegio, deberia formatear la vigencia de licencia', fakeAsync(() => {
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({
+        role: 'DIRECTIVO_COLEGIO',
+        estadoLicenciaColegio: 'ACTIVA',
+        fechaVencimientoLicenciaColegio: '2026-08-05T22:48:39.49749',
+      }));
+
+      whenMontoYAvanzo();
+
+      thenEstadoLicenciaColegioEs('Activa');
+      thenVigenciaLicenciaColegioEs('05/08/2026');
+    }));
   });
 
   function givenUsuarioLogueado(usuario: UsuarioLogueado): void {
@@ -603,7 +665,7 @@ describe('PerfilUsuarioPage', () => {
     servicioPerfilUsuario.obtenerPerfil.and.resolveTo(perfil);
   }
 
-  function givenUsuarioConRol(rol: 'PADRE' | 'ALUMNO' | 'VENDEDOR'): void {
+  function givenUsuarioConRol(rol: 'PADRE' | 'ALUMNO' | 'VENDEDOR' | 'DIRECTIVO_COLEGIO'): void {
     givenUsuarioLogueado(UsuarioLogueadoMother.crear({ role: rol }));
     givenPerfilCargado(PerfilUsuarioMother.crear({ role: rol }));
     if (rol === 'VENDEDOR') servicioPerfil.obtenerBuffetId.and.returnValue('buffet-1');
@@ -918,6 +980,26 @@ describe('PerfilUsuarioPage', () => {
   function thenEsPremiumEs(esperado: boolean): void {
     const priv = component as unknown as { esPremium(): boolean };
     expect(priv.esPremium()).toBe(esperado);
+  }
+
+  function thenPlanActualLabelEs(esperado: string): void {
+    const priv = component as unknown as { planActualLabel(): string };
+    expect(priv.planActualLabel()).toBe(esperado);
+  }
+
+  function thenVigenciaPlanEs(esperado: string): void {
+    const priv = component as unknown as { vigenciaPlan(): string };
+    expect(priv.vigenciaPlan()).toBe(esperado);
+  }
+
+  function thenEstadoLicenciaColegioEs(esperado: string): void {
+    const priv = component as unknown as { estadoLicenciaColegio(): string };
+    expect(priv.estadoLicenciaColegio()).toBe(esperado);
+  }
+
+  function thenVigenciaLicenciaColegioEs(esperado: string): void {
+    const priv = component as unknown as { vigenciaLicenciaColegio(): string };
+    expect(priv.vigenciaLicenciaColegio()).toBe(esperado);
   }
 
   function formControls(): {

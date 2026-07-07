@@ -489,6 +489,8 @@ describe('BuffetPresenter', () => {
       const ids = new Set(['f1', 'f2', 'f3', 'f4', 'f5']);
       (presenter as unknown as { favoritosState: { set: (v: Set<string>) => void } })
         .favoritosState.set(ids);
+      (presenter as unknown as { favoritosTotalesFamiliaState: { set: (v: number | null) => void } })
+        .favoritosTotalesFamiliaState.set(5);
 
       presenter.toggleFavorito(PRODUCTO_DISPONIBLE);
 

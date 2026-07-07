@@ -219,7 +219,7 @@ export class AsistentePanelComponent implements AfterViewInit {
   }
 
   protected onOpcion(opcion: SugerenciaCapacidad): void {
-    if (this.deshabilitadoState()) return;
+    if (this.deshabilitadoState() || opcion.bloqueada) return;
     this.accionesAbiertasState.set(false);
     this.sugerencia.emit(opcion.prompt);
   }

@@ -186,11 +186,13 @@
 }
 
 .alumno-card__btn {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 6px;
+  min-height: 74px;
   padding: 8px 4px;
   background-color: var(--color-superficie, #ffffff);
   border: 1px solid transparent;
@@ -204,6 +206,35 @@
   transform: translateY(-2px);
   border-color: rgba(74, 111, 165, 0.15);
   box-shadow: 0 4px 10px rgba(74, 111, 165, 0.04);
+}
+
+.alumno-card__btn--locked {
+  cursor: not-allowed;
+  opacity: 0.78;
+}
+
+.alumno-card__plan-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  max-width: calc(100% - 8px);
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  color: #1e293b;
+  font-family: var(--font-display);
+  font-size: 7.5px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(212, 175, 55, 0.28);
+}
+
+.alumno-card__plan-badge i {
+  font-size: 7px;
 }
 
 .alumno-card__btn-icono {
@@ -403,8 +434,27 @@
     padding: 20px;
   }
   
-  .alumno-card__acciones-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .alumno-card__btn-label {
+    font-size: 9px;
+    letter-spacing: -0.2px;
+  }
+  
+  .alumno-card__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .alumno-card__identidad {
+    width: 100%;
+  }
+
+  .alumno-card__saldo {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 16px;
   }
 
   .alumno-card__budget {
@@ -743,4 +793,3 @@
   opacity: 0.5;
   cursor: not-allowed !important;
 }
-

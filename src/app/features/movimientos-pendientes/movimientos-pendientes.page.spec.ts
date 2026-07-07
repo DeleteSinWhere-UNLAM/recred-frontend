@@ -68,7 +68,7 @@ describe('MovimientosPendientesPage', () => {
       'asegurarCargados',
       'getAlumnoById',
     ]);
-    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['perfil']);
+    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['perfil', 'esPlanGratuito']);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
     servicioDialog = jasmine.createSpyObj<DialogService>('DialogService', ['confirm']);
 
@@ -77,6 +77,7 @@ describe('MovimientosPendientesPage', () => {
       id === 'alumno-1' ? alumno : undefined,
     );
     servicioPerfil.perfil.and.returnValue(null);
+    servicioPerfil.esPlanGratuito.and.returnValue(true);
     servicioMovimientos.getPendientesAlumno.and.returnValue(of([movPendiente, movListo]));
     servicioMovimientos.cancelarCompra.and.returnValue(of(undefined));
     servicioDialog.confirm.and.resolveTo(true);
@@ -395,8 +396,8 @@ describe('MovimientosPendientesPage', () => {
   });
 
   describe('esPremium segun plan', () => {
-    it('dado un perfil PREMIUM, esPremium deberia ser true', fakeAsync(() => {
-      servicioPerfil.perfil.and.returnValue({ plan: 'PREMIUM' } as never);
+    it('dado un perfil INTERMEDIO, esPremium deberia ser true', fakeAsync(() => {
+      servicioPerfil.esPlanGratuito.and.returnValue(false);
 
       whenMonto();
       tick();
@@ -405,7 +406,7 @@ describe('MovimientosPendientesPage', () => {
     }));
 
     it('dado un perfil basico, esPremium deberia ser false', fakeAsync(() => {
-      servicioPerfil.perfil.and.returnValue({ plan: 'GRATIS' } as never);
+      servicioPerfil.esPlanGratuito.and.returnValue(true);
 
       whenMonto();
       tick();

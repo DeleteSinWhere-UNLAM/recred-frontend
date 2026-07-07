@@ -1,3 +1,7 @@
+:host {
+  display: contents;
+}
+
 .navbar {
   position: sticky;
   top: 0;
@@ -223,6 +227,10 @@
 .navbar__menu-item:hover {
   background-color: var(--color-fondo);
   color: var(--color-melocoton);
+}
+
+.navbar__menu-item--locked {
+  cursor: not-allowed;
 }
 
 .navbar__menu-item:focus-visible {
@@ -482,6 +490,10 @@
   transform: translateY(0);
 }
 
+.navbar__dashboard-link--locked {
+  cursor: not-allowed;
+}
+
 .navbar__dashboard-link i,
 .navbar__movimientos-link i,
 .navbar__carritos-favoritos-link i {
@@ -547,14 +559,20 @@
   }
 }
 
+@media (max-width: 768px) {
+  .navbar__logo-text {
+    display: none; /* Hide redundant text earlier to prevent overlap */
+  }
+
+  .navbar__actions .navbar__premium-badge {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .navbar__inner {
     padding-right: 16px;
     padding-left: 16px;
-  }
-
-  .navbar__logo-text {
-    display: none; /* Hide redundant text to prevent overlap on mobile */
   }
 
   .navbar__logo-img {
@@ -582,10 +600,6 @@
   .navbar__dashboard-link span,
   .navbar__movimientos-link span,
   .navbar__carritos-favoritos-link span {
-    display: none;
-  }
-
-  .navbar__actions .navbar__premium-badge {
     display: none;
   }
 
@@ -909,6 +923,10 @@
   border-color: rgba(242, 183, 5, 0.32);
 }
 
+.navbar--kiosquero .navbar__kiosk-link--locked {
+  cursor: not-allowed;
+}
+
 .navbar--kiosquero .navbar__kiosk-link .navbar__premium-badge {
   margin-left: 2px;
   flex: 0 0 auto;
@@ -995,6 +1013,7 @@
 .navbar__premium-badge {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
@@ -1007,6 +1026,10 @@
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
   line-height: 1;
   margin-left: auto;
+}
+
+.navbar__premium-badge i {
+  font-size: 8px;
 }
 
 .pv__premium-badge {
@@ -1027,3 +1050,109 @@
   text-transform: uppercase;
 }
 
+/* Hamburguesa Menu Mobile */
+.navbar__burger {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  margin-left: auto;
+}
+.navbar__burger:hover, .navbar__burger:active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 514px) {
+  .navbar__burger {
+    display: block;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__actions {
+    display: none;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #0c3670, #123f80);
+    padding: 20px 20px 40px 20px;
+    gap: 12px;
+    box-shadow: 0 12px 30px rgba(15, 52, 117, 0.6);
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: stretch;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  /* Enlaces de texto ocupan el 100% */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > a {
+    width: 100% !important;
+    height: 48px !important;
+    justify-content: flex-start;
+    padding: 0 16px !important;
+  }
+
+  /* Los 3 botones finales comparten la última fila */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > div,
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > button.navbar__cart {
+    flex: 1;
+    width: auto !important;
+    height: 48px !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Asegurar que los botones internos se estiren al 100% de sus contenedores */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__notif,
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__perfil {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px !important;
+  }
+
+  /* Si un botón abre su menú, lo forzamos a ocupar el 100% para que empuje el contenido hacia abajo */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > div:has(.navbar__menu) {
+    flex-basis: 100% !important;
+    height: auto !important;
+    flex-direction: column;
+    background: transparent !important;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .max-xl\:hidden {
+    display: inline-block !important;
+    margin-left: 12px;
+  }
+
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-top: 12px;
+    margin-bottom: 24px;
+    width: 100%;
+    min-width: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    background: var(--color-superficie);
+  }
+
+  /* Ocultar el piquito superior del menú en la versión móvil */
+  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu::before {
+    display: none;
+  }
+}

@@ -42,7 +42,7 @@
   </header>
 
 
-  <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
+    <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
 
     <a class="alumno-card__btn alumno-card__btn--menta" (click)="navegar('/acreditar-mercado-pago')"
       [class.active]="isActive('/acreditar-mercado-pago')">
@@ -52,12 +52,12 @@
       <span class="alumno-card__btn-label">Acreditar</span>
     </a>
 
-    <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')"
-      [class.active]="isActive('/restricciones-nutricionales')">
-      <span class="alumno-card__btn-icono" aria-hidden="true">
-        <i class="fa-solid fa-shield"></i>
-      </span>
-      <span class="alumno-card__btn-label">Restricciones</span>
+    <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')"
+      [class.active]="isActive('/restricciones-horarias')">
+    <span class="alumno-card__btn-icono" aria-hidden="true">
+      <i class="fa-solid fa-clock"></i>
+    </span>
+    <span class="alumno-card__btn-label">Horarios</span>
     </a>
 
     <a class="alumno-card__btn alumno-card__btn--gris" (click)="navegar('/tutor-movimientos')"
@@ -71,20 +71,21 @@
 
   <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
     <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
-      <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')"
-        [class.active]="isActive('/restricciones-horarias')">
+
+      <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')"
+        [class.active]="isActive('/restricciones-nutricionales')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
-          <i class="fa-solid fa-clock"></i>
+          <i class="fa-solid fa-shield"></i>
         </span>
-        <span class="alumno-card__btn-label">Horarios</span>
+        <span class="alumno-card__btn-label">Restricciones</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
-        [class.active]="isActive('/presupuesto')">
+      <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')"
+        [class.active]="isActive('/favoritos-alumno')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
-          <i class="fa-solid fa-piggy-bank"></i>
+          <i class="fa-solid fa-heart"></i>
         </span>
-        <span class="alumno-card__btn-label">Presupuesto</span>
+        <span class="alumno-card__btn-label">Favoritos</span>
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--pizarra" (click)="navegar('/estadistica')"
@@ -106,19 +107,44 @@
         <span class="alumno-card__btn-label">Pendientes</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegar('/prediccion-gasto')"
-        [class.active]="isActive('/prediccion-gasto')">
+      <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')"
+        [class.active]="isActive('/prediccion-gasto')"
+        [class.alumno-card__btn--locked]="planBloqueado('INTERMEDIO')"
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
+        <span class="alumno-card__plan-badge">
+          @if (planBloqueado('INTERMEDIO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Intermedio
+        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-compass"></i>
         </span>
         <span class="alumno-card__btn-label">Predicción</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegar('/preferencias')" [class.active]="isActive('/preferencias')">
+      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegarConPlan('/preferencias', 'INTERMEDIO')"
+        [class.active]="isActive('/preferencias')"
+        [class.alumno-card__btn--locked]="planBloqueado('INTERMEDIO')"
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
+        <span class="alumno-card__plan-badge">
+          @if (planBloqueado('INTERMEDIO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Intermedio
+        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </span>
         <span class="alumno-card__btn-label">Preferencias</span>
+      </a>
+
+      <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
+        [class.active]="isActive('/presupuesto')">
+        <span class="alumno-card__btn-icono" aria-hidden="true">
+          <i class="fa-solid fa-piggy-bank"></i>
+        </span>
+        <span class="alumno-card__btn-label">Presupuesto</span>
       </a>
 
       @if (esPadre) {
@@ -129,22 +155,22 @@
         </span>
         <span class="alumno-card__btn-label">Adelanto</span>
       </a>
-      <a class="alumno-card__btn alumno-card__btn--azul" title="Transferir" (click)="navegar('/transferir-saldo')"
-        [class.active]="isActive('/transferir-saldo')">
+      <a class="alumno-card__btn alumno-card__btn--azul" title="Transferir" (click)="navegarConPlan('/transferir-saldo', 'AVANZADO')"
+        [class.active]="isActive('/transferir-saldo')"
+        [class.alumno-card__btn--locked]="planBloqueado('AVANZADO')"
+        [attr.aria-disabled]="planBloqueado('AVANZADO')">
+        <span class="alumno-card__plan-badge">
+          @if (planBloqueado('AVANZADO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Avanzado
+        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-right-left"></i>
         </span>
         <span class="alumno-card__btn-label">Transferir</span>
       </a>
       }
-
-      <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')"
-        [class.active]="isActive('/favoritos-alumno')">
-        <span class="alumno-card__btn-icono" aria-hidden="true">
-          <i class="fa-solid fa-heart"></i>
-        </span>
-        <span class="alumno-card__btn-label">Favoritos</span>
-      </a>
     </div>
   </div>
 

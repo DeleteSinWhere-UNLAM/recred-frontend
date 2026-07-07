@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DirectivoPage } from './directivo.page';
 import { DirectivoPresenter } from './presenter/directivo.presenter';
-import { Component, Input, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { DirectivoDashboardComponent } from './components/directivo-dashboard/directivo-dashboard.component';
@@ -14,6 +14,9 @@ class DashboardStubComponent {
   @Input() data: unknown;
   @Input() loading: unknown;
   @Input() error: unknown;
+  @Input() pagandoLicencia: unknown;
+  @Input() errorPagoLicencia: unknown;
+  @Output() pagarLicencia = new EventEmitter<void>();
 }
 
 describe('DirectivoPage', () => {
@@ -24,11 +27,13 @@ describe('DirectivoPage', () => {
 
   beforeEach(async () => {
 
-    presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar'], {
+    presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar', 'pagarLicenciaColegio'], {
       mensajeBienvenida: signal('Cargando...'),
       schoolOverview: signal(null),
       loading: signal(false),
-      error: signal(null)
+      error: signal(null),
+      pagandoLicencia: signal(false),
+      errorPagoLicencia: signal(null)
     });
     authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
 
