@@ -62,8 +62,16 @@ describe('PerfilService', () => {
       expect(service.esPlanGratuito()).toBeTrue();
     });
 
-    it('dado perfil con plan PREMIUM, cuando consulto esPlanGratuito, deberia ser false', () => {
-      givenPerfilEnStorage(PerfilMother.crear({ plan: 'PREMIUM' }));
+    it('dado perfil con plan INTERMEDIO, cuando consulto esPlanGratuito, deberia ser false', () => {
+      givenPerfilEnStorage(PerfilMother.crear({ plan: 'INTERMEDIO' }));
+
+      const service = whenInstancioElService();
+
+      expect(service.esPlanGratuito()).toBeFalse();
+    });
+
+    it('dado perfil con plan AVANZADO, cuando consulto esPlanGratuito, deberia ser false', () => {
+      givenPerfilEnStorage(PerfilMother.crear({ plan: 'AVANZADO' }));
 
       const service = whenInstancioElService();
 
@@ -176,6 +184,19 @@ describe('PerfilService', () => {
       expect(actual.nombre).toBe('Nuevo');
       expect(actual.apellido).toBe('Apellido');
       expect(actual.urlFotoPerfil).toBe('https://cdn/foto.png');
+    });
+
+    it('dado fechaVencimientoPlan null, cuando actualizo, deberia limpiar la vigencia previa', async () => {
+      const service = whenInstancioElService();
+      const perfil = PerfilMother.crear({
+        id: 'p1',
+        fechaVencimientoPlan: '2026-08-05T22:48:39.49749',
+      });
+      await whenCargoElPerfilYElBackDevuelve(service, perfil);
+
+      service.actualizarDatosUsuario({ fechaVencimientoPlan: null });
+
+      expect(service.getPerfil()?.fechaVencimientoPlan).toBeNull();
     });
   });
 

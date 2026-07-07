@@ -82,8 +82,8 @@ interface PerfilTest {
 }
 
 class PerfilTestMother {
-  static premium(): PerfilTest {
-    return { id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' };
+  static intermedio(): PerfilTest {
+    return { id: 'p-1', nombre: 'Tutor', plan: 'INTERMEDIO' };
   }
   static gratuito(): PerfilTest {
     return { id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' };
@@ -118,8 +118,8 @@ describe('CarritoPage', () => {
   });
 
   describe('esPremium / esPlanGratuito / limiteCarritosAlcanzado', () => {
-    it('dado plan PREMIUM, cuando consulto el plan, esPremium true y sin limite', async () => {
-      await givenPageConfigurada(PerfilTestMother.premium());
+    it('dado plan INTERMEDIO, cuando consulto el plan, esPremium true y sin limite', async () => {
+      await givenPageConfigurada(PerfilTestMother.intermedio());
       whenMonto();
 
       expect(component['esPremium']()).toBeTrue();
@@ -127,10 +127,10 @@ describe('CarritoPage', () => {
       expect(component['limiteCarritosAlcanzado']()).toBeFalse();
     });
 
-    it('dado plan GRATUITO con 3 carritos, cuando consulto el limite, deberia ser true', async () => {
+    it('dado plan GRATUITO con 5 carritos, cuando consulto el limite, deberia ser true', async () => {
       await givenPageConfigurada(PerfilTestMother.gratuito());
       carritosFavoritosService.getCarritosFavoritos.and.returnValue(
-        of([{}, {}, {}] as unknown as CarritoFavoritoResponse[]),
+        of([{}, {}, {}, {}, {}] as unknown as CarritoFavoritoResponse[]),
       );
 
       whenMonto();
@@ -173,8 +173,12 @@ describe('CarritoPage', () => {
     });
   });
 
-  async function givenPageConfigurada(perfil: PerfilTest | null = PerfilTestMother.premium()): Promise<void> {
+  async function givenPageConfigurada(perfil: PerfilTest | null = PerfilTestMother.intermedio()): Promise<void> {
     perfilSignal = signal<PerfilTest | null>(perfil);
+    const esPlanGratuito = () => {
+      const plan = perfilSignal()?.plan?.toUpperCase();
+      return plan !== 'INTERMEDIO' && plan !== 'AVANZADO';
+    };
 
     const presenter = {
       init: jasmine.createSpy('init'),
@@ -221,7 +225,7 @@ describe('CarritoPage', () => {
       imports: [CarritoPage],
       providers: [
         { provide: UsuarioService, useValue: usuarioService },
-        { provide: PerfilService, useValue: { perfil: perfilSignal } },
+        { provide: PerfilService, useValue: { perfil: perfilSignal, esPlanGratuito } },
         { provide: CarritosFavoritosService, useValue: carritosFavoritosService },
       ],
     })

@@ -3,6 +3,7 @@ import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { PerfilMother } from '../../../data-access/services/alumno.mother';
 import { HomeAlumnoService } from '../../home-alumno/services/home-alumno.service';
+import { ToastService } from '../../../shared/services/toast.service';
 import {
   ESTADO_COMPRA_CANCELADO,
   ESTADO_ESPERANDO_FECHA,
@@ -31,6 +32,7 @@ describe('AsistenteVirtualPresenter', () => {
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioAsistente: jasmine.SpyObj<AsistenteVirtualService>;
   let servicioHomeAlumno: jasmine.SpyObj<HomeAlumnoService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
 
   beforeEach(() => {
     servicioPerfil = jasmine.createSpyObj('PerfilService', [
@@ -40,7 +42,7 @@ describe('AsistenteVirtualPresenter', () => {
     ]);
     servicioPerfil.rol.and.returnValue('ALUMNO');
     servicioPerfil.getPerfil.and.returnValue(
-      PerfilMother.crear({ rol: 'ALUMNO' }),
+      PerfilMother.crear({ rol: 'ALUMNO', plan: 'INTERMEDIO' }),
     );
     servicioPerfil.obtenerAlumnoId.and.returnValue(null);
 
@@ -59,6 +61,7 @@ describe('AsistenteVirtualPresenter', () => {
       'cargarPedidoEnCurso',
     ]);
     servicioHomeAlumno.cargarPedidoEnCurso.and.resolveTo();
+    servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -66,6 +69,7 @@ describe('AsistenteVirtualPresenter', () => {
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: AsistenteVirtualService, useValue: servicioAsistente },
         { provide: HomeAlumnoService, useValue: servicioHomeAlumno },
+        { provide: ToastService, useValue: servicioToast },
       ],
     });
 
@@ -91,6 +95,13 @@ describe('AsistenteVirtualPresenter', () => {
       givenRol(null);
 
       expect(presenter.opcionesDisponibles()).toEqual([]);
+    });
+
+    it('dado un alumno intermedio, las opciones avanzadas deberian estar bloqueadas', () => {
+      const opcionPremium = presenter.opcionesDisponibles().find((opcion) => opcion.premium);
+
+      expect(opcionPremium?.bloqueada).toBeTrue();
+      expect(opcionPremium?.planRequerido).toBe('AVANZADO');
     });
   });
 
@@ -139,6 +150,15 @@ describe('AsistenteVirtualPresenter', () => {
 
       expect(luegoDeAbrir).toBeTrue();
       expect(luegoDeCerrar).toBeFalse();
+    });
+
+    it('dado alumno gratuito, cuando abro el asistente, deberia mostrar bloqueo y no abrir', () => {
+      givenPerfil({ rol: 'ALUMNO', plan: 'GRATUITO' });
+
+      whenAbro();
+
+      expect(presenter.abierto()).toBeFalse();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Intermedio.', 'info');
     });
   });
 
@@ -211,6 +231,7 @@ describe('AsistenteVirtualPresenter', () => {
 
   describe('sugerencias dinamicas segun la respuesta del asistente', () => {
     it('dado una accion esperando confirmacion, cuando envio, deberia exponer las sugerencias de compra pendiente', async () => {
+      givenPerfil({ rol: 'ALUMNO', plan: 'AVANZADO' });
       givenRespuestaDelBack(
         RespuestaAsistenteMother.crear({
           accion: AccionAsistenteMother.crearEsperandoConfirmacion(),
@@ -224,6 +245,35 @@ describe('AsistenteVirtualPresenter', () => {
         'confirmar-compra',
         'cancelar-compra',
       ]);
+    });
+
+    it('dado alumno intermedio y compra pendiente, confirmar deberia quedar bloqueado', async () => {
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          accion: AccionAsistenteMother.crearEsperandoConfirmacion(),
+        }),
+      );
+
+      await whenEnvio('comprame lo de siempre');
+
+      const confirmar = presenter.sugerencias().find((s) => s.id === 'confirmar-compra');
+      expect(confirmar?.bloqueada).toBeTrue();
+      expect(confirmar?.planRequerido).toBe('AVANZADO');
+    });
+
+    it('dado alumno intermedio y accion esperando confirmacion, cuando escribe confirmar, no deberia llamar al back', async () => {
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          accion: AccionAsistenteMother.crearEsperandoConfirmacion(),
+        }),
+      );
+      await whenEnvio('comprame lo de siempre');
+      servicioAsistente.enviarMensaje.calls.reset();
+
+      await whenEnvio('confirmar');
+
+      expect(servicioAsistente.enviarMensaje).not.toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Avanzado.', 'info');
     });
 
     it('dado sugerencias del backend sin accion, cuando envio, deberia mapearlas', async () => {
@@ -474,6 +524,15 @@ describe('AsistenteVirtualPresenter', () => {
 
   function givenRol(rol: RolUsuario | null): void {
     servicioPerfil.rol.and.returnValue(rol);
+  }
+
+  function givenPerfil(override: { rol?: RolUsuario; plan?: string } = {}): void {
+    const perfil = PerfilMother.crear({
+      rol: override.rol ?? 'ALUMNO',
+      plan: override.plan ?? 'INTERMEDIO',
+    });
+    servicioPerfil.rol.and.returnValue(perfil.rol);
+    servicioPerfil.getPerfil.and.returnValue(perfil);
   }
 
   function givenRespuestaDelBack(respuesta: RespuestaAsistente): void {

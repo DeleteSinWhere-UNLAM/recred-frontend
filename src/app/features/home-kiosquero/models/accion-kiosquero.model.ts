@@ -21,6 +21,8 @@ export type AccionKiosqueroColor =
   | 'melocoton'
   | 'violeta';
 
+export type PlanRequeridoAccion = 'INTERMEDIO' | 'AVANZADO';
+
 export interface AccionKiosquero {
   id: AccionKiosqueroId;
   titulo: string;
@@ -30,4 +32,5 @@ export interface AccionKiosquero {
   color?: AccionKiosqueroColor;
   destacada?: boolean;
   premium?: boolean;
+  planRequerido?: PlanRequeridoAccion;
 }

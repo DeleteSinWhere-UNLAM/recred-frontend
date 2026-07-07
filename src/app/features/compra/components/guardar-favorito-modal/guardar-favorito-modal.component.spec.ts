@@ -17,8 +17,8 @@ interface PerfilTest {
 }
 
 class PerfilTestMother {
-  static premium(): PerfilTest {
-    return { id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' };
+  static intermedio(): PerfilTest {
+    return { id: 'p-1', nombre: 'Tutor', plan: 'INTERMEDIO' };
   }
   static gratuito(): PerfilTest {
     return { id: 'p-1', nombre: 'Tutor', plan: 'GRATUITO' };
@@ -50,17 +50,17 @@ describe('GuardarFavoritoModalComponent', () => {
       expect(component.alumnoId).toBe('alumno-1');
     });
 
-    it('dado plan GRATUITO y no hay cartId, cuando se monta y tengo 3 carritos, deberia marcar limitReached', async () => {
+    it('dado plan GRATUITO y no hay cartId, cuando se monta y tengo 5 carritos, deberia marcar limitReached', async () => {
       await givenComponentConfigurado(PerfilTestMother.gratuito());
-      givenCarritosFavoritosDelBack([{}, {}, {}] as CarritoFavoritoResponse[]);
+      givenCarritosFavoritosDelBack([{}, {}, {}, {}, {}] as CarritoFavoritoResponse[]);
 
       whenMonto();
 
       expect(component.limitReached).toBeTrue();
     });
 
-    it('dado plan PREMIUM, cuando se monta, no deberia pedir carritos favoritos para validar limite', async () => {
-      await givenComponentConfigurado(PerfilTestMother.premium());
+    it('dado plan INTERMEDIO, cuando se monta, no deberia pedir carritos favoritos para validar limite', async () => {
+      await givenComponentConfigurado(PerfilTestMother.intermedio());
 
       whenMonto();
 
@@ -176,9 +176,13 @@ describe('GuardarFavoritoModalComponent', () => {
     });
   });
 
-  async function givenComponentConfigurado(perfil: PerfilTest | null = PerfilTestMother.premium()): Promise<void> {
+  async function givenComponentConfigurado(perfil: PerfilTest | null = PerfilTestMother.intermedio()): Promise<void> {
     esVistaAlumnoSignal = signal(false);
     perfilSignal = signal<PerfilTest | null>(perfil);
+    const esPlanGratuito = () => {
+      const plan = perfilSignal()?.plan?.toUpperCase();
+      return plan !== 'INTERMEDIO' && plan !== 'AVANZADO';
+    };
 
     alumnosService = {
       alumnos: signal([AlumnoMother.crearHijoDelTutor()]),
@@ -201,7 +205,7 @@ describe('GuardarFavoritoModalComponent', () => {
         { provide: CarritosFavoritosService, useValue: carritosFavoritosService },
         { provide: ToastService, useValue: toastService },
         { provide: UsuarioService, useValue: { esVistaAlumno: esVistaAlumnoSignal } },
-        { provide: PerfilService, useValue: { perfil: perfilSignal } },
+        { provide: PerfilService, useValue: { perfil: perfilSignal, esPlanGratuito } },
       ],
     }).compileComponents();
 

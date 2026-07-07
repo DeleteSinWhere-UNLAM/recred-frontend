@@ -31,6 +31,26 @@ describe('ModalSeleccionCargaComponent', () => {
     thenSeEmitio(spyEmit);
   });
 
+  it('dado plan intermedio, cuando hago click en Carga Masiva, deberia emitir planBlocked y no bulkUpload', () => {
+    component.planActual = 'INTERMEDIO';
+    const spyBulk = spyOn(component.bulkUpload, 'emit');
+    const spyBloqueo = spyOn(component.planBlocked, 'emit');
+
+    whenHagoClickEnCargaMasiva();
+
+    expect(spyBulk).not.toHaveBeenCalled();
+    expect(spyBloqueo).toHaveBeenCalledWith('Avanzado');
+  });
+
+  it('dado plan intermedio, cuando hago click en Carga Asistida, deberia emitir iaUpload', () => {
+    component.planActual = 'INTERMEDIO';
+    const spyEmit = spyOn(component.iaUpload, 'emit');
+
+    whenHagoClickEnCargaAsistida();
+
+    thenSeEmitio(spyEmit);
+  });
+
   it('dado el modal, cuando hago click en Cancelar o presiono esc/backdrop, deberia emitir closeModal', () => {
     const spyEmit = spyOn(component.closeModal, 'emit');
 

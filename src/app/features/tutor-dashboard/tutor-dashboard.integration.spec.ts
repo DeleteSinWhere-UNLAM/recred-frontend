@@ -56,7 +56,10 @@ describe('TutorDashboard Integration', () => {
         { provide: Router, useValue: jasmine.createSpyObj<Router>('Router', ['navigate']) },
         {
           provide: PerfilService,
-          useValue: { perfil: signal({ id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' }) },
+          useValue: {
+            perfil: signal({ id: 'p-1', nombre: 'Tutor', plan: 'AVANZADO' }),
+            esPlanGratuito: () => false,
+          },
         },
       ],
     })

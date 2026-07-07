@@ -135,18 +135,20 @@ describe('CarritosFavoritos Integration', () => {
     expect(queryUno('.grupo-hijo-card')).toBeFalsy();
   });
 
-  it('dado el plan gratuito y 3+ carritos, cuando se monta, deberia mostrar el aviso de limite', async () => {
+  it('dado el plan gratuito y 5 carritos, cuando se monta, deberia mostrar el aviso de limite', async () => {
     servicioCarritos.getCarritosFavoritos.and.returnValue(
       of([
         CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-1' }),
         CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-2' }),
         CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-3' }),
+        CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-4' }),
+        CarritoFavoritoResponseMother.crearParaAlumno('alumno-1', { id: 'c-5' }),
       ]),
     );
 
     await whenMonto();
 
-    expect(queryTexto('.dashboard-limit-alert')).toContain('Límite de 3 carritos favoritos');
+    expect(queryTexto('.dashboard-limit-alert')).toContain('Límite de 5 carritos favoritos');
   });
 
   it('dado un carrito, cuando toco eliminar y confirmo, deberia llamar al service y recargar', async () => {

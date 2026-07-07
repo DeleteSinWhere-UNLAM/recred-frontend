@@ -9,6 +9,9 @@ import { By } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { AuthService } from '../../core/auth/services/auth.service';
+import { SubscriptionPaymentService } from '../../data-access/services/suscripciones/subscription-payment.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
 class NavbarStubComponent { }
@@ -28,6 +31,14 @@ describe('DirectivoPage Integration', () => {
         DirectivoPresenter,
         { provide: PerfilService, useValue: perfilServiceSpy },
         { provide: DirectivoService, useValue: directivoServiceSpy },
+        {
+          provide: SubscriptionPaymentService,
+          useValue: jasmine.createSpyObj<SubscriptionPaymentService>('SubscriptionPaymentService', [
+            'crearPagoSuscripcionColegio',
+          ]),
+        },
+        { provide: ToastService, useValue: jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']) },
+        { provide: AuthService, useValue: jasmine.createSpyObj<AuthService>('AuthService', ['logout']) },
       ],
     })
       .overrideComponent(DirectivoPage, {
@@ -59,7 +70,6 @@ describe('DirectivoPage Integration', () => {
       fixture.detectChanges(); // Update DOM after promises resolve
 
       const dashboardElement = fixture.nativeElement.querySelector('app-directivo-dashboard');
-      console.log('DASHBOARD HTML:', dashboardElement?.innerHTML);
       expect(dashboardElement).toBeTruthy();
 
       const headerTitle = fixture.debugElement.query(By.css('#pv-title'));

@@ -41,6 +41,12 @@ describe('DirectivoDashboardComponent', () => {
       id: '1',
       nombre: 'Colegio Test',
       cue: '112233',
+      licencia: {
+        estado: 'ACTIVA',
+        fechaVencimiento: '2026-08-05T22:48:39',
+        monto: 20,
+        moneda: 'USD',
+      },
       buffets: [
         {
           id: 'b1',
@@ -58,6 +64,55 @@ describe('DirectivoDashboardComponent', () => {
     const card = fixture.debugElement.query(By.css('.pv__operation-card'));
     expect(card).toBeTruthy();
     expect(card.nativeElement.textContent).toContain('Kiosco 1');
+  });
+
+  it('dado licencia activa, deberia mostrar monto y vigencia', () => {
+    component.data = {
+      id: '1',
+      nombre: 'Colegio Test',
+      cue: '112233',
+      licencia: {
+        estado: 'ACTIVA',
+        fechaVencimiento: '2026-08-05T22:48:39',
+        monto: 20,
+        moneda: 'USD',
+      },
+      buffets: [],
+    };
+    fixture.detectChanges();
+
+    const licencia = fixture.debugElement.query(By.css('.pv__license-card')).nativeElement as HTMLElement;
+    expect(licencia.textContent).toContain('Licencia colegio');
+    expect(licencia.textContent).toContain('USD 20 / mes');
+    expect(licencia.textContent).toContain('05/08/2026');
+  });
+
+  it('dado click en pagar licencia, deberia emitir el evento', () => {
+    component.data = {
+      id: '1',
+      nombre: 'Colegio Test',
+      cue: '112233',
+      buffets: [],
+    };
+    const spy = spyOn(component.pagarLicencia, 'emit');
+    fixture.detectChanges();
+
+    const boton = fixture.debugElement.query(By.css('.pv__license-button')).nativeElement as HTMLButtonElement;
+    boton.click();
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('dado error de panel, deberia permitir iniciar pago de licencia', () => {
+    component.error = 'Licencia vencida';
+    const spy = spyOn(component.pagarLicencia, 'emit');
+    fixture.detectChanges();
+
+    const boton = fixture.debugElement.query(By.css('.pv__license-button')).nativeElement as HTMLButtonElement;
+    expect(boton.textContent).toContain('Pagar licencia');
+    boton.click();
+
+    expect(spy).toHaveBeenCalled();
   });
 
   function whenMonto(): void {

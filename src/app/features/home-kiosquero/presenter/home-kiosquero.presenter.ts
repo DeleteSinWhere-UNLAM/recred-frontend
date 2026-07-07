@@ -885,7 +885,6 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
-
     },
     {
       id: 'tracking-pedidos',
@@ -912,7 +911,7 @@ export class HomeKiosqueroPresenter {
       ruta: '/kiosquero/inteligencia-comercial',
       color: 'pizarra',
       destacada: true,
-      premium: true,
+      planRequerido: 'AVANZADO',
     },
     {
       id: 'reportes',
@@ -921,6 +920,7 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-chart-line',
       ruta: '/kiosquero/reportes',
       color: 'pizarra',
+      planRequerido: 'INTERMEDIO',
     },
     {
       id: 'recomendaciones',
@@ -937,6 +937,7 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-tags',
       ruta: '/promociones',
       color: 'violeta',
+      planRequerido: 'AVANZADO',
     },
     {
       id: 'cierre-diario',

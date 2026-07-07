@@ -12,7 +12,11 @@ export interface Perfil {
   readonly apellido: string;
   readonly rol: RolUsuario;
   readonly buffetId?: string | null;
+  readonly colegioId?: string | null;
+  readonly schoolId?: string | null;
   readonly buffet?: ReferenciaPerfil | null;
+  readonly colegio?: ReferenciaPerfil | null;
+  readonly school?: ReferenciaPerfil | null;
   readonly buffets?: readonly ReferenciaPerfil[] | null;
   readonly comercioId?: string | null;
   readonly comercio?: ReferenciaPerfil | null;
@@ -26,4 +30,9 @@ export interface Perfil {
   readonly phone?: string | null;
   readonly documentNumber?: string | null;
   readonly urlFotoPerfil?: string | null;
+  readonly fechaVencimientoPlan?: string | null;
+  readonly estadoLicenciaColegio?: string | null;
+  readonly fechaVencimientoLicenciaColegio?: string | null;
+  readonly fechaVencimientoLicencia?: string | null;
+  readonly fechaVencimientoSuscripcionColegio?: string | null;
 }

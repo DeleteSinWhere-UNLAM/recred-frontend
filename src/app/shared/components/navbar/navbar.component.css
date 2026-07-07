@@ -229,6 +229,10 @@
   color: var(--color-melocoton);
 }
 
+.navbar__menu-item--locked {
+  cursor: not-allowed;
+}
+
 .navbar__menu-item:focus-visible {
   outline: 2px solid var(--color-pizarra);
   outline-offset: 2px;
@@ -484,6 +488,10 @@
 .navbar__movimientos-link:active,
 .navbar__carritos-favoritos-link:active {
   transform: translateY(0);
+}
+
+.navbar__dashboard-link--locked {
+  cursor: not-allowed;
 }
 
 .navbar__dashboard-link i,
@@ -915,6 +923,10 @@
   border-color: rgba(242, 183, 5, 0.32);
 }
 
+.navbar--kiosquero .navbar__kiosk-link--locked {
+  cursor: not-allowed;
+}
+
 .navbar--kiosquero .navbar__kiosk-link .navbar__premium-badge {
   margin-left: 2px;
   flex: 0 0 auto;
@@ -1001,6 +1013,7 @@
 .navbar__premium-badge {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
@@ -1013,6 +1026,10 @@
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
   line-height: 1;
   margin-left: auto;
+}
+
+.navbar__premium-badge i {
+  font-size: 8px;
 }
 
 .pv__premium-badge {
@@ -1054,11 +1071,11 @@
   .navbar__burger {
     display: block;
   }
-  
+
   .navbar:not(.navbar--kiosquero) .navbar__actions {
     display: none;
   }
-  
+
   .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open {
     display: flex;
     flex-direction: row;
@@ -1078,7 +1095,7 @@
     max-height: 85vh;
     overflow-y: auto;
   }
-  
+
   /* Enlaces de texto ocupan el 100% */
   .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > a {
     width: 100% !important;
@@ -1106,7 +1123,7 @@
     height: 100% !important;
     border-radius: 12px !important;
   }
-  
+
   /* Si un botón abre su menú, lo forzamos a ocupar el 100% para que empuje el contenido hacia abajo */
   .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > div:has(.navbar__menu) {
     flex-basis: 100% !important;
@@ -1119,7 +1136,7 @@
     display: inline-block !important;
     margin-left: 12px;
   }
-  
+
   .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu {
     position: relative;
     top: 0;
@@ -1133,10 +1150,9 @@
     border: none;
     background: var(--color-superficie);
   }
-  
+
   /* Ocultar el piquito superior del menú en la versión móvil */
   .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu::before {
     display: none;
   }
 }
-

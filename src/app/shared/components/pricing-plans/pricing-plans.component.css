@@ -20,6 +20,27 @@
   font-size: 1.1rem;
 }
 
+.current-plan-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background-color: var(--color-superficie);
+  color: var(--color-texto-claro);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.current-plan-summary strong {
+  color: var(--color-pizarra-dark);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -66,15 +87,47 @@
   transform: scale(1.02) translateY(-8px);
 }
 
+.pricing-card.current {
+  border-color: var(--color-menta);
+}
+
+.pricing-card.current::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background-color: var(--color-menta);
+}
+
 .card-header {
   margin-bottom: 16px;
   margin-top: 5px;
+}
+
+.plan-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .card-header h3 {
   color: var(--color-pizarra-dark);
   font-size: 1.5rem;
   margin-bottom: 8px;
+}
+
+.current-plan-badge {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: rgba(129, 178, 154, 0.16);
+  color: var(--color-menta);
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .card-header .description {
@@ -149,6 +202,16 @@
   color: white;
 }
 
+.btn-select:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+.btn-select:disabled:hover {
+  background-color: var(--color-superficie-alt);
+  color: var(--color-pizarra-dark);
+}
+
 .highlighted .btn-select {
   background-color: var(--color-pizarra);
   color: #fff;
@@ -156,6 +219,19 @@
 
 .highlighted .btn-select:hover {
   background-color: var(--color-pizarra-dark);
+}
+
+.highlighted .btn-select:disabled:hover {
+  background-color: var(--color-pizarra);
+  color: #fff;
+}
+
+.pricing-error {
+  margin: 16px auto 0;
+  color: var(--color-melocoton);
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
 }
 
 /* Feature disabled styles */

@@ -1,6 +1,7 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { ToastService } from '../../../shared/services/toast.service';
 import { HomeAlumnoService } from '../../home-alumno/services/home-alumno.service';
 import {
   SUGERENCIAS_ASISTENTE_POR_ROL,
@@ -44,12 +45,15 @@ const MENSAJE_ERROR =
 const ESTADO_ESPERANDO_RECREO = 'ESPERANDO_RECREO';
 const ESTADO_ESPERANDO_CONFIRMACION = 'ESPERANDO_CONFIRMACION';
 const ESTADO_EJECUTADA = 'EJECUTADA';
+type PlanAsistente = 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO';
+type PlanAsistenteRequerido = Exclude<PlanAsistente, 'GRATUITO'>;
 
 @Injectable()
 export class AsistenteVirtualPresenter {
   private readonly perfilService = inject(PerfilService);
   private readonly asistenteService = inject(AsistenteVirtualService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
+  private readonly toastService = inject(ToastService);
 
   private readonly abiertoState = signal(false);
   private readonly mensajesState = signal<MensajeAsistente[]>([]);
@@ -78,10 +82,22 @@ export class AsistenteVirtualPresenter {
       !this.historialVisibleState() &&
       !this.tieneAccionInteractiva(),
   );
+  readonly asistenteBloqueado: Signal<boolean> = computed(() =>
+    this.planBloqueadoParaRol('INTERMEDIO'),
+  );
   readonly opcionesDisponibles: Signal<readonly SugerenciaCapacidad[]> =
     computed(() => {
       const rol = this.perfilService.rol();
-      return rol ? SUGERENCIAS_ASISTENTE_POR_ROL[rol] : [];
+      const opciones = rol ? SUGERENCIAS_ASISTENTE_POR_ROL[rol] : [];
+      return opciones.map((opcion) =>
+        opcion.premium
+          ? {
+              ...opcion,
+              planRequerido: 'AVANZADO',
+              bloqueada: this.planBloqueadoParaRol('AVANZADO'),
+            }
+          : opcion,
+      );
     });
 
   readonly sugerencias: Signal<readonly SugerenciaCapacidad[]> = computed(() => {
@@ -90,7 +106,7 @@ export class AsistenteVirtualPresenter {
     const estadoAccion = this.estadoAccion(accion);
 
     if (estadoAccion === ESTADO_ESPERANDO_CONFIRMACION) {
-      return SUGERENCIAS_COMPRA_PENDIENTE;
+      return this.sugerenciasCompraPendiente();
     }
 
     if (estadoAccion === ESTADO_ESPERANDO_RECREO) {
@@ -119,6 +135,11 @@ export class AsistenteVirtualPresenter {
   );
 
   abrir(): void {
+    if (this.asistenteBloqueado()) {
+      this.mostrarBloqueo('INTERMEDIO');
+      return;
+    }
+
     this.asegurarBienvenida();
     this.abiertoState.set(true);
     void this.revisarUltimaSesion();
@@ -139,6 +160,14 @@ export class AsistenteVirtualPresenter {
   async enviar(texto: string): Promise<void> {
     const limpio = texto.trim();
     if (!limpio || this.procesando()) return;
+    if (this.asistenteBloqueado()) {
+      this.mostrarBloqueo('INTERMEDIO');
+      return;
+    }
+    if (this.confirmacionCompraIaBloqueada(limpio)) {
+      this.mostrarBloqueo('AVANZADO');
+      return;
+    }
 
     this.mensajesState.update((lista) => [
       ...lista,
@@ -199,6 +228,7 @@ export class AsistenteVirtualPresenter {
 
   async nuevaConversacion(): Promise<void> {
     if (this.procesando()) return;
+    if (this.asistenteBloqueado()) return;
 
     const contexto = this.obtenerContexto();
     const sesionId = this.sesionIdState();
@@ -220,6 +250,7 @@ export class AsistenteVirtualPresenter {
 
   async verMensajesAnteriores(): Promise<void> {
     if (this.procesando() || !this.puedeVerHistorial()) return;
+    if (this.asistenteBloqueado()) return;
 
     const contexto = this.obtenerContexto();
     const sesionId = this.sesionHistorialState();
@@ -250,6 +281,8 @@ export class AsistenteVirtualPresenter {
   }
 
   private async revisarUltimaSesion(): Promise<void> {
+    if (this.asistenteBloqueado()) return;
+
     if (
       this.historialRevisadoState() ||
       this.cargandoHistorialState() ||
@@ -300,6 +333,65 @@ export class AsistenteVirtualPresenter {
         new Date(a.fechaUltimaActividad).getTime(),
     );
     return ultima ?? null;
+  }
+
+  private sugerenciasCompraPendiente(): readonly SugerenciaCapacidad[] {
+    if (this.perfilService.rol() !== 'ALUMNO') {
+      return SUGERENCIAS_COMPRA_PENDIENTE;
+    }
+
+    return SUGERENCIAS_COMPRA_PENDIENTE.map((sugerencia) =>
+      sugerencia.tipo === 'confirmacion'
+        ? {
+            ...sugerencia,
+            premium: true,
+            planRequerido: 'AVANZADO',
+            bloqueada: this.planBloqueadoParaRol('AVANZADO'),
+          }
+        : sugerencia,
+    );
+  }
+
+  private confirmacionCompraIaBloqueada(texto: string): boolean {
+    if (this.perfilService.rol() !== 'ALUMNO') return false;
+    if (this.estadoAccion(this.accionState()) !== ESTADO_ESPERANDO_CONFIRMACION) {
+      return false;
+    }
+    if (!this.planBloqueadoParaRol('AVANZADO')) return false;
+
+    const normalizado = texto
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    return ['confirmar', 'si', 'comprar', 'aceptar'].includes(normalizado);
+  }
+
+  private planBloqueadoParaRol(planRequerido: PlanAsistenteRequerido): boolean {
+    const perfil = this.perfilService.getPerfil();
+    const rol = perfil?.rol ?? this.perfilService.rol();
+    if (!perfil) return false;
+    if (rol !== 'PADRE' && rol !== 'ALUMNO' && rol !== 'VENDEDOR') {
+      return false;
+    }
+
+    return this.nivelPlan(this.normalizarPlan(perfil.plan)) < this.nivelPlan(planRequerido);
+  }
+
+  private normalizarPlan(planActual: string | undefined): PlanAsistente {
+    const plan = planActual?.toUpperCase();
+    if (plan === 'INTERMEDIO' || plan === 'AVANZADO') return plan;
+    return 'GRATUITO';
+  }
+
+  private nivelPlan(plan: PlanAsistente): number {
+    if (plan === 'AVANZADO') return 2;
+    if (plan === 'INTERMEDIO') return 1;
+    return 0;
+  }
+
+  private mostrarBloqueo(planRequerido: PlanAsistenteRequerido): void {
+    const label = planRequerido === 'AVANZADO' ? 'Avanzado' : 'Intermedio';
+    this.toastService.mostrar(`Disponible con plan ${label}.`, 'info');
   }
 
   private obtenerContexto(): ContextoAsistente | null {

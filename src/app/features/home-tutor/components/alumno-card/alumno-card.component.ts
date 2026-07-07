@@ -15,6 +15,9 @@ import { DialogService } from '../../../../shared/services/dialog.service';
 import { PresupuestoService } from '../../../presupuesto/services/presupuesto.service';
 import { getPeriodRange } from '../../../compra/utils/budget-helpers';
 
+type PlanFamiliaHome = 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO';
+type PlanRequeridoAccion = Exclude<PlanFamiliaHome, 'GRATUITO'>;
+
 const formateadorSaldo = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',
@@ -144,6 +147,15 @@ export class AlumnoCardComponent implements OnInit {
     void this.router.navigate([ruta]);
   }
 
+  navegarConPlan(ruta: string, planRequerido?: PlanRequeridoAccion): void {
+    if (planRequerido && this.planBloqueado(planRequerido)) {
+      this.toastService.mostrar(`Disponible con plan ${this.planLabel(planRequerido)}.`, 'info');
+      return;
+    }
+
+    this.navegar(ruta);
+  }
+
   get fotoPerfil(): string | null {
     return this.alumno.urlFotoPerfil ?? null;
   }
@@ -240,7 +252,15 @@ export class AlumnoCardComponent implements OnInit {
   }
 
   get esPremium(): boolean {
-    return this.perfilService.perfil()?.plan === 'PREMIUM';
+    return !this.perfilService.esPlanGratuito();
+  }
+
+  planBloqueado(planRequerido: PlanRequeridoAccion): boolean {
+    return this.nivelPlan(this.planActualFamilia()) < this.nivelPlan(planRequerido);
+  }
+
+  planLabel(plan: PlanRequeridoAccion): string {
+    return plan === 'AVANZADO' ? 'Avanzado' : 'Intermedio';
   }
 
   isActive(ruta: string): boolean {
@@ -248,6 +268,18 @@ export class AlumnoCardComponent implements OnInit {
     if (!url) return false;
     // Check both route and context
     return this.contextoService.alumnoId() === this.alumno.id && url.includes(ruta);
+  }
+
+  private planActualFamilia(): PlanFamiliaHome {
+    const plan = this.perfilService.perfil()?.plan?.toUpperCase();
+    if (plan === 'INTERMEDIO' || plan === 'AVANZADO') return plan;
+    return 'GRATUITO';
+  }
+
+  private nivelPlan(plan: PlanFamiliaHome): number {
+    if (plan === 'AVANZADO') return 2;
+    if (plan === 'INTERMEDIO') return 1;
+    return 0;
   }
 
 }
