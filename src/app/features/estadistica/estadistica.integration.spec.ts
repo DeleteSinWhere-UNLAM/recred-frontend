@@ -1,6 +1,11 @@
 import { signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { of } from 'rxjs';
+import { MovimientosService } from '../movimientos/services/movimientos.service';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { AlumnoMother } from '../../data-access/services/alumno.mother';
@@ -13,6 +18,7 @@ describe('Estadistica Integration', () => {
   let fixture: ComponentFixture<EstadisticaPage>;
   let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
   let servicioPresupuesto: jasmine.SpyObj<PresupuestoService>;
+  let servicioMovimientos: jasmine.SpyObj<MovimientosService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
   let router: jasmine.SpyObj<Router>;
   let alumnoIdSignal: WritableSignal<string>;
@@ -29,8 +35,11 @@ describe('Estadistica Integration', () => {
       }),
     );
 
-    servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', ['getPrediccion']);
-    servicioPresupuesto.getPrediccion.and.returnValue(PrediccionGastoMother.crear());
+    servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', ['cargarPrediccion']);
+    servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoMother.crear());
+
+    servicioMovimientos = jasmine.createSpyObj('MovimientosService', ['getHistorialAlumno']);
+    servicioMovimientos.getHistorialAlumno.and.returnValue(of([]));
 
     servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getUsuarioActual']);
     servicioUsuario.getUsuarioActual.and.returnValue({
@@ -45,8 +54,12 @@ describe('Estadistica Integration', () => {
       providers: [
         { provide: AlumnosService, useValue: servicioAlumnos },
         { provide: PresupuestoService, useValue: servicioPresupuesto },
+        { provide: MovimientosService, useValue: servicioMovimientos },
         { provide: UsuarioService, useValue: servicioUsuario },
         { provide: Router, useValue: router },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideCharts(withDefaultRegisterables()),
         {
           provide: AlumnoContextoService,
           useValue: { alumnoId: alumnoIdSignal.asReadonly() },
@@ -57,8 +70,8 @@ describe('Estadistica Integration', () => {
     fixture = TestBed.createComponent(EstadisticaPage);
   });
 
-  it('dado un alumno con prediccion, cuando se monta la page, deberia mostrar iniciales, grado y card con datos', () => {
-    whenMonto();
+  it('dado un alumno con prediccion, cuando se monta la page, deberia mostrar iniciales, grado y card con datos', async () => {
+    await whenMonto();
 
     const texto = textoRenderizado();
     expect(texto).toContain('JP');
@@ -68,33 +81,35 @@ describe('Estadistica Integration', () => {
     expect(texto).toContain('Bebidas');
   });
 
-  it('dado el nivel excedido, deberia agregar la clase excedido al card', () => {
-    servicioPresupuesto.getPrediccion.and.returnValue(PrediccionGastoMother.crearExcedido());
+  it('dado el nivel excedido, deberia agregar la clase excedido al card', async () => {
+    servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoMother.crearExcedido());
 
-    whenMonto();
+    await whenMonto();
 
     expect(queryUno('.prediccion-card--excedido')).toBeTruthy();
     expect(textoRenderizado()).toContain('Excede el presupuesto');
   });
 
-  it('dado que no hay prediccion cargada, deberia mostrar el estado vacio del card', () => {
-    servicioPresupuesto.getPrediccion.and.returnValue(undefined);
+  it('dado que no hay prediccion cargada, deberia mostrar el estado vacio del card', async () => {
+    servicioPresupuesto.cargarPrediccion.and.resolveTo(undefined);
 
-    whenMonto();
+    await whenMonto();
 
     expect(queryUno('.prediccion-card--vacio')).toBeTruthy();
     expect(textoRenderizado()).toContain('Todavía no hay datos suficientes');
   });
 
-  it('dado un alumno inexistente en el contexto, deberia redirigir a /tutor', () => {
+  it('dado un alumno inexistente en el contexto, deberia redirigir a /tutor', async () => {
     servicioAlumnos.getAlumnoById.and.returnValue(undefined);
 
-    whenMonto();
+    await whenMonto();
 
     expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
   });
 
-  function whenMonto(): void {
+  async function whenMonto(): Promise<void> {
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
   }
 

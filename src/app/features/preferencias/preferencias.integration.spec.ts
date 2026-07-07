@@ -7,6 +7,8 @@ import { Preferencia } from './models/preferencia.model';
 import { ALUMNO_ID_TEST, PreferenciaMother } from './preferencias.mother';
 import { PreferenciasPage } from './preferencias.page';
 import { PreferenciasService } from './services/preferencias.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('Preferencias Integration', () => {
   let fixture: ComponentFixture<PreferenciasPage>;
@@ -29,6 +31,8 @@ describe('Preferencias Integration', () => {
           provide: AlumnoContextoService,
           useValue: { alumnoId: signal(ALUMNO_ID_TEST).asReadonly() },
         },
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     }).compileComponents();
   });

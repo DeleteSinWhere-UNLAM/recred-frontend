@@ -5,19 +5,25 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
 import { PrediccionGastoMother } from '../estadistica.mother';
 import { EstadisticaPresenter } from './estadistica.presenter';
+import { MovimientosService } from '../../movimientos/services/movimientos.service';
+import { of } from 'rxjs';
 
 describe('EstadisticaPresenter', () => {
   let presenter: EstadisticaPresenter;
   let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
   let servicioPresupuesto: jasmine.SpyObj<PresupuestoService>;
+  let servicioMovimientos: jasmine.SpyObj<MovimientosService>;
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
     servicioAlumnos.getAlumnoById.and.returnValue(undefined);
 
-    servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', ['getPrediccion']);
-    servicioPresupuesto.getPrediccion.and.returnValue(undefined);
+    servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', ['cargarPrediccion']);
+    servicioPresupuesto.cargarPrediccion.and.resolveTo(undefined);
+
+    servicioMovimientos = jasmine.createSpyObj('MovimientosService', ['getHistorialAlumno']);
+    servicioMovimientos.getHistorialAlumno.and.returnValue(of([]));
 
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
@@ -26,6 +32,7 @@ describe('EstadisticaPresenter', () => {
         EstadisticaPresenter,
         { provide: AlumnosService, useValue: servicioAlumnos },
         { provide: PresupuestoService, useValue: servicioPresupuesto },
+        { provide: MovimientosService, useValue: servicioMovimientos },
         { provide: Router, useValue: router },
       ],
     });
@@ -46,7 +53,7 @@ describe('EstadisticaPresenter', () => {
   });
 
   describe('init', () => {
-    it('dado un alumno existente, cuando inicializo, deberia setearlo con sus datos y su prediccion', () => {
+    it('dado un alumno existente, cuando inicializo, deberia setearlo con sus datos y su prediccion', async () => {
       givenAlumnoEncontrado(
         AlumnoMother.crear({
           id: 'alumno-1',
@@ -56,9 +63,9 @@ describe('EstadisticaPresenter', () => {
           urlFotoPerfil: 'https://foto.com/j.png',
         }),
       );
-      servicioPresupuesto.getPrediccion.and.returnValue(PrediccionGastoMother.crear());
+      servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoMother.crear());
 
-      whenInit('alumno-1');
+      await whenInit('alumno-1');
 
       expect(presenter.alumno()?.id).toBe('alumno-1');
       expect(presenter.nombreCompleto()).toBe('Juan');
@@ -68,41 +75,41 @@ describe('EstadisticaPresenter', () => {
       expect(presenter.prediccion()).toBeDefined();
     });
 
-    it('dado un alumno sin nombre ni apellido, cuando inicializo, iniciales y nombreCompleto deberian ser vacios', () => {
+    it('dado un alumno sin nombre ni apellido, cuando inicializo, iniciales y nombreCompleto deberian ser vacios', async () => {
       givenAlumnoEncontrado(AlumnoMother.crear({ nombre: '', apellido: '' }));
 
-      whenInit('alumno-1');
+      await whenInit('alumno-1');
 
       expect(presenter.nombreCompleto()).toBe('');
       expect(presenter.iniciales()).toBe('');
     });
 
-    it('dado que el alumno no existe, cuando inicializo, deberia redirigir a /tutor sin setear alumno', () => {
+    it('dado que el alumno no existe, cuando inicializo, deberia redirigir a /tutor sin setear alumno', async () => {
       givenAlumnoNoEncontrado();
 
-      whenInit('alumno-inexistente');
+      await whenInit('alumno-inexistente');
 
       expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor');
       expect(presenter.alumno()).toBeUndefined();
-      expect(servicioPresupuesto.getPrediccion).not.toHaveBeenCalled();
+      expect(servicioPresupuesto.cargarPrediccion).not.toHaveBeenCalled();
     });
   });
 
   describe('nivelAlerta segun la prediccion', () => {
-    it('dado prediccion en 50%, nivelAlerta deberia ser "ok"', () => {
-      givenAlumnoYPrediccion(PrediccionGastoMother.crear({ porcentajePresupuesto: 50 }));
+    it('dado prediccion en 50%, nivelAlerta deberia ser "ok"', async () => {
+      await givenAlumnoYPrediccion(PrediccionGastoMother.crear({ porcentajePresupuesto: 50 }));
 
       expect(presenter.nivelAlerta()).toBe('ok');
     });
 
-    it('dado prediccion en 80%, nivelAlerta deberia ser "warning"', () => {
-      givenAlumnoYPrediccion(PrediccionGastoMother.crearWarning());
+    it('dado prediccion en 80%, nivelAlerta deberia ser "warning"', async () => {
+      await givenAlumnoYPrediccion(PrediccionGastoMother.crearWarning());
 
       expect(presenter.nivelAlerta()).toBe('warning');
     });
 
-    it('dado prediccion en 120%, nivelAlerta deberia ser "excedido"', () => {
-      givenAlumnoYPrediccion(PrediccionGastoMother.crearExcedido());
+    it('dado prediccion en 120%, nivelAlerta deberia ser "excedido"', async () => {
+      await givenAlumnoYPrediccion(PrediccionGastoMother.crearExcedido());
 
       expect(presenter.nivelAlerta()).toBe('excedido');
     });
@@ -124,13 +131,13 @@ describe('EstadisticaPresenter', () => {
     servicioAlumnos.getAlumnoById.and.returnValue(undefined);
   }
 
-  function givenAlumnoYPrediccion(prediccion: ReturnType<typeof PrediccionGastoMother.crear>): void {
+  async function givenAlumnoYPrediccion(prediccion: ReturnType<typeof PrediccionGastoMother.crear>): Promise<void> {
     servicioAlumnos.getAlumnoById.and.returnValue(AlumnoMother.crear({ id: 'alumno-1' }));
-    servicioPresupuesto.getPrediccion.and.returnValue(prediccion);
-    presenter.init('alumno-1');
+    servicioPresupuesto.cargarPrediccion.and.resolveTo(prediccion);
+    await presenter.init('alumno-1');
   }
 
-  function whenInit(alumnoId: string): void {
-    presenter.init(alumnoId);
+  async function whenInit(alumnoId: string): Promise<void> {
+    await presenter.init(alumnoId);
   }
 });
