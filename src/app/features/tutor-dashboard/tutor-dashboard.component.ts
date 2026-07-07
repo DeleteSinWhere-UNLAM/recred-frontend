@@ -144,11 +144,15 @@ export class TutorDashboardComponent implements OnInit {
   }
   
   get esPlanGratuito(): boolean {
-    return this.perfilService.perfil()?.plan !== 'PREMIUM';
+    return this.perfilService.esPlanGratuito();
   }
 
   get esPremium(): boolean {
     return !this.esPlanGratuito;
+  }
+
+  get tienePlanAvanzado(): boolean {
+    return this.perfilService.perfil()?.plan?.toUpperCase() === 'AVANZADO';
   }
 
   get puedeAgregarTarjeta(): boolean {
@@ -157,7 +161,7 @@ export class TutorDashboardComponent implements OnInit {
 
   // Drag and Drop Logic
   onDragStart(event: DragEvent, child: ChildDashboardSummary): void {
-    if (this.esPlanGratuito) {
+    if (!this.tienePlanAvanzado) {
       event.preventDefault();
       return;
     }
@@ -199,8 +203,8 @@ export class TutorDashboardComponent implements OnInit {
     const target = event.currentTarget as HTMLElement;
     target.classList.remove('drag-over');
 
-    if (this.esPlanGratuito) {
-      await this.dialogService.alert('La transferencia entre hijos no está permitida en cuentas gratuitas.', 'Plan Gratuito');
+    if (!this.tienePlanAvanzado) {
+      await this.dialogService.alert('La transferencia entre hijos esta disponible con plan Avanzado.', 'Plan Avanzado');
       return;
     }
 
@@ -241,8 +245,8 @@ export class TutorDashboardComponent implements OnInit {
 
   // Button Transfer Logic
   openTransferModal(sourceChild: ChildDashboardSummary): void {
-    if (this.esPlanGratuito) {
-      this.dialogService.alert('La transferencia entre hijos no está permitida en cuentas gratuitas.', 'Plan Gratuito');
+    if (!this.tienePlanAvanzado) {
+      this.dialogService.alert('La transferencia entre hijos esta disponible con plan Avanzado.', 'Plan Avanzado');
       return;
     }
     

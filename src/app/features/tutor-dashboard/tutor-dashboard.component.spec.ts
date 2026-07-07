@@ -94,7 +94,7 @@ describe('TutorDashboardComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let perfilSignal: ReturnType<typeof signal<Perfil | null>>;
 
-  async function givenComponenteMontado(perfil: Perfil | null = { id: 'p-1', nombre: 'Tutor Test', plan: 'PREMIUM' }): Promise<void> {
+  async function givenComponenteMontado(perfil: Perfil | null = { id: 'p-1', nombre: 'Tutor Test', plan: 'AVANZADO' }): Promise<void> {
     dashboardService = jasmine.createSpyObj<TutorDashboardService>('TutorDashboardService', [
       'getGlobalDashboard',
       'saveDashboardConfig',
@@ -127,7 +127,16 @@ describe('TutorDashboardComponent', () => {
         { provide: UsuarioService, useValue: usuarioService },
         { provide: DialogService, useValue: dialogService },
         { provide: Router, useValue: router },
-        { provide: PerfilService, useValue: { perfil: perfilSignal } },
+        {
+          provide: PerfilService,
+          useValue: {
+            perfil: perfilSignal,
+            esPlanGratuito: () => {
+              const plan = perfilSignal()?.plan?.toUpperCase();
+              return plan !== 'INTERMEDIO' && plan !== 'AVANZADO';
+            },
+          },
+        },
       ],
     })
       .overrideComponent(TutorDashboardComponent, {
@@ -293,9 +302,9 @@ describe('TutorDashboardComponent', () => {
     });
   });
 
-  describe('plan gratuito vs premium', () => {
-    it('dado plan PREMIUM, esPremium deberia ser true y puedeAgregarTarjeta true sin limite', async () => {
-      await givenComponenteMontado({ id: 'p-1', nombre: 'Tutor', plan: 'PREMIUM' });
+  describe('plan gratuito vs pago', () => {
+    it('dado plan INTERMEDIO, esPremium deberia ser true y puedeAgregarTarjeta true sin limite', async () => {
+      await givenComponenteMontado({ id: 'p-1', nombre: 'Tutor', plan: 'INTERMEDIO' });
       whenDetectoCambios();
 
       thenEsPlanGratuitoEs(false);
@@ -423,7 +432,7 @@ describe('TutorDashboardComponent', () => {
 
       whenAbroTransferModal(ChildDashboardSummaryMother.crear());
 
-      thenSeMostroAlerta({ matcher: 'La transferencia entre hijos no está permitida en cuentas gratuitas.', titulo: 'Plan Gratuito' });
+      thenSeMostroAlerta({ matcher: 'La transferencia entre hijos esta disponible con plan Avanzado.', titulo: 'Plan Avanzado' });
       thenElTransferModalEsta(false);
     });
 
@@ -585,7 +594,7 @@ describe('TutorDashboardComponent', () => {
       thenElDraggedChildEs(null);
     });
 
-    it('dado plan premium con dataTransfer, cuando arrastro, deberia setear draggedChild y usar dataTransfer', () => {
+    it('dado plan avanzado con dataTransfer, cuando arrastro, deberia setear draggedChild y usar dataTransfer', () => {
       const dataTransfer = { setData: jasmine.createSpy(), effectAllowed: '' } as unknown as DataTransfer;
       const event = DragEventMother.crearParaDragStart(dataTransfer);
       const child = component.globalSummary!.children[0];
@@ -596,7 +605,7 @@ describe('TutorDashboardComponent', () => {
       expect(dataTransfer.setData).toHaveBeenCalledWith('text/plain', child.studentId);
     });
 
-    it('dado plan premium sin dataTransfer, cuando arrastro, no deberia romper y draggedChild deberia setearse', () => {
+    it('dado plan avanzado sin dataTransfer, cuando arrastro, no deberia romper y draggedChild deberia setearse', () => {
       const event = DragEventMother.crearParaDragStart(null);
       const child = component.globalSummary!.children[0];
 
@@ -674,7 +683,7 @@ describe('TutorDashboardComponent', () => {
 
       await whenDrop(DragEventMother.crearParaDrop(), component.globalSummary!.children[1]);
 
-      thenSeMostroAlerta({ matcher: jasmine.stringMatching(/no está permitida en cuentas gratuitas/i), titulo: 'Plan Gratuito' });
+      thenSeMostroAlerta({ matcher: jasmine.stringMatching(/disponible con plan Avanzado/i), titulo: 'Plan Avanzado' });
       thenNoSeLlamoTransferBalance();
     });
 

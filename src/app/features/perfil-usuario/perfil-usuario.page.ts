@@ -69,14 +69,51 @@ export class PerfilUsuarioPage implements OnInit {
     return role === 'PADRE';
   });
 
+  protected readonly esDirectivo = computed(() => {
+    const role = this.usuario()?.role || this.perfil()?.role;
+    return role === 'DIRECTIVO_COLEGIO';
+  });
+
   protected readonly esPremium = computed(() => {
     const plan = this.planUsuario();
-    return plan === 'PREMIUM' || plan === 'AVANZADO';
+    return plan === 'INTERMEDIO' || plan === 'AVANZADO';
+  });
+
+  protected readonly planActualLabel = computed(() => {
+    const plan = this.planUsuario();
+    if (plan === 'AVANZADO') return 'Avanzado';
+    if (plan === 'INTERMEDIO') return 'Intermedio';
+    return 'Gratuito';
   });
 
   protected readonly vigenciaPlan = computed(() => {
-    // Retornamos la fecha por defecto según lo solicitado, idealmente vendrá de this.perfil()
-    return '19/12/2026';
+    if (!this.esPremium()) return 'Sin vencimiento';
+
+    const fecha = this.perfil()?.fechaVencimientoPlan;
+    return this.formatearFechaVencimiento(fecha) ?? 'Sin vencimiento';
+  });
+
+  protected readonly estadoLicenciaColegio = computed(() => {
+    const estado = this.perfil()?.estadoLicenciaColegio || this.perfil()?.licenciaColegio?.estado;
+    if (estado) return this.normalizarEstadoLicencia(estado);
+
+    const dias = this.diasRestantesLicenciaColegio();
+    if (dias === null) return 'Pendiente de pago';
+    return dias >= 0 ? 'Activa' : 'Vencida';
+  });
+
+  protected readonly vigenciaLicenciaColegio = computed(() => {
+    const fecha = this.fechaVencimientoLicenciaColegio();
+    return this.formatearFechaVencimiento(fecha) ?? 'Sin vigencia activa';
+  });
+
+  protected readonly restanteLicenciaColegio = computed(() => {
+    const dias = this.diasRestantesLicenciaColegio();
+    if (dias === null) return 'Sin licencia registrada';
+    if (dias < 0) return 'Licencia vencida';
+    if (dias === 0) return 'Vence hoy';
+    if (dias === 1) return 'Resta 1 dia';
+    return `Restan ${dias} dias`;
   });
 
   protected readonly payoutForm = new FormGroup({
@@ -203,6 +240,8 @@ export class PerfilUsuarioPage implements OnInit {
         this.usuarioService.setHomeUrl('/kiosquero');
       } else if (role === 'PADRE') {
         this.usuarioService.setHomeUrl('/tutor');
+      } else if (role === 'DIRECTIVO_COLEGIO') {
+        this.usuarioService.setHomeUrl('/directivo');
       }
 
       if (role === 'VENDEDOR') {
@@ -332,6 +371,8 @@ export class PerfilUsuarioPage implements OnInit {
         return 'Alumno';
       case 'VENDEDOR':
         return 'Kiosquero';
+      case 'DIRECTIVO_COLEGIO':
+        return 'Directivo';
       default:
         return 'Usuario';
     }
@@ -391,6 +432,56 @@ export class PerfilUsuarioPage implements OnInit {
       lastName: perfil.lastName,
       role: perfil.role,
     };
+  }
+
+  private formatearFechaVencimiento(fecha: string | null | undefined): string | null {
+    if (!fecha?.trim()) return null;
+
+    const date = new Date(fecha);
+    if (Number.isNaN(date.getTime())) return null;
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+
+  private fechaVencimientoLicenciaColegio(): string | null | undefined {
+    const perfil = this.perfil();
+    return (
+      perfil?.licenciaColegio?.fechaVencimiento
+      ?? perfil?.fechaVencimientoLicenciaColegio
+      ?? perfil?.fechaVencimientoSuscripcionColegio
+      ?? perfil?.fechaVencimientoLicencia
+      ?? null
+    );
+  }
+
+  private diasRestantesLicenciaColegio(): number | null {
+    const fecha = this.fechaVencimientoLicenciaColegio();
+    if (!fecha?.trim()) return null;
+
+    const vencimiento = new Date(fecha);
+    if (Number.isNaN(vencimiento.getTime())) return null;
+
+    const hoy = new Date();
+    const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
+    const inicioVencimiento = new Date(
+      vencimiento.getFullYear(),
+      vencimiento.getMonth(),
+      vencimiento.getDate(),
+    ).getTime();
+    return Math.ceil((inicioVencimiento - inicioHoy) / 86_400_000);
+  }
+
+  private normalizarEstadoLicencia(estado: string): string {
+    const normalizado = estado.toUpperCase();
+    if (normalizado === 'ACTIVA' || normalizado === 'ACTIVE') return 'Activa';
+    if (normalizado === 'PENDIENTE' || normalizado === 'PENDING') return 'Pendiente';
+    if (normalizado === 'VENCIDA' || normalizado === 'EXPIRED') return 'Vencida';
+    if (normalizado === 'CANCELADA' || normalizado === 'CANCELLED') return 'Cancelada';
+    return estado;
   }
 
   protected async cargarConfiguracionPayout(): Promise<void> {

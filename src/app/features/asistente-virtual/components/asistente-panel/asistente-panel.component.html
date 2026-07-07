@@ -106,10 +106,15 @@
                   type="button"
                   class="asistente-panel__opcion"
                   [class.asistente-panel__opcion--premium]="opcion.premium"
-                  [disabled]="deshabilitado_()"
+                  [class.asistente-panel__opcion--locked]="opcion.bloqueada"
+                  [disabled]="deshabilitado_() || opcion.bloqueada"
                   (click)="onOpcion(opcion)"
                 >
-                  @if (opcion.premium) {
+                  @if (opcion.bloqueada) {
+                    <span class="asistente-panel__opcion-icono" aria-hidden="true">
+                      <i class="fa-solid fa-lock"></i>
+                    </span>
+                  } @else if (opcion.premium) {
                     <span class="asistente-panel__opcion-icono" aria-hidden="true">
                       <i class="fa-solid fa-crown"></i>
                     </span>

@@ -10,6 +10,7 @@ import { SugerenciaCapacidad } from './models/capacidad-asistente.model';
 import { MensajeAsistente } from './models/mensaje-asistente.model';
 import { PerfilMother } from '../../data-access/services/alumno.mother';
 import { RespuestaAsistenteMother } from './asistente-virtual.mother';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-asistente-fab',
@@ -19,6 +20,7 @@ import { RespuestaAsistenteMother } from './asistente-virtual.mother';
 class AsistenteFabStub {
   @Input() oculto = false;
   @Input() mostrarBadge = true;
+  @Input() bloqueado = false;
   @Output() togglePanel = new EventEmitter<void>();
 }
 
@@ -49,6 +51,7 @@ describe('AsistenteVirtual Integration', () => {
   let servicioAsistente: jasmine.SpyObj<AsistenteVirtualService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioHomeAlumno: jasmine.SpyObj<HomeAlumnoService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
     servicioAsistente = jasmine.createSpyObj('AsistenteVirtualService', [
@@ -64,11 +67,12 @@ describe('AsistenteVirtual Integration', () => {
 
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['rol', 'getPerfil', 'obtenerAlumnoId']);
     servicioPerfil.rol.and.returnValue('ALUMNO');
-    servicioPerfil.getPerfil.and.returnValue(PerfilMother.crear({ rol: 'ALUMNO' }));
+    servicioPerfil.getPerfil.and.returnValue(PerfilMother.crear({ rol: 'ALUMNO', plan: 'INTERMEDIO' }));
     servicioPerfil.obtenerAlumnoId.and.returnValue(null);
 
     servicioHomeAlumno = jasmine.createSpyObj('HomeAlumnoService', ['cargarPedidoEnCurso']);
     servicioHomeAlumno.cargarPedidoEnCurso.and.resolveTo();
+    servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
 
     await TestBed.configureTestingModule({
       imports: [AsistenteVirtualComponent],
@@ -76,6 +80,7 @@ describe('AsistenteVirtual Integration', () => {
         { provide: AsistenteVirtualService, useValue: servicioAsistente },
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: HomeAlumnoService, useValue: servicioHomeAlumno },
+        { provide: ToastService, useValue: servicioToast },
       ],
     })
       .overrideComponent(AsistenteVirtualComponent, {

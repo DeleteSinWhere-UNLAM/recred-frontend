@@ -1,5 +1,6 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
@@ -107,6 +108,7 @@ export class BuffetPresenter {
   private readonly filtrosState = signal<FiltrosBuffet>({ ...filtrosPorDefecto });
   private readonly restriccionesNutricionalesState = signal<ClasificacionSaludBackend[]>([]);
   private readonly promocionesState = signal<Promotion[]>([]);
+  private readonly favoritosTotalesFamiliaState = signal<number | null>(null);
 
   private readonly franjasState = signal<TimeSlot[]>([]);
   private readonly restriccionesState = signal<RestriccionHoraria[]>([]);
@@ -470,9 +472,11 @@ export class BuffetPresenter {
       next: (favs) => {
         const ids = new Set(favs.map((f) => f.id));
         this.favoritosState.set(ids);
+        this.cargarCantidadFavoritosFamilia(alumnoId, ids.size);
       },
       error: (err) => {
         console.error('Error loading favorites:', err);
+        this.cargarCantidadFavoritosFamilia(alumnoId, 0);
       }
     });
 
@@ -752,22 +756,72 @@ export class BuffetPresenter {
     if (ids.has(producto.id)) {
       ids.delete(producto.id);
       this.favoritosState.set(ids);
+      this.favoritosTotalesFamiliaState.update((total) =>
+        total === null ? total : Math.max(0, total - 1),
+      );
       this.favoritosService.removerFavorito(alumno.id, producto.id).subscribe({
         next: () => this.toastService.mostrar(`Se quitó "${producto.nombre}" de tus favoritos`, 'success'),
         error: (err) => console.error('Error removing favorite:', err)
       });
     } else {
-      const esPlanGratuito = this.perfilService.perfil()?.plan !== 'PREMIUM';
-      if (esPlanGratuito && ids.size >= 5) {
-        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 por hijo).', 'error');
+      const totalFavoritos = this.favoritosTotalesFamiliaState() ?? ids.size;
+      if (this.perfilService.esPlanGratuito() && totalFavoritos >= 5) {
+        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 en total).', 'error');
         return;
       }
       ids.add(producto.id);
       this.favoritosState.set(ids);
+      this.favoritosTotalesFamiliaState.update((total) =>
+        total === null ? total : total + 1,
+      );
       this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({
         next: () => this.toastService.mostrar(`Se agregó "${producto.nombre}" a tus favoritos`, 'success'),
         error: (err) => console.error('Error adding favorite:', err)
       });
+    }
+  }
+
+  private cargarCantidadFavoritosFamilia(alumnoIdActual: string, favoritosActuales: number): void {
+    if (!this.perfilService.esPlanGratuito()) {
+      this.favoritosTotalesFamiliaState.set(null);
+      return;
+    }
+
+    const perfil = this.perfilService.perfil();
+    if (perfil?.rol !== 'PADRE') {
+      this.favoritosTotalesFamiliaState.set(favoritosActuales);
+      return;
+    }
+
+    void this.calcularCantidadFavoritosFamilia(alumnoIdActual, favoritosActuales);
+  }
+
+  private async calcularCantidadFavoritosFamilia(
+    alumnoIdActual: string,
+    favoritosActuales: number,
+  ): Promise<void> {
+    try {
+      const alumnos = await this.alumnosService.asegurarCargados();
+      const idsAlumnos = alumnos.map((alumno) => alumno.id).filter(Boolean);
+      const ids = idsAlumnos.length > 0 ? idsAlumnos : [alumnoIdActual];
+      const cantidades = await Promise.all(
+        ids.map(async (alumnoId) => {
+          if (alumnoId === alumnoIdActual) return favoritosActuales;
+          try {
+            return (await firstValueFrom(this.favoritosService.getFavoritos(alumnoId))).length;
+          } catch (err) {
+            console.error('Error counting family favorites:', err);
+            return 0;
+          }
+        }),
+      );
+
+      this.favoritosTotalesFamiliaState.set(
+        cantidades.reduce((total, cantidad) => total + cantidad, 0),
+      );
+    } catch (err) {
+      console.error('Error loading family favorites count:', err);
+      this.favoritosTotalesFamiliaState.set(favoritosActuales);
     }
   }
 
@@ -917,9 +971,3 @@ export class BuffetPresenter {
     return [...porId.values()];
   }
 }
-
-
-
-
-
-

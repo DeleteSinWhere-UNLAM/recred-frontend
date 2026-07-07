@@ -129,7 +129,7 @@
         type="button"
         class="orden-alumno__favorito-btn"
         [disabled]="favoritoDeshabilitado"
-        [attr.title]="favoritoDeshabilitado ? 'Límite de 3 carritos favoritos alcanzado para cuenta gratuita' : ''"
+        [attr.title]="favoritoDeshabilitado ? 'Límite de 5 carritos favoritos alcanzado para cuenta gratuita' : ''"
         (click)="guardarFavorito.emit()"
       >
         <i class="fa-regular fa-heart" aria-hidden="true"></i>

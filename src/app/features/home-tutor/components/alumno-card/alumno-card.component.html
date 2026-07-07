@@ -106,15 +106,32 @@
         <span class="alumno-card__btn-label">Pendientes</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegar('/prediccion-gasto')"
-        [class.active]="isActive('/prediccion-gasto')">
+      <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')"
+        [class.active]="isActive('/prediccion-gasto')"
+        [class.alumno-card__btn--locked]="planBloqueado('INTERMEDIO')"
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
+        <span class="alumno-card__plan-badge">
+          @if (planBloqueado('INTERMEDIO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Intermedio
+        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-compass"></i>
         </span>
         <span class="alumno-card__btn-label">Predicción</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegar('/preferencias')" [class.active]="isActive('/preferencias')">
+      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegarConPlan('/preferencias', 'INTERMEDIO')"
+        [class.active]="isActive('/preferencias')"
+        [class.alumno-card__btn--locked]="planBloqueado('INTERMEDIO')"
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
+        <span class="alumno-card__plan-badge">
+          @if (planBloqueado('INTERMEDIO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Intermedio
+        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </span>
@@ -129,8 +146,16 @@
         </span>
         <span class="alumno-card__btn-label">Adelanto</span>
       </a>
-      <a class="alumno-card__btn alumno-card__btn--azul" title="Transferir" (click)="navegar('/transferir-saldo')"
-        [class.active]="isActive('/transferir-saldo')">
+      <a class="alumno-card__btn alumno-card__btn--azul" title="Transferir" (click)="navegarConPlan('/transferir-saldo', 'AVANZADO')"
+        [class.active]="isActive('/transferir-saldo')"
+        [class.alumno-card__btn--locked]="planBloqueado('AVANZADO')"
+        [attr.aria-disabled]="planBloqueado('AVANZADO')">
+        <span class="alumno-card__plan-badge">
+          @if (planBloqueado('AVANZADO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Avanzado
+        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-right-left"></i>
         </span>

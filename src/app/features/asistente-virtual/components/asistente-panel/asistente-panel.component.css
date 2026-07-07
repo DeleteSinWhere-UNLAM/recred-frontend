@@ -340,6 +340,11 @@
   cursor: not-allowed;
 }
 
+.asistente-panel__opcion--locked {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 .asistente-panel__opcion-icono {
   flex: 0 0 22px;
   width: 22px;

@@ -15,6 +15,7 @@ import { AsistenteVirtualPresenter } from './presenter/asistente-virtual.present
 class AsistenteFabStub {
   @Input() oculto = false;
   @Input() mostrarBadge = true;
+  @Input() bloqueado = false;
   @Output() togglePanel = new EventEmitter<void>();
 }
 
@@ -143,6 +144,7 @@ function crearPresenterSpy(): jasmine.SpyObj<AsistenteVirtualPresenter> {
     puedeVerHistorial: signal(false),
     requiereFechaRetiro: signal(false),
     fechaRetiroMinima: signal('2026-07-01'),
+    asistenteBloqueado: signal(false),
   });
   return spy;
 }

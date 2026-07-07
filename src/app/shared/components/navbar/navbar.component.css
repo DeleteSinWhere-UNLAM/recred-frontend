@@ -225,6 +225,10 @@
   color: var(--color-melocoton);
 }
 
+.navbar__menu-item--locked {
+  cursor: not-allowed;
+}
+
 .navbar__menu-item:focus-visible {
   outline: 2px solid var(--color-pizarra);
   outline-offset: 2px;
@@ -480,6 +484,10 @@
 .navbar__movimientos-link:active,
 .navbar__carritos-favoritos-link:active {
   transform: translateY(0);
+}
+
+.navbar__dashboard-link--locked {
+  cursor: not-allowed;
 }
 
 .navbar__dashboard-link i,
@@ -909,6 +917,10 @@
   border-color: rgba(242, 183, 5, 0.32);
 }
 
+.navbar--kiosquero .navbar__kiosk-link--locked {
+  cursor: not-allowed;
+}
+
 .navbar--kiosquero .navbar__kiosk-link .navbar__premium-badge {
   margin-left: 2px;
   flex: 0 0 auto;
@@ -995,6 +1007,7 @@
 .navbar__premium-badge {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
@@ -1007,6 +1020,10 @@
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
   line-height: 1;
   margin-left: auto;
+}
+
+.navbar__premium-badge i {
+  font-size: 8px;
 }
 
 .pv__premium-badge {
@@ -1026,4 +1043,3 @@
   box-shadow: 0 2px 5px rgba(212, 175, 55, 0.35);
   text-transform: uppercase;
 }
-

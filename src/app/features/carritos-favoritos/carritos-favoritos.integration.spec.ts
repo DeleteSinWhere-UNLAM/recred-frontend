@@ -146,7 +146,7 @@ describe('CarritosFavoritos Integration', () => {
 
     await whenMonto();
 
-    expect(queryTexto('.dashboard-limit-alert')).toContain('Límite de 3 carritos favoritos');
+    expect(queryTexto('.dashboard-limit-alert')).toContain('Límite de 5 carritos favoritos');
   });
 
   it('dado un carrito, cuando toco eliminar y confirmo, deberia llamar al service y recargar', async () => {

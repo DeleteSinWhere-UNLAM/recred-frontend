@@ -34,7 +34,7 @@ export class MovimientosPage implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly alumnoId$ = toObservable(this.contextoService.alumnoId);
 
-  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
+  readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
   readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   readonly esVistaIndividual = signal<boolean>(false);
   readonly nombreAlumno = signal<string>('');

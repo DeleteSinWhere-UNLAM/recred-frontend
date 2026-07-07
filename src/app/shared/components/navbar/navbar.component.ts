@@ -18,6 +18,9 @@ import { NotificacionesService, Notificacion } from '../../../data-access/servic
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
+import { ToastService } from '../../services/toast.service';
+
+type PlanNavbar = 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO';
 
 @Component({
   selector: 'app-navbar',
@@ -37,6 +40,7 @@ export class NavbarComponent implements OnInit {
   private readonly host = inject(ElementRef<HTMLElement>);
   protected readonly themeService = inject(ThemeService);
   private readonly contextoService = inject(AlumnoContextoService);
+  private readonly toastService = inject(ToastService);
 
   @Input() userName = '';
 
@@ -45,13 +49,14 @@ export class NavbarComponent implements OnInit {
   }
 
 
-  protected readonly esPremium = computed(() => {
-    if (typeof this.perfilService?.perfil !== 'function') {
-      return false;
-    }
-    const plan = this.perfilService.perfil()?.plan;
-    return plan === 'PREMIUM' || plan === 'AVANZADO';
+  protected readonly planPagoLabel = computed(() => {
+    const plan = this.planActual();
+    if (plan === 'INTERMEDIO') return 'Intermedio';
+    if (plan === 'AVANZADO') return 'Avanzado';
+    return null;
   });
+
+  protected readonly esPremium = computed(() => this.planPagoLabel() !== null);
 
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
@@ -204,11 +209,37 @@ export class NavbarComponent implements OnInit {
   }
 
   protected irARecomendacionesEstacionales(): void {
+    if (this.planBloqueado('AVANZADO')) {
+      this.toastService.mostrar('Disponible con plan Avanzado.', 'info');
+      return;
+    }
     this.menuKiosqueroAbierto.set(false);
     this.router.navigateByUrl('/recomendaciones-estacionales');
   }
 
+  protected irAPanelControl(event?: Event): void {
+    event?.preventDefault();
+    if (this.planBloqueado('INTERMEDIO')) {
+      this.toastService.mostrar('Disponible con plan Intermedio.', 'info');
+      return;
+    }
+    this.router.navigateByUrl('/kiosquero/reportes');
+  }
+
+  protected irAPanelTutor(event?: Event): void {
+    event?.preventDefault();
+    if (this.planBloqueado('INTERMEDIO')) {
+      this.toastService.mostrar('Disponible con plan Intermedio.', 'info');
+      return;
+    }
+    this.router.navigateByUrl('/tutor-dashboard');
+  }
+
   protected irAPromociones(): void {
+    if (this.planBloqueado('AVANZADO')) {
+      this.toastService.mostrar('Disponible con plan Avanzado.', 'info');
+      return;
+    }
     this.menuKiosqueroAbierto.set(false);
     this.router.navigateByUrl('/promociones');
   }
@@ -234,6 +265,23 @@ export class NavbarComponent implements OnInit {
   protected irAPremium(): void {
     this.menuAbierto.set(false);
     this.router.navigateByUrl('/suscripcion');
+  }
+
+  protected planBloqueado(planRequerido: 'INTERMEDIO' | 'AVANZADO'): boolean {
+    return this.nivelPlan(this.planActual()) < this.nivelPlan(planRequerido);
+  }
+
+  private planActual(): PlanNavbar {
+    if (typeof this.perfilService?.perfil !== 'function') return 'GRATUITO';
+    const plan = this.perfilService.perfil()?.plan?.toUpperCase();
+    if (plan === 'INTERMEDIO' || plan === 'AVANZADO') return plan;
+    return 'GRATUITO';
+  }
+
+  private nivelPlan(plan: PlanNavbar): number {
+    if (plan === 'AVANZADO') return 2;
+    if (plan === 'INTERMEDIO') return 1;
+    return 0;
   }
 
   protected async cerrarSesion(): Promise<void> {

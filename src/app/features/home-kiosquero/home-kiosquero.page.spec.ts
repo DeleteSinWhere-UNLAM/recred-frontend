@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
+import { Perfil } from '../../data-access/models/perfil.model';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -25,10 +26,15 @@ class NavbarStub {
 @Component({ selector: 'app-modal-seleccion-carga', template: '', standalone: true })
 class ModalSeleccionCargaStub {
   @Input() isOpen = false;
+  @Input() planActual: 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO' = 'GRATUITO';
   @Output() closeModal = new EventEmitter<void>();
   @Output() selectIA = new EventEmitter<void>();
   @Output() selectManual = new EventEmitter<void>();
   @Output() selectBulk = new EventEmitter<void>();
+  @Output() iaUpload = new EventEmitter<void>();
+  @Output() manualUpload = new EventEmitter<void>();
+  @Output() bulkUpload = new EventEmitter<void>();
+  @Output() planBlocked = new EventEmitter<'Intermedio' | 'Avanzado'>();
 }
 
 @Component({ selector: 'app-modal-tabla-carga-masiva', template: '', standalone: true })
@@ -159,13 +165,14 @@ describe('HomeKiosqueroPage', () => {
     ]);
     servicioCargaMasiva = jasmine.createSpyObj<CargaMasivaService>('CargaMasivaService', ['uploadFile']);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
-    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerBuffetId']);
+    servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerBuffetId', 'getPerfil']);
 
     servicioProducto.getCategories.and.returnValue(of([]));
     servicioProducto.create.and.returnValue(of({} as Producto));
     servicioProducto.createBulk.and.returnValue(of([] as Producto[]));
     servicioCargaMasiva.uploadFile.and.returnValue(of({ products: [] } as RespuestaCargaMasiva));
     servicioPerfil.obtenerBuffetId.and.returnValue('buffet-1');
+    givenPlanVendedor('GRATUITO');
 
     await TestBed.configureTestingModule({
       imports: [HomeKiosqueroPage],
@@ -247,6 +254,50 @@ describe('HomeKiosqueroPage', () => {
       component.onActionClick(accion);
 
       expect(presenter.ejecutarAccion).toHaveBeenCalledWith(accion);
+    });
+  });
+
+  describe('planes de acciones', () => {
+    it('dado vendedor intermedio y accion intermedia, deberia mostrar badge Intermedio sin bloquear', () => {
+      givenPlanVendedor('INTERMEDIO');
+      const accion = accionConPlan('INTERMEDIO');
+
+      expect(homePrivado().badgePlanAccion(accion)).toBe('Intermedio');
+      expect(homePrivado().accionBloqueada(accion)).toBeFalse();
+    });
+
+    it('dado vendedor avanzado y accion intermedia, deberia mostrar badge Intermedio sin bloquear', () => {
+      givenPlanVendedor('AVANZADO');
+      const accion = accionConPlan('INTERMEDIO');
+
+      expect(homePrivado().badgePlanAccion(accion)).toBe('Intermedio');
+      expect(homePrivado().accionBloqueada(accion)).toBeFalse();
+    });
+
+    it('dado vendedor gratuito y accion intermedia, deberia mostrar badge Intermedio bloqueado', () => {
+      givenPlanVendedor('GRATUITO');
+      const accion = accionConPlan('INTERMEDIO');
+
+      expect(homePrivado().badgePlanAccion(accion)).toBe('Intermedio');
+      expect(homePrivado().accionBloqueada(accion)).toBeTrue();
+    });
+
+    it('dado vendedor intermedio y accion avanzada, deberia mostrar badge Avanzado bloqueado', () => {
+      givenPlanVendedor('INTERMEDIO');
+      const accion = accionConPlan('AVANZADO');
+
+      expect(homePrivado().badgePlanAccion(accion)).toBe('Avanzado');
+      expect(homePrivado().accionBloqueada(accion)).toBeTrue();
+    });
+
+    it('dado accion bloqueada, cuando hago click, deberia mostrar toast y no ejecutar accion', () => {
+      givenPlanVendedor('GRATUITO');
+      const accion = accionConPlan('INTERMEDIO');
+
+      component.onActionClick(accion);
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Intermedio.', 'info');
+      expect(presenter.ejecutarAccion).not.toHaveBeenCalled();
     });
   });
 
@@ -435,5 +486,33 @@ describe('HomeKiosqueroPage', () => {
 
   function givenSinBuffetId(): void {
     servicioPerfil.obtenerBuffetId.and.returnValue(null);
+  }
+
+  function givenPlanVendedor(plan: 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO'): void {
+    servicioPerfil.getPerfil.and.returnValue({
+      id: 'usuario-1',
+      email: 'vendedor@recred.com',
+      nombre: 'Vendedor',
+      apellido: 'Demo',
+      rol: 'VENDEDOR',
+      plan,
+    } as Perfil);
+  }
+
+  function accionConPlan(planRequerido: 'INTERMEDIO' | 'AVANZADO'): AccionKiosquero {
+    return {
+      ...AccionKiosqueroMother.verPedidos(),
+      planRequerido,
+    };
+  }
+
+  function homePrivado(): {
+    badgePlanAccion(action: AccionKiosquero): string | null;
+    accionBloqueada(action: AccionKiosquero): boolean;
+  } {
+    return component as unknown as {
+      badgePlanAccion(action: AccionKiosquero): string | null;
+      accionBloqueada(action: AccionKiosquero): boolean;
+    };
   }
 });

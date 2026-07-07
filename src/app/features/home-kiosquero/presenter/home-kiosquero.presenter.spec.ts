@@ -136,6 +136,12 @@ describe('HomeKiosqueroPresenter', () => {
       ]);
     });
 
+    it('dado el presenter, cargar producto no deberia pedir plan en la card de home', () => {
+      const accion = presenter.featuredActions().find((a) => a.id === 'cargar-productos');
+
+      expect(accion?.planRequerido).toBeUndefined();
+    });
+
     it('dado el presenter, deberia exponer proveedores como accion secundaria', () => {
       expect(presenter.secondaryActions().map((a) => a.id)).toEqual(['proveedores']);
     });

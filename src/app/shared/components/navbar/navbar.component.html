@@ -4,20 +4,27 @@
       <a class="navbar__logo" href="/" (click)="irAInicio($event)" aria-label="RECRED — Inicio">
         <img src="logoHeader.png" alt="" class="navbar__logo-img" />
         <span class="navbar__logo-text">RECRED</span>
-        @if (esPremium()) {
-        <span class="navbar__premium-badge" style="margin-left: 8px;">AVANZADO</span>
+        @if (planPagoLabel(); as planLabel) {
+        <span class="navbar__premium-badge" style="margin-left: 8px;">{{ planLabel }}</span>
         }
       </a>
     </div>
 
     <nav class="navbar__actions" aria-label="Acciones principales">
       @if (!esVistaAlumno() && !esVistaKiosquero() && !esVistaDirectivo() && !esVistaAdmin()) {
-      <a class="navbar__dashboard-link" [routerLink]="['/tutor-dashboard']">
+      <a class="navbar__dashboard-link"
+        [class.navbar__dashboard-link--locked]="planBloqueado('INTERMEDIO')"
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')"
+        href="/tutor-dashboard"
+        (click)="irAPanelTutor($event)">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span>Panel de Control</span>
-        @if (esPremium()) {
-        <span class="navbar__premium-badge">AVANZADO</span>
-        }
+        <span class="navbar__premium-badge">
+          @if (planBloqueado('INTERMEDIO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Intermedio
+        </span>
       </a>
       <a class="navbar__movimientos-link" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" tabindex="0" style="cursor: pointer;">
         <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
@@ -30,10 +37,18 @@
       }
 
       @if (esVistaKiosquero()) {
-      <a class="navbar__kiosk-link navbar__kiosk-link--premium" [routerLink]="['/kiosquero/reportes']">
+      <a class="navbar__kiosk-link navbar__kiosk-link--premium"
+        [class.navbar__kiosk-link--locked]="planBloqueado('INTERMEDIO')"
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')" href="/kiosquero/reportes"
+        (click)="irAPanelControl($event)">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span>Panel de control</span>
-        <span class="navbar__premium-badge">AVANZADO</span>
+        <span class="navbar__premium-badge">
+          @if (planBloqueado('INTERMEDIO')) {
+          <i class="fa-solid fa-lock" aria-hidden="true"></i>
+          }
+          Intermedio
+        </span>
       </a>
       <div class="navbar__kiosk-tools-wrap">
         <button type="button" class="navbar__kiosk-tools" aria-label="Promos"
@@ -44,15 +59,29 @@
         </button>
         @if (menuKiosqueroAbierto()) {
         <div class="navbar__menu navbar__menu--kiosk-tools" role="menu">
-          <button type="button" class="navbar__menu-item" role="menuitem" (click)="irARecomendacionesEstacionales()">
+          <button type="button" class="navbar__menu-item"
+            [class.navbar__menu-item--locked]="planBloqueado('AVANZADO')" role="menuitem"
+            [attr.aria-disabled]="planBloqueado('AVANZADO')" (click)="irARecomendacionesEstacionales()">
             <i class="fa-solid fa-leaf" aria-hidden="true"></i>
             <span>Recomendaciones estacionales</span>
-            <span class="navbar__premium-badge">AVANZADO</span>
+            <span class="navbar__premium-badge">
+              @if (planBloqueado('AVANZADO')) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              }
+              Avanzado
+            </span>
           </button>
-          <button type="button" class="navbar__menu-item" role="menuitem" (click)="irAPromociones()">
+          <button type="button" class="navbar__menu-item"
+            [class.navbar__menu-item--locked]="planBloqueado('AVANZADO')" role="menuitem"
+            [attr.aria-disabled]="planBloqueado('AVANZADO')" (click)="irAPromociones()">
             <i class="fa-solid fa-tags" aria-hidden="true"></i>
             <span>Promociones</span>
-            <span class="navbar__premium-badge">AVANZADO</span>
+            <span class="navbar__premium-badge">
+              @if (planBloqueado('AVANZADO')) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              }
+              Avanzado
+            </span>
           </button>
         </div>
         }

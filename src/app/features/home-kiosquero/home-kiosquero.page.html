@@ -137,7 +137,10 @@
               [class.pv__quick-action--menta]="action.color === 'menta'"
               [class.pv__quick-action--dorado]="action.color === 'dorado'"
               [class.pv__quick-action--melocoton]="action.color === 'melocoton'"
-              [class.pv__quick-action--violeta]="action.color === 'violeta'" (click)="presenter.ejecutarAccion(action)">
+              [class.pv__quick-action--violeta]="action.color === 'violeta'"
+              [class.pv__quick-action--locked]="accionBloqueada(action)"
+              [attr.aria-disabled]="accionBloqueada(action)"
+              (click)="onActionClick(action)">
               <span class="pv__quick-icon" aria-hidden="true">
                 <i class="fa-solid {{ action.icono }}"></i>
               </span>
@@ -145,8 +148,13 @@
               <span>
                 <span class="pv__action-title-container">
                   <strong>{{ action.titulo }}</strong>
-                  @if (action.premium) {
-                  <span class="pv__premium-badge">AVANZADO</span>
+                  @if (badgePlanAccion(action); as planBadge) {
+                  <span class="pv__premium-badge" [class.pv__premium-badge--locked]="accionBloqueada(action)">
+                    @if (accionBloqueada(action)) {
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                    }
+                    {{ planBadge }}
+                  </span>
                   }
                 </span>
                 <small>{{ action.descripcion }}</small>
@@ -170,7 +178,10 @@
               [class.pv__featured-card--dorado]="action.color === 'dorado'"
               [class.pv__featured-card--menta]="action.color === 'menta'"
               [class.pv__featured-card--pizarra]="action.color === 'pizarra'"
-              [class.pv__featured-card--melocoton]="action.color === 'melocoton'" (click)="onActionClick(action)">
+              [class.pv__featured-card--melocoton]="action.color === 'melocoton'"
+              [class.pv__featured-card--locked]="accionBloqueada(action)"
+              [attr.aria-disabled]="accionBloqueada(action)"
+              (click)="onActionClick(action)">
               <span class="pv__featured-icon" aria-hidden="true">
                 <i class="fa-solid {{ action.icono }}"></i>
               </span>
@@ -178,8 +189,13 @@
               <span>
                 <span class="pv__action-title-container">
                   <strong>{{ action.titulo }}</strong>
-                  @if (action.premium) {
-                  <span class="pv__premium-badge">AVANZADO</span>
+                  @if (badgePlanAccion(action); as planBadge) {
+                  <span class="pv__premium-badge" [class.pv__premium-badge--locked]="accionBloqueada(action)">
+                    @if (accionBloqueada(action)) {
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                    }
+                    {{ planBadge }}
+                  </span>
                   }
                 </span>
                 <small>{{ action.descripcion }}</small>
@@ -291,8 +307,9 @@
 </main>
 
 @if (isUploadModalVisible) {
-<app-upload-selection-modal (iaUpload)="goToIaUpload()" (manualUpload)="goToManualUpload()"
-  (bulkUpload)="goToBulkUpload()" (closeModal)="closeUploadModal()" />
+<app-upload-selection-modal [planActual]="planActualVendedor()" (iaUpload)="goToIaUpload()"
+  (manualUpload)="goToManualUpload()" (bulkUpload)="goToBulkUpload()"
+  (planBlocked)="mostrarBloqueoPlan($event)" (closeModal)="closeUploadModal()" />
 }
 
 @if (isBulkUploadModalVisible) {
