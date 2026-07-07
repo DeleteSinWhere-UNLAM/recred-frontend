@@ -1,0 +1,125 @@
+<app-navbar></app-navbar>
+
+<div class="page">
+  <div class="page__container">
+    <header class="page__header">
+      <button type="button" class="page__back" (click)="presenter.volver()">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver al panel</span>
+      </button>
+      <h1>Importar tutores por CSV</h1>
+      <p class="page__subtitle">
+        Subí un CSV con los emails de los tutores. La única columna obligatoria es <strong>email</strong>.
+      </p>
+    </header>
+
+    <section class="card card--formato">
+      <h2><i class="fa-solid fa-file-lines"></i> Formato esperado</h2>
+      <pre class="code-block">email,nombre,apellido,telefono
+maria&#64;test.com,Maria,Gomez,1122334455
+carlos&#64;test.com,Carlos,Perez,1133344455</pre>
+      <p class="hint">
+        Las columnas <strong>nombre</strong>, <strong>apellido</strong> y <strong>telefono</strong> son opcionales.
+      </p>
+    </section>
+
+    @if (presenter.reporte(); as reporte) {
+      <section class="card card--reporte">
+        <h2><i class="fa-solid fa-circle-check"></i> Importación finalizada</h2>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat__value">{{ reporte.totalRows }}</span>
+            <span class="stat__label">Filas procesadas</span>
+          </div>
+          <div class="stat stat--ok">
+            <span class="stat__value">{{ reporte.createdInvitations }}</span>
+            <span class="stat__label">Creadas</span>
+          </div>
+          <div class="stat stat--info">
+            <span class="stat__value">{{ reporte.resentInvitations }}</span>
+            <span class="stat__label">Reenviadas</span>
+          </div>
+          <div class="stat stat--warn">
+            <span class="stat__value">{{ reporte.alreadyAssociated }}</span>
+            <span class="stat__label">Ya asociadas</span>
+          </div>
+          <div class="stat" [class.stat--error]="reporte.errors.length > 0">
+            <span class="stat__value">{{ reporte.errors.length }}</span>
+            <span class="stat__label">Errores</span>
+          </div>
+        </div>
+
+        @if (reporte.errors.length > 0) {
+          <div class="errores">
+            <h3>Filas con error</h3>
+            <ul>
+              @for (err of reporte.errors; track err.row) {
+                <li>
+                  <strong>Fila {{ err.row }}</strong>
+                  <span>{{ err.email || '(sin email)' }}</span>
+                  <em>{{ err.message }}</em>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        <div class="card__actions">
+          <button type="button" class="btn btn--secondary" (click)="presenter.volver()">
+            Volver al panel
+          </button>
+          <button type="button" class="btn btn--primary" (click)="importarOtro()">
+            Importar otro archivo
+          </button>
+        </div>
+      </section>
+    } @else {
+      <form (submit)="onSubmit($event)" class="card card--form">
+        @if (presenter.error(); as error) {
+          <div class="alert alert--error" role="alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>{{ error }}</span>
+          </div>
+        }
+
+        <div class="upload">
+          <label for="archivo-csv" class="upload__dropzone">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            @if (archivoSeleccionado()) {
+              <strong>{{ archivoSeleccionado()!.name }}</strong>
+              <small>Hacé click para cambiar</small>
+            } @else {
+              <strong>Elegí tu archivo CSV</strong>
+              <small>Hacé click o arrastrá el archivo</small>
+            }
+          </label>
+          <input
+            id="archivo-csv"
+            type="file"
+            accept=".csv,text/csv"
+            (change)="onArchivoElegido($event)"
+            hidden
+          />
+        </div>
+
+        @if (errorArchivo(); as errArch) {
+          <span class="form-group__error">{{ errArch }}</span>
+        }
+
+        <div class="card__actions">
+          <button type="button" class="btn btn--secondary" (click)="presenter.volver()" [disabled]="presenter.loading()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn--primary"
+            [disabled]="!archivoSeleccionado() || presenter.loading()"
+          >
+            {{ presenter.loading() ? 'Procesando...' : 'Importar tutores' }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

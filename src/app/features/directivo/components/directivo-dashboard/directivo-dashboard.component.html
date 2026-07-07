@@ -140,7 +140,7 @@
               <span class="pv__operation-icon" aria-hidden="true">
                 <i class="fa-solid fa-store"></i>
               </span>
-              
+
               <div class="pv__operation-body">
                 <span class="pv__operation-label">
                   <span class="status-indicator" [class.active]="buffet.activo">
@@ -148,7 +148,7 @@
                   </span>
                 </span>
                 <strong style="font-size: 20px;">{{ buffet.nombre }}</strong>
-                
+
                 @if (buffet.vendedor) {
                   <small style="margin-top: 8px;">
                     <i class="fa-solid fa-user-tie"></i> {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
@@ -185,6 +185,45 @@
           }
         </div>
       }
+    </section>
+
+    <section class="pv__panel" aria-labelledby="tutores-title">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div class="pv__section-title">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-user-group"></i>
+          </span>
+          <h2 id="tutores-title">Tutores del Colegio</h2>
+        </div>
+      </div>
+
+      <div class="pv__operation-grid" style="margin-top: 12px;">
+        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/invitar-tutor']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </span>
+          <span style="text-align: left;">
+            <strong style="font-size: 15px; display: block;">Invitar tutor</strong>
+            <small style="color: #64748b;">Enviar link único por email</small>
+          </span>
+          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+
+        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/importar-tutores']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-file-csv"></i>
+          </span>
+          <span style="text-align: left;">
+            <strong style="font-size: 15px; display: block;">Importar tutores por CSV</strong>
+            <small style="color: #64748b;">Alta masiva desde archivo</small>
+          </span>
+          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+      </div>
     </section>
   }
 </div>

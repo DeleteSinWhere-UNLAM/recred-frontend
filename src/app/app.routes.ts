@@ -18,6 +18,13 @@ export const routes: Routes = [
       import('./features/registro-colegio/registro-colegio.page').then((m) => m.RegistroColegioPage),
   },
   {
+    path: 'invitaciones/tutor',
+    loadComponent: () =>
+      import('./features/aceptar-invitacion-tutor/aceptar-invitacion-tutor.page').then(
+        (m) => m.AceptarInvitacionTutorPage,
+      ),
+  },
+  {
     path: 'recred-admin',
     canActivate: [authChildGuard, rolGuard],
     data: { roles: ['ADMIN'] },
@@ -43,6 +50,16 @@ export const routes: Routes = [
         path: 'asignar-vendedor',
         loadComponent: () =>
           import('./features/directivo/asignar-vendedor/asignar-vendedor.page').then((m) => m.AsignarVendedorPage),
+      },
+      {
+        path: 'invitar-tutor',
+        loadComponent: () =>
+          import('./features/directivo/invitar-tutor/invitar-tutor.page').then((m) => m.InvitarTutorPage),
+      },
+      {
+        path: 'importar-tutores',
+        loadComponent: () =>
+          import('./features/directivo/importar-tutores/importar-tutores.page').then((m) => m.ImportarTutoresPage),
       }
     ]
   },

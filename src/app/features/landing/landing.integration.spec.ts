@@ -1,11 +1,15 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { LandingPage } from './landing.page';
 import { LandingCtaButtonComponent } from './components/landing-cta-button/landing-cta-button.component';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
+import { InvitacionTokenStorageService } from '../aceptar-invitacion-tutor/services/invitacion-token-storage.service';
+import { InvitacionesTutorService } from '../directivo/services/invitaciones-tutor.service';
 import { CtaLanding } from './models/cta-landing.model';
 import { PerfilMother, AlumnoMother } from '../../data-access/services/alumno.mother';
 import { RolUsuario } from '../../data-access/models/perfil.model';
@@ -27,21 +31,30 @@ describe('Landing Integration', () => {
   let servicioAuth: jasmine.SpyObj<AuthService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
+  let servicioTokenInvitacion: jasmine.SpyObj<InvitacionTokenStorageService>;
+  let servicioInvitaciones: jasmine.SpyObj<InvitacionesTutorService>;
 
   beforeEach(async () => {
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
     servicioAuth = jasmine.createSpyObj('AuthService', ['isAutenticado', 'esperarAutenticacion', 'login']);
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['cargarPerfil']);
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['cargarHijosDelTutor']);
+    servicioTokenInvitacion = jasmine.createSpyObj('InvitacionTokenStorageService', ['leer', 'guardar', 'limpiar']);
+    servicioTokenInvitacion.leer.and.returnValue(null);
+    servicioInvitaciones = jasmine.createSpyObj('InvitacionesTutorService', ['aceptarInvitacion']);
     servicioAuth.login.and.resolveTo();
 
     await TestBed.configureTestingModule({
       imports: [LandingPage],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: Router, useValue: router },
         { provide: AuthService, useValue: servicioAuth },
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: AlumnosService, useValue: servicioAlumnos },
+        { provide: InvitacionTokenStorageService, useValue: servicioTokenInvitacion },
+        { provide: InvitacionesTutorService, useValue: servicioInvitaciones },
       ],
     })
       .overrideComponent(LandingPage, {
