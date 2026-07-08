@@ -1,0 +1,73 @@
+<app-navbar />
+<div class="explicacion-page">
+  <div class="explicacion-container">
+    <header class="explicacion-header">
+      <button class="btn-volver" (click)="volverAlHome()" aria-label="Volver atrás">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1>¿Cómo funcionan tus puntos?</h1>
+    </header>
+
+    <main class="explicacion-content">
+      <section class="card intro-card">
+        <h2>¡Subí de nivel comiendo sano! 🍎</h2>
+        <p>
+          Si compras desde una <strong>notificación de sugerencia saludable</strong> (como una fruta, un yogurt o un
+          jugo natural),
+          <strong>ganás puntos de experiencia (XP)</strong>. ¡Cuanto más constante seas, más rápido vas a subir de
+          nivel!
+        </p>
+      </section>
+
+      <section class="niveles-section">
+        <h2>Los 3 niveles globales 🏆</h2>
+        <div class="niveles-grid">
+          <div class="nivel-card principiante">
+            <div class="nivel-icon">🌱</div>
+            <h3>PRINCIPIANTE</h3>
+            <span class="puntos-rango">De 0 a 99 pts</span>
+            <p>Es el primer paso. Todos empezamos acá, ¡a juntar esos puntos!</p>
+          </div>
+
+          <div class="nivel-card crack">
+            <div class="nivel-icon">🔥</div>
+            <h3>CRACK</h3>
+            <span class="puntos-rango">De 100 a 249 pts</span>
+            <p>¡Se nota el esfuerzo! Ya estás a mitad de camino de ser CRACK.</p>
+          </div>
+
+          <div class="nivel-card goat">
+            <div class="nivel-icon">🐐</div>
+            <h3>G.O.A.T</h3>
+            <span class="puntos-rango">250+ pts</span>
+            <p>Greatest Of All Time. ¡Sos la CABRA de la comida saludable!</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card rachas-card">
+        <h2>¡Activá tu multiplicador!</h2>
+        <p>La cantidad de puntos que ganás por compra depende de tus rachas de hábitos saludables:</p>
+
+        <ul class="rachas-list">
+          <li>
+            <span class="racha-puntos">+10 pts</span>
+            <span class="racha-desc">Por defecto en cada compra saludable.</span>
+          </li>
+          <li>
+            <span class="racha-puntos">+25 pts</span>
+            <span class="racha-desc">Si hiciste <strong>3 o más</strong> compras saludables en los últimos 7
+              días.</span>
+          </li>
+          <li>
+            <span class="racha-puntos">+50 pts</span>
+            <span class="racha-desc">Si hiciste <strong>más de 5</strong> compras en los últimos 15 días (Nivel
+              Leyenda).</span>
+          </li>
+        </ul>
+      </section>
+
+
+    </main>
+  </div>
+</div>

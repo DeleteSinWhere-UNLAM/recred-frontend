@@ -14,6 +14,8 @@
       (cambioFondo)="presenter.cambiarFondoPerfil($event)"
     />
 
+    <app-puntos-recompensa-bar [status]="presenter.rewardStatus()" />
+
     <app-acciones-grid
       [acciones]="presenter.acciones()"
       (accion)="presenter.ejecutarAccion($event)"

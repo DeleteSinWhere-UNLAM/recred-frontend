@@ -41,8 +41,13 @@ describe('NotificacionesService', () => {
   }
 
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({
-      providers: [NotificacionesService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        NotificacionesService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(NotificacionesService);
     httpMock = TestBed.inject(HttpTestingController);

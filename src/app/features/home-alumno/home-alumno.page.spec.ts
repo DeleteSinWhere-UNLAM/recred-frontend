@@ -8,6 +8,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { PerfilHeaderComponent } from './components/perfil-header/perfil-header.component';
 import { AccionesGridComponent } from './components/acciones-grid/acciones-grid.component';
 import { PedidoRecreoCardComponent } from './components/pedido-recreo-card/pedido-recreo-card.component';
+import { PuntosRecompensaBarComponent } from './components/puntos-recompensa-bar/puntos-recompensa-bar.component';
 import { HomeAlumnoPresenter } from './presenter/home-alumno.presenter';
 import { AccionRapida } from './models/accion-rapida.model';
 import { FondoPerfil } from './models/fondo-perfil.model';
@@ -65,6 +66,15 @@ class PedidoRecreoCardStub {
   @Output() verPedido = new EventEmitter<void>();
 }
 
+@Component({
+  selector: 'app-puntos-recompensa-bar',
+  template: '',
+  standalone: true,
+})
+class PuntosRecompensaBarStub {
+  @Input() status: unknown;
+}
+
 describe('HomeAlumnoPage', () => {
   let fixture: ComponentFixture<HomeAlumnoPage>;
   let component: HomeAlumnoPage;
@@ -96,10 +106,11 @@ describe('HomeAlumnoPage', () => {
             PerfilHeaderComponent,
             AccionesGridComponent,
             PedidoRecreoCardComponent,
+            PuntosRecompensaBarComponent,
           ],
         },
         add: {
-          imports: [NavbarStub, PerfilHeaderStub, AccionesGridStub, PedidoRecreoCardStub],
+          imports: [NavbarStub, PerfilHeaderStub, AccionesGridStub, PedidoRecreoCardStub, PuntosRecompensaBarStub],
           providers: [{ provide: HomeAlumnoPresenter, useValue: presenter }],
         },
       })
@@ -164,6 +175,7 @@ function crearPresenterSpy(): jasmine.SpyObj<HomeAlumnoPresenter> {
     estadoPedidoLabel: signal('Pedido confirmado'),
     iconoEstadoPedido: signal('fa-clipboard-check'),
     acciones: signal([AccionRapidaMother.crearBuffet()]),
+    rewardStatus: signal(null),
   });
   return spy;
 }

@@ -1,0 +1,40 @@
+<div class="recompensas-bar" (click)="irAExplicacionPuntos()" (keydown.enter)="irAExplicacionPuntos()" tabindex="0"
+  role="button" title="¡Descubrí cómo ganar más puntos!">
+  <div class="recompensas-bar__header">
+    <div class="recompensas-bar__level">
+      @switch (status.nivelGlobal) {
+      @case ('PRINCIPIANTE') {
+      <span class="nivel-icon" aria-hidden="true">🌱</span>
+      }
+      @case ('CRACK') {
+      <span class="nivel-icon" aria-hidden="true">🔥</span>
+      }
+      @case ('GOAT') {
+      <span class="nivel-icon" aria-hidden="true">🐐</span>
+      }
+      }
+      <span class="nivel-badge" [ngClass]="'badge-' + status.nivelGlobal.toLowerCase()">
+        {{ status.nivelGlobal }}
+      </span>
+    </div>
+    <div class="recompensas-bar__points">
+      <span class="puntos-actuales">{{ status.puntajeTotal }} pts</span>
+    </div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-fill" [ngClass]="'fill-' + status.nivelGlobal.toLowerCase()"
+      [style.width.%]="status.porcentajeProgreso"></div>
+  </div>
+
+  <div class="recompensas-bar__footer">
+    <span class="mensaje-motivacional">{{ status.mensajeMotivacional }}</span>
+    @if (status.proximoNivel) {
+    <span class="faltan-puntos">Faltan {{ status.puntosFaltantes }} para {{ status.proximoNivel }}</span>
+    }
+  </div>
+
+  <div class="hover-suggestion">
+    <span>¡Hacé click para ver cómo ganar puntos!</span>
+  </div>
+</div>

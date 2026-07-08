@@ -1,10 +1,20 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 import { Movimiento } from '../../movimientos/models/movimiento.model';
 import { MovimientosService } from '../../movimientos/services/movimientos.service';
 import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
 import { EstadoPedido, PedidoEnCurso } from '../models/pedido-en-curso.model';
 import { Recreo } from '../models/recreo.model';
+
+export interface RecompensaResponse {
+  totalPoints: number;
+  currentLevel: string;
+  levelMessage: string;
+  pointsToNextLevel: number;
+  nextLevelName: string;
+}
 
 const formateadorTotal = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -26,9 +36,14 @@ const ESTADO_PEDIDO_POR_BACK: Record<string, EstadoPedido> = {
 export class HomeAlumnoService {
   private readonly movimientosService = inject(MovimientosService);
   private readonly franjasHorariasService = inject(FranjasHorariasService);
+  private readonly http = inject(HttpClient);
 
   private readonly pedidosState = signal<Record<string, PedidoEnCurso | null>>({});
   private readonly recreosState = signal<Record<string, readonly Recreo[]>>({});
+
+  getRecompensasSaludables(alumnoId: string): Observable<RecompensaResponse> {
+    return this.http.get<RecompensaResponse>(`${environment.apiUrl}/consumos/alumnos/${alumnoId}/recompensas-saludables`);
+  }
 
   getPedidoEnCurso(alumnoId: string): PedidoEnCurso | undefined {
     return this.pedidosState()[alumnoId] ?? undefined;

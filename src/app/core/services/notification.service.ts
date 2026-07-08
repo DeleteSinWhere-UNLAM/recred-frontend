@@ -69,12 +69,19 @@ export class NotificationService {
             return;
           }
 
+          let productoParseado = null;
+          if (data['producto']) {
+            try { productoParseado = typeof data['producto'] === 'string' ? JSON.parse(data['producto']) : data['producto']; } catch { /* ignorar error de parseo */ }
+          }
           const nuevaNotif = {
             id: data['sugerenciaId'] || String(Date.now()),
             titulo: data['titulo'] || title,
             mensaje: data['mensaje'] || body,
             fecha: new Date().toISOString(),
             tipo: data['type'] || data['tipo'],
+            alumnoId: data['alumnoId'],
+            sugerenciaId: data['sugerenciaId'],
+            producto: productoParseado
           };
           this.notificacionesService.agregarNotificacion(nuevaNotif);
 
