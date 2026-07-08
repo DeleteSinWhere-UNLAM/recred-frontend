@@ -6,6 +6,7 @@ import { ColegiosService } from '../../../data-access/services/colegios.service'
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { StudentRewardStatus } from '../../../data-access/models/student-reward-status.model';
 import { HomeAlumnoService } from '../services/home-alumno.service';
 import { AccionRapida } from '../models/accion-rapida.model';
 import { FondoPerfil } from '../models/fondo-perfil.model';
@@ -74,6 +75,45 @@ export class HomeAlumnoPresenter {
   readonly saldo = computed(() => this.alumnoState()?.saldo ?? 0);
   readonly saldoFormateado = computed(() => formateadorSaldo.format(this.saldo()));
   readonly saldoNegativo = computed(() => this.saldo() < 0);
+
+  readonly rewardStatus = computed<StudentRewardStatus>(() => {
+    const puntos = this.alumnoState()?.puntosRecompensa ?? 0;
+    
+    let result: StudentRewardStatus;
+
+    if (puntos >= 250) {
+      result = {
+        puntajeTotal: puntos,
+        nivelGlobal: 'GOAT',
+        mensajeMotivacional: '¡Estás en la cima! Sos un verdadero GOAT. 🐐',
+        puntosFaltantes: 0,
+        proximoNivel: null,
+        porcentajeProgreso: 100,
+      };
+    } else if (puntos >= 100) {
+      const faltantes = 250 - puntos;
+      result = {
+        puntajeTotal: puntos,
+        nivelGlobal: 'CRACK',
+        mensajeMotivacional: '¡Excelente ritmo! Ya casi tocás el cielo. 🚀',
+        puntosFaltantes: faltantes,
+        proximoNivel: 'GOAT',
+        porcentajeProgreso: ((puntos - 100) / 150) * 100,
+      };
+    } else {
+      const faltantes = 100 - puntos;
+      result = {
+        puntajeTotal: puntos,
+        nivelGlobal: 'PRINCIPIANTE',
+        mensajeMotivacional: '¡Buen comienzo! Sumá puntos comiendo sano. 🍎',
+        puntosFaltantes: faltantes,
+        proximoNivel: 'CRACK',
+        porcentajeProgreso: (puntos / 100) * 100,
+      };
+    }
+
+    return result;
+  });
 
   readonly tienePedidoEnCurso = computed(() => this.pedidoEnCurso() !== undefined);
 
