@@ -225,14 +225,87 @@
   border-color: var(--color-borde-fuerte);
 }
 
-.promo-header {
-  padding: 1rem 1.25rem;
+.promotion-card__image-container {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background-color: var(--color-borde);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.promotion-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.promotion-card:hover .promotion-card__image {
+  transform: scale(1.06);
+}
+
+.promo-header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  border-bottom: 1px solid var(--color-borde);
-  background: rgba(248, 251, 255, 0.72);
+  align-items: flex-start;
+  padding: 0.85rem 1.1rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0) 100%);
+  z-index: 2;
+}
+
+.promo-header-overlay .status-badge {
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(4px);
+}
+
+.promo-header-overlay .status-badge.active {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.promo-header-overlay .status-badge.draft {
+  background-color: #f59e0b;
+  color: #ffffff;
+}
+
+.promo-header-overlay .status-badge.rejected {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.promo-header-overlay .status-badge.expired {
+  background-color: #6b7280;
+  color: #ffffff;
+}
+
+.promo-header-overlay .discount-badge {
+  background-color: #f97316;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+.promo-header-overlay .delete-btn {
+  background: rgba(255, 255, 255, 0.95);
+  color: #64748b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.promo-header-overlay .delete-btn:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
 }
 
 .promo-badges {

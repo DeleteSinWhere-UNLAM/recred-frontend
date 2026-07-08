@@ -1,17 +1,21 @@
-import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../../environments/environment';
 import {
-  ClasificacionSaludBackend,
-  RestriccionesNutricionalesService,
-} from './restricciones-nutricionales.service';
+  ALUMNO_ID_TEST,
+  ClasificacionSaludBackendMother,
+} from '../restricciones-nutricionales.mother';
+import { ClasificacionSaludBackend, RestriccionesNutricionalesService } from './restricciones-nutricionales.service';
 
 describe('RestriccionesNutricionalesService', () => {
   const apiBase = environment.apiUrl;
+  const URL_CATALOGO = `${apiBase}/clasificaciones-salud`;
+  const URL_RESTRICCIONES_ALUMNO = (alumnoId: string): string =>
+    `${apiBase}/control-parental/alumnos/${alumnoId}/obtener-restricciones-salud`;
+  const URL_ACTUALIZAR = (alumnoId: string): string =>
+    `${apiBase}/control-parental/alumnos/${alumnoId}/actualizar-restricciones-salud`;
+
   let service: RestriccionesNutricionalesService;
   let httpMock: HttpTestingController;
 
@@ -29,56 +33,86 @@ describe('RestriccionesNutricionalesService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('getCatalogo pega a /clasificaciones-salud', async () => {
-    const catalogoEsperado: ClasificacionSaludBackend[] = [
-      { id: 'uuid-1', descripcion: 'Sin TACC', activo: true },
-      { id: 'uuid-2', descripcion: 'Sin azúcar', activo: true },
-    ];
+  describe('getCatalogo', () => {
+    it('cuando pido el catalogo, deberia hacer GET a /clasificaciones-salud', async () => {
+      const catalogo = ClasificacionSaludBackendMother.crearCatalogoCompleto();
 
-    const promesa = service.getCatalogo();
-    const req = httpMock.expectOne(`${apiBase}/clasificaciones-salud`);
-    expect(req.request.method).toBe('GET');
-    req.flush(catalogoEsperado);
+      const promesa = whenPidoElCatalogo();
 
-    await expectAsync(promesa).toBeResolvedTo(catalogoEsperado);
+      thenSeHizoGetCatalogo().flush(catalogo);
+
+      expect(await promesa).toEqual(catalogo);
+    });
+
+    it('dado que el back devuelve error, cuando pido el catalogo, deberia rechazar la promesa', async () => {
+      const promesa = whenPidoElCatalogo();
+
+      thenSeHizoGetCatalogo().flush('boom', { status: 500, statusText: 'Server Error' });
+
+      await expectAsync(promesa).toBeRejected();
+    });
   });
 
-  it('getRestriccionesAlumno usa la ruta de control-parental con el alumnoId', async () => {
-    const alumnoId = 'alumno-42';
-    const activas: ClasificacionSaludBackend[] = [
-      { id: 'uuid-1', descripcion: 'Sin TACC', activo: true },
-    ];
+  describe('getRestriccionesAlumno', () => {
+    it('dado un alumnoId, cuando pido las restricciones activas, deberia hacer GET al endpoint de control-parental', async () => {
+      const activas = [ClasificacionSaludBackendMother.crear()];
 
-    const promesa = service.getRestriccionesAlumno(alumnoId);
-    const req = httpMock.expectOne(
-      `${apiBase}/control-parental/alumnos/${alumnoId}/obtener-restricciones-salud`,
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush(activas);
+      const promesa = whenPidoRestriccionesActivasDe(ALUMNO_ID_TEST);
 
-    await expectAsync(promesa).toBeResolvedTo(activas);
+      thenSeHizoGetRestriccionesActivasDe(ALUMNO_ID_TEST).flush(activas);
+
+      expect(await promesa).toEqual(activas);
+    });
   });
 
-  it('actualizarRestricciones manda PUT con clasificacionesIds en el body', async () => {
-    const alumnoId = 'alumno-42';
-    const ids = ['uuid-1', 'uuid-3'];
+  describe('actualizarRestricciones', () => {
+    it('dado un alumnoId y una lista de ids, cuando actualizo, deberia hacer PUT con clasificacionesIds en el body', async () => {
+      const ids = ['uuid-tacc', 'uuid-sodio'];
 
-    const promesa = service.actualizarRestricciones(alumnoId, ids);
-    const req = httpMock.expectOne(
-      `${apiBase}/control-parental/alumnos/${alumnoId}/actualizar-restricciones-salud`,
-    );
+      const promesa = whenActualizoRestriccionesDe(ALUMNO_ID_TEST, ids);
+
+      thenSeHizoPutActualizarRestriccionesCon(ALUMNO_ID_TEST, ids).flush(null);
+
+      await expectAsync(promesa).toBeResolved();
+    });
+
+    it('dado una lista vacia, cuando actualizo, deberia mandar el body con array vacio', async () => {
+      const promesa = whenActualizoRestriccionesDe(ALUMNO_ID_TEST, []);
+
+      thenSeHizoPutActualizarRestriccionesCon(ALUMNO_ID_TEST, []).flush(null);
+
+      await expectAsync(promesa).toBeResolved();
+    });
+  });
+
+  function whenPidoElCatalogo(): Promise<ClasificacionSaludBackend[]> {
+    return service.getCatalogo();
+  }
+
+  function whenPidoRestriccionesActivasDe(alumnoId: string): Promise<ClasificacionSaludBackend[]> {
+    return service.getRestriccionesAlumno(alumnoId);
+  }
+
+  function whenActualizoRestriccionesDe(alumnoId: string, ids: string[]): Promise<void> {
+    return service.actualizarRestricciones(alumnoId, ids);
+  }
+
+  function thenSeHizoGetCatalogo(): TestRequest {
+    const req = httpMock.expectOne(URL_CATALOGO);
+    expect(req.request.method).toBe('GET');
+    return req;
+  }
+
+  function thenSeHizoGetRestriccionesActivasDe(alumnoId: string): TestRequest {
+    const req = httpMock.expectOne(URL_RESTRICCIONES_ALUMNO(alumnoId));
+    expect(req.request.method).toBe('GET');
+    return req;
+  }
+
+  function thenSeHizoPutActualizarRestriccionesCon(alumnoId: string, clasificacionesIds: string[]): TestRequest {
+    const req = httpMock.expectOne(URL_ACTUALIZAR(alumnoId));
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual({ clasificacionesIds: ids });
-    req.flush(null);
-
-    await expectAsync(promesa).toBeResolved();
-  });
-
-  it('rechaza la promesa cuando el back devuelve error', async () => {
-    const promesa = service.getCatalogo();
-    const req = httpMock.expectOne(`${apiBase}/clasificaciones-salud`);
-    req.flush('boom', { status: 500, statusText: 'Server Error' });
-
-    await expectAsync(promesa).toBeRejected();
-  });
+    expect(req.request.body).toEqual({ clasificacionesIds });
+    return req;
+  }
 });

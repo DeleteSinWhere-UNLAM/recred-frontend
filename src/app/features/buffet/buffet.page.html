@@ -15,14 +15,6 @@
 
           <div class="buffet__titulo-bloque">
             <h2 class="buffet__titulo">Menú del Buffet</h2>
-            <div class="buffet__titulo-meta">
-              @if (presenter.buffet(); as buffet) {
-              <p class="buffet__buffet-nombre">{{ buffet.nombre }}</p>
-              }
-              <span class="buffet__productos-count">
-                {{ presenter.productosFiltrados().length }} productos
-              </span>
-            </div>
           </div>
 
           @if (presenter.alumno(); as alumno) {
@@ -112,6 +104,7 @@
         </section>
 
         @if (!esVistaAlumno() && presenter.alumno(); as alumno) {
+        @if (tieneRestriccionesActivas()) {
         <section class="buffet__restricciones-barra" aria-label="Restricciones del alumno">
           <div class="buffet__restricciones-header">
             <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
@@ -119,38 +112,25 @@
           </div>
           <div class="buffet__restricciones-badges">
             <!-- Nutricionales -->
-            @if (presenter.restriccionesNutricionales().length > 0) {
             @for (rest of presenter.restriccionesNutricionales(); track rest.id) {
             <span class="restriccion-pill-card restriccion-pill-card--danger">
               <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
               {{ rest.descripcion }}
             </span>
             }
-            } @else {
-            <span class="restriccion-pill-card restriccion-pill-card--success">
-              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-              Sin restricciones alimenticias
-            </span>
-            }
 
             <!-- Horarias -->
-            @if (presenter.tieneRestriccionesHorarias()) {
             @for (horario of presenter.restriccionesHorariasInformativas(); track horario.descripcion) {
-            <span class="restriccion-pill-card" [class.restriccion-pill-card--success]="!horario.bloqueado"
-              [class.restriccion-pill-card--muted]="horario.bloqueado">
-              <i class="fa-solid" [class.fa-circle-check]="!horario.bloqueado"
-                [class.fa-circle-xmark]="horario.bloqueado" aria-hidden="true"></i>
-              {{ horario.descripcion }}
-            </span>
-            }
-            } @else {
-            <span class="restriccion-pill-card restriccion-pill-card--success">
-              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-              Sin restricciones horarias
-            </span>
+              @if (horario.bloqueado) {
+              <span class="restriccion-pill-card restriccion-pill-card--muted">
+                <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+                {{ horario.descripcion }}
+              </span>
+              }
             }
           </div>
         </section>
+        }
         }
 
 
@@ -173,56 +153,67 @@
               @for (promo of promocionesDestacadasFiltradas(); track promo.id) {
               <article class="promo-card" [class.promo-card--bloqueada]="!esVistaAlumno() && promo.bloqueada"
                 [class.promo-card--restringida]="promo.bloqueadaPorRestriccion">
-                <!-- Color vertical banner / Left side -->
-                <div class="promo-card__banner"
-                  [class]="'promo-card__banner--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
-                  <span class="promo-card__badge-promo">PROMO</span>
+                <!-- Color horizontal banner / Top header -->
+                <header class="promo-card__header"
+                  [class]="'promo-card__header--' + (promo.id.includes('mock-combo-merienda') ? 'merienda' : (promo.id.includes('mock-duo-pack') ? 'duopack' : 'almuerzo'))">
+                  <h4 class="promo-card__header-title">{{ promo.nombre }}</h4>
                   @if (!esVistaAlumno() && promo.bloqueada) {
                   <span class="promo-card__badge-bloqueado" [title]="promo.motivoBloqueo || 'Bloqueado por el tutor'">
                     <i class="fa-solid fa-lock" aria-hidden="true"></i> Bloqueada
                   </span>
                   }
-                  <h4 class="promo-card__banner-title">{{ promo.nombre }}</h4>
-                  <p class="promo-card__banner-desc">
-                    @for (item of promo.itemsList; track $index) {
-                    + {{ item }}<br>
-                    }
-                  </p>
-                </div>
+                </header>
 
-                <!-- Right side info & image -->
+                <!-- Body info & image -->
                 <div class="promo-card__body">
+                  <!-- Left 50% -->
                   <div class="promo-card__media">
                     <img [src]="promo.imagen" [alt]="promo.nombre" class="promo-card__image" loading="lazy" />
                   </div>
 
+                  <!-- Right 50% -->
                   <div class="promo-card__content">
-                    <h4 class="promo-card__title">{{ promo.nombre }}</h4>
+                    <div class="promo-card__price-info">
+                      @if (promo.precioOriginal && promo.precioOriginal !== promo.precio) {
+                      <span class="promo-card__price-original">{{ formatARS(promo.precioOriginal) }}</span>
+                      }
+                      <span class="promo-card__price-value">{{ formatARS(promo.precio) }}</span>
+                    </div>
 
-                    <div class="promo-card__footer">
-                      <div class="promo-card__price-info">
-                        <div class="promo-card__price-value-container">
-                          @if (promo.precioOriginal && promo.precioOriginal !== promo.precio) {
-                          <span class="promo-card__price-original">{{ formatARS(promo.precioOriginal) }}</span>
-                          }
-                          <span class="promo-card__price-value">{{ formatARS(promo.precio) }}</span>
-                          @if (promo.descuento) {
-                          <span class="promo-card__discount-tag">{{ promo.descuento }}</span>
-                          }
-                        </div>
-                      </div>
+                    <div class="promo-card__items-list">
+                      @for (item of promo.itemsList; track $index) {
+                      <span class="promo-card__item-text">+ {{ item }}</span>
+                      }
+                    </div>
 
+                    <div class="promo-card__action-area">
                       @if (promo.bloqueadaPorRestriccion) {
-                      <!-- Restricción nutricional: botón deshabilitado con motivo -->
-                      <button type="button" class="promo-card__btn-restringido" disabled>
+                      <!-- Restricción nutricional: texto de advertencia (sin botón) -->
+                      <div class="promo-card__restriction-badge">
                         <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
                         {{ getMensajeRestriccionPromo(promo) }}
-                      </button>
+                      </div>
                       } @else if (puedeComprarPromo(promo)) {
-                      <button type="button" class="promo-card__btn-agregar"
-                        [class.promo-card__btn-agregar--premium]="esPremium()" (click)="agregarPromoAlCarrito(promo)">
-                        Agregar Promo
-                      </button>
+                        <div class="promo-card__cantidad" style="margin-top: 0;">
+                          <button
+                            type="button"
+                            class="promo-card__cantidad-btn"
+                            (click)="onAgregarAlCarrito(promoComoProducto(promo), obtenerCantidadEnCarrito(promo.id) - 1)"
+                            [disabled]="obtenerCantidadEnCarrito(promo.id) <= 0"
+                            aria-label="Restar uno"
+                          >
+                            <i class="fa-solid fa-minus" aria-hidden="true"></i>
+                          </button>
+                          <span class="promo-card__cantidad-valor" aria-live="polite">{{ obtenerCantidadEnCarrito(promo.id) }}</span>
+                          <button
+                            type="button"
+                            class="promo-card__cantidad-btn"
+                            (click)="onAgregarAlCarrito(promoComoProducto(promo), obtenerCantidadEnCarrito(promo.id) + 1)"
+                            aria-label="Sumar uno"
+                          >
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                          </button>
+                        </div>
                       } @else {
                       <button type="button" class="promo-card__btn-insuficiente" disabled>
                         Saldo insuficiente
@@ -258,7 +249,8 @@
           @for (producto of productosSueltos(); track producto.id) {
           <app-producto-card [producto]="producto" [alumnoId]="presenter.alumno()?.id ?? ''"
             [esFavorito]="presenter.favoritos().has(producto.id)" [mostrarCandado]="!esVistaAlumno()"
-            (agregar)="presenter.agregarAlCarrito($event.producto, $event.cantidad)"
+
+            (cambioCantidad)="onAgregarAlCarrito($event.producto, $event.cantidad)"
             (toggleFavorito)="presenter.toggleFavorito($event)" (toggleLock)="presenter.toggleLock($event)" />
           }
         </section>
@@ -289,8 +281,102 @@
         </button>
 
         <div class="buffet__sidebar-content">
+          <!-- SECCIÓN 1: CARRITO (TU PEDIDO) -->
+          <div class="buffet__sidebar-section">
+            <div class="buffet__sidebar-section-header-inline"> <h3 class="buffet__sidebar-section-title"> <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Tu Pedido </h3> <button type="button" class="buffet__sidebar-fav-btn" [disabled]="hayCombosEnCarrito() || presenter.itemsCarrito().length === 0" (click)="abrirModalFavorito()" title="Guardar este pedido como favorito para compras rápidas futuras"> <i class="fa-heart fa-regular" aria-hidden="true"></i> <span>Guardar como favorito</span> </button> </div>
+            
+            <div class="buffet__sidebar-cart-items">
+              @if (presenter.itemsCarrito().length > 0) {
+                @for (item of presenter.itemsCarrito(); track item.producto.id + '_' + item.cantidad) {
+                <div class="buffet__sidebar-cart-item">
+                  <div class="cart-item-info">
+                    <span class="cart-item-name">{{ item.producto.nombre }}</span>
+                    <span class="cart-item-price">{{ formatARS(item.producto.precio * item.cantidad) }}</span>
+                  </div>
+                  <div class="cart-item-quantity">
+                    <span class="cart-item-qty-badge">{{ item.cantidad }}x</span>
+                  </div>
+                </div>
+                }
+                
+              } @else {
+                <p class="buffet__sidebar-empty-cart">No hay productos en tu pedido aún.</p>
+              }
+            </div>
+          </div>
 
-          <!-- SECCIÓN 1: PRESUPUESTO DISPONIBLE (Acordeón) -->
+          <!-- SECCIÓN 2: FECHA Y HORARIO DE RETIRO -->
+          <div class="buffet__sidebar-section">
+            <h3 class="buffet__sidebar-section-title">
+              <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+              Fecha y Horario de Retiro
+            </h3>
+            <p class="buffet__sidebar-section-subtitle">Elegí cuándo retirará el pedido el alumno.</p>
+
+            <div class="buffet__sidebar-retiro-layout">
+              <div class="buffet__calendar-widget">
+                <div class="calendar-widget-header">
+                  <span class="calendar-current-month">{{ nombreMesCalendario() }}</span>
+                </div>
+                <div class="calendar-grid">
+                  <span class="calendar-grid-header">L</span>
+                  <span class="calendar-grid-header">M</span>
+                  <span class="calendar-grid-header">M</span>
+                  <span class="calendar-grid-header">J</span>
+                  <span class="calendar-grid-header">V</span>
+                  <span class="calendar-grid-header">S</span>
+                  <span class="calendar-grid-header">D</span>
+
+                  @for (cell of diasCalendario(); track cell.fechaStr) {
+                  <button type="button" class="calendar-day-btn" [class.calendar-day-btn--selected]="cell.seleccionada"
+                    [class.calendar-day-btn--disabled]="cell.bloqueado"
+                    [class.calendar-day-btn--outside]="cell.fueraDeMes" [disabled]="cell.bloqueado"
+                    (click)="seleccionarDiaCalendario(cell)">
+                    {{ cell.nroDia }}
+                  </button>
+                  }
+                </div>
+              </div>
+
+              <div class="buffet__sidebar-recreos">
+                <span class="recreo-section-label">FRANJA HORARIA</span>
+                <div class="recreos-btn-stack">
+                  @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
+                  <button type="button" class="recreo-option-btn"
+                    [class.active]="opc.recreo === presenter.recreoSeleccionado()" [disabled]="opc.bloqueado"
+                    (click)="presenter.setRecreo(opc.recreo)"
+                    [title]="opc.bloqueado ? (opc.motivo === 'tiempo' ? 'No disponible  menos de 1h' : 'Bloqueado por el tutor') : ''">
+                    <span class="recreo-option-name">{{ opc.descripcion }}</span>
+                    @if (obtenerRangoHorario(opc.recreo); as rango) {
+                    <span class="recreo-option-time">{{ rango }}</span>
+                    }
+                  </button>
+                  }
+                </div>
+              </div>
+            </div>
+
+            @if (presenter.cargandoPresupuestoPorFecha()) {
+            <div class="buffet__sidebar-budget-status budget-status--cargando">
+              <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
+              <span>Verificando presupuesto</span>
+            </div>
+            } @else if (presenter.presupuestoPorFecha(); as budgetFecha) {
+            @if (budgetFecha.bloqueado) {
+            <div class="buffet__sidebar-budget-status budget-status--bloqueado" role="alert">
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              <div>
+                <strong>Presupuesto insuficiente</strong>
+                @if (budgetFecha.razon) {
+                <p class="budget-status-reason">{{ budgetFecha.razon }}</p>
+                }
+              </div>
+            </div>
+            }
+            }
+          </div>
+
+          <!-- SECCIÓN 3: PRESUPUESTO DISPONIBLE (Acordeón) -->
           @if (presupuestoInfo(); as info) {
           <div class="buffet__sidebar-section-new">
             <!-- Encabezado Acordeón -->
@@ -328,10 +414,10 @@
                 <!-- Gráfico circular principal de resumen -->
                 <div class="buffet__sidebar-circle-gauge-new">
                   <svg class="circle-gauge-svg-new" viewBox="0 0 100 100">
-                    <circle class="circle-gauge-bg-new" cx="50" cy="50" r="42" stroke-width="8"></circle>
-                    <circle class="circle-gauge-fill-new" cx="50" cy="50" r="42" stroke-width="8"
-                      [style.strokeDashoffset]="263.89 - (263.89 * (info.porcentajeDisponible || 0)) / 100"
-                      stroke-dasharray="263.89"
+                    <circle class="circle-gauge-bg-new" cx="50" cy="50" r="44" stroke-width="6"></circle>
+                    <circle class="circle-gauge-fill-new" cx="50" cy="50" r="44" stroke-width="6"
+                      [style.strokeDashoffset]="276.46 - (276.46 * (info.porcentajeDisponible || 0)) / 100"
+                      stroke-dasharray="276.46"
                       transform="rotate(-90 50 50)"></circle>
                   </svg>
                   <div class="circle-gauge-text-new">
@@ -355,22 +441,22 @@
             </div>
           </div>
 
-          <!-- SECCIÓN 2: LÍMITES POR CATEGORÍA (Acordeón independiente) -->
-          @if (info.hasBudget && info.reglasCategorias.length > 0) {
+          <!-- SECCIÓN 4: LÍMITES (Acordeón unificado) -->
           <div class="buffet__sidebar-section-new">
             <!-- Encabezado Acordeón -->
             <button type="button" class="buffet__sidebar-section-header" 
-              (click)="categoriasColapsado.set(!categoriasColapsado())"
-              [attr.aria-expanded]="!categoriasColapsado()">
+              (click)="limitesColapsado.set(!limitesColapsado())"
+              [attr.aria-expanded]="!limitesColapsado()">
               <div class="header-left">
-                <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
-                <span class="header-title">Límites por Categoría</span>
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                <span class="header-title">Límites</span>
               </div>
-              <i class="fa-solid fa-chevron-down accordion-arrow" [class.collapsed]="categoriasColapsado()" aria-hidden="true"></i>
+              <i class="fa-solid fa-chevron-down accordion-arrow" [class.collapsed]="limitesColapsado()" aria-hidden="true"></i>
             </button>
 
             <!-- Contenido Acordeón -->
-            <div class="buffet__sidebar-section-body" [class.collapsed]="categoriasColapsado()">
+            <div class="buffet__sidebar-section-body" [class.collapsed]="limitesColapsado()">
+              @if (info.hasBudget && info.reglasCategorias.length > 0) {
               <div class="buffet__sidebar-categoria-items-new">
                 @for (regla of info.reglasCategorias; track regla.categoriaId) {
                 <div class="buffet__sidebar-categoria-card">
@@ -400,108 +486,12 @@
                 </div>
                 }
               </div>
-            </div>
-          </div>
-          }
-
-          <!-- SECCIÓN 3: OTROS LÍMITES (Acordeón independiente, colapsado por defecto) -->
-          <div class="buffet__sidebar-section-new">
-            <button type="button" class="buffet__sidebar-section-header" 
-              (click)="otrosLimitesColapsado.set(!otrosLimitesColapsado())"
-              [attr.aria-expanded]="!otrosLimitesColapsado()">
-              <div class="header-left">
-                <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-                <span class="header-title">Otros límites</span>
-              </div>
-              <i class="fa-solid fa-chevron-down accordion-arrow" [class.collapsed]="otrosLimitesColapsado()" aria-hidden="true"></i>
-            </button>
-            <div class="buffet__sidebar-section-body" [class.collapsed]="otrosLimitesColapsado()">
+              }
               <p class="otros-limites-vacio">No hay otros límites adicionales configurados.</p>
             </div>
           </div>
           }
-
-
-          <div class="buffet__sidebar-section">
-            <h3 class="buffet__sidebar-section-title">
-              <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
-              Fecha y Horario de Retiro
-            </h3>
-            <p class="buffet__sidebar-section-subtitle">Elegí cuándo retirará el pedido el alumno.</p>
-
-            <div class="buffet__sidebar-retiro-layout">
-
-              <div class="buffet__calendar-widget">
-                <div class="calendar-widget-header">
-                  <span class="calendar-current-month">{{ nombreMesCalendario() }}</span>
-                </div>
-
-                <div class="calendar-grid">
-                  <span class="calendar-grid-header">L</span>
-                  <span class="calendar-grid-header">M</span>
-                  <span class="calendar-grid-header">M</span>
-                  <span class="calendar-grid-header">J</span>
-                  <span class="calendar-grid-header">V</span>
-                  <span class="calendar-grid-header">S</span>
-                  <span class="calendar-grid-header">D</span>
-
-                  @for (cell of diasCalendario(); track cell.fechaStr) {
-                  <button type="button" class="calendar-day-btn" [class.calendar-day-btn--selected]="cell.seleccionada"
-                    [class.calendar-day-btn--disabled]="cell.bloqueado"
-                    [class.calendar-day-btn--outside]="cell.fueraDeMes" [disabled]="cell.bloqueado"
-                    (click)="seleccionarDiaCalendario(cell)">
-                    {{ cell.nroDia }}
-                  </button>
-                  }
-                </div>
-              </div>
-
-
-              <div class="buffet__sidebar-recreos">
-                <span class="recreo-section-label">FRANJA HORARIA</span>
-                <div class="recreos-btn-stack">
-                  @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
-                  <button type="button" class="recreo-option-btn"
-                    [class.active]="opc.recreo === presenter.recreoSeleccionado()" [disabled]="opc.bloqueado"
-                    (click)="presenter.setRecreo(opc.recreo)"
-                    [title]="opc.bloqueado ? (opc.motivo === 'tiempo' ? 'No disponible — menos de 1h' : 'Bloqueado por el tutor') : ''">
-                    <span class="recreo-option-name">{{ opc.descripcion }}</span>
-                    @if (obtenerRangoHorario(opc.recreo); as rango) {
-                    <span class="recreo-option-time">{{ rango }}</span>
-                    }
-                  </button>
-                  }
-                </div>
-              </div>
-            </div>
-
-
-            @if (presenter.cargandoPresupuestoPorFecha()) {
-            <div class="buffet__sidebar-budget-status budget-status--cargando">
-              <i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i>
-              <span>Verificando presupuesto…</span>
-            </div>
-            } @else if (presenter.presupuestoPorFecha(); as budgetFecha) {
-            @if (budgetFecha.bloqueado) {
-            <div class="buffet__sidebar-budget-status budget-status--bloqueado" role="alert">
-              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-              <div>
-                <strong>Presupuesto insuficiente</strong>
-                @if (budgetFecha.razon) {
-                <p class="budget-status-reason">{{ budgetFecha.razon }}</p>
-                }
-              </div>
-            </div>
-            } @else {
-            <div class="buffet__sidebar-budget-status budget-status--ok">
-              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-              <span>Presupuesto disponible para la fecha seleccionada</span>
-            </div>
-            }
-            }
-          </div>
-        </div>
-      </aside>
+        </div>      </aside>
       }
 
     </div>
@@ -519,14 +509,13 @@
 <button type="button" class="buffet__sidebar-open-btn" (click)="panelLateralCerrado.set(false)"
   aria-label="Abrir panel de información">
   <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-  <span>Ver Saldo y Retiro</span>
+  <span>Opciones de retiro</span>
 </button>
 }
 
 
 @if (presenter.alumno(); as alumno) {
-@if (presenter.totalCarrito() > 0) {
-<div class="buffet__footer-cart">
+<div class="buffet__footer-cart" [class.footer-hidden]="presenter.totalCarrito() === 0">
   <div class="buffet__footer-cart-container">
     <div class="buffet__footer-cart-info">
       <div class="buffet__footer-cart-icon">
@@ -534,16 +523,39 @@
         <span class="buffet__footer-cart-badge">{{ presenter.cantidadItemsCarrito() }}</span>
       </div>
       <div class="buffet__footer-cart-text">
-        <span class="buffet__footer-cart-label">Subtotal del carrito</span>
+        <span class="buffet__footer-cart-label">TOTAL</span>
         <span class="buffet__footer-cart-total">{{ formatARS(presenter.totalCarrito()) }}</span>
       </div>
     </div>
-    <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()"
-      (click)="presenter.irAlCarrito()">
-      <span>Ver Carrito y Pagar</span>
-      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-    </button>
+    <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()" [disabled]="presenter.procesandoPago()" (click)="presenter.iniciarPago()"> <i class="fa-solid fa-lock" aria-hidden="true"></i> @if(presenter.procesandoPago()) { <span>Procesando...</span> } @else { <span>Avanzar al Pago</span> } </button>
   </div>
 </div>
 }
+
+
+
+
+
+@if (mostrarModalFavorito) {
+  <app-guardar-favorito-modal
+    [initialAlumnoId]="favoritoModalAlumnoId"
+    [items]="favoritoModalItems"
+    (closeModal)="cerrarModalFavorito()"
+  />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+

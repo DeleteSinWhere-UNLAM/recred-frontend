@@ -78,6 +78,11 @@
   cursor: not-allowed;
 }
 
+.sugerencias-chips__chip--locked {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 .sugerencias-chips__emoji {
   min-width: 18px;
   font-size: 15px;
@@ -107,5 +112,4 @@
   border-color: #B8860B;
   box-shadow: 0 6px 14px rgba(212, 175, 55, 0.3);
 }
-
 

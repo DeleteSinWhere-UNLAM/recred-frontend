@@ -27,6 +27,10 @@ export class AuthSessionService {
   async esperarSesionAutenticada(
     options: EsperarSesionOptions = {},
   ): Promise<AuthSession | null> {
+    if (!this.tieneDatosDeSesionEnStorage()) {
+      return null;
+    }
+
     const reintentos = options.reintentos ?? REINTENTOS_DEFAULT;
     const intervaloMs = options.intervaloMs ?? INTERVALO_DEFAULT_MS;
 
@@ -43,6 +47,17 @@ export class AuthSessionService {
     }
 
     return null;
+  }
+
+  private tieneDatosDeSesionEnStorage(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('CognitoIdentityServiceProvider') || key.startsWith('amplify-'))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   async obtenerAccessTokenParaApi(

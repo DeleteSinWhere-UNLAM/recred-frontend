@@ -2,18 +2,15 @@
 
 <main class="home-kiosquero">
   <div class="home-kiosquero__container">
-    <section
-      class="pv"
-      aria-labelledby="pv-title"
-      [attr.aria-busy]="presenter.isLoading()"
-    >
+    <section class="pv" aria-labelledby="pv-title" [attr.aria-busy]="presenter.isLoading()">
       <header class="pv__profile-card">
         <div class="pv__profile-identity">
           <div class="pv__avatar" aria-hidden="true">
             @if (presenter.urlFotoPerfil()) {
-              <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreKiosquero()" class="pv__avatar-img" />
+            <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreKiosquero()"
+              class="pv__avatar-img" />
             } @else {
-              <span>{{ presenter.iniciales() }}</span>
+            <span>{{ presenter.iniciales() }}</span>
             }
           </div>
 
@@ -26,323 +23,306 @@
       </header>
 
       @if (presenter.errorMessage(); as errorMessage) {
-        <div class="pv__notice pv__notice--error" role="alert">
-          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-          <span>{{ errorMessage }}</span>
-        </div>
+      <div class="pv__notice pv__notice--error" role="alert">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
       }
 
       @if (presenter.isLoading()) {
-        <div class="pv__notice" role="status">
-          <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-          <span>Cargando datos de la fecha.</span>
-        </div>
+      <div class="pv__notice" role="status">
+        <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+        <span>Cargando datos de la fecha.</span>
+      </div>
       }
 
       @if (presenter.hasPanelData()) {
-        <div class="pv__layout">
-          <div class="pv__main-column">
-            <section class="pv__summary-panel" aria-labelledby="summary-title">
-              <div class="pv__section-title pv__section-title--light">
-                <span aria-hidden="true">
-                  <i class="fa-solid fa-chart-line"></i>
+      <div class="pv__layout">
+        <div class="pv__main-column">
+          <section class="pv__summary-panel" aria-labelledby="summary-title">
+            <div class="pv__section-title pv__section-title--light">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-chart-line"></i>
+              </span>
+              <h2 id="summary-title">Resumen del Día</h2>
+            </div>
+
+            <div class="pv__summary-grid">
+              @for (metric of presenter.mainSummaryMetrics(); track metric.label) {
+              <article class="pv__summary-card">
+                <span class="pv__summary-icon" aria-hidden="true">
+                  <i class="fa-solid {{ metric.icon }}"></i>
                 </span>
-                <h2 id="summary-title">Resumen del Día</h2>
-              </div>
+                <div>
+                  <small>{{ metric.label }}</small>
+                  <strong>{{ metric.value }}</strong>
+                </div>
+              </article>
+              }
+            </div>
+          </section>
+          <section class="pv__panel" aria-labelledby="orders-title">
+            <div class="pv__section-title">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-clipboard-list"></i>
+              </span>
+              <h2 id="orders-title">Pedidos del día</h2>
+            </div>
 
-              <div class="pv__summary-grid">
-                @for (metric of presenter.mainSummaryMetrics(); track metric.label) {
-                  <article class="pv__summary-card">
-                    <span class="pv__summary-icon" aria-hidden="true">
-                      <i class="fa-solid {{ metric.icon }}"></i>
-                    </span>
-                    <div>
-                      <small>{{ metric.label }}</small>
-                      <strong>{{ metric.value }}</strong>
-                    </div>
-                  </article>
-                }
-              </div>
-            </section>
-            <section class="pv__panel" aria-labelledby="orders-title">
-              <div class="pv__section-title">
-                <span aria-hidden="true">
-                  <i class="fa-solid fa-clipboard-list"></i>
-                </span>
-                <h2 id="orders-title">Pedidos del día</h2>
-              </div>
-
-              <div class="pv__operation-grid">
-                @for (card of presenter.operationalCards(); track card.label) {
-                  <button
-                    type="button"
-                    class="pv__operation-card"
-                    [class.pv__operation-card--success]="card.tone === 'success'"
-                    [class.pv__operation-card--warning]="card.tone === 'warning'"
-                    [class.pv__operation-card--danger]="card.tone === 'danger'"
-                    (click)="presenter.abrirPedidos(card.status)"
-                  >
-                    <span class="pv__operation-icon" aria-hidden="true">
-                      <i class="fa-solid {{ card.icon }}"></i>
-                    </span>
-
-                    <span class="pv__operation-body">
-                      <span class="pv__operation-label">{{ card.label }}</span>
-                      <strong>{{ card.value }}</strong>
-                    </span>
-
-                    <span class="pv__operation-arrow" aria-hidden="true">
-                      <i class="fa-solid fa-arrow-right"></i>
-                    </span>
-                  </button>
-                }
-              </div>
-            </section>
-
-            @if (presenter.primaryAction(); as primaryAction) {
-              <button
-                type="button"
-                class="pv__primary-action"
-                (click)="presenter.ejecutarAccion(primaryAction)"
-              >
-                <span class="pv__primary-icon" aria-hidden="true">
-                  <i class="fa-solid {{ primaryAction.icono }}"></i>
+            <div class="pv__operation-grid">
+              @for (card of presenter.operationalCards(); track card.label) {
+              <button type="button" class="pv__operation-card"
+                [class.pv__operation-card--success]="card.tone === 'success'"
+                [class.pv__operation-card--warning]="card.tone === 'warning'"
+                [class.pv__operation-card--danger]="card.tone === 'danger'"
+                (click)="presenter.abrirPedidos(card.status)">
+                <span class="pv__operation-icon" aria-hidden="true">
+                  <i class="fa-solid {{ card.icon }}"></i>
                 </span>
 
-                <span class="pv__primary-text">
-                  <strong>{{ primaryAction.titulo }}</strong>
-                  <small>{{ primaryAction.descripcion }}</small>
+                <span class="pv__operation-body">
+                  <span class="pv__operation-label">{{ card.label }}</span>
+                  <strong>{{ card.value }}</strong>
                 </span>
 
-                <span class="pv__primary-illustration" aria-hidden="true">
-                  <i class="fa-solid fa-clipboard-check"></i>
-                </span>
-
-                <span class="pv__primary-arrow" aria-hidden="true">
+                <span class="pv__operation-arrow" aria-hidden="true">
                   <i class="fa-solid fa-arrow-right"></i>
                 </span>
               </button>
-            }
-
-            @if (presenter.secondaryActions().length > 0) {
-              <section class="pv__quick-actions" aria-labelledby="actions-title">
-              <h2 id="actions-title" class="pv__sr-only">Acciones rápidas</h2>
-
-              @for (action of presenter.secondaryActions(); track action.id) {
-                <button
-                  type="button"
-                  class="pv__quick-action"
-                  [class.pv__quick-action--pizarra]="action.color === 'pizarra'"
-                  [class.pv__quick-action--menta]="action.color === 'menta'"
-                  [class.pv__quick-action--dorado]="action.color === 'dorado'"
-                  [class.pv__quick-action--melocoton]="action.color === 'melocoton'"
-                  [class.pv__quick-action--violeta]="action.color === 'violeta'"
-                  (click)="presenter.ejecutarAccion(action)"
-                >
-                  <span class="pv__quick-icon" aria-hidden="true">
-                    <i class="fa-solid {{ action.icono }}"></i>
-                  </span>
-
-                  <span>
-                    <span class="pv__action-title-container">
-                      <strong>{{ action.titulo }}</strong>
-                      @if (action.premium) {
-                        <span class="pv__premium-badge">AVANZADO</span>
-                      }
-                    </span>
-                    <small>{{ action.descripcion }}</small>
-                  </span>
-
-                  <span class="pv__quick-arrow" aria-hidden="true">
-                    <i class="fa-solid fa-arrow-right"></i>
-                  </span>
-                </button>
               }
-              </section>
-            }
-          </div>
+            </div>
 
-          <aside class="pv__side-column" aria-label="Acciones y stock crítico">
-            <section class="pv__featured-actions" aria-labelledby="featured-title">
-              <h2 id="featured-title" class="pv__sr-only">Sugerencias y recomendaciones</h2>
+            <button type="button" class="pv__verify-btn" (click)="openVerificationModal()">
+              <span class="pv__verify-btn-icon" aria-hidden="true">
+                <i class="fa-solid fa-key"></i>
+              </span>
+              <span class="pv__verify-btn-body">
+                <strong>Entregar Compra Anticipada</strong>
+                <small>Verifica el código de retiro del alumno en mostrador</small>
+              </span>
+              <span class="pv__verify-btn-arrow" aria-hidden="true">
+                <i class="fa-solid fa-arrow-right"></i>
+              </span>
+            </button>
+          </section>
 
-              @for (action of presenter.featuredActions(); track action.id) {
-                <button
-                  type="button"
-                  class="pv__featured-card"
-                  [class.pv__featured-card--dorado]="action.color === 'dorado'"
-                  [class.pv__featured-card--menta]="action.color === 'menta'"
-                  [class.pv__featured-card--pizarra]="action.color === 'pizarra'"
-                  [class.pv__featured-card--melocoton]="action.color === 'melocoton'"
-                  (click)="onActionClick(action)"
-                >
-                  <span class="pv__featured-icon" aria-hidden="true">
-                    <i class="fa-solid {{ action.icono }}"></i>
+          @if (presenter.primaryAction(); as primaryAction) {
+          <button type="button" class="pv__primary-action" (click)="presenter.ejecutarAccion(primaryAction)">
+            <span class="pv__primary-icon" aria-hidden="true">
+              <i class="fa-solid {{ primaryAction.icono }}"></i>
+            </span>
+
+            <span class="pv__primary-text">
+              <strong>{{ primaryAction.titulo }}</strong>
+              <small>{{ primaryAction.descripcion }}</small>
+            </span>
+
+            <span class="pv__primary-illustration" aria-hidden="true">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </span>
+
+            <span class="pv__primary-arrow" aria-hidden="true">
+              <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </button>
+          }
+
+          @if (presenter.secondaryActions().length > 0) {
+          <section class="pv__quick-actions" aria-labelledby="actions-title">
+            <h2 id="actions-title" class="pv__sr-only">Acciones rápidas</h2>
+
+            @for (action of presenter.secondaryActions(); track action.id) {
+            <button type="button" class="pv__quick-action"
+              [class.pv__quick-action--pizarra]="action.color === 'pizarra'"
+              [class.pv__quick-action--menta]="action.color === 'menta'"
+              [class.pv__quick-action--dorado]="action.color === 'dorado'"
+              [class.pv__quick-action--melocoton]="action.color === 'melocoton'"
+              [class.pv__quick-action--violeta]="action.color === 'violeta'"
+              [class.pv__quick-action--locked]="accionBloqueada(action)"
+              [attr.aria-disabled]="accionBloqueada(action)"
+              (click)="onActionClick(action)">
+              <span class="pv__quick-icon" aria-hidden="true">
+                <i class="fa-solid {{ action.icono }}"></i>
+              </span>
+
+              <span>
+                <span class="pv__action-title-container">
+                  <strong>{{ action.titulo }}</strong>
+                  @if (badgePlanAccion(action); as planBadge) {
+                  <span class="pv__premium-badge" [class.pv__premium-badge--locked]="accionBloqueada(action)">
+                    @if (accionBloqueada(action)) {
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                    }
+                    {{ planBadge }}
                   </span>
-
-                  <span>
-                    <span class="pv__action-title-container">
-                      <strong>{{ action.titulo }}</strong>
-                      @if (action.premium) {
-                        <span class="pv__premium-badge">AVANZADO</span>
-                      }
-                    </span>
-                    <small>{{ action.descripcion }}</small>
-                  </span>
-
-                  <span class="pv__featured-arrow" aria-hidden="true">
-                    <i class="fa-solid fa-arrow-right"></i>
-                  </span>
-                </button>
-              }
-            </section>
-
-            <section class="pv__stock-panel" aria-labelledby="stock-title">
-              <div class="pv__stock-header">
-                <div class="pv__section-title">
-                  <span class="pv__stock-title-icon" aria-hidden="true">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                  </span>
-                  <h2 id="stock-title">Stock crítico</h2>
-                </div>
-
-                <button
-                  type="button"
-                  class="pv__stock-link"
-                  (click)="presenter.abrirStock()"
-                >
-                  <i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i>
-                  <span>Ver stock</span>
-                </button>
-              </div>
-
-              <div class="pv__stock-metrics" aria-label="Resumen de stock crítico">
-                @for (metric of presenter.stockOverview(); track metric.label) {
-                  <article
-                    class="pv__stock-metric"
-                    [class.pv__stock-metric--success]="metric.tone === 'success'"
-                    [class.pv__stock-metric--warning]="metric.tone === 'warning'"
-                    [class.pv__stock-metric--danger]="metric.tone === 'danger'"
-                  >
-                    <span aria-hidden="true">
-                      <i class="fa-solid {{ metric.icon }}"></i>
-                    </span>
-                    <div>
-                      <strong>{{ metric.value }}</strong>
-                      <small>{{ metric.label }}</small>
-                    </div>
-                  </article>
-                }
-              </div>
-
-              @if (presenter.hasCriticalStock()) {
-                <div class="pv__stock-groups">
-                  @for (group of presenter.criticalProductGroups(); track group.title) {
-                    <article
-                      class="pv__stock-group"
-                      [class.pv__stock-group--warning]="group.tone === 'warning'"
-                      [class.pv__stock-group--danger]="group.tone === 'danger'"
-                    >
-                      <header class="pv__stock-group-header">
-                        <span aria-hidden="true">
-                          <i class="fa-solid {{ group.icon }}"></i>
-                        </span>
-                        <div>
-                          <h3>{{ group.title }}</h3>
-                          @if (group.countLabel) {
-                            <small>{{ group.countLabel }} actuales</small>
-                          }
-                        </div>
-                      </header>
-
-                      @if (group.items.length > 0) {
-                        <div class="pv__product-list">
-                          @for (item of group.items; track item.id) {
-                            <div
-                              class="pv__product-item"
-                              [class.pv__product-item--warning]="item.tone === 'warning'"
-                              [class.pv__product-item--danger]="item.tone === 'danger'"
-                            >
-                              <div class="pv__product-media">
-                                <img
-                                  class="pv__product-image"
-                                  [src]="item.imageUrl || IMAGEN_FALLBACK"
-                                  [alt]="item.label"
-                                  loading="lazy"
-                                  (error)="onImagenError($event)"
-                                />
-                              </div>
-                              <div>
-                                <strong>{{ item.label }}</strong>
-                                <small>{{ item.detail }}</small>
-                              </div>
-                              <button
-                                type="button"
-                                class="pv__restock-btn"
-                                (click)="presenter.reponerStock(item)"
-                              >
-                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                                <span>Reponer</span>
-                              </button>
-                            </div>
-                          }
-                        </div>
-                      } @else {
-                        <p class="pv__empty">{{ group.emptyLabel }}</p>
-                      }
-                    </article>
                   }
+                </span>
+                <small>{{ action.descripcion }}</small>
+              </span>
+
+              <span class="pv__quick-arrow" aria-hidden="true">
+                <i class="fa-solid fa-arrow-right"></i>
+              </span>
+            </button>
+            }
+          </section>
+          }
+        </div>
+
+        <aside class="pv__side-column" aria-label="Acciones y stock crítico">
+          <section class="pv__featured-actions" aria-labelledby="featured-title">
+            <h2 id="featured-title" class="pv__sr-only">Sugerencias y recomendaciones</h2>
+
+            @for (action of presenter.featuredActions(); track action.id) {
+            <button type="button" class="pv__featured-card"
+              [class.pv__featured-card--dorado]="action.color === 'dorado'"
+              [class.pv__featured-card--menta]="action.color === 'menta'"
+              [class.pv__featured-card--pizarra]="action.color === 'pizarra'"
+              [class.pv__featured-card--melocoton]="action.color === 'melocoton'"
+              [class.pv__featured-card--locked]="accionBloqueada(action)"
+              [attr.aria-disabled]="accionBloqueada(action)"
+              (click)="onActionClick(action)">
+              <span class="pv__featured-icon" aria-hidden="true">
+                <i class="fa-solid {{ action.icono }}"></i>
+              </span>
+
+              <span>
+                <span class="pv__action-title-container">
+                  <strong>{{ action.titulo }}</strong>
+                  @if (badgePlanAccion(action); as planBadge) {
+                  <span class="pv__premium-badge" [class.pv__premium-badge--locked]="accionBloqueada(action)">
+                    @if (accionBloqueada(action)) {
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                    }
+                    {{ planBadge }}
+                  </span>
+                  }
+                </span>
+                <small>{{ action.descripcion }}</small>
+              </span>
+
+              <span class="pv__featured-arrow" aria-hidden="true">
+                <i class="fa-solid fa-arrow-right"></i>
+              </span>
+            </button>
+            }
+          </section>
+
+          <section class="pv__stock-panel" aria-labelledby="stock-title">
+            <div class="pv__stock-header">
+              <div class="pv__section-title">
+                <span class="pv__stock-title-icon" aria-hidden="true">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                </span>
+                <h2 id="stock-title">Stock crítico</h2>
+              </div>
+
+              <button type="button" class="pv__stock-link" (click)="presenter.abrirStock()">
+                <i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i>
+                <span>Ver stock</span>
+              </button>
+            </div>
+
+            <div class="pv__stock-metrics" aria-label="Resumen de stock crítico">
+              @for (metric of presenter.stockOverview(); track metric.label) {
+              <article class="pv__stock-metric" [class.pv__stock-metric--success]="metric.tone === 'success'"
+                [class.pv__stock-metric--warning]="metric.tone === 'warning'"
+                [class.pv__stock-metric--danger]="metric.tone === 'danger'">
+                <span aria-hidden="true">
+                  <i class="fa-solid {{ metric.icon }}"></i>
+                </span>
+                <div>
+                  <strong>{{ metric.value }}</strong>
+                  <small>{{ metric.label }}</small>
                 </div>
-              } @else {
-                <div class="pv__ok-state">
+              </article>
+              }
+            </div>
+
+            @if (presenter.hasCriticalStock()) {
+            <div class="pv__stock-groups">
+              @for (group of presenter.criticalProductGroups(); track group.title) {
+              <article class="pv__stock-group" [class.pv__stock-group--warning]="group.tone === 'warning'"
+                [class.pv__stock-group--danger]="group.tone === 'danger'">
+                <header class="pv__stock-group-header">
                   <span aria-hidden="true">
-                    <i class="fa-solid fa-circle-check"></i>
+                    <i class="fa-solid {{ group.icon }}"></i>
                   </span>
                   <div>
-                    <strong>Stock sin alertas críticas</strong>
-                    <p>No hay productos agotados ni debajo del mínimo.</p>
+                    <h3>{{ group.title }}</h3>
+                    @if (group.countLabel) {
+                    <small>{{ group.countLabel }} actuales</small>
+                    }
                   </div>
+                </header>
+
+                @if (group.items.length > 0) {
+                <div class="pv__product-list">
+                  @for (item of group.items; track item.id) {
+                  <div class="pv__product-item" [class.pv__product-item--warning]="item.tone === 'warning'"
+                    [class.pv__product-item--danger]="item.tone === 'danger'">
+                    <div class="pv__product-media">
+                      <img class="pv__product-image" [src]="item.imageUrl || IMAGEN_FALLBACK" [alt]="item.label"
+                        loading="lazy" (error)="onImagenError($event)" />
+                    </div>
+                    <div>
+                      <strong>{{ item.label }}</strong>
+                      <small>{{ item.detail }}</small>
+                    </div>
+                    <button type="button" class="pv__restock-btn" (click)="presenter.reponerStock(item)">
+                      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                      <span>Reponer</span>
+                    </button>
+                  </div>
+                  }
                 </div>
+                } @else {
+                <p class="pv__empty">{{ group.emptyLabel }}</p>
+                }
+              </article>
               }
-            </section>
-          </aside>
-        </div>
+            </div>
+            } @else {
+            <div class="pv__ok-state">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-circle-check"></i>
+              </span>
+              <div>
+                <strong>Stock sin alertas críticas</strong>
+                <p>No hay productos agotados ni debajo del mínimo.</p>
+              </div>
+            </div>
+            }
+          </section>
+        </aside>
+      </div>
       } @else if (!presenter.isLoading() && !presenter.errorMessage()) {
-        <div class="pv__notice" role="status">
-          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-          <span>Sin datos para la fecha seleccionada.</span>
-        </div>
+      <div class="pv__notice" role="status">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <span>Sin datos para la fecha seleccionada.</span>
+      </div>
       }
     </section>
   </div>
 </main>
 
 @if (isUploadModalVisible) {
-  <app-upload-selection-modal
-    (iaUpload)="goToIaUpload()"
-    (manualUpload)="goToManualUpload()"
-    (bulkUpload)="goToBulkUpload()"
-    (closeModal)="closeUploadModal()"
-  />
+<app-upload-selection-modal [planActual]="planActualVendedor()" (iaUpload)="goToIaUpload()"
+  (manualUpload)="goToManualUpload()" (bulkUpload)="goToBulkUpload()"
+  (planBlocked)="mostrarBloqueoPlan($event)" (closeModal)="closeUploadModal()" />
 }
 
 @if (isBulkUploadModalVisible) {
-  <app-bulk-upload-table-modal
-    [isProcessingFile]="isProcessingFile"
-    [prefilledProducts]="bulkProductsData"
-    [categories]="categories"
-    (fileSelected)="handleFileUpload($event)"
-    (saveProducts)="handleBulkProductsSave($event)"
-    (closeModal)="closeBulkUploadModal()"
-  />
+<app-bulk-upload-table-modal [isProcessingFile]="isProcessingFile" [prefilledProducts]="bulkProductsData"
+  [categories]="categories" (fileSelected)="handleFileUpload($event)" (saveProducts)="handleBulkProductsSave($event)"
+  (closeModal)="closeBulkUploadModal()" />
 }
 
 @if (isManualProductFormVisible) {
-  <app-product-form
-    [categories]="categories"
-    [isSaving]="isSavingManualProduct"
-    [buffetId]="buffetId"
-    (formSubmit)="handleManualProductSubmit($event)"
-    (formCancel)="isManualProductFormVisible = false"
-  />
+<app-product-form [categories]="categories" [isSaving]="isSavingManualProduct" [buffetId]="buffetId"
+  (formSubmit)="handleManualProductSubmit($event)" (formCancel)="isManualProductFormVisible = false" />
+}
+
+@if (isVerificationModalVisible) {
+<app-modal-verificacion-codigo (closeModal)="closeVerificationModal()" (orderDelivered)="handleOrderDelivered()" />
 }

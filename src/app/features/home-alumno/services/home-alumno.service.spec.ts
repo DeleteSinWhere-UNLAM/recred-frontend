@@ -3,174 +3,217 @@ import { of, throwError } from 'rxjs';
 import { Movimiento } from '../../movimientos/models/movimiento.model';
 import { MovimientosService } from '../../movimientos/services/movimientos.service';
 import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
-import { TimeSlot } from '../../restricciones-horarias/models/restriccion-horaria.model';
 import { HomeAlumnoService } from './home-alumno.service';
+import { FranjaHorariaMother, MovimientoPendienteMother } from '../home-alumno.mother';
 
 describe('HomeAlumnoService', () => {
   let service: HomeAlumnoService;
-  let movimientosServiceSpy: jasmine.SpyObj<MovimientosService>;
-  let franjasServiceSpy: jasmine.SpyObj<FranjasHorariasService>;
+  let servicioMovimientos: jasmine.SpyObj<MovimientosService>;
+  let servicioFranjas: jasmine.SpyObj<FranjasHorariasService>;
 
-  const hoyISO = new Date().toISOString().slice(0, 10);
-
-  const franjasMock: TimeSlot[] = [
-    { id: '1', colegioId: 'col-1', descripcion: 'Primer recreo', horaInicio: '10:15:00', horaFin: '10:30:00', activo: true },
-    { id: '2', colegioId: 'col-1', descripcion: 'Mediodia',      horaInicio: '13:00:00', horaFin: '13:30:00', activo: true },
-    { id: '3', colegioId: 'col-1', descripcion: 'Segundo recreo', horaInicio: '11:30:00', horaFin: '11:50:00', activo: true },
-    { id: '4', colegioId: 'col-1', descripcion: 'Recreo viejo',   horaInicio: '09:00:00', horaFin: '09:10:00', activo: false },
-  ];
+  const COLEGIO_ID = 'col-1';
+  const ALUMNO_ID = 'alumno-1';
 
   beforeEach(() => {
-    movimientosServiceSpy = jasmine.createSpyObj('MovimientosService', [
-      'getPendientesAlumno',
-    ]);
-    franjasServiceSpy = jasmine.createSpyObj('FranjasHorariasService', [
-      'getFranjasHorarias',
-    ]);
-    franjasServiceSpy.getFranjasHorarias.and.resolveTo(franjasMock);
+    servicioMovimientos = jasmine.createSpyObj('MovimientosService', ['getPendientesAlumno']);
+    servicioFranjas = jasmine.createSpyObj('FranjasHorariasService', ['getFranjasHorarias']);
+    servicioFranjas.getFranjasHorarias.and.resolveTo(FranjaHorariaMother.crearListaDelColegio());
 
     TestBed.configureTestingModule({
       providers: [
         HomeAlumnoService,
-        { provide: MovimientosService, useValue: movimientosServiceSpy },
-        { provide: FranjasHorariasService, useValue: franjasServiceSpy },
+        { provide: MovimientosService, useValue: servicioMovimientos },
+        { provide: FranjasHorariasService, useValue: servicioFranjas },
       ],
     });
     service = TestBed.inject(HomeAlumnoService);
   });
 
-  it('debería crearse', () => {
+  it('dado que se inyecta el servicio, deberia crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
-  it('debería devolver undefined si no se cargó pedido', () => {
-    expect(service.getPedidoEnCurso('alumno-1')).toBeUndefined();
+  it('dado que no se cargo nada, cuando consulto el pedido en curso, deberia devolver undefined', () => {
+    expect(service.getPedidoEnCurso(ALUMNO_ID)).toBeUndefined();
   });
 
-  it('debería cargar y mapear el pendiente más reciente', async () => {
-    const movimientos: Movimiento[] = [
-      {
-        id: 'compra-1',
-        studentId: 'alumno-1',
-        totalAmount: 1950,
-        status: 'EN_PREPARACION',
-        statusLabel: 'En preparacion',
-        paymentMethod: 'DEBIT',
-        date: `${hoyISO}T08:00:00`,
-        items: [
-          { productId: 'p1', productName: 'Sándwich JyQ', quantity: 1, unitPrice: 1500 },
-          { productId: 'p2', productName: 'Jugo', quantity: 2, unitPrice: 225 },
-        ],
-        tipo: 'ANTICIPADA',
-        pickupDate: hoyISO,
-        pickupSlotStartTime: '10:30',
-      },
-    ];
-    movimientosServiceSpy.getPendientesAlumno.and.returnValue(of(movimientos));
+  it('dado un pendiente del alumno, cuando cargo el pedido en curso, deberia mapearlo correctamente', async () => {
+    givenPendientesDelAlumno([MovimientoPendienteMother.crear()]);
 
-    await service.cargarPedidoEnCurso('alumno-1');
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
 
-    const pedido = service.getPedidoEnCurso('alumno-1');
-    expect(pedido).toBeDefined();
+    const pedido = service.getPedidoEnCurso(ALUMNO_ID);
     expect(pedido?.id).toBe('compra-1');
     expect(pedido?.estado).toBe('PREPARANDO');
     expect(pedido?.retiraEn).toBe('10:30');
     expect(pedido?.itemsResumen).toEqual(['Sándwich JyQ', '2x Jugo']);
   });
 
-  it('debería elegir el pendiente con fecha más reciente aunque no sea de hoy', async () => {
-    const movimientos: Movimiento[] = [
-      {
-        id: 'compra-vieja',
-        studentId: 'alumno-1',
-        totalAmount: 1000,
-        status: 'PENDIENTE',
-        statusLabel: 'A preparar',
-        paymentMethod: 'DEBIT',
-        date: '2024-01-01T08:00:00',
-        items: [],
-        tipo: 'ANTICIPADA',
-        pickupDate: '2024-01-01',
-      },
-      {
-        id: 'compra-nueva',
-        studentId: 'alumno-1',
-        totalAmount: 2000,
-        status: 'PENDIENTE',
-        statusLabel: 'A preparar',
-        paymentMethod: 'DEBIT',
-        date: '2026-06-27T10:00:00',
-        items: [
-          { productId: 'p1', productName: 'Medialunas', quantity: 2, unitPrice: 500 },
-        ],
-        tipo: 'ANTICIPADA',
-        pickupDate: '2026-06-27',
-        pickupSlotStartTime: '09:30',
-      },
-    ];
-    movimientosServiceSpy.getPendientesAlumno.and.returnValue(of(movimientos));
+  it('dados varios pendientes, cuando cargo el pedido en curso, deberia elegir el de fecha mas reciente', async () => {
+    const viejo = MovimientoPendienteMother.crear({
+      id: 'compra-vieja',
+      status: 'PENDIENTE',
+      date: '2024-01-01T08:00:00',
+      items: [],
+      pickupDate: '2024-01-01',
+      pickupSlotStartTime: undefined,
+    });
+    const nuevo = MovimientoPendienteMother.crear({
+      id: 'compra-nueva',
+      totalAmount: 2000,
+      status: 'PENDIENTE',
+      date: '2026-06-27T10:00:00',
+      items: [{ productId: 'p1', productName: 'Medialunas', quantity: 2, unitPrice: 500 }],
+      pickupDate: '2026-06-27',
+      pickupSlotStartTime: '09:30',
+    });
+    givenPendientesDelAlumno([viejo, nuevo]);
 
-    await service.cargarPedidoEnCurso('alumno-1');
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
 
-    const pedido = service.getPedidoEnCurso('alumno-1');
+    const pedido = service.getPedidoEnCurso(ALUMNO_ID);
     expect(pedido?.id).toBe('compra-nueva');
     expect(pedido?.estado).toBe('CONFIRMADO');
     expect(pedido?.retiraEn).toBe('09:30');
     expect(pedido?.itemsResumen).toEqual(['2x Medialunas']);
   });
 
-  it('debería dejar el pedido nulo si falla el endpoint', async () => {
-    movimientosServiceSpy.getPendientesAlumno.and.returnValue(
-      throwError(() => new Error('500')),
-    );
+  it('dado que el endpoint de pendientes falla, cuando cargo el pedido en curso, deberia dejar el pedido en undefined', async () => {
+    givenQueElEndpointDePendientesFalla();
 
-    await service.cargarPedidoEnCurso('alumno-1');
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
 
-    expect(service.getPedidoEnCurso('alumno-1')).toBeUndefined();
+    expect(service.getPedidoEnCurso(ALUMNO_ID)).toBeUndefined();
   });
 
-  it('debería devolver undefined si todavía no se cargaron los recreos del colegio', () => {
-    expect(service.getProximoRecreo('col-1')).toBeUndefined();
+  it('dado que no se cargaron recreos, cuando consulto el proximo recreo, deberia devolver undefined', () => {
+    expect(service.getProximoRecreo(COLEGIO_ID)).toBeUndefined();
   });
 
-  it('debería devolver undefined si no se pasó colegioId', async () => {
-    await service.cargarRecreos('col-1');
+  it('dado un colegioId undefined, cuando consulto el proximo recreo, deberia devolver undefined', async () => {
+    await whenCargoRecreos(COLEGIO_ID);
+
     expect(service.getProximoRecreo(undefined)).toBeUndefined();
   });
 
-  it('debería cargar recreos del colegio filtrando no-recreos e inactivos', async () => {
-    await service.cargarRecreos('col-1');
+  it('dado que cargo los recreos del colegio, cuando consulto antes del primero, deberia devolver el primero', async () => {
+    await whenCargoRecreos(COLEGIO_ID);
 
     const antesDelPrimero = new Date(2026, 5, 22, 8, 0);
-    expect(service.getProximoRecreo('col-1', antesDelPrimero)?.nombre).toBe('Primer recreo');
+    expect(service.getProximoRecreo(COLEGIO_ID, antesDelPrimero)?.nombre).toBe('Primer recreo');
   });
 
-  it('debería seguir devolviendo el recreo en curso hasta que termine', async () => {
-    await service.cargarRecreos('col-1');
+  it('dado que estoy en la mitad del segundo recreo, cuando consulto el proximo, deberia seguir devolviendo el segundo', async () => {
+    await whenCargoRecreos(COLEGIO_ID);
 
     const enMediaDelSegundo = new Date(2026, 5, 22, 11, 35);
-    expect(service.getProximoRecreo('col-1', enMediaDelSegundo)?.nombre).toBe('Segundo recreo');
+    expect(service.getProximoRecreo(COLEGIO_ID, enMediaDelSegundo)?.nombre).toBe('Segundo recreo');
   });
 
-  it('debería saltear al siguiente recreo cuando el anterior ya terminó', async () => {
-    await service.cargarRecreos('col-1');
+  it('dado que el primer recreo termino, cuando consulto el proximo, deberia saltar al siguiente', async () => {
+    await whenCargoRecreos(COLEGIO_ID);
 
     const despuesDelPrimero = new Date(2026, 5, 22, 10, 45);
-    expect(service.getProximoRecreo('col-1', despuesDelPrimero)?.nombre).toBe('Segundo recreo');
+    expect(service.getProximoRecreo(COLEGIO_ID, despuesDelPrimero)?.nombre).toBe('Segundo recreo');
   });
 
-  it('debería devolver undefined si ya pasaron todos los recreos del día', async () => {
-    await service.cargarRecreos('col-1');
+  it('dado que ya pasaron todos los recreos, cuando consulto el proximo, deberia devolver undefined', async () => {
+    await whenCargoRecreos(COLEGIO_ID);
 
     const finDeJornada = new Date(2026, 5, 22, 18, 0);
-    expect(service.getProximoRecreo('col-1', finDeJornada)).toBeUndefined();
+    expect(service.getProximoRecreo(COLEGIO_ID, finDeJornada)).toBeUndefined();
   });
 
-  it('debería dejar la lista vacía si el endpoint de franjas falla', async () => {
-    franjasServiceSpy.getFranjasHorarias.and.rejectWith(new Error('500'));
+  it('dado que el endpoint de franjas falla, cuando cargo recreos, deberia dejar la lista vacia', async () => {
+    givenQueElEndpointDeFranjasFalla();
 
-    await service.cargarRecreos('col-1');
+    await whenCargoRecreos(COLEGIO_ID);
 
-    expect(service.getProximoRecreo('col-1', new Date(2026, 5, 22, 8, 0))).toBeUndefined();
+    expect(service.getProximoRecreo(COLEGIO_ID, new Date(2026, 5, 22, 8, 0))).toBeUndefined();
   });
+
+  it('dado alumnoId vacio en cargarPedidoEnCurso, no deberia llamar al service de movimientos', async () => {
+    await service.cargarPedidoEnCurso('');
+
+    expect(servicioMovimientos.getPendientesAlumno).not.toHaveBeenCalled();
+  });
+
+  it('dado colegioId vacio en cargarRecreos, no deberia llamar al service de franjas', async () => {
+    servicioFranjas.getFranjasHorarias.calls.reset();
+
+    await service.cargarRecreos('');
+
+    expect(servicioFranjas.getFranjasHorarias).not.toHaveBeenCalled();
+  });
+
+  it('dado un movimiento con status desconocido, deberia mapear el estado a CONFIRMADO por default', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({ status: 'STATUS_RARO' }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.estado).toBe('CONFIRMADO');
+  });
+
+  it('dado un movimiento sin pickupSlotStartTime pero con pickupSlotDescription, retiraEn deberia usar la descripcion', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({
+        pickupSlotStartTime: undefined,
+        pickupSlotDescription: 'Primer recreo',
+      }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.retiraEn).toBe('Primer recreo');
+  });
+
+  it('dado un movimiento con solo date, retiraEn deberia formatearlo como HH:mm', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({
+        pickupSlotStartTime: undefined,
+        pickupSlotDescription: undefined,
+        date: '2026-06-15T14:23:00',
+      }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.retiraEn).toBe('14:23');
+  });
+
+  it('dado un movimiento sin date ni pickup, retiraEn deberia ser ""', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({
+        pickupSlotStartTime: undefined,
+        pickupSlotDescription: undefined,
+        date: '',
+      }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.retiraEn).toBe('');
+  });
+
+  function givenPendientesDelAlumno(pendientes: Movimiento[]): void {
+    servicioMovimientos.getPendientesAlumno.and.returnValue(of(pendientes));
+  }
+
+  function givenQueElEndpointDePendientesFalla(): void {
+    servicioMovimientos.getPendientesAlumno.and.returnValue(throwError(() => new Error('500')));
+  }
+
+  function givenQueElEndpointDeFranjasFalla(): void {
+    servicioFranjas.getFranjasHorarias.and.rejectWith(new Error('500'));
+  }
+
+  function whenCargoPedidoEnCurso(alumnoId: string): Promise<void> {
+    return service.cargarPedidoEnCurso(alumnoId);
+  }
+
+  function whenCargoRecreos(colegioId: string): Promise<void> {
+    return service.cargarRecreos(colegioId);
+  }
 });

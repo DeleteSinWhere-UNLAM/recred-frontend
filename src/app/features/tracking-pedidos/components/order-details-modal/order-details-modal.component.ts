@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, computed, inject, ChangeDetectorRef } from '@angular/core';
 import { CompraService } from '../../../compra/services/compra.service';
 import { DialogService } from '../../../../shared/services/dialog.service';
 import { ScheduledPickup, EstadoCompra } from '../../models/tracking-pedidos.model';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PromotionService, Promotion } from '../../../../data-access/services/promociones/promotion.service';
-import { ProductService } from '../../../../features/updated-inventory/services/product.service';
-import { Product } from '../../../../features/updated-inventory/models/product.interface';
+import { ProductoService } from '../../../../features/inventario/services/producto.service';
+import { Producto } from '../../../../features/inventario/models/producto.interface';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -21,10 +21,11 @@ import { catchError } from 'rxjs/operators';
 export class OrderDetailsModalComponent {
   private readonly compraService = inject(CompraService);
   private readonly promotionService = inject(PromotionService);
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(ProductoService);
   private readonly dialogService = inject(DialogService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  promosLoaded = new Map<string, { promotion: Promotion | null; products: Product[]; loading: boolean; error: boolean }>();
+  promosLoaded = new Map<string, { promotion: Promotion | null; products: Producto[]; loading: boolean; error: boolean }>();
   expandedPromos = new Set<string>();
 
   esPromocion(nombre: string): boolean {
@@ -112,6 +113,10 @@ export class OrderDetailsModalComponent {
 
   showVerificationModal = false;
   verificationCode = '';
+  isValidating = false;
+  codeValidated = false;
+  validationError: string | null = null;
+
   @Input({ required: true }) order!: ScheduledPickup;
   @Input() isUpdating = false;
 
@@ -161,7 +166,13 @@ export class OrderDetailsModalComponent {
     } else if (this.order.status === 'EN_PREPARACION') {
       nextStatus = 'LISTO';
     } else if (this.order.status === 'LISTO') {
-      this.showVerificationModal = true;
+      if (!this.showVerificationModal) {
+        this.showVerificationModal = true;
+        return;
+      }
+      if (this.codeValidated) {
+        this.advanceStatus.emit({ orderId: this.order.id, nextStatus: 'ENTREGADO' });
+      }
       return;
     }
 
@@ -170,18 +181,30 @@ export class OrderDetailsModalComponent {
     }
   }
 
-  protected confirmDelivery(): void {
-    if (!this.verificationCode) return;
+  protected validateCode(): void {
+    if (!this.verificationCode || this.isUpdating || this.isValidating) return;
+
+    this.isValidating = true;
+    this.validationError = null;
+
     this.compraService.deliver(this.order.id, this.verificationCode).subscribe({
       next: () => {
-        this.advanceStatus.emit({ orderId: this.order.id, nextStatus: 'ENTREGADO' });
-        this.showVerificationModal = false;
-        this.verificationCode = '';
+        this.codeValidated = true;
+        this.isValidating = false;
+        this.validationError = null;
+        this.cdr.markForCheck();
       },
-      error: async () => {
-        await this.dialogService.alert('Código incorrecto. Intente nuevamente.', 'Código Inválido');
+      error: () => {
+        this.codeValidated = false;
+        this.isValidating = false;
+        this.validationError = 'Código incorrecto. Por favor, ingréselo nuevamente.';
+        this.cdr.markForCheck();
       }
     });
+  }
+
+  protected onCodeInput(): void {
+    this.validationError = null;
   }
 
   protected async onCancel(): Promise<void> {

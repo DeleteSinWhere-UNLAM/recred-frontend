@@ -9,7 +9,6 @@ export class ThemeService {
   constructor() {
     effect(() => {
       const activeTheme = this.theme();
-      // Forzamos momentáneamente el modo claro sin borrar la lógica del modo oscuro
       document.documentElement.setAttribute('data-theme', 'light');
       localStorage.setItem('theme', activeTheme);
     });

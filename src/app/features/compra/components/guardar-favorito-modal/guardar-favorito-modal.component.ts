@@ -51,11 +51,10 @@ export class GuardarFavoritoModalComponent implements OnInit {
     this.alumnoId = this.initialAlumnoId;
     void this.alumnosService.asegurarCargados();
 
-    const esPlanGratuito = this.perfilService.perfil()?.plan !== 'PREMIUM';
-    if (esPlanGratuito && !this.cartId) {
+    if (this.perfilService.esPlanGratuito() && !this.cartId) {
       this.carritosFavoritosService.getCarritosFavoritos().subscribe({
         next: (carts) => {
-          if (carts.length >= 3) {
+          if (carts.length >= 5) {
             this.limitReached = true;
           }
         },

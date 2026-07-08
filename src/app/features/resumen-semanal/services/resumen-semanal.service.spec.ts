@@ -1,12 +1,15 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-
-import { ResumenSemanalService } from './resumen-semanal.service';
+import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ResumenSemanal } from '../models/resumen-semanal.model';
+import { ResumenSemanalMother } from '../resumen-semanal.mother';
+import { ResumenSemanalService } from './resumen-semanal.service';
 
 describe('ResumenSemanalService', () => {
+  const URL_RESUMEN = `${environment.apiUrl}/resumen/me`;
+
   let service: ResumenSemanalService;
   let httpMock: HttpTestingController;
 
@@ -15,43 +18,42 @@ describe('ResumenSemanalService', () => {
       providers: [
         ResumenSemanalService,
         provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(ResumenSemanalService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    // Verificamos que no haya peticiones http pendientes después de cada test
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  it('debería ser creado', () => {
-    expect(service).toBeTruthy();
-  });
+  describe('getResumen', () => {
+    it('cuando pido el resumen, deberia hacer GET a /resumen/me y devolver el body', async () => {
+      const resumen = ResumenSemanalMother.crear();
 
-  it('debería hacer una petición GET a la API con el usuarioId correcto', () => {
-    const mockUsuarioId = 'usuario-123';
-    const mockRespuesta: ResumenSemanal = {
-      id: 'res-123',
-      fechaDesde: '2023-01-01',
-      fechaHasta: '2023-01-07',
-      resumen: '{"hijos":{}}'
-    };
+      const promesa = whenPidoElResumen();
 
-    // Llamamos al método
-    service.getResumen(mockUsuarioId).subscribe((data) => {
-      expect(data).toEqual(mockRespuesta);
+      thenSeHizoGetResumen().flush(resumen);
+
+      expect(await promesa).toEqual(resumen);
     });
 
-    // Esperamos que se haga una petición HTTP a la URL construida
-    const req = httpMock.expectOne(`${environment.apiUrl}/resumen/${mockUsuarioId}`);
-    
-    // Verificamos que sea de tipo GET
-    expect(req.request.method).toBe('GET');
+    it('dado que el back devuelve error, cuando pido el resumen, deberia rechazar la promesa', async () => {
+      const promesa = whenPidoElResumen();
 
-    // Respondemos a la petición con nuestros datos de prueba
-    req.flush(mockRespuesta);
+      thenSeHizoGetResumen().flush('boom', { status: 500, statusText: 'Server Error' });
+
+      await expectAsync(promesa).toBeRejected();
+    });
   });
+
+  function whenPidoElResumen(): Promise<ResumenSemanal> {
+    return firstValueFrom(service.getResumen());
+  }
+
+  function thenSeHizoGetResumen(): TestRequest {
+    const req = httpMock.expectOne(URL_RESUMEN);
+    expect(req.request.method).toBe('GET');
+    return req;
+  }
 });

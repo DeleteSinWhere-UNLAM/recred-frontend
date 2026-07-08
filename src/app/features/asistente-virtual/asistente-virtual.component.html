@@ -1,5 +1,6 @@
 <app-asistente-fab
   [oculto]="presenter.abierto()"
+  [bloqueado]="presenter.asistenteBloqueado()"
   (togglePanel)="presenter.toggle()"
 />
 
@@ -11,9 +12,12 @@
     [enviando]="presenter.enviando()"
     [deshabilitado]="presenter.procesando()"
     [mostrarHistorial]="presenter.puedeVerHistorial()"
+    [mostrarSelectorFechaRetiro]="presenter.requiereFechaRetiro()"
+    [fechaRetiroMinima]="presenter.fechaRetiroMinima()"
     (cerrar)="presenter.cerrar()"
     (enviar)="presenter.enviar($event)"
     (sugerencia)="presenter.enviarSugerencia($event)"
+    (fechaRetiro)="presenter.enviarFechaRetiro($event)"
     (nuevaConversacion)="presenter.nuevaConversacion()"
     (verHistorial)="presenter.verMensajesAnteriores()"
   />

@@ -46,5 +46,11 @@ export class ColegiosService {
       ),
     );
   }
+
+  async obtenerColegiosDelTutor(): Promise<Colegio[]> {
+    return firstValueFrom(
+      this.http.get<Colegio[]>(`${environment.apiUrl}/tutores/me/colegios`),
+    );
+  }
 }
 

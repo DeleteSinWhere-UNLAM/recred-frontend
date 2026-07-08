@@ -5,6 +5,20 @@
   flex-direction: column;
 }
 
+.landing__aviso-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 16px 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(231, 111, 81, 0.12);
+  color: #8a321f;
+  border: 1px solid rgba(231, 111, 81, 0.32);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 .dino-loader {
   position: fixed;
   inset: 0;

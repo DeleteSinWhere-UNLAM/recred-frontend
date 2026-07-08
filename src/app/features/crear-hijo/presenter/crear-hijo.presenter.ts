@@ -37,10 +37,13 @@ export class CrearHijoPresenter {
     if (this.cargandoColegiosState() || this.colegiosState().length > 0) return;
     this.cargandoColegiosState.set(true);
     try {
-      const lista = await this.colegiosService.obtenerColegios();
+      const lista = await this.colegiosService.obtenerColegiosDelTutor();
       this.colegiosState.set(lista);
     } catch {
-      this.toastService.mostrar('No se pudieron cargar los colegios.', 'error');
+      this.toastService.mostrar(
+        'No se pudieron cargar tus colegios asociados.',
+        'error',
+      );
     } finally {
       this.cargandoColegiosState.set(false);
     }

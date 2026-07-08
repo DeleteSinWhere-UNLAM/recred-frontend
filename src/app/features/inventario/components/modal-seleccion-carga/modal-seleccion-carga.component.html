@@ -1,0 +1,76 @@
+<div class="upload-selection-modal__backdrop" tabindex="0" role="button" (click)="onCancel()"
+  (keydown.enter)="onCancel()" (keydown.space)="onCancel()">
+  <section class="upload-selection-modal" role="dialog" aria-modal="true" aria-labelledby="upload-selection-title"
+    tabindex="-1" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()"
+    (keydown.space)="$event.stopPropagation()">
+    <header class="upload-selection-modal__header">
+      <div>
+        <h3 id="upload-selection-title" class="upload-selection-modal__titulo">
+          Cargar Producto
+        </h3>
+        <p class="upload-selection-modal__subtitle">
+          Elige cómo deseas agregar productos
+        </p>
+      </div>
+      <button type="button" class="upload-selection-modal__close" (click)="onCancel()" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <div class="upload-selection-modal__body">
+      <button type="button" class="upload-selection-modal__option"
+        [class.upload-selection-modal__option--locked]="opcionBloqueada('INTERMEDIO')"
+        [attr.aria-disabled]="opcionBloqueada('INTERMEDIO')" (click)="onIaUpload()">
+        <div class="upload-selection-modal__icon" aria-hidden="true">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div class="upload-selection-modal__text">
+          <strong class="upload-selection-modal__option-title">
+            Carga Inteligente
+            <span class="upload-selection-modal__premium-badge">
+              @if (opcionBloqueada('INTERMEDIO')) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              }
+              Intermedio
+            </span>
+          </strong>
+          <span class="upload-selection-modal__option-desc">Alta asistida usando foto y procesado automático</span>
+        </div>
+        <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="upload-selection-modal__option"
+        [class.upload-selection-modal__option--locked]="opcionBloqueada('AVANZADO')"
+        [attr.aria-disabled]="opcionBloqueada('AVANZADO')" (click)="onBulkUpload()">
+        <div class="upload-selection-modal__icon" aria-hidden="true">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <div class="upload-selection-modal__text">
+          <strong class="upload-selection-modal__option-title">
+            Carga masiva
+            <span class="upload-selection-modal__premium-badge">
+              @if (opcionBloqueada('AVANZADO')) {
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              }
+              Avanzado
+            </span>
+          </strong>
+          <span class="upload-selection-modal__option-desc">Sube un archivo PDF para procesar múltiples productos a la
+            vez</span>
+        </div>
+        <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="upload-selection-modal__option" (click)="onManualUpload()">
+        <div class="upload-selection-modal__icon" aria-hidden="true">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+        <div class="upload-selection-modal__text">
+          <strong class="upload-selection-modal__option-title">
+            Carga de producto
+          </strong>
+          <span class="upload-selection-modal__option-desc">Alta manual completando el formulario del producto</span>
+        </div>
+        <i class="fa-solid fa-chevron-right upload-selection-modal__chevron" aria-hidden="true"></i>
+      </button>
+    </div>
+  </section>
+</div>

@@ -7,6 +7,7 @@ import {
 import { environment } from '../../../../environments/environment';
 import { BilleteraService } from './billetera.service';
 import { BilleteraResumen } from '../models/billetera.model';
+import { BilleteraMother } from '../billetera.mother';
 
 describe('BilleteraService', () => {
   let service: BilleteraService;
@@ -27,51 +28,58 @@ describe('BilleteraService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('debería crearse', () => {
+  it('dado que se inyecta el servicio, deberia crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
-  it('getResumen debería enviar el rango de fechas como query params', () => {
-    let resultado: BilleteraResumen | undefined;
+  it('dado un alumno y un rango de fechas, cuando consulto el resumen, deberia hacer GET con esos query params y devolver el resumen', () => {
+    const resumenEsperado = BilleteraMother.crearResumen({ saldoActual: 1250 });
 
-    service.getResumen('alumno-1', '2026-06-01', '2026-06-14').subscribe((r) => {
-      resultado = r;
-    });
+    const resultado = whenConsultoElResumen(BilleteraMother.ALUMNO_ID, BilleteraMother.DESDE, BilleteraMother.HASTA);
 
-    const req = httpMock.expectOne(
-      (request) =>
-        request.method === 'GET' &&
-        request.url === `${environment.apiUrl}/wallets/students/alumno-1/summary`,
-    );
-
-    expect(req.request.params.get('desde')).toBe('2026-06-01');
-    expect(req.request.params.get('hasta')).toBe('2026-06-14');
-
-    const mock: BilleteraResumen = {
-      alumnoId: 'alumno-1',
-      saldoActual: 1250,
-      periodo: { desde: '2026-06-01', hasta: '2026-06-14' },
-      montoIngresado: 3000,
-      montoGastado: 1750,
-      balancePeriodo: 1250,
-      cantidadCompras: 8,
-      gastoPorCategoria: [],
-      gastoPorClasificacionSalud: [],
-      movimientos: [],
-    };
-    req.flush(mock);
-
-    expect(resultado).toEqual(mock);
+    thenSeHizoGetConRango(BilleteraMother.ALUMNO_ID, BilleteraMother.DESDE, BilleteraMother.HASTA, resumenEsperado);
+    expect(resultado()).toEqual(resumenEsperado);
   });
 
-  it('getResumen debería omitir el rango cuando no se informa', () => {
-    service.getResumen('alumno-1').subscribe();
+  it('dado un alumno sin rango de fechas, cuando consulto el resumen, no deberia enviar query params de rango', () => {
+    whenConsultoElResumen(BilleteraMother.ALUMNO_ID);
 
+    thenSeHizoGetSinRango(BilleteraMother.ALUMNO_ID);
+  });
+
+  function whenConsultoElResumen(
+    alumnoId: string,
+    desde?: string,
+    hasta?: string,
+  ): () => BilleteraResumen | undefined {
+    let resultado: BilleteraResumen | undefined;
+    service.getResumen(alumnoId, desde, hasta).subscribe((r) => (resultado = r));
+    return () => resultado;
+  }
+
+  function thenSeHizoGetConRango(
+    alumnoId: string,
+    desde: string,
+    hasta: string,
+    respuesta: BilleteraResumen,
+  ): void {
     const req = httpMock.expectOne(
-      `${environment.apiUrl}/wallets/students/alumno-1/summary`,
+      (r) =>
+        r.method === 'GET' &&
+        r.url === `${environment.apiUrl}/wallets/students/${alumnoId}/summary`,
     );
+    expect(req.request.params.get('desde')).toBe(desde);
+    expect(req.request.params.get('hasta')).toBe(hasta);
+    req.flush(respuesta);
+  }
+
+  function thenSeHizoGetSinRango(alumnoId: string): void {
+    const req = httpMock.expectOne(
+      `${environment.apiUrl}/wallets/students/${alumnoId}/summary`,
+    );
+    expect(req.request.method).toBe('GET');
     expect(req.request.params.has('desde')).toBeFalse();
     expect(req.request.params.has('hasta')).toBeFalse();
     req.flush({});
-  });
+  }
 });

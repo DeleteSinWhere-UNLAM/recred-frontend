@@ -15,6 +15,7 @@ import {
 export class AsistenteFabComponent {
   @Input() oculto = false;
   @Input() mostrarBadge = true;
+  @Input() bloqueado = false;
 
   @Output() togglePanel = new EventEmitter<void>();
 

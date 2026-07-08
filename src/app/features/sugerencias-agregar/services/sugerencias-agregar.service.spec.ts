@@ -1,62 +1,59 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { SugerenciasAgregarService } from './sugerencias-agregar.service';
+import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { SugerenciaAgregarProducto } from '../models/sugerencia-agregar.model';
+import { SugerenciaAgregarProductoMother } from '../sugerencias-agregar.mother';
+import { SugerenciasAgregarService } from './sugerencias-agregar.service';
 
 describe('SugerenciasAgregarService', () => {
+  const URL_SUGERENCIAS = `${environment.apiUrl}/sugerencias/agregar-producto`;
+
   let service: SugerenciasAgregarService;
   let httpMock: HttpTestingController;
-
-  const mockUserId = 'user-123';
-  const baseUrl = environment.apiUrl;
-
-  const mockResponse: SugerenciaAgregarProducto[] = [
-    {
-      id: '1',
-      alumnoId: null,
-      buffetId: 'buffet-1',
-      productoId: 'prod-1',
-      titulo: 'Sugerencia 1',
-      mensaje: 'Mensaje 1',
-      metadata: {
-        totalSales: 10,
-        productName: 'Producto 1',
-        productPrice: 100,
-        totalRevenue: 1000,
-        totalCustomers: 5
-      }
-    }
-  ];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        SugerenciasAgregarService,
         provideHttpClient(),
         provideHttpClientTesting(),
-        SugerenciasAgregarService
-      ]
+      ],
     });
     service = TestBed.inject(SugerenciasAgregarService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  it('debería ser creado', () => {
-    expect(service).toBeTruthy();
-  });
+  describe('getSugerenciasAgregarProducto', () => {
+    it('cuando pido las oportunidades de stock, deberia hacer GET a /sugerencias/agregar-producto', async () => {
+      const sugerencias = SugerenciaAgregarProductoMother.crearVarias();
 
-  it('getSugerenciasAgregarProducto debería hacer un GET al endpoint correcto', () => {
-    service.getSugerenciasAgregarProducto(mockUserId).subscribe((data) => {
-      expect(data).toEqual(mockResponse);
+      const promesa = whenPidoLasOportunidades();
+
+      thenSeHizoGetSugerenciasAgregar().flush(sugerencias);
+
+      expect(await promesa).toEqual(sugerencias);
     });
 
-    const req = httpMock.expectOne(`${baseUrl}/sugerencias/agregar-producto/${mockUserId}`);
-    expect(req.request.method).toBe('GET');
-    req.flush(mockResponse);
+    it('dado que el back devuelve error, cuando pido las oportunidades, deberia rechazar la promesa', async () => {
+      const promesa = whenPidoLasOportunidades();
+
+      thenSeHizoGetSugerenciasAgregar().flush('boom', { status: 500, statusText: 'Server Error' });
+
+      await expectAsync(promesa).toBeRejected();
+    });
   });
+
+  function whenPidoLasOportunidades(): Promise<SugerenciaAgregarProducto[]> {
+    return firstValueFrom(service.getSugerenciasAgregarProducto());
+  }
+
+  function thenSeHizoGetSugerenciasAgregar(): TestRequest {
+    const req = httpMock.expectOne(URL_SUGERENCIAS);
+    expect(req.request.method).toBe('GET');
+    return req;
+  }
 });

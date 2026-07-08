@@ -1,5 +1,6 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
@@ -18,6 +19,8 @@ import {
   Producto,
 } from '../models/producto.model';
 import { RestriccionProductoService } from '../../restriccion-producto/services/restriccion-producto.service';
+import { CompraService } from '../../compra/services/compra.service';
+import { OrdenAlumno } from '../../compra/models/orden-compra.model';
 import { getPeriodRange, getProductCategory, isSameCategory } from '../../compra/utils/budget-helpers';
 import { PERIODO_LABELS } from '../../presupuesto/models/presupuesto.model';
 import { FranjasHorariasService } from '../../restricciones-horarias/services/franjas-horarias.service';
@@ -88,6 +91,7 @@ export class BuffetPresenter {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly compraService = inject(CompraService);
   private readonly restriccionProductoService = inject(RestriccionProductoService);
   private readonly franjasService = inject(FranjasHorariasService);
   private readonly restriccionesService = inject(RestriccionesHorariasService);
@@ -104,6 +108,7 @@ export class BuffetPresenter {
   private readonly filtrosState = signal<FiltrosBuffet>({ ...filtrosPorDefecto });
   private readonly restriccionesNutricionalesState = signal<ClasificacionSaludBackend[]>([]);
   private readonly promocionesState = signal<Promotion[]>([]);
+  private readonly favoritosTotalesFamiliaState = signal<number | null>(null);
 
   private readonly franjasState = signal<TimeSlot[]>([]);
   private readonly restriccionesState = signal<RestriccionHoraria[]>([]);
@@ -317,13 +322,12 @@ export class BuffetPresenter {
       spentCartGeneral += item.producto.precio * item.cantidad;
     }
 
-    const limiteTeorico = alumno.saldo + spentPastGeneral;
-    const montoLimiteGeneral = Math.min(budget.montoLimiteGeneral, limiteTeorico);
+    const montoLimiteGeneral = budget.montoLimiteGeneral;
+    const montoConsumidoGeneral = spentPastGeneral + spentCartGeneral;
     const montoDisponibleGeneral = Math.max(
       0,
-      Math.min(alumno.saldo - spentCartGeneral, budget.montoLimiteGeneral - spentPastGeneral - spentCartGeneral)
+      budget.montoLimiteGeneral - spentPastGeneral - spentCartGeneral
     );
-    const montoConsumidoGeneral = montoLimiteGeneral - montoDisponibleGeneral;
     const porcentajeConsumidoGeneral = montoLimiteGeneral > 0
       ? Math.round((montoConsumidoGeneral / montoLimiteGeneral) * 100)
       : 0;
@@ -411,7 +415,7 @@ export class BuffetPresenter {
     const favs = this.favoritosState();
     const esAlumno = this.usuarioService.esVistaAlumno();
 
-    return this.productosState().filter((producto) => {
+    const filtered = this.productosState().filter((producto) => {
       if (esAlumno) {
         if (producto.bloqueado) {
           return false;
@@ -443,6 +447,14 @@ export class BuffetPresenter {
       }
       return true;
     });
+
+    return [...filtered].sort((a, b) => {
+      const aBlocked = !!(a.bloqueado || a.bloqueadoPorRestriccion || a.estadoStock === 'SIN_STOCK');
+      const bBlocked = !!(b.bloqueado || b.bloqueadoPorRestriccion || b.estadoStock === 'SIN_STOCK');
+      if (aBlocked && !bBlocked) return 1;
+      if (!aBlocked && bBlocked) return -1;
+      return 0;
+    });
   });
 
   init(alumnoId: string): void {
@@ -460,9 +472,11 @@ export class BuffetPresenter {
       next: (favs) => {
         const ids = new Set(favs.map((f) => f.id));
         this.favoritosState.set(ids);
+        this.cargarCantidadFavoritosFamilia(alumnoId, ids.size);
       },
       error: (err) => {
         console.error('Error loading favorites:', err);
+        this.cargarCantidadFavoritosFamilia(alumnoId, 0);
       }
     });
 
@@ -563,6 +577,7 @@ export class BuffetPresenter {
     }
 
     this.fechaSeleccionadaState.set(adjustedFecha);
+    void this.carritoService.cargarPresupuestoYConsumo(alumno.id);
 
     const recreoActual = this.recreoSeleccionadoState();
     const opciones = this.recreosDisponibles();
@@ -654,9 +669,48 @@ export class BuffetPresenter {
   volver(): void {
     this.router.navigateByUrl(this.usuarioService.homeUrl());
   }
+  procesandoPago = signal<boolean>(false);
 
-  irAlCarrito(): void {
-    this.router.navigateByUrl('/compra');
+  iniciarPago(): void {
+    const alumno = this.alumnoState();
+    const items = this.itemsCarrito();
+    if (!alumno || items.length === 0 || this.procesandoPago()) return;
+
+    const buffet = this.buffetState();
+    if (!buffet) {
+      this.toastService.mostrar('No se pudo resolver el buffet del pedido', 'error');
+      return;
+    }
+
+    const subtotal = this.totalCarrito();
+    if (alumno.saldo < subtotal) {
+      this.toastService.mostrar('Saldo insuficiente para realizar el pedido', 'error');
+      return;
+    }
+
+    const orden: OrdenAlumno = {
+      alumno: alumno,
+      buffetId: buffet.id,
+      items: items,
+      fecha: this.fechaSeleccionadaState(),
+      recreo: this.recreoSeleccionadoState(),
+      subtotal: subtotal
+    };
+
+    this.compraService.iniciarOrden([orden]);
+    
+    this.procesandoPago.set(true);
+    this.compraService.procesarPago().subscribe({
+      next: () => {
+        this.carritoService.limpiarAlumno(alumno.id);
+        this.procesandoPago.set(false);
+        this.router.navigateByUrl('/compra/exito');
+      },
+      error: () => {
+        this.procesandoPago.set(false);
+        this.toastService.mostrar('No pudimos procesar el pago. Intentalo de nuevo.', 'error');
+      }
+    });
   }
 
   cambiarAlumno(nuevoAlumnoId: string): void {
@@ -676,6 +730,24 @@ export class BuffetPresenter {
     );
   }
 
+  setCantidadProducto(producto: Producto, cantidad: number): void {
+    const alumno = this.alumnoState();
+    if (!alumno) return;
+
+    const itemExistente = this.itemsCarrito().find((i) => i.producto.id === producto.id);
+    const cantidadActual = itemExistente ? itemExistente.cantidad : 0;
+    const cantidadAdicional = cantidad - cantidadActual;
+
+    if (cantidadAdicional > 0) {
+      if (!this.carritoService.puedeAgregar(producto, alumno.id, cantidadAdicional)) {
+        this.toastService.mostrar('No es posible agregar más unidades de este producto.', 'error');
+        return;
+      }
+    }
+
+    this.carritoService.setCantidadPorProducto(producto, alumno.id, cantidad);
+  }
+
   toggleFavorito(producto: Producto): void {
     const alumno = this.alumnoState();
     if (!alumno) return;
@@ -684,22 +756,72 @@ export class BuffetPresenter {
     if (ids.has(producto.id)) {
       ids.delete(producto.id);
       this.favoritosState.set(ids);
+      this.favoritosTotalesFamiliaState.update((total) =>
+        total === null ? total : Math.max(0, total - 1),
+      );
       this.favoritosService.removerFavorito(alumno.id, producto.id).subscribe({
         next: () => this.toastService.mostrar(`Se quitó "${producto.nombre}" de tus favoritos`, 'success'),
         error: (err) => console.error('Error removing favorite:', err)
       });
     } else {
-      const esPlanGratuito = this.perfilService.perfil()?.plan !== 'PREMIUM';
-      if (esPlanGratuito && ids.size >= 5) {
-        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 por hijo).', 'error');
+      const totalFavoritos = this.favoritosTotalesFamiliaState() ?? ids.size;
+      if (this.perfilService.esPlanGratuito() && totalFavoritos >= 5) {
+        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 en total).', 'error');
         return;
       }
       ids.add(producto.id);
       this.favoritosState.set(ids);
+      this.favoritosTotalesFamiliaState.update((total) =>
+        total === null ? total : total + 1,
+      );
       this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({
         next: () => this.toastService.mostrar(`Se agregó "${producto.nombre}" a tus favoritos`, 'success'),
         error: (err) => console.error('Error adding favorite:', err)
       });
+    }
+  }
+
+  private cargarCantidadFavoritosFamilia(alumnoIdActual: string, favoritosActuales: number): void {
+    if (!this.perfilService.esPlanGratuito()) {
+      this.favoritosTotalesFamiliaState.set(null);
+      return;
+    }
+
+    const perfil = this.perfilService.perfil();
+    if (perfil?.rol !== 'PADRE') {
+      this.favoritosTotalesFamiliaState.set(favoritosActuales);
+      return;
+    }
+
+    void this.calcularCantidadFavoritosFamilia(alumnoIdActual, favoritosActuales);
+  }
+
+  private async calcularCantidadFavoritosFamilia(
+    alumnoIdActual: string,
+    favoritosActuales: number,
+  ): Promise<void> {
+    try {
+      const alumnos = await this.alumnosService.asegurarCargados();
+      const idsAlumnos = alumnos.map((alumno) => alumno.id).filter(Boolean);
+      const ids = idsAlumnos.length > 0 ? idsAlumnos : [alumnoIdActual];
+      const cantidades = await Promise.all(
+        ids.map(async (alumnoId) => {
+          if (alumnoId === alumnoIdActual) return favoritosActuales;
+          try {
+            return (await firstValueFrom(this.favoritosService.getFavoritos(alumnoId))).length;
+          } catch (err) {
+            console.error('Error counting family favorites:', err);
+            return 0;
+          }
+        }),
+      );
+
+      this.favoritosTotalesFamiliaState.set(
+        cantidades.reduce((total, cantidad) => total + cantidad, 0),
+      );
+    } catch (err) {
+      console.error('Error loading family favorites count:', err);
+      this.favoritosTotalesFamiliaState.set(favoritosActuales);
     }
   }
 

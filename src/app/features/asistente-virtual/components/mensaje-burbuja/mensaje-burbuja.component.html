@@ -32,6 +32,14 @@
         </dl>
       </div>
     }
+    @if (muestraCancelacionCompra) {
+      <div class="mensaje-burbuja__comprobante mensaje-burbuja__comprobante--cancelado" aria-label="Cancelacion de compra">
+        <div class="mensaje-burbuja__comprobante-header">
+          <span>Compra cancelada</span>
+          <strong>{{ estadoCompraTexto }}</strong>
+        </div>
+      </div>
+    }
     <span class="mensaje-burbuja__hora">{{ horaFormateada }}</span>
   </div>
 </div>

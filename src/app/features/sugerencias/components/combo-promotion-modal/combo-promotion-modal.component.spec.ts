@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ComboPromotionModalComponent } from './combo-promotion-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { SuggestedProduct } from '../../models/sugerencia-producto.model';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SuggestedProductMother } from '../../sugerencias.mother';
+import { ComboPromotionModalComponent } from './combo-promotion-modal.component';
 
 describe('ComboPromotionModalComponent', () => {
   let component: ComboPromotionModalComponent;
@@ -9,104 +9,112 @@ describe('ComboPromotionModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ComboPromotionModalComponent, ReactiveFormsModule]
+      imports: [ComboPromotionModalComponent, ReactiveFormsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ComboPromotionModalComponent);
     component = fixture.componentInstance;
-    component.baseProductName = 'Test Product';
+    component.baseProductName = 'Test Producto';
     component.suggestedProducts = [
-      { id: 'p1', nombre: 'Prod 1', precio: 100 } as SuggestedProduct,
-      { id: 'p2', nombre: 'Prod 2', precio: 200 } as SuggestedProduct
+      SuggestedProductMother.crear({ id: 'p1', nombre: 'Prod 1', precio: 100 }),
+      SuggestedProductMother.crear({ id: 'p2', nombre: 'Prod 2', precio: 200 }),
     ];
     fixture.detectChanges();
   });
 
-  it('debería crearse', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('debería iniciar con el formulario válido por sus valores por defecto', () => {
-    expect(component.promotionForm.valid).toBeTrue();
-  });
-
-  it('debería permitir togglear la selección de un producto', () => {
-    expect(component.isProductSelected('p1')).toBeFalse();
-    
-    component.toggleProductSelection('p1');
-    expect(component.isProductSelected('p1')).toBeTrue();
-    expect(component.selectedProductIds.size).toBe(1);
-
-    component.toggleProductSelection('p1');
-    expect(component.isProductSelected('p1')).toBeFalse();
-    expect(component.selectedProductIds.size).toBe(0);
-  });
-
-  it('getDiscountedPrice debería calcular el precio con descuento', () => {
-    component.promotionForm.patchValue({ discountPercentage: 20 });
-    const discounted = component.getDiscountedPrice(100);
-    expect(discounted).toBe(80);
-  });
-
-  it('getDiscountedPrice debería retornar el precio original si no hay descuento', () => {
-    component.promotionForm.patchValue({ discountPercentage: null });
-    const discounted = component.getDiscountedPrice(100);
-    expect(discounted).toBe(100);
-  });
-
-  it('onConfirm debería emitir si el formulario es válido y hay productos seleccionados', () => {
-    spyOn(component.confirmPromotion, 'emit');
-
-    component.promotionForm.patchValue({
-      discountPercentage: 15,
-      startDate: '2026-06-16',
-      endDate: '2026-06-20'
-    });
-    component.toggleProductSelection('p1');
-
-    component.onConfirm();
-
-    expect(component.confirmPromotion.emit).toHaveBeenCalledWith({
-      discountPercentage: 15,
-      startDate: '2026-06-16',
-      endDate: '2026-06-20',
-      productIds: ['p1']
+  describe('estado inicial', () => {
+    it('cuando se monta el modal, el formulario deberia iniciar valido con valores por defecto', () => {
+      expect(component.promotionForm.valid).toBeTrue();
     });
   });
 
-  it('onConfirm no debería emitir si el formulario es inválido', () => {
-    spyOn(component.confirmPromotion, 'emit');
+  describe('toggleProductSelection', () => {
+    it('dado un producto, cuando hago click en toggle dos veces, deberia agregarlo y luego removerlo', () => {
+      expect(component.isProductSelected('p1')).toBeFalse();
 
-    component.promotionForm.patchValue({
-      discountPercentage: 15,
-      startDate: '', // Invalid
-      endDate: '2026-06-20'
+      component.toggleProductSelection('p1');
+      expect(component.isProductSelected('p1')).toBeTrue();
+      expect(component.selectedProductIds.size).toBe(1);
+
+      component.toggleProductSelection('p1');
+      expect(component.isProductSelected('p1')).toBeFalse();
+      expect(component.selectedProductIds.size).toBe(0);
     });
-    component.toggleProductSelection('p1');
-
-    component.onConfirm();
-
-    expect(component.confirmPromotion.emit).not.toHaveBeenCalled();
   });
 
-  it('onConfirm no debería emitir si no hay productos seleccionados', () => {
-    spyOn(component.confirmPromotion, 'emit');
+  describe('getDiscountedPrice', () => {
+    it('dado un descuento del 20%, cuando calculo el precio de 100, deberia devolver 80', () => {
+      givenDescuento(20);
 
-    component.promotionForm.patchValue({
-      discountPercentage: 15,
-      startDate: '2026-06-16',
-      endDate: '2026-06-20'
+      expect(component.getDiscountedPrice(100)).toBe(80);
     });
-    // No products selected
 
-    component.onConfirm();
+    it('dado descuento nulo, cuando calculo el precio de 100, deberia devolver el original', () => {
+      givenDescuento(null);
 
-    expect(component.confirmPromotion.emit).not.toHaveBeenCalled();
+      expect(component.getDiscountedPrice(100)).toBe(100);
+    });
   });
 
-  it('onClose debería emitir evento closeModal', () => {
-    spyOn(component.closeModal, 'emit');
-    component.onClose();
-    expect(component.closeModal.emit).toHaveBeenCalled();
+  describe('onConfirm', () => {
+    it('dado un form valido y productos seleccionados, cuando confirmo, deberia emitir confirmPromotion', () => {
+      spyOn(component.confirmPromotion, 'emit');
+      component.promotionForm.patchValue({
+        discountPercentage: 15,
+        startDate: '2026-06-16',
+        endDate: '2026-06-20',
+      });
+      component.toggleProductSelection('p1');
+
+      component.onConfirm();
+
+      expect(component.confirmPromotion.emit).toHaveBeenCalledWith({
+        discountPercentage: 15,
+        startDate: '2026-06-16',
+        endDate: '2026-06-20',
+        productIds: ['p1'],
+      });
+    });
+
+    it('dado un form invalido, cuando confirmo, no deberia emitir', () => {
+      spyOn(component.confirmPromotion, 'emit');
+      component.promotionForm.patchValue({
+        discountPercentage: 15,
+        startDate: '',
+        endDate: '2026-06-20',
+      });
+      component.toggleProductSelection('p1');
+
+      component.onConfirm();
+
+      expect(component.confirmPromotion.emit).not.toHaveBeenCalled();
+    });
+
+    it('dado que no hay productos seleccionados, cuando confirmo, no deberia emitir', () => {
+      spyOn(component.confirmPromotion, 'emit');
+      component.promotionForm.patchValue({
+        discountPercentage: 15,
+        startDate: '2026-06-16',
+        endDate: '2026-06-20',
+      });
+
+      component.onConfirm();
+
+      expect(component.confirmPromotion.emit).not.toHaveBeenCalled();
+    });
   });
+
+  describe('onClose', () => {
+    it('cuando hago click en cerrar, deberia emitir closeModal', () => {
+      spyOn(component.closeModal, 'emit');
+
+      component.onClose();
+
+      expect(component.closeModal.emit).toHaveBeenCalled();
+    });
+  });
+
+  function givenDescuento(porcentaje: number | null): void {
+    component.promotionForm.patchValue({ discountPercentage: porcentaje });
+  }
 });

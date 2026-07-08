@@ -8,8 +8,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authSessionService = inject(AuthSessionService);
 
   const esApiPropia = esUrlDeApiPropia(req.url);
+  const esRegistroColegioPublico = req.method === 'POST' && req.url.endsWith('/school-registrations');
+  const esValidarInvitacionTutor =
+    req.method === 'GET' && /\/invitaciones\/tutor\/[^/]+$/.test(req.url);
 
-  if (!esApiPropia) {
+  if (!esApiPropia || esRegistroColegioPublico || esValidarInvitacionTutor) {
     return next(req);
   }
 

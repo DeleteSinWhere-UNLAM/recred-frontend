@@ -31,6 +31,8 @@ export interface SugerenciaCapacidad {
   readonly tipo?: TipoSugerenciaAsistente;
   readonly tipoAccion?: string | null;
   readonly premium?: boolean;
+  readonly bloqueada?: boolean;
+  readonly planRequerido?: 'INTERMEDIO' | 'AVANZADO';
 }
 
 export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
@@ -95,6 +97,13 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       label: 'Pedidos pendientes',
       emoji: 'P',
       prompt: 'mostrame mis pedidos pendientes',
+    },
+    {
+      id: 'cancelar-pedido',
+      capacidad: 'PEDIDOS_PENDIENTES',
+      label: 'Cancelar pedido',
+      emoji: 'X',
+      prompt: 'cancelar mi pedido',
     },
     {
       id: 'codigo-retiro',
@@ -171,6 +180,8 @@ export const SUGERENCIAS_ASISTENTE_POR_ROL: Record<
       prompt: 'pedidos del buffet',
     },
   ],
+  ADMIN: [],
+  DIRECTIVO_COLEGIO: [],
 };
 
 export const SUGERENCIAS_COMPRA_PENDIENTE: readonly SugerenciaCapacidad[] = [

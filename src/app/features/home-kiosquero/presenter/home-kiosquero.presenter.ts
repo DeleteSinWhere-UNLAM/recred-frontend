@@ -31,8 +31,8 @@ import {
   DashboardRangeParams,
   HomeKiosqueroService,
 } from '../services/home-kiosquero.service';
-import { InventoryRealtimeService } from '../../updated-inventory/services/inventory-realtime.service';
-import { RealtimeInventoryEvent } from '../../updated-inventory/models/inventory.interface';
+import { InventarioRealtimeService } from '../../inventario/services/inventario-realtime.service';
+import { EventoInventarioRealtime } from '../../inventario/models/inventario.interface';
 
 type MetricTone = 'success' | 'warning' | 'danger';
 type PanelMode = 'home' | 'reportes';
@@ -170,7 +170,7 @@ export class HomeKiosqueroPresenter {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly homeKiosqueroService = inject(HomeKiosqueroService);
-  private readonly inventoryRealtimeService = inject(InventoryRealtimeService);
+  private readonly inventoryRealtimeService = inject(InventarioRealtimeService);
   private readonly router = inject(Router);
   private readonly zone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
@@ -885,17 +885,6 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
-
-    },
-    {
-      id: 'oportunidades-stock',
-      titulo: 'Oportunidades de Stock',
-      descripcion: 'Descubrir nuevos productos',
-      icono: 'fa-rocket',
-      ruta: '/sugerencias-agregar',
-      color: 'menta',
-      destacada: true,
-      premium: true,
     },
     {
       id: 'tracking-pedidos',
@@ -915,22 +904,23 @@ export class HomeKiosqueroPresenter {
       color: 'violeta',
     },
     {
+      id: 'inteligencia-comercial',
+      titulo: 'Diagnostico comercial',
+      descripcion: 'Detecta productos para sumar o impulsar',
+      icono: 'fa-chart-line',
+      ruta: '/kiosquero/inteligencia-comercial',
+      color: 'pizarra',
+      destacada: true,
+      planRequerido: 'AVANZADO',
+    },
+    {
       id: 'reportes',
       titulo: 'Panel de control',
       descripcion: 'Métricas y reportes',
       icono: 'fa-chart-line',
       ruta: '/kiosquero/reportes',
       color: 'pizarra',
-    },
-    {
-      id: 'sugerencias',
-      titulo: 'Impulsar Baja Rotación',
-      descripcion: 'Armar combos para mover stock estancado',
-      icono: 'fa-robot',
-      ruta: '/sugerencias',
-      color: 'melocoton',
-      destacada: true,
-      premium: true,
+      planRequerido: 'INTERMEDIO',
     },
     {
       id: 'recomendaciones',
@@ -947,6 +937,7 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-tags',
       ruta: '/promociones',
       color: 'violeta',
+      planRequerido: 'AVANZADO',
     },
     {
       id: 'cierre-diario',
@@ -955,6 +946,14 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-clipboard-check',
       ruta: '/cierre-diario',
       color: 'melocoton',
+    },
+    {
+      id: 'proveedores',
+      titulo: 'Proveedores y Precios',
+      descripcion: 'Gestionar listas de precios y recomendaciones por IA',
+      icono: 'fa-truck-field',
+      ruta: '/kiosquero/proveedores',
+      color: 'dorado',
     },
   ]);
 
@@ -972,6 +971,7 @@ export class HomeKiosqueroPresenter {
           'cargar-productos',
           'tracking-pedidos',
           'stock',
+          'inteligencia-comercial',
           'reportes',
           'sugerencias',
           'recomendaciones',
@@ -1157,7 +1157,7 @@ export class HomeKiosqueroPresenter {
   }
 
   abrirPedidos(status: KiosqueroOrderStatus): void {
-    this.router.navigate(['/cierre-diario'], {
+    this.router.navigate(['/kiosquero/pedidos-tracking'], {
       queryParams: {
         date: this.selectedDateState(),
         status,
@@ -1365,7 +1365,7 @@ export class HomeKiosqueroPresenter {
     );
   }
 
-  private scheduleRealtimeRefresh(event: RealtimeInventoryEvent): void {
+  private scheduleRealtimeRefresh(event: EventoInventarioRealtime): void {
     if (
       !this.shouldRefreshPanelForRealtimeEvent(event) ||
       this.realtimeRefreshTimeoutId !== null
@@ -1677,7 +1677,7 @@ export class HomeKiosqueroPresenter {
   }
 
   private shouldRefreshPanelForRealtimeEvent(
-    event: RealtimeInventoryEvent,
+    event: EventoInventarioRealtime,
   ): boolean {
     return (
       document.visibilityState === 'visible' &&
@@ -1686,7 +1686,7 @@ export class HomeKiosqueroPresenter {
     );
   }
 
-  private isRealtimeEventForCurrentPanel(event: RealtimeInventoryEvent): boolean {
+  private isRealtimeEventForCurrentPanel(event: EventoInventarioRealtime): boolean {
     if (this.panelModeState() === 'reportes') {
       return this.isRealtimeEventForReportRange(event);
     }
@@ -1694,14 +1694,14 @@ export class HomeKiosqueroPresenter {
     return this.isRealtimeEventForSelectedDate(event);
   }
 
-  private isRealtimeEventForReportRange(event: RealtimeInventoryEvent): boolean {
+  private isRealtimeEventForReportRange(event: EventoInventarioRealtime): boolean {
     const eventDate = event.date?.trim() || this.getTodayInputDate();
     const range = this.getReportRange();
 
     return eventDate >= range.from && eventDate <= range.to;
   }
 
-  private isRealtimeEventForSelectedDate(event: RealtimeInventoryEvent): boolean {
+  private isRealtimeEventForSelectedDate(event: EventoInventarioRealtime): boolean {
     const eventDate = event.date?.trim();
 
     if (eventDate) {

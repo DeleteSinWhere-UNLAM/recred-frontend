@@ -15,4 +15,27 @@
     </h4>
     <p class="preferencia-card__motivo">{{ preferencia.razonIA }}</p>
   </div>
+
+  @if (preferencia.productoNombre) {
+    <div class="preferencia-card__producto">
+      <div class="preferencia-card__producto-info">
+        @if (imagenProducto) {
+          <img [src]="imagenProducto" alt="Imagen de producto" class="preferencia-card__producto-img" (error)="onImagenError($event)" />
+        } @else {
+          <img [src]="IMAGEN_FALLBACK" alt="Imagen de producto" class="preferencia-card__producto-img-placeholder" />
+        }
+        <div class="preferencia-card__producto-detalles">
+          <span class="preferencia-card__producto-nombre">{{ preferencia.productoNombre }}</span>
+          <span class="preferencia-card__producto-precio">${{ preferencia.productoPrecio }}</span>
+        </div>
+      </div>
+      <button 
+        class="preferencia-card__btn-favorito" 
+        (click)="agregarAFavoritos()" 
+        [disabled]="isAdding || !alumnoId">
+        <i class="fa-solid" [ngClass]="isAdding ? 'fa-spinner fa-spin' : 'fa-heart'"></i>
+        {{ isAdding ? 'Añadiendo...' : 'Añadir a Favoritos' }}
+      </button>
+    </div>
+  }
 </article>

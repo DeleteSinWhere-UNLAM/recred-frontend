@@ -1,13 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-.tutor-dashboard {
-  font-family: 'Inter', sans-serif;
-  padding: 1.5rem;
-  background: var(--body-gradient), var(--color-fondo);
-  min-height: 100vh;
-  color: var(--color-texto-oscuro);
-}
-
 /* Dashboard Top Actions */
 .dashboard-top-actions {
   display: flex;
@@ -156,11 +148,19 @@
   margin-bottom: 1rem;
 }
 
+.card-header > div {
+  min-width: 0;
+}
+
 .card-header h3 {
   font-size: 1.1rem;
   font-weight: 700;
   color: #1a3b5c;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* Smart Action Card */
@@ -462,6 +462,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .tx-icon {
@@ -525,6 +526,7 @@
   background-color: var(--color-superficie-alt);
   outline: none;
   transition: border-color 0.2s;
+  flex-shrink: 0;
 }
 
 .custom-select:focus {
@@ -742,18 +744,22 @@
 .modal-btn-cancelar {
   flex: 1;
   padding: 14px;
-  background-color: var(--color-superficie-alt);
-  color: var(--color-texto-claro);
-  border: none;
+  background-color: #ffffff;
+  color: #3b82f6;
+  border: 1.5px solid #cbd5e1;
   border-radius: 14px;
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 }
 
 .modal-btn-cancelar:hover {
-  background-color: var(--color-superficie);
+  background-color: #f8fafc;
+  color: #2563eb;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
 }
 
 .modal-btn-confirmar {
@@ -799,6 +805,21 @@
   border: 1px solid #bbf7d0;
   color: #166534;
 }
+
+.modal-btn-confirmar:disabled {
+  background-color: var(--color-superficie-alt);
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.modal-btn-cancelar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
 
 .smart-modal .smart-icon {
   font-size: 3rem;
@@ -1152,11 +1173,7 @@
   background-color: rgba(242, 183, 5, 0.4) !important;
 }
 
-@media (max-width: 768px) {
-  .tutor-dashboard {
-    padding: 1rem;
-  }
-}
+
 
 @media (max-width: 600px) {
   .global-header {
@@ -1322,4 +1339,39 @@
   background-color: rgba(242, 183, 5, 0.1) !important;
   color: var(--color-dorado) !important;
   border-color: rgba(242, 183, 5, 0.2) !important;
+}
+/* Mobile Responsiveness (down to 320px) */
+@media (max-width: 767px) {
+  .global-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .global-balance-info,
+  .global-debt-info {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .balance-display .amount {
+    font-size: 2rem;
+  }
+  .action-btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .dashboard-actions {
+    flex-direction: column;
+  }
+  .modal-content {
+    padding: 16px;
+  }
+  .modal-actions {
+    flex-direction: column;
+  }
+}
+
+.dashboard-gridster {
+  flex: 1;
+  min-height: 500px;
 }

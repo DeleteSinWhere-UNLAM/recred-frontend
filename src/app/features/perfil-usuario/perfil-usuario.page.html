@@ -70,11 +70,39 @@
           @if (esTutor() || esKiosquero()) {
           <div>
             <dt>Plan</dt>
-            <dd>{{ esPremium() ? 'Avanzado' : 'Gratuito' }}</dd>
+            <dd>{{ planActualLabel() }}</dd>
           </div>
           <div>
             <dt>Vigencia</dt>
-            <dd>{{ esPremium() ? vigenciaPlan() : 'Sin vencimiento' }}</dd>
+            <dd>{{ vigenciaPlan() }}</dd>
+          </div>
+          }
+          @if (esDirectivo()) {
+          <div>
+            <dt>Licencia colegio</dt>
+            <dd>USD 20 / mes</dd>
+          </div>
+          <div>
+            <dt>Estado licencia</dt>
+            <dd>{{ estadoLicenciaColegio() }}</dd>
+          </div>
+          <div>
+            <dt>Vigencia licencia</dt>
+            <dd>{{ vigenciaLicenciaColegio() }}</dd>
+          </div>
+          <div>
+            <dt>Restante</dt>
+            <dd>{{ restanteLicenciaColegio() }}</dd>
+          </div>
+          }
+          @if (esKiosquero()) {
+          <div>
+            <dt>CUIT</dt>
+            <dd>{{ cuitGuardado() || 'No configurado' }}</dd>
+          </div>
+          <div>
+            <dt>CVU / CBU</dt>
+            <dd>{{ cvuGuardado() || 'No configurado' }}</dd>
           </div>
           }
         </dl>
@@ -161,13 +189,10 @@
         </div>
 
         @if (proximaEjecucion()) {
-        <div class="perfil-usuario__payout-info perfil-usuario__campo--full">
-          <div class="perfil-usuario__payout-info-item">
+        <div class="perfil-usuario__payout-info perfil-usuario__payout-info--limpio perfil-usuario__campo--full">
+          <div class="perfil-usuario__payout-info-item payout-destacado">
             <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
-            <div>
-              <span class="info-label">Próxima liquidación:</span>
-              <strong class="info-value">{{ proximaEjecucion() }}</strong>
-            </div>
+            <strong class="info-value">Próximo cobro programado para el {{ proximaEjecucion() }}</strong>
           </div>
           @if (ultimaEjecucion()) {
           <div class="perfil-usuario__payout-info-item">
@@ -222,10 +247,24 @@
 
         <label class="perfil-usuario__campo">
           <span>Frecuencia (Cantidad)</span>
-          <input type="number" formControlName="cantidadIntervalo" placeholder="7"
-            [class.perfil-usuario__input--error]="campoPayoutInvalido('cantidadIntervalo')" />
+          <select formControlName="cantidadIntervalo"
+            [class.perfil-usuario__input--error]="campoPayoutInvalido('cantidadIntervalo')">
+            @if (unidadIntervaloSeleccionada() === 'DAYS') {
+            <option [ngValue]="1">1</option>
+            <option [ngValue]="10">10</option>
+            }
+            @if (unidadIntervaloSeleccionada() === 'WEEKS') {
+            <option [ngValue]="1">1</option>
+            <option [ngValue]="2">2</option>
+            }
+            @if (unidadIntervaloSeleccionada() === 'MONTHS') {
+            <option [ngValue]="1">1</option>
+            <option [ngValue]="2">2</option>
+            <option [ngValue]="3">3</option>
+            }
+          </select>
           @if (campoPayoutInvalido('cantidadIntervalo')) {
-          <small>Ingresá una cantidad de intervalo válida (mínimo 1).</small>
+          <small>Seleccioná una cantidad válida.</small>
           }
         </label>
 

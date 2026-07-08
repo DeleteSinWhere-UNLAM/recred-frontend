@@ -1,78 +1,162 @@
+import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { ColegiosService } from '../../data-access/services/colegios.service';
-import { Colegio } from '../../data-access/models/colegio.model';
-import { Grado } from '../../data-access/models/grado.model';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { CrearHijoPage } from './crear-hijo.page';
+import { ColegioMother, GradoMother } from './crear-hijo.mother';
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true,
+})
+class NavbarStub {
+  @Input() userName = '';
+}
 
 describe('CrearHijoPage', () => {
   let fixture: ComponentFixture<CrearHijoPage>;
   let component: CrearHijoPage;
-
-  const colegios: Colegio[] = [
-    { id: 'colegio-1', nombre: 'Instituto San José' },
-    { id: 'colegio-2', nombre: 'Colegio Santa María' },
-  ];
-  const grados: Grado[] = [
-    { id: 'grado-1', nombre: '5to A' },
-    { id: 'grado-2', nombre: '6to B' },
-  ];
-
-  const colegiosStub: Pick<
-    ColegiosService,
-    'obtenerColegios' | 'obtenerGradosPorColegio' | 'getColegios'
-  > = {
-    obtenerColegios: () => Promise.resolve(colegios),
-    obtenerGradosPorColegio: () => Promise.resolve(grados),
-    getColegios: () => colegios,
-  };
+  let servicioColegios: jasmine.SpyObj<ColegiosService>;
 
   beforeEach(async () => {
+    servicioColegios = jasmine.createSpyObj<ColegiosService>('ColegiosService', [
+      'obtenerColegiosDelTutor',
+      'obtenerGradosPorColegio',
+      'getColegios',
+    ]);
+    servicioColegios.obtenerColegiosDelTutor.and.resolveTo(ColegioMother.crearLista());
+    servicioColegios.obtenerGradosPorColegio.and.resolveTo(GradoMother.crearLista());
+    servicioColegios.getColegios.and.returnValue(ColegioMother.crearLista());
+
     await TestBed.configureTestingModule({
       imports: [CrearHijoPage],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         provideRouter([]),
-        { provide: ColegiosService, useValue: colegiosStub },
+        { provide: ColegiosService, useValue: servicioColegios },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(CrearHijoPage, {
+        remove: { imports: [NavbarComponent] },
+        add: { imports: [NavbarStub] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(CrearHijoPage);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('debería crear la página', () => {
+  it('dado que se monta la pagina, deberia crearse correctamente', () => {
+    whenMontoLaPagina();
+
     expect(component).toBeTruthy();
   });
 
-  it('debería mostrar el título de primer hijo cuando no hay alumnos', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Agregá a tu primer hijo');
+  it('dado que no hay alumnos cargados, cuando monto la pagina, deberia mostrar el titulo de primer hijo', () => {
+    whenMontoLaPagina();
+
+    thenElDomContieneTexto('Agregá a tu primer hijo');
   });
 
-  it('debería renderizar los campos requeridos del form', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('input[formControlName="nombre"]')).toBeTruthy();
-    expect(compiled.querySelector('input[formControlName="apellido"]')).toBeTruthy();
-    expect(compiled.querySelector('input[formControlName="username"]')).toBeTruthy();
-    expect(compiled.querySelector('input[formControlName="dni"]')).toBeTruthy();
-    expect(compiled.querySelector('input[formControlName="email"]')).toBeTruthy();
-    expect(compiled.querySelector('select[formControlName="colegioId"]')).toBeTruthy();
-    expect(compiled.querySelector('select[formControlName="gradoId"]')).toBeTruthy();
+  it('dado que monto la pagina, deberia renderizar todos los campos requeridos del form', () => {
+    whenMontoLaPagina();
+
+    thenElFormTieneCampo('input[formControlName="nombre"]');
+    thenElFormTieneCampo('input[formControlName="apellido"]');
+    thenElFormTieneCampo('input[formControlName="username"]');
+    thenElFormTieneCampo('input[formControlName="dni"]');
+    thenElFormTieneCampo('input[formControlName="email"]');
+    thenElFormTieneCampo('select[formControlName="colegioId"]');
+    thenElFormTieneCampo('select[formControlName="gradoId"]');
   });
 
-  it('debería cargar las opciones de colegio en el select tras el init', async () => {
+  it('dada la pagina ya inicializada, cuando termina el init, deberia cargar las opciones de colegio en el select', async () => {
+    whenMontoLaPagina();
+
+    await whenEsperoQueSeEstabilice();
+
+    thenElSelectColegioTieneOpciones(ColegioMother.crearLista().length);
+    thenLaPrimeraOpcionDelSelectColegioEs('Instituto San José');
+  });
+
+  it('dado un submit con form invalido, no deberia crear y deberia marcar los campos como touched', async () => {
+    whenMontoLaPagina();
+    await whenEsperoQueSeEstabilice();
+    const spyCrear = spyOn(component['presenter'], 'crear').and.resolveTo(undefined);
+
+    const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
+    form.dispatchEvent(new Event('submit'));
+    await fixture.whenStable();
+
+    expect(spyCrear).not.toHaveBeenCalled();
+    expect(component['form'].touched).toBeTrue();
+  });
+
+  it('dado alumnos ya cargados, cuando cancelo, deberia navegar a /tutor', async () => {
+    whenMontoLaPagina();
+    await whenEsperoQueSeEstabilice();
+    const alumnosService = TestBed.inject((await import('../../data-access/services/alumnos.service')).AlumnosService);
+    Object.defineProperty(alumnosService, 'alumnos', {
+      value: () => [{ id: '1' }],
+      configurable: true,
+    });
+    const router = TestBed.inject((await import('@angular/router')).Router);
+    const navSpy = spyOn(router, 'navigateByUrl');
+
+    (component as unknown as { onCancelar(): void }).onCancelar();
+
+    expect(navSpy).toHaveBeenCalledWith('/tutor');
+  });
+
+  it('dado un username con formato de email, deberia marcar el campo como invalido', async () => {
+    whenMontoLaPagina();
+
+    component['form'].controls.username.setValue('user@example.com');
+
+    expect(component['form'].controls.username.errors?.['emailFormat']).toBeTrue();
+  });
+
+  it('dado un username no-string, la funcion validadora deberia devolver null (safe)', () => {
+    whenMontoLaPagina();
+
+    component['form'].controls.username.setValue('   '); // se trimea a vacio -> null
+
+    expect(component['form'].controls.username.errors?.['emailFormat']).toBeUndefined();
+  });
+
+  function whenMontoLaPagina(): void {
+    fixture.detectChanges();
+  }
+
+  async function whenEsperoQueSeEstabilice(): Promise<void> {
     await fixture.whenStable();
     fixture.detectChanges();
+  }
 
+  function thenElDomContieneTexto(texto: string): void {
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(texto);
+  }
+
+  function thenElFormTieneCampo(selector: string): void {
+    expect((fixture.nativeElement as HTMLElement).querySelector(selector)).toBeTruthy();
+  }
+
+  function thenElSelectColegioTieneOpciones(cantidad: number): void {
     const opciones = (fixture.nativeElement as HTMLElement).querySelectorAll(
       'select[formControlName="colegioId"] option',
     );
-    expect(opciones.length).toBe(1 + colegios.length);
-    expect(opciones[1].textContent?.trim()).toBe('Instituto San José');
-  });
+    expect(opciones.length).toBe(1 + cantidad);
+  }
+
+  function thenLaPrimeraOpcionDelSelectColegioEs(texto: string): void {
+    const opciones = (fixture.nativeElement as HTMLElement).querySelectorAll(
+      'select[formControlName="colegioId"] option',
+    );
+    expect(opciones[1].textContent?.trim()).toBe(texto);
+  }
 });

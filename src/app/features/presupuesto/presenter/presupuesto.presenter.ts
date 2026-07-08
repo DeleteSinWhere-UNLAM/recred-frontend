@@ -120,7 +120,7 @@ export class PresupuestoPresenter {
       );
       this.prediccionState.set(prediccion);
     } catch (error) {
-      console.error('[Presupuesto] error cargando', error);
+      console.warn('[Presupuesto] error cargando', error);
       this.toastService.mostrar(
         'No pudimos cargar el presupuesto del alumno.',
         'error',
@@ -210,7 +210,7 @@ export class PresupuestoPresenter {
       this.presupuestoState.set(guardado);
       this.toastService.mostrar('Presupuesto guardado.', 'success');
     } catch (error) {
-      console.error('[Presupuesto] error guardando', error);
+      console.warn('[Presupuesto] error guardando', error);
       this.toastService.mostrar(
         'No pudimos guardar el presupuesto. Probá de nuevo.',
         'error',

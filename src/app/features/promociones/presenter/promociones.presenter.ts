@@ -3,17 +3,17 @@ import { PromotionService, Promotion } from '../../../data-access/services/promo
 import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { ProductService } from '../../updated-inventory/services/product.service';
-import { Product } from '../../updated-inventory/models/product.interface';
+import { ProductoService } from '../../inventario/services/producto.service';
+import { Producto } from '../../inventario/models/producto.interface';
 
 export interface PromotionWithProducts extends Promotion {
-  products: Product[];
+  products: Producto[];
 }
 
 @Injectable()
 export class PromocionesPagePresenter {
   private readonly promotionService = inject(PromotionService);
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(ProductoService);
   private readonly router = inject(Router);
   private readonly dialogService = inject(DialogService);
 
@@ -47,7 +47,7 @@ export class PromocionesPagePresenter {
     return Math.round(originalTotal * (1 - (promotion.discountPercentage || 0) / 100));
   }
 
-  getVisibleProducts(promotion: PromotionWithProducts): Product[] {
+  getVisibleProducts(promotion: PromotionWithProducts): Producto[] {
     return promotion.products.slice(0, 3);
   }
 
@@ -85,7 +85,8 @@ export class PromocionesPagePresenter {
       productIds: this.normalizeProductIds(promoRaw),
       startDate: this.sanitizeDate((promoRaw['startDate'] || promoRaw['start_date'] || promoRaw['fechaInicio'] || promoRaw['fecha_inicio'] || new Date().toISOString()) as string),
       endDate: this.sanitizeDate((promoRaw['endDate'] || promoRaw['end_date'] || promoRaw['fechaFin'] || promoRaw['fecha_fin'] || new Date().toISOString()) as string),
-      status: (promoRaw['status'] || promoRaw['estado'] || 'UNKNOWN') as string
+      status: (promoRaw['status'] || promoRaw['estado'] || 'UNKNOWN') as string,
+      imageUrl: (promoRaw['imageUrl'] || promoRaw['image_url'] || promoRaw['imagenUrl'] || promoRaw['imagen']) as string | undefined
     };
   }
 
@@ -114,7 +115,7 @@ export class PromocionesPagePresenter {
     );
   }
 
-  private resolveProducts(productIds: string[]): Observable<Product[]> {
+  private resolveProducts(productIds: string[]): Observable<Producto[]> {
     if (!productIds || productIds.length === 0) return of([]);
 
     return forkJoin(
@@ -128,7 +129,7 @@ export class PromocionesPagePresenter {
             peso: 0,
             requierePreparacion: false,
             stockActual: 0,
-          } as Product))
+          } as Producto))
         )
       )
     );
@@ -137,6 +138,10 @@ export class PromocionesPagePresenter {
   private sanitizeDate(d: string): string {
     if (!d) return '';
     return d.split('.')[0] + 'Z';
+  }
+
+  nuevaPromocion(): void {
+    this.router.navigateByUrl('/kiosquero/sugerencias');
   }
 
   volver(): void {
@@ -148,16 +153,13 @@ export class PromocionesPagePresenter {
     if (confirmed) {
       this.isLoadingState.set(true);
       this.promotionService.discardPromotion(id).pipe(
-        catchError(() => {
-          this.errorState.set('Error al eliminar la promoción.');
-          return of(null);
-        }),
         finalize(() => this.isLoadingState.set(false))
       ).subscribe({
-        next: (success) => {
-          if (success !== null) {
-            this.loadPromotions();
-          }
+        next: () => {
+          this.loadPromotions();
+        },
+        error: () => {
+          this.errorState.set('Error al eliminar la promoción.');
         }
       });
     }

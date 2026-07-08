@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { AlumnoSelector } from './alumno-selector';
 
 describe('AlumnoSelector', () => {
@@ -8,16 +7,22 @@ describe('AlumnoSelector', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AlumnoSelector]
-    })
-    .compileComponents();
+      imports: [AlumnoSelector],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AlumnoSelector);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('inicializacion', () => {
+    it('dado el componente, cuando se monta, deberia crearse', () => {
+      whenMonto();
+
+      expect(component).toBeTruthy();
+    });
   });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
 });

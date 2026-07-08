@@ -31,7 +31,7 @@ export class MovimientosPendientesPage {
   private readonly toastService = inject(ToastService);
   private readonly dialogService = inject(DialogService);
 
-  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
+  readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
   readonly nombreNavbar = this.usuarioService.nombreNavbar;
   readonly alumnoId = signal<string>('');
   readonly nombreAlumno = signal<string>('');

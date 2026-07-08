@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Movimiento } from '../../models/movimiento.model';
 import { PromotionService, Promotion } from '../../../../data-access/services/promociones/promotion.service';
-import { ProductService } from '../../../../features/updated-inventory/services/product.service';
-import { Product } from '../../../../features/updated-inventory/models/product.interface';
+import { ProductoService } from '../../../../features/inventario/services/producto.service';
+import { Producto } from '../../../../features/inventario/models/producto.interface';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -14,9 +14,9 @@ import { catchError } from 'rxjs/operators';
 })
 export class MovimientoDetalleModalComponent {
   private readonly promotionService = inject(PromotionService);
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(ProductoService);
 
-  promosLoaded = new Map<string, { promotion: Promotion | null; products: Product[]; loading: boolean; error: boolean }>();
+  promosLoaded = new Map<string, { promotion: Promotion | null; products: Producto[]; loading: boolean; error: boolean }>();
   expandedPromos = new Set<string>();
 
   esPromocion(nombre: string): boolean {
@@ -129,8 +129,20 @@ export class MovimientoDetalleModalComponent {
     return diffMs <= oneHourMs;
   }
 
+  estaCancelado(): boolean {
+    return !this.esVistaAlumno &&
+           this.movimiento.tipo === 'ANTICIPADA' &&
+           this.movimiento.status === 'CANCELADO';
+  }
+
   onCancelar(): void {
     this.cancelar.emit(this.movimiento.id);
+  }
+
+  @Output() revertirCancelacion = new EventEmitter<string>();
+
+  onRevertirCancelacion(): void {
+    this.revertirCancelacion.emit(this.movimiento.id);
   }
 
   onOverlayClick(event: MouseEvent): void {

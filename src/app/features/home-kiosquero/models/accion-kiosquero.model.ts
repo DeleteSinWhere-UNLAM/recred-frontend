@@ -6,11 +6,13 @@ export type AccionKiosqueroId =
   | 'cierre-diario'
   | 'reportes'
   | 'stock'
+  | 'inteligencia-comercial'
   | 'sugerencias'
   | 'recomendaciones'
   | 'recomendaciones-estacionales'
   | 'oportunidades-stock'
-  | 'promociones';
+  | 'promociones'
+  | 'proveedores';
 
 export type AccionKiosqueroColor =
   | 'pizarra'
@@ -18,6 +20,8 @@ export type AccionKiosqueroColor =
   | 'dorado'
   | 'melocoton'
   | 'violeta';
+
+export type PlanRequeridoAccion = 'INTERMEDIO' | 'AVANZADO';
 
 export interface AccionKiosquero {
   id: AccionKiosqueroId;
@@ -28,4 +32,5 @@ export interface AccionKiosquero {
   color?: AccionKiosqueroColor;
   destacada?: boolean;
   premium?: boolean;
+  planRequerido?: PlanRequeridoAccion;
 }

@@ -71,6 +71,14 @@
   box-shadow: 0 8px 18px rgba(74, 111, 165, 0.12);
 }
 
+.mensaje-burbuja__comprobante--cancelado {
+  border-color: color-mix(in srgb, var(--color-melocoton) 46%, var(--color-borde));
+}
+
+.mensaje-burbuja__comprobante--cancelado .mensaje-burbuja__comprobante-header strong {
+  color: var(--color-melocoton);
+}
+
 .mensaje-burbuja__comprobante-header {
   display: flex;
   align-items: center;

@@ -1,0 +1,248 @@
+<app-navbar [userName]="nombreKiosquero()" />
+
+<main class="comp-container" [class.has-results]="recommendations().length > 0">
+  <header class="comp-header">
+    <button class="back-btn" (click)="volver()" aria-label="Volver a proveedores">
+      <i class="fa-solid fa-arrow-left"></i> Volver a Proveedores
+    </button>
+    <h1 class="comp-title">Comparador de Precios & Recomendación</h1>
+    <p class="comp-subtitle">Seleccioná los productos de tu buffet para comparar los costos de tus proveedores
+      y recomendar la opción más económica calculada por unidad.</p>
+  </header>
+
+  <!-- Filters Section -->
+  <section class="filters-section">
+    <div class="filters-header-row">
+      <h2 class="section-title">Productos en Inventario</h2>
+      
+      <!-- Filters Row containing inputs, selectors, and quick selection buttons inline -->
+      <div class="products-filters-row">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-box__icon"></i>
+          <input type="text" placeholder="Buscar por nombre..." 
+                 [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" 
+                 class="search-box__input" />
+        </div>
+        <div class="filters-right-group">
+          <div class="category-box">
+            <select [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event)" 
+                    class="category-box__select">
+              <option value="TODAS">Todas las categorías</option>
+              @for (cat of categories(); track cat.id) {
+                <option [value]="cat.id">{{ cat.desc }}</option>
+              }
+            </select>
+          </div>
+          <div class="category-box">
+            <select [ngModel]="mappedFilter()" (ngModelChange)="mappedFilter.set($event)" 
+                    class="category-box__select">
+              <option value="TODOS">Todos los productos</option>
+              <option value="MAPEADOS">Solo Mapeados</option>
+            </select>
+          </div>
+          <button class="select-helper select-helper--stock" (click)="selectAllLowStock()">
+            <i class="fa-solid fa-triangle-exclamation"></i> Bajo Stock
+          </button>
+          <button class="select-helper select-helper--small" (click)="selectAll()">Todos</button>
+          <button class="select-helper select-helper--small" (click)="clearSelection()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Row: Cotizar Compra (Left) and Compras Sugeridas (Right) at the same level -->
+  <div class="top-row">
+    <!-- Left Column: Cotizar Compra Horizontal Card -->
+    <div class="comparison-card">
+      <div class="comparison-card__info">
+        <h3 class="comparison-card__title">Cotizar Compra</h3>
+        <p class="comparison-card__description">Se compararán las listas de precios activas cargadas de tus proveedores.</p>
+      </div>
+
+      <div class="comparison-card__actions">
+        <div class="comparison-status">
+          <span class="status-metric__label">Seleccionados</span>
+          <strong class="status-metric__value">{{ selectedProductIds().size }}</strong>
+        </div>
+
+        <button class="quote-btn" [disabled]="selectedProductIds().size === 0 || isFetchingRecommendations()"
+          (click)="getRecommendations()">
+          @if (isFetchingRecommendations()) {
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Buscando Ofertas...
+          } @else {
+          <i class="fa-solid fa-calculator"></i> Obtener Mejor Oferta
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column: Export Sugerencias Actions Card -->
+    <div class="recommendations-actions-wrapper">
+      @if (recommendations().length > 0) {
+      <div class="recommendations-actions-card">
+        <div class="results-header-row">
+          <h2 class="results-title"><i class="fa-solid fa-square-poll-vertical"></i> Compras Sugeridas</h2>
+          <div class="export-buttons">
+            <button class="export-btn export-btn--excel" (click)="exportToCsv()" title="Exportar a Excel (CSV)">
+              <i class="fa-solid fa-file-excel"></i> Excel
+            </button>
+            <button class="export-btn export-btn--pdf" (click)="exportToPdf()" title="Exportar a PDF">
+              <i class="fa-solid fa-file-pdf"></i> PDF
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Loading / Empty States -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
+    <p>Cargando catálogo del buffet...</p>
+  </div>
+  }
+
+  @if (!isLoading() && products().length === 0) {
+  <div class="empty-state">
+    <i class="fa-solid fa-box-open empty-state__icon"></i>
+    <h3 class="empty-state__title">Sin productos</h3>
+    <p class="empty-state__text">No tenés productos cargados en tu inventario. Registrá productos en el inventario
+      para poder compararlos.</p>
+  </div>
+  }
+
+  @if (!isLoading() && products().length > 0 && filteredProducts().length === 0) {
+  <div class="empty-state">
+    <i class="fa-solid fa-magnifying-glass empty-state__icon"></i>
+    <h3 class="empty-state__title">Sin coincidencias</h3>
+    <p class="empty-state__text">No hay productos que coincidan con la búsqueda o filtro seleccionados.</p>
+  </div>
+  }
+
+  <!-- Bottom Section: The horizontally aligned product and price columns -->
+  @if (!isLoading() && filteredProducts().length > 0) {
+  <div class="comparison-grid">
+    @for (prod of filteredProducts(); track prod.id) {
+    <div class="comparison-row">
+      <!-- Left Column: Product Selector Card -->
+      <article class="product-item" [class.product-item--selected]="isProductSelected(prod.id)"
+        [class.product-item--disabled]="!isProductMapped(prod.id)"
+        (click)="isProductMapped(prod.id) && toggleProductSelection(prod.id)" tabindex="0" 
+        (keydown.enter)="isProductMapped(prod.id) && toggleProductSelection(prod.id)">
+        <div class="product-item__left">
+          <input type="checkbox" [checked]="isProductSelected(prod.id)"
+            [disabled]="!isProductMapped(prod.id)"
+            (click)="$event.stopPropagation()"
+            (change)="toggleProductSelection(prod.id)" class="product-checkbox" />
+          <div class="product-info-block">
+            <span class="product-item__name">{{ prod.nombre }}</span>
+            <div class="product-meta-row">
+              <span class="product-item__stock" [class.product-item__stock--critical]="isLowStock(prod)">
+                Stock: {{ prod.stockActual }} un.
+              </span>
+              @if (isLowStock(prod)) {
+              <span class="badge-critical"><i class="fa-solid fa-triangle-exclamation"></i> Bajo Stock</span>
+              }
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Right Column: Pricing Card (Separate, Aligned) -->
+      @if (hasRecommendation(prod.id)) {
+        <article class="price-item">
+          <div class="pricing-details">
+            <div class="pricing-supplier">
+              <span class="supplier-badge"><i class="fa-solid fa-truck-field"></i> {{ getChosenSupplierName(prod.id) }}</span>
+            </div>
+            <div class="pricing-amounts">
+              <strong class="pricing-total-price">
+                {{ getChosenPrice(prod.id) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}
+              </strong>
+              <span class="pricing-unit">/ {{ getChosenUnit(prod.id) }}</span>
+              @if (hasChosenEquivalent(prod.id)) {
+                <span class="pricing-equivalent">
+                  (Equivale a <strong>{{ getChosenUnitPrice(prod.id) | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</strong>/un.)
+                </span>
+              }
+            </div>
+          </div>
+
+          <!-- Ver alternativas Button -->
+          @if (hasAlternatives(prod.id)) {
+            <button class="btn-alternatives" (click)="openAlternativesModal(prod.id, $event)" title="Ver otras alternativas de precio">
+              Ver alternativas <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          }
+        </article>
+      } @else if (hasNoQuote(prod.id)) {
+        <article class="price-item price-item--unquoted">
+          <span class="badge-unquoted-small"><i class="fa-solid fa-triangle-exclamation"></i> Sin cotización</span>
+        </article>
+      } @else {
+        <!-- Placeholder to maintain two column structure before comparison is fetched -->
+        <div class="price-item-placeholder"></div>
+      }
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Alternatives Modal -->
+  @if (isAlternativesModalOpen() && activeAlternativesProductId()) {
+  <div class="modal-overlay" (click)="closeAlternativesModal($event)" (keydown.enter)="closeAlternativesModal($event)" tabindex="0" role="button" aria-label="Cerrar modal">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 class="modal-title">Alternativas para {{ getActiveProductName() }}</h3>
+        <button class="modal-close-btn" (click)="closeAlternativesModal()" aria-label="Cerrar modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+
+      <div class="modal-body">
+        <p class="modal-description">Elegí la oferta de proveedor que preferís para esta compra:</p>
+        
+        <div class="options-list">
+          @for (opt of getAllOptionsForProduct(activeAlternativesProductId()!); track opt.proveedorId) {
+            <div class="option-item" [class.option-item--chosen]="isCurrentChosenOption(activeAlternativesProductId()!, opt)">
+              <div class="option-info">
+                <div class="option-supplier">
+                  <strong class="option-supplier-name">{{ opt.nombreProveedor }}</strong>
+                  @if (opt.isRecommended) {
+                    <span class="badge-recommended"><i class="fa-solid fa-medal"></i> Recomendado</span>
+                  }
+                  @if (isCurrentChosenOption(activeAlternativesProductId()!, opt)) {
+                    <span class="badge-chosen"><i class="fa-solid fa-circle-check"></i> Seleccionado</span>
+                  }
+                </div>
+                <div class="option-pricing">
+                  <span class="option-price">{{ opt.precio | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</span>
+                  <small class="option-unit">/ {{ opt.unidad }}</small>
+                  @if (opt.precioUnitario && opt.precioUnitario !== opt.precio) {
+                    <span class="option-equivalent">
+                      (Equivale a <strong>{{ opt.precioUnitario | currency: 'ARS': 'symbol-narrow': '1.0-0' }}</strong> / un.)
+                    </span>
+                  }
+                </div>
+              </div>
+              <div class="option-actions">
+                @if (isCurrentChosenOption(activeAlternativesProductId()!, opt)) {
+                  <button class="btn-choose btn-choose--selected" disabled>
+                    Seleccionado
+                  </button>
+                } @else {
+                  <button class="btn-choose" (click)="chooseAlternative(activeAlternativesProductId()!, opt)">
+                    Elegir
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</main>

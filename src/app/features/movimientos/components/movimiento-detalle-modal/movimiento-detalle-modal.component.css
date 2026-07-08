@@ -307,42 +307,47 @@
   gap: 4px;
 }
 
+.mov-modal__header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .mov-modal__header-badge {
-  font-size: 0.72rem;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  padding: 4px 8px;
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
-  width: fit-content;
   letter-spacing: 0.5px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mov-modal__header-badge[data-status="CONFIRMADO"],
 .mov-modal__header-badge[data-status="PENDIENTE"] {
-  background-color: rgba(74, 111, 165, 0.12);
-  color: #4a6fa5;
+  background-color: #ffedd5;
+  color: #c2410c;
 }
 
 .mov-modal__header-badge[data-status="EN_PREPARACION"],
 .mov-modal__header-badge[data-status="PREPARANDO"] {
-  background-color: rgba(242, 183, 5, 0.12);
-  color: var(--color-dorado-dark);
+  background-color: #ffedd5;
+  color: #c2410c;
 }
 
-.mov-modal__header-badge[data-status="LISTO"] {
-  background-color: rgba(129, 178, 154, 0.12);
-  color: var(--color-menta);
+.mov-modal__header-badge[data-status="LISTO"],
+.mov-modal__header-badge[data-status="ENTREGADO"],
+.mov-modal__header-badge[data-status="APPROVED"] {
+  background-color: #d1fae5;
+  color: #0f766e;
 }
 
-.mov-modal__header-badge[data-status="ENTREGADO"] {
-  background-color: rgba(129, 178, 154, 0.2);
-  color: var(--color-menta);
-}
-
-.mov-modal__header-badge[data-status="CANCELADO"] {
-  background-color: rgba(231, 111, 81, 0.12);
-  color: var(--color-melocoton);
+.mov-modal__header-badge[data-status="CANCELADO"],
+.mov-modal__header-badge[data-status="REJECTED"] {
+  background-color: #fee2e2;
+  color: #b91c1c;
 }
 
 .mov-modal__section-titulo-pedido {

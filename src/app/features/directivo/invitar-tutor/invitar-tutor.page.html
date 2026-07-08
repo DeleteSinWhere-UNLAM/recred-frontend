@@ -1,0 +1,112 @@
+<app-navbar></app-navbar>
+
+<div class="page">
+  <div class="page__container">
+    <header class="page__header">
+      <button type="button" class="page__back" (click)="presenter.volver()">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver al panel</span>
+      </button>
+      <h1>Invitar tutor</h1>
+      <p class="page__subtitle">
+        El tutor recibirá un mail con un link único para asociarse a tu colegio.
+      </p>
+    </header>
+
+    @if (presenter.resultado(); as resultado) {
+      <section class="card card--resultado">
+        @switch (resultado.result) {
+          @case ('CREATED') {
+            <h2><i class="fa-solid fa-circle-check"></i> Invitación enviada</h2>
+            <p>Le enviamos un mail a <strong>{{ resultado.email }}</strong> con el link para asociarse a {{ resultado.schoolName }}.</p>
+          }
+          @case ('RESENT') {
+            <h2><i class="fa-solid fa-rotate"></i> Invitación reenviada</h2>
+            <p>Actualizamos la invitación existente para <strong>{{ resultado.email }}</strong> y regeneramos el link.</p>
+          }
+          @case ('ALREADY_ASSOCIATED') {
+            <h2><i class="fa-solid fa-circle-info"></i> Ya está asociado</h2>
+            <p>El tutor <strong>{{ resultado.email }}</strong> ya pertenece a tu colegio activamente.</p>
+          }
+          @case ('CREATED_EMAIL_ERROR') {
+            <h2><i class="fa-solid fa-triangle-exclamation"></i> Invitación creada, mail no enviado</h2>
+            <p>Se creó la invitación para <strong>{{ resultado.email }}</strong> pero falló el envío del mail. Podés compartir el link manualmente.</p>
+          }
+          @case ('RESENT_EMAIL_ERROR') {
+            <h2><i class="fa-solid fa-triangle-exclamation"></i> Invitación actualizada, mail no enviado</h2>
+            <p>Se actualizó la invitación pero falló el envío del mail. Podés compartir el link manualmente.</p>
+          }
+          @default {
+            <h2>Invitación procesada</h2>
+            <p>{{ resultado.email }}</p>
+          }
+        }
+
+        @if (resultado.invitationLink) {
+          <div class="link-box">
+            <label for="invitation-link">Link de invitación</label>
+            <input id="invitation-link" type="text" [value]="resultado.invitationLink" readonly />
+          </div>
+        }
+
+        <div class="card__actions">
+          <button type="button" class="btn btn--secondary" (click)="presenter.volver()">
+            Volver al panel
+          </button>
+          <button type="button" class="btn btn--primary" (click)="invitarOtro()">
+            Invitar otro tutor
+          </button>
+        </div>
+      </section>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit($event)" class="card card--form">
+        @if (presenter.error(); as error) {
+          <div class="alert alert--error" role="alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>{{ error }}</span>
+          </div>
+        }
+
+        <div class="form-group">
+          <label for="email">Email del tutor *</label>
+          <input id="email" type="email" formControlName="email" placeholder="tutor@ejemplo.com" autocomplete="off" />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <span class="form-group__error">
+              @if (form.controls.email.hasError('required')) {
+                Ingresá el email del tutor.
+              } @else {
+                Formato de email inválido.
+              }
+            </span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">Nombre (opcional)</label>
+            <input id="firstName" type="text" formControlName="firstName" />
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Apellido (opcional)</label>
+            <input id="lastName" type="text" formControlName="lastName" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Teléfono (opcional)</label>
+          <input id="phone" type="tel" formControlName="phone" placeholder="1122334455" />
+        </div>
+
+        <div class="card__actions">
+          <button type="button" class="btn btn--secondary" (click)="presenter.volver()" [disabled]="presenter.loading()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn--primary" [disabled]="presenter.loading()">
+            {{ presenter.loading() ? 'Enviando...' : 'Enviar invitación' }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

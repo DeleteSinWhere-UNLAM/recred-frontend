@@ -1,4 +1,4 @@
-import { Injectable, computed, signal, inject } from '@angular/core';
+import { Injectable, computed, signal, inject, effect } from '@angular/core';
 import { Producto } from '../../buffet/models/producto.model';
 import { ItemCarrito } from '../models/carrito.model';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
@@ -26,6 +26,22 @@ export class CarritoService {
   private readonly purchasesState = signal<Map<string, Movimiento[]>>(new Map());
   private readonly seleccionRetiroState = signal<Record<string, SeleccionRetiro>>({});
   private catalog: Producto[] = [];
+
+  constructor() {
+    const guardado = localStorage.getItem('recred_carrito_items');
+    if (guardado) {
+      try {
+        this.itemsState.set(JSON.parse(guardado));
+      } catch (e) {
+        console.error('Error parseando carrito', e);
+      }
+    }
+
+    effect(() => {
+      localStorage.setItem('recred_carrito_items', JSON.stringify(this.itemsState()));
+    });
+  }
+
 
   readonly items = this.itemsState.asReadonly();
   readonly budgets = this.budgetsState.asReadonly();
@@ -115,6 +131,18 @@ export class CarritoService {
     this.itemsState.update((items) =>
       items.map((i) => (i.id === itemId ? { ...i, cantidad } : i)),
     );
+  }
+
+  setCantidadPorProducto(producto: Producto, alumnoId: string, cantidad: number): void {
+    const itemExistente = this.itemsState().find(
+      (i) => i.producto.id === producto.id && i.alumnoId === alumnoId
+    );
+
+    if (itemExistente) {
+      this.setCantidad(itemExistente.id, cantidad);
+    } else if (cantidad > 0) {
+      this.agregar(producto, alumnoId, cantidad);
+    }
   }
 
   cambiarCantidad(itemId: string, delta: number): void {
@@ -301,7 +329,7 @@ export class CarritoService {
     console.log('[DEBUG validarAgregar] Matched rule for category:', producto.categoria.id, rule);
     if (rule) {
       const totalCategory = spentPastCategory + spentCartCategory + additionalCost;
-      console.log('[DEBUG validarAgregar] Category cost check:', {
+      console.log('[DEBUG validarAgregar] Categoria cost check:', {
         spentPastCategory,
         spentCartCategory,
         additionalCost,
@@ -321,3 +349,4 @@ export class CarritoService {
     return this.validarAgregar(producto, alumnoId, cantidadAdicional).permitido;
   }
 }
+

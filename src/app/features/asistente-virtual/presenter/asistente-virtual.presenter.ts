@@ -1,6 +1,7 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
+import { ToastService } from '../../../shared/services/toast.service';
 import { HomeAlumnoService } from '../../home-alumno/services/home-alumno.service';
 import {
   SUGERENCIAS_ASISTENTE_POR_ROL,
@@ -10,8 +11,14 @@ import {
 import { MensajeAsistente } from '../models/mensaje-asistente.model';
 import {
   AccionAsistente,
+  ESTADO_COMPRA_CANCELADO,
+  ESTADO_ESPERANDO_FECHA,
+  EstadoAccionAsistente,
+  INPUT_FECHA_RETIRO,
+  InputRequeridoAsistente,
   RespuestaAsistente,
   SugerenciaRespuestaAsistente,
+  TIPO_ACCION_CANCELACION_COMPRA,
 } from '../models/respuesta-asistente.model';
 import {
   MensajeAsistenteResponse,
@@ -28,6 +35,8 @@ const MENSAJES_BIENVENIDA: Record<RolUsuario, string> = {
     'Hola. Soy Recredito. Puedo ayudarte con hijos, presupuestos, restricciones y eventos.',
   VENDEDOR:
     'Hola. Soy Recredito. Puedo ayudarte con stock, ventas, productos y pedidos del buffet.',
+  ADMIN: 'Hola. Soy Recredito. En que te puedo ayudar?',
+  DIRECTIVO_COLEGIO: 'Hola. Soy Recredito. En que te puedo ayudar?',
 };
 
 const MENSAJE_BIENVENIDA_DEFAULT = 'Hola. Soy Recredito. En que te puedo ayudar?';
@@ -36,12 +45,15 @@ const MENSAJE_ERROR =
 const ESTADO_ESPERANDO_RECREO = 'ESPERANDO_RECREO';
 const ESTADO_ESPERANDO_CONFIRMACION = 'ESPERANDO_CONFIRMACION';
 const ESTADO_EJECUTADA = 'EJECUTADA';
+type PlanAsistente = 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO';
+type PlanAsistenteRequerido = Exclude<PlanAsistente, 'GRATUITO'>;
 
 @Injectable()
 export class AsistenteVirtualPresenter {
   private readonly perfilService = inject(PerfilService);
   private readonly asistenteService = inject(AsistenteVirtualService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
+  private readonly toastService = inject(ToastService);
 
   private readonly abiertoState = signal(false);
   private readonly mensajesState = signal<MensajeAsistente[]>([]);
@@ -70,22 +82,39 @@ export class AsistenteVirtualPresenter {
       !this.historialVisibleState() &&
       !this.tieneAccionInteractiva(),
   );
+  readonly asistenteBloqueado: Signal<boolean> = computed(() =>
+    this.planBloqueadoParaRol('INTERMEDIO'),
+  );
   readonly opcionesDisponibles: Signal<readonly SugerenciaCapacidad[]> =
     computed(() => {
       const rol = this.perfilService.rol();
-      return rol ? SUGERENCIAS_ASISTENTE_POR_ROL[rol] : [];
+      const opciones = rol ? SUGERENCIAS_ASISTENTE_POR_ROL[rol] : [];
+      return opciones.map((opcion) =>
+        opcion.premium
+          ? {
+              ...opcion,
+              planRequerido: 'AVANZADO',
+              bloqueada: this.planBloqueadoParaRol('AVANZADO'),
+            }
+          : opcion,
+      );
     });
 
   readonly sugerencias: Signal<readonly SugerenciaCapacidad[]> = computed(() => {
     const accion = this.accionState();
     const sugerenciasBackend = this.sugerenciasBackendState();
+    const estadoAccion = this.estadoAccion(accion);
 
-    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
-      return SUGERENCIAS_COMPRA_PENDIENTE;
+    if (estadoAccion === ESTADO_ESPERANDO_CONFIRMACION) {
+      return this.sugerenciasCompraPendiente();
     }
 
-    if (accion?.estado === ESTADO_ESPERANDO_RECREO) {
+    if (estadoAccion === ESTADO_ESPERANDO_RECREO) {
       return sugerenciasBackend;
+    }
+
+    if (this.requiereFechaRetiro()) {
+      return [];
     }
 
     if (sugerenciasBackend.length > 0) {
@@ -94,8 +123,23 @@ export class AsistenteVirtualPresenter {
 
     return [];
   });
+  readonly requiereFechaRetiro: Signal<boolean> = computed(() => {
+    const accion = this.accionState();
+    return (
+      this.estadoAccion(accion) === ESTADO_ESPERANDO_FECHA &&
+      this.inputsAccion(accion).includes(INPUT_FECHA_RETIRO)
+    );
+  });
+  readonly fechaRetiroMinima: Signal<string> = computed(() =>
+    this.formatearFechaInput(new Date()),
+  );
 
   abrir(): void {
+    if (this.asistenteBloqueado()) {
+      this.mostrarBloqueo('INTERMEDIO');
+      return;
+    }
+
     this.asegurarBienvenida();
     this.abiertoState.set(true);
     void this.revisarUltimaSesion();
@@ -116,6 +160,14 @@ export class AsistenteVirtualPresenter {
   async enviar(texto: string): Promise<void> {
     const limpio = texto.trim();
     if (!limpio || this.procesando()) return;
+    if (this.asistenteBloqueado()) {
+      this.mostrarBloqueo('INTERMEDIO');
+      return;
+    }
+    if (this.confirmacionCompraIaBloqueada(limpio)) {
+      this.mostrarBloqueo('AVANZADO');
+      return;
+    }
 
     this.mensajesState.update((lista) => [
       ...lista,
@@ -144,14 +196,14 @@ export class AsistenteVirtualPresenter {
         this.sesionIdState.set(sesionIdRespuesta);
       }
 
-      this.aplicarEstadoRespuesta(respuesta);
+      const accion = this.aplicarEstadoRespuesta(respuesta);
       this.mensajesState.update((lista) => [
         ...lista,
         this.crearMensajeCred(
           respuesta.respuesta,
           respuesta.generadoPorIa ?? false,
           respuesta.fechaHora,
-          respuesta.accion ?? null,
+          accion,
         ),
       ]);
     } catch (err) {
@@ -169,8 +221,14 @@ export class AsistenteVirtualPresenter {
     return this.enviar(prompt);
   }
 
+  enviarFechaRetiro(fechaInput: string): Promise<void> {
+    const mensaje = this.formatearMensajeFechaRetiro(fechaInput);
+    return mensaje ? this.enviar(mensaje) : Promise.resolve();
+  }
+
   async nuevaConversacion(): Promise<void> {
     if (this.procesando()) return;
+    if (this.asistenteBloqueado()) return;
 
     const contexto = this.obtenerContexto();
     const sesionId = this.sesionIdState();
@@ -192,6 +250,7 @@ export class AsistenteVirtualPresenter {
 
   async verMensajesAnteriores(): Promise<void> {
     if (this.procesando() || !this.puedeVerHistorial()) return;
+    if (this.asistenteBloqueado()) return;
 
     const contexto = this.obtenerContexto();
     const sesionId = this.sesionHistorialState();
@@ -222,6 +281,8 @@ export class AsistenteVirtualPresenter {
   }
 
   private async revisarUltimaSesion(): Promise<void> {
+    if (this.asistenteBloqueado()) return;
+
     if (
       this.historialRevisadoState() ||
       this.cargandoHistorialState() ||
@@ -274,6 +335,65 @@ export class AsistenteVirtualPresenter {
     return ultima ?? null;
   }
 
+  private sugerenciasCompraPendiente(): readonly SugerenciaCapacidad[] {
+    if (this.perfilService.rol() !== 'ALUMNO') {
+      return SUGERENCIAS_COMPRA_PENDIENTE;
+    }
+
+    return SUGERENCIAS_COMPRA_PENDIENTE.map((sugerencia) =>
+      sugerencia.tipo === 'confirmacion'
+        ? {
+            ...sugerencia,
+            premium: true,
+            planRequerido: 'AVANZADO',
+            bloqueada: this.planBloqueadoParaRol('AVANZADO'),
+          }
+        : sugerencia,
+    );
+  }
+
+  private confirmacionCompraIaBloqueada(texto: string): boolean {
+    if (this.perfilService.rol() !== 'ALUMNO') return false;
+    if (this.estadoAccion(this.accionState()) !== ESTADO_ESPERANDO_CONFIRMACION) {
+      return false;
+    }
+    if (!this.planBloqueadoParaRol('AVANZADO')) return false;
+
+    const normalizado = texto
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+    return ['confirmar', 'si', 'comprar', 'aceptar'].includes(normalizado);
+  }
+
+  private planBloqueadoParaRol(planRequerido: PlanAsistenteRequerido): boolean {
+    const perfil = this.perfilService.getPerfil();
+    const rol = perfil?.rol ?? this.perfilService.rol();
+    if (!perfil) return false;
+    if (rol !== 'PADRE' && rol !== 'ALUMNO' && rol !== 'VENDEDOR') {
+      return false;
+    }
+
+    return this.nivelPlan(this.normalizarPlan(perfil.plan)) < this.nivelPlan(planRequerido);
+  }
+
+  private normalizarPlan(planActual: string | undefined): PlanAsistente {
+    const plan = planActual?.toUpperCase();
+    if (plan === 'INTERMEDIO' || plan === 'AVANZADO') return plan;
+    return 'GRATUITO';
+  }
+
+  private nivelPlan(plan: PlanAsistente): number {
+    if (plan === 'AVANZADO') return 2;
+    if (plan === 'INTERMEDIO') return 1;
+    return 0;
+  }
+
+  private mostrarBloqueo(planRequerido: PlanAsistenteRequerido): void {
+    const label = planRequerido === 'AVANZADO' ? 'Avanzado' : 'Intermedio';
+    this.toastService.mostrar(`Disponible con plan ${label}.`, 'info');
+  }
+
   private obtenerContexto(): ContextoAsistente | null {
     const perfil = this.perfilService.getPerfil();
     if (!perfil) return null;
@@ -291,27 +411,30 @@ export class AsistenteVirtualPresenter {
     return rol ? MENSAJES_BIENVENIDA[rol] : MENSAJE_BIENVENIDA_DEFAULT;
   }
 
-  private aplicarEstadoRespuesta(respuesta: RespuestaAsistente): void {
-    const accion = respuesta.accion ?? null;
+  private aplicarEstadoRespuesta(respuesta: RespuestaAsistente): AccionAsistente | null {
+    const accion = this.obtenerAccionRespuesta(respuesta);
     const sugerenciasBackend = this.mapearSugerenciasBackend(
       respuesta.sugerencias,
     );
+    const estadoAccion = this.estadoAccion(accion);
 
     this.accionState.set(accion);
 
-    if (accion?.estado === ESTADO_ESPERANDO_CONFIRMACION) {
+    if (estadoAccion === ESTADO_ESPERANDO_CONFIRMACION) {
       this.sugerenciasBackendState.set([]);
-      return;
+      return accion;
     }
 
     this.sugerenciasBackendState.set(sugerenciasBackend);
 
-    if (accion?.estado === ESTADO_EJECUTADA) {
+    if (accion && estadoAccion === ESTADO_EJECUTADA) {
       this.refrescarPedidoAlumnoSiAplica();
-      if (accion.compraId) {
+      if (accion.compraId && !this.esCancelacionCompra(accion)) {
         this.reproducirSonidoExito();
       }
     }
+
+    return accion;
   }
 
   private reproducirSonidoExito(): void {
@@ -325,6 +448,31 @@ export class AsistenteVirtualPresenter {
     const alumnoId = this.perfilService.obtenerAlumnoId();
     if (!alumnoId) return;
     void this.homeAlumnoService.cargarPedidoEnCurso(alumnoId);
+  }
+
+  private esCancelacionCompra(accion: AccionAsistente): boolean {
+    return (
+      accion.tipo === TIPO_ACCION_CANCELACION_COMPRA ||
+      accion.estadoCompra === ESTADO_COMPRA_CANCELADO
+    );
+  }
+
+  private obtenerAccionRespuesta(
+    respuesta: RespuestaAsistente,
+  ): AccionAsistente | null {
+    return respuesta.accion ?? respuesta.action ?? null;
+  }
+
+  private estadoAccion(
+    accion: AccionAsistente | null | undefined,
+  ): EstadoAccionAsistente | null {
+    return accion?.estado ?? accion?.status ?? null;
+  }
+
+  private inputsAccion(
+    accion: AccionAsistente | null | undefined,
+  ): readonly InputRequeridoAsistente[] {
+    return accion?.inputsRequeridos ?? accion?.requiredInputs ?? [];
   }
 
   private mapearSugerenciasBackend(
@@ -345,10 +493,11 @@ export class AsistenteVirtualPresenter {
   }
 
   private tieneAccionInteractiva(): boolean {
-    const estado = this.accionState()?.estado;
+    const estado = this.estadoAccion(this.accionState());
     return (
       estado === ESTADO_ESPERANDO_RECREO ||
-      estado === ESTADO_ESPERANDO_CONFIRMACION
+      estado === ESTADO_ESPERANDO_CONFIRMACION ||
+      estado === ESTADO_ESPERANDO_FECHA
     );
   }
 
@@ -426,5 +575,33 @@ export class AsistenteVirtualPresenter {
 
   private crearId(): string {
     return globalThis.crypto?.randomUUID?.() ?? `msg-${Date.now()}`;
+  }
+
+  private formatearFechaInput(fecha: Date): string {
+    const year = fecha.getFullYear();
+    const month = String(fecha.getMonth() + 1).padStart(2, '0');
+    const day = String(fecha.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatearMensajeFechaRetiro(fechaInput: string): string | null {
+    const limpia = fechaInput.trim();
+    if (!limpia) return null;
+
+    const partesInput = /^(\d{4})-(\d{2})-(\d{2})$/.exec(limpia);
+    if (partesInput) {
+      const [, year, month, day] = partesInput;
+      return `para el ${day}/${month}/${year}`;
+    }
+
+    if (/^\d{2}\/\d{2}(\/\d{4})?$/.test(limpia)) {
+      return `para el ${limpia}`;
+    }
+
+    if (/^para el \d{2}\/\d{2}(\/\d{4})?$/i.test(limpia)) {
+      return limpia;
+    }
+
+    return null;
   }
 }

@@ -30,6 +30,13 @@ interface DatosUsuarioActualizados {
   readonly phone?: string | null;
   readonly documentNumber?: string | null;
   readonly urlFotoPerfil?: string | null;
+  readonly fechaVencimientoPlan?: string | null;
+  readonly colegioId?: string | null;
+  readonly schoolId?: string | null;
+  readonly estadoLicenciaColegio?: string | null;
+  readonly fechaVencimientoLicenciaColegio?: string | null;
+  readonly fechaVencimientoLicencia?: string | null;
+  readonly fechaVencimientoSuscripcionColegio?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -46,7 +53,10 @@ export class PerfilService {
     () => this.perfilState()?.rol ?? null,
   );
   readonly esPlanGratuito: Signal<boolean> = computed(
-    () => this.perfilState()?.plan !== 'PREMIUM',
+    () => {
+      const plan = this.perfilState()?.plan?.toUpperCase();
+      return plan !== 'INTERMEDIO' && plan !== 'AVANZADO';
+    },
   );
 
   async cargarPerfil(): Promise<Perfil> {
@@ -93,6 +103,28 @@ export class PerfilService {
       phone: datos.phone ?? perfil.phone,
       documentNumber: datos.documentNumber ?? perfil.documentNumber,
       urlFotoPerfil: datos.urlFotoPerfil ?? perfil.urlFotoPerfil,
+      colegioId: datos.colegioId ?? perfil.colegioId,
+      schoolId: datos.schoolId ?? perfil.schoolId,
+      fechaVencimientoPlan:
+        datos.fechaVencimientoPlan !== undefined
+          ? datos.fechaVencimientoPlan
+          : perfil.fechaVencimientoPlan,
+      estadoLicenciaColegio:
+        datos.estadoLicenciaColegio !== undefined
+          ? datos.estadoLicenciaColegio
+          : perfil.estadoLicenciaColegio,
+      fechaVencimientoLicenciaColegio:
+        datos.fechaVencimientoLicenciaColegio !== undefined
+          ? datos.fechaVencimientoLicenciaColegio
+          : perfil.fechaVencimientoLicenciaColegio,
+      fechaVencimientoLicencia:
+        datos.fechaVencimientoLicencia !== undefined
+          ? datos.fechaVencimientoLicencia
+          : perfil.fechaVencimientoLicencia,
+      fechaVencimientoSuscripcionColegio:
+        datos.fechaVencimientoSuscripcionColegio !== undefined
+          ? datos.fechaVencimientoSuscripcionColegio
+          : perfil.fechaVencimientoSuscripcionColegio,
     };
 
     this.perfilState.set(actualizado);
