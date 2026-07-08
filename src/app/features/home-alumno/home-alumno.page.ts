@@ -5,15 +5,16 @@ import { UsuarioService } from '../../data-access/services/usuario.service';
 import { AccionesGridComponent } from './components/acciones-grid/acciones-grid.component';
 import { PedidoRecreoCardComponent } from './components/pedido-recreo-card/pedido-recreo-card.component';
 import { PerfilHeaderComponent } from './components/perfil-header/perfil-header.component';
+import { PuntosRecompensaBarComponent } from './components/puntos-recompensa-bar/puntos-recompensa-bar.component';
 import { HomeAlumnoPresenter } from './presenter/home-alumno.presenter';
 
 @Component({
   selector: 'app-home-alumno-page',
   templateUrl: './home-alumno.page.html',
   styleUrl: './home-alumno.page.css',
-  imports: [NavbarComponent, 
-    
+  imports: [NavbarComponent,
     PerfilHeaderComponent,
+    PuntosRecompensaBarComponent,
     AccionesGridComponent,
     PedidoRecreoCardComponent,
   ],

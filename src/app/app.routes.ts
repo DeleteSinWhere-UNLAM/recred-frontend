@@ -264,6 +264,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'puntos',
+            loadComponent: () =>
+              import('./features/explicacion-puntos/explicacion-puntos.page').then(
+                (m) => m.ExplicacionPuntosPage,
+              ),
+          },
+          {
             path: 'favoritos',
             loadComponent: () =>
               import('./features/favoritos/favoritos.page').then(

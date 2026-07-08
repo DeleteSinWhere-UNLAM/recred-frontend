@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { Movimiento } from '../../movimientos/models/movimiento.model';
 import { MovimientosService } from '../../movimientos/services/movimientos.service';
@@ -24,6 +26,8 @@ describe('HomeAlumnoService', () => {
         HomeAlumnoService,
         { provide: MovimientosService, useValue: servicioMovimientos },
         { provide: FranjasHorariasService, useValue: servicioFranjas },
+        provideHttpClient(),
+        provideHttpClientTesting()
       ],
     });
     service = TestBed.inject(HomeAlumnoService);

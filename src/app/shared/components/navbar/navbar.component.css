@@ -1156,3 +1156,24 @@
     display: none;
   }
 }
+
+/* Botón Comprar en notificaciones */
+.btn-buy {
+  background-color: var(--color-menta, #81b29a);
+  color: white;
+  border: none;
+  border-radius: var(--radius-button, 12px);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(129, 178, 154, 0.3);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-buy:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}

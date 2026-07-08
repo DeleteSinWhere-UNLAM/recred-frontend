@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { ColegiosService } from '../../data-access/services/colegios.service';
@@ -120,9 +121,11 @@ describe('HomeAlumno Integration', () => {
       'getProximoRecreo',
       'cargarPedidoEnCurso',
       'cargarRecreos',
+      'getRecompensasSaludables',
     ]);
     servicioHomeAlumno.getPedidoEnCurso.and.returnValue(PedidoEnCursoMother.crear({ estado: 'LISTO' }));
     servicioHomeAlumno.getProximoRecreo.and.returnValue(undefined);
+    servicioHomeAlumno.getRecompensasSaludables.and.returnValue(of({ totalPoints: 0, currentLevel: '', levelMessage: '', pointsToNextLevel: 0, nextLevelName: '' }));
     servicioHomeAlumno.cargarPedidoEnCurso.and.resolveTo();
     servicioHomeAlumno.cargarRecreos.and.resolveTo();
 

@@ -123,14 +123,23 @@
           } @else {
           <div class="navbar__notif-list">
             @for (notif of notificaciones(); track notif.id || $index) {
-            <button type="button" class="navbar__notif-item"
-              [class.navbar__notif-item--clickable]="true"
+            <div class="navbar__notif-item"
               [class.navbar__notif-item--unread]="!notif.read"
-              [class.navbar__notif-item--read]="notif.read"
-              (click)="clickEnNotificacion(notif)">
-              <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
-              <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>
-            </button>
+              [class.navbar__notif-item--read]="notif.read">
+              
+              <div class="navbar__notif-content" (click)="clickEnNotificacion(notif)" (keyup.enter)="clickEnNotificacion(notif)" tabindex="0" style="cursor: pointer;">
+                <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
+                <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>
+              </div>
+
+              @if (notif.tipo === 'PURCHASE_SUGGESTION' && notif.producto && notif.alumnoId && notif.sugerenciaId) {
+                <div class="navbar__notif-actions" style="margin-top: 8px;">
+                   <button type="button" class="btn-buy" style="padding: 6px 12px; font-size: 14px; width: auto;" (click)="comprarSugerencia($event, notif)">
+                     <i class="fa-solid fa-cart-shopping"></i> Comprar
+                   </button>
+                </div>
+              }
+            </div>
             }
           </div>
           }

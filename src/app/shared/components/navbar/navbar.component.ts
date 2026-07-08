@@ -19,6 +19,8 @@ import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { ToastService } from '../../services/toast.service';
+import { CompraService } from '../../../features/compra/services/compra.service';
+import { AcreditarMercadoPagoService } from '../../../features/acreditar-mercado-pago/services/acreditar-mercado-pago.service';
 
 type PlanNavbar = 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO';
 
@@ -41,6 +43,8 @@ export class NavbarComponent implements OnInit {
   protected readonly themeService = inject(ThemeService);
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly toastService = inject(ToastService);
+  private readonly compraService = inject(CompraService);
+  private readonly mercadoPagoService = inject(AcreditarMercadoPagoService);
 
   @Input() userName = '';
 
@@ -210,6 +214,47 @@ export class NavbarComponent implements OnInit {
     } catch (error) {
       console.error('Error al manejar el click de la notificacion:', error);
       void this.router.navigateByUrl('/kiosquero');
+    }
+  }
+
+  protected async comprarSugerencia(event: Event, notif: Notificacion): Promise<void> {
+    event.stopPropagation();
+    this.menuNotifAbierto.set(false);
+    
+    if (notif.id) {
+       this.notificacionesService.marcarComoLeida(notif.id);
+    }
+    
+    const producto = notif.producto;
+    const alumnoId = notif.alumnoId;
+    const sugerenciaId = notif.sugerenciaId;
+    
+    if (!producto || !alumnoId || !sugerenciaId) return;
+
+    try {
+      await this.alumnosService.asegurarCargados();
+      const alumno = this.alumnosService.getAlumnoById(alumnoId);
+
+      if (!alumno) {
+        this.toastService.mostrar('No pudimos encontrar la información del alumno.', 'error');
+        return;
+      }
+
+      if (alumno.saldo >= producto.precio) {
+        this.carritoService.agregar(producto, alumnoId, 1);
+        this.compraService.setSugerenciaPendiente(sugerenciaId);
+        this.router.navigate(['/compra']);
+      } else {
+        const linkPago = await this.mercadoPagoService.generarLinkPago(alumnoId, producto.precio);
+        this.toastService.mostrar(
+          `Saldo insuficiente para "${producto.nombre}". <a href="${linkPago}" target="_blank" style="color: white; text-decoration: underline; font-weight: bold;">Cargar saldo con Mercado Pago</a>`,
+          'error',
+          8000
+        );
+      }
+    } catch (error) {
+      console.error('Error al procesar la compra sugerida:', error);
+      this.toastService.mostrar('Hubo un error al procesar tu solicitud. Reintentá en unos momentos.', 'error');
     }
   }
 

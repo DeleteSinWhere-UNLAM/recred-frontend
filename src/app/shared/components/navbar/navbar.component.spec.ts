@@ -10,6 +10,8 @@ import { Notificacion, NotificacionesService } from '../../../data-access/servic
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
+import { CompraService } from '../../../features/compra/services/compra.service';
+import { AcreditarMercadoPagoService } from '../../../features/acreditar-mercado-pago/services/acreditar-mercado-pago.service';
 import { ToastService } from '../../services/toast.service';
 import { NavbarComponent } from './navbar.component';
 
@@ -59,6 +61,8 @@ describe('NavbarComponent', () => {
   let servicioTheme: jasmine.SpyObj<ThemeService>;
   let servicioContexto: jasmine.SpyObj<AlumnoContextoService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioCompra: jasmine.SpyObj<CompraService>;
+  let servicioMercadoPago: jasmine.SpyObj<AcreditarMercadoPagoService>;
   let cartCountSignal: ReturnType<typeof signal<number>>;
   let esVistaAlumnoSignal: ReturnType<typeof signal<boolean>>;
   let esVistaKiosqueroSignal: ReturnType<typeof signal<boolean>>;
@@ -122,6 +126,8 @@ describe('NavbarComponent', () => {
       'limpiar',
     ]);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+    servicioCompra = jasmine.createSpyObj<CompraService>('CompraService', ['setSugerenciaPendiente']);
+    servicioMercadoPago = jasmine.createSpyObj<AcreditarMercadoPagoService>('AcreditarMercadoPagoService', ['generarLinkPago']);
 
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
@@ -136,6 +142,8 @@ describe('NavbarComponent', () => {
         { provide: ThemeService, useValue: servicioTheme },
         { provide: AlumnoContextoService, useValue: servicioContexto },
         { provide: ToastService, useValue: servicioToast },
+        { provide: CompraService, useValue: servicioCompra },
+        { provide: AcreditarMercadoPagoService, useValue: servicioMercadoPago },
       ],
     }).compileComponents();
 
