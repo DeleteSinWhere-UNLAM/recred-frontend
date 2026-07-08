@@ -26,11 +26,10 @@ describe('ResumenPrediccionComponent', () => {
       expect(texto).toContain('500.00');
     });
 
-    it('dado datos, deberia mostrar los stats de confianza, dias analizados y dias restantes', () => {
-      whenRenderoCon(PrediccionGastoMother.crear({ confianza: 0.8, diasHistoricosUsados: 20, diasRestantes: 3 }));
+    it('dado datos, deberia mostrar los stats de dias analizados y dias restantes', () => {
+      whenRenderoCon(PrediccionGastoMother.crear({ diasHistoricosUsados: 20, diasRestantes: 3 }));
 
       const texto = textoRenderizado();
-      expect(texto).toContain('80%');
       expect(texto).toContain('20');
       expect(texto).toContain('3');
     });
@@ -81,7 +80,6 @@ describe('ResumenPrediccionComponent', () => {
     component.promedioGastoDiario = prediccion.promedioGastoDiario;
     component.montoLimite = prediccion.montoLimite;
     component.porcentajePresupuesto = prediccion.porcentajePresupuesto;
-    component.confianza = prediccion.confianza;
     component.diasHistoricosUsados = prediccion.diasHistoricosUsados;
     component.diasRestantes = prediccion.diasRestantes;
     fixture.detectChanges();
