@@ -28,7 +28,7 @@ import { RestriccionesHorariasService } from '../../restricciones-horarias/servi
 import { PresupuestoService, DateBudgetStatus } from '../../presupuesto/services/presupuesto.service';
 import { RestriccionesNutricionalesService, ClasificacionSaludBackend } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { TimeSlot, RestriccionHoraria } from '../../restricciones-horarias/models/restriccion-horaria.model';
-import { Recreo, RECREO_LABELS } from '../../compra/models/orden-compra.model';
+import { Recreo } from '../../compra/models/orden-compra.model';
 
 export interface PresupuestoDisponibleCategoria {
   categoriaId: string;
@@ -280,16 +280,10 @@ export class BuffetPresenter {
       }
     }
 
-    if (options.length === 0) {
-      return recreosPosibles.map((rec) => ({
-        recreo: rec,
-        descripcion: RECREO_LABELS[rec],
-        bloqueado: false,
-      }));
-    }
-
     return options;
   });
+
+  readonly hayFranjasHorariasDisponibles = computed(() => this.recreosDisponibles().length > 0);
 
   readonly presupuestoDisponible = computed<PresupuestoDisponible | null>(() => {
     const alumno = this.alumnoState();
@@ -508,14 +502,24 @@ export class BuffetPresenter {
           const initialFecha = savedSelection?.fecha && savedSelection.fecha >= minDate
             ? savedSelection.fecha
             : minDate;
-          const initialRecreo = savedSelection?.recreo ?? this.firstAvailableRecreo();
+          const opcionesRetiro = this.recreosDisponibles();
+          const savedRecreo =
+            savedSelection?.recreo && opcionesRetiro.some((o) => o.recreo === savedSelection.recreo)
+              ? savedSelection.recreo
+              : undefined;
+          const initialRecreo = savedRecreo ?? this.firstAvailableRecreo();
 
           this.fechaSeleccionadaState.set(initialFecha);
-          this.recreoSeleccionadoState.set(initialRecreo);
-          this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
+          if (initialRecreo) {
+            this.recreoSeleccionadoState.set(initialRecreo);
+            this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
 
-          const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
-          this.cargarProductos(buffet.id, alumnoId, fechaHora);
+            const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
+            this.cargarProductos(buffet.id, alumnoId, fechaHora);
+          } else {
+            this.carritoService.clearSeleccionRetiro(alumnoId);
+            this.cargarProductos(buffet.id, alumnoId);
+          }
 
           this.consultarPresupuestoPorFecha(alumnoId, initialFecha);
         }).catch((err) => {
@@ -581,6 +585,17 @@ export class BuffetPresenter {
 
     const recreoActual = this.recreoSeleccionadoState();
     const opciones = this.recreosDisponibles();
+    if (opciones.length === 0) {
+      this.carritoService.clearSeleccionRetiro(alumno.id);
+      this.consultarPresupuestoPorFecha(alumno.id, adjustedFecha);
+
+      const buffet = this.buffetState();
+      if (buffet) {
+        this.cargarProductos(buffet.id, alumno.id);
+      }
+      return;
+    }
+
     const opcionActual = opciones.find((o) => o.recreo === recreoActual);
     if (!opcionActual || opcionActual.bloqueado) {
       const primera = opciones.find((o) => !o.bloqueado);
@@ -675,6 +690,11 @@ export class BuffetPresenter {
     const alumno = this.alumnoState();
     const items = this.itemsCarrito();
     if (!alumno || items.length === 0 || this.procesandoPago()) return;
+
+    if (!this.hayFranjasHorariasDisponibles()) {
+      this.toastService.mostrar('No hay franjas horarias disponibles para realizar el pedido.', 'error');
+      return;
+    }
 
     const buffet = this.buffetState();
     if (!buffet) {
@@ -868,9 +888,9 @@ export class BuffetPresenter {
     }
   }
 
-  private firstAvailableRecreo(): Recreo {
+  private firstAvailableRecreo(): Recreo | null {
     const opciones = this.recreosDisponibles();
-    return opciones.find((o) => !o.bloqueado)?.recreo ?? 'PRIMER_RECREO';
+    return opciones.find((o) => !o.bloqueado)?.recreo ?? null;
   }
 
   private matchesDescription(slotDescripcion: string, recreo: Recreo): boolean {
