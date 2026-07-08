@@ -127,7 +127,7 @@
               [class.navbar__notif-item--unread]="!notif.read"
               [class.navbar__notif-item--read]="notif.read">
               
-              <div class="navbar__notif-content" (click)="clickEnNotificacion(notif)" style="cursor: pointer;">
+              <div class="navbar__notif-content" (click)="clickEnNotificacion(notif)" (keyup.enter)="clickEnNotificacion(notif)" tabindex="0" style="cursor: pointer;">
                 <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
                 <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>
               </div>

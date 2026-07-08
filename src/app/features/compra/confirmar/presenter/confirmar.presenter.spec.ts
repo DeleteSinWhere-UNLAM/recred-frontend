@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
+import { NotificacionesService } from '../../../../data-access/services/notificaciones.service';
 import { SugerenciasService } from '../../../sugerencias/services/sugerencias.service';
 import { OrdenAlumnoMother, OrdenCompraMother } from '../../compra.mother';
 import { OrdenCompra } from '../../models/orden-compra.model';
@@ -18,6 +19,7 @@ describe('ConfirmarPresenter', () => {
   let servicioSugerencias: jasmine.SpyObj<SugerenciasService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
+  let servicioNotificaciones: jasmine.SpyObj<NotificacionesService>;
   let router: jasmine.SpyObj<Router>;
   let ordenEnCurso: WritableSignal<OrdenCompra | null>;
 
@@ -31,6 +33,7 @@ describe('ConfirmarPresenter', () => {
     servicioSugerencias = jasmine.createSpyObj('SugerenciasService', ['comprarSugerencia']);
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['perfil', 'rol']);
+    servicioNotificaciones = jasmine.createSpyObj('NotificacionesService', ['eliminarNotificacionLocal']);
     servicioPerfil.perfil.and.returnValue({ plan: 'AVANZADO' } as never);
     servicioPerfil.rol.and.returnValue('PADRE');
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
@@ -43,6 +46,7 @@ describe('ConfirmarPresenter', () => {
         { provide: SugerenciasService, useValue: servicioSugerencias },
         { provide: ToastService, useValue: servicioToast },
         { provide: PerfilService, useValue: servicioPerfil },
+        { provide: NotificacionesService, useValue: servicioNotificaciones },
         { provide: Router, useValue: router },
       ],
     });

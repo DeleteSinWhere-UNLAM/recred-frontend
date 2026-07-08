@@ -1,6 +1,7 @@
 import { Injectable, Signal, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { Producto } from '../../features/buffet/models/producto.model';
 
 export interface Notificacion {
   id?: string;
@@ -12,7 +13,7 @@ export interface Notificacion {
   compraId?: string;
   productoId?: string;
   sugerenciaId?: string;
-  producto?: any;
+  producto?: Producto;
   read?: boolean;
 }
 
@@ -36,8 +37,8 @@ export interface NotificacionBackend {
   purchaseId?: string;
   productId?: string;
   suggestionId?: string;
-  producto?: any;
-  product?: any;
+  producto?: unknown;
+  product?: unknown;
 }
 
 export type NotificacionesResponse = NotificacionBackend[] | { notifications: NotificacionBackend[] };
@@ -97,7 +98,7 @@ export class NotificacionesService {
         const mapeadas: Notificacion[] = items.map((item) => {
           let parseado = item.product || item.producto;
           if (typeof parseado === 'string' && parseado.length > 0) {
-            try { parseado = JSON.parse(parseado); } catch(e) {}
+            try { parseado = JSON.parse(parseado); } catch { /* ignorar error de parseo */ }
           }
           return {
             id: item.id,
@@ -109,7 +110,7 @@ export class NotificacionesService {
             compraId: item.purchaseId || item.compraId,
             productoId: item.productId || item.productoId,
             sugerenciaId: item.suggestionId || item.sugerenciaId,
-            producto: parseado,
+            producto: parseado as Producto,
             read: item.read ?? false,
           };
         });
@@ -172,8 +173,8 @@ export class NotificacionesService {
     const noLeidas = this.allNotificacionesState().filter((n) => !n.read && n.id);
     if (noLeidas.length === 0) return;
 
-    this.allNotificacionesState.update((lista) => {
-      const nuevaLista = lista.filter((n) => false); // Borra todas localmente
+    this.allNotificacionesState.update(() => {
+      const nuevaLista: Notificacion[] = []; // Borra todas localmente
       this.guardarEnLocalStorage(nuevaLista);
       return nuevaLista;
     });

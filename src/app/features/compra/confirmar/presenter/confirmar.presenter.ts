@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { map } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { RECREO_LABELS } from '../../models/orden-compra.model';
 import { CarritoService } from '../../services/carrito.service';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -55,7 +55,7 @@ export class ConfirmarPresenter {
     this.cargandoState.set(true);
     const obs$ = (ordenActual?.sugerenciaId)
       ? this.sugerenciasService.comprarSugerencia(ordenActual.sugerenciaId).pipe(
-          map(() => ordenActual)
+          switchMap(() => this.compraService.procesarPago())
         )
       : this.compraService.procesarPago();
 

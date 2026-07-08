@@ -1,25 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExplicacionPuntosPage } from './explicacion-puntos.page';
-import { Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 
 describe('ExplicacionPuntosPage', () => {
   let component: ExplicacionPuntosPage;
   let fixture: ComponentFixture<ExplicacionPuntosPage>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let router: Router;
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
-
     await TestBed.configureTestingModule({
       imports: [ExplicacionPuntosPage],
       providers: [
-        { provide: Router, useValue: routerSpy }
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting()
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ExplicacionPuntosPage);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -47,6 +51,6 @@ describe('ExplicacionPuntosPage', () => {
 
 
   function thenDeberiaNavegarAlHomeAlumno(): void {
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/alumno']);
+    expect(router.navigate).toHaveBeenCalledWith(['/alumno']);
   }
 });
