@@ -1,0 +1,458 @@
+<app-navbar></app-navbar>
+
+<main class="gestion-page">
+  <div class="gestion-page__container">
+    <header class="gestion-hero">
+      <div>
+        <button type="button" class="gestion-back" (click)="presenter.volver()">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          <span>Volver al panel</span>
+        </button>
+        <p class="gestion-kicker">Panel administrativo</p>
+        <h1>Gestion escolar</h1>
+        @if (presenter.schoolOverview(); as school) {
+          <p class="gestion-school">{{ school.nombre }} · CUE {{ school.cue }}</p>
+        }
+      </div>
+    </header>
+
+    @if (presenter.loadingInicial()) {
+      <div class="gestion-notice" role="status">
+        <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+        <span>Cargando gestion escolar...</span>
+      </div>
+    } @else if (presenter.errorInicial()) {
+      <div class="gestion-notice gestion-notice--error" role="alert">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <span>{{ presenter.errorInicial() }}</span>
+      </div>
+    } @else {
+      <nav class="gestion-tabs" aria-label="Secciones de gestion escolar">
+        <a
+          class="gestion-tab"
+          [class.is-active]="tab() === 'grados'"
+          [routerLink]="['/directivo/grados']"
+          [attr.aria-current]="tab() === 'grados' ? 'page' : null"
+        >
+          <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+          <span>Grados</span>
+        </a>
+        <a
+          class="gestion-tab"
+          [class.is-active]="tab() === 'franjas'"
+          [routerLink]="['/directivo/franjas-horarias']"
+          [attr.aria-current]="tab() === 'franjas' ? 'page' : null"
+        >
+          <i class="fa-solid fa-clock" aria-hidden="true"></i>
+          <span>Franjas horarias</span>
+        </a>
+      </nav>
+
+      @if (presenter.errorOperacion(); as errorOperacion) {
+        <div class="gestion-notice gestion-notice--error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          <span>{{ errorOperacion }}</span>
+        </div>
+      }
+
+      @if (tab() === 'grados') {
+        <section class="gestion-section" aria-labelledby="grados-title">
+          <div class="gestion-section__header">
+            <div class="gestion-section__title">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-layer-group"></i>
+              </span>
+              <div>
+                <h2 id="grados-title">Grados</h2>
+                <p>{{ presenter.grados().length }} registros</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="gestion-icon-button"
+              [disabled]="presenter.loadingGrados()"
+              (click)="presenter.recargarGrados()"
+              aria-label="Recargar grados"
+            >
+              <i class="fa-solid fa-rotate-right" [class.fa-spin]="presenter.loadingGrados()" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="gestion-layout">
+            <form class="gestion-form" [formGroup]="gradoForm" (ngSubmit)="guardarGrado($event)">
+              <div class="gestion-form__header">
+                <h3>{{ gradoEditando() ? 'Editar grado' : 'Nuevo grado' }}</h3>
+                @if (gradoEditando()) {
+                  <button type="button" class="gestion-link-button" (click)="cancelarEdicionGrado()">
+                    Cancelar
+                  </button>
+                }
+              </div>
+
+              <div class="gestion-field">
+                <label for="nivelId">Nivel *</label>
+                <select id="nivelId" formControlName="nivelId">
+                  <option value="" disabled>Seleccionar nivel</option>
+                  @for (nivel of presenter.niveles(); track nivel.id) {
+                    <option [value]="nivel.id">{{ nivel.descripcion }}</option>
+                  }
+                </select>
+                @if (gradoForm.controls.nivelId.touched && gradoForm.controls.nivelId.invalid) {
+                  <span class="gestion-field__error">Selecciona un nivel.</span>
+                }
+              </div>
+
+              <div class="gestion-form__row">
+                <div class="gestion-field">
+                  <label for="anio">Año *</label>
+                  <input id="anio" type="text" formControlName="anio" autocomplete="off" />
+                  @if (gradoForm.controls.anio.touched && gradoForm.controls.anio.invalid) {
+                    <span class="gestion-field__error">Ingresa el anio.</span>
+                  }
+                </div>
+
+                <div class="gestion-field">
+                  <label for="division">Division *</label>
+                  <input id="division" type="text" formControlName="division" autocomplete="off" />
+                  @if (gradoForm.controls.division.touched && gradoForm.controls.division.invalid) {
+                    <span class="gestion-field__error">Ingresa la division.</span>
+                  }
+                </div>
+              </div>
+
+              <div class="gestion-form__actions">
+                <button
+                  type="submit"
+                  class="gestion-primary-button"
+                  [disabled]="presenter.accionEnCurso() !== null"
+                >
+                  @if (accionActual(gradoEditando() ? 'grado-' + gradoEditando()?.id + '-guardar' : 'grado-crear')) {
+                    <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                  } @else {
+                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                  }
+                  <span>{{ gradoEditando() ? 'Guardar cambios' : 'Crear grado' }}</span>
+                </button>
+              </div>
+            </form>
+
+            <div class="gestion-list-panel">
+              @if (presenter.errorGrados(); as errorGrados) {
+                <div class="gestion-notice gestion-notice--error" role="alert">
+                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                  <span>{{ errorGrados }}</span>
+                </div>
+              }
+
+              @if (presenter.loadingGrados()) {
+                <div class="gestion-notice" role="status">
+                  <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                  <span>Cargando grados...</span>
+                </div>
+              } @else if (presenter.grados().length === 0) {
+                <div class="gestion-empty">
+                  <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                  <strong>Sin grados cargados</strong>
+                </div>
+              } @else {
+                <div class="gestion-list">
+                  @for (grado of presenter.grados(); track grado.id) {
+                    <article class="gestion-item" [class.is-inactive]="!grado.activo">
+                      <span class="gestion-item__icon" aria-hidden="true">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                      </span>
+                      <div class="gestion-item__body">
+                        <span class="gestion-status" [class.is-active]="grado.activo">
+                          {{ grado.activo ? 'Activo' : 'Inactivo' }}
+                        </span>
+                        <h3>{{ grado.nombre }}</h3>
+                        <p>{{ grado.nivelDescripcion }} · Anio {{ grado.anio }} · Division {{ grado.division }}</p>
+                      </div>
+                      <div class="gestion-item__actions">
+                        @if (grado.activo) {
+                          <button type="button" class="gestion-action-button" (click)="editarGrado(grado)">
+                            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                            <span>Editar</span>
+                          </button>
+                          <button
+                            type="button"
+                            class="gestion-action-button gestion-action-button--danger"
+                            [disabled]="presenter.accionEnCurso() !== null"
+                            (click)="solicitarBajaGrado(grado)"
+                          >
+                            @if (accionActual('grado-' + grado.id + '-eliminar')) {
+                              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                            } @else {
+                              <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            }
+                            <span>Baja</span>
+                          </button>
+                        } @else {
+                          <button
+                            type="button"
+                            class="gestion-action-button gestion-action-button--success"
+                            [disabled]="presenter.accionEnCurso() !== null"
+                            (click)="reactivarGrado(grado)"
+                          >
+                            @if (accionActual('grado-' + grado.id + '-reactivar')) {
+                              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                            } @else {
+                              <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                            }
+                            <span>Reactivar</span>
+                          </button>
+                        }
+                      </div>
+                    </article>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+      } @else {
+        <section class="gestion-section" aria-labelledby="franjas-title">
+          <div class="gestion-section__header">
+            <div class="gestion-section__title">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-clock"></i>
+              </span>
+              <div>
+                <h2 id="franjas-title">Franjas horarias</h2>
+                <p>{{ presenter.franjas().length }} registros</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="gestion-icon-button"
+              [disabled]="presenter.loadingFranjas()"
+              (click)="presenter.recargarFranjas()"
+              aria-label="Recargar franjas horarias"
+            >
+              <i class="fa-solid fa-rotate-right" [class.fa-spin]="presenter.loadingFranjas()" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="gestion-layout">
+            <form class="gestion-form" [formGroup]="franjaForm" (ngSubmit)="guardarFranja($event)">
+              <div class="gestion-form__header">
+                <h3>{{ franjaEditando() ? 'Editar franja' : 'Nueva franja' }}</h3>
+                @if (franjaEditando()) {
+                  <button type="button" class="gestion-link-button" (click)="cancelarEdicionFranja()">
+                    Cancelar
+                  </button>
+                }
+              </div>
+
+              <div class="gestion-field">
+                <label for="descripcion">Descripcion *</label>
+                <input id="descripcion" type="text" formControlName="descripcion" autocomplete="off" />
+                @if (franjaForm.controls.descripcion.touched && franjaForm.controls.descripcion.invalid) {
+                  <span class="gestion-field__error">Ingresa una descripcion.</span>
+                }
+              </div>
+
+              <div class="gestion-form__row">
+                <div class="gestion-field">
+                  <label for="horaInicio">Inicio *</label>
+                  <input id="horaInicio" type="time" formControlName="horaInicio" />
+                  @if (franjaForm.controls.horaInicio.touched && franjaForm.controls.horaInicio.invalid) {
+                    <span class="gestion-field__error">Ingresa el inicio.</span>
+                  }
+                </div>
+
+                <div class="gestion-field">
+                  <label for="horaFin">Fin *</label>
+                  <input id="horaFin" type="time" formControlName="horaFin" />
+                  @if (franjaForm.controls.horaFin.touched && franjaForm.controls.horaFin.invalid) {
+                    <span class="gestion-field__error">Ingresa el fin.</span>
+                  }
+                </div>
+              </div>
+
+              @if (franjaForm.touched && franjaForm.hasError('rangoHorario')) {
+                <span class="gestion-field__error">La hora de inicio debe ser anterior a la hora de fin.</span>
+              }
+
+              <div class="gestion-form__row">
+                <div class="gestion-field">
+                  <label for="cupoMaximo">Cupo maximo</label>
+                  <input id="cupoMaximo" type="number" min="0" formControlName="cupoMaximo" />
+                  @if (franjaForm.controls.cupoMaximo.touched && franjaForm.controls.cupoMaximo.invalid) {
+                    <span class="gestion-field__error">Debe ser 0 o mayor.</span>
+                  }
+                </div>
+
+                <div class="gestion-field">
+                  <label for="minutosCorte">Minutos de corte</label>
+                  <input id="minutosCorte" type="number" min="0" formControlName="minutosCorte" />
+                  @if (franjaForm.controls.minutosCorte.touched && franjaForm.controls.minutosCorte.invalid) {
+                    <span class="gestion-field__error">Debe ser 0 o mayor.</span>
+                  }
+                </div>
+              </div>
+
+              <div class="gestion-form__actions">
+                <button
+                  type="submit"
+                  class="gestion-primary-button"
+                  [disabled]="presenter.accionEnCurso() !== null"
+                >
+                  @if (accionActual(franjaEditando() ? 'franja-' + franjaEditando()?.id + '-guardar' : 'franja-crear')) {
+                    <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                  } @else {
+                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                  }
+                  <span>{{ franjaEditando() ? 'Guardar cambios' : 'Crear franja' }}</span>
+                </button>
+              </div>
+            </form>
+
+            <div class="gestion-list-panel">
+              @if (presenter.errorFranjas(); as errorFranjas) {
+                <div class="gestion-notice gestion-notice--error" role="alert">
+                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                  <span>{{ errorFranjas }}</span>
+                </div>
+              }
+
+              @if (presenter.loadingFranjas()) {
+                <div class="gestion-notice" role="status">
+                  <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                  <span>Cargando franjas horarias...</span>
+                </div>
+              } @else if (presenter.franjas().length === 0) {
+                <div class="gestion-empty">
+                  <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                  <strong>Sin franjas cargadas</strong>
+                </div>
+              } @else {
+                <div class="gestion-list">
+                  @for (franja of presenter.franjas(); track franja.id) {
+                    <article class="gestion-item" [class.is-inactive]="!franja.activo">
+                      <span class="gestion-item__icon" aria-hidden="true">
+                        <i class="fa-solid fa-clock"></i>
+                      </span>
+                      <div class="gestion-item__body">
+                        <span class="gestion-status" [class.is-active]="franja.activo">
+                          {{ franja.activo ? 'Activo' : 'Inactivo' }}
+                        </span>
+                        <h3>{{ franja.descripcion }}</h3>
+                        <p>{{ horaCorta(franja.horaInicio) }} a {{ horaCorta(franja.horaFin) }} · {{ cupoTexto(franja) }} · {{ corteTexto(franja) }}</p>
+                      </div>
+                      <div class="gestion-item__actions">
+                        @if (franja.activo) {
+                          <button type="button" class="gestion-action-button" (click)="editarFranja(franja)">
+                            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                            <span>Editar</span>
+                          </button>
+                          <button
+                            type="button"
+                            class="gestion-action-button gestion-action-button--danger"
+                            [disabled]="presenter.accionEnCurso() !== null"
+                            (click)="solicitarBajaFranja(franja)"
+                          >
+                            @if (accionActual('franja-' + franja.id + '-eliminar')) {
+                              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                            } @else {
+                              <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            }
+                            <span>Baja</span>
+                          </button>
+                        } @else {
+                          <button
+                            type="button"
+                            class="gestion-action-button gestion-action-button--success"
+                            [disabled]="presenter.accionEnCurso() !== null"
+                            (click)="reactivarFranja(franja)"
+                          >
+                            @if (accionActual('franja-' + franja.id + '-reactivar')) {
+                              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                            } @else {
+                              <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                            }
+                            <span>Reactivar</span>
+                          </button>
+                        }
+                      </div>
+                    </article>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+      }
+    }
+  </div>
+</main>
+
+@if (bajaPendiente()) {
+  <div
+    class="gestion-modal-overlay"
+    tabindex="-1"
+    (click)="cerrarConfirmacionBaja()"
+    (keydown.escape)="cerrarConfirmacionBaja()"
+  >
+    <section
+      class="gestion-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="baja-confirmacion-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="gestion-modal__header">
+        <div class="gestion-modal__title-group">
+          <span class="gestion-modal__icon gestion-modal__icon--danger" aria-hidden="true">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </span>
+          <div>
+            <p>Confirmacion requerida</p>
+            <h2 id="baja-confirmacion-title">{{ tituloConfirmacionBaja() }}</h2>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="gestion-modal__close"
+          [disabled]="presenter.accionEnCurso() !== null"
+          (click)="cerrarConfirmacionBaja()"
+          aria-label="Cerrar confirmacion"
+        >
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="gestion-modal__body">
+        <p>Esta accion deja el registro inactivo. Vas a poder reactivarlo desde este mismo panel.</p>
+        <div class="gestion-modal__summary">
+          <span>Registro</span>
+          <strong>{{ detalleConfirmacionBaja() }}</strong>
+        </div>
+      </div>
+
+      <footer class="gestion-modal__actions">
+        <button
+          type="button"
+          class="gestion-secondary-button"
+          [disabled]="presenter.accionEnCurso() !== null"
+          (click)="cerrarConfirmacionBaja()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="gestion-danger-button"
+          [disabled]="presenter.accionEnCurso() !== null"
+          (click)="confirmarBaja()"
+        >
+          @if (accionActual(accionBajaPendiente())) {
+            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+          } @else {
+            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+          }
+          <span>Confirmar baja</span>
+        </button>
+      </footer>
+    </section>
+  </div>
+}
