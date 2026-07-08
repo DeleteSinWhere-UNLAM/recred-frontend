@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
-import { } from '../../shared/components/navbar/navbar.component';
 import { AcreditarMercadoPagoPresenter } from './presenter/acreditar-mercado-pago.presenter';
 
 @Component({

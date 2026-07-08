@@ -1,51 +1,70 @@
+<app-navbar />
+
 <main class="carga-producto">
-  <button type="button" class="carga-producto__volver" (click)="volver()">
-    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-    <span>Volver</span>
-  </button>
+  <section class="carga-producto__hero" aria-labelledby="carga-producto-title">
+    <button type="button" class="carga-producto__volver" (click)="volver()" aria-label="Volver al inicio del kiosquero">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      <span>Volver</span>
+    </button>
 
-  <div class="carga-producto__container">
-    <header class="carga-producto__cabecera">
-      <div class="carga-producto__icono" aria-hidden="true">
+    <div class="carga-producto__heading">
+      <span class="carga-producto__eyebrow">
+        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+        Producto por imagen
+      </span>
+      <h1 id="carga-producto-title" class="carga-producto__titulo">Carga de producto</h1>
+      <p class="carga-producto__subtitulo">
+        Complet&aacute; la ficha del producto y revis&aacute; los datos detectados antes de guardarlo en tu inventario.
+      </p>
+    </div>
+
+    <div class="carga-producto__estado" aria-label="Estado de carga">
+      <span class="carga-producto__estado-icono" aria-hidden="true">
         <i class="fa-solid fa-camera"></i>
+      </span>
+      <div>
+        <strong>{{ scannedProductData ? 'Datos detectados' : 'Listo para cargar' }}</strong>
+        <span>{{ isLoading ? 'Analizando imagen' : 'Inventario del kiosco' }}</span>
       </div>
-      <div class="carga-producto__identidad">
-        <div class="carga-producto__titulo-container">
-          <h2 class="carga-producto__titulo">Carga de producto</h2>
-          <span class="carga-producto__premium-badge">AVANZADO</span>
+    </div>
+  </section>
+
+  <section class="carga-producto__workspace" aria-label="Carga de producto por imagen">
+    <div class="carga-producto__scan-column">
+      <app-camera-capture [isScanning]="isLoading" (photoTaken)="handlePhoto($event)" />
+
+      <app-scanner-loader [isScanning]="isLoading" />
+
+      @if (saveSuccess) {
+        <div class="carga-producto__feedback carga-producto__feedback--success">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+          <p>Producto guardado exitosamente.</p>
         </div>
-        <p class="carga-producto__subtitulo">
-          Cargá los datos a mano o tomá una foto del envase para autocompletar
-        </p>
-      </div>
-    </header>
+      }
 
-    <app-camera-capture [isScanning]="isLoading" (photoTaken)="handlePhoto($event)" />
+      @if (saveError) {
+        <div class="carga-producto__feedback carga-producto__feedback--error">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+          <p>{{ saveError }}</p>
+        </div>
+      }
 
-    <app-scanner-loader [isScanning]="isLoading" />
-
-    @if (saveSuccess) {
-    <div class="carga-producto__feedback carga-producto__feedback--success">
-      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-      <p>¡Producto guardado exitosamente!</p>
+      @if (scannedProductData) {
+        <div class="carga-producto__feedback carga-producto__feedback--info">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+          <p>Datos detectados. Verific&aacute; la informaci&oacute;n antes de guardar.</p>
+        </div>
+      }
     </div>
-    }
 
-    @if (saveError) {
-    <div class="carga-producto__feedback carga-producto__feedback--error">
-      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-      <p>{{ saveError }}</p>
+    <div class="carga-producto__form-column">
+      <app-ai-product-form
+        [prefillData]="scannedProductData"
+        [categories]="categories"
+        [isSaving]="isSaving"
+        [buffetId]="buffetId"
+        (save)="saveProduct($event)"
+      />
     </div>
-    }
-
-    @if (scannedProductData) {
-    <div class="carga-producto__feedback carga-producto__feedback--info">
-      <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-      <p>¡Datos detectados! Verificá y corregí la información antes de guardar.</p>
-    </div>
-    }
-
-    <app-ai-product-form [prefillData]="scannedProductData" [categories]="categories" [isSaving]="isSaving"
-      [buffetId]="buffetId" (save)="saveProduct($event)" />
-  </div>
+  </section>
 </main>

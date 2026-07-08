@@ -3,15 +3,65 @@
   border: 1px solid var(--color-borde);
   border-radius: 20px;
   box-shadow: var(--shadow-card);
-  padding: 18px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
+}
+
+.ai-product-form__preview {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  background-color: color-mix(in srgb, var(--color-pizarra) 5%, var(--color-superficie));
+  border: 1px solid var(--color-borde);
+  border-radius: 16px;
+}
+
+.ai-product-form__preview-img {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--color-borde-fuerte);
+  background-color: var(--color-superficie);
+}
+
+.ai-product-form__preview-copy {
+  min-width: 0;
+}
+
+.ai-product-form__preview-copy strong,
+.ai-product-form__preview-copy span {
+  display: block;
+}
+
+.ai-product-form__preview-copy strong {
+  color: var(--color-texto-oscuro);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.ai-product-form__preview-copy span {
+  margin-top: 4px;
+  color: var(--color-texto-claro);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .ai-product-form__seccion {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+}
+
+.ai-product-form__seccion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 
@@ -23,6 +73,20 @@
   letter-spacing: 0.4px;
   text-transform: uppercase;
   color: var(--color-pizarra);
+}
+
+.ai-product-form__seccion-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, var(--color-menta) 18%, var(--color-fondo));
+  color: var(--color-pizarra);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .ai-product-form__grid {
@@ -79,9 +143,8 @@
 }
 
 .ai-product-form__group--error .ai-product-form__input {
-  box-shadow:
-    var(--shadow-neu-concave),
-    0 0 0 2px var(--color-melocoton);
+  border-color: color-mix(in srgb, var(--color-melocoton) 70%, var(--color-borde));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-melocoton) 16%, transparent);
 }
 
 .ai-product-form__error {
@@ -107,6 +170,12 @@
   border-radius: 12px;
   box-shadow: none;
   cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.ai-product-form__toggle:hover {
+  border-color: var(--color-borde-fuerte);
+  background-color: rgba(74, 111, 165, 0.07);
 }
 
 .ai-product-form__toggle-label {
@@ -214,6 +283,15 @@
   .ai-product-form {
     padding: 14px;
     border-radius: 16px;
+  }
+
+  .ai-product-form__preview {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .ai-product-form__preview-img {
+    width: 72px;
+    height: 72px;
   }
 
   .ai-product-form__seccion-titulo {
