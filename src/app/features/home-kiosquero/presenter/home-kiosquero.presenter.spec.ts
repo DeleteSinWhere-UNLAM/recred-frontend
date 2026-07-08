@@ -352,7 +352,7 @@ describe('HomeKiosqueroPresenter', () => {
       presenter.onDateChange(inputEl);
 
       expect(presenter.selectedDate()).toBe('2030-01-15');
-      expect(servicioHomeKiosquero.getPanel).toHaveBeenCalledWith(BUFFET_ID_TEST, '2030-01-15');
+      expect(servicioHomeKiosquero.getPanel).toHaveBeenCalledWith(BUFFET_ID_TEST, '2030-01-15', 'home');
     });
 
     it('dado una fecha igual a la actual, no deberia recargar', () => {

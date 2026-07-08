@@ -1,13 +1,11 @@
 <div class="pv">
-  <!-- Loading State -->
   @if (loading) {
     <div class="pv__notice" role="status">
       <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-      <span>Cargando panel de administración...</span>
+      <span>Cargando panel de administracion...</span>
     </div>
   }
 
-  <!-- Error State -->
   @if (error) {
     <div class="pv__notice pv__notice--error" role="alert">
       <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
@@ -21,10 +19,13 @@
         <span aria-hidden="true">
           <i class="fa-solid fa-file-invoice-dollar"></i>
         </span>
-        <h2>Licencia de acceso</h2>
+        <div>
+          <p class="pv__section-kicker">Acceso del colegio</p>
+          <h2>Licencia</h2>
+        </div>
       </div>
 
-      <div class="pv__license-card">
+      <div class="pv__license-card pv__license-card--standalone">
         <div class="pv__license-main">
           <span class="pv__license-icon" aria-hidden="true">
             <i class="fa-solid fa-file-invoice-dollar"></i>
@@ -55,20 +56,18 @@
     </section>
   }
 
-  <!-- Data State -->
   @if (!loading && !error && data) {
-    <header class="pv__profile-card">
-      <div class="pv__profile-identity">
+    <header class="pv__hero">
+      <div class="pv__hero-main">
         <div class="pv__avatar" aria-hidden="true">
           <span><i class="fa-solid fa-school"></i></span>
         </div>
-        <div>
-          <p class="pv__greeting">Panel Administrativo</p>
+        <div class="pv__hero-copy">
+          <p class="pv__greeting">Panel administrativo</p>
           <h1 id="pv-title">{{ data.nombre }}</h1>
-          <p>CUE: {{ data.cue }}</p>
+          <p class="pv__school-meta">CUE {{ data.cue }}</p>
         </div>
       </div>
-
       <div class="pv__license-card" [class.pv__license-card--active]="licenciaActiva()">
         <div class="pv__license-main">
           <span class="pv__license-icon" aria-hidden="true">
@@ -100,126 +99,122 @@
     </header>
 
     <section class="pv__panel" aria-labelledby="kioscos-title">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div class="pv__panel-header">
         <div class="pv__section-title">
           <span aria-hidden="true">
             <i class="fa-solid fa-store"></i>
           </span>
-          <h2 id="kioscos-title">Kioscos del Colegio</h2>
+          <div>
+            <p class="pv__section-kicker">Operacion</p>
+            <h2 id="kioscos-title">Kiosco del colegio</h2>
+          </div>
         </div>
-        
-        <button type="button" class="pv__featured-card pv__featured-card--menta" style="min-height: auto; padding: 12px 18px; margin: 0; width: max-content; gap: 12px;" [routerLink]="['/directivo/crear-buffet']" [state]="{ schoolId: data.id }">
-          <span class="pv__featured-icon" style="width: 38px; height: 38px; font-size: 16px;" aria-hidden="true">
-            <i class="fa-solid fa-plus"></i>
-          </span>
-          <span class="pv__action-title-container">
-            <strong style="font-size: 15px;">Nuevo Kiosco</strong>
-          </span>
-          <span class="pv__featured-arrow" style="width: 28px; height: 28px;" aria-hidden="true">
-            <i class="fa-solid fa-arrow-right"></i>
-          </span>
-        </button>
+
+        @if (data.buffets.length === 0) {
+          <button type="button" class="pv__primary-action" [routerLink]="['/directivo/crear-buffet']" [state]="{ schoolId: data.id }">
+            <span class="pv__primary-action-icon" aria-hidden="true">
+              <i class="fa-solid fa-plus"></i>
+            </span>
+            <strong>Nuevo kiosco</strong>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        }
       </div>
 
       @if (data.buffets.length === 0) {
-        <div class="pv__ok-state" style="margin-top: 16px;">
+        <div class="pv__ok-state">
           <span aria-hidden="true">
             <i class="fa-solid fa-circle-info"></i>
           </span>
           <div>
             <strong>Sin kioscos registrados</strong>
-            <p>No hay buffets registrados en este colegio todavía.</p>
+            <p>No hay buffets registrados en este colegio todavia.</p>
           </div>
         </div>
       }
 
       @if (data.buffets.length > 0) {
         <div class="pv__operation-grid">
-          @for (buffet of data.buffets; track buffet) {
-            <div class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
-              <span class="pv__operation-icon" aria-hidden="true">
+          @for (buffet of data.buffets; track buffet.id) {
+            <article class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
+              <div class="pv__operation-icon" aria-hidden="true">
                 <i class="fa-solid fa-store"></i>
-              </span>
+              </div>
 
               <div class="pv__operation-body">
-                <span class="pv__operation-label">
-                  <span class="status-indicator" [class.active]="buffet.activo">
-                    {{ buffet.activo ? 'Activo' : 'Inactivo' }}
-                  </span>
+                <span class="pv__status" [class.pv__status--active]="buffet.activo">
+                  {{ buffet.activo ? 'Activo' : 'Inactivo' }}
                 </span>
-                <strong style="font-size: 20px;">{{ buffet.nombre }}</strong>
+                <strong>{{ buffet.nombre }}</strong>
 
                 @if (buffet.vendedor) {
-                  <small style="margin-top: 8px;">
-                    <i class="fa-solid fa-user-tie"></i> {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
+                  <small class="pv__operation-detail">
+                    <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+                    {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
                   </small>
                 } @else {
-                  <small style="margin-top: 8px; color: #d97706;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Sin vendedor
+                  <small class="pv__operation-detail pv__operation-detail--warning">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    Sin vendedor asignado
                   </small>
                 }
               </div>
 
-              <div class="actions-column" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-width: max-content;">
+              <div class="pv__operation-actions">
                 @if (!buffet.vendedor) {
-                  <button type="button" class="pv__quick-action pv__quick-action--dorado" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
-                    <span>
-                      <strong style="font-size: 13px;">Asignar Vendedor</strong>
-                    </span>
-                    <span class="pv__quick-arrow" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
-                      <i class="fa-solid fa-arrow-right"></i>
-                    </span>
+                  <button type="button" class="pv__mini-action pv__mini-action--warning" [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
+                    <span>Asignar vendedor</span>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                   </button>
                 } @else {
-                  <button type="button" class="pv__quick-action" style="min-height: auto; padding: 10px 14px; flex-direction: row; gap: 8px; width: max-content; align-items: center;" (click)="verDetalleVendedor(buffet.vendedor)">
-                    <span>
-                      <strong style="font-size: 13px;">Ver Vendedor</strong>
-                    </span>
-                    <span class="pv__quick-arrow pv__quick-arrow--eye" style="width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; align-self: center;" aria-hidden="true">
-                      <i class="fa-solid fa-eye"></i>
-                    </span>
+                  <button type="button" class="pv__mini-action" (click)="verDetalleVendedor(buffet.vendedor)">
+                    <span>Ver vendedor</span>
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
                   </button>
                 }
               </div>
-            </div>
+            </article>
           }
         </div>
       }
     </section>
 
     <section class="pv__panel" aria-labelledby="gestion-escolar-title">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div class="pv__panel-header">
         <div class="pv__section-title">
           <span aria-hidden="true">
             <i class="fa-solid fa-school-flag"></i>
           </span>
-          <h2 id="gestion-escolar-title">Gestion escolar</h2>
+          <div>
+            <p class="pv__section-kicker">Configuracion</p>
+            <h2 id="gestion-escolar-title">Gestion escolar</h2>
+          </div>
         </div>
       </div>
 
-      <div class="pv__operation-grid" style="margin-top: 12px;">
-        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/grados']">
+      <div class="pv__action-grid">
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/grados']">
           <span class="pv__quick-icon" aria-hidden="true">
             <i class="fa-solid fa-layer-group"></i>
           </span>
-          <span style="text-align: left;">
-            <strong style="font-size: 15px; display: block;">Grados</strong>
-            <small style="color: #64748b;">Altas, bajas y modificaciones</small>
+          <span class="pv__action-copy">
+            <strong>Grados</strong>
+            <small>Altas, bajas y modificaciones</small>
           </span>
-          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+          <span class="pv__quick-arrow" aria-hidden="true">
             <i class="fa-solid fa-arrow-right"></i>
           </span>
         </button>
 
-        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/franjas-horarias']">
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/franjas-horarias']">
           <span class="pv__quick-icon" aria-hidden="true">
             <i class="fa-solid fa-clock"></i>
           </span>
-          <span style="text-align: left;">
-            <strong style="font-size: 15px; display: block;">Franjas horarias</strong>
-            <small style="color: #64748b;">Horarios, cupos y cortes</small>
+          <span class="pv__action-copy">
+            <strong>Franjas horarias</strong>
+            <small>Horarios, cupos y cortes</small>
           </span>
-          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+          <span class="pv__quick-arrow" aria-hidden="true">
             <i class="fa-solid fa-arrow-right"></i>
           </span>
         </button>
@@ -227,38 +222,41 @@
     </section>
 
     <section class="pv__panel" aria-labelledby="tutores-title">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div class="pv__panel-header">
         <div class="pv__section-title">
           <span aria-hidden="true">
             <i class="fa-solid fa-user-group"></i>
           </span>
-          <h2 id="tutores-title">Tutores del Colegio</h2>
+          <div>
+            <p class="pv__section-kicker">Comunidad</p>
+            <h2 id="tutores-title">Tutores del colegio</h2>
+          </div>
         </div>
       </div>
 
-      <div class="pv__operation-grid" style="margin-top: 12px;">
-        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/invitar-tutor']">
+      <div class="pv__action-grid">
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/invitar-tutor']">
           <span class="pv__quick-icon" aria-hidden="true">
             <i class="fa-solid fa-envelope-open-text"></i>
           </span>
-          <span style="text-align: left;">
-            <strong style="font-size: 15px; display: block;">Invitar tutor</strong>
-            <small style="color: #64748b;">Enviar link único por email</small>
+          <span class="pv__action-copy">
+            <strong>Invitar tutor</strong>
+            <small>Enviar link unico por email</small>
           </span>
-          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+          <span class="pv__quick-arrow" aria-hidden="true">
             <i class="fa-solid fa-arrow-right"></i>
           </span>
         </button>
 
-        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/importar-tutores']">
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/importar-tutores']">
           <span class="pv__quick-icon" aria-hidden="true">
             <i class="fa-solid fa-file-csv"></i>
           </span>
-          <span style="text-align: left;">
-            <strong style="font-size: 15px; display: block;">Importar tutores por CSV</strong>
-            <small style="color: #64748b;">Alta masiva desde archivo</small>
+          <span class="pv__action-copy">
+            <strong>Importar tutores por CSV</strong>
+            <small>Alta masiva desde archivo</small>
           </span>
-          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+          <span class="pv__quick-arrow" aria-hidden="true">
             <i class="fa-solid fa-arrow-right"></i>
           </span>
         </button>
@@ -267,22 +265,21 @@
   }
 </div>
 
-<!-- Modal Vendedor -->
 @if (vendedorSeleccionado()) {
   <div class="pv-modal-overlay" (click)="cerrarModal()" (keydown.enter)="cerrarModal()" tabindex="0" role="button">
     <div class="pv-modal" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0" role="dialog" aria-labelledby="modal-title">
       <header class="pv-modal__header">
         <div class="pv-modal__title-group">
-          <span class="pv-modal__icon">
+          <span class="pv-modal__icon" aria-hidden="true">
             <i class="fa-solid fa-user-tie"></i>
           </span>
-          <h2 id="modal-title">Datos del Vendedor</h2>
+          <h2 id="modal-title">Datos del vendedor</h2>
         </div>
         <button class="pv-modal__close" (click)="cerrarModal()" aria-label="Cerrar modal">
-          <i class="fa-solid fa-xmark"></i>
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </header>
-      
+
       <div class="pv-modal__body">
         <div class="pv-modal__data-row">
           <small>Nombre completo</small>

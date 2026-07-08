@@ -29,6 +29,14 @@ export class DirectivoDashboardComponent {
     this.vendedorSeleccionado.set(null);
   }
 
+  public buffetsConVendedor(): number {
+    return this.data?.buffets.filter((buffet) => !!buffet.vendedor).length ?? 0;
+  }
+
+  public buffetsSinVendedor(): number {
+    return this.data?.buffets.filter((buffet) => !buffet.vendedor).length ?? 0;
+  }
+
   public iniciarPagoLicencia(): void {
     if (this.pagandoLicencia) return;
     this.pagarLicencia.emit();

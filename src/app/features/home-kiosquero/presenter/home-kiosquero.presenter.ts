@@ -1249,7 +1249,7 @@ export class HomeKiosqueroPresenter {
     }
 
     this.homeKiosqueroService
-      .getPanel(buffetId, selectedDate)
+      .getPanel(buffetId, selectedDate, 'home')
       .pipe(
         finalize(() => {
           if (showLoading && requestId === this.requestSeq) {

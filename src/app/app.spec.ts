@@ -94,6 +94,16 @@ describe('App', () => {
       expect(componente.mostrarAsistente()).toBeFalse();
     });
 
+    it('dado usuario autenticado con rol directivo, mostrarAsistente deberia ser false', async () => {
+      givenUsuarioAutenticado();
+      givenRol('DIRECTIVO_COLEGIO');
+      givenRouterEnUrl('/directivo');
+
+      const componente = await whenInicializoYObtengoPrivado();
+
+      expect(componente.mostrarAsistente()).toBeFalse();
+    });
+
     it('dado una url con query y hash, cuando normalizo, deberia devolver solo el path', () => {
       const priv = crearPrivadoSinInit();
 
