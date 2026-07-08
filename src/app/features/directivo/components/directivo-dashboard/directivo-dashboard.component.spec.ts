@@ -87,6 +87,21 @@ describe('DirectivoDashboardComponent', () => {
     expect(licencia.textContent).toContain('05/08/2026');
   });
 
+  it('dado estado SIN_LICENCIA, deberia mostrar Sin licencia', () => {
+    component.data = {
+      id: '1',
+      nombre: 'Colegio Test',
+      cue: '112233',
+      estadoLicencia: 'SIN_LICENCIA',
+      buffets: [],
+    };
+    fixture.detectChanges();
+
+    const licencia = fixture.debugElement.query(By.css('.pv__license-card')).nativeElement as HTMLElement;
+    expect(licencia.textContent).toContain('Sin licencia');
+    expect(licencia.textContent).not.toContain('SIN_LICENCIA');
+  });
+
   it('dado click en pagar licencia, deberia emitir el evento', () => {
     component.data = {
       id: '1',

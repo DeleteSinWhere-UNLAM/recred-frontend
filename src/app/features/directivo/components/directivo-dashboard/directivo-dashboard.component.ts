@@ -129,6 +129,7 @@ export class DirectivoDashboardComponent {
     if (normalizado === 'PENDIENTE' || normalizado === 'PENDING') return 'Pendiente';
     if (normalizado === 'VENCIDA' || normalizado === 'EXPIRED') return 'Vencida';
     if (normalizado === 'CANCELADA' || normalizado === 'CANCELLED') return 'Cancelada';
+    if (normalizado === 'SIN_LICENCIA' || normalizado === 'NO_LICENSE') return 'Sin licencia';
     return estado;
   }
 }

@@ -12,7 +12,7 @@ import { NotificacionSugerenciaSaludableComponent } from "./shared/components/no
 import { ModalComponent } from './shared/components/modal-component/modal-component';
 import { DialogService } from './shared/services/dialog.service';
 
-const RUTAS_SIN_ASISTENTE = new Set(['/', '/seleccion-tipo-cuenta']);
+const RUTAS_SIN_ASISTENTE = new Set(['/', '/seleccion-tipo-cuenta', '/invitaciones/tutor']);
 
 @Component({
   selector: 'app-root',

@@ -7,7 +7,7 @@ import { ProductoService } from '../../inventario/services/producto.service';
 import { Categoria } from '../../inventario/models/categoria.interface';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { PerfilService } from '../../../data-access/services/perfil.service';
-import { } from '../../../shared/components/navbar/navbar.component';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { CapturaCamara } from '../components/captura-camara/captura-camara';
 import { EscanerLoader } from '../components/escaner-loader/escaner-loader';
 import { ProductoIaForm } from '../components/producto-ia-form/producto-ia-form';
@@ -16,7 +16,7 @@ import { DialogService } from '../../../shared/services/dialog.service';
 @Component({
     selector: 'app-ai-product-upload-page',
     standalone: true,
-    imports: [ CapturaCamara, EscanerLoader, ProductoIaForm],
+    imports: [NavbarComponent, CapturaCamara, EscanerLoader, ProductoIaForm],
     templateUrl: './cargar-producto-ia-page.component.html',
     styleUrl: './cargar-producto-ia-page.component.css'
 })

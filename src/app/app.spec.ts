@@ -94,6 +94,17 @@ describe('App', () => {
       expect(componente.mostrarAsistente()).toBeFalse();
     });
 
+    it('dado un evento NavigationEnd a /invitaciones/tutor con token, mostrarAsistente deberia ser false', async () => {
+      givenUsuarioAutenticado();
+      givenRol('PADRE');
+      givenRouterEnUrl('/tutor');
+
+      const componente = await whenInicializoYObtengoPrivado();
+      whenSeNavegaA('/invitaciones/tutor?token=abc123');
+
+      expect(componente.mostrarAsistente()).toBeFalse();
+    });
+
     it('dado usuario autenticado con rol directivo, mostrarAsistente deberia ser false', async () => {
       givenUsuarioAutenticado();
       givenRol('DIRECTIVO_COLEGIO');
