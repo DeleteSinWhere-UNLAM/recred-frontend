@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegistroColegioPresenter } from './presenter/registro-colegio.presenter';
-import { NIVELES_EDUCATIVOS, SchoolRegistrationPayload } from './models/registro-colegio.model';
+import { SchoolRegistrationPayload } from './models/registro-colegio.model';
 
 @Component({
   selector: 'app-registro-colegio-page',
@@ -17,7 +17,6 @@ export class RegistroColegioPage implements OnInit {
   readonly presenter = inject(RegistroColegioPresenter);
   private readonly fb = inject(FormBuilder);
 
-  readonly niveles = NIVELES_EDUCATIVOS;
   form!: FormGroup;
 
   ngOnInit(): void {
@@ -26,7 +25,7 @@ export class RegistroColegioPage implements OnInit {
       schoolEmail: ['', [Validators.required, Validators.email]],
       schoolPhone: ['', Validators.required],
       schoolCue: ['', Validators.required],
-      schoolLevelId: ['', Validators.required],
+
       directorFirstName: ['', Validators.required],
       directorLastName: ['', Validators.required],
       directorEmail: ['', [Validators.required, Validators.email]],
@@ -45,7 +44,7 @@ export class RegistroColegioPage implements OnInit {
       schoolEmail: v.schoolEmail,
       schoolPhone: v.schoolPhone,
       schoolCue: v.schoolCue,
-      schoolLevel: { id: v.schoolLevelId },
+
       directorFirstName: v.directorFirstName,
       directorLastName: v.directorLastName,
       directorEmail: v.directorEmail,

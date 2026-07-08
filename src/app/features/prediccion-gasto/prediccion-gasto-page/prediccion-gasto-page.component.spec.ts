@@ -29,7 +29,6 @@ class ResumenPrediccionStub {
   @Input() promedioGastoDiario = 0;
   @Input() montoLimite: number | null = null;
   @Input() porcentajePresupuesto: number | null = null;
-  @Input() confianza = 0;
   @Input() diasHistoricosUsados = 0;
   @Input() diasRestantes = 0;
 }

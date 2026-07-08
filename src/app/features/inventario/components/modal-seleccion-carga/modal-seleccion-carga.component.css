@@ -97,6 +97,10 @@
   gap: 1rem;
 }
 
+.upload-selection-modal__option--locked {
+  cursor: not-allowed;
+}
+
 .upload-selection-modal__option:hover,
 .upload-selection-modal__option:focus-visible {
   border-color: var(--color-pizarra);
@@ -153,6 +157,7 @@
 .upload-selection-modal__premium-badge {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
@@ -164,6 +169,10 @@
   box-shadow: 0 2px 6px rgba(212, 175, 55, 0.3);
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.2);
   line-height: 1;
+}
+
+.upload-selection-modal__premium-badge i {
+  font-size: 9px;
 }
 
 .upload-selection-modal__option-desc {

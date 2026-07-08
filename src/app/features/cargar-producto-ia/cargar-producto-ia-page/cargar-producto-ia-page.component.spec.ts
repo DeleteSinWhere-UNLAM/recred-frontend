@@ -1,8 +1,10 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { ProductoService } from '../../inventario/services/producto.service';
 import {
@@ -12,6 +14,13 @@ import {
 } from '../cargar-producto-ia.mother';
 import { IaVisionService } from '../services/ia-vision-service/ia-vision-service';
 import { CargarProductoIaPageComponent } from './cargar-producto-ia-page.component';
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true,
+})
+class NavbarStubComponent {}
 
 describe('CargarProductoIaPageComponent', () => {
   const BUFFET_ID = 'buffet-test-123';
@@ -49,7 +58,12 @@ describe('CargarProductoIaPageComponent', () => {
         { provide: DialogService, useValue: servicioDialog },
         provideRouter([]),
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(CargarProductoIaPageComponent, {
+        remove: { imports: [NavbarComponent] },
+        add: { imports: [NavbarStubComponent] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(CargarProductoIaPageComponent);
     component = fixture.componentInstance;

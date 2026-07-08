@@ -38,6 +38,15 @@ describe('AsistenteFabComponent', () => {
 
       expect(boton().querySelector('.asistente-fab__badge')).toBeNull();
     });
+
+    it('dado bloqueado=true, cuando renderizo, deberia mostrar el candado', () => {
+      component.bloqueado = true;
+
+      whenMonto();
+
+      expect(boton().classList.contains('asistente-fab--locked')).toBeTrue();
+      expect(boton().querySelector('.asistente-fab__lock')).not.toBeNull();
+    });
   });
 
   describe('togglePanel', () => {

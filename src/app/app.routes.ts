@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { authChildGuard } from './core/auth/guards/auth.guard';
 import { alumnoContextoGuard } from './core/guards/alumno-contexto.guard';
 import { rolGuard, rolChildGuard, wildcardRedirectGuard } from './core/auth/guards/rol.guard';
+import { vendedorPlanGuard } from './core/guards/vendedor-plan.guard';
+import { familiaPlanGuard } from './core/guards/familia-plan.guard';
 
 export const routes: Routes = [
   {
@@ -16,6 +18,13 @@ export const routes: Routes = [
       import('./features/registro-colegio/registro-colegio.page').then((m) => m.RegistroColegioPage),
   },
   {
+    path: 'invitaciones/tutor',
+    loadComponent: () =>
+      import('./features/aceptar-invitacion-tutor/aceptar-invitacion-tutor.page').then(
+        (m) => m.AceptarInvitacionTutorPage,
+      ),
+  },
+  {
     path: 'recred-admin',
     canActivate: [authChildGuard, rolGuard],
     data: { roles: ['ADMIN'] },
@@ -26,8 +35,45 @@ export const routes: Routes = [
     path: 'directivo',
     canActivate: [authChildGuard, rolGuard],
     data: { roles: ['DIRECTIVO_COLEGIO'] },
-    loadComponent: () =>
-      import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/directivo/directivo.page').then((m) => m.DirectivoPage),
+      },
+      {
+        path: 'crear-buffet',
+        loadComponent: () =>
+          import('./features/directivo/crear-buffet/crear-buffet.page').then((m) => m.CrearBuffetPage),
+      },
+      {
+        path: 'asignar-vendedor',
+        loadComponent: () =>
+          import('./features/directivo/asignar-vendedor/asignar-vendedor.page').then((m) => m.AsignarVendedorPage),
+      },
+      {
+        path: 'invitar-tutor',
+        loadComponent: () =>
+          import('./features/directivo/invitar-tutor/invitar-tutor.page').then((m) => m.InvitarTutorPage),
+      },
+      {
+        path: 'grados',
+        data: { tab: 'grados' },
+        loadComponent: () =>
+          import('./features/directivo/gestion-escolar/gestion-escolar.page').then((m) => m.GestionEscolarPage),
+      },
+      {
+        path: 'franjas-horarias',
+        data: { tab: 'franjas' },
+        loadComponent: () =>
+          import('./features/directivo/gestion-escolar/gestion-escolar.page').then((m) => m.GestionEscolarPage),
+      },
+      {
+        path: 'importar-tutores',
+        loadComponent: () =>
+          import('./features/directivo/importar-tutores/importar-tutores.page').then((m) => m.ImportarTutoresPage),
+      }
+    ]
   },
   {
     path: '',
@@ -100,7 +146,8 @@ export const routes: Routes = [
               },
               {
                 path: 'transferir-saldo',
-                canActivate: [alumnoContextoGuard],
+                canActivate: [alumnoContextoGuard, familiaPlanGuard],
+                data: { familiaPlanMinimo: 'AVANZADO' },
                 loadComponent: () =>
                   import('./features/transferir-saldo/transferir-saldo.page').then(
                     (m) => m.TransferirSaldoPage,
@@ -116,6 +163,8 @@ export const routes: Routes = [
               },
               {
                 path: 'preferencias',
+                canActivate: [familiaPlanGuard],
+                data: { familiaPlanMinimo: 'INTERMEDIO' },
                 loadComponent: () =>
                   import('./features/preferencias/preferencias.page').then(
                     (m) => m.PreferenciasPage,
@@ -123,6 +172,8 @@ export const routes: Routes = [
               },
               {
                 path: 'prediccion-gasto',
+                canActivate: [familiaPlanGuard],
+                data: { familiaPlanMinimo: 'INTERMEDIO' },
                 loadChildren: () =>
                   import('./features/prediccion-gasto/prediccion-gasto.routes').then(
                     (m) => m.PREDICCION_GASTO_ROUTES,
@@ -161,6 +212,8 @@ export const routes: Routes = [
               },
               {
                 path: 'resumen-semanal',
+                canActivate: [familiaPlanGuard],
+                data: { familiaPlanMinimo: 'INTERMEDIO' },
                 loadComponent: () =>
                   import('./features/resumen-semanal/resumen-semanal.page').then(
                     (m) => m.ResumenSemanalPage,
@@ -168,6 +221,8 @@ export const routes: Routes = [
               },
               {
                 path: 'preferencias-detectadas',
+                canActivate: [familiaPlanGuard],
+                data: { familiaPlanMinimo: 'INTERMEDIO' },
                 loadComponent: () =>
                   import('./features/preferencias-detectadas/preferencias-detectadas.page').then(
                     (m) => m.PreferenciasDetectadasPage,
@@ -177,6 +232,8 @@ export const routes: Routes = [
           },
           {
             path: 'tutor-dashboard',
+            canActivate: [familiaPlanGuard],
+            data: { familiaPlanMinimo: 'INTERMEDIO' },
             loadComponent: () =>
               import('./features/tutor-dashboard/tutor-dashboard.component').then(
                 (m) => m.TutorDashboardComponent,
@@ -219,6 +276,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'puntos',
+            loadComponent: () =>
+              import('./features/explicacion-puntos/explicacion-puntos.page').then(
+                (m) => m.ExplicacionPuntosPage,
+              ),
+          },
+          {
             path: 'favoritos',
             loadComponent: () =>
               import('./features/favoritos/favoritos.page').then(
@@ -252,6 +316,8 @@ export const routes: Routes = [
           },
           {
             path: 'kiosquero/reportes',
+            canActivate: [vendedorPlanGuard],
+            data: { vendedorPlanMinimo: 'INTERMEDIO' },
             loadComponent: () =>
               import('./features/home-kiosquero/kiosquero-reportes.page').then(
                 (m) => m.KiosqueroReportesPage,
@@ -286,7 +352,27 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'kiosquero/inteligencia-comercial',
+            canActivate: [vendedorPlanGuard],
+            data: { vendedorPlanMinimo: 'AVANZADO' },
+            loadComponent: () =>
+              import('./features/inteligencia-comercial/inteligencia-comercial.page').then(
+                (m) => m.InteligenciaComercialPage,
+              ),
+          },
+          {
+            path: 'kiosquero/sugerencias',
+            canActivate: [vendedorPlanGuard],
+            data: { vendedorPlanMinimo: 'AVANZADO' },
+            loadComponent: () =>
+              import('./features/sugerencias/sugerencias.page').then(
+                (m) => m.SugerenciasPage,
+              ),
+          },
+          {
             path: 'cargar-producto-ia',
+            canActivate: [vendedorPlanGuard],
+            data: { vendedorPlanMinimo: 'INTERMEDIO' },
             loadChildren: () =>
               import('./features/cargar-producto-ia/cargar-producto-ia.routes').then(
                 (m) => m.cargarProductoIaRoutes,
@@ -294,6 +380,8 @@ export const routes: Routes = [
           },
           {
             path: 'recomendaciones-estacionales',
+            canActivate: [vendedorPlanGuard],
+            data: { vendedorPlanMinimo: 'AVANZADO' },
             loadComponent: () =>
               import('./features/recomendaciones-estacionales/pages/recomendaciones-page/recomendaciones-page.component').then(
                 (m) => m.RecomendacionesPageComponent,
@@ -308,6 +396,8 @@ export const routes: Routes = [
           },
           {
             path: 'promociones',
+            canActivate: [vendedorPlanGuard],
+            data: { vendedorPlanMinimo: 'AVANZADO' },
             loadComponent: () =>
               import('./features/promociones/promociones.page').then(
                 (m) => m.PromocionesPageComponent,
@@ -322,6 +412,8 @@ export const routes: Routes = [
           },
           {
             path: 'sugerencias',
+            canActivate: [vendedorPlanGuard],
+            data: { vendedorPlanMinimo: 'AVANZADO' },
             loadComponent: () =>
               import('./features/sugerencias/sugerencias.page').then(
                 (m) => m.SugerenciasPage,

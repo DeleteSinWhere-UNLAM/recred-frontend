@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  min-width: 0;
 }
 
 .prediction-summary__cabecera {
@@ -15,6 +16,7 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .prediction-summary__titulo {
@@ -63,6 +65,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  min-width: 0;
 }
 
 .prediction-summary__card {
@@ -76,6 +79,7 @@
   border-radius: 12px;
   box-shadow: none;
   text-align: center;
+  min-width: 0;
 }
 
 .prediction-summary__card-label {
@@ -103,6 +107,7 @@
   border: 1px solid var(--color-borde);
   border-radius: 12px;
   box-shadow: none;
+  min-width: 0;
 }
 
 .prediction-summary__limite-info {
@@ -126,20 +131,34 @@
   background-color: var(--color-superficie-alt);
   border-radius: var(--radius-pill);
   overflow: hidden;
+  position: relative;
 }
 
 .prediction-summary__barra-fill {
   height: 100%;
-  background-color: var(--color-menta);
   border-radius: var(--radius-pill);
   transition: width 0.3s ease, background-color 0.25s ease;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.prediction-summary__barra-fill--actual {
+  z-index: 2;
+  background-color: var(--color-menta);
+}
+
+.prediction-summary__barra-fill--predicho {
+  background-color: var(--color-pizarra);
+  opacity: 0.4;
+  z-index: 1;
 }
 
 .prediction-summary__limite--danger .prediction-summary__limite-info strong {
   color: var(--color-melocoton);
 }
 
-.prediction-summary__limite--danger .prediction-summary__barra-fill {
+.prediction-summary__limite--danger .prediction-summary__barra-fill--actual {
   background-color: var(--color-melocoton);
 }
 
@@ -165,6 +184,7 @@
   border: 1px solid var(--color-borde);
   border-radius: 12px;
   box-shadow: none;
+  min-width: 0;
 }
 
 .prediction-summary__stat {
@@ -172,6 +192,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  min-width: 0;
 }
 
 .prediction-summary__stat-valor {

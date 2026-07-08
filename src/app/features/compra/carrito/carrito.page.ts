@@ -37,9 +37,9 @@ export class CarritoPage implements OnInit {
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   cantCarritos = signal(0);
-  readonly esPlanGratuito = computed(() => this.perfilService.perfil()?.plan !== 'PREMIUM');
-  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
-  readonly limiteCarritosAlcanzado = computed(() => this.esPlanGratuito() && this.cantCarritos() >= 3);
+  readonly esPlanGratuito = this.perfilService.esPlanGratuito;
+  readonly esPremium = computed(() => !this.esPlanGratuito());
+  readonly limiteCarritosAlcanzado = computed(() => this.esPlanGratuito() && this.cantCarritos() >= 5);
 
   mostrarModalFavorito = false;
   favoritoModalAlumnoId = '';

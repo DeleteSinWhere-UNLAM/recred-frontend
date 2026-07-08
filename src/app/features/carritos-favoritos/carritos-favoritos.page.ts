@@ -40,7 +40,7 @@ export class CarritosFavoritosPage implements OnInit {
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
   readonly esPlanGratuito = this.perfilService.esPlanGratuito;
-  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
+  readonly esPremium = computed(() => !this.esPlanGratuito());
 
   readonly hijosColapsados = signal<Record<string, boolean>>({});
 

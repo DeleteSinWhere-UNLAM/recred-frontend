@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { of } from 'rxjs';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
@@ -58,9 +59,13 @@ describe('HomeAlumnoPresenter', () => {
       'getProximoRecreo',
       'cargarPedidoEnCurso',
       'cargarRecreos',
+      'getRecompensasSaludables',
     ]);
     servicioHomeAlumno.getPedidoEnCurso.and.returnValue(undefined);
     servicioHomeAlumno.getProximoRecreo.and.returnValue(undefined);
+    servicioHomeAlumno.getRecompensasSaludables.and.returnValue(
+      of({ totalPoints: 0, currentLevel: '', levelMessage: '', pointsToNextLevel: 0, nextLevelName: '' })
+    );
     servicioHomeAlumno.cargarPedidoEnCurso.and.resolveTo();
     servicioHomeAlumno.cargarRecreos.and.resolveTo();
 

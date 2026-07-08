@@ -103,6 +103,32 @@ describe('FormularioProductoComponent', () => {
       expect(component.productForm.get('categoriaId')?.value).toBe('c1');
       expect(component.productForm.get('requierePreparacion')?.value).toBeTrue();
     });
+
+    it('dado datos iniciales sin producto, cuando cambian los inputs, deberia precompletar el form de creacion', () => {
+      component.product = null;
+      component.datosIniciales = {
+        nombre: 'Prod C',
+        descripcion: 'Producto sugerido para incorporar al stock.',
+        precio: 400,
+        peso: 0,
+        stockActual: 0,
+      };
+
+      component.ngOnChanges({
+        datosIniciales: {
+          currentValue: component.datosIniciales,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.isEditing).toBeFalse();
+      expect(component.productForm.get('nombre')?.value).toBe('Prod C');
+      expect(component.productForm.get('descripcion')?.value).toBe('Producto sugerido para incorporar al stock.');
+      expect(component.productForm.get('precio')?.value).toBe(400);
+      expect(component.productForm.get('stockActual')?.value).toBe(0);
+    });
   });
 
   describe('validaciones del form', () => {

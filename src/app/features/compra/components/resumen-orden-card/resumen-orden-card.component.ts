@@ -33,7 +33,7 @@ export interface ResumenLinea {
 })
 export class ResumenOrdenCardComponent {
   private readonly perfilService = inject(PerfilService);
-  readonly esPremium = computed(() => this.perfilService.perfil()?.plan === 'PREMIUM');
+  readonly esPremium = computed(() => !this.perfilService.esPlanGratuito());
 
   private readonly lineasState = signal<ResumenLinea[]>([]);
   private readonly totalState = signal<number>(0);

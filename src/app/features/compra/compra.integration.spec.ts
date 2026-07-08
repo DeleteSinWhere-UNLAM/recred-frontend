@@ -1,8 +1,11 @@
 import { Component, EventEmitter, Input, Output, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { PerfilService } from '../../data-access/services/perfil.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../shared/services/toast.service';
 import { SugerenciasService } from '../sugerencias/services/sugerencias.service';
@@ -76,7 +79,16 @@ describe('Compra (confirmar) Integration', () => {
         { provide: SugerenciasService, useValue: servicioSugerencias },
         { provide: ToastService, useValue: servicioToast },
         { provide: UsuarioService, useValue: servicioUsuario },
+        {
+          provide: PerfilService,
+          useValue: {
+            perfil: signal(null).asReadonly(),
+            rol: signal('PADRE').asReadonly(),
+          },
+        },
         provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     })
       .overrideComponent(ConfirmarPage, {

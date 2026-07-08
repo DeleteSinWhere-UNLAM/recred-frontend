@@ -18,6 +18,11 @@ import { NotificacionesService, Notificacion } from '../../../data-access/servic
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
+import { ToastService } from '../../services/toast.service';
+import { CompraService } from '../../../features/compra/services/compra.service';
+import { AcreditarMercadoPagoService } from '../../../features/acreditar-mercado-pago/services/acreditar-mercado-pago.service';
+
+type PlanNavbar = 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO';
 
 @Component({
   selector: 'app-navbar',
@@ -37,6 +42,9 @@ export class NavbarComponent implements OnInit {
   private readonly host = inject(ElementRef<HTMLElement>);
   protected readonly themeService = inject(ThemeService);
   private readonly contextoService = inject(AlumnoContextoService);
+  private readonly toastService = inject(ToastService);
+  private readonly compraService = inject(CompraService);
+  private readonly mercadoPagoService = inject(AcreditarMercadoPagoService);
 
   @Input() userName = '';
 
@@ -45,17 +53,20 @@ export class NavbarComponent implements OnInit {
   }
 
 
-  protected readonly esPremium = computed(() => {
-    if (typeof this.perfilService?.perfil !== 'function') {
-      return false;
-    }
-    const plan = this.perfilService.perfil()?.plan;
-    return plan === 'PREMIUM' || plan === 'AVANZADO';
+  protected readonly planPagoLabel = computed(() => {
+    const plan = this.planActual();
+    if (plan === 'INTERMEDIO') return 'Intermedio';
+    if (plan === 'AVANZADO') return 'Avanzado';
+    return null;
   });
+
+  protected readonly esPremium = computed(() => this.planPagoLabel() !== null);
 
   protected readonly cartCount = this.carritoService.cantidadTotal;
   protected readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
   protected readonly esVistaKiosquero = this.usuarioService.esVistaKiosquero;
+  protected readonly esVistaDirectivo = this.usuarioService.esVistaDirectivo;
+  protected readonly esVistaAdmin = this.usuarioService.esVistaAdmin;
   protected readonly notificaciones = this.notificacionesService.notificaciones;
   protected readonly notifCount = this.notificacionesService.cantidad;
   protected readonly alumnos = this.alumnosService.alumnos;
@@ -63,6 +74,7 @@ export class NavbarComponent implements OnInit {
   protected readonly menuNotifAbierto = signal(false);
   protected readonly menuKiosqueroAbierto = signal(false);
   protected readonly menuBilleteraAbierto = signal(false);
+  protected readonly menuMobileAbierto = signal(false);
   protected readonly temaActivo = this.themeService.theme;
 
   protected toggleTema(): void {
@@ -70,16 +82,19 @@ export class NavbarComponent implements OnInit {
   }
 
   protected irAlCarrito(): void {
+    this.menuMobileAbierto.set(false);
     this.router.navigateByUrl('/compra');
   }
 
   protected irAMovimientos(): void {
+    this.menuMobileAbierto.set(false);
     this.contextoService.limpiar();
     void this.router.navigateByUrl('/movimientos');
   }
 
   protected irAInicio(event: Event): void {
     event.preventDefault();
+    this.menuMobileAbierto.set(false);
     this.router.navigateByUrl(this.usuarioService.homeUrl());
   }
 
@@ -90,6 +105,15 @@ export class NavbarComponent implements OnInit {
       this.menuKiosqueroAbierto.set(false);
     } else {
       this.menuBilleteraAbierto.set(false);
+    }
+  }
+
+  protected toggleMenuMobile(): void {
+    this.menuMobileAbierto.update((abierto) => !abierto);
+    if (this.menuMobileAbierto()) {
+      this.menuAbierto.set(false);
+      this.menuNotifAbierto.set(false);
+      this.menuKiosqueroAbierto.set(false);
     }
   }
 
@@ -115,7 +139,6 @@ export class NavbarComponent implements OnInit {
 
   protected clickEnNotificacion(notif: Notificacion): void {
     this.menuNotifAbierto.set(false);
-    console.log('Notificacion clickeada:', notif);
 
     if (notif.id) {
       this.notificacionesService.marcarComoLeida(notif.id);
@@ -126,23 +149,18 @@ export class NavbarComponent implements OnInit {
                           (typeof this.esVistaKiosquero === 'function' && this.esVistaKiosquero()) ||
                           (this.esVistaKiosquero as unknown) === true;
 
-      console.log('¿Es vista kiosquero?', esKiosquero);
 
       if (esKiosquero) {
         if (notif.tipo === 'ESTADO_COMPRA' || notif.tipo === 'RETIRO_PROGRAMADO') {
           const url = notif.compraId 
             ? `/kiosquero/pedidos-tracking?id=${notif.compraId}`
             : '/kiosquero/pedidos-tracking';
-          console.log('Navegando a (Kiosquero):', url);
           void this.router.navigateByUrl(url);
         } else if (notif.tipo === 'AGREGAR_PRODUCTO') {
-          console.log('Navegando a (Kiosquero Agregar Producto): /sugerencias-agregar');
           void this.router.navigateByUrl('/sugerencias-agregar');
         } else if (notif.tipo === 'SISTEMA') {
-          console.log('Navegando a (Kiosquero Stock): /admin-productos');
           void this.router.navigateByUrl('/admin-productos');
         } else {
-          console.log('Navegando a (Kiosquero Home): /kiosquero');
           void this.router.navigateByUrl('/kiosquero');
         }
         return;
@@ -157,7 +175,6 @@ export class NavbarComponent implements OnInit {
         const url = notif.compraId 
           ? `/movimientos?id=${notif.compraId}`
           : '/movimientos';
-        console.log('Navegando a (Tutor):', url);
         void this.router.navigateByUrl(url);
       } else if (notif.tipo === 'RESUMEN_SEMANAL') {
         void this.router.navigateByUrl('/resumen-semanal');
@@ -184,12 +201,52 @@ export class NavbarComponent implements OnInit {
         void this.router.navigateByUrl('/sugerencias-agregar');
       } else {
         const fallbackUrl = this.esVistaAlumno() ? '/alumno' : '/tutor-dashboard';
-        console.log('Navegando a fallback:', fallbackUrl);
         void this.router.navigateByUrl(fallbackUrl);
       }
     } catch (error) {
       console.error('Error al manejar el click de la notificacion:', error);
       void this.router.navigateByUrl('/kiosquero');
+    }
+  }
+
+  protected async comprarSugerencia(event: Event, notif: Notificacion): Promise<void> {
+    event.stopPropagation();
+    this.menuNotifAbierto.set(false);
+    
+    if (notif.id) {
+       this.notificacionesService.marcarComoLeida(notif.id);
+    }
+    
+    const producto = notif.producto;
+    const alumnoId = notif.alumnoId;
+    const sugerenciaId = notif.sugerenciaId;
+    
+    if (!producto || !alumnoId || !sugerenciaId) return;
+
+    try {
+      await this.alumnosService.asegurarCargados();
+      const alumno = this.alumnosService.getAlumnoById(alumnoId);
+
+      if (!alumno) {
+        this.toastService.mostrar('No pudimos encontrar la información del alumno.', 'error');
+        return;
+      }
+
+      if (alumno.saldo >= producto.precio) {
+        this.carritoService.agregar(producto, alumnoId, 1);
+        this.compraService.setSugerenciaPendiente(sugerenciaId);
+        this.router.navigate(['/compra']);
+      } else {
+        const linkPago = await this.mercadoPagoService.generarLinkPago(alumnoId, producto.precio);
+        this.toastService.mostrar(
+          `Saldo insuficiente para "${producto.nombre}". <a href="${linkPago}" target="_blank" style="color: white; text-decoration: underline; font-weight: bold;">Cargar saldo con Mercado Pago</a>`,
+          'error',
+          8000
+        );
+      }
+    } catch (error) {
+      console.error('Error al procesar la compra sugerida:', error);
+      this.toastService.mostrar('Hubo un error al procesar tu solicitud. Reintentá en unos momentos.', 'error');
     }
   }
 
@@ -202,11 +259,37 @@ export class NavbarComponent implements OnInit {
   }
 
   protected irARecomendacionesEstacionales(): void {
+    if (this.planBloqueado('AVANZADO')) {
+      this.toastService.mostrar('Disponible con plan Avanzado.', 'info');
+      return;
+    }
     this.menuKiosqueroAbierto.set(false);
     this.router.navigateByUrl('/recomendaciones-estacionales');
   }
 
+  protected irAPanelControl(event?: Event): void {
+    event?.preventDefault();
+    if (this.planBloqueado('INTERMEDIO')) {
+      this.toastService.mostrar('Disponible con plan Intermedio.', 'info');
+      return;
+    }
+    this.router.navigateByUrl('/kiosquero/reportes');
+  }
+
+  protected irAPanelTutor(event?: Event): void {
+    event?.preventDefault();
+    if (this.planBloqueado('INTERMEDIO')) {
+      this.toastService.mostrar('Disponible con plan Intermedio.', 'info');
+      return;
+    }
+    this.router.navigateByUrl('/tutor-dashboard');
+  }
+
   protected irAPromociones(): void {
+    if (this.planBloqueado('AVANZADO')) {
+      this.toastService.mostrar('Disponible con plan Avanzado.', 'info');
+      return;
+    }
     this.menuKiosqueroAbierto.set(false);
     this.router.navigateByUrl('/promociones');
   }
@@ -240,6 +323,23 @@ export class NavbarComponent implements OnInit {
     void this.router.navigateByUrl('/crear-hijo');
   }
 
+  protected planBloqueado(planRequerido: 'INTERMEDIO' | 'AVANZADO'): boolean {
+    return this.nivelPlan(this.planActual()) < this.nivelPlan(planRequerido);
+  }
+
+  private planActual(): PlanNavbar {
+    if (typeof this.perfilService?.perfil !== 'function') return 'GRATUITO';
+    const plan = this.perfilService.perfil()?.plan?.toUpperCase();
+    if (plan === 'INTERMEDIO' || plan === 'AVANZADO') return plan;
+    return 'GRATUITO';
+  }
+
+  private nivelPlan(plan: PlanNavbar): number {
+    if (plan === 'AVANZADO') return 2;
+    if (plan === 'INTERMEDIO') return 1;
+    return 0;
+  }
+
   protected async cerrarSesion(): Promise<void> {
     this.menuAbierto.set(false);
     try {
@@ -257,7 +357,8 @@ export class NavbarComponent implements OnInit {
       !this.menuAbierto() &&
       !this.menuNotifAbierto() &&
       !this.menuKiosqueroAbierto() &&
-      !this.menuBilleteraAbierto()
+      !this.menuBilleteraAbierto() &&
+      !this.menuMobileAbierto()
     ) {
       return;
     }
@@ -268,6 +369,7 @@ export class NavbarComponent implements OnInit {
       this.menuNotifAbierto.set(false);
       this.menuKiosqueroAbierto.set(false);
       this.menuBilleteraAbierto.set(false);
+      this.menuMobileAbierto.set(false);
     }
   }
 
@@ -277,5 +379,6 @@ export class NavbarComponent implements OnInit {
     if (this.menuNotifAbierto()) this.menuNotifAbierto.set(false);
     if (this.menuKiosqueroAbierto()) this.menuKiosqueroAbierto.set(false);
     if (this.menuBilleteraAbierto()) this.menuBilleteraAbierto.set(false);
+    if (this.menuMobileAbierto()) this.menuMobileAbierto.set(false);
   }
 }

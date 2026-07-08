@@ -12,7 +12,7 @@ import { NotificacionSugerenciaSaludableComponent } from "./shared/components/no
 import { ModalComponent } from './shared/components/modal-component/modal-component';
 import { DialogService } from './shared/services/dialog.service';
 
-const RUTAS_SIN_ASISTENTE = new Set(['/', '/seleccion-tipo-cuenta']);
+const RUTAS_SIN_ASISTENTE = new Set(['/', '/seleccion-tipo-cuenta', '/invitaciones/tutor']);
 
 @Component({
   selector: 'app-root',
@@ -32,10 +32,15 @@ export class App implements OnInit {
   private autenticado = signal(false);
 
   protected mostrarAsistente = computed(
-    () =>
-      this.autenticado() &&
-      this.perfilService.rol() !== null &&
-      !RUTAS_SIN_ASISTENTE.has(this.rutaActual()),
+    () => {
+      const rol = this.perfilService.rol();
+      return (
+        this.autenticado() &&
+        rol !== null &&
+        rol !== 'DIRECTIVO_COLEGIO' &&
+        !RUTAS_SIN_ASISTENTE.has(this.rutaActual())
+      );
+    },
   );
 
   async ngOnInit() {

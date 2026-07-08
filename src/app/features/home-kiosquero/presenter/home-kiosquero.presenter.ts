@@ -885,17 +885,6 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-cloud-arrow-up',
       ruta: '/cargar-producto-ia',
       color: 'dorado',
-
-    },
-    {
-      id: 'oportunidades-stock',
-      titulo: 'Oportunidades de Stock',
-      descripcion: 'Descubrir nuevos productos',
-      icono: 'fa-rocket',
-      ruta: '/sugerencias-agregar',
-      color: 'menta',
-      destacada: true,
-      premium: true,
     },
     {
       id: 'tracking-pedidos',
@@ -915,22 +904,23 @@ export class HomeKiosqueroPresenter {
       color: 'violeta',
     },
     {
+      id: 'inteligencia-comercial',
+      titulo: 'Diagnostico comercial',
+      descripcion: 'Detecta productos para sumar o impulsar',
+      icono: 'fa-chart-line',
+      ruta: '/kiosquero/inteligencia-comercial',
+      color: 'pizarra',
+      destacada: true,
+      planRequerido: 'AVANZADO',
+    },
+    {
       id: 'reportes',
       titulo: 'Panel de control',
       descripcion: 'Métricas y reportes',
       icono: 'fa-chart-line',
       ruta: '/kiosquero/reportes',
       color: 'pizarra',
-    },
-    {
-      id: 'sugerencias',
-      titulo: 'Impulsar Baja Rotación',
-      descripcion: 'Armar combos para mover stock estancado',
-      icono: 'fa-robot',
-      ruta: '/sugerencias',
-      color: 'melocoton',
-      destacada: true,
-      premium: true,
+      planRequerido: 'INTERMEDIO',
     },
     {
       id: 'recomendaciones',
@@ -947,6 +937,7 @@ export class HomeKiosqueroPresenter {
       icono: 'fa-tags',
       ruta: '/promociones',
       color: 'violeta',
+      planRequerido: 'AVANZADO',
     },
     {
       id: 'cierre-diario',
@@ -980,6 +971,7 @@ export class HomeKiosqueroPresenter {
           'cargar-productos',
           'tracking-pedidos',
           'stock',
+          'inteligencia-comercial',
           'reportes',
           'sugerencias',
           'recomendaciones',
@@ -1062,6 +1054,14 @@ export class HomeKiosqueroPresenter {
       return;
     }
 
+    const licencia = perfil?.estadoLicenciaColegio;
+    if (licencia && licencia !== 'ACTIVA' && licencia !== 'EN_GRACIA') {
+      this.errorMessageState.set(
+        'El colegio asociado al buffet no cuenta con una suscripción activa.',
+      );
+      return;
+    }
+
     this.cargarPanel();
     this.connectRealtime(buffetId);
   }
@@ -1092,6 +1092,14 @@ export class HomeKiosqueroPresenter {
 
     this.selectedRangePresetState.set('TODAY');
     this.applyReportRangePreset('TODAY');
+    const licencia = perfil?.estadoLicenciaColegio;
+    if (licencia && licencia !== 'ACTIVA' && licencia !== 'EN_GRACIA') {
+      this.errorMessageState.set(
+        'El colegio asociado al buffet no cuenta con una suscripción activa.',
+      );
+      return;
+    }
+
     this.cargarPanelReportes();
     this.connectRealtime(buffetId);
   }
@@ -1241,7 +1249,7 @@ export class HomeKiosqueroPresenter {
     }
 
     this.homeKiosqueroService
-      .getPanel(buffetId, selectedDate)
+      .getPanel(buffetId, selectedDate, 'home')
       .pipe(
         finalize(() => {
           if (showLoading && requestId === this.requestSeq) {

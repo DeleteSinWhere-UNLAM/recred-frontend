@@ -41,9 +41,17 @@
         <strong>{{ (porcentajePresupuesto || 0) | percent:'1.0-2' }}</strong>
       </div>
       <div class="prediction-summary__barra">
+        <!-- Gasto Actual (Color Menta o Melocotón si supera límite) -->
         <div
-          class="prediction-summary__barra-fill"
-          [style.width.%]="((porcentajePresupuesto || 0) * 100) > 100 ? 100 : (porcentajePresupuesto || 0) * 100"
+          class="prediction-summary__barra-fill prediction-summary__barra-fill--actual"
+          [style.width.%]="porcentajeActualPorc"
+        ></div>
+        <!-- Gasto Predicho (Diferencia visual) -->
+        <div
+          class="prediction-summary__barra-fill prediction-summary__barra-fill--predicho"
+          [style.width.%]="porcentajePredichoPorc"
+          [style.left.%]="porcentajeActualPorc"
+          [style.width.%]="porcentajePredichoPorc - porcentajeActualPorc > 0 ? porcentajePredichoPorc - porcentajeActualPorc : 0"
         ></div>
       </div>
     </div>
@@ -54,10 +62,6 @@
   }
 
   <div class="prediction-summary__footer">
-    <div class="prediction-summary__stat">
-      <span class="prediction-summary__stat-valor">{{ confianza | percent:'1.0-0' }}</span>
-      <span class="prediction-summary__stat-label">Confianza</span>
-    </div>
     <div class="prediction-summary__stat">
       <span class="prediction-summary__stat-valor">{{ diasHistoricosUsados }}</span>
       <span class="prediction-summary__stat-label">Días analizados</span>

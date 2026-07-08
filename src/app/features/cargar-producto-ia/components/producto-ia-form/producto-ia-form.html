@@ -1,35 +1,41 @@
-<form
-  [formGroup]="productForm"
-  (ngSubmit)="submitForm()"
-  class="ai-product-form"
->
+<form [formGroup]="productForm" (ngSubmit)="submitForm()" class="ai-product-form">
   @if (productForm.get("urlImagen")?.value) {
-    <div class="ai-product-form__preview-container" style="margin-bottom: 2rem; display: flex; justify-content: center;">
-      <img 
-        [src]="productForm.get('urlImagen')?.value" 
-        alt="Previsualización del producto" 
-        style="width: 200px; height: 200px; object-fit: cover; border-radius: 12px; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+    <section class="ai-product-form__preview" aria-label="Imagen detectada">
+      <img
+        [src]="productForm.get('urlImagen')?.value"
+        alt="Previsualizacion del producto"
+        class="ai-product-form__preview-img"
       >
-    </div>
+      <div class="ai-product-form__preview-copy">
+        <strong>Imagen detectada</strong>
+        <span>Lista para guardar con el producto.</span>
+      </div>
+    </section>
   }
 
   <section class="ai-product-form__seccion">
-    <h3 class="ai-product-form__seccion-titulo">Información del producto</h3>
+    <div class="ai-product-form__seccion-header">
+      <h3 class="ai-product-form__seccion-titulo">Informacion del producto</h3>
+      <span class="ai-product-form__seccion-badge">Inventario</span>
+    </div>
 
     <div class="ai-product-form__grid">
-      <div class="ai-product-form__group">
+      <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('nombre')">
         <label for="ai-nombre" class="ai-product-form__label">Nombre del producto</label>
         <input
           id="ai-nombre"
           class="ai-product-form__input"
           formControlName="nombre"
           type="text"
-          placeholder="Ej: Manzana Roja"
+          placeholder="Ej: Manzana roja"
         >
+        @if (hasError('nombre')) {
+          <span class="ai-product-form__error">{{ getErrorMessage('nombre') }}</span>
+        }
       </div>
 
-      <div class="ai-product-form__group">
-        <label for="ai-descripcion" class="ai-product-form__label">Descripción</label>
+      <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('descripcion')">
+        <label for="ai-descripcion" class="ai-product-form__label">Descripcion</label>
         <input
           id="ai-descripcion"
           class="ai-product-form__input"
@@ -37,20 +43,23 @@
           type="text"
           placeholder="Ej: Manzana roja fresca por unidad"
         >
+        @if (hasError('descripcion')) {
+          <span class="ai-product-form__error">{{ getErrorMessage('descripcion') }}</span>
+        }
       </div>
 
       <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('categoriaId')">
-        <label for="ai-categoria" class="ai-product-form__label">Categoría</label>
+        <label for="ai-categoria" class="ai-product-form__label">Categoria</label>
         <select
           id="ai-categoria"
           class="ai-product-form__input ai-product-form__input--select"
           formControlName="categoriaId"
         >
-          <option [ngValue]="null" disabled selected>Selecciona una categoría</option>
+          <option [ngValue]="null" disabled>Selecciona una categoria</option>
           @for (cat of categories; track cat.id) {
             <option [value]="cat.id">{{ cat.descripcion }}</option>
           }
-          <option value="NEW">+ Crear nueva categoría</option>
+          <option value="NEW">+ Crear nueva categoria</option>
         </select>
         @if (hasError('categoriaId')) {
           <span class="ai-product-form__error">{{ getErrorMessage('categoriaId') }}</span>
@@ -58,14 +67,14 @@
       </div>
 
       @if (productForm.get('categoriaId')?.value === 'NEW') {
-        <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('nuevaCategoriaNombre')">  
-          <label for="ai-nueva-categoria" class="ai-product-form__label">Nombre de la nueva categoría</label>
+        <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('nuevaCategoriaNombre')">
+          <label for="ai-nueva-categoria" class="ai-product-form__label">Nombre de la nueva categoria</label>
           <input
             id="ai-nueva-categoria"
             class="ai-product-form__input"
             formControlName="nuevaCategoriaNombre"
             type="text"
-            placeholder="Ej: Frutas y Verduras"
+            placeholder="Ej: Frutas y verduras"
           >
           @if (hasError('nuevaCategoriaNombre')) {
             <span class="ai-product-form__error">{{ getErrorMessage('nuevaCategoriaNombre') }}</span>
@@ -73,7 +82,7 @@
         </div>
       }
 
-      <div class="ai-product-form__group">
+      <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('peso')">
         <label for="ai-peso" class="ai-product-form__label">Peso (kg)</label>
         <input
           id="ai-peso"
@@ -84,9 +93,12 @@
           min="0"
           placeholder="0.150"
         >
+        @if (hasError('peso')) {
+          <span class="ai-product-form__error">{{ getErrorMessage('peso') }}</span>
+        }
       </div>
 
-      <div class="ai-product-form__group">
+      <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('precio')">
         <label for="ai-precio" class="ai-product-form__label">Precio ($)</label>
         <input
           id="ai-precio"
@@ -97,9 +109,12 @@
           min="0"
           placeholder="800.00"
         >
+        @if (hasError('precio')) {
+          <span class="ai-product-form__error">{{ getErrorMessage('precio') }}</span>
+        }
       </div>
 
-      <div class="ai-product-form__group">
+      <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('stockActual')">
         <label for="ai-stock" class="ai-product-form__label">Stock actual</label>
         <input
           id="ai-stock"
@@ -109,28 +124,34 @@
           min="0"
           placeholder="120"
         >
+        @if (hasError('stockActual')) {
+          <span class="ai-product-form__error">{{ getErrorMessage('stockActual') }}</span>
+        }
       </div>
     </div>
   </section>
 
   <section class="ai-product-form__seccion">
-    <h3 class="ai-product-form__seccion-titulo">Atributos</h3>
+    <div class="ai-product-form__seccion-header">
+      <h3 class="ai-product-form__seccion-titulo">Atributos</h3>
+      <span class="ai-product-form__seccion-badge">Salud</span>
+    </div>
 
     <div class="ai-product-form__toggles">
       <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Requiere preparación</span>
+        <span class="ai-product-form__toggle-label">Requiere preparacion</span>
         <input type="checkbox" formControlName="requierePreparacion">
         <span class="ai-product-form__toggle-switch"></span>
       </label>
 
       <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene azúcar</span>
+        <span class="ai-product-form__toggle-label">Contiene azucar</span>
         <input type="checkbox" formControlName="contiene_azucar">
         <span class="ai-product-form__toggle-switch"></span>
       </label>
 
       <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene maní</span>
+        <span class="ai-product-form__toggle-label">Contiene mani</span>
         <input type="checkbox" formControlName="contiene_mani">
         <span class="ai-product-form__toggle-switch"></span>
       </label>

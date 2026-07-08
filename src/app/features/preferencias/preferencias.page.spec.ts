@@ -9,10 +9,13 @@ import { Preferencia } from './models/preferencia.model';
 import { ALUMNO_ID_TEST, PreferenciaMother } from './preferencias.mother';
 import { PreferenciasPage } from './preferencias.page';
 import { PreferenciasService } from './services/preferencias.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 @Component({ selector: 'app-preferencia-card', template: '', standalone: true })
 class PreferenciaCardStub {
   @Input() preferencia!: Preferencia;
+  @Input() alumnoId!: string;
 }
 
 describe('PreferenciasPage', () => {
@@ -43,6 +46,8 @@ describe('PreferenciasPage', () => {
           provide: AlumnoContextoService,
           useValue: { alumnoId: alumnoIdSignal.asReadonly() },
         },
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     })
       .overrideComponent(PreferenciasPage, {

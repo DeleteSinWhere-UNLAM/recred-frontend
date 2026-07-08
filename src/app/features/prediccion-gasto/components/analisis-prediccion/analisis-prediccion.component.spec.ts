@@ -5,6 +5,7 @@ import {
   CategoriaMasConsumidaMother,
 } from '../../prediccion-gasto.mother';
 import { AnalisisPrediccionComponent } from './analisis-prediccion.component';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 describe('AnalisisPrediccionComponent', () => {
   let component: AnalisisPrediccionComponent;
@@ -13,6 +14,7 @@ describe('AnalisisPrediccionComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AnalisisPrediccionComponent],
+      providers: [provideCharts(withDefaultRegisterables())]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AnalisisPrediccionComponent);
@@ -30,9 +32,9 @@ describe('AnalisisPrediccionComponent', () => {
 
       const texto = textoRenderizado();
       expect(texto).toContain('Bebidas');
-      expect(texto).toContain('1,500.00');
+      expect(texto).toContain('1.500');
       expect(texto).toContain('Snacks');
-      expect(texto).toContain('800.00');
+      expect(texto).toContain('800');
     });
 
     it('dado sin categorias, cuando renderizo, deberia mostrar el mensaje de "No hay suficientes datos"', () => {
@@ -45,16 +47,23 @@ describe('AnalisisPrediccionComponent', () => {
   });
 
   describe('analisis IA', () => {
-    it('dado analisisIa, cuando renderizo, deberia mostrar el resumen y el modelo', () => {
+    it('dado analisisIa, cuando renderizo, deberia mostrar el resumen', () => {
       givenAnalisisIa(AnalisisIaMother.crear({
         resumen: 'Estas dentro del presupuesto.',
-        modelo: 'gpt-4o-mini',
       }));
       fixture.detectChanges();
 
       const texto = textoRenderizado();
       expect(texto).toContain('Estas dentro del presupuesto');
-      expect(texto).toContain('gpt-4o-mini');
+    });
+
+    it('dado analisisIa con modelo, cuando renderizo, no deberia mostrar el nombre del modelo', () => {
+      givenAnalisisIa(AnalisisIaMother.crear({
+        modelo: 'gpt-4o-mini',
+      }));
+      fixture.detectChanges();
+
+      expect(textoRenderizado()).not.toContain('gpt-4o-mini');
     });
 
     it('dado alertas en el analisis, cuando renderizo, deberia renderizar el bloque "Alertas" con cada item', () => {

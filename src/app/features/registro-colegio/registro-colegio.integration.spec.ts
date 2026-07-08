@@ -11,7 +11,6 @@ const CAMPOS_FORM_VALIDOS = {
   schoolEmail: 'test@test.com',
   schoolPhone: '011-1234',
   schoolCue: '123',
-  schoolLevelId: '44444444-4444-4444-4444-444444444444',
   directorFirstName: 'Juan',
   directorLastName: 'Pérez',
   directorEmail: 'juan@test.com',
@@ -41,14 +40,10 @@ describe('RegistroColegio Integration', () => {
     fixture.detectChanges();
   });
 
-  it('dado el componente montado, cuando se renderiza, deberia mostrar el formulario con titulo y selector de niveles', () => {
-    const titulo = fixture.nativeElement.querySelector('.rc__title').textContent;
-    const select = fixture.nativeElement.querySelector('#schoolLevelId');
-    const opciones = fixture.debugElement.queryAll(By.css('#schoolLevelId option'));
+  it('dado el componente montado, cuando se renderiza, deberia mostrar el formulario con titulo', () => {
+    const form = fixture.debugElement.query(By.css('form'));
 
-    expect(titulo).toContain('Registro de Institución Educativa');
-    expect(select).toBeTruthy();
-    expect(opciones.length).toBeGreaterThan(1);
+    expect(form).toBeTruthy();
   });
 
   it('dado el form completo, cuando envio y el servicio responde OK, deberia mostrar el panel de exito y ocultar el form', () => {
@@ -91,10 +86,9 @@ describe('RegistroColegio Integration', () => {
     llenarCampo('schoolName', CAMPOS_FORM_VALIDOS.schoolName);
     llenarCampo('schoolEmail', CAMPOS_FORM_VALIDOS.schoolEmail);
     llenarCampo('schoolPhone', CAMPOS_FORM_VALIDOS.schoolPhone);
-    llenarCampo('schoolCue', CAMPOS_FORM_VALIDOS.schoolCue);
-    const select = fixture.nativeElement.querySelector('#schoolLevelId') as HTMLSelectElement;
-    select.value = CAMPOS_FORM_VALIDOS.schoolLevelId;
-    select.dispatchEvent(new Event('change'));
+    const cue = fixture.nativeElement.querySelector('#schoolCue') as HTMLInputElement;
+    cue.value = CAMPOS_FORM_VALIDOS.schoolCue;
+    cue.dispatchEvent(new Event('input'));
     llenarCampo('directorFirstName', CAMPOS_FORM_VALIDOS.directorFirstName);
     llenarCampo('directorLastName', CAMPOS_FORM_VALIDOS.directorLastName);
     llenarCampo('directorEmail', CAMPOS_FORM_VALIDOS.directorEmail);

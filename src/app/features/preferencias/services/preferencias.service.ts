@@ -24,7 +24,7 @@ export class PreferenciasService {
     const alumnoId = alumnoIdSeleccionado ?? this.perfilService.obtenerAlumnoId() ?? this.fallbackAlumnoId;
     const path = this.getPath(alumnoId);
     return this.http
-      .get<Preferencia[]>(`${environment.apiUrl}/${path}/preferencias?ultima=true`)
+      .get<Preferencia[]>(`${environment.apiUrl}/${path}/preferencias`)
       .pipe(map((response) => response));
   }
 }

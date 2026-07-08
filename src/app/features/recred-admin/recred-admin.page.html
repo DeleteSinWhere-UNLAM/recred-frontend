@@ -1,121 +1,119 @@
-<div class="ra__container">
-  <header class="ra__header">
-    <div class="ra__header-info">
-      <h1 class="ra__title">Dashboard Recred Admin</h1>
-      <p class="ra__subtitle">Solicitudes de instituciones educativas pendientes de aprobación</p>
-    </div>
-    <div class="ra__header-actions">
-      @if (presenter.solicitudes$ | async; as lista) {
-        <div class="ra__badge">{{ lista.length }} pendiente{{ lista.length !== 1 ? 's' : '' }}</div>
-      }
-      <button (click)="cerrarSesion()" class="logout-btn">Cerrar Sesión</button>
-    </div>
-  </header>
+<app-navbar></app-navbar>
 
-  @if (presenter.cargando$ | async) {
-    <div class="ra__loading" id="estado-cargando">
-      <div class="ra__spinner"></div>
-      <span>Cargando solicitudes...</span>
-    </div>
-  }
-
-  @if (presenter.error$ | async; as error) {
-    <div class="ra__error" id="panel-error">{{ error }}</div>
-  }
-
-  @if ((presenter.cargando$ | async) === false) {
-    @if (presenter.solicitudes$ | async; as solicitudes) {
-      @if (solicitudes.length === 0) {
-        <div class="ra__empty" id="estado-vacio">
-          <span class="ra__empty-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </span>
-          <p>No hay solicitudes pendientes por el momento.</p>
+<main class="recred-admin-page">
+  <div class="recred-admin-page__container">
+    <div class="pv">
+      
+      <!-- Encabezado / Título -->
+      <header class="pv__profile-card">
+        <div class="pv__profile-identity">
+          <div class="pv__avatar" aria-hidden="true">
+            <span><i class="fa-solid fa-building-columns"></i></span>
+          </div>
+          <div>
+            <p class="pv__greeting">Administración del Sistema</p>
+            <h1>Dashboard Recred</h1>
+            <p>Solicitudes de instituciones educativas pendientes de aprobación</p>
+          </div>
         </div>
-      }
-
-      @if (solicitudes.length > 0) {
-        <div class="ra__list">
-          @for (s of solicitudes; track s.id) {
-            <article class="ra__card" [id]="'card-' + s.id">
-
-              <div class="ra__card-header">
-                <div>
-                  <h2 class="ra__school-name">{{ s.schoolName }}</h2>
-                  <span class="ra__level">{{ s.schoolLevel.descripcion }}</span>
-                </div>
-                <span class="ra__status-badge">PENDIENTE</span>
-              </div>
-
-              <div class="ra__card-body">
-                <div class="ra__info-group">
-                  <h3 class="ra__info-title">Institución</h3>
-                  <div class="ra__info-grid">
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">Email</span>
-                      <span class="ra__info-value">{{ s.schoolEmail }}</span>
-                    </div>
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">Teléfono</span>
-                      <span class="ra__info-value">{{ s.schoolPhone }}</span>
-                    </div>
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">CUE</span>
-                      <span class="ra__info-value">{{ s.schoolCue }}</span>
-                    </div>
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">Recibida</span>
-                      <span class="ra__info-value">{{ s.createdAt | date:'dd/MM/yyyy' }}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="ra__info-group">
-                  <h3 class="ra__info-title">Director</h3>
-                  <div class="ra__info-grid">
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">Nombre</span>
-                      <span class="ra__info-value">{{ s.directorFirstName }} {{ s.directorLastName }}</span>
-                    </div>
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">Email</span>
-                      <span class="ra__info-value">{{ s.directorEmail }}</span>
-                    </div>
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">DNI</span>
-                      <span class="ra__info-value">{{ s.directorDni }}</span>
-                    </div>
-                    <div class="ra__info-item">
-                      <span class="ra__info-label">Usuario</span>
-                      <span class="ra__info-value">{{ s.directorUsername }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="ra__card-actions">
-                <button
-                  class="ra__btn ra__btn--reject"
-                  [id]="'btn-rechazar-' + s.id"
-                  (click)="presenter.rechazar(s.id)"
-                >
-                  Rechazar
-                </button>
-                <button
-                  class="ra__btn ra__btn--approve"
-                  [id]="'btn-aprobar-' + s.id"
-                  (click)="presenter.aprobar(s.id)"
-                >
-                  Aprobar colegio
-                </button>
-              </div>
-
-            </article>
+        <div class="pv__section-title">
+          @if (presenter.solicitudes$ | async; as lista) {
+            <span style="font-size: 16px; font-weight: 800; border-radius: 12px; width: auto; padding: 0 16px;">
+              {{ lista.length }} Pendiente{{ lista.length !== 1 ? 's' : '' }}
+            </span>
           }
         </div>
+      </header>
+
+      <!-- Estado Cargando -->
+      @if (presenter.cargando$ | async) {
+        <div class="pv__notice" role="status">
+          <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+          <span>Cargando solicitudes...</span>
+        </div>
       }
-    }
-  }
-</div>
+
+      <!-- Estado Error -->
+      @if (presenter.error$ | async; as error) {
+        <div class="pv__notice pv__notice--error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          <span>{{ error }}</span>
+        </div>
+      }
+
+      <!-- Lista de Solicitudes -->
+      @if ((presenter.cargando$ | async) === false) {
+        @if (presenter.solicitudes$ | async; as solicitudes) {
+          
+          @if (solicitudes.length === 0) {
+            <div class="pv__ok-state">
+              <span aria-hidden="true">
+                <i class="fa-solid fa-check-circle"></i>
+              </span>
+              <div>
+                <strong>Al día</strong>
+                <p>No hay solicitudes pendientes por el momento.</p>
+              </div>
+            </div>
+          }
+
+          @if (solicitudes.length > 0) {
+            <section class="pv__panel">
+              <div class="pv__section-title">
+                <span aria-hidden="true">
+                  <i class="fa-solid fa-list-check"></i>
+                </span>
+                <h2>Solicitudes Pendientes</h2>
+              </div>
+              
+              <div class="pv__operation-grid">
+                @for (s of solicitudes; track s.id) {
+                  <article class="pv__operation-card" [id]="'card-solicitud-' + s.id">
+                    
+                    <div class="pv__operation-card-header">
+                      <span class="pv__operation-icon" aria-hidden="true">
+                        <i class="fa-solid fa-school"></i>
+                      </span>
+                      <div class="pv__operation-body">
+                        <span class="status-indicator">PENDIENTE</span>
+                        <strong class="school-name">{{ s.schoolName }}</strong>
+                        <small>Recibida: {{ s.createdAt | date:'dd/MM/yyyy' }}</small>
+                      </div>
+                    </div>
+
+                    <div class="pv__operation-details">
+                      <div class="pv__detail-group">
+                        <span>Datos Institución</span>
+                        <div><i class="fa-solid fa-at"></i> {{ s.schoolEmail }}</div>
+                        <div><i class="fa-solid fa-phone"></i> {{ s.schoolPhone }}</div>
+                        <div><i class="fa-solid fa-hashtag"></i> CUE: {{ s.schoolCue }}</div>
+                      </div>
+
+                      <div class="pv__detail-group">
+                        <span>Director / Autoridad</span>
+                        <div><i class="fa-solid fa-user"></i> {{ s.directorFirstName }} {{ s.directorLastName }}</div>
+                        <div><i class="fa-solid fa-at"></i> {{ s.directorEmail }}</div>
+                        <div><i class="fa-solid fa-id-card"></i> DNI: {{ s.directorDni }}</div>
+                      </div>
+                    </div>
+
+                    <div class="pv__operation-actions">
+                      <button type="button" [id]="'btn-rechazar-' + s.id" class="pv__quick-action pv__quick-action--danger" (click)="presenter.rechazar(s.id)">
+                        <i class="fa-solid fa-xmark"></i>
+                        <strong>Rechazar</strong>
+                      </button>
+                      <button type="button" [id]="'btn-aprobar-' + s.id" class="pv__quick-action pv__quick-action--dorado" (click)="presenter.aprobar(s.id)">
+                        <i class="fa-solid fa-check"></i>
+                        <strong>Aprobar Colegio</strong>
+                      </button>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+        }
+      }
+    </div>
+  </div>
+</main>

@@ -1,5 +1,6 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
@@ -27,7 +28,7 @@ import { RestriccionesHorariasService } from '../../restricciones-horarias/servi
 import { PresupuestoService, DateBudgetStatus } from '../../presupuesto/services/presupuesto.service';
 import { RestriccionesNutricionalesService, ClasificacionSaludBackend } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { TimeSlot, RestriccionHoraria } from '../../restricciones-horarias/models/restriccion-horaria.model';
-import { Recreo, RECREO_LABELS } from '../../compra/models/orden-compra.model';
+import { Recreo } from '../../compra/models/orden-compra.model';
 
 export interface PresupuestoDisponibleCategoria {
   categoriaId: string;
@@ -107,6 +108,7 @@ export class BuffetPresenter {
   private readonly filtrosState = signal<FiltrosBuffet>({ ...filtrosPorDefecto });
   private readonly restriccionesNutricionalesState = signal<ClasificacionSaludBackend[]>([]);
   private readonly promocionesState = signal<Promotion[]>([]);
+  private readonly favoritosTotalesFamiliaState = signal<number | null>(null);
 
   private readonly franjasState = signal<TimeSlot[]>([]);
   private readonly restriccionesState = signal<RestriccionHoraria[]>([]);
@@ -278,16 +280,10 @@ export class BuffetPresenter {
       }
     }
 
-    if (options.length === 0) {
-      return recreosPosibles.map((rec) => ({
-        recreo: rec,
-        descripcion: RECREO_LABELS[rec],
-        bloqueado: false,
-      }));
-    }
-
     return options;
   });
+
+  readonly hayFranjasHorariasDisponibles = computed(() => this.recreosDisponibles().length > 0);
 
   readonly presupuestoDisponible = computed<PresupuestoDisponible | null>(() => {
     const alumno = this.alumnoState();
@@ -470,9 +466,11 @@ export class BuffetPresenter {
       next: (favs) => {
         const ids = new Set(favs.map((f) => f.id));
         this.favoritosState.set(ids);
+        this.cargarCantidadFavoritosFamilia(alumnoId, ids.size);
       },
       error: (err) => {
         console.error('Error loading favorites:', err);
+        this.cargarCantidadFavoritosFamilia(alumnoId, 0);
       }
     });
 
@@ -504,14 +502,24 @@ export class BuffetPresenter {
           const initialFecha = savedSelection?.fecha && savedSelection.fecha >= minDate
             ? savedSelection.fecha
             : minDate;
-          const initialRecreo = savedSelection?.recreo ?? this.firstAvailableRecreo();
+          const opcionesRetiro = this.recreosDisponibles();
+          const savedRecreo =
+            savedSelection?.recreo && opcionesRetiro.some((o) => o.recreo === savedSelection.recreo)
+              ? savedSelection.recreo
+              : undefined;
+          const initialRecreo = savedRecreo ?? this.firstAvailableRecreo();
 
           this.fechaSeleccionadaState.set(initialFecha);
-          this.recreoSeleccionadoState.set(initialRecreo);
-          this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
+          if (initialRecreo) {
+            this.recreoSeleccionadoState.set(initialRecreo);
+            this.carritoService.setSeleccionRetiro(alumnoId, initialFecha, initialRecreo);
 
-          const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
-          this.cargarProductos(buffet.id, alumnoId, fechaHora);
+            const fechaHora = this.getFechaHoraConsulta(initialFecha, initialRecreo);
+            this.cargarProductos(buffet.id, alumnoId, fechaHora);
+          } else {
+            this.carritoService.clearSeleccionRetiro(alumnoId);
+            this.cargarProductos(buffet.id, alumnoId);
+          }
 
           this.consultarPresupuestoPorFecha(alumnoId, initialFecha);
         }).catch((err) => {
@@ -577,6 +585,17 @@ export class BuffetPresenter {
 
     const recreoActual = this.recreoSeleccionadoState();
     const opciones = this.recreosDisponibles();
+    if (opciones.length === 0) {
+      this.carritoService.clearSeleccionRetiro(alumno.id);
+      this.consultarPresupuestoPorFecha(alumno.id, adjustedFecha);
+
+      const buffet = this.buffetState();
+      if (buffet) {
+        this.cargarProductos(buffet.id, alumno.id);
+      }
+      return;
+    }
+
     const opcionActual = opciones.find((o) => o.recreo === recreoActual);
     if (!opcionActual || opcionActual.bloqueado) {
       const primera = opciones.find((o) => !o.bloqueado);
@@ -672,6 +691,11 @@ export class BuffetPresenter {
     const items = this.itemsCarrito();
     if (!alumno || items.length === 0 || this.procesandoPago()) return;
 
+    if (!this.hayFranjasHorariasDisponibles()) {
+      this.toastService.mostrar('No hay franjas horarias disponibles para realizar el pedido.', 'error');
+      return;
+    }
+
     const buffet = this.buffetState();
     if (!buffet) {
       this.toastService.mostrar('No se pudo resolver el buffet del pedido', 'error');
@@ -752,22 +776,72 @@ export class BuffetPresenter {
     if (ids.has(producto.id)) {
       ids.delete(producto.id);
       this.favoritosState.set(ids);
+      this.favoritosTotalesFamiliaState.update((total) =>
+        total === null ? total : Math.max(0, total - 1),
+      );
       this.favoritosService.removerFavorito(alumno.id, producto.id).subscribe({
         next: () => this.toastService.mostrar(`Se quitó "${producto.nombre}" de tus favoritos`, 'success'),
         error: (err) => console.error('Error removing favorite:', err)
       });
     } else {
-      const esPlanGratuito = this.perfilService.perfil()?.plan !== 'PREMIUM';
-      if (esPlanGratuito && ids.size >= 5) {
-        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 por hijo).', 'error');
+      const totalFavoritos = this.favoritosTotalesFamiliaState() ?? ids.size;
+      if (this.perfilService.esPlanGratuito() && totalFavoritos >= 5) {
+        this.toastService.mostrar('Límite de productos favoritos alcanzado para cuenta gratuita (máximo 5 en total).', 'error');
         return;
       }
       ids.add(producto.id);
       this.favoritosState.set(ids);
+      this.favoritosTotalesFamiliaState.update((total) =>
+        total === null ? total : total + 1,
+      );
       this.favoritosService.agregarFavorito(alumno.id, producto).subscribe({
         next: () => this.toastService.mostrar(`Se agregó "${producto.nombre}" a tus favoritos`, 'success'),
         error: (err) => console.error('Error adding favorite:', err)
       });
+    }
+  }
+
+  private cargarCantidadFavoritosFamilia(alumnoIdActual: string, favoritosActuales: number): void {
+    if (!this.perfilService.esPlanGratuito()) {
+      this.favoritosTotalesFamiliaState.set(null);
+      return;
+    }
+
+    const perfil = this.perfilService.perfil();
+    if (perfil?.rol !== 'PADRE') {
+      this.favoritosTotalesFamiliaState.set(favoritosActuales);
+      return;
+    }
+
+    void this.calcularCantidadFavoritosFamilia(alumnoIdActual, favoritosActuales);
+  }
+
+  private async calcularCantidadFavoritosFamilia(
+    alumnoIdActual: string,
+    favoritosActuales: number,
+  ): Promise<void> {
+    try {
+      const alumnos = await this.alumnosService.asegurarCargados();
+      const idsAlumnos = alumnos.map((alumno) => alumno.id).filter(Boolean);
+      const ids = idsAlumnos.length > 0 ? idsAlumnos : [alumnoIdActual];
+      const cantidades = await Promise.all(
+        ids.map(async (alumnoId) => {
+          if (alumnoId === alumnoIdActual) return favoritosActuales;
+          try {
+            return (await firstValueFrom(this.favoritosService.getFavoritos(alumnoId))).length;
+          } catch (err) {
+            console.error('Error counting family favorites:', err);
+            return 0;
+          }
+        }),
+      );
+
+      this.favoritosTotalesFamiliaState.set(
+        cantidades.reduce((total, cantidad) => total + cantidad, 0),
+      );
+    } catch (err) {
+      console.error('Error loading family favorites count:', err);
+      this.favoritosTotalesFamiliaState.set(favoritosActuales);
     }
   }
 
@@ -814,9 +888,9 @@ export class BuffetPresenter {
     }
   }
 
-  private firstAvailableRecreo(): Recreo {
+  private firstAvailableRecreo(): Recreo | null {
     const opciones = this.recreosDisponibles();
-    return opciones.find((o) => !o.bloqueado)?.recreo ?? 'PRIMER_RECREO';
+    return opciones.find((o) => !o.bloqueado)?.recreo ?? null;
   }
 
   private matchesDescription(slotDescripcion: string, recreo: Recreo): boolean {
@@ -917,9 +991,3 @@ export class BuffetPresenter {
     return [...porId.values()];
   }
 }
-
-
-
-
-
-

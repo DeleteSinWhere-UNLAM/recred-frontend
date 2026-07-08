@@ -21,6 +21,14 @@ export interface DatosFormularioProducto {
   urlImagen?: string | null;
 }
 
+export interface DatosInicialesProducto {
+  nombre?: string;
+  descripcion?: string;
+  precio?: number;
+  peso?: number;
+  stockActual?: number;
+}
+
 @Component({
   selector: "app-product-form",
   standalone: true,
@@ -33,6 +41,7 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
   @Input() categories: Categoria[] = [];
   @Input() isSaving = false;
   @Input() buffetId: string | null = null;
+  @Input() datosIniciales: DatosInicialesProducto | null = null;
   @Output() formSubmit = new EventEmitter<DatosFormularioProducto>();
   @Output() formCancel = new EventEmitter<void>();
 
@@ -132,6 +141,27 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
       });
       this.imagePreview.set(null);
     }
+
+    if (!this.product && (changes["datosIniciales"] || changes["product"]) && this.datosIniciales) {
+      this.aplicarDatosIniciales(this.datosIniciales);
+    }
+  }
+
+  private aplicarDatosIniciales(datos: DatosInicialesProducto): void {
+    this.productForm.patchValue({
+      nombre: datos.nombre ?? "",
+      descripcion: datos.descripcion ?? "",
+      precio: datos.precio ?? null,
+      peso: datos.peso ?? null,
+      stockActual: datos.stockActual ?? null,
+      requierePreparacion: false,
+      contiene_azucar: false,
+      contiene_mani: false,
+      contiene_lactosa: false,
+      contiene_tacc: false,
+      urlImagen: null,
+    });
+    this.imagePreview.set(null);
   }
 
   onFileSelected(event: Event): void {

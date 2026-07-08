@@ -1,9 +1,14 @@
-<div class="directivo-container">
-  <div class="content">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-      <h1 style="margin: 0;">{{ presenter.mensajeBienvenida() }}</h1>
-      <button (click)="cerrarSesion()" class="logout-btn">Cerrar Sesión</button>
-    </div>
-    <app-directivo-dashboard></app-directivo-dashboard>
+<app-navbar></app-navbar>
+
+<main class="directivo-page">
+  <div class="directivo-page__container">
+    <app-directivo-dashboard
+      [data]="presenter.schoolOverview()"
+      [loading]="presenter.loading()"
+      [error]="presenter.error()"
+      [pagandoLicencia]="presenter.pagandoLicencia()"
+      [errorPagoLicencia]="presenter.errorPagoLicencia()"
+      (pagarLicencia)="presenter.pagarLicenciaColegio()"
+    ></app-directivo-dashboard>
   </div>
-</div>
+</main>

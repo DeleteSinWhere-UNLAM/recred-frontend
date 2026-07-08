@@ -63,11 +63,11 @@ describe('CrearHijo Integration', () => {
     servicioAlumnos.asegurarCargados.and.resolveTo([]);
 
     servicioColegios = jasmine.createSpyObj('ColegiosService', [
-      'obtenerColegios',
+      'obtenerColegiosDelTutor',
       'obtenerGradosPorColegio',
       'getColegios',
     ]);
-    servicioColegios.obtenerColegios.and.resolveTo(ColegioMother.crearLista());
+    servicioColegios.obtenerColegiosDelTutor.and.resolveTo(ColegioMother.crearLista());
     servicioColegios.obtenerGradosPorColegio.and.resolveTo(GradoMother.crearLista());
     servicioColegios.getColegios.and.returnValue(ColegioMother.crearLista());
 
@@ -121,7 +121,7 @@ describe('CrearHijo Integration', () => {
   it('dada la pagina inicializada, cuando el presenter real termina el init, deberia cargar las opciones de colegio en el select', async () => {
     await whenMontoLaPagina();
 
-    expect(servicioColegios.obtenerColegios).toHaveBeenCalled();
+    expect(servicioColegios.obtenerColegiosDelTutor).toHaveBeenCalled();
     thenElSelectColegioTieneOpciones(ColegioMother.crearLista().length);
     thenLaPrimeraOpcionDelSelectColegioEs('Instituto San José');
   });

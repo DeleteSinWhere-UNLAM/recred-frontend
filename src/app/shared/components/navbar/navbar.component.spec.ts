@@ -10,10 +10,14 @@ import { Notificacion, NotificacionesService } from '../../../data-access/servic
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { CarritoService } from '../../../features/compra/services/carrito.service';
+import { CompraService } from '../../../features/compra/services/compra.service';
+import { AcreditarMercadoPagoService } from '../../../features/acreditar-mercado-pago/services/acreditar-mercado-pago.service';
+import { ToastService } from '../../services/toast.service';
 import { NavbarComponent } from './navbar.component';
 
 interface NavbarProtegido {
   esPremium: () => boolean;
+  planPagoLabel: () => string | null;
   cartCount: () => number;
   notifCount: () => number;
   menuAbierto: ReturnType<typeof signal<boolean>>;
@@ -30,6 +34,8 @@ interface NavbarProtegido {
   clickEnNotificacion: (notif: Notificacion) => void;
   toggleMenuKiosquero: () => void;
   irARecomendacionesEstacionales: () => void;
+  irAPanelControl: (event?: Event) => void;
+  irAPanelTutor: (event?: Event) => void;
   irAPromociones: () => void;
   irAPerfil: () => void;
   irABilletera: () => void;
@@ -38,6 +44,7 @@ interface NavbarProtegido {
   cerrarSesion: () => Promise<void>;
   onDocumentClick: (event: MouseEvent) => void;
   onEscape: () => void;
+  planBloqueado: (planRequerido: 'INTERMEDIO' | 'AVANZADO') => boolean;
 }
 
 describe('NavbarComponent', () => {
@@ -53,9 +60,14 @@ describe('NavbarComponent', () => {
   let servicioNotif: jasmine.SpyObj<NotificacionesService>;
   let servicioTheme: jasmine.SpyObj<ThemeService>;
   let servicioContexto: jasmine.SpyObj<AlumnoContextoService>;
+  let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioCompra: jasmine.SpyObj<CompraService>;
+  let servicioMercadoPago: jasmine.SpyObj<AcreditarMercadoPagoService>;
   let cartCountSignal: ReturnType<typeof signal<number>>;
   let esVistaAlumnoSignal: ReturnType<typeof signal<boolean>>;
   let esVistaKiosqueroSignal: ReturnType<typeof signal<boolean>>;
+  let esVistaDirectivoSignal: ReturnType<typeof signal<boolean>>;
+  let esVistaAdminSignal: ReturnType<typeof signal<boolean>>;
   let notificacionesSignal: ReturnType<typeof signal<Notificacion[]>>;
   let notifCantidadSignal: ReturnType<typeof signal<number>>;
   let alumnosSignal: ReturnType<typeof signal<ReturnType<typeof AlumnoMother.crear>[]>>;
@@ -66,6 +78,8 @@ describe('NavbarComponent', () => {
     cartCountSignal = signal(0);
     esVistaAlumnoSignal = signal(false);
     esVistaKiosqueroSignal = signal(false);
+    esVistaDirectivoSignal = signal(false);
+    esVistaAdminSignal = signal(false);
     notificacionesSignal = signal<Notificacion[]>([]);
     notifCantidadSignal = signal(0);
     alumnosSignal = signal([AlumnoMother.crear({ id: 'alumno-1' })]);
@@ -83,6 +97,8 @@ describe('NavbarComponent', () => {
     servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl'], {
       esVistaAlumno: esVistaAlumnoSignal.asReadonly(),
       esVistaKiosquero: esVistaKiosqueroSignal.asReadonly(),
+      esVistaDirectivo: esVistaDirectivoSignal.asReadonly(),
+      esVistaAdmin: esVistaAdminSignal.asReadonly(),
     });
     servicioUsuario.homeUrl.and.returnValue('/tutor');
     servicioAlumnos = jasmine.createSpyObj<AlumnosService>(
@@ -109,6 +125,9 @@ describe('NavbarComponent', () => {
       'setAlumnoId',
       'limpiar',
     ]);
+    servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+    servicioCompra = jasmine.createSpyObj<CompraService>('CompraService', ['setSugerenciaPendiente']);
+    servicioMercadoPago = jasmine.createSpyObj<AcreditarMercadoPagoService>('AcreditarMercadoPagoService', ['generarLinkPago']);
 
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
@@ -122,6 +141,9 @@ describe('NavbarComponent', () => {
         { provide: NotificacionesService, useValue: servicioNotif },
         { provide: ThemeService, useValue: servicioTheme },
         { provide: AlumnoContextoService, useValue: servicioContexto },
+        { provide: ToastService, useValue: servicioToast },
+        { provide: CompraService, useValue: servicioCompra },
+        { provide: AcreditarMercadoPagoService, useValue: servicioMercadoPago },
       ],
     }).compileComponents();
 
@@ -133,28 +155,32 @@ describe('NavbarComponent', () => {
     interno = component as unknown as NavbarProtegido;
   });
 
-  describe('esPremium', () => {
-    it('dado un perfil PREMIUM, esPremium deberia ser true', () => {
-      givenPerfil({ plan: 'PREMIUM' });
-
-      expect(interno.esPremium()).toBeTrue();
-    });
-
-    it('dado un perfil AVANZADO, esPremium deberia ser true', () => {
+  describe('planPagoLabel', () => {
+    it('dado un perfil AVANZADO, deberia devolver Avanzado', () => {
       givenPerfil({ plan: 'AVANZADO' });
 
+      expect(interno.planPagoLabel()).toBe('Avanzado');
       expect(interno.esPremium()).toBeTrue();
     });
 
-    it('dado un perfil basico, esPremium deberia ser false', () => {
-      givenPerfil({ plan: 'GRATIS' });
+    it('dado un perfil INTERMEDIO, deberia devolver Intermedio', () => {
+      givenPerfil({ plan: 'INTERMEDIO' });
 
+      expect(interno.planPagoLabel()).toBe('Intermedio');
+      expect(interno.esPremium()).toBeTrue();
+    });
+
+    it('dado un perfil gratuito, no deberia mostrar label de plan pago', () => {
+      givenPerfil({ plan: 'GRATUITO' });
+
+      expect(interno.planPagoLabel()).toBeNull();
       expect(interno.esPremium()).toBeFalse();
     });
 
-    it('dado sin perfil, esPremium deberia ser false', () => {
+    it('dado sin perfil, no deberia mostrar label de plan pago', () => {
       givenPerfil(null);
 
+      expect(interno.planPagoLabel()).toBeNull();
       expect(interno.esPremium()).toBeFalse();
     });
   });
@@ -219,7 +245,8 @@ describe('NavbarComponent', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/suscripcion');
     });
 
-    it('dado el navbar, cuando llamo irARecomendacionesEstacionales, deberia cerrar el menu kiosquero y navegar', () => {
+    it('dado plan avanzado, cuando llamo irARecomendacionesEstacionales, deberia cerrar el menu kiosquero y navegar', () => {
+      givenPerfil({ plan: 'AVANZADO' });
       interno.menuKiosqueroAbierto.set(true);
 
       interno.irARecomendacionesEstacionales();
@@ -228,7 +255,51 @@ describe('NavbarComponent', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/recomendaciones-estacionales');
     });
 
+    it('dado plan intermedio, cuando llamo irARecomendacionesEstacionales, deberia mostrar bloqueo y no navegar', () => {
+      givenPerfil({ plan: 'INTERMEDIO' });
+
+      interno.irARecomendacionesEstacionales();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Avanzado.', 'info');
+      expect(router.navigateByUrl).not.toHaveBeenCalledWith('/recomendaciones-estacionales');
+    });
+
+    it('dado plan gratuito, cuando llamo irAPanelControl, deberia mostrar bloqueo y no navegar', () => {
+      givenPerfil({ plan: 'GRATUITO' });
+
+      interno.irAPanelControl(new Event('click'));
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Intermedio.', 'info');
+      expect(router.navigateByUrl).not.toHaveBeenCalledWith('/kiosquero/reportes');
+    });
+
+    it('dado plan intermedio, cuando llamo irAPanelControl, deberia navegar a reportes', () => {
+      givenPerfil({ plan: 'INTERMEDIO' });
+
+      interno.irAPanelControl(new Event('click'));
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/reportes');
+    });
+
+    it('dado plan gratuito, cuando llamo irAPanelTutor, deberia mostrar bloqueo y no navegar', () => {
+      givenPerfil({ plan: 'GRATUITO' });
+
+      interno.irAPanelTutor(new Event('click'));
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Intermedio.', 'info');
+      expect(router.navigateByUrl).not.toHaveBeenCalledWith('/tutor-dashboard');
+    });
+
+    it('dado plan intermedio, cuando llamo irAPanelTutor, deberia navegar al panel tutor', () => {
+      givenPerfil({ plan: 'INTERMEDIO' });
+
+      interno.irAPanelTutor(new Event('click'));
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/tutor-dashboard');
+    });
+
     it('dado el navbar, cuando llamo irAPromociones, deberia cerrar el menu kiosquero y navegar', () => {
+      givenPerfil({ plan: 'AVANZADO' });
       interno.menuKiosqueroAbierto.set(true);
 
       interno.irAPromociones();

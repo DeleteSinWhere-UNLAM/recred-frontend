@@ -9,11 +9,16 @@
           [class.sugerencias-chips__chip--confirmar]="s.tipo === 'confirmacion'"
           [class.sugerencias-chips__chip--cancelar]="s.tipo === 'cancelacion'"
           [class.sugerencias-chips__chip--premium]="s.premium"
+          [class.sugerencias-chips__chip--locked]="s.bloqueada"
           role="listitem"
-          [disabled]="deshabilitado"
+          [disabled]="deshabilitado || s.bloqueada"
           (click)="onClick(s)"
         >
-          @if (s.emoji) {
+          @if (s.bloqueada) {
+            <span class="sugerencias-chips__emoji" aria-hidden="true">
+              <i class="fa-solid fa-lock"></i>
+            </span>
+          } @else if (s.emoji) {
             <span class="sugerencias-chips__emoji" aria-hidden="true">{{ s.emoji }}</span>
           }
           <span class="sugerencias-chips__label">{{ s.label }}</span>

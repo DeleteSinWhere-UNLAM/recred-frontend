@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .prediction-analysis__panel {
@@ -13,6 +14,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
 }
 
 .prediction-analysis__titulo {
@@ -47,29 +49,6 @@
   font-weight: 700;
 }
 
-.prediction-analysis__ia-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.prediction-analysis__modelo {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background-color: color-mix(in srgb, var(--color-dorado) 18%, var(--color-fondo));
-  color: var(--color-dorado-dark);
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
-
 .prediction-analysis__resumen {
   display: flex;
   gap: 12px;
@@ -84,6 +63,7 @@
   font-size: 14px;
   line-height: 1.5;
   color: var(--color-texto-oscuro);
+  min-width: 0;
 }
 
 .prediction-analysis__resumen i {
@@ -97,6 +77,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .prediction-analysis__subtitulo {
@@ -126,6 +107,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .prediction-analysis__lista li {
@@ -198,5 +180,47 @@
   .prediction-analysis__lista li {
     font-size: 12px;
     padding: 8px 12px;
+  }
+}
+
+.prediction-analysis__categorias-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.prediction-analysis__table-container {
+  overflow-x: auto;
+}
+
+.prediction-analysis__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.prediction-analysis__table th, .prediction-analysis__table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--color-borde);
+  text-align: left;
+}
+
+.prediction-analysis__table th {
+  font-weight: 600;
+  color: var(--color-pizarra);
+}
+
+.prediction-analysis__table .right-align {
+  text-align: right;
+}
+
+.prediction-analysis__table .font-mono {
+  font-family: monospace;
+}
+
+@media (max-width: 768px) {
+  .prediction-analysis__categorias-grid {
+    grid-template-columns: 1fr;
   }
 }

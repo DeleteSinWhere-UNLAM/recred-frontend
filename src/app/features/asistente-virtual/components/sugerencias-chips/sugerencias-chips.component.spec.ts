@@ -84,6 +84,16 @@ describe('SugerenciasChipsComponent', () => {
 
       expect(chipsBotones()[0].classList.contains('sugerencias-chips__chip--premium')).toBeTrue();
     });
+
+    it('dado una sugerencia bloqueada, cuando renderizo, deberia marcarla con candado y deshabilitarla', () => {
+      component.sugerencias = [SugerenciaCapacidadMother.crear({ bloqueada: true })];
+
+      whenMonto();
+
+      expect(chipsBotones()[0].classList.contains('sugerencias-chips__chip--locked')).toBeTrue();
+      expect(chipsBotones()[0].disabled).toBeTrue();
+      expect(chipsBotones()[0].querySelector('.fa-lock')).not.toBeNull();
+    });
   });
 
   describe('hint segun tipo de sugerencia', () => {
@@ -135,6 +145,16 @@ describe('SugerenciasChipsComponent', () => {
     it('dado deshabilitado=true, cuando hago click en un chip, no deberia emitir elegir', () => {
       component.sugerencias = [SugerenciaCapacidadMother.crear()];
       component.deshabilitado = true;
+      spyOn(component.elegir, 'emit');
+      whenMonto();
+
+      component['onClick'](component.sugerencias[0]);
+
+      expect(component.elegir.emit).not.toHaveBeenCalled();
+    });
+
+    it('dado una sugerencia bloqueada, cuando hago click en un chip, no deberia emitir elegir', () => {
+      component.sugerencias = [SugerenciaCapacidadMother.crear({ bloqueada: true })];
       spyOn(component.elegir, 'emit');
       whenMonto();
 

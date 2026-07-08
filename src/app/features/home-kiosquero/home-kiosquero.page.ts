@@ -11,7 +11,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
 import { ModalSeleccionCargaComponent } from '../inventario/components/modal-seleccion-carga/modal-seleccion-carga.component';
 import { ModalTablaCargaMasivaComponent } from '../inventario/components/modal-tabla-carga-masiva/modal-tabla-carga-masiva.component';
-import { AccionKiosquero } from './models/accion-kiosquero.model';
+import { AccionKiosquero, PlanRequeridoAccion } from './models/accion-kiosquero.model';
 import { Router } from '@angular/router';
 import { CargaMasivaService, RespuestaProductoMasivo } from '../inventario/services/carga-masiva.service';
 import { ProductoService } from '../inventario/services/producto.service';
@@ -24,6 +24,8 @@ import { ModalVerificacionCodigoComponent } from './components/modal-verificacio
 
 const IMAGEN_FALLBACK =
   'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+type PlanVendedorHome = 'GRATUITO' | 'INTERMEDIO' | 'AVANZADO';
 
 @Component({
   selector: 'app-home-kiosquero-page',
@@ -56,8 +58,15 @@ export class HomeKiosqueroPage implements OnInit {
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
+    
+    const perfil = this.perfilService.getPerfil();
+    const licencia = perfil?.estadoLicenciaColegio;
+
     this.presenter.init();
-    this.loadCategories();
+
+    if (!licencia || licencia === 'ACTIVA' || licencia === 'EN_GRACIA') {
+      this.loadCategories();
+    }
   }
 
   loadCategories(): void {
@@ -78,11 +87,48 @@ export class HomeKiosqueroPage implements OnInit {
   }
 
   onActionClick(action: AccionKiosquero): void {
+    if (this.accionBloqueada(action)) {
+      this.toastService.mostrar(`Disponible con plan ${this.badgePlanAccion(action)}.`, 'info');
+      return;
+    }
+
     if (action.id === 'cargar-productos') {
       this.isUploadModalVisible = true;
     } else {
       this.presenter.ejecutarAccion(action);
     }
+  }
+
+  protected badgePlanAccion(action: AccionKiosquero): 'Intermedio' | 'Avanzado' | null {
+    const planRequerido = this.planRequeridoAccion(action);
+    if (!planRequerido) return null;
+    return planRequerido === 'AVANZADO' ? 'Avanzado' : 'Intermedio';
+  }
+
+  protected accionBloqueada(action: AccionKiosquero): boolean {
+    const planRequerido = this.planRequeridoAccion(action);
+    if (!planRequerido) return false;
+    return this.nivelPlan(this.planActualVendedor()) < this.nivelPlan(planRequerido);
+  }
+
+  private planRequeridoAccion(action: AccionKiosquero): PlanRequeridoAccion | null {
+    return action.planRequerido ?? (action.premium ? 'AVANZADO' : null);
+  }
+
+  protected planActualVendedor(): PlanVendedorHome {
+    const plan = this.perfilService.getPerfil()?.plan?.toUpperCase();
+    if (plan === 'INTERMEDIO' || plan === 'AVANZADO') return plan;
+    return 'GRATUITO';
+  }
+
+  protected mostrarBloqueoPlan(plan: 'Intermedio' | 'Avanzado'): void {
+    this.toastService.mostrar(`Disponible con plan ${plan}.`, 'info');
+  }
+
+  private nivelPlan(plan: PlanVendedorHome | PlanRequeridoAccion): number {
+    if (plan === 'AVANZADO') return 2;
+    if (plan === 'INTERMEDIO') return 1;
+    return 0;
   }
 
   openVerificationModal(): void {

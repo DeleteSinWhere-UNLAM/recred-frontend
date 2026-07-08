@@ -18,7 +18,17 @@ export class ResumenPrediccionComponent {
   @Input() promedioGastoDiario = 0;
   @Input() montoLimite: number | null = null;
   @Input() porcentajePresupuesto: number | null = null;
-  @Input() confianza = 0;
   @Input() diasHistoricosUsados = 0;
   @Input() diasRestantes = 0;
+
+  get porcentajeActualPorc(): number {
+    return Math.min((this.porcentajePresupuesto || 0) * 100, 100);
+  }
+
+  get porcentajePredichoPorc(): number {
+    if (!this.montoLimite || this.montoLimite <= 0) return 0;
+    // Calculate how much the predicted spending takes of the limit
+    const predictedRatio = this.gastoPredicho / this.montoLimite;
+    return Math.min(predictedRatio * 100, 100);
+  }
 }

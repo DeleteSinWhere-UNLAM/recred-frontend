@@ -116,11 +116,10 @@ describe('HomeKiosqueroPresenter', () => {
         'ver-pedidos',
         'venta-espontanea',
         'cargar-productos',
-        'oportunidades-stock',
         'tracking-pedidos',
         'stock',
+        'inteligencia-comercial',
         'reportes',
-        'sugerencias',
         'recomendaciones',
         'promociones',
         'cierre-diario',
@@ -128,14 +127,19 @@ describe('HomeKiosqueroPresenter', () => {
       ]);
     });
 
-    it('dado el presenter, deberia exponer las 5 acciones destacadas', () => {
+    it('dado el presenter, deberia exponer las 4 acciones destacadas', () => {
       expect(presenter.featuredActions().map((a) => a.id)).toEqual([
         'venta-espontanea',
         'cargar-productos',
-        'oportunidades-stock',
-        'sugerencias',
+        'inteligencia-comercial',
         'cierre-diario',
       ]);
+    });
+
+    it('dado el presenter, cargar producto no deberia pedir plan en la card de home', () => {
+      const accion = presenter.featuredActions().find((a) => a.id === 'cargar-productos');
+
+      expect(accion?.planRequerido).toBeUndefined();
     });
 
     it('dado el presenter, deberia exponer proveedores como accion secundaria', () => {
@@ -348,7 +352,7 @@ describe('HomeKiosqueroPresenter', () => {
       presenter.onDateChange(inputEl);
 
       expect(presenter.selectedDate()).toBe('2030-01-15');
-      expect(servicioHomeKiosquero.getPanel).toHaveBeenCalledWith(BUFFET_ID_TEST, '2030-01-15');
+      expect(servicioHomeKiosquero.getPanel).toHaveBeenCalledWith(BUFFET_ID_TEST, '2030-01-15', 'home');
     });
 
     it('dado una fecha igual a la actual, no deberia recargar', () => {

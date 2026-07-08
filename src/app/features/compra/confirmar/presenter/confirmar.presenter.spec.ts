@@ -3,6 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
+import { NotificacionesService } from '../../../../data-access/services/notificaciones.service';
 import { SugerenciasService } from '../../../sugerencias/services/sugerencias.service';
 import { OrdenAlumnoMother, OrdenCompraMother } from '../../compra.mother';
 import { OrdenCompra } from '../../models/orden-compra.model';
@@ -16,6 +18,8 @@ describe('ConfirmarPresenter', () => {
   let servicioCarrito: jasmine.SpyObj<CarritoService>;
   let servicioSugerencias: jasmine.SpyObj<SugerenciasService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioPerfil: jasmine.SpyObj<PerfilService>;
+  let servicioNotificaciones: jasmine.SpyObj<NotificacionesService>;
   let router: jasmine.SpyObj<Router>;
   let ordenEnCurso: WritableSignal<OrdenCompra | null>;
 
@@ -28,6 +32,10 @@ describe('ConfirmarPresenter', () => {
     servicioCarrito = jasmine.createSpyObj('CarritoService', ['limpiarAlumno']);
     servicioSugerencias = jasmine.createSpyObj('SugerenciasService', ['comprarSugerencia']);
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', ['perfil', 'rol']);
+    servicioNotificaciones = jasmine.createSpyObj('NotificacionesService', ['eliminarNotificacionLocal']);
+    servicioPerfil.perfil.and.returnValue({ plan: 'AVANZADO' } as never);
+    servicioPerfil.rol.and.returnValue('PADRE');
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
 
     TestBed.configureTestingModule({
@@ -37,6 +45,8 @@ describe('ConfirmarPresenter', () => {
         { provide: CarritoService, useValue: servicioCarrito },
         { provide: SugerenciasService, useValue: servicioSugerencias },
         { provide: ToastService, useValue: servicioToast },
+        { provide: PerfilService, useValue: servicioPerfil },
+        { provide: NotificacionesService, useValue: servicioNotificaciones },
         { provide: Router, useValue: router },
       ],
     });
@@ -102,6 +112,7 @@ describe('ConfirmarPresenter', () => {
 
     it('dado una orden con sugerenciaId, cuando confirmo, deberia primero comprar la sugerencia y despues procesar pago', () => {
       givenOrdenEnCurso(OrdenCompraMother.crear({ sugerenciaId: 'sug-123' }));
+      givenPlan('AVANZADO');
       servicioSugerencias.comprarSugerencia.and.returnValue(of(undefined));
       givenProcesarPagoResuelveCon(OrdenCompraMother.crearPagada());
 
@@ -110,6 +121,21 @@ describe('ConfirmarPresenter', () => {
       expect(servicioSugerencias.comprarSugerencia).toHaveBeenCalledWith('sug-123');
       expect(servicioCompra.procesarPago).toHaveBeenCalled();
       expect(router.navigateByUrl).toHaveBeenCalledWith('/compra/exito');
+    });
+
+    it('dado una orden con sugerenciaId sin plan avanzado, cuando confirmo, deberia bloquear la compra IA', () => {
+      givenOrdenEnCurso(OrdenCompraMother.crear({ sugerenciaId: 'sug-123' }));
+      givenPlan('INTERMEDIO');
+
+      presenter.confirmar();
+
+      expect(servicioSugerencias.comprarSugerencia).not.toHaveBeenCalled();
+      expect(servicioCompra.procesarPago).not.toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Comprar sugerencias IA esta disponible con plan Avanzado.',
+        'info',
+      );
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/suscripcion');
     });
 
     it('dado que el pago falla, cuando confirmo, deberia mostrar el toast de error', () => {
@@ -149,5 +175,9 @@ describe('ConfirmarPresenter', () => {
 
   function givenProcesarPagoResuelveCon(orden: OrdenCompra): void {
     servicioCompra.procesarPago.and.returnValue(of(orden));
+  }
+
+  function givenPlan(plan: string): void {
+    servicioPerfil.perfil.and.returnValue({ plan } as never);
   }
 });

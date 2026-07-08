@@ -103,13 +103,13 @@ describe('SugerenciasPage', () => {
   });
 
   describe('volver', () => {
-    it('cuando hago click en volver, deberia navegar a /kiosquero', () => {
+    it('cuando hago click en volver, deberia navegar a inteligencia comercial', () => {
       givenUsuarioEnLocalStorage();
       whenMonto();
 
       component.volver();
 
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/inteligencia-comercial');
     });
   });
 

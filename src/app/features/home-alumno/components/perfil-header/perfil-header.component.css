@@ -118,6 +118,7 @@
 @media (min-width: 1024px) {
   .perfil-header__deco--goku {
     top: 50%;
+    left: 58%;
     width: 280px;
   }
 }
@@ -149,6 +150,7 @@
 
 @media (min-width: 1024px) {
   .perfil-header__deco--gato {
+    left: 58%;
     width: 200px;
   }
 }
@@ -196,6 +198,10 @@
     right: 4px;
     width: 100px;
     transform: none;
+  }
+
+  .perfil-header--nombre-largo .perfil-header__deco--messi {
+    width: 80px;
   }
 }
 
@@ -257,6 +263,19 @@
 
   .perfil-header--fondo-minecraft .perfil-header__deco--tres {
     width: 42px;
+  }
+}
+
+@media (min-width: 521px) and (max-width: 1023px) {
+  .perfil-header__deco--goku,
+  .perfil-header__deco--messi,
+  .perfil-header__deco--gato {
+    top: 8px;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: 110px;
+    transform: translateX(-50%);
   }
 }
 
@@ -407,10 +426,11 @@
 .perfil-header__info {
   grid-area: info;
   position: relative;
-  z-index: 1;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .perfil-header__saludo {
@@ -433,17 +453,17 @@
 
 .perfil-header__nombre {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: clamp(18px, 4.2vw, 20px);
   font-weight: 800;
   color: var(--color-pizarra);
-  line-height: 1.1;
+  line-height: 1.15;
   margin: 0;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 @media (min-width: 769px) {
   .perfil-header__nombre {
-    font-size: 36px;
+    font-size: clamp(22px, 2.3vw, 32px);
   }
 }
 
@@ -512,6 +532,10 @@
     grid-template-areas: 'avatar info saldo';
     padding: 34px 38px;
     gap: 32px;
+  }
+
+  .perfil-header--nombre-largo .perfil-header__info {
+    max-width: 340px;
   }
 
   .perfil-header__avatar {

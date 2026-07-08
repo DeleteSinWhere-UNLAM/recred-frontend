@@ -36,7 +36,7 @@ export class SugerenciasChipsComponent {
   }
 
   protected onClick(sugerencia: SugerenciaCapacidad): void {
-    if (this.deshabilitado) return;
+    if (this.deshabilitado || sugerencia.bloqueada) return;
     this.elegir.emit(sugerencia.prompt);
   }
 

@@ -1,5 +1,5 @@
 <app-navbar></app-navbar>
-<div class="tutor-dashboard">
+<div class="w-full max-w-[1600px] mx-auto p-8 max-md:p-4 min-h-screen bg-[var(--color-fondo)] flex flex-col gap-8">
   @if (isLoading) {
     <div class="loading-state">
       <div class="spinner"></div>
@@ -20,7 +20,7 @@
       @if (esPlanGratuito && dashboardItems.length >= 5) {
         <div class="dashboard-limit-alert">
           <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-          <span>Límite de 5 tarjetas alcanzado para cuenta gratuita. Pasate a Premium para agregar más.</span>
+          <span>Límite de 5 tarjetas alcanzado para cuenta gratuita. Pasate a Intermedio para agregar más.</span>
         </div>
       }
       <div class="dashboard-actions" style="margin-bottom: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">

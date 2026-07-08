@@ -18,9 +18,14 @@
 
     <div class="pricing-grid">
       @for (plan of plans(); track plan.id) {
-      <div class="pricing-card" [class.highlighted]="plan.isHighlighted">
+      <div class="pricing-card" [class.highlighted]="plan.isHighlighted" [class.current]="esPlanActual(plan.id)">
         <div class="card-header">
-          <h3>{{ plan.name }}</h3>
+          <div class="plan-title-row">
+            <h3>{{ plan.name }}</h3>
+            @if (esPlanActual(plan.id)) {
+            <span class="current-plan-badge">Plan actual</span>
+            }
+          </div>
           <p class="description">{{ plan.description }}</p>
         </div>
 
@@ -61,10 +66,17 @@
           }
         </ul>
         <div class="card-action">
-          <button class="btn-select" (click)="selectPlan(plan.id)">Seleccionar Plan</button>
+          <button class="btn-select" [disabled]="planNoComprable(plan.id) || !!planEnCompra()"
+            (click)="selectPlan(plan.id)">
+            {{ textoBoton(plan.id) }}
+          </button>
         </div>
       </div>
       }
     </div>
+
+    @if (errorCompra()) {
+    <p class="pricing-error" aria-live="polite">{{ errorCompra() }}</p>
+    }
   </div>
 </section>

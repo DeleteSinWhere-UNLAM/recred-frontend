@@ -202,24 +202,13 @@ export class CarritoService {
   }
 
   validarAgregar(producto: Producto, alumnoId: string, cantidadAdicional: number): { permitido: boolean, razon?: 'saldo' | 'presupuesto' | 'categoria' } {
-    console.log('[DEBUG validarAgregar]', {
-      productoId: producto.id,
-      productoNombre: producto.nombre,
-      productoPrecio: producto.precio,
-      productoCategoria: producto.categoria,
-      alumnoId,
-      cantidadAdicional
-    });
 
     if (producto.superaPresupuesto) {
-      console.log('[DEBUG validarAgregar] producto.superaPresupuesto is true');
       return { permitido: false, razon: 'presupuesto' };
     }
 
     const budget = this.budgetsState().get(alumnoId);
-    console.log('[DEBUG validarAgregar] Loaded budget:', budget);
     if (!budget || !budget.activo) {
-      console.log('[DEBUG validarAgregar] No budget found or inactive');
       const alumno = this.alumnosService.getAlumnoById(alumnoId);
       if (alumno) {
         let spentCartGeneral = 0;
@@ -228,7 +217,6 @@ export class CarritoService {
           spentCartGeneral += item.producto.precio * item.cantidad;
         }
         if (spentCartGeneral + producto.precio * cantidadAdicional > alumno.saldo) {
-          console.log('[DEBUG validarAgregar] Exceeds student credit balance (no budget case)!');
           return { permitido: false, razon: 'saldo' };
         }
       }
@@ -296,24 +284,12 @@ export class CarritoService {
     const totalGeneral = spentPastGeneral + spentCartGeneral + additionalCost;
     
     if (totalGeneral > limiteSaldo) {
-      console.log('[DEBUG validarAgregar] Exceeds student credit balance!');
       return { permitido: false, razon: 'saldo' };
     }
 
     const limiteEfectivo = Math.min(budget.montoLimiteGeneral, limiteSaldo);
 
-    console.log('[DEBUG validarAgregar] General cost check:', {
-      spentPastGeneral,
-      spentCartGeneral,
-      additionalCost,
-      totalGeneral,
-      limit: budget.montoLimiteGeneral,
-      saldo: alumno?.saldo,
-      limiteEfectivo
-    });
-    
     if (totalGeneral > limiteEfectivo) {
-      console.log('[DEBUG validarAgregar] Exceeds general budget!');
       return { permitido: false, razon: 'presupuesto' };
     }
 
@@ -326,18 +302,9 @@ export class CarritoService {
         r.descripcionCategoria
       )
     );
-    console.log('[DEBUG validarAgregar] Matched rule for category:', producto.categoria.id, rule);
     if (rule) {
       const totalCategory = spentPastCategory + spentCartCategory + additionalCost;
-      console.log('[DEBUG validarAgregar] Categoria cost check:', {
-        spentPastCategory,
-        spentCartCategory,
-        additionalCost,
-        totalCategory,
-        limit: rule.montoLimiteCalculado
-      });
       if (totalCategory > rule.montoLimiteCalculado) {
-        console.log('[DEBUG validarAgregar] Exceeds category budget!');
         return { permitido: false, razon: 'categoria' };
       }
     }

@@ -147,10 +147,10 @@ describe('PromocionesPagePresenter', () => {
       expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
     });
 
-    it('dado el presenter, cuando hago click en nueva promocion, deberia navegar a /sugerencias', () => {
+    it('dado el presenter, cuando hago click en nueva promocion, deberia navegar a baja rotacion del kiosquero', () => {
       presenter.nuevaPromocion();
 
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/sugerencias');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/sugerencias');
     });
   });
 

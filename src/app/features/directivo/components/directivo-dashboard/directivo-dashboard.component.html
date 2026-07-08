@@ -1,4 +1,299 @@
-<div class="dashboard-card">
-  <h2>Panel Principal</h2>
-  <p>Próximamente: Indicadores y reportes del colegio.</p>
+<div class="pv">
+  @if (loading) {
+    <div class="pv__notice" role="status">
+      <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>Cargando panel de administracion...</span>
+    </div>
+  }
+
+  @if (error) {
+    <div class="pv__notice pv__notice--error" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  @if (!loading && error) {
+    <section class="pv__panel pv__license-panel" aria-label="Pago de licencia del colegio">
+      <div class="pv__section-title">
+        <span aria-hidden="true">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </span>
+        <div>
+          <p class="pv__section-kicker">Acceso del colegio</p>
+          <h2>Licencia</h2>
+        </div>
+      </div>
+
+      <div class="pv__license-card pv__license-card--standalone">
+        <div class="pv__license-main">
+          <span class="pv__license-icon" aria-hidden="true">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </span>
+          <div>
+            <p class="pv__license-label">Licencia colegio</p>
+            <strong>{{ montoLicencia() }}</strong>
+          </div>
+        </div>
+        <div class="pv__license-details">
+          <span>{{ estadoLicencia() }}</span>
+          <span>{{ vigenciaLicencia() }}</span>
+          <small>{{ restanteLicencia() }}</small>
+        </div>
+        <button type="button" class="pv__license-button" [disabled]="pagandoLicencia" (click)="iniciarPagoLicencia()">
+          @if (pagandoLicencia) {
+            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            <span>Redirigiendo...</span>
+          } @else {
+            <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
+            <span>Pagar licencia</span>
+          }
+        </button>
+        @if (errorPagoLicencia) {
+          <p class="pv__license-error">{{ errorPagoLicencia }}</p>
+        }
+      </div>
+    </section>
+  }
+
+  @if (!loading && !error && data) {
+    <header class="pv__hero">
+      <div class="pv__hero-main">
+        <div class="pv__avatar" aria-hidden="true">
+          <span><i class="fa-solid fa-school"></i></span>
+        </div>
+        <div class="pv__hero-copy">
+          <p class="pv__greeting">Panel administrativo</p>
+          <h1 id="pv-title">{{ data.nombre }}</h1>
+          <p class="pv__school-meta">CUE {{ data.cue }}</p>
+        </div>
+      </div>
+      <div class="pv__license-card" [class.pv__license-card--active]="licenciaActiva()">
+        <div class="pv__license-main">
+          <span class="pv__license-icon" aria-hidden="true">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </span>
+          <div>
+            <p class="pv__license-label">Licencia colegio</p>
+            <strong>{{ montoLicencia() }}</strong>
+          </div>
+        </div>
+        <div class="pv__license-details">
+          <span>{{ estadoLicencia() }}</span>
+          <span>{{ vigenciaLicencia() }}</span>
+          <small>{{ restanteLicencia() }}</small>
+        </div>
+        <button type="button" class="pv__license-button" [disabled]="pagandoLicencia" (click)="iniciarPagoLicencia()">
+          @if (pagandoLicencia) {
+            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            <span>Redirigiendo...</span>
+          } @else {
+            <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
+            <span>{{ licenciaActiva() ? 'Renovar' : 'Pagar licencia' }}</span>
+          }
+        </button>
+        @if (errorPagoLicencia) {
+          <p class="pv__license-error">{{ errorPagoLicencia }}</p>
+        }
+      </div>
+    </header>
+
+    <section class="pv__panel" aria-labelledby="kioscos-title">
+      <div class="pv__panel-header">
+        <div class="pv__section-title">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-store"></i>
+          </span>
+          <div>
+            <p class="pv__section-kicker">Operacion</p>
+            <h2 id="kioscos-title">Kiosco del colegio</h2>
+          </div>
+        </div>
+
+        @if (data.buffets.length === 0) {
+          <button type="button" class="pv__primary-action" [routerLink]="['/directivo/crear-buffet']" [state]="{ schoolId: data.id }">
+            <span class="pv__primary-action-icon" aria-hidden="true">
+              <i class="fa-solid fa-plus"></i>
+            </span>
+            <strong>Nuevo kiosco</strong>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        }
+      </div>
+
+      @if (data.buffets.length === 0) {
+        <div class="pv__ok-state">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-circle-info"></i>
+          </span>
+          <div>
+            <strong>Sin kioscos registrados</strong>
+            <p>No hay buffets registrados en este colegio todavia.</p>
+          </div>
+        </div>
+      }
+
+      @if (data.buffets.length > 0) {
+        <div class="pv__operation-grid">
+          @for (buffet of data.buffets; track buffet.id) {
+            <article class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
+              <div class="pv__operation-icon" aria-hidden="true">
+                <i class="fa-solid fa-store"></i>
+              </div>
+
+              <div class="pv__operation-body">
+                <span class="pv__status" [class.pv__status--active]="buffet.activo">
+                  {{ buffet.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+                <strong>{{ buffet.nombre }}</strong>
+
+                @if (buffet.vendedor) {
+                  <small class="pv__operation-detail">
+                    <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+                    {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
+                  </small>
+                } @else {
+                  <small class="pv__operation-detail pv__operation-detail--warning">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    Sin vendedor asignado
+                  </small>
+                }
+              </div>
+
+              <div class="pv__operation-actions">
+                @if (!buffet.vendedor) {
+                  <button type="button" class="pv__mini-action pv__mini-action--warning" [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
+                    <span>Asignar vendedor</span>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                  </button>
+                } @else {
+                  <button type="button" class="pv__mini-action" (click)="verDetalleVendedor(buffet.vendedor)">
+                    <span>Ver vendedor</span>
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                  </button>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="pv__panel" aria-labelledby="gestion-escolar-title">
+      <div class="pv__panel-header">
+        <div class="pv__section-title">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-school-flag"></i>
+          </span>
+          <div>
+            <p class="pv__section-kicker">Configuracion</p>
+            <h2 id="gestion-escolar-title">Gestion escolar</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="pv__action-grid">
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/grados']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-layer-group"></i>
+          </span>
+          <span class="pv__action-copy">
+            <strong>Grados</strong>
+            <small>Altas, bajas y modificaciones</small>
+          </span>
+          <span class="pv__quick-arrow" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/franjas-horarias']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-clock"></i>
+          </span>
+          <span class="pv__action-copy">
+            <strong>Franjas horarias</strong>
+            <small>Horarios, cupos y cortes</small>
+          </span>
+          <span class="pv__quick-arrow" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <section class="pv__panel" aria-labelledby="tutores-title">
+      <div class="pv__panel-header">
+        <div class="pv__section-title">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-user-group"></i>
+          </span>
+          <div>
+            <p class="pv__section-kicker">Comunidad</p>
+            <h2 id="tutores-title">Tutores del colegio</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="pv__action-grid">
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/invitar-tutor']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </span>
+          <span class="pv__action-copy">
+            <strong>Invitar tutor</strong>
+            <small>Enviar link unico por email</small>
+          </span>
+          <span class="pv__quick-arrow" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+
+        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/importar-tutores']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-file-csv"></i>
+          </span>
+          <span class="pv__action-copy">
+            <strong>Importar tutores por CSV</strong>
+            <small>Alta masiva desde archivo</small>
+          </span>
+          <span class="pv__quick-arrow" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+      </div>
+    </section>
+  }
 </div>
+
+@if (vendedorSeleccionado()) {
+  <div class="pv-modal-overlay" (click)="cerrarModal()" (keydown.enter)="cerrarModal()" tabindex="0" role="button">
+    <div class="pv-modal" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0" role="dialog" aria-labelledby="modal-title">
+      <header class="pv-modal__header">
+        <div class="pv-modal__title-group">
+          <span class="pv-modal__icon" aria-hidden="true">
+            <i class="fa-solid fa-user-tie"></i>
+          </span>
+          <h2 id="modal-title">Datos del vendedor</h2>
+        </div>
+        <button class="pv-modal__close" (click)="cerrarModal()" aria-label="Cerrar modal">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="pv-modal__body">
+        <div class="pv-modal__data-row">
+          <small>Nombre completo</small>
+          <p><strong>{{ vendedorSeleccionado()?.nombre }} {{ vendedorSeleccionado()?.apellido }}</strong></p>
+        </div>
+        <div class="pv-modal__data-row">
+          <small>Email</small>
+          <p>{{ vendedorSeleccionado()?.email }}</p>
+        </div>
+        <div class="pv-modal__data-row">
+          <small>CUIT</small>
+          <p>{{ vendedorSeleccionado()?.cuit }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

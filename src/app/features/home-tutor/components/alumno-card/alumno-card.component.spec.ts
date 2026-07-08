@@ -68,7 +68,16 @@ describe('AlumnoCardComponent', () => {
         { provide: ToastService, useValue: servicioToast },
         { provide: DialogService, useValue: servicioDialog },
         { provide: AlumnoContextoService, useValue: servicioContexto },
-        { provide: PerfilService, useValue: { perfil: perfilSignal.asReadonly() } },
+        {
+          provide: PerfilService,
+          useValue: {
+            perfil: perfilSignal.asReadonly(),
+            esPlanGratuito: () => {
+              const plan = perfilSignal()?.plan?.toUpperCase();
+              return plan !== 'INTERMEDIO' && plan !== 'AVANZADO';
+            },
+          },
+        },
         { provide: PresupuestoService, useValue: servicioPresupuesto },
         provideRouter([]),
       ],
@@ -215,12 +224,33 @@ describe('AlumnoCardComponent', () => {
       expect(component.esPremium).toBeFalse();
     });
 
-    it('dado un perfil con plan PREMIUM, esPremium deberia ser true', () => {
+    it('dado un perfil con plan INTERMEDIO, esPremium deberia ser true', () => {
       perfilSignal.set(PerfilMother.crearTutor());
-      const tutorPremium = { ...perfilSignal(), plan: 'PREMIUM' } as Perfil;
-      perfilSignal.set(tutorPremium);
+      const tutorIntermedio = { ...perfilSignal(), plan: 'INTERMEDIO' } as Perfil;
+      perfilSignal.set(tutorIntermedio);
 
       expect(component.esPremium).toBeTrue();
+    });
+
+    it('dado plan gratuito, navegarConPlan deberia mostrar bloqueo y no navegar', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+
+      component.navegarConPlan('/prediccion-gasto', 'INTERMEDIO');
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Intermedio.', 'info');
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('dado plan avanzado, navegarConPlan deberia navegar a una accion avanzada', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+      perfilSignal.set({ ...PerfilMother.crearTutor(), plan: 'AVANZADO' });
+
+      component.navegarConPlan('/transferir-saldo', 'AVANZADO');
+
+      expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith('alumno-1');
+      expect(router.navigate).toHaveBeenCalledWith(['/transferir-saldo']);
     });
 
     it('dado un perfil ALUMNO, esPadre deberia ser false', () => {

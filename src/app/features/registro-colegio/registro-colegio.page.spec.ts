@@ -8,7 +8,6 @@ const CAMPOS_FORM_VALIDOS = {
   schoolEmail: 'test@test.com',
   schoolPhone: '011-1234',
   schoolCue: '123',
-  schoolLevelId: '44444444-4444-4444-4444-444444444444',
   directorFirstName: 'Juan',
   directorLastName: 'Pérez',
   directorEmail: 'juan@test.com',
@@ -55,7 +54,7 @@ describe('RegistroColegioPage', () => {
       expect(controles).toContain('schoolName');
       expect(controles).toContain('schoolEmail');
       expect(controles).toContain('directorDni');
-      expect(controles.length).toBe(11);
+      expect(controles.length).toBe(10);
     });
 
     it('dado el form recien creado, cuando lo consulto, deberia estar invalido', () => {
@@ -79,7 +78,6 @@ describe('RegistroColegioPage', () => {
         jasmine.objectContaining({
           schoolName: 'Instituto Test',
           schoolEmail: 'test@test.com',
-          schoolLevel: { id: CAMPOS_FORM_VALIDOS.schoolLevelId },
           directorFirstName: 'Juan',
           directorDni: '12345678',
         }),
@@ -89,17 +87,11 @@ describe('RegistroColegioPage', () => {
     it('dado un payload esperado de la Mother, cuando envio, deberia matchear la forma que espera el back', () => {
       const payload = RegistroColegioMother.crearPayload();
 
-      expect(payload.schoolLevel).toBeDefined();
       expect(payload.schoolName).toBeDefined();
       expect(payload.directorDni).toBeDefined();
     });
   });
 
-  describe('niveles', () => {
-    it('dado la page, cuando leo niveles, deberia exponer la lista NIVELES_EDUCATIVOS', () => {
-      expect(component.niveles.length).toBeGreaterThan(0);
-    });
-  });
 
   function givenFormValido(): void {
     component.form.patchValue(CAMPOS_FORM_VALIDOS);

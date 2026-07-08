@@ -26,8 +26,7 @@ export class TutorHeaderComponent {
   private readonly perfilService = inject(PerfilService);
 
   protected readonly esPremium = computed(() => {
-    const plan = this.perfilService.perfil()?.plan;
-    return plan === 'PREMIUM' || plan === 'AVANZADO';
+    return !this.perfilService.esPlanGratuito();
   });
 
   protected readonly subiendoFoto = signal(false);

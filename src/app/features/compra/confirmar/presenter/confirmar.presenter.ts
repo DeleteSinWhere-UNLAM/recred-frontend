@@ -6,6 +6,8 @@ import { CarritoService } from '../../services/carrito.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CompraService } from '../../services/compra.service';
 import { SugerenciasService } from '../../../sugerencias/services/sugerencias.service';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
+import { NotificacionesService } from '../../../../data-access/services/notificaciones.service';
 
 @Injectable()
 export class ConfirmarPresenter {
@@ -14,6 +16,8 @@ export class ConfirmarPresenter {
   private readonly sugerenciasService = inject(SugerenciasService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly perfilService = inject(PerfilService);
+  private readonly notificacionesService = inject(NotificacionesService);
 
   private readonly cargandoState = signal<boolean>(false);
 
@@ -39,8 +43,16 @@ export class ConfirmarPresenter {
 
   confirmar(): void {
     if (this.cargandoState() || this.vacia()) return;
-    this.cargandoState.set(true);
     const ordenActual = this.orden();
+    if (ordenActual?.sugerenciaId && !this.tienePlanAvanzado()) {
+      this.toastService.mostrar('Comprar sugerencias IA esta disponible con plan Avanzado.', 'info');
+      if (this.perfilService.rol() === 'PADRE') {
+        this.router.navigateByUrl('/suscripcion');
+      }
+      return;
+    }
+
+    this.cargandoState.set(true);
     const obs$ = (ordenActual?.sugerenciaId)
       ? this.sugerenciasService.comprarSugerencia(ordenActual.sugerenciaId).pipe(
           switchMap(() => this.compraService.procesarPago())
@@ -49,6 +61,11 @@ export class ConfirmarPresenter {
 
     obs$.subscribe({
       next: (orden) => {
+        if (ordenActual?.sugerenciaId) {
+          this.toastService.mostrar('¡Compra exitosa! Sumaste puntos saludables.', 'success');
+          // Eliminamos la notificación de la sugerencia de la campanita
+          this.notificacionesService.eliminarNotificacionLocal(ordenActual.sugerenciaId);
+        }
         for (const o of orden.ordenes) {
           this.carritoService.limpiarAlumno(o.alumno.id);
         }
@@ -74,5 +91,9 @@ export class ConfirmarPresenter {
   cancelar(): void {
     this.compraService.cancelarOrden();
     this.router.navigateByUrl('/compra');
+  }
+
+  private tienePlanAvanzado(): boolean {
+    return this.perfilService.perfil()?.plan?.toUpperCase() === 'AVANZADO';
   }
 }

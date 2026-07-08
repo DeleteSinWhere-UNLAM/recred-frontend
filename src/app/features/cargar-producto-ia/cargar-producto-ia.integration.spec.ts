@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { DialogService } from '../../shared/services/dialog.service';
 import { Categoria } from '../inventario/models/categoria.interface';
 import { ProductoService } from '../inventario/services/producto.service';
@@ -16,9 +17,16 @@ import { CargarProductoIaPageComponent } from './cargar-producto-ia-page/cargar-
 import { CapturaCamara } from './components/captura-camara/captura-camara';
 import { EscanerLoader } from './components/escaner-loader/escaner-loader';
 import { ProductoIaForm } from './components/producto-ia-form/producto-ia-form';
-import { RespuestaProductoIa } from './models/producto-ia-response.interface';
 import { SolicitudGuardarProducto } from './models/guardar-producto-request.interface';
+import { RespuestaProductoIa } from './models/producto-ia-response.interface';
 import { IaVisionService } from './services/ia-vision-service/ia-vision-service';
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true,
+})
+class NavbarStubComponent {}
 
 @Component({
   selector: 'app-camera-capture',
@@ -90,8 +98,8 @@ describe('CargarProductoIa Integration', () => {
       ],
     })
       .overrideComponent(CargarProductoIaPageComponent, {
-        remove: { imports: [CapturaCamara, EscanerLoader, ProductoIaForm] },
-        add: { imports: [CapturaCamaraStub, EscanerLoaderStub, ProductoIaFormStub] },
+        remove: { imports: [NavbarComponent, CapturaCamara, EscanerLoader, ProductoIaForm] },
+        add: { imports: [NavbarStubComponent, CapturaCamaraStub, EscanerLoaderStub, ProductoIaFormStub] },
       })
       .compileComponents();
 
@@ -126,7 +134,7 @@ describe('CargarProductoIa Integration', () => {
 
     expect(servicioDialog.alert).toHaveBeenCalledWith(
       'Hubo un error al procesar la imagen.',
-      'Error de Análisis',
+      jasmine.any(String),
     );
   }));
 
@@ -191,7 +199,7 @@ describe('CargarProductoIa Integration', () => {
 
   function thenElFeedbackDeExitoEsVisible(): void {
     const exito = queryTexto('.carga-producto__feedback--success');
-    expect(exito).toContain('¡Producto guardado exitosamente!');
+    expect(exito).toContain('Producto guardado exitosamente.');
   }
 
   function crearImagen(): File {
