@@ -253,4 +253,18 @@
   text-transform: uppercase;
 }
 
+.tutor-header__link-agregar {
+  color: var(--color-pizarra);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.tutor-header__link-agregar:hover {
+  color: var(--color-dorado-dark);
+  text-decoration: underline;
+}
+
 

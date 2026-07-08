@@ -234,6 +234,12 @@ export class NavbarComponent implements OnInit {
     this.router.navigateByUrl('/suscripcion');
   }
 
+  protected irAAgregarHijo(): void {
+    this.menuAbierto.set(false);
+    this.menuBilleteraAbierto.set(false);
+    void this.router.navigateByUrl('/crear-hijo');
+  }
+
   protected async cerrarSesion(): Promise<void> {
     this.menuAbierto.set(false);
     try {

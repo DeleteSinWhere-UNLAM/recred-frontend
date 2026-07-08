@@ -1,5 +1,6 @@
 import { Component, Input, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { Perfil } from '../../../../data-access/models/perfil.model';
 import { PerfilMother } from '../../../../data-access/services/alumno.mother';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
@@ -29,6 +30,7 @@ describe('TutorHeaderComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TutorHeaderComponent],
       providers: [
+        provideRouter([]),
         { provide: PerfilUsuarioService, useValue: servicioPerfilUsuario },
         { provide: ToastService, useValue: servicioToast },
         { provide: PerfilService, useValue: { perfil: perfilSignal.asReadonly() } },

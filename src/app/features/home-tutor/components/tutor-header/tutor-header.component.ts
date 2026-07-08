@@ -3,12 +3,13 @@ import { PerfilUsuarioService } from '../../../../data-access/services/perfil-us
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CropModalComponent } from '../../../perfil-usuario/components/crop-modal/crop-modal.component';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-tutor-header',
   templateUrl: './tutor-header.component.html',
   styleUrl: './tutor-header.component.css',
-  imports: [CropModalComponent],
+  imports: [CropModalComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TutorHeaderComponent {
