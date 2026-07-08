@@ -1,5 +1,5 @@
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
-import { Component, OnInit, inject, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -26,7 +26,7 @@ export interface DashboardWidget extends GridsterItemConfig {
   templateUrl: './tutor-dashboard.component.html',
   styleUrls: ['./tutor-dashboard.component.css']
 })
-export class TutorDashboardComponent implements OnInit {
+export class TutorDashboardComponent implements OnInit, OnDestroy {
   private dashboardService = inject(TutorDashboardService);
   private readonly perfilService = inject(PerfilService);
   private readonly usuarioService = inject(UsuarioService);
@@ -64,6 +64,13 @@ export class TutorDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.initGrid();
     this.loadDashboardData();
+  }
+
+  ngOnDestroy(): void {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+      this.saveTimeout = undefined;
+    }
   }
 
   volver(): void {
@@ -215,7 +222,6 @@ export class TutorDashboardComponent implements OnInit {
       if (amount && amount > 0) {
         this.dashboardService.transferBalance(sourceChild.studentId, targetChild.studentId, amount).subscribe({
           next: () => {
-            console.log(`Successfully transferred $${amount} from ${sourceChild.studentName} to ${targetChild.studentName}`);
             this.transferAmounts[sourceChild.studentId] = null; // reset the input
             this.ngOnInit(); // Refresh dashboard to fetch updated balances
           },
@@ -239,7 +245,6 @@ export class TutorDashboardComponent implements OnInit {
   }
   
   applySmartAction(): void {
-    console.log('Action applied for', this.selectedChild?.studentName);
     this.closeSmartActionModal();
   }
 
@@ -292,7 +297,6 @@ export class TutorDashboardComponent implements OnInit {
     this.isTransferring = true;
     this.dashboardService.transferBalance(sourceId, targetId, amount).subscribe({
       next: () => {
-        console.log(`Successfully transferred $${amount}`);
         this.transferAmounts[sourceId] = null;
         this.isTransferring = false;
         this.closeTransferModal();

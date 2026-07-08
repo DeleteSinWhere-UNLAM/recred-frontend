@@ -52,14 +52,12 @@ export class NotificationService {
     runInInjectionContext(this.injector, () => {
       onMessage(this.messaging, (payload) => {
         this.ngZone.run(() => {
-          console.log('Mensaje recibido en primer plano:', payload);
 
           const title = payload.notification?.title || 'Nueva notificación';
           const body = payload.notification?.body || '';
 
           const data = payload.data;
           if (!data) {
-            console.log('La notificación no contiene propiedad data, agregando notificación simple');
             this.notificacionesService.agregarNotificacion({
               id: String(Date.now()),
               titulo: title,
@@ -85,10 +83,7 @@ export class NotificationService {
           };
           this.notificacionesService.agregarNotificacion(nuevaNotif);
 
-          console.log(`Evaluando Notificación -> type: ${data['type']}, rol: ${data['rol']}`);
-
           if (data['type'] === 'LOW_BALANCE_ALERT' && data['rol'] === 'PADRE') {
-            console.log('Entró a LOW_BALANCE_ALERT');
             this.notificacionSaldoBajoService.mostrar(
               Number(data['balance'] || 0),
               data['alumnoId']
@@ -96,24 +91,20 @@ export class NotificationService {
           }
 
           if (data['type'] === 'PURCHASE_SUGGESTION') {
-            console.log('Entró a PURCHASE_SUGGESTION (Type correcto)');
             if (data['rol'] !== 'ALUMNO') {
               console.warn('Advertencia: El rol no es ALUMNO, es:', data['rol']);
             }
 
             let producto = null;
             try {
-              console.log('Contenido de producto antes de parsear:', data['producto']);
               producto = typeof data['producto'] === 'string'
                 ? JSON.parse(data['producto'])
                 : data['producto'];
-              console.log('Producto parseado exitosamente:', producto);
             } catch (e) {
               console.error('Error parseando el producto sugerido', e);
             }
 
             if (producto) {
-              console.log('Llamando al servicio NotificacionSugerenciaSaludableService.mostrar...');
               this.notificacionSugerenciaSaludableService.mostrar(
                 data['sugerenciaId'],
                 data['titulo'],

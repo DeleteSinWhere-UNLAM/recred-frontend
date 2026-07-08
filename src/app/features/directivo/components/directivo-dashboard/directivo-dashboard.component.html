@@ -187,6 +187,45 @@
       }
     </section>
 
+    <section class="pv__panel" aria-labelledby="gestion-escolar-title">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div class="pv__section-title">
+          <span aria-hidden="true">
+            <i class="fa-solid fa-school-flag"></i>
+          </span>
+          <h2 id="gestion-escolar-title">Gestion escolar</h2>
+        </div>
+      </div>
+
+      <div class="pv__operation-grid" style="margin-top: 12px;">
+        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/grados']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-layer-group"></i>
+          </span>
+          <span style="text-align: left;">
+            <strong style="font-size: 15px; display: block;">Grados</strong>
+            <small style="color: #64748b;">Altas, bajas y modificaciones</small>
+          </span>
+          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+
+        <button type="button" class="pv__quick-action" style="padding: 16px; gap: 12px; align-items: center;" [routerLink]="['/directivo/franjas-horarias']">
+          <span class="pv__quick-icon" aria-hidden="true">
+            <i class="fa-solid fa-clock"></i>
+          </span>
+          <span style="text-align: left;">
+            <strong style="font-size: 15px; display: block;">Franjas horarias</strong>
+            <small style="color: #64748b;">Horarios, cupos y cortes</small>
+          </span>
+          <span class="pv__quick-arrow" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-left: auto;" aria-hidden="true">
+            <i class="fa-solid fa-arrow-right"></i>
+          </span>
+        </button>
+      </div>
+    </section>
+
     <section class="pv__panel" aria-labelledby="tutores-title">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div class="pv__section-title">

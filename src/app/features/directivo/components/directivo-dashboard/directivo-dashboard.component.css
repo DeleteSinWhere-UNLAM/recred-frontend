@@ -331,6 +331,19 @@
   color: #172554;
 }
 
+.pv__quick-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background-color: rgba(74, 111, 165, 0.1);
+  color: var(--color-pizarra);
+  font-size: 18px;
+}
+
 .pv__quick-arrow {
   border-radius: 50%;
   background-color: var(--color-pizarra);

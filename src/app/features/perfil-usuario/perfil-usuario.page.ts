@@ -496,7 +496,6 @@ export class PerfilUsuarioPage implements OnInit {
 
     try {
       const config = await this.payoutConfigService.obtenerConfiguracion(kiosqueroId);
-      console.log('Respuesta del backend para PayoutConfig:', config);
       if (config) {
         this.payoutForm.setValue({
           destinationCvu: config.destinationCvu || '',
