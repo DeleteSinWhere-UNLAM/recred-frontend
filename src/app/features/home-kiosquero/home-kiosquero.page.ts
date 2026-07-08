@@ -58,8 +58,15 @@ export class HomeKiosqueroPage implements OnInit {
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
+    
+    const perfil = this.perfilService.getPerfil();
+    const licencia = perfil?.estadoLicenciaColegio;
+
     this.presenter.init();
-    this.loadCategories();
+
+    if (!licencia || licencia === 'ACTIVA' || licencia === 'EN_GRACIA') {
+      this.loadCategories();
+    }
   }
 
   loadCategories(): void {
