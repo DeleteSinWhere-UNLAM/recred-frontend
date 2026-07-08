@@ -37,6 +37,16 @@ describe('HomeKiosqueroService', () => {
       expect(await promesa).toEqual(panel);
     });
 
+    it('dado view home, cuando pido el panel, deberia mandar view=home junto con la fecha', async () => {
+      const panel = PanelKiosqueroMother.crear();
+
+      const promesa = firstValueFrom(service.getPanel(BUFFET_ID_TEST, FECHA_TEST, 'home'));
+      const req = thenSeHaceUnGetA(`${KIOSQUEROS}/${BUFFET_ID_TEST}/dashboard?date=${FECHA_TEST}&view=home`);
+      req.flush(panel);
+
+      expect(await promesa).toEqual(panel);
+    });
+
     it('dado un buffet sin fecha, cuando pido el panel, deberia no agregar el query param', async () => {
       const promesa = firstValueFrom(service.getPanel(BUFFET_ID_TEST));
 
@@ -44,6 +54,7 @@ describe('HomeKiosqueroService', () => {
         (r) => r.method === 'GET' && r.url === `${KIOSQUEROS}/${BUFFET_ID_TEST}/dashboard`,
       );
       expect(req.request.params.has('date')).toBeFalse();
+      expect(req.request.params.has('view')).toBeFalse();
       req.flush(PanelKiosqueroMother.crear());
       await promesa;
     });

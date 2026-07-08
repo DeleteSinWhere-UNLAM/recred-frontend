@@ -32,10 +32,15 @@ export class App implements OnInit {
   private autenticado = signal(false);
 
   protected mostrarAsistente = computed(
-    () =>
-      this.autenticado() &&
-      this.perfilService.rol() !== null &&
-      !RUTAS_SIN_ASISTENTE.has(this.rutaActual()),
+    () => {
+      const rol = this.perfilService.rol();
+      return (
+        this.autenticado() &&
+        rol !== null &&
+        rol !== 'DIRECTIVO_COLEGIO' &&
+        !RUTAS_SIN_ASISTENTE.has(this.rutaActual())
+      );
+    },
   );
 
   async ngOnInit() {

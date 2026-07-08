@@ -103,6 +103,42 @@ describe('DirectivoDashboardComponent', () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it('dado un colegio sin kioscos, deberia mostrar el boton para crear kiosco', () => {
+    component.data = {
+      id: '1',
+      nombre: 'Colegio Test',
+      cue: '112233',
+      buffets: [],
+    };
+    fixture.detectChanges();
+
+    const botonCrearKiosco = fixture.debugElement.query(By.css('.pv__primary-action'));
+
+    expect(botonCrearKiosco).toBeTruthy();
+    expect(botonCrearKiosco.nativeElement.textContent).toContain('Nuevo kiosco');
+  });
+
+  it('dado un colegio con kiosco cargado, no deberia mostrar el boton para crear kiosco', () => {
+    component.data = {
+      id: '1',
+      nombre: 'Colegio Test',
+      cue: '112233',
+      buffets: [
+        {
+          id: 'b1',
+          nombre: 'Kiosco 1',
+          activo: true,
+          vendedor: null,
+        },
+      ],
+    };
+    fixture.detectChanges();
+
+    const botonCrearKiosco = fixture.debugElement.query(By.css('.pv__primary-action'));
+
+    expect(botonCrearKiosco).toBeNull();
+  });
+
   it('dado error de panel, deberia permitir iniciar pago de licencia', () => {
     component.error = 'Licencia vencida';
     const spy = spyOn(component.pagarLicencia, 'emit');
