@@ -391,7 +391,7 @@
   <div
     class="gestion-modal-overlay"
     tabindex="-1"
-    (click)="cerrarConfirmacionBaja()"
+    (click)="cerrarConfirmacionBajaDesdeOverlay($event)"
     (keydown.escape)="cerrarConfirmacionBaja()"
   >
     <section
@@ -399,7 +399,6 @@
       role="dialog"
       aria-modal="true"
       aria-labelledby="baja-confirmacion-title"
-      (click)="$event.stopPropagation()"
     >
       <header class="gestion-modal__header">
         <div class="gestion-modal__title-group">

@@ -219,6 +219,11 @@ export class GestionEscolarPage implements OnInit {
     this.bajaPendiente.set(null);
   }
 
+  protected cerrarConfirmacionBajaDesdeOverlay(event: MouseEvent): void {
+    if (event.target !== event.currentTarget) return;
+    this.cerrarConfirmacionBaja();
+  }
+
   protected async confirmarBaja(): Promise<void> {
     const baja = this.bajaPendiente();
     if (!baja) return;
