@@ -6,8 +6,9 @@ import { ColegiosService } from '../../../data-access/services/colegios.service'
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
-import { StudentRewardStatus } from '../../../data-access/models/student-reward-status.model';
-import { HomeAlumnoService } from '../services/home-alumno.service';
+import { StudentRewardStatus, NivelRecompensa } from '../../../data-access/models/student-reward-status.model';
+import { HomeAlumnoService, RecompensaResponse } from '../services/home-alumno.service';
+import { firstValueFrom } from 'rxjs';
 import { AccionRapida } from '../models/accion-rapida.model';
 import { FondoPerfil } from '../models/fondo-perfil.model';
 import { PedidoEnCurso } from '../models/pedido-en-curso.model';
@@ -36,6 +37,7 @@ export class HomeAlumnoPresenter {
 
   private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly fondoPerfilState = signal<FondoPerfil>('nubes');
+  private readonly recompensaState = signal<RecompensaResponse | null>(null);
 
   readonly alumno: Signal<Alumno | undefined> = this.alumnoState.asReadonly();
   readonly fondoPerfil: Signal<FondoPerfil> = this.fondoPerfilState.asReadonly();
@@ -77,42 +79,33 @@ export class HomeAlumnoPresenter {
   readonly saldoNegativo = computed(() => this.saldo() < 0);
 
   readonly rewardStatus = computed<StudentRewardStatus>(() => {
-    const puntos = this.alumnoState()?.puntosRecompensa ?? 0;
+    const data = this.recompensaState();
     
-    let result: StudentRewardStatus;
-
-    if (puntos >= 250) {
-      result = {
-        puntajeTotal: puntos,
-        nivelGlobal: 'GOAT',
-        mensajeMotivacional: '¡Estás en la cima! Sos un verdadero GOAT. 🐐',
-        puntosFaltantes: 0,
-        proximoNivel: null,
-        porcentajeProgreso: 100,
-      };
-    } else if (puntos >= 100) {
-      const faltantes = 250 - puntos;
-      result = {
-        puntajeTotal: puntos,
-        nivelGlobal: 'CRACK',
-        mensajeMotivacional: '¡Excelente ritmo! Ya casi tocás el cielo. 🚀',
-        puntosFaltantes: faltantes,
-        proximoNivel: 'GOAT',
-        porcentajeProgreso: ((puntos - 100) / 150) * 100,
-      };
-    } else {
-      const faltantes = 100 - puntos;
-      result = {
-        puntajeTotal: puntos,
+    // Valores por defecto si la data aún no carga o falla
+    if (!data) {
+      return {
+        puntajeTotal: 0,
         nivelGlobal: 'PRINCIPIANTE',
-        mensajeMotivacional: '¡Buen comienzo! Sumá puntos comiendo sano. 🍎',
-        puntosFaltantes: faltantes,
+        mensajeMotivacional: 'Cargando tus puntos...',
+        puntosFaltantes: 100,
         proximoNivel: 'CRACK',
-        porcentajeProgreso: (puntos / 100) * 100,
+        porcentajeProgreso: 0,
       };
     }
+    
+    // Calculamos el porcentaje usando la data del back
+    const totalPointsThreshold = data.totalPoints + data.pointsToNextLevel;
+    const progress = totalPointsThreshold > 0 ? (data.totalPoints / totalPointsThreshold) * 100 : 100;
+    const percentage = data.nextLevelName ? Math.min(progress, 100) : 100;
 
-    return result;
+    return {
+      puntajeTotal: data.totalPoints,
+      nivelGlobal: (data.currentLevel as NivelRecompensa) || 'PRINCIPIANTE',
+      mensajeMotivacional: data.levelMessage || '¡Sigue así!',
+      puntosFaltantes: data.pointsToNextLevel,
+      proximoNivel: (data.nextLevelName as NivelRecompensa) || null,
+      porcentajeProgreso: percentage,
+    };
   });
 
   readonly tienePedidoEnCurso = computed(() => this.pedidoEnCurso() !== undefined);
@@ -187,6 +180,11 @@ export class HomeAlumnoPresenter {
       if (alumno) {
         this.alumnoState.set(alumno);
         this.contextoService.setAlumnoId(alumno.id);
+        
+        void firstValueFrom(this.homeAlumnoService.getRecompensasSaludables(alumno.id))
+          .then((res) => this.recompensaState.set(res))
+          .catch((err) => console.error('Error cargando recompensas saludables:', err));
+          
         void this.homeAlumnoService.cargarPedidoEnCurso(alumno.id);
         if (alumno.colegioId) {
           void this.homeAlumnoService.cargarRecreos(alumno.colegioId);

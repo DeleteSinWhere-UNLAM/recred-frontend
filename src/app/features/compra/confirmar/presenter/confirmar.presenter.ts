@@ -1,12 +1,13 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { RECREO_LABELS } from '../../models/orden-compra.model';
 import { CarritoService } from '../../services/carrito.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { CompraService } from '../../services/compra.service';
 import { SugerenciasService } from '../../../sugerencias/services/sugerencias.service';
 import { PerfilService } from '../../../../data-access/services/perfil.service';
+import { NotificacionesService } from '../../../../data-access/services/notificaciones.service';
 
 @Injectable()
 export class ConfirmarPresenter {
@@ -16,6 +17,7 @@ export class ConfirmarPresenter {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly perfilService = inject(PerfilService);
+  private readonly notificacionesService = inject(NotificacionesService);
 
   private readonly cargandoState = signal<boolean>(false);
 
@@ -53,12 +55,17 @@ export class ConfirmarPresenter {
     this.cargandoState.set(true);
     const obs$ = (ordenActual?.sugerenciaId)
       ? this.sugerenciasService.comprarSugerencia(ordenActual.sugerenciaId).pipe(
-          switchMap(() => this.compraService.procesarPago())
+          map(() => ordenActual)
         )
       : this.compraService.procesarPago();
 
     obs$.subscribe({
       next: (orden) => {
+        if (ordenActual?.sugerenciaId) {
+          this.toastService.mostrar('¡Compra exitosa! Sumaste puntos saludables.', 'success');
+          // Eliminamos la notificación de la sugerencia de la campanita
+          this.notificacionesService.eliminarNotificacionLocal(ordenActual.sugerenciaId);
+        }
         for (const o of orden.ordenes) {
           this.carritoService.limpiarAlumno(o.alumno.id);
         }
