@@ -86,14 +86,14 @@ describe('AcreditarMercadoPagoPage', () => {
       expect(component.montoIngresado).toBe(2500);
     });
 
-    it('dado el input de monto, no deberia definir minimos ni maximos nativos', () => {
+    it('dado el input de monto, deberia definir los minimos y steps nativos de recarga', () => {
       whenMonto();
 
       const input = queryElemento('#monto') as HTMLInputElement;
 
-      expect(input.hasAttribute('min')).toBeFalse();
+      expect(input.getAttribute('min')).toBe('100');
       expect(input.hasAttribute('max')).toBeFalse();
-      expect(input.getAttribute('step')).toBe('any');
+      expect(input.getAttribute('step')).toBe('100');
     });
   });
 
