@@ -1609,6 +1609,26 @@
   gap: 8px;
 }
 
+.recreos-empty-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: var(--color-superficie);
+  border: 1px dashed var(--color-borde-fuerte);
+  border-radius: 12px;
+  color: var(--color-texto-claro);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.recreos-empty-state i {
+  color: var(--color-pizarra);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
 .recreo-option-btn {
   display: flex;
   flex-direction: column;

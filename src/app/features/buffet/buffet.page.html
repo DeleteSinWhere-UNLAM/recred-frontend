@@ -341,7 +341,14 @@
               <div class="buffet__sidebar-recreos">
                 <span class="recreo-section-label">FRANJA HORARIA</span>
                 <div class="recreos-btn-stack">
-                  @for (opc of presenter.recreosDisponibles(); track opc.recreo) {
+                  @let opcionesRecreo = presenter.recreosDisponibles();
+                  @if (opcionesRecreo.length === 0) {
+                    <div class="recreos-empty-state" role="status">
+                      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                      <span>No hay franjas horarias disponibles.</span>
+                    </div>
+                  } @else {
+                  @for (opc of opcionesRecreo; track opc.recreo) {
                   <button type="button" class="recreo-option-btn"
                     [class.active]="opc.recreo === presenter.recreoSeleccionado()" [disabled]="opc.bloqueado"
                     (click)="presenter.setRecreo(opc.recreo)"
@@ -351,6 +358,7 @@
                     <span class="recreo-option-time">{{ rango }}</span>
                     }
                   </button>
+                  }
                   }
                 </div>
               </div>
@@ -527,7 +535,7 @@
         <span class="buffet__footer-cart-total">{{ formatARS(presenter.totalCarrito()) }}</span>
       </div>
     </div>
-    <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()" [disabled]="presenter.procesandoPago()" (click)="presenter.iniciarPago()"> <i class="fa-solid fa-lock" aria-hidden="true"></i> @if(presenter.procesandoPago()) { <span>Procesando...</span> } @else { <span>Avanzar al Pago</span> } </button>
+    <button type="button" class="buffet__footer-cart-btn" [class.buffet__footer-cart-btn--premium]="esPremium()" [disabled]="presenter.procesandoPago() || !presenter.hayFranjasHorariasDisponibles()" (click)="presenter.iniciarPago()"> <i class="fa-solid fa-lock" aria-hidden="true"></i> @if(presenter.procesandoPago()) { <span>Procesando...</span> } @else { <span>Avanzar al Pago</span> } </button>
   </div>
 </div>
 }
@@ -558,4 +566,3 @@
 
 
 }
-

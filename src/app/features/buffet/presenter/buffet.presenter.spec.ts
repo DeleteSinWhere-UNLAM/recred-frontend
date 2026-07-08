@@ -78,6 +78,7 @@ describe('BuffetPresenter', () => {
       'cargarPresupuestoYConsumo',
       'getSeleccionRetiro',
       'setSeleccionRetiro',
+      'clearSeleccionRetiro',
     ]);
     const mockCarrito = servicioCarrito as unknown as {
       items: unknown;
@@ -574,18 +575,15 @@ describe('BuffetPresenter', () => {
   });
 
   describe('recreosDisponibles', () => {
-    it('dado sin slots, deberia devolver las 4 opciones no bloqueadas', fakeAsync(() => {
+    it('dado sin slots, no deberia devolver opciones hardcodeadas', fakeAsync(() => {
+      servicioFranjas.getFranjasHorarias.and.resolveTo([]);
+
       whenInicializo('alumno-1');
 
       const opciones = presenter.recreosDisponibles();
-      expect(opciones.length).toBe(4);
-      expect(opciones.map((o) => o.recreo)).toEqual([
-        'PRIMER_RECREO',
-        'SEGUNDO_RECREO',
-        'MEDIODIA',
-        'FUERA_HORA',
-      ]);
-      expect(opciones.every((o) => !o.bloqueado)).toBeTrue();
+      expect(opciones).toEqual([]);
+      expect(presenter.hayFranjasHorariasDisponibles()).toBeFalse();
+      expect(servicioCarrito.clearSeleccionRetiro).toHaveBeenCalledWith('alumno-1');
     }));
 
     it('dado slots que matchean por descripcion, deberia asignar el recreo correcto', fakeAsync(() => {
@@ -648,6 +646,9 @@ describe('BuffetPresenter', () => {
 
   describe('setFecha y setRecreo', () => {
     beforeEach(fakeAsync(() => {
+      servicioFranjas.getFranjasHorarias.and.resolveTo([
+        crearSlot('s-1', '10:00', 'Primer Recreo'),
+      ]);
       whenInicializo('alumno-1');
       servicioBuffet.getProductosDelBuffet.calls.reset();
       servicioCarrito.setSeleccionRetiro.calls.reset();
@@ -768,6 +769,9 @@ describe('BuffetPresenter', () => {
 
   describe('iniciarPago sin buffet', () => {
     it('dado alumno sin buffet en state, deberia mostrar toast y no procesar', fakeAsync(() => {
+      servicioFranjas.getFranjasHorarias.and.resolveTo([
+        crearSlot('s-1', '10:00', 'Primer Recreo'),
+      ]);
       whenInicializo('alumno-1');
       (servicioCarrito as unknown as { items: unknown }).items = signal([
         { producto: PRODUCTO_DISPONIBLE, alumnoId: 'alumno-1', cantidad: 1 },
@@ -919,6 +923,9 @@ describe('BuffetPresenter', () => {
 
   describe('iniciarPago', () => {
     beforeEach(fakeAsync(() => {
+      servicioFranjas.getFranjasHorarias.and.resolveTo([
+        crearSlot('s-1', '10:00', 'Primer Recreo'),
+      ]);
       whenInicializo('alumno-1');
       (servicioCarrito as unknown as { items: unknown }).items = signal([
         { producto: PRODUCTO_DISPONIBLE, alumnoId: 'alumno-1', cantidad: 2 },
@@ -953,6 +960,18 @@ describe('BuffetPresenter', () => {
       presenter.iniciarPago();
 
       expect(servicioToast.mostrar).toHaveBeenCalledWith('Saldo insuficiente para realizar el pedido', 'error');
+      expect(servicioCompra.iniciarOrden).not.toHaveBeenCalled();
+    });
+
+    it('dado que no hay franjas horarias disponibles, deberia mostrar toast y no procesar', () => {
+      (presenter as unknown as { franjasState: { set: (v: unknown[]) => void } }).franjasState.set([]);
+
+      presenter.iniciarPago();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'No hay franjas horarias disponibles para realizar el pedido.',
+        'error',
+      );
       expect(servicioCompra.iniciarOrden).not.toHaveBeenCalled();
     });
 
