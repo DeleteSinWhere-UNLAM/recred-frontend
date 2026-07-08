@@ -22,7 +22,7 @@ type GestionEscolarTab = 'grados' | 'franjas';
 
 type GradoForm = FormGroup<{
   nivelId: FormControl<string>;
-  anio: FormControl<string>;
+  año: FormControl<string>;
   division: FormControl<string>;
 }>;
 
@@ -59,7 +59,7 @@ export class GestionEscolarPage implements OnInit {
 
   protected readonly gradoForm: GradoForm = new FormGroup({
     nivelId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    anio: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    año: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     division: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
 
@@ -91,7 +91,7 @@ export class GestionEscolarPage implements OnInit {
     const value = this.gradoForm.getRawValue();
     const payload: GradoPayload = {
       nivelId: value.nivelId,
-      anio: value.anio.trim(),
+      año: value.año.trim(),
       division: value.division.trim(),
     };
     const ok = await this.presenter.guardarGrado(payload, this.gradoEditando()?.id);
@@ -102,14 +102,14 @@ export class GestionEscolarPage implements OnInit {
     this.gradoEditando.set(grado);
     this.gradoForm.setValue({
       nivelId: grado.nivelId,
-      anio: grado.anio,
+      año: grado.año,
       division: grado.division,
     });
   }
 
   protected cancelarEdicionGrado(): void {
     this.gradoEditando.set(null);
-    this.gradoForm.reset({ nivelId: '', anio: '', division: '' });
+    this.gradoForm.reset({ nivelId: '', año: '', division: '' });
   }
 
   protected solicitarBajaGrado(grado: GradoColegio): void {
@@ -200,7 +200,7 @@ export class GestionEscolarPage implements OnInit {
     if (!baja) return '';
 
     if (baja.tipo === 'grado') {
-      return `${baja.item.nivelDescripcion} - Anio ${baja.item.anio} - Division ${baja.item.division}`;
+      return `${baja.item.nivelDescripcion} - Año ${baja.item.año} - Division ${baja.item.division}`;
     }
 
     return `${this.horaCorta(baja.item.horaInicio)} a ${this.horaCorta(baja.item.horaFin)} - ${this.cupoTexto(baja.item)} - ${this.corteTexto(baja.item)}`;

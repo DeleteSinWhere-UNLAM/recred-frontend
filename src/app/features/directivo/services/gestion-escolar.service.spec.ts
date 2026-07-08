@@ -46,7 +46,7 @@ describe('GestionEscolarService', () => {
   });
 
   it('dado un payload, cuando creo grado, deberia hacer POST al colegio', async () => {
-    const payload = { nivelId: 'n1', anio: '1', division: 'A' };
+    const payload = { nivelId: 'n1', año: '1', division: 'A' };
     const respuesta = grado();
 
     const promise = service.crearGrado('school-1', payload);
@@ -60,8 +60,8 @@ describe('GestionEscolarService', () => {
   });
 
   it('dado un gradeId, cuando edito grado, deberia hacer PUT al detalle', async () => {
-    const payload = { nivelId: 'n1', anio: '2', division: 'B' };
-    const respuesta = grado({ id: 'g1', anio: '2', division: 'B', nombre: '2 B' });
+    const payload = { nivelId: 'n1', año: '2', division: 'B' };
+    const respuesta = grado({ id: 'g1', año: '2', division: 'B', nombre: '2 B' });
 
     const promise = service.editarGrado('school-1', 'g1', payload);
 
@@ -180,7 +180,7 @@ describe('GestionEscolarService', () => {
       nivelId: 'n1',
       nivelDescripcion: 'Primario',
       nombre: '1 A',
-      anio: '1',
+      año: '1',
       division: 'A',
       activo: true,
       ...override,
@@ -201,4 +201,3 @@ describe('GestionEscolarService', () => {
     };
   }
 });
-

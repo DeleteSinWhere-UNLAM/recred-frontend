@@ -10,14 +10,14 @@ export interface GradoColegio {
   readonly nivelId: string;
   readonly nivelDescripcion: string;
   readonly nombre: string;
-  readonly anio: string;
+  readonly año: string;
   readonly division: string;
   readonly activo: boolean;
 }
 
 export interface GradoPayload {
   readonly nivelId: string;
-  readonly anio: string;
+  readonly año: string;
   readonly division: string;
 }
 
@@ -39,4 +39,3 @@ export interface FranjaHorariaPayload {
   readonly cupoMaximo?: number | null;
   readonly minutosCorte?: number | null;
 }
-
