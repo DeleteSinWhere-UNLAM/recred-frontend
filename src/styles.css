@@ -214,3 +214,14 @@ textarea {
     opacity: 1;
   }
 }
+
+/* Mueve el chatbot hacia arriba cuando el carrito está visible en el buffet */
+body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {
+  bottom: 110px !important;
+}
+
+@media (min-width: 768px) {
+  body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {
+    bottom: 120px !important;
+  }
+}
