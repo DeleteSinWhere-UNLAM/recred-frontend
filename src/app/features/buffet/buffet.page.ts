@@ -615,6 +615,13 @@ export class BuffetPage implements OnInit {
     }
     return '';
   }
+
+  scrollToSidebar(): void {
+    const sidebar = document.querySelector('.buffet__sidebar');
+    if (sidebar) {
+      sidebar.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 }
 
 

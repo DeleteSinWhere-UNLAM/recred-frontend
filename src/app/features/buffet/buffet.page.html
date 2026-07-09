@@ -540,9 +540,11 @@
 </div>
 }
 
-
-
-
+@if (presenter.alumno()) {
+<button class="buffet__scroll-fab" (click)="scrollToSidebar()" title="Ir a tu pedido y opciones de retiro" aria-label="Ir al pedido y opciones">
+  <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
+</button>
+}
 
 @if (mostrarModalFavorito) {
   <app-guardar-favorito-modal
