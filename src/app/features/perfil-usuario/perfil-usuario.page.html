@@ -106,6 +106,13 @@
           </div>
           }
         </dl>
+
+        <div class="perfil-usuario__datos-acciones">
+          <button type="button" class="perfil-usuario__boton-cambiar-password" (click)="abrirModalPassword()">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+            Cambiar contraseña
+          </button>
+        </div>
       </article>
 
       <form class="perfil-usuario__panel perfil-usuario__form" [formGroup]="form" (ngSubmit)="guardar()">
@@ -306,3 +313,100 @@
 @if (fotoEvent()) {
 <app-crop-modal [imageEvent]="fotoEvent()!" (cropped)="onFotoRecortada($event)" (canceled)="onCancelarRecorte()" />
 }
+
+@if (mostrarModalPassword()) {
+<div class="pw-modal__backdrop" (click)="cerrarModalPassword()" role="dialog" aria-modal="true" aria-labelledby="pw-modal-titulo">
+  <div class="pw-modal__panel" (click)="$event.stopPropagation()">
+    <div class="pw-modal__header">
+      <div class="pw-modal__icono-wrapper" aria-hidden="true">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <h2 id="pw-modal-titulo" class="pw-modal__titulo">Cambiar contraseña</h2>
+        <p class="pw-modal__subtitulo">Ingresá tu contraseña actual y la nueva.</p>
+      </div>
+      <button type="button" class="pw-modal__cerrar" (click)="cerrarModalPassword()" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <form class="pw-modal__form" [formGroup]="passwordForm" (ngSubmit)="cambiarPassword(); $event.preventDefault()">
+
+      <div class="pw-modal__campo">
+        <label class="pw-modal__label" for="pw-old">Contraseña actual</label>
+        <div class="pw-modal__input-wrapper" [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('oldPassword')">
+          <input id="pw-old"
+            [type]="mostrarOldPassword() ? 'text' : 'password'"
+            formControlName="oldPassword"
+            autocomplete="current-password"
+            class="pw-modal__input"
+            placeholder="••••••••" />
+          <button type="button" class="pw-modal__ojo" (click)="mostrarOldPassword.set(!mostrarOldPassword())"
+            [attr.aria-label]="mostrarOldPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            <i [class]="mostrarOldPassword() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" aria-hidden="true"></i>
+          </button>
+        </div>
+        @if (campoPasswordInvalido('oldPassword')) {
+        <small class="pw-modal__error">La contraseña actual es obligatoria.</small>
+        }
+      </div>
+
+      <div class="pw-modal__campo">
+        <label class="pw-modal__label" for="pw-new">Nueva contraseña</label>
+        <div class="pw-modal__input-wrapper" [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('newPassword')">
+          <input id="pw-new"
+            [type]="mostrarNewPassword() ? 'text' : 'password'"
+            formControlName="newPassword"
+            autocomplete="new-password"
+            class="pw-modal__input"
+            placeholder="Mínimo 8 caracteres" />
+          <button type="button" class="pw-modal__ojo" (click)="mostrarNewPassword.set(!mostrarNewPassword())"
+            [attr.aria-label]="mostrarNewPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            <i [class]="mostrarNewPassword() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" aria-hidden="true"></i>
+          </button>
+        </div>
+        @if (campoPasswordInvalido('newPassword')) {
+        <small class="pw-modal__error">La contraseña debe tener al menos 8 caracteres.</small>
+        }
+      </div>
+
+      <div class="pw-modal__campo">
+        <label class="pw-modal__label" for="pw-confirm">Confirmar nueva contraseña</label>
+        <div class="pw-modal__input-wrapper" [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('confirmPassword')">
+          <input id="pw-confirm"
+            [type]="mostrarConfirmPassword() ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            class="pw-modal__input"
+            placeholder="Repetí la nueva contraseña" />
+          <button type="button" class="pw-modal__ojo" (click)="mostrarConfirmPassword.set(!mostrarConfirmPassword())"
+            [attr.aria-label]="mostrarConfirmPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            <i [class]="mostrarConfirmPassword() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" aria-hidden="true"></i>
+          </button>
+        </div>
+        @if (campoPasswordInvalido('confirmPassword')) {
+        <small class="pw-modal__error">Confirmar la contraseña es obligatorio.</small>
+        }
+      </div>
+
+      <div class="pw-modal__acciones">
+        <button type="button" class="pw-modal__btn pw-modal__btn--cancelar" (click)="cerrarModalPassword()"
+          [disabled]="guardandoPassword()">
+          Cancelar
+        </button>
+        <button type="submit" class="pw-modal__btn pw-modal__btn--confirmar"
+          [disabled]="guardandoPassword() || passwordForm.invalid">
+          @if (guardandoPassword()) {
+          <span class="pw-modal__spinner" aria-hidden="true"></span>
+          Cambiando...
+          } @else {
+          Cambiar contraseña
+          }
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+}
+
