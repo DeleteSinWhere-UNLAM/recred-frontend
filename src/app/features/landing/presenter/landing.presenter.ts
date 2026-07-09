@@ -8,7 +8,7 @@ export class LandingPresenter {
 
   readonly ctas: readonly CtaLanding[] = [
     { texto: 'Iniciar sesión', ruta: 'login', variante: 'primario' },
-    { texto: 'Registrarme', ruta: 'registro', variante: 'secundario' },
+    { texto: 'Registrar institución', ruta: 'registro-colegio', variante: 'secundario' },
   ];
 
   async iniciarLogin(): Promise<void> {

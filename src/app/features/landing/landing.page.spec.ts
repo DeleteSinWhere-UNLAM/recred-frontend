@@ -37,7 +37,7 @@ class LandingCtaButtonStub {
 
 interface PageProtegida {
   cargando(): boolean;
-  onCtaClick(): void;
+  onCtaClick(cta: CtaLanding): void;
   onImagenError(evento: Event): void;
 }
 
@@ -242,13 +242,23 @@ describe('LandingPage', () => {
   });
 
   describe('Interacciones del usuario y template', () => {
-    it('dado el cta clickeado, cuando llamo a onCtaClick, deberia delegar al presenter', () => {
+    it('dado el cta de login clickeado, cuando llamo a onCtaClick, deberia delegar al presenter', () => {
       givenUsuarioNoAutenticado();
       fixture.detectChanges();
 
-      whenClickEnElCta();
+      whenClickEnElCta({ texto: 'Iniciar sesión', ruta: 'login', variante: 'primario' });
 
       expect(presenter.iniciarLogin).toHaveBeenCalled();
+    });
+
+    it('dado el cta de registro clickeado, cuando llamo a onCtaClick, deberia navegar a esa ruta', () => {
+      givenUsuarioNoAutenticado();
+      fixture.detectChanges();
+
+      whenClickEnElCta({ texto: 'Registrar institución', ruta: 'registro-colegio', variante: 'secundario' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/registro-colegio');
+      expect(presenter.iniciarLogin).not.toHaveBeenCalled();
     });
 
     it('dada una imagen que falla y no es el fallback, cuando se dispara el error, deberia asignar la imagen fallback', () => {
@@ -309,8 +319,8 @@ describe('LandingPage', () => {
     tick();
   }
 
-  function whenClickEnElCta(): void {
-    (component as unknown as PageProtegida).onCtaClick();
+  function whenClickEnElCta(cta: CtaLanding): void {
+    (component as unknown as PageProtegida).onCtaClick(cta);
   }
 
   function whenLaImagenFalla(imagen: HTMLImageElement): void {
