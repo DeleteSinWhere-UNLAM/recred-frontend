@@ -100,6 +100,12 @@
   text-align: center;
 }
 
+.transferir-page__form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .transferir-page__input-group {
   margin-bottom: 12px;
   display: flex;
@@ -248,6 +254,7 @@
   display: flex;
   flex-direction: row;
   gap: 12px;
+  margin-top: auto;
 }
 
 .transferir-page__btn {
