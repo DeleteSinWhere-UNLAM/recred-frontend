@@ -221,7 +221,7 @@ export class AlumnoCardComponent implements OnInit {
   }
 
   get saldoFormateado(): string {
-    return formateadorSaldo.format(this.alumno.saldo);
+    return formateadorSaldo.format(Math.floor(this.alumno.saldo));
   }
 
   get saldoNegativo(): boolean {

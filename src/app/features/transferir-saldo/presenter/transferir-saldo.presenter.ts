@@ -121,7 +121,11 @@ export class TransferirSaldoPresenter {
       return false;
     }
 
-    if (amount > origen.saldo) {
+    const numAmount = Number(amount);
+    const numSaldo = Number(origen.saldo);
+    
+    // We add a small epsilon to avoid floating point precision issues causing a rejection when they are virtually equal.
+    if (numAmount > numSaldo + 0.01) {
       this.toastService.mostrar('El monto a transferir no puede superar el saldo actual.', 'error');
       return false;
     }
