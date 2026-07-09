@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { signInWithRedirect, signOut } from 'aws-amplify/auth';
+import { signInWithRedirect, signOut, updatePassword } from 'aws-amplify/auth';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { AuthSessionService } from './auth-session.service';
 
@@ -25,6 +25,10 @@ export class AuthService {
     } finally {
       this.perfilService.limpiar();
     }
+  }
+
+  async cambiarPassword(oldPassword: string, newPassword: string): Promise<void> {
+    await updatePassword({ oldPassword, newPassword });
   }
 
   async isAutenticado(): Promise<boolean> {

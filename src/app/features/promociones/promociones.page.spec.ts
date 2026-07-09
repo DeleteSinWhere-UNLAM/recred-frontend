@@ -147,11 +147,12 @@ describe('PromocionesPageComponent', () => {
       expect(presenter.volver).toHaveBeenCalled();
     });
 
-    it('dado el header, cuando hago click en Nueva Promocion, deberia llamar presenter.nuevaPromocion()', () => {
+    it('dado el header, cuando hago click en Nueva Promocion, deberia abrir el modal de opciones', () => {
+      spyOn(component, 'openTypeModal');
       const boton = (fixture.nativeElement as HTMLElement).querySelector('.btn-primary') as HTMLButtonElement;
       boton.click();
 
-      expect(presenter.nuevaPromocion).toHaveBeenCalled();
+      expect(component.openTypeModal).toHaveBeenCalled();
     });
   });
 

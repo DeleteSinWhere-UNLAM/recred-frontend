@@ -7,7 +7,6 @@ import { PresupuestoService } from '../services/presupuesto.service';
 import {
   ALUMNO_ID_TEST,
   CategoriaProductoMother,
-  PrediccionGastoPresupuestoMother,
   PresupuestoMother,
   ReglaCategoriaMother,
 } from '../presupuesto.mother';
@@ -25,7 +24,6 @@ describe('PresupuestoPresenter', () => {
     servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', [
       'getPresupuesto',
       'getCategoriasDisponibles',
-      'cargarPrediccion',
       'guardar',
     ]);
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
@@ -41,7 +39,6 @@ describe('PresupuestoPresenter', () => {
     servicioAlumnos.getAlumnoById.and.returnValue(alumnoTest);
     servicioPresupuesto.getCategoriasDisponibles.and.resolveTo(CategoriaProductoMother.crearVarias());
     servicioPresupuesto.getPresupuesto.and.resolveTo(undefined);
-    servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crear());
 
     TestBed.configureTestingModule({
       providers: [
@@ -67,7 +64,7 @@ describe('PresupuestoPresenter', () => {
       expect(servicioPresupuesto.getPresupuesto).not.toHaveBeenCalled();
     });
 
-    it('dado un alumno existente sin presupuesto previo, cuando inicializo, deberia cargar categorias y prediccion', async () => {
+    it('dado un alumno existente sin presupuesto previo, cuando inicializo, deberia cargar categorias y presupuesto por defecto', async () => {
       await presenter.init(ALUMNO_ID_TEST);
 
       expect(presenter.alumno()?.id).toBe(ALUMNO_ID_TEST);
@@ -76,7 +73,6 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.grado()).toBe('5to A');
       expect(presenter.categoriasDisponibles().length).toBe(3);
       expect(presenter.reglas().length).toBe(0);
-      expect(presenter.prediccion()).toBeDefined();
       expect(presenter.cargando()).toBeFalse();
     });
 
@@ -87,10 +83,6 @@ describe('PresupuestoPresenter', () => {
 
       expect(presenter.presupuesto().montoLimiteGeneral).toBe(10000);
       expect(presenter.reglas().length).toBe(2);
-      expect(servicioPresupuesto.cargarPrediccion).toHaveBeenCalledWith(
-        ALUMNO_ID_TEST,
-        presenter.presupuesto().periodo,
-      );
     });
 
     it('dado que la carga falla, cuando inicializo, deberia mostrar toast de error', async () => {
@@ -258,17 +250,6 @@ describe('PresupuestoPresenter', () => {
       expect(presenter.topeCompletado()).toBeFalse();
     });
 
-    it('dado una prediccion, cuando consulto nivelAlerta, deberia reflejar el porcentaje (60% ok, 80% warning, 110% excedido)', async () => {
-      expect(presenter.nivelAlerta()).toBe('ok');
-
-      servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crearWarning());
-      await presenter.init(ALUMNO_ID_TEST);
-      expect(presenter.nivelAlerta()).toBe('warning');
-
-      servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crearExcedido());
-      await presenter.init(ALUMNO_ID_TEST);
-      expect(presenter.nivelAlerta()).toBe('excedido');
-    });
   });
 
   describe('guardar', () => {

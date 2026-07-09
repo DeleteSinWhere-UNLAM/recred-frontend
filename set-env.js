@@ -45,7 +45,7 @@ const envConfigFile = `export const environment = {
       redirectSignIn: '${process.env.REDIRECT_SIGN_IN}',
       redirectSignOut: '${process.env.REDIRECT_SIGN_OUT}',
       responseType: 'code' as const,
-      scopes: ['openid', 'email', 'profile'] as const,
+      scopes: ['openid', 'email', 'profile', 'aws.cognito.signin.user.admin'] as const,
     },
   },
   apiUrl: '${process.env.API_URL}',

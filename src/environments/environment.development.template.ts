@@ -9,7 +9,7 @@ export const environment = {
       redirectSignIn: 'REDIRECT_SIGN_IN',
       redirectSignOut: 'REDIRECT_SIGN_OUT',
       responseType: 'code' as const,
-      scopes: ['openid', 'email', 'profile'] as const,
+      scopes: ['openid', 'email', 'profile', 'aws.cognito.signin.user.admin'] as const,
     },
   },
   apiUrl: 'API_URL',

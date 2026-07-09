@@ -17,6 +17,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { ToastService } from '../../shared/services/toast.service';
 import { CropModalComponent } from './components/crop-modal/crop-modal.component';
 import { PerfilUsuarioPage } from './perfil-usuario.page';
+import { AuthService } from '../../core/auth/services/auth.service';
 
 interface WritableSignalLike<T> {
   (): T;
@@ -117,6 +118,7 @@ describe('PerfilUsuarioPage', () => {
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioPayout: jasmine.SpyObj<PayoutConfigService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioAuth: jasmine.SpyObj<AuthService>;
   let homeUrlSignal: ReturnType<typeof signal<string>>;
   let nombreNavbarSignal: ReturnType<typeof signal<string>>;
   let esVistaAlumnoSignal: ReturnType<typeof signal<boolean>>;
@@ -147,6 +149,8 @@ describe('PerfilUsuarioPage', () => {
       'guardarConfiguracion',
     ]);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+    servicioAuth = jasmine.createSpyObj<AuthService>('AuthService', ['cambiarPassword']);
+    servicioAuth.cambiarPassword.and.resolveTo();
 
     givenUsuarioLogueado(UsuarioLogueadoMother.crear());
     givenPerfilCargado(PerfilUsuarioMother.crear());
@@ -163,6 +167,7 @@ describe('PerfilUsuarioPage', () => {
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: PayoutConfigService, useValue: servicioPayout },
         { provide: ToastService, useValue: servicioToast },
+        { provide: AuthService, useValue: servicioAuth },
       ],
     })
       .overrideComponent(PerfilUsuarioPage, {
