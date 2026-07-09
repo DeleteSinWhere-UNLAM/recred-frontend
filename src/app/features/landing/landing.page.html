@@ -19,12 +19,25 @@
     }
     <div class="landing">
     <header class="landing__header">
-      <img
-        class="landing__logo"
-        src="logoHeader.png"
-        alt="Logo RECRED"
-      />
-      <span class="landing__marca">RECRED</span>
+      <div class="landing__header-brand">
+        <img
+          class="landing__logo"
+          src="logoHeader.png"
+          alt="Logo RECRED"
+        />
+        <span class="landing__marca">RECRED</span>
+      </div>
+      <div class="landing__header-cta">
+        @for (cta of presenter.ctas; track cta.ruta) {
+          @if (cta.ruta !== 'login') {
+            <app-landing-cta-button
+              [cta]="cta"
+              (clicked)="onCtaClick(cta)"
+            />
+          }
+        }
+        <span class="landing__header-cta-leyenda">Solo para instituciones educativas</span>
+      </div>
     </header>
 
     <main class="landing__hero">
@@ -42,10 +55,12 @@
 
         <div class="landing__ctas">
           @for (cta of presenter.ctas; track cta.ruta) {
-            <app-landing-cta-button
-              [cta]="cta"
-              (clicked)="onCtaClick()"
-            />
+            @if (cta.ruta === 'login') {
+              <app-landing-cta-button
+                [cta]="cta"
+                (clicked)="onCtaClick(cta)"
+              />
+            }
           }
         </div>
       </section>

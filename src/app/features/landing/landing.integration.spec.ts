@@ -76,14 +76,14 @@ describe('Landing Integration', () => {
 
     whenMontoLaPagina();
 
-    thenLosCtasEnElDomSon(['Iniciar sesión', 'Registrarme']);
+    thenLosCtasEnElDomSon(['Registrar institución', 'Iniciar sesión']);
   }));
 
-  it('dado un usuario no autenticado, cuando hago click en un CTA, deberia invocar AuthService.login a traves del presenter real', fakeAsync(() => {
+  it('dado un usuario no autenticado, cuando hago click en el CTA de login, deberia invocar AuthService.login a traves del presenter real', fakeAsync(() => {
     givenUsuarioNoAutenticado();
     whenMontoLaPagina();
 
-    whenHagoClickEnElPrimerCta();
+    whenHagoClickEnElCtaDeLogin();
 
     expect(servicioAuth.login).toHaveBeenCalled();
   }));
@@ -135,9 +135,12 @@ describe('Landing Integration', () => {
     fixture.detectChanges();
   }
 
-  function whenHagoClickEnElPrimerCta(): void {
-    const primerCta = (fixture.nativeElement as HTMLElement).querySelector('.cta-stub') as HTMLButtonElement;
-    primerCta.click();
+  function whenHagoClickEnElCtaDeLogin(): void {
+    const ctas = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLButtonElement>('.cta-stub'),
+    );
+    const ctaLogin = ctas.find((b) => b.textContent?.trim() === 'Iniciar sesión');
+    ctaLogin?.click();
     tick();
   }
 
