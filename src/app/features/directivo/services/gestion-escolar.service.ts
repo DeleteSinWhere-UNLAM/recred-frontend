@@ -35,13 +35,19 @@ export class GestionEscolarService {
 
   public crearGrado(schoolId: string, payload: GradoPayload): Promise<GradoColegio> {
     return firstValueFrom(
-      this.http.post<GradoColegio>(`${this.baseUrl}/colegios/${schoolId}/grados`, payload),
+      this.http.post<GradoColegio>(
+        `${this.baseUrl}/colegios/${schoolId}/grados`,
+        this.payloadGradoApi(payload),
+      ),
     );
   }
 
   public editarGrado(schoolId: string, gradeId: string, payload: GradoPayload): Promise<GradoColegio> {
     return firstValueFrom(
-      this.http.put<GradoColegio>(`${this.baseUrl}/colegios/${schoolId}/grados/${gradeId}`, payload),
+      this.http.put<GradoColegio>(
+        `${this.baseUrl}/colegios/${schoolId}/grados/${gradeId}`,
+        this.payloadGradoApi(payload),
+      ),
     );
   }
 
@@ -109,6 +115,14 @@ export class GestionEscolarService {
     return includeInactive ? new HttpParams().set('includeInactive', 'true') : new HttpParams();
   }
 
+  private payloadGradoApi(payload: GradoPayload): { nivelId: string; anio: string; division: string } {
+    return {
+      nivelId: payload.nivelId,
+      anio: payload.año,
+      division: payload.division,
+    };
+  }
+
   private ordenarFranjas(franjas: FranjaHorariaColegio[]): FranjaHorariaColegio[] {
     return [...franjas].sort((left, right) => {
       const activos = Number(right.activo) - Number(left.activo);
@@ -117,4 +131,3 @@ export class GestionEscolarService {
     });
   }
 }
-
