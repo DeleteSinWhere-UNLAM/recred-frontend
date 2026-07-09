@@ -20,7 +20,7 @@ export class AceptarInvitacionTutorPage implements OnInit {
     await this.presenter.validar(token);
   }
 
-  protected async onIniciarLogin(): Promise<void> {
-    await this.presenter.iniciarLogin();
+  protected async onIniciarLogin(username?: string): Promise<void> {
+    await this.presenter.iniciarLogin(username);
   }
 }

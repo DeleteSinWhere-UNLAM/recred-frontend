@@ -53,7 +53,7 @@ describe('GestionEscolarService', () => {
 
     const req = httpMock.expectOne(`${environment.apiUrl}/colegios/school-1/grados`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(payload);
+    expect(req.request.body).toEqual({ nivelId: 'n1', anio: '1', division: 'A' });
     req.flush(respuesta);
 
     expect(await promise).toEqual(respuesta);
@@ -67,7 +67,7 @@ describe('GestionEscolarService', () => {
 
     const req = httpMock.expectOne(`${environment.apiUrl}/colegios/school-1/grados/g1`);
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(payload);
+    expect(req.request.body).toEqual({ nivelId: 'n1', anio: '2', division: 'B' });
     req.flush(respuesta);
 
     expect(await promise).toEqual(respuesta);

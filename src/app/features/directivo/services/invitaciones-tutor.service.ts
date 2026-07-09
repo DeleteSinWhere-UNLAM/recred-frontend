@@ -6,6 +6,7 @@ import {
   ColegioAsociadoTutor,
   InvitacionTutor,
   InvitacionTutorPayload,
+  PreparacionCuentaTutor,
   ReporteImportacionCsv,
 } from '../models/invitacion-tutor.model';
 
@@ -37,6 +38,16 @@ export class InvitacionesTutorService {
     return firstValueFrom(
       this.http.get<InvitacionTutor>(
         `${environment.apiUrl}/invitaciones/tutor/${encodeURIComponent(token)}`,
+      ),
+    );
+  }
+
+  prepararCuenta(token: string, username?: string): Promise<PreparacionCuentaTutor> {
+    const body = username ? { username } : null;
+    return firstValueFrom(
+      this.http.post<PreparacionCuentaTutor>(
+        `${environment.apiUrl}/invitaciones/tutor/${encodeURIComponent(token)}/preparar-cuenta`,
+        body,
       ),
     );
   }
