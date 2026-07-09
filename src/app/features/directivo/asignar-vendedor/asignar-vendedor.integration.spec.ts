@@ -5,6 +5,11 @@ import { AsignarVendedorPresenter } from './presenter/asignar-vendedor.presenter
 import { Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+
+@Component({ selector: 'app-navbar', template: '', standalone: true })
+class NavbarStub {}
 
 describe('AsignarVendedor (Integración)', () => {
   let fixture: ComponentFixture<AsignarVendedorPage>;
@@ -26,6 +31,9 @@ describe('AsignarVendedor (Integración)', () => {
         { provide: DirectivoService, useValue: directivoServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]
+    }).overrideComponent(AsignarVendedorPage, {
+      remove: { imports: [NavbarComponent] },
+      add: { imports: [NavbarStub] }
     }).compileComponents();
   });
 

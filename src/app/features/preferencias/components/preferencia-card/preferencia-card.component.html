@@ -31,10 +31,11 @@
       </div>
       <button 
         class="preferencia-card__btn-favorito" 
+        [class.preferencia-card__btn-favorito--ya-favorito]="esFavorito"
         (click)="agregarAFavoritos()" 
-        [disabled]="isAdding || !alumnoId">
-        <i class="fa-solid" [ngClass]="isAdding ? 'fa-spinner fa-spin' : 'fa-heart'"></i>
-        {{ isAdding ? 'Añadiendo...' : 'Añadir a Favoritos' }}
+        [disabled]="isAdding || !alumnoId || esFavorito">
+        <i class="fa-solid" [ngClass]="isAdding ? 'fa-spinner fa-spin' : (esFavorito ? 'fa-check' : 'fa-heart')"></i>
+        {{ isAdding ? 'Añadiendo...' : (esFavorito ? 'Ya en Favoritos' : 'Añadir a Favoritos') }}
       </button>
     </div>
   }

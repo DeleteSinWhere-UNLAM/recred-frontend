@@ -8,7 +8,7 @@
     @if (presenter.loading()) {
       <section class="card card--estado" role="status">
         <i class="fa-solid fa-spinner fa-spin"></i>
-        <h1>Validando tu invitación...</h1>
+        <h1>Validando tu invitacion...</h1>
       </section>
     } @else if (presenter.error(); as errorMsg) {
       <section class="card card--estado card--error" role="alert">
@@ -20,9 +20,9 @@
       <section class="card">
         <div class="card__hero">
           <i class="fa-solid fa-envelope-open-text"></i>
-          <h1>¡Bienvenida/o a Recred!</h1>
+          <h1>Bienvenida/o a Recred</h1>
           <p>
-            <strong>{{ invitacion.schoolName }}</strong> te invitó a asociarte como tutor.
+            <strong>{{ invitacion.schoolName }}</strong> te invito a asociarte como tutor.
           </p>
         </div>
 
@@ -39,19 +39,70 @@
 
         <div class="aviso">
           <i class="fa-solid fa-circle-info"></i>
-          <p>
-            Vas a iniciar sesión o registrarte con el email <strong>{{ invitacion.email }}</strong>.
-            Usá ese mismo email para que podamos asociarte al colegio.
-          </p>
+          @if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
+            <p>
+              Te enviamos usuario y contrasena temporal a <strong>{{ invitacion.email }}</strong>.
+              Inicia sesion para activar tu vinculo con el colegio.
+            </p>
+          } @else if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
+            <p>
+              Elegi un nombre de usuario para crear tu cuenta. Vas a recibir la contrasena temporal en
+              <strong>{{ invitacion.email }}</strong>.
+            </p>
+          } @else {
+            <p>
+              Vas a iniciar sesion con el email <strong>{{ invitacion.email }}</strong>.
+              Usa ese mismo email para que podamos asociarte al colegio.
+            </p>
+          }
         </div>
 
-        <button type="button" class="btn btn--primary" (click)="onIniciarLogin()">
-          Continuar con Recred
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
+        @if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
+          <label class="campo">
+            <span>Nombre de usuario</span>
+            <input
+              #usernameInput
+              type="text"
+              autocomplete="username"
+              inputmode="text"
+              placeholder="arruaclotilde"
+              [class.campo__input--error]="presenter.usernameError()" />
+          </label>
+          @if (presenter.usernameError(); as usernameError) {
+            <p class="campo__error">{{ usernameError }}</p>
+          }
+
+          <button
+            type="button"
+            class="btn btn--primary"
+            (click)="onIniciarLogin(usernameInput.value)"
+            [disabled]="presenter.preparandoCuenta()">
+            @if (presenter.preparandoCuenta()) {
+              Preparando cuenta...
+            } @else {
+              Crear cuenta
+            }
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn btn--primary"
+            (click)="onIniciarLogin()"
+            [disabled]="presenter.preparandoCuenta()">
+            @if (presenter.preparandoCuenta()) {
+              Preparando cuenta...
+            } @else if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
+              Iniciar sesion
+            } @else {
+              Continuar con Recred
+            }
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        }
 
         <p class="pie">
-          Si ya tenés cuenta, iniciá sesión con el mismo email para agregar este colegio.
+          La asociacion con el colegio se activa despues de iniciar sesion correctamente.
         </p>
       </section>
     }
