@@ -142,7 +142,8 @@ export class TutorWelcome implements OnInit {
   }
 
   irAcreditar(alumnoId: string) {
-    this.router.navigate(['/tutor/acreditar', alumnoId]);
+    this.contextoService.setAlumnoId(alumnoId);
+    void this.router.navigate(['/acreditar-mercado-pago']);
   }
 
   irAMovimientos() {
