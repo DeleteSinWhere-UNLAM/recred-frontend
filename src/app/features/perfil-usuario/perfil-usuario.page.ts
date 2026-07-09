@@ -15,6 +15,7 @@ import { PayoutConfig } from '../../data-access/models/payout-config.model';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../shared/services/toast.service';
 import { CropModalComponent } from './components/crop-modal/crop-modal.component';
+import { AuthService } from '../../core/auth/services/auth.service';
 
 type PerfilUsuarioForm = FormGroup<{
   firstName: FormControl<string>;
@@ -37,8 +38,29 @@ export class PerfilUsuarioPage implements OnInit {
   private readonly payoutConfigService = inject(PayoutConfigService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   protected readonly usuario = signal<UsuarioLogueado | null>(null);
+  protected readonly passwordForm = new FormGroup({
+    oldPassword: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    newPassword: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(8)],
+    }),
+    confirmPassword: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
+
+  protected readonly guardandoPassword = signal(false);
+  protected readonly mostrarModalPassword = signal(false);
+  protected readonly mostrarOldPassword = signal(false);
+  protected readonly mostrarNewPassword = signal(false);
+  protected readonly mostrarConfirmPassword = signal(false);
   protected readonly perfil = signal<PerfilUsuario | null>(null);
   protected readonly cargando = signal(false);
   protected readonly guardando = signal(false);
@@ -582,4 +604,57 @@ export class PerfilUsuarioPage implements OnInit {
     const control = this.payoutForm.controls[campo];
     return control.invalid && (control.dirty || control.touched);
   }
+
+  protected abrirModalPassword(): void {
+    this.passwordForm.reset();
+    this.mostrarOldPassword.set(false);
+    this.mostrarNewPassword.set(false);
+    this.mostrarConfirmPassword.set(false);
+    this.mostrarModalPassword.set(true);
+  }
+
+  protected cerrarModalPassword(): void {
+    if (this.guardandoPassword()) return;
+    this.mostrarModalPassword.set(false);
+    this.passwordForm.reset();
+    this.mostrarOldPassword.set(false);
+    this.mostrarNewPassword.set(false);
+    this.mostrarConfirmPassword.set(false);
+  }
+
+  protected async cambiarPassword(): Promise<void> {
+    if (this.guardandoPassword() || this.cargando()) return;
+
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      this.toastService.mostrar('Revisá los campos del cambio de contraseña.', 'error');
+      return;
+    }
+
+    const { oldPassword, newPassword, confirmPassword } = this.passwordForm.getRawValue();
+
+    if (newPassword !== confirmPassword) {
+      this.toastService.mostrar('La nueva contraseña y la confirmación no coinciden.', 'error');
+      return;
+    }
+
+    this.guardandoPassword.set(true);
+    try {
+      await this.authService.cambiarPassword(oldPassword, newPassword);
+      this.toastService.mostrar('Contraseña cambiada exitosamente.', 'success');
+      this.cerrarModalPassword();
+    } catch (err: unknown) {
+      console.error('Error al cambiar la contraseña:', err);
+      const mensaje = err instanceof Error ? err.message : 'Error al cambiar la contraseña. Verificá los datos.';
+      this.toastService.mostrar(mensaje, 'error');
+    } finally {
+      this.guardandoPassword.set(false);
+    }
+  }
+
+  protected campoPasswordInvalido(campo: keyof typeof this.passwordForm.controls): boolean {
+    const control = this.passwordForm.controls[campo];
+    return control.invalid && (control.dirty || control.touched);
+  }
 }
+

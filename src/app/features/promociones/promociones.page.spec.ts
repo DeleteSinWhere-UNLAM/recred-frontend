@@ -18,10 +18,17 @@ interface PresenterMock {
   isLoading: ReturnType<typeof signal<boolean>>;
   error: ReturnType<typeof signal<string | null>>;
   hasPromotions: ReturnType<typeof signal<boolean>>;
+  filter: ReturnType<typeof signal<string>>;
+  sort: ReturnType<typeof signal<string>>;
+  filteredPromotions: ReturnType<typeof signal<PromotionWithProducts[]>>;
   loadPromotions: jasmine.Spy;
   volver: jasmine.Spy;
   nuevaPromocion: jasmine.Spy;
-  deletePromotion: jasmine.Spy;
+  toggleStatus: jasmine.Spy;
+  setFilter: jasmine.Spy;
+  setSort: jasmine.Spy;
+  getPromotionStateClass: jasmine.Spy;
+  isExpiringSoon: jasmine.Spy;
   getStatusLabel: jasmine.Spy;
   getOriginalTotal: jasmine.Spy;
   getDiscountedTotal: jasmine.Spy;
@@ -140,11 +147,12 @@ describe('PromocionesPageComponent', () => {
       expect(presenter.volver).toHaveBeenCalled();
     });
 
-    it('dado el header, cuando hago click en Nueva Promocion, deberia llamar presenter.nuevaPromocion()', () => {
+    it('dado el header, cuando hago click en Nueva Promocion, deberia abrir el modal de opciones', () => {
+      spyOn(component, 'openTypeModal');
       const boton = (fixture.nativeElement as HTMLElement).querySelector('.btn-primary') as HTMLButtonElement;
       boton.click();
 
-      expect(presenter.nuevaPromocion).toHaveBeenCalled();
+      expect(component.openTypeModal).toHaveBeenCalled();
     });
   });
 
@@ -162,15 +170,26 @@ describe('PromocionesPageComponent', () => {
     const error = signal<string | null>(null);
     const hasPromotions = signal(false);
 
+    const filter = signal<string>('ALL');
+    const sort = signal<string>('DATE_DESC');
+    const filteredPromotions = promotions; // alias
+
     return {
       promotions,
       isLoading,
       error,
       hasPromotions,
+      filter,
+      sort,
+      filteredPromotions,
       loadPromotions: jasmine.createSpy('loadPromotions'),
       volver: jasmine.createSpy('volver'),
       nuevaPromocion: jasmine.createSpy('nuevaPromocion'),
-      deletePromotion: jasmine.createSpy('deletePromotion'),
+      toggleStatus: jasmine.createSpy('toggleStatus'),
+      setFilter: jasmine.createSpy('setFilter'),
+      setSort: jasmine.createSpy('setSort'),
+      getPromotionStateClass: jasmine.createSpy('getPromotionStateClass').and.returnValue(''),
+      isExpiringSoon: jasmine.createSpy('isExpiringSoon').and.returnValue(false),
       getStatusLabel: jasmine.createSpy('getStatusLabel').and.returnValue(''),
       getOriginalTotal: jasmine.createSpy('getOriginalTotal').and.returnValue(0),
       getDiscountedTotal: jasmine.createSpy('getDiscountedTotal').and.returnValue(0),

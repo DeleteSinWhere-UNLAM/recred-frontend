@@ -229,6 +229,17 @@ describe('InventarioRealtimeService', () => {
   });
 
   describe('metricas por ventana', () => {
+    let originalProduction: boolean;
+
+    beforeEach(() => {
+      originalProduction = environment.production;
+      environment.production = false;
+    });
+
+    afterEach(() => {
+      environment.production = originalProduction;
+    });
+
     it('dado tres recordSseEvent, cuando pasan 60s, deberia loguear el resumen y limpiar el contador', fakeAsync(() => {
       const infoSpy = spyOn(console, 'info');
       whenRegistroEventoSse('STOCK_CHANGED');

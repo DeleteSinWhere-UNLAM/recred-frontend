@@ -11,11 +11,28 @@
       <p>Visualizá y gestioná las promociones creadas en tu kiosco.</p>
     </div>
     <div class="header-actions">
-      <button type="button" class="btn btn-primary" (click)="presenter.nuevaPromocion()">
+      <button type="button" class="btn btn-primary" (click)="openTypeModal()">
         <i class="fa-solid fa-plus"></i> Nueva Promoción
       </button>
     </div>
   </header>
+
+  <div class="controls-container">
+    <div class="filter-tabs">
+      <button class="tab-btn" [class.active]="presenter.filter() === 'ALL'" (click)="presenter.setFilter('ALL')">Todas</button>
+      <button class="tab-btn" [class.active]="presenter.filter() === 'ACTIVE'" (click)="presenter.setFilter('ACTIVE')">Activas</button>
+      <button class="tab-btn" [class.active]="presenter.filter() === 'INACTIVE'" (click)="presenter.setFilter('INACTIVE')">Inactivas</button>
+    </div>
+
+    <div class="sort-control">
+      <select class="sort-select" [ngModel]="presenter.sort()" (ngModelChange)="presenter.setSort($event)">
+        <option value="DATE_DESC">Más recientes</option>
+        <option value="NAME_ASC">Nombre (A-Z)</option>
+        <option value="NAME_DESC">Nombre (Z-A)</option>
+      </select>
+      <i class="fa-solid fa-chevron-down select-icon"></i>
+    </div>
+  </div>
 
   @if (presenter.isLoading()) {
   <div class="loading-state">
@@ -37,18 +54,27 @@
   </div>
   } @else {
   <div class="promotions-grid">
-    @for (promo of presenter.promotions(); track promo.id) {
-    <div class="promotion-card" [class.draft]="promo.status === 'DRAFT'" [class.active]="promo.status === 'ACTIVE'">
+    @for (promo of presenter.filteredPromotions(); track promo.id) {
+    <div class="promotion-card" [class.draft]="presenter.getPromotionStateClass(promo) === 'draft'" [class.active]="presenter.getPromotionStateClass(promo) === 'active'">
       <div class="promotion-card__image-container">
         <img [src]="promo.imageUrl || 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png'" alt="Imagen de la promoción" class="promotion-card__image" />
         <div class="promo-header-overlay">
           <div class="promo-badges">
-            <span class="status-badge" [ngClass]="promo.status | lowercase">{{ presenter.getStatusLabel(promo.status) }}</span>
+            <span class="status-badge" [ngClass]="presenter.getPromotionStateClass(promo)">{{ presenter.getStatusLabel(promo) }}</span>
             <span class="discount-badge">Descuento {{ promo.discountPercentage }}%</span>
+            @if (presenter.isExpiringSoon(promo)) {
+              <span class="expiring-badge"><i class="fa-solid fa-clock"></i> Por vencer</span>
+            }
           </div>
-          <button type="button" class="delete-btn" (click)="presenter.deletePromotion(promo.id)" title="Descartar promoción">
-            <i class="fa-solid fa-trash"></i>
-          </button>
+          <div class="promo-actions">
+            <button type="button" class="action-btn toggle-btn" (click)="presenter.toggleStatus(promo.id)" [title]="promo.status === 'ACTIVE' ? 'Desactivar promoción' : 'Activar promoción'">
+              <i class="fa-solid" [ngClass]="promo.status === 'ACTIVE' ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+            </button>
+
+            <button type="button" class="action-btn edit-btn" (click)="openEditModal(promo)" title="Editar promoción">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -106,5 +132,62 @@
     </div>
     }
   </div>
+  }
+
+  @if (isModalOpen && selectedPromotion) {
+    <app-editar-promocion-modal
+      [promotion]="selectedPromotion"
+      [isOpen]="isModalOpen"
+      (closeModalEvent)="closeModal()"
+      (save)="savePromotion($event)">
+    </app-editar-promocion-modal>
+  }
+
+  @if (isTypeModalOpen) {
+    <div class="modal-overlay" (click)="closeTypeModal()" (keydown.enter)="closeTypeModal()" tabindex="0" role="button">
+      <div class="type-modal-container" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0" role="dialog">
+        <div class="type-modal-header">
+          <div class="type-header-content">
+            <h2>Crear Promoción</h2>
+            <p>¿Cómo deseas crear tu nueva promoción?</p>
+          </div>
+          <button class="type-close-btn" (click)="closeTypeModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        
+        <div class="type-modal-body">
+          <button class="type-option-btn" (click)="navigateTo('/recomendaciones-estacionales')">
+            <div class="type-icon-wrapper">
+              <i class="fa-solid fa-leaf"></i>
+            </div>
+            <div class="type-content-wrapper">
+              <div class="type-title-row">
+                <h3>Recomendaciones Estacionales</h3>
+              </div>
+              <p>Alta asistida usando foto y procesado automático</p>
+            </div>
+            <div class="type-arrow">
+              <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </button>
+          
+          <button class="type-option-btn" (click)="navigateTo('/kiosquero/inteligencia-comercial')">
+            <div class="type-icon-wrapper">
+              <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div class="type-content-wrapper">
+              <div class="type-title-row">
+                <h3>Impulsar Baja Rotación</h3>
+              </div>
+              <p>Sube un archivo PDF para procesar múltiples productos a la vez</p>
+            </div>
+            <div class="type-arrow">
+              <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
   }
 </main>

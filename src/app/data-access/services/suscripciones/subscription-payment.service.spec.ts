@@ -11,6 +11,7 @@ import {
 describe('SubscriptionPaymentService', () => {
   const URL_USER_SUBSCRIPTION = `${environment.apiUrl}/payments/subscriptions/user`;
   const URL_SCHOOL_SUBSCRIPTION_PAYMENT = `${environment.apiUrl}/payments/subscriptions/school`;
+  const URL_USER_TRIAL = `${environment.apiUrl}/payments/subscriptions/user/trial`;
 
   let service: SubscriptionPaymentService;
   let httpMock: HttpTestingController;
@@ -65,6 +66,25 @@ describe('SubscriptionPaymentService', () => {
     });
 
     const respuesta = crearRespuestaColegio();
+    req.flush(respuesta);
+
+    await expectAsync(promise).toBeResolvedTo(respuesta);
+  });
+
+  it('dado una activacion de prueba de usuario, cuando la solicito, deberia hacer POST con usuarioId y plan', async () => {
+    const promise = service.activarPruebaUsuario({
+      usuarioId: 'usuario-1',
+      plan: 'AVANZADO',
+    });
+
+    const req = httpMock.expectOne(URL_USER_TRIAL);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      usuarioId: 'usuario-1',
+      plan: 'AVANZADO',
+    });
+
+    const respuesta = { success: true };
     req.flush(respuesta);
 
     await expectAsync(promise).toBeResolvedTo(respuesta);
