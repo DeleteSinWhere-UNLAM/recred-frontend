@@ -19,12 +19,12 @@ export class DirectivoDashboardComponent {
   public vendedorSeleccionado = signal<Vendedor | null>(null);
   public buffetSeleccionado = signal<Buffet | null>(null);
 
-  @Output() onReenviarCredenciales = new EventEmitter<string>();
+  @Output() reenviarCredencialesRequested = new EventEmitter<string>();
 
   public emitirReenviarCredenciales(): void {
     const vendedor = this.vendedorSeleccionado();
     if (vendedor) {
-      this.onReenviarCredenciales.emit(vendedor.id);
+      this.reenviarCredencialesRequested.emit(vendedor.id);
     }
   }
 

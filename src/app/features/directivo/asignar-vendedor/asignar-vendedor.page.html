@@ -16,8 +16,8 @@
 </div>
 
 @if (mostrarModalConfirmacion()) {
-  <div class="pv-modal-overlay" (click)="cerrarModalConfirmacion()">
-    <div class="pv-modal" (click)="$event.stopPropagation()">
+  <div class="pv-modal-overlay" tabindex="0" role="button" (click)="cerrarModalConfirmacion()" (keydown.enter)="cerrarModalConfirmacion()">
+    <div class="pv-modal" tabindex="0" role="dialog" aria-labelledby="modal-title" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
       <header class="pv-modal__header">
         <div class="pv-modal__title-group">
           <span class="pv-modal__icon" aria-hidden="true">
