@@ -77,7 +77,11 @@ export class MovimientosPage implements OnInit {
 
     if (query) {
       filtered = filtered.filter((m) => {
-        return m.items.some((item) => item.productName.toLowerCase().includes(query));
+        const matchesProduct = m.items?.some((item) => item.productName.toLowerCase().includes(query));
+        const matchesStudent = this.getNombreAlumno(m.studentId).toLowerCase().includes(query);
+        const matchesCode = m.withdrawalCode?.toLowerCase().includes(query);
+        const matchesId = m.id.toLowerCase().includes(query);
+        return matchesProduct || matchesStudent || matchesCode || matchesId;
       });
     }
 
