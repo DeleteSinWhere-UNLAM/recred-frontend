@@ -22,7 +22,6 @@
     </div>
   </header>
 
-  <!-- Search & Filter Card -->
   <section class="filters-card" aria-label="Buscador de proveedores">
     <div class="search-input-wrap">
       <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -31,7 +30,6 @@
     </div>
   </section>
 
-  <!-- Loading State -->
   @if (isLoading() && filteredSuppliers().length === 0) {
   <div class="loading-state">
     <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
@@ -39,7 +37,6 @@
   </div>
   }
 
-  <!-- Empty State -->
   @if (!isLoading() && filteredSuppliers().length === 0) {
   <div class="empty-state">
     <i class="fa-solid fa-truck-field empty-state__icon"></i>
@@ -59,7 +56,6 @@
   </div>
   }
 
-  <!-- Suppliers Grid -->
   @if (filteredSuppliers().length > 0) {
   <div class="suppliers-grid">
     @for (supplier of filteredSuppliers(); track supplier.id) {
@@ -108,7 +104,6 @@
   </div>
   }
 
-  <!-- Add / Edit Supplier Modal -->
   @if (isFormModalOpen()) {
   <div class="modal-overlay" (click)="closeFormModal()" tabindex="-1" (keydown.enter)="closeFormModal()">
     <div class="modal-dialog" (click)="$event.stopPropagation()" tabindex="-1"
@@ -178,7 +173,6 @@
   </div>
   }
 
-  <!-- Delete Confirmation Modal -->
   @if (isDeleteModalOpen()) {
   <div class="modal-overlay" (click)="closeDeleteModal()" tabindex="-1" (keydown.enter)="closeDeleteModal()">
     <div class="modal-dialog modal-dialog--confirm" (click)="$event.stopPropagation()" tabindex="-1"
