@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
 import { SchoolOverview, Vendedor } from '../../models/directivo.model';
 
 import { RouterModule } from '@angular/router';
