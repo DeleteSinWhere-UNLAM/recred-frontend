@@ -36,6 +36,4 @@ export interface FranjaHorariaPayload {
   readonly descripcion: string;
   readonly horaInicio: string;
   readonly horaFin: string;
-  readonly cupoMaximo?: number | null;
-  readonly minutosCorte?: number | null;
 }

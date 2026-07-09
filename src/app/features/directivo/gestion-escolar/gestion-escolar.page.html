@@ -274,24 +274,6 @@
                 <span class="gestion-field__error">La hora de inicio debe ser anterior a la hora de fin.</span>
               }
 
-              <div class="gestion-form__row">
-                <div class="gestion-field">
-                  <label for="cupoMaximo">Cupo maximo</label>
-                  <input id="cupoMaximo" type="number" min="0" formControlName="cupoMaximo" />
-                  @if (franjaForm.controls.cupoMaximo.touched && franjaForm.controls.cupoMaximo.invalid) {
-                    <span class="gestion-field__error">Debe ser 0 o mayor.</span>
-                  }
-                </div>
-
-                <div class="gestion-field">
-                  <label for="minutosCorte">Minutos de corte</label>
-                  <input id="minutosCorte" type="number" min="0" formControlName="minutosCorte" />
-                  @if (franjaForm.controls.minutosCorte.touched && franjaForm.controls.minutosCorte.invalid) {
-                    <span class="gestion-field__error">Debe ser 0 o mayor.</span>
-                  }
-                </div>
-              </div>
-
               <div class="gestion-form__actions">
                 <button
                   type="submit"
@@ -338,7 +320,7 @@
                           {{ franja.activo ? 'Activo' : 'Inactivo' }}
                         </span>
                         <h3>{{ franja.descripcion }}</h3>
-                        <p>{{ horaCorta(franja.horaInicio) }} a {{ horaCorta(franja.horaFin) }} · {{ cupoTexto(franja) }} · {{ corteTexto(franja) }}</p>
+                        <p>{{ horaCorta(franja.horaInicio) }} a {{ horaCorta(franja.horaFin) }}</p>
                       </div>
                       <div class="gestion-item__actions">
                         @if (franja.activo) {
