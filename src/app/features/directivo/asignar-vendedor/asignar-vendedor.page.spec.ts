@@ -5,6 +5,14 @@ import { AsignarVendedorPage } from './asignar-vendedor.page';
 import { AsignarVendedorFormComponent } from './components/asignar-vendedor-form/asignar-vendedor-form.component';
 import { AsignarVendedorPresenter } from './presenter/asignar-vendedor.presenter';
 import { CrearVendedorRequest } from '../models/directivo.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true,
+})
+class NavbarStub {}
 
 @Component({
   selector: 'app-asignar-vendedor-form',
@@ -47,11 +55,11 @@ describe('AsignarVendedorPage', () => {
     })
       .overrideComponent(AsignarVendedorPage, {
         remove: {
-          imports: [AsignarVendedorFormComponent],
+          imports: [AsignarVendedorFormComponent, NavbarComponent],
           providers: [AsignarVendedorPresenter],
         },
         add: {
-          imports: [AsignarVendedorFormStub],
+          imports: [AsignarVendedorFormStub, NavbarStub],
           providers: [{ provide: AsignarVendedorPresenter, useValue: presenter }],
         },
       })

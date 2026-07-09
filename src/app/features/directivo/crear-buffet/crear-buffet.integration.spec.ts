@@ -3,6 +3,11 @@ import { CrearBuffetPage } from './crear-buffet.page';
 import { DirectivoService } from '../services/directivo.service';
 import { Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
+import { Component } from '@angular/core';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+
+@Component({ selector: 'app-navbar', template: '', standalone: true })
+class NavbarStub {}
 
 describe('CrearBuffet (Integración)', () => {
   let fixture: ComponentFixture<CrearBuffetPage>;
@@ -24,6 +29,9 @@ describe('CrearBuffet (Integración)', () => {
         { provide: DirectivoService, useValue: directivoServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]
+    }).overrideComponent(CrearBuffetPage, {
+      remove: { imports: [NavbarComponent] },
+      add: { imports: [NavbarStub] }
     }).compileComponents();
   });
 
