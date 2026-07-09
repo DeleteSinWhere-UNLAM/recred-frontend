@@ -2058,6 +2058,11 @@
   .buffet__sidebar-retiro-layout {
     flex-direction: column;
   }
+  
+  .buffet__calendar-widget,
+  .buffet__sidebar-recreos {
+    flex: 1 1 auto;
+  }
 }
 
 /* ==========================================================================
