@@ -66,10 +66,24 @@
   pointer-events: none;
 }
 
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .header-content,
 .header-actions {
   position: relative;
   z-index: 1;
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .header-content h1 {
@@ -78,10 +92,7 @@
   font-size: 2rem;
   line-height: 1.08;
   font-weight: 900;
-  margin: 0 0 0.5rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  margin: 0;
 }
 
 .premium-badge {
@@ -688,6 +699,18 @@
     align-items: flex-start;
     padding: 22px;
     border-radius: 20px;
+  }
+
+  .header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .header-content h1 {

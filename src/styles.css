@@ -85,6 +85,10 @@ textarea,
   caret-color: auto;
 }
 
+html {
+  background-color: var(--color-fondo);
+}
+
 html,
 body {
   height: 100%;
