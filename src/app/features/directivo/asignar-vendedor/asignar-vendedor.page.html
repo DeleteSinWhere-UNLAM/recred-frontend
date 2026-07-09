@@ -1,6 +1,6 @@
 <app-navbar></app-navbar>
 <div class="directivo-container" style="padding: 24px; max-width: 800px; margin: 0 auto;">
-  <h1 style="margin-bottom: 24px;">Asignar Vendedor a Buffet</h1>
+  <h1 style="margin-bottom: 24px;">{{ mode === 'replace' ? 'Reemplazar Vendedor de Buffet' : 'Asignar Vendedor a Buffet' }}</h1>
   @if (buffetName) {
     <p style="margin-bottom: 24px; font-size: 1.125rem; color: #4b5563;">
       Kiosco seleccionado: <strong>{{ buffetName }}</strong>
@@ -14,3 +14,31 @@
     (cancelForm)="presenter.cancelar()"
   ></app-asignar-vendedor-form>
 </div>
+
+@if (mostrarModalConfirmacion()) {
+  <div class="pv-modal-overlay" tabindex="0" role="button" (click)="cerrarModalConfirmacion()" (keydown.enter)="cerrarModalConfirmacion()">
+    <div class="pv-modal" tabindex="0" role="dialog" aria-labelledby="modal-title" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()">
+      <header class="pv-modal__header">
+        <div class="pv-modal__title-group">
+          <span class="pv-modal__icon" aria-hidden="true">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </span>
+          <h2 id="modal-title">Confirmar reemplazo</h2>
+        </div>
+        <button class="pv-modal__close" (click)="cerrarModalConfirmacion()" aria-label="Cancelar">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </header>
+      <div class="pv-modal__body">
+        <p style="margin-bottom: 1rem; font-size: 15px; color: #172554;">¿Estás seguro de querer asignar a este nuevo vendedor?</p>
+        <p style="margin: 0; font-size: 15px; color: #172554;"><strong>El vendedor actual perderá el acceso a la plataforma de forma inmediata y definitiva.</strong></p>
+      </div>
+      <div class="pv-modal__footer">
+        <button type="button" class="pv__mini-action" (click)="cerrarModalConfirmacion()">Cancelar</button>
+        <button type="button" class="pv__primary-action" (click)="confirmarReemplazo()">
+          <span>Reemplazar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}
