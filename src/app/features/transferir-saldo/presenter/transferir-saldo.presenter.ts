@@ -32,7 +32,10 @@ export class TransferirSaldoPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoOrigenState();
-    return alumno ? `${alumno.nombre} ${alumno.apellido}`.trim() : '';
+    if (!alumno) return '';
+    const primerNombre = (alumno.nombre || '').trim().split(' ')[0];
+    const primerApellido = (alumno.apellido || '').trim().split(' ')[0];
+    return `${primerNombre} ${primerApellido}`.trim();
   });
 
   readonly grado = computed(() => this.alumnoOrigenState()?.grado ?? '');
@@ -43,6 +46,13 @@ export class TransferirSaldoPresenter {
     if (!origen) return [];
     return this.alumnosService.alumnos().filter((a) => a.id !== origen.id);
   });
+
+  formatShortName(alumno: Alumno): string {
+    if (!alumno) return '';
+    const primerNombre = (alumno.nombre || '').trim().split(' ')[0];
+    const primerApellido = (alumno.apellido || '').trim().split(' ')[0];
+    return `${primerNombre} ${primerApellido}`.trim();
+  }
 
   async init(alumnoId: string): Promise<void> {
     this.cargandoState.set(true);

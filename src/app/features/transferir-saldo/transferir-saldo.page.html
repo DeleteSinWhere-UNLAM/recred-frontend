@@ -9,7 +9,7 @@
     <div class="transferir-page__grid">
 
       <section class="transferir-page__form-section">
-        <h3>¿Cuánto querés transferir de {{ presenter.alumnoOrigen()?.nombre }}?</h3>
+        <h3>¿Cuánto querés transferir de {{ presenter.nombreCompleto() }}?</h3>
         <p class="transferir-page__description">
           Saldo actual: <strong>{{ saldoFormateado }}</strong>. Ingresá el monto, elegí a quién transferirle y confirmá
           la operación.
@@ -24,7 +24,7 @@
                 <option value="" disabled selected>Elegí un hijo</option>
                 @for (hijo of presenter.otrosHijos(); track hijo.id) {
                 <option [value]="hijo.id">
-                  {{ hijo.nombre }} {{ hijo.apellido }} (Saldo: ${{ hijo.saldo.toLocaleString('es-AR') }})
+                  {{ presenter.formatShortName(hijo) }} (Saldo: ${{ hijo.saldo.toLocaleString('es-AR') }})
                 </option>
                 }
               </select>
@@ -103,7 +103,7 @@
       </section>
 
       <section class="transferir-page__history-section">
-        <h3>Historial de transferencias de {{ presenter.alumnoOrigen()?.nombre }}</h3>
+        <h3>Historial de transferencias de {{ presenter.nombreCompleto() }}</h3>
         <p class="transferir-page__history-description">
           Últimas transferencias (dadas y recibidas) de {{ presenter.nombreCompleto() }}.
         </p>
@@ -112,7 +112,7 @@
           @if (transferencias.length === 0) {
           <div class="transferir-page__history-empty">
             <i class="fa-solid fa-right-left" aria-hidden="true"></i>
-            <p>No se registran transferencias recientes para {{ presenter.alumnoOrigen()?.nombre }}.</p>
+            <p>No se registran transferencias recientes para {{ presenter.nombreCompleto() }}.</p>
           </div>
           } @else {
           <div class="transferir-page__history-list">
