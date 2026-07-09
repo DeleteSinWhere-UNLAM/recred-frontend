@@ -17,6 +17,23 @@
     </div>
   </header>
 
+  <div class="controls-container">
+    <div class="filter-tabs">
+      <button class="tab-btn" [class.active]="presenter.filter() === 'ALL'" (click)="presenter.setFilter('ALL')">Todas</button>
+      <button class="tab-btn" [class.active]="presenter.filter() === 'ACTIVE'" (click)="presenter.setFilter('ACTIVE')">Activas</button>
+      <button class="tab-btn" [class.active]="presenter.filter() === 'INACTIVE'" (click)="presenter.setFilter('INACTIVE')">Inactivas</button>
+    </div>
+
+    <div class="sort-control">
+      <select class="sort-select" [ngModel]="presenter.sort()" (ngModelChange)="presenter.setSort($event)">
+        <option value="DATE_DESC">Más recientes</option>
+        <option value="NAME_ASC">Nombre (A-Z)</option>
+        <option value="NAME_DESC">Nombre (Z-A)</option>
+      </select>
+      <i class="fa-solid fa-chevron-down select-icon"></i>
+    </div>
+  </div>
+
   @if (presenter.isLoading()) {
   <div class="loading-state">
     <i class="fa-solid fa-circle-notch fa-spin"></i>
@@ -37,18 +54,27 @@
   </div>
   } @else {
   <div class="promotions-grid">
-    @for (promo of presenter.promotions(); track promo.id) {
-    <div class="promotion-card" [class.draft]="promo.status === 'DRAFT'" [class.active]="promo.status === 'ACTIVE'">
+    @for (promo of presenter.filteredPromotions(); track promo.id) {
+    <div class="promotion-card" [class.draft]="presenter.getPromotionStateClass(promo) === 'draft'" [class.active]="presenter.getPromotionStateClass(promo) === 'active'">
       <div class="promotion-card__image-container">
         <img [src]="promo.imageUrl || 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png'" alt="Imagen de la promoción" class="promotion-card__image" />
         <div class="promo-header-overlay">
           <div class="promo-badges">
-            <span class="status-badge" [ngClass]="promo.status | lowercase">{{ presenter.getStatusLabel(promo.status) }}</span>
+            <span class="status-badge" [ngClass]="presenter.getPromotionStateClass(promo)">{{ presenter.getStatusLabel(promo) }}</span>
             <span class="discount-badge">Descuento {{ promo.discountPercentage }}%</span>
+            @if (presenter.isExpiringSoon(promo)) {
+              <span class="expiring-badge"><i class="fa-solid fa-clock"></i> Por vencer</span>
+            }
           </div>
-          <button type="button" class="delete-btn" (click)="presenter.deletePromotion(promo.id)" title="Descartar promoción">
-            <i class="fa-solid fa-trash"></i>
-          </button>
+          <div class="promo-actions">
+            <button type="button" class="action-btn toggle-btn" (click)="presenter.toggleStatus(promo.id)" [title]="promo.status === 'ACTIVE' ? 'Desactivar promoción' : 'Activar promoción'">
+              <i class="fa-solid" [ngClass]="promo.status === 'ACTIVE' ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+            </button>
+
+            <button type="button" class="action-btn edit-btn" (click)="openEditModal(promo)" title="Editar promoción">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
         </div>
       </div>
 

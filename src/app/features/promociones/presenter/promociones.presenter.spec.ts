@@ -50,7 +50,8 @@ describe('PromocionesPagePresenter', () => {
   beforeEach(() => {
     servicioPromocion = jasmine.createSpyObj('PromotionService', [
       'getPromotions',
-      'discardPromotion',
+      'cambiarEstadoPromocion',
+      'actualizarPromocion'
     ]);
     servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
@@ -154,47 +155,40 @@ describe('PromocionesPagePresenter', () => {
     });
   });
 
-  describe('deletePromotion', () => {
-    it('dado que el usuario cancela la confirmacion, no deberia llamar al service', async () => {
-      servicioDialog.confirm.and.returnValue(Promise.resolve(false));
-
-      await presenter.deletePromotion('promo-1');
-
-      expect(servicioDialog.confirm).toHaveBeenCalled();
-      expect(servicioPromocion.discardPromotion).not.toHaveBeenCalled();
-    });
-
-    it('dado que el usuario confirma y el borrado es exitoso, deberia descartar y recargar la lista', async () => {
-      servicioDialog.confirm.and.returnValue(Promise.resolve(true));
-      servicioPromocion.discardPromotion.and.returnValue(of(undefined));
+  describe('toggleStatus', () => {
+    it('deberia llamar al service y recargar promociones si es exitoso', () => {
+      servicioPromocion.cambiarEstadoPromocion.and.returnValue(of(PromocionMother.crear()));
       servicioPromocion.getPromotions.and.returnValue(of([]));
 
-      await presenter.deletePromotion('promo-1');
+      presenter.toggleStatus('promo-1');
 
-      expect(servicioPromocion.discardPromotion).toHaveBeenCalledWith('promo-1');
+      expect(servicioPromocion.cambiarEstadoPromocion).toHaveBeenCalledWith('promo-1');
       expect(servicioPromocion.getPromotions).toHaveBeenCalled();
     });
 
-    it('dado que el borrado falla, deberia setear el estado de error', async () => {
-      servicioDialog.confirm.and.returnValue(Promise.resolve(true));
-      servicioPromocion.discardPromotion.and.returnValue(throwError(() => new Error('Delete failed')));
+    it('dado que el toggle falla, deberia setear el estado de error', () => {
+      servicioPromocion.cambiarEstadoPromocion.and.returnValue(throwError(() => new Error('Toggle failed')));
 
-      await presenter.deletePromotion('promo-1');
+      presenter.toggleStatus('promo-1');
 
-      expect(presenter.error()).toBe('Error al eliminar la promoción.');
+      expect(presenter.error()).toBe('Error al cambiar el estado de la promoción.');
     });
   });
 
   describe('helpers de UI y calculos', () => {
-    it('dado los codigos conocidos, getStatusLabel deberia devolver la etiqueta en espanol', () => {
-      expect(presenter.getStatusLabel('DRAFT')).toBe('Borrador');
-      expect(presenter.getStatusLabel('ACTIVE')).toBe('Activa');
-      expect(presenter.getStatusLabel('REJECTED')).toBe('Rechazada');
-      expect(presenter.getStatusLabel('EXPIRED')).toBe('Vencida');
-    });
+    it('getStatusLabel deberia devolver la etiqueta correcta segun estado y fechas', () => {
+      const pastDate = new Date(Date.now() - 100000).toISOString();
+      const futureDate = new Date(Date.now() + 100000).toISOString();
 
-    it('dado un status desconocido, getStatusLabel deberia devolver el mismo codigo', () => {
-      expect(presenter.getStatusLabel('CUALQUIERA')).toBe('CUALQUIERA');
+      const pInactive = { ...PromocionMother.crear({ status: 'INACTIVE' }), products: [] };
+      const pDraft = { ...PromocionMother.crear({ status: 'ACTIVE', startDate: futureDate, endDate: futureDate }), products: [] };
+      const pActive = { ...PromocionMother.crear({ status: 'ACTIVE', startDate: pastDate, endDate: futureDate }), products: [] };
+      const pExpired = { ...PromocionMother.crear({ status: 'ACTIVE', startDate: pastDate, endDate: pastDate }), products: [] };
+
+      expect(presenter.getStatusLabel(pInactive)).toBe('Inactiva');
+      expect(presenter.getStatusLabel(pDraft)).toBe('Programada');
+      expect(presenter.getStatusLabel(pActive)).toBe('Activa');
+      expect(presenter.getStatusLabel(pExpired)).toBe('Vencida');
     });
 
     it('dado una promocion con 5 productos y descuento 20%, calcularia originales, descuentos y visibles', () => {

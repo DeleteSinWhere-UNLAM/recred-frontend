@@ -18,24 +18,58 @@ export class PromocionesPagePresenter {
   private readonly dialogService = inject(DialogService);
 
   private readonly promotionsState = signal<PromotionWithProducts[]>([]);
+  private readonly filterState = signal<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
+  private readonly sortState = signal<'DATE_DESC' | 'NAME_ASC' | 'NAME_DESC'>('DATE_DESC');
   private readonly isLoadingState = signal<boolean>(false);
   private readonly errorState = signal<string | null>(null);
 
   readonly promotions: Signal<PromotionWithProducts[]> = this.promotionsState.asReadonly();
+  readonly filter: Signal<'ALL' | 'ACTIVE' | 'INACTIVE'> = this.filterState.asReadonly();
+  readonly sort: Signal<'DATE_DESC' | 'NAME_ASC' | 'NAME_DESC'> = this.sortState.asReadonly();
   readonly isLoading: Signal<boolean> = this.isLoadingState.asReadonly();
   readonly error: Signal<string | null> = this.errorState.asReadonly();
 
   readonly hasPromotions = computed(() => this.promotionsState().length > 0);
+  readonly filteredPromotions = computed(() => {
+    const filter = this.filterState();
+    const sort = this.sortState();
+    const all = this.promotionsState();
 
-  getStatusLabel(status: string): string {
-    const labels: Record<string, string> = {
-      DRAFT: 'Borrador',
-      ACTIVE: 'Activa',
-      REJECTED: 'Rechazada',
-      EXPIRED: 'Vencida',
-    };
+    let result = all;
+    if (filter === 'ACTIVE') result = all.filter(p => p.status === 'ACTIVE');
+    else if (filter === 'INACTIVE') result = all.filter(p => p.status === 'INACTIVE');
 
-    return labels[status] ?? status;
+    return result.slice().sort((a, b) => {
+      if (sort === 'NAME_ASC') return a.name.localeCompare(b.name);
+      if (sort === 'NAME_DESC') return b.name.localeCompare(a.name);
+      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+    });
+  });
+
+  getStatusLabel(promotion: PromotionWithProducts): string {
+    if (promotion.status === 'INACTIVE') {
+      return 'Inactiva';
+    }
+
+    const now = new Date().getTime();
+    const start = new Date(promotion.startDate).getTime();
+    const end = new Date(promotion.endDate).getTime();
+
+    if (now < start) return 'Programada';
+    if (now > end) return 'Vencida';
+    return 'Activa';
+  }
+
+  getPromotionStateClass(promotion: PromotionWithProducts): string {
+    if (promotion.status === 'INACTIVE') return 'inactive';
+
+    const now = new Date().getTime();
+    const start = new Date(promotion.startDate).getTime();
+    const end = new Date(promotion.endDate).getTime();
+
+    if (now < start) return 'draft';
+    if (now > end) return 'expired';
+    return 'active';
   }
 
   getOriginalTotal(promotion: PromotionWithProducts): number {
@@ -148,20 +182,40 @@ export class PromocionesPagePresenter {
     this.router.navigateByUrl('/kiosquero');
   }
 
-  async deletePromotion(id: string): Promise<void> {
-    const confirmed = await this.dialogService.confirm('¿Estás seguro de que deseas eliminar esta promoción?', 'Eliminar Promoción');
-    if (confirmed) {
-      this.isLoadingState.set(true);
-      this.promotionService.discardPromotion(id).pipe(
-        finalize(() => this.isLoadingState.set(false))
-      ).subscribe({
-        next: () => {
-          this.loadPromotions();
-        },
-        error: () => {
-          this.errorState.set('Error al eliminar la promoción.');
-        }
-      });
-    }
+  setFilter(filter: 'ALL' | 'ACTIVE' | 'INACTIVE'): void {
+    this.filterState.set(filter);
+  }
+
+  setSort(sort: 'DATE_DESC' | 'NAME_ASC' | 'NAME_DESC'): void {
+    this.sortState.set(sort);
+  }
+
+  toggleStatus(id: string): void {
+    this.isLoadingState.set(true);
+    this.promotionService.cambiarEstadoPromocion(id).pipe(
+      finalize(() => this.isLoadingState.set(false))
+    ).subscribe({
+      next: () => this.loadPromotions(),
+      error: () => this.errorState.set('Error al cambiar el estado de la promoción.')
+    });
+  }
+
+  savePromotion(promo: Partial<PromotionWithProducts>): void {
+    this.isLoadingState.set(true);
+    this.promotionService.actualizarPromocion(promo.id!, promo).pipe(
+      finalize(() => this.isLoadingState.set(false))
+    ).subscribe({
+      next: () => this.loadPromotions(),
+      error: () => this.errorState.set('Error al actualizar la promoción.')
+    });
+  }
+
+
+  isExpiringSoon(promotion: PromotionWithProducts): boolean {
+    if (promotion.status !== 'ACTIVE') return false;
+    const endDate = new Date(promotion.endDate).getTime();
+    const now = new Date().getTime();
+    const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+    return endDate - now > 0 && endDate - now <= threeDaysInMs;
   }
 }
