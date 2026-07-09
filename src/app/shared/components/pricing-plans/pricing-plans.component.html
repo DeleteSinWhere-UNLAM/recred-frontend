@@ -2,6 +2,11 @@
   <div class="pricing-header">
     <h2>Nuestros Planes</h2>
     <p>Elige el plan que mejor se adapte a tus necesidades. Cancela en cualquier momento.</p>
+    @if (planActual() !== 'GRATUITO' && diasRestantes() > 0) {
+      <div class="current-plan-summary">
+        Plan actual: <strong>{{ planActualLabel() }}</strong> (Quedan {{ diasRestantes() }} días de prueba)
+      </div>
+    }
   </div>
 
   <div class="variant-section">
@@ -66,10 +71,16 @@
           }
         </ul>
         <div class="card-action">
+          @if (esElegibleParaTrial(plan.id)) {
+          <button class="btn-trial" [disabled]="!!planEnCompra()" (click)="selectTrial(plan.id)">
+            Probar gratis 1 mes
+          </button>
+          } @else {
           <button class="btn-select" [disabled]="planNoComprable(plan.id) || !!planEnCompra()"
             (click)="selectPlan(plan.id)">
             {{ textoBoton(plan.id) }}
           </button>
+          }
         </div>
       </div>
       }

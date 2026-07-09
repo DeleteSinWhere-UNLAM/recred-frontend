@@ -37,6 +37,7 @@ interface DatosUsuarioActualizados {
   readonly fechaVencimientoLicenciaColegio?: string | null;
   readonly fechaVencimientoLicencia?: string | null;
   readonly fechaVencimientoSuscripcionColegio?: string | null;
+  readonly hasUsedTrial?: boolean | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -125,6 +126,10 @@ export class PerfilService {
         datos.fechaVencimientoSuscripcionColegio !== undefined
           ? datos.fechaVencimientoSuscripcionColegio
           : perfil.fechaVencimientoSuscripcionColegio,
+      hasUsedTrial:
+        datos.hasUsedTrial !== undefined
+          ? datos.hasUsedTrial
+          : perfil.hasUsedTrial,
     };
 
     this.perfilState.set(actualizado);
