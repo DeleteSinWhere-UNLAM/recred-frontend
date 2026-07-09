@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { AsignarVendedorPresenter } from './presenter/asignar-vendedor.presenter';
 import { AsignarVendedorFormComponent } from './components/asignar-vendedor-form/asignar-vendedor-form.component';
 import { CrearVendedorRequest } from '../models/directivo.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-asignar-vendedor-page',
   standalone: true,
-  imports: [AsignarVendedorFormComponent],
+  imports: [AsignarVendedorFormComponent, NavbarComponent],
   templateUrl: './asignar-vendedor.page.html',
   styleUrl: './asignar-vendedor.page.css',
   providers: [AsignarVendedorPresenter],

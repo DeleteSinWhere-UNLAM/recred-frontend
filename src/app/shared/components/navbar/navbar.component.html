@@ -94,13 +94,10 @@
       }
 
       <div class="navbar__notif-wrap">
-        <button type="button" class="navbar__notif" [class.navbar__notif--wide]="esVistaKiosquero()"
+        <button type="button" class="navbar__notif"
           [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'" [attr.aria-expanded]="menuNotifAbierto()"
           aria-haspopup="menu" (click)="toggleNotificaciones()" title="Ver notificaciones">
           <i class="fa-solid fa-bell" aria-hidden="true"></i>
-          @if (esVistaKiosquero()) {
-          <span>Notificaciones</span>
-          }
           @if (notifCount() > 0) {
           <span class="navbar__notif-badge">{{ notifCount() }}</span>
           }
