@@ -492,7 +492,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   getStockMovementTypeLabel(type: MovimientoStockInventario['tipo']): string {
     const labels: Record<MovimientoStockInventario['tipo'], string> = {
       RESERVA: 'Reserva',
-      LIBERACION: 'LiberaciÃ³n',
+      LIBERACION: 'Liberación',
       CONSUMO: 'Consumo',
       VENTA: 'Venta',
       AJUSTE: 'Ajuste',
