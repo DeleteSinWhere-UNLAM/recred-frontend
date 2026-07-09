@@ -643,9 +643,10 @@ export class PerfilUsuarioPage implements OnInit {
       await this.authService.cambiarPassword(oldPassword, newPassword);
       this.toastService.mostrar('Contraseña cambiada exitosamente.', 'success');
       this.cerrarModalPassword();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error al cambiar la contraseña:', err);
-      this.toastService.mostrar(err.message || 'Error al cambiar la contraseña. Verificá los datos.', 'error');
+      const mensaje = err instanceof Error ? err.message : 'Error al cambiar la contraseña. Verificá los datos.';
+      this.toastService.mostrar(mensaje, 'error');
     } finally {
       this.guardandoPassword.set(false);
     }
