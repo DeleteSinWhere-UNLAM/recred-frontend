@@ -143,7 +143,7 @@ export class AlumnoCardComponent implements OnInit {
    * Esto permite URLs limpias (sin UUID) en todas las rutas de alumno.
    */
   navegar(ruta: string): void {
-    if (ruta === '/adelanto' && !this.esPremium) {
+    if (ruta === '/adelanto' && this.planBloqueado('AVANZADO')) {
       return;
     }
     this.contextoService.setAlumnoId(this.alumno.id);
