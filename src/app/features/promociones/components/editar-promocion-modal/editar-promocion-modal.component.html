@@ -1,0 +1,92 @@
+@if(isOpen) {
+<div class="modal-overlay" (click)="closeModal()" tabindex="0" (keydown.enter)="closeModal()">
+
+  <div class="modal-container" (click)="$event.stopPropagation()" (keyup.enter)="$event.stopPropagation()" tabindex="-1">
+    <div class="modal-header">
+      <div class="header-left">
+        <div class="icon-container">
+          <i class="fa-solid fa-tags"></i>
+        </div>
+        <h2>Editar Promoción : {{ formData.name || 'Sin título' }}</h2>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <form (ngSubmit)="saveChanges()" #promoForm="ngForm">
+        
+        <div class="card-section">
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label for="promoName">Nombre de la promoción</label>
+            <div class="input-with-icon" style="margin-top: 8px;">
+              <i class="fa-solid fa-pen date-icon"></i>
+              <input type="text" id="promoName" name="name" [(ngModel)]="formData.name" required placeholder="Ej: Promo Desayuno" style="width: 100%;">
+            </div>
+          </div>
+          <div class="form-group row-flex">
+            <label for="promoDiscount">Porcentaje de Descuento</label>
+            <div class="badge-discount">{{formData.discountPercentage}}%</div>
+          </div>
+          <div class="slider-container">
+             <input type="range" id="promoDiscount" name="discount" [(ngModel)]="formData.discountPercentage" min="0" max="100" class="custom-slider">
+          </div>
+          
+          <div class="form-group-row dates-row">
+            <div class="form-group half">
+              <label for="promoStart">Fecha de Inicio</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-calendar date-icon"></i>
+                <input type="date" id="promoStart" name="startDate" [(ngModel)]="formData.startDate" required>
+              </div>
+            </div>
+            
+            <div class="form-group half">
+              <label for="promoEnd">Fecha de Fin</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-calendar date-icon"></i>
+                <input type="date" id="promoEnd" name="endDate" [(ngModel)]="formData.endDate" required>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="products-section">
+          <h3 class="section-title"><span class="bullet"></span> Selecciona productos para el combo:</h3>
+          
+          <div class="products-list">
+            @for(product of promotion.products; track product) {
+              <div class="product-item">
+                <div class="product-left">
+                  <input type="checkbox" class="product-checkbox" checked disabled>
+                  <div class="product-icon">
+                    <img [src]="product.urlImagen || 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png'" alt="Imagen" />
+                  </div>
+                  <span class="product-name">{{ product.nombre }}</span>
+                </div>
+                <div class="product-right">
+                  @if(product.precio > 0) { <span class="price-original">{{ product.precio | currency:'ARS':'symbol-narrow':'1.0-0' }}</span> }
+                  @if(product.precio > 0) { <span class="price-discounted">{{ product.precio * (1 - formData.discountPercentage / 100) | currency:'ARS':'symbol-narrow':'1.0-0' }}</span> }
+                </div>
+              </div>
+            }
+            @if(!promotion.products || promotion.products.length === 0) {
+              <p class="empty-products">No hay productos en esta promoción.</p>
+            }
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="closeModal()">
+            <i class="fa-solid fa-times"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="!promoForm.valid">
+            <i class="fa-solid fa-check"></i> Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+}
