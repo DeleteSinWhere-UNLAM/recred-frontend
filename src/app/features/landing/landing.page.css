@@ -133,13 +133,46 @@
   z-index: 2;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 20px 32px;
+}
+
+.landing__header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing__header-cta {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.landing__header-cta .cta {
+  width: auto;
+  padding: 10px 18px;
+  font-size: 0.9375rem;
+}
+
+.landing__header-cta-leyenda {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.02em;
 }
 
 @media (min-width: 880px) {
   .landing__header {
     padding: 28px 64px;
+  }
+
+  .landing__header-cta .cta {
+    padding: 12px 22px;
+    font-size: 1rem;
   }
 }
 
@@ -158,6 +191,9 @@
 }
 
 .landing__hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   flex: 1;
   display: grid;
   grid-template-columns: 1fr;
@@ -168,15 +204,40 @@
   width: 100%;
   min-height: 100dvh;
   margin: 0;
-  background:
-    linear-gradient(90deg, rgba(51, 65, 85, 0.86) 0%, rgba(51, 65, 85, 0.68) 44%, rgba(51, 65, 85, 0.22) 100%),
-    linear-gradient(180deg, rgba(51, 65, 85, 0.2), rgba(51, 65, 85, 0.4)),
-    url('/landing.png') center / cover no-repeat;
+  background-color: #1f2a3a;
+}
+
+.landing__hero::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: url('/landing.png') center / cover no-repeat;
+  filter: blur(0.5px) brightness(0.6) saturate(0.9);
+  transform: scale(1.05);
+  z-index: -2;
+}
+
+.landing__hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(31, 42, 58, 0.55) 0%, rgba(31, 42, 58, 0.78) 100%);
+  z-index: -1;
 }
 
 @media (min-width: 880px) {
   .landing__hero {
     padding: 128px 64px 72px;
+  }
+
+  .landing__hero::before {
+    filter: blur(0.3px) brightness(0.7) saturate(0.95);
+  }
+
+  .landing__hero::after {
+    background:
+      linear-gradient(90deg, rgba(31, 42, 58, 0.82) 0%, rgba(31, 42, 58, 0.58) 50%, rgba(31, 42, 58, 0.25) 100%),
+      linear-gradient(180deg, rgba(31, 42, 58, 0.15), rgba(31, 42, 58, 0.4));
   }
 }
 
@@ -215,7 +276,7 @@
 }
 
 .landing__tagline {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-weight: 500;
   font-size: clamp(1rem, 1.4vw, 1.125rem);
   color: rgba(255, 255, 255, 0.9);

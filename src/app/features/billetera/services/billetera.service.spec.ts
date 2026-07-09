@@ -47,6 +47,32 @@ describe('BilleteraService', () => {
     thenSeHizoGetSinRango(BilleteraMother.ALUMNO_ID);
   });
 
+  it('dado solo fecha desde, cuando consulto el resumen, deberia enviar solo ese query param', () => {
+    whenConsultoElResumen(BilleteraMother.ALUMNO_ID, '2026-06-01');
+
+    const req = httpMock.expectOne(
+      `${environment.apiUrl}/wallets/students/${BilleteraMother.ALUMNO_ID}/summary?desde=2026-06-01`,
+    );
+    expect(req.request.params.get('desde')).toBe('2026-06-01');
+    expect(req.request.params.has('hasta')).toBeFalse();
+    req.flush({});
+  });
+
+  describe('transferirSaldo', () => {
+    it('dado un origen, destino y monto, cuando transfiero, deberia hacer POST /wallets/transfer con esos datos', () => {
+      service.transferirSaldo('alumno-a', 'alumno-b', 500).subscribe();
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/wallets/transfer`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({
+        fromStudentId: 'alumno-a',
+        toStudentId: 'alumno-b',
+        amount: 500,
+      });
+      req.flush(null);
+    });
+  });
+
   function whenConsultoElResumen(
     alumnoId: string,
     desde?: string,

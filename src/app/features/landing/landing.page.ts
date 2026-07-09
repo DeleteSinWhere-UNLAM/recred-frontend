@@ -11,6 +11,7 @@ import {
 import { InvitacionTokenStorageService } from '../aceptar-invitacion-tutor/services/invitacion-token-storage.service';
 import { InvitacionesTutorService } from '../directivo/services/invitaciones-tutor.service';
 import { LandingCtaButtonComponent } from './components/landing-cta-button/landing-cta-button.component';
+import { CtaLanding } from './models/cta-landing.model';
 import { LandingPresenter } from './presenter/landing.presenter';
 
 const ROL_A_RUTA: Record<RolUsuario, string> = {
@@ -132,8 +133,12 @@ export class LandingPage implements OnInit, OnDestroy {
     }
   }
 
-  protected onCtaClick(): void {
-    void this.presenter.iniciarLogin();
+  protected onCtaClick(cta: CtaLanding): void {
+    if (cta.ruta === 'login') {
+      void this.presenter.iniciarLogin();
+      return;
+    }
+    void this.router.navigateByUrl(`/${cta.ruta}`);
   }
 
   protected onImagenError(event: Event): void {

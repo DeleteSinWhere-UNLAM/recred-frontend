@@ -15,7 +15,7 @@ export class CtaLandingMother {
   }
 
   static crearSecundario(override: Partial<CtaLanding> = {}): CtaLanding {
-    return CtaLandingMother.crear({ texto: 'Registrarme', ruta: 'registro', variante: 'secundario', ...override });
+    return CtaLandingMother.crear({ texto: 'Registrar institución', ruta: 'registro-colegio', variante: 'secundario', ...override });
   }
 
   static crearLista(): readonly CtaLanding[] {

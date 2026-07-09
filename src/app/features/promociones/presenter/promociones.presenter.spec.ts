@@ -238,6 +238,130 @@ describe('PromocionesPagePresenter', () => {
     });
   });
 
+  describe('filtros y ordenamiento', () => {
+    beforeEach(() => {
+      const p1 = { ...PromocionMother.crear({ id: '1', name: 'Banana', status: 'ACTIVE', startDate: '2026-05-01T00:00:00.000Z' }), products: [] };
+      const p2 = { ...PromocionMother.crear({ id: '2', name: 'Alfajor', status: 'INACTIVE', startDate: '2026-01-01T00:00:00.000Z' }), products: [] };
+      const p3 = { ...PromocionMother.crear({ id: '3', name: 'Cerveza', status: 'ACTIVE', startDate: '2026-07-01T00:00:00.000Z' }), products: [] };
+      servicioPromocion.getPromotions.and.returnValue(of([p1, p2, p3]));
+      servicioProducto.getById.and.returnValue(of(ProductoMother.crear()));
+      presenter.loadPromotions();
+    });
+
+    it('dado filter ALL y sort DATE_DESC (default), deberia devolver todas ordenadas por fecha descendente', () => {
+      const ids = presenter.filteredPromotions().map((p) => p.id);
+      expect(ids).toEqual(['3', '1', '2']);
+    });
+
+    it('dado filter ACTIVE, solo deberia devolver las activas', () => {
+      presenter.setFilter('ACTIVE');
+
+      const ids = presenter.filteredPromotions().map((p) => p.id);
+      expect(ids).toEqual(['3', '1']);
+    });
+
+    it('dado filter INACTIVE, solo deberia devolver las inactivas', () => {
+      presenter.setFilter('INACTIVE');
+
+      const ids = presenter.filteredPromotions().map((p) => p.id);
+      expect(ids).toEqual(['2']);
+    });
+
+    it('dado sort NAME_ASC, deberia ordenar por nombre alfabeticamente', () => {
+      presenter.setSort('NAME_ASC');
+
+      const nombres = presenter.filteredPromotions().map((p) => p.name);
+      expect(nombres).toEqual(['Alfajor', 'Banana', 'Cerveza']);
+    });
+
+    it('dado sort NAME_DESC, deberia ordenar por nombre inverso', () => {
+      presenter.setSort('NAME_DESC');
+
+      const nombres = presenter.filteredPromotions().map((p) => p.name);
+      expect(nombres).toEqual(['Cerveza', 'Banana', 'Alfajor']);
+    });
+  });
+
+  describe('savePromotion', () => {
+    it('dado el update es exitoso, deberia recargar las promociones', () => {
+      servicioPromocion.actualizarPromocion.and.returnValue(of(PromocionMother.crear()));
+      servicioPromocion.getPromotions.and.returnValue(of([]));
+
+      presenter.savePromotion({ id: 'promo-1', name: 'X' });
+
+      expect(servicioPromocion.actualizarPromocion).toHaveBeenCalledWith('promo-1', { id: 'promo-1', name: 'X' });
+      expect(servicioPromocion.getPromotions).toHaveBeenCalled();
+    });
+
+    it('dado el update falla, deberia setear el mensaje de error', () => {
+      servicioPromocion.actualizarPromocion.and.returnValue(throwError(() => new Error('boom')));
+
+      presenter.savePromotion({ id: 'promo-1' });
+
+      expect(presenter.error()).toBe('Error al actualizar la promoción.');
+    });
+  });
+
+  describe('getPromotionStateClass', () => {
+    it('dado una promocion INACTIVE, deberia devolver "inactive"', () => {
+      const promo = { ...PromocionMother.crear({ status: 'INACTIVE' }), products: [] };
+
+      expect(presenter.getPromotionStateClass(promo)).toBe('inactive');
+    });
+
+    it('dado una promocion ACTIVE con fecha futura, deberia devolver "draft"', () => {
+      const future = new Date(Date.now() + 100000).toISOString();
+      const promo = { ...PromocionMother.crear({ status: 'ACTIVE', startDate: future, endDate: future }), products: [] };
+
+      expect(presenter.getPromotionStateClass(promo)).toBe('draft');
+    });
+
+    it('dado una promocion ACTIVE vigente, deberia devolver "active"', () => {
+      const past = new Date(Date.now() - 100000).toISOString();
+      const future = new Date(Date.now() + 100000).toISOString();
+      const promo = { ...PromocionMother.crear({ status: 'ACTIVE', startDate: past, endDate: future }), products: [] };
+
+      expect(presenter.getPromotionStateClass(promo)).toBe('active');
+    });
+
+    it('dado una promocion ACTIVE ya vencida, deberia devolver "expired"', () => {
+      const past = new Date(Date.now() - 100000).toISOString();
+      const promo = { ...PromocionMother.crear({ status: 'ACTIVE', startDate: past, endDate: past }), products: [] };
+
+      expect(presenter.getPromotionStateClass(promo)).toBe('expired');
+    });
+  });
+
+  describe('isExpiringSoon', () => {
+    it('dado una promocion INACTIVE, deberia devolver false aunque termine pronto', () => {
+      const enUnDia = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const promo = { ...PromocionMother.crear({ status: 'INACTIVE', endDate: enUnDia }), products: [] };
+
+      expect(presenter.isExpiringSoon(promo)).toBeFalse();
+    });
+
+    it('dado una promocion ACTIVE que termina en menos de 3 dias, deberia devolver true', () => {
+      const enUnDia = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const promo = { ...PromocionMother.crear({ status: 'ACTIVE', endDate: enUnDia }), products: [] };
+
+      expect(presenter.isExpiringSoon(promo)).toBeTrue();
+    });
+
+    it('dado una promocion ACTIVE que termina en mas de 3 dias, deberia devolver false', () => {
+      const enUnaSemana = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      const promo = { ...PromocionMother.crear({ status: 'ACTIVE', endDate: enUnaSemana }), products: [] };
+
+      expect(presenter.isExpiringSoon(promo)).toBeFalse();
+    });
+
+    it('dado una promocion ACTIVE ya vencida, deberia devolver false', () => {
+      const ayer = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const promo = { ...PromocionMother.crear({ status: 'ACTIVE', endDate: ayer }), products: [] };
+
+      expect(presenter.isExpiringSoon(promo)).toBeFalse();
+    });
+  });
+
   describe('normalizacion de promociones con nombres alternativos', () => {
     it('dado que el back devuelve promocion sin nombre reconocible, deberia usar "Sin nombre"', () => {
       const promocionRaw: Record<string, unknown> = {

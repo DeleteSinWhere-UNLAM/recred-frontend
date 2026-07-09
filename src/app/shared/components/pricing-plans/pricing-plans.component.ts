@@ -58,6 +58,14 @@ export class PricingPlansComponent {
     return 'Gratuito';
   });
 
+  diasRestantes = computed(() => {
+    const vencimiento = this.perfilService.perfil()?.fechaVencimientoPlan;
+    if (!vencimiento) return 0;
+    const diffMs = new Date(vencimiento).getTime() - new Date().getTime();
+    const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 0;
+  });
+
   plans = computed<PricingPlan[]>(() => {
     const basicFeatures = [
       'Funciones esenciales',
@@ -159,6 +167,41 @@ export class PricingPlansComponent {
     } finally {
       this.planEnCompra.set(null);
     }
+  }
+
+  async selectTrial(planId: PricingPlanId): Promise<void> {
+    const plan = this.obtenerPlanBackend(planId);
+    if (!plan || this.planEnCompra()) return;
+
+    this.planEnCompra.set(planId);
+    this.errorCompra.set(null);
+
+    try {
+      const usuarioId = await this.obtenerUsuarioId();
+      if (!usuarioId) {
+        throw new Error('No se encontro el ID del usuario.');
+      }
+
+      await this.subscriptionPaymentService.activarPruebaUsuario({
+        usuarioId,
+        plan,
+      });
+      await this.perfilService.cargarPerfil();
+      this.toastService.mostrar('¡Periodo de prueba de 1 mes activado!', 'success');
+    } catch (err) {
+      console.error('Error activando periodo de prueba:', err);
+      this.errorCompra.set('No pudimos activar el periodo de prueba. Intenta de nuevo.');
+      this.toastService.mostrar('No pudimos activar el periodo de prueba.', 'error');
+    } finally {
+      this.planEnCompra.set(null);
+    }
+  }
+
+  esElegibleParaTrial(planId: PricingPlanId): boolean {
+    if (planId !== 'avanzado') return false;
+    if (this.esPlanActual(planId)) return false;
+    const perfil = this.perfilService.perfil();
+    return this.planActual() === 'GRATUITO' && !perfil?.hasUsedTrial;
   }
 
   private periodoSeleccionado(): PeriodoSuscripcion {

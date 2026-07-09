@@ -11,7 +11,6 @@ import { ReglaCategoria } from './models/presupuesto.model';
 import {
   ALUMNO_ID_TEST,
   CategoriaProductoMother,
-  PrediccionGastoPresupuestoMother,
   PresupuestoMother,
 } from './presupuesto.mother';
 import { PresupuestoPage } from './presupuesto.page';
@@ -41,12 +40,10 @@ describe('Presupuesto Integration', () => {
     servicioPresupuesto = jasmine.createSpyObj('PresupuestoService', [
       'getPresupuesto',
       'getCategoriasDisponibles',
-      'cargarPrediccion',
       'guardar',
     ]);
     servicioPresupuesto.getCategoriasDisponibles.and.resolveTo(CategoriaProductoMother.crearVarias());
     servicioPresupuesto.getPresupuesto.and.resolveTo(undefined);
-    servicioPresupuesto.cargarPrediccion.and.resolveTo(PrediccionGastoPresupuestoMother.crear());
     servicioPresupuesto.guardar.and.resolveTo(PresupuestoMother.crear({ id: 'pres-nuevo' }));
 
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
@@ -80,13 +77,12 @@ describe('Presupuesto Integration', () => {
     fixture = TestBed.createComponent(PresupuestoPage);
   });
 
-  it('dado el alumnoId en el contexto, cuando se monta la page, deberia pedirle al service categorias, presupuesto y prediccion', async () => {
+  it('dado el alumnoId en el contexto, cuando se monta la page, deberia pedirle al service categorias y presupuesto', async () => {
     await whenMontoYEspero();
 
     expect(servicioAlumnos.asegurarCargados).toHaveBeenCalled();
     expect(servicioPresupuesto.getCategoriasDisponibles).toHaveBeenCalled();
     expect(servicioPresupuesto.getPresupuesto).toHaveBeenCalledWith(ALUMNO_ID_TEST);
-    expect(servicioPresupuesto.cargarPrediccion).toHaveBeenCalledWith(ALUMNO_ID_TEST, 'MENSUAL');
   });
 
   it('dado un presupuesto del back con reglas, cuando se monta, deberia propagarlas al item stub via input', async () => {

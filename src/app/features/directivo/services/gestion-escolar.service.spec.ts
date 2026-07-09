@@ -173,6 +173,51 @@ describe('GestionEscolarService', () => {
     expect(await promise).toEqual(respuesta);
   });
 
+  it('dado sin includeInactive, cuando listo grados, no deberia enviar el query param', async () => {
+    const promise = service.listarGrados('school-1');
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/colegios/school-1/grados`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.params.has('includeInactive')).toBeFalse();
+    req.flush([]);
+
+    await promise;
+  });
+
+  it('dado un gradeId, cuando pido el detalle del grado, deberia hacer GET al detalle', async () => {
+    const respuesta = grado({ id: 'g1' });
+
+    const promise = service.obtenerGrado('school-1', 'g1');
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/colegios/school-1/grados/g1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(respuesta);
+
+    expect(await promise).toEqual(respuesta);
+  });
+
+  it('dado sin includeInactive, cuando listo franjas, no deberia enviar el query param', async () => {
+    const promise = service.listarFranjas('school-1');
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/colegios/school-1/franjas-horarias`);
+    expect(req.request.params.has('includeInactive')).toBeFalse();
+    req.flush([]);
+
+    expect(await promise).toEqual([]);
+  });
+
+  it('dado un slotId, cuando pido el detalle de la franja, deberia hacer GET al detalle', async () => {
+    const respuesta = franja({ id: 'f1' });
+
+    const promise = service.obtenerFranja('school-1', 'f1');
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/colegios/school-1/franjas-horarias/f1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(respuesta);
+
+    expect(await promise).toEqual(respuesta);
+  });
+
   function grado(override: Partial<GradoColegio> = {}): GradoColegio {
     return {
       id: 'g1',

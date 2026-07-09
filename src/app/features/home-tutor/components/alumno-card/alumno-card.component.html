@@ -106,37 +106,34 @@
         </span>
         <span class="alumno-card__btn-label">Pendientes</span>
       </a>
-
       <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')"
         [class.active]="isActive('/prediccion-gasto')"
-        [class.alumno-card__btn--locked]="planBloqueado('INTERMEDIO')"
+        [class.alumno-card__btn--disabled]="planBloqueado('INTERMEDIO')"
         [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
-        <span class="alumno-card__plan-badge">
-          @if (planBloqueado('INTERMEDIO')) {
-          <i class="fa-solid fa-lock" aria-hidden="true"></i>
-          }
-          Intermedio
-        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-compass"></i>
         </span>
-        <span class="alumno-card__btn-label">Predicción</span>
+        <span class="alumno-card__btn-label">
+          Predicción
+          @if (planBloqueado('INTERMEDIO')) {
+            <i class="fa-solid fa-lock" style="font-size: 0.75rem; margin-left: 4px;" aria-hidden="true"></i>
+          }
+        </span>
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegarConPlan('/preferencias', 'INTERMEDIO')"
         [class.active]="isActive('/preferencias')"
-        [class.alumno-card__btn--locked]="planBloqueado('INTERMEDIO')"
+        [class.alumno-card__btn--disabled]="planBloqueado('INTERMEDIO')"
         [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
-        <span class="alumno-card__plan-badge">
-          @if (planBloqueado('INTERMEDIO')) {
-          <i class="fa-solid fa-lock" aria-hidden="true"></i>
-          }
-          Intermedio
-        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-wand-magic-sparkles"></i>
         </span>
-        <span class="alumno-card__btn-label">Preferencias</span>
+        <span class="alumno-card__btn-label">
+          Preferencias
+          @if (planBloqueado('INTERMEDIO')) {
+            <i class="fa-solid fa-lock" style="font-size: 0.75rem; margin-left: 4px;" aria-hidden="true"></i>
+          }
+        </span>
       </a>
 
       <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
@@ -149,31 +146,31 @@
 
       @if (esPadre) {
       <a class="alumno-card__btn alumno-card__btn--menta" title="Adelanto" (click)="navegar('/adelanto')"
-        [class.active]="isActive('/adelanto')" [class.alumno-card__btn--disabled]="!esPremium">
+        [class.active]="isActive('/adelanto')" [class.alumno-card__btn--disabled]="planBloqueado('AVANZADO')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-hand-holding-dollar"></i>
         </span>
         <span class="alumno-card__btn-label">
           Adelanto
-          @if (!esPremium) {
+          @if (planBloqueado('AVANZADO')) {
             <i class="fa-solid fa-lock" style="font-size: 0.75rem; margin-left: 4px;" aria-hidden="true"></i>
           }
         </span>
       </a>
+
       <a class="alumno-card__btn alumno-card__btn--azul" title="Transferir" (click)="navegarConPlan('/transferir-saldo', 'AVANZADO')"
         [class.active]="isActive('/transferir-saldo')"
-        [class.alumno-card__btn--locked]="planBloqueado('AVANZADO')"
+        [class.alumno-card__btn--disabled]="planBloqueado('AVANZADO')"
         [attr.aria-disabled]="planBloqueado('AVANZADO')">
-        <span class="alumno-card__plan-badge">
-          @if (planBloqueado('AVANZADO')) {
-          <i class="fa-solid fa-lock" aria-hidden="true"></i>
-          }
-          Avanzado
-        </span>
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-right-left"></i>
         </span>
-        <span class="alumno-card__btn-label">Transferir</span>
+        <span class="alumno-card__btn-label">
+          Transferir
+          @if (planBloqueado('AVANZADO')) {
+            <i class="fa-solid fa-lock" style="font-size: 0.75rem; margin-left: 4px;" aria-hidden="true"></i>
+          }
+        </span>
       </a>
       }
     </div>
