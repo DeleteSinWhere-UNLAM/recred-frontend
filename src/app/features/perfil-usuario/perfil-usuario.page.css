@@ -396,14 +396,19 @@
 }
 
 .payout-destacado {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
+  display: flex;
+  flex: 1 1 100%;
+  align-items: flex-start;
   gap: 10px;
   background-color: color-mix(in srgb, var(--color-dorado) 35%, var(--color-superficie));
   color: var(--color-pizarra);
-  padding: 6px 12px;
-  border-radius: 0; /* Sin vértices redondeados */
+  padding: 8px 12px;
+  border-radius: 8px;
+  word-break: break-word;
+}
+
+.payout-destacado i {
+  margin-top: 2px;
 }
 
 .payout-destacado i,
