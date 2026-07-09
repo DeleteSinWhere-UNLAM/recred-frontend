@@ -1050,6 +1050,12 @@
   text-transform: uppercase;
 }
 
+.navbar__submenu-item--add {
+  border-top: 1px dashed var(--color-borde);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
 /* Hamburguesa Menu Mobile */
 .navbar__burger {
   display: none;

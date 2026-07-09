@@ -317,6 +317,12 @@ export class NavbarComponent implements OnInit {
     this.router.navigateByUrl('/suscripcion');
   }
 
+  protected irAAgregarHijo(): void {
+    this.menuAbierto.set(false);
+    this.menuBilleteraAbierto.set(false);
+    void this.router.navigateByUrl('/crear-hijo');
+  }
+
   protected planBloqueado(planRequerido: 'INTERMEDIO' | 'AVANZADO'): boolean {
     return this.nivelPlan(this.planActual()) < this.nivelPlan(planRequerido);
   }

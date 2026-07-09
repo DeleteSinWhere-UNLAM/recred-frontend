@@ -194,6 +194,28 @@ describe('AlumnoCardComponent', () => {
       expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith('alumno-1');
       expect(router.navigate).toHaveBeenCalledWith(['/tutor/estadistica']);
     });
+
+    it('dado ruta /adelanto y esPremium true, deberia permitir navegar', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+      spyOnProperty(component, 'esPremium', 'get').and.returnValue(true);
+
+      component.navegar('/adelanto');
+
+      expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith('alumno-1');
+      expect(router.navigate).toHaveBeenCalledWith(['/adelanto']);
+    });
+
+    it('dado ruta /adelanto y esPremium false, no deberia permitir navegar', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+      spyOnProperty(component, 'esPremium', 'get').and.returnValue(false);
+
+      component.navegar('/adelanto');
+
+      expect(servicioContexto.setAlumnoId).not.toHaveBeenCalled();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
   });
 
   describe('permisos derivados del perfil', () => {
