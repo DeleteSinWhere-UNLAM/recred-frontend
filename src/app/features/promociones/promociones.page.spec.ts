@@ -1,5 +1,6 @@
 import { Component, Input, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import {
@@ -27,6 +28,7 @@ interface PresenterMock {
   toggleStatus: jasmine.Spy;
   setFilter: jasmine.Spy;
   setSort: jasmine.Spy;
+  savePromotion: jasmine.Spy;
   getPromotionStateClass: jasmine.Spy;
   isExpiringSoon: jasmine.Spy;
   getStatusLabel: jasmine.Spy;
@@ -41,6 +43,7 @@ describe('PromocionesPageComponent', () => {
   let fixture: ComponentFixture<PromocionesPageComponent>;
   let presenter: PresenterMock;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let router: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
     presenter = crearPresenterMock();
@@ -49,11 +52,13 @@ describe('PromocionesPageComponent', () => {
     servicioUsuario.getUsuarioActual.and.returnValue({
       nombre: 'Kiosquero Test',
     } as ReturnType<UsuarioService['getUsuarioActual']>);
+    router = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [PromocionesPageComponent],
       providers: [
         { provide: UsuarioService, useValue: servicioUsuario },
+        { provide: Router, useValue: router },
       ],
     })
       .overrideComponent(PromocionesPageComponent, {
@@ -156,6 +161,62 @@ describe('PromocionesPageComponent', () => {
     });
   });
 
+  describe('modal de edicion', () => {
+    it('dado openEditModal con una promocion, deberia setear selectedPromotion y abrir el modal', () => {
+      const promo = crearPromocion({ id: 'promo-x' });
+
+      component.openEditModal(promo);
+
+      expect(component.selectedPromotion).toBe(promo);
+      expect(component.isModalOpen).toBeTrue();
+    });
+
+    it('dado el modal abierto, cuando cierro, deberia limpiar selectedPromotion y setear isModalOpen en false', () => {
+      component.openEditModal(crearPromocion());
+
+      component.closeModal();
+
+      expect(component.selectedPromotion).toBeNull();
+      expect(component.isModalOpen).toBeFalse();
+    });
+
+    it('dado savePromotion con datos, deberia delegar al presenter y cerrar el modal', () => {
+      component.openEditModal(crearPromocion());
+      const payload: Partial<PromotionWithProducts> = { id: 'promo-1', name: 'Actualizada' };
+
+      component.savePromotion(payload);
+
+      expect(presenter.savePromotion).toHaveBeenCalledWith(payload);
+      expect(component.isModalOpen).toBeFalse();
+      expect(component.selectedPromotion).toBeNull();
+    });
+  });
+
+  describe('modal de tipo (nueva promocion)', () => {
+    it('cuando abro el modal de tipo, deberia setear isTypeModalOpen en true', () => {
+      component.openTypeModal();
+
+      expect(component.isTypeModalOpen).toBeTrue();
+    });
+
+    it('cuando cierro el modal de tipo, deberia setear isTypeModalOpen en false', () => {
+      component.openTypeModal();
+
+      component.closeTypeModal();
+
+      expect(component.isTypeModalOpen).toBeFalse();
+    });
+
+    it('dado navigateTo, deberia navegar a la ruta y cerrar el modal de tipo', () => {
+      component.openTypeModal();
+
+      component.navigateTo('/kiosquero/inteligencia-comercial');
+
+      expect(router.navigate).toHaveBeenCalledWith(['/kiosquero/inteligencia-comercial']);
+      expect(component.isTypeModalOpen).toBeFalse();
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }
@@ -188,6 +249,7 @@ describe('PromocionesPageComponent', () => {
       toggleStatus: jasmine.createSpy('toggleStatus'),
       setFilter: jasmine.createSpy('setFilter'),
       setSort: jasmine.createSpy('setSort'),
+      savePromotion: jasmine.createSpy('savePromotion'),
       getPromotionStateClass: jasmine.createSpy('getPromotionStateClass').and.returnValue(''),
       isExpiringSoon: jasmine.createSpy('isExpiringSoon').and.returnValue(false),
       getStatusLabel: jasmine.createSpy('getStatusLabel').and.returnValue(''),

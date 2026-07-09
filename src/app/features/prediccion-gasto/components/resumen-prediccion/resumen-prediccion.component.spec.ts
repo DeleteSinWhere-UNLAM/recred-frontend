@@ -68,6 +68,63 @@ describe('ResumenPrediccionComponent', () => {
     });
   });
 
+  describe('porcentajeActualPorc', () => {
+    it('dado porcentajePresupuesto null, deberia devolver 0', () => {
+      component.porcentajePresupuesto = null;
+
+      expect(component.porcentajeActualPorc).toBe(0);
+    });
+
+    it('dado porcentajePresupuesto 0.5, deberia devolver 50', () => {
+      component.porcentajePresupuesto = 0.5;
+
+      expect(component.porcentajeActualPorc).toBe(50);
+    });
+
+    it('dado porcentajePresupuesto > 1, deberia caparlo a 100', () => {
+      component.porcentajePresupuesto = 1.5;
+
+      expect(component.porcentajeActualPorc).toBe(100);
+    });
+  });
+
+  describe('porcentajePredichoPorc', () => {
+    it('dado montoLimite null, deberia devolver 0', () => {
+      component.montoLimite = null;
+      component.gastoPredicho = 1000;
+
+      expect(component.porcentajePredichoPorc).toBe(0);
+    });
+
+    it('dado montoLimite 0, deberia devolver 0', () => {
+      component.montoLimite = 0;
+      component.gastoPredicho = 1000;
+
+      expect(component.porcentajePredichoPorc).toBe(0);
+    });
+
+    it('dado montoLimite negativo, deberia devolver 0', () => {
+      component.montoLimite = -50;
+      component.gastoPredicho = 1000;
+
+      expect(component.porcentajePredichoPorc).toBe(0);
+    });
+
+    it('dado montoLimite valido y gastoPredicho al 50%, deberia devolver 50', () => {
+      component.montoLimite = 2000;
+      component.gastoPredicho = 1000;
+
+      expect(component.porcentajePredichoPorc).toBe(50);
+    });
+
+    it('dado gastoPredicho > montoLimite, deberia caparlo a 100', () => {
+      component.montoLimite = 1000;
+      component.gastoPredicho = 3000;
+
+      expect(component.porcentajePredichoPorc).toBe(100);
+    });
+  });
+
   function whenRenderoCon(
     prediccion: ReturnType<typeof PrediccionGastoMother.crear>,
   ): void {
