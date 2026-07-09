@@ -61,9 +61,9 @@ export class SubscriptionPaymentService {
   activarPruebaUsuario(request: {
     usuarioId: string;
     plan: PlanSuscripcionUsuario;
-  }): Promise<any> {
+  }): Promise<unknown> {
     return firstValueFrom(
-      this.http.post<any>(
+      this.http.post<unknown>(
         `${this.apiBase}/payments/subscriptions/user/trial`,
         request,
       ),
