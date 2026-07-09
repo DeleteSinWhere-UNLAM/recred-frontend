@@ -165,11 +165,9 @@ export class BuffetPage implements OnInit {
     return 'fa-solid fa-utensils';
   }
 
-  // Carrusel de Promociones
   @ViewChild('promosContainer') promosContainer!: ElementRef<HTMLDivElement>;
   protected readonly activeSlideIndex = signal(0);
 
-  // Mapeo dinámico y estático de promociones
   protected esPromocion(producto: Producto): boolean {
     if (!producto) return false;
     const nombre = (producto.nombre || '').toLowerCase();
@@ -357,10 +355,10 @@ export class BuffetPage implements OnInit {
     const motivo = promo.motivoBloqueo ?? '';
     if (!motivo) return 'No apto';
     const MAPA: Record<string, string> = {
-      'Gluten (TACC)':                 'Contiene TACC',
-      'Az\u00facar':                   'Contiene Az\u00facar',
-      'L\u00e1cteos':                  'Contiene L\u00e1cteos',
-      'Alto Sodio':                    'Contiene Sodio',
+      'Gluten (TACC)': 'Contiene TACC',
+      'Az\u00facar': 'Contiene Az\u00facar',
+      'L\u00e1cteos': 'Contiene L\u00e1cteos',
+      'Alto Sodio': 'Contiene Sodio',
       'Ingredientes de origen animal': 'No Vegano',
     };
     const contenido = motivo.replace(/^Contiene:\s*/i, '');
@@ -403,7 +401,7 @@ export class BuffetPage implements OnInit {
 
     const eraVacio = this.presenter.itemsCarrito().length === 0;
     this.presenter.agregarAlCarrito(pTemp, 1);
-    
+
     if (eraVacio && this.panelLateralCerrado()) {
       this.panelLateralCerrado.set(false);
     }
@@ -412,7 +410,7 @@ export class BuffetPage implements OnInit {
   protected onAgregarAlCarrito(producto: Producto, cantidad: number): void {
     const eraVacio = this.presenter.itemsCarrito().length === 0;
     this.presenter.setCantidadProducto(producto, cantidad);
-    
+
     if (eraVacio && cantidad > 0 && this.panelLateralCerrado()) {
       this.panelLateralCerrado.set(false);
     }
@@ -543,32 +541,32 @@ export class BuffetPage implements OnInit {
     const refDate = new Date(referenceDateStr + 'T12:00:00');
     const year = refDate.getFullYear();
     const month = refDate.getMonth();
-    
+
     const firstDayOfMonth = new Date(year, month, 1);
     let startDayOfWeek = firstDayOfMonth.getDay();
     startDayOfWeek = startDayOfWeek === 0 ? 7 : startDayOfWeek;
-    
+
     const startDate = new Date(firstDayOfMonth);
     startDate.setDate(startDate.getDate() - (startDayOfWeek - 1));
-    
+
     const cells: DateCell[] = [];
     const minDateStr = this.presenter.fechaMinima();
     const selectedDateStr = this.presenter.fechaSeleccionada();
-    
+
     for (let i = 0; i < 42; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
-      
+
       const yyyy = currentDate.getFullYear();
       const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
       const dd = String(currentDate.getDate()).padStart(2, '0');
       const fechaStr = `${yyyy}-${mm}-${dd}`;
-      
+
       const dayOfWeek = currentDate.getDay();
       const esFinDeSemana = dayOfWeek === 0 || dayOfWeek === 6;
-      
+
       const bloqueado = fechaStr < minDateStr || esFinDeSemana;
-      
+
       cells.push({
         date: currentDate,
         fechaStr,
@@ -579,7 +577,7 @@ export class BuffetPage implements OnInit {
         seleccionada: fechaStr === selectedDateStr
       });
     }
-    
+
     this.diasCalendario.set(cells);
   }
 
@@ -605,7 +603,7 @@ export class BuffetPage implements OnInit {
       if (recreo === 'FUERA_HORA') return desc.includes('salida') || desc.includes('despues') || desc.includes('final');
       return false;
     });
-    
+
     if (slot && slot.horaInicio && slot.horaFin) {
       const formatTime = (timeStr: string) => {
         const parts = timeStr.split(':');

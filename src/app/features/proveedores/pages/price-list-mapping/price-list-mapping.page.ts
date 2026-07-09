@@ -144,7 +144,7 @@ export class PriceListMappingPage implements OnInit {
       },
       error: (err) => {
         console.error('Error updating mapping', err);
-        this.toastService.mostrar('Error al actualizar el mapeo del producto', 'error');
+        this.toastService.mostrar('Error al actualizar la carga del producto', 'error');
       }
     });
   }
