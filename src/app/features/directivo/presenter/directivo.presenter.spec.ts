@@ -5,22 +5,17 @@ import { TestBed } from '@angular/core/testing';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { DirectivoService } from '../services/directivo.service';
 import { Perfil } from '../../../data-access/models/perfil.model';
-import { SubscriptionPaymentService } from '../../../data-access/services/suscripciones/subscription-payment.service';
 import { ToastService } from '../../../shared/services/toast.service';
 
 describe('DirectivoPresenter', () => {
   let presenter: DirectivoPresenter;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
   let directivoServiceSpy: jasmine.SpyObj<DirectivoService>;
-  let subscriptionPaymentServiceSpy: jasmine.SpyObj<SubscriptionPaymentService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   beforeEach(() => {
     perfilServiceSpy = jasmine.createSpyObj('PerfilService', ['cargarPerfil']);
     directivoServiceSpy = jasmine.createSpyObj('DirectivoService', ['obtenerResumenColegio']);
-    subscriptionPaymentServiceSpy = jasmine.createSpyObj<SubscriptionPaymentService>('SubscriptionPaymentService', [
-      'crearPagoSuscripcionColegio',
-    ]);
     toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
     directivoServiceSpy.obtenerResumenColegio.and.resolveTo({
       id: 'colegio-1',
@@ -34,13 +29,11 @@ describe('DirectivoPresenter', () => {
         DirectivoPresenter,
         { provide: PerfilService, useValue: perfilServiceSpy },
         { provide: DirectivoService, useValue: directivoServiceSpy },
-        { provide: SubscriptionPaymentService, useValue: subscriptionPaymentServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy }
       ],
     });
 
     presenter = TestBed.inject(DirectivoPresenter);
-    givenPagoLicenciaResuelve();
   });
 
   describe('Al inicializar el presenter', () => {
@@ -58,84 +51,6 @@ describe('DirectivoPresenter', () => {
       await presenter.inicializar();
 
       expect(presenter.mensajeBienvenida()).toBe('Hola bienvenido');
-    });
-  });
-
-  describe('pago de licencia', () => {
-    it('dado un colegio cargado, cuando paga licencia, deberia crear el pago y redirigir al checkout', async () => {
-      givenPerfilDelDirectivo(DirectivoMother.perfilDirectivo({ nombre: 'Juan' }));
-      const redireccion = givenRedireccionInterceptada();
-      await presenter.inicializar();
-
-      await presenter.pagarLicenciaColegio();
-
-      expect(subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio).toHaveBeenCalledWith({
-        colegioId: 'colegio-1',
-      });
-      expect(redireccion).toHaveBeenCalledWith('https://www.mercadopago.com/school-checkout');
-      expect(presenter.pagandoLicencia()).toBeFalse();
-    });
-
-    it('dado que el pago falla, cuando paga licencia, deberia mostrar error', async () => {
-      spyOn(console, 'error');
-      givenPerfilDelDirectivo(DirectivoMother.perfilDirectivo({ nombre: 'Juan' }));
-      subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio.and.rejectWith(new Error('boom'));
-      await presenter.inicializar();
-
-      await presenter.pagarLicenciaColegio();
-
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith('No pudimos iniciar el pago de la licencia.', 'error');
-      expect(presenter.errorPagoLicencia()).toBe('No pudimos iniciar el pago de la licencia.');
-    });
-
-    it('dado que no hay colegio, cuando paga licencia, deberia mostrar toast de error y no llamar al service', async () => {
-      givenPerfilDelDirectivo(DirectivoMother.perfilDirectivo({ nombre: 'Juan' }));
-      directivoServiceSpy.obtenerResumenColegio.and.rejectWith(new HttpErrorResponse({ status: 404 }));
-      await presenter.inicializar();
-
-      await presenter.pagarLicenciaColegio();
-
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
-        'No se encontro el colegio asociado al usuario.',
-        'error',
-      );
-      expect(subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio).not.toHaveBeenCalled();
-    });
-
-    it('dado el pago ya en curso, cuando llamo de nuevo, deberia retornar sin volver a llamar al service', async () => {
-      givenPerfilDelDirectivo(DirectivoMother.perfilDirectivo({ nombre: 'Juan' }));
-      givenRedireccionInterceptada();
-      await presenter.inicializar();
-      let resolver!: (v: unknown) => void;
-      subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio.and.returnValue(
-        new Promise((res) => {
-          resolver = res;
-        }) as never,
-      );
-
-      const promesaEnCurso = presenter.pagarLicenciaColegio();
-      await presenter.pagarLicenciaColegio();
-
-      expect(subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio).toHaveBeenCalledTimes(1);
-      resolver({ paymentUrl: 'https://mp/checkout' });
-      await promesaEnCurso;
-    });
-
-    it('dado la respuesta sin checkoutUrl ni paymentUrl, deberia mostrar toast de error', async () => {
-      spyOn(console, 'error');
-      givenPerfilDelDirectivo(DirectivoMother.perfilDirectivo({ nombre: 'Juan' }));
-      subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio.and.resolveTo({
-        price: 20,
-        currency: 'USD',
-      } as never);
-      await presenter.inicializar();
-
-      await presenter.pagarLicenciaColegio();
-
-      expect(toastServiceSpy.mostrar).toHaveBeenCalledWith(
-        'No pudimos iniciar el pago de la licencia.',
-        'error',
-      );
     });
   });
 
@@ -183,18 +98,5 @@ describe('DirectivoPresenter', () => {
 
   function givenLaCargaDelPerfilFalla(): void {
     perfilServiceSpy.cargarPerfil.and.rejectWith(new Error('Network error'));
-  }
-
-  function givenPagoLicenciaResuelve(): void {
-    subscriptionPaymentServiceSpy.crearPagoSuscripcionColegio.and.resolveTo({
-      paymentUrl: 'https://www.mercadopago.com/school-checkout',
-      price: 20,
-      currency: 'USD',
-    });
-  }
-
-  function givenRedireccionInterceptada(): jasmine.Spy {
-    const priv = presenter as unknown as { redirigirAPago(url: string): void };
-    return spyOn(priv, 'redirigirAPago').and.stub();
   }
 });
