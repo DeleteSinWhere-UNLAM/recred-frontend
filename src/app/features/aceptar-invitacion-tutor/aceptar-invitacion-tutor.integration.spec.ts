@@ -125,7 +125,7 @@ describe('AceptarInvitacionTutor Integration', () => {
     whenCompletoCampo('input[autocomplete="username"]', 'arruaclotilde');
     await whenHagoClickEn('.btn--primary');
 
-    thenElDomContieneTexto('Te enviamos usuario y contrasena temporal');
+    thenElDomContieneTexto('Te enviamos usuario y contraseña temporal');
     expect(servicioInvitaciones.prepararCuenta).toHaveBeenCalledWith('abc123', 'arruaclotilde');
     expect(tokenStorage.guardar).toHaveBeenCalledWith('abc123');
     expect(servicioAuth.login).not.toHaveBeenCalled();
