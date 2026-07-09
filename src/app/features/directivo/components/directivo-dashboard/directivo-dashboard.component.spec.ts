@@ -107,19 +107,22 @@ describe('DirectivoDashboardComponent', () => {
 
   describe('modal de vendedor', () => {
     const vendedorX = { id: 'v1', nombre: 'Juan', apellido: 'Perez', email: 'j@j.com', cuit: '20-000' };
+    const buffetX = { id: 'b1', nombre: 'Kiosco', activo: true, vendedor: vendedorX };
 
     it('dado un vendedor, cuando lo abro, deberia setear vendedorSeleccionado', () => {
-      component.verDetalleVendedor(vendedorX);
+      component.verDetalleVendedor(vendedorX, buffetX);
 
       expect(component.vendedorSeleccionado()).toEqual(vendedorX);
+      expect(component.buffetSeleccionado()).toEqual(buffetX);
     });
 
     it('dado el modal abierto, cuando cierro, deberia limpiar vendedorSeleccionado', () => {
-      component.verDetalleVendedor(vendedorX);
+      component.verDetalleVendedor(vendedorX, buffetX);
 
       component.cerrarModal();
 
       expect(component.vendedorSeleccionado()).toBeNull();
+      expect(component.buffetSeleccionado()).toBeNull();
     });
   });
 
