@@ -14,9 +14,6 @@ class DashboardStubComponent {
   @Input() data: unknown;
   @Input() loading: unknown;
   @Input() error: unknown;
-  @Input() pagandoLicencia: unknown;
-  @Input() errorPagoLicencia: unknown;
-  @Output() pagarLicencia = new EventEmitter<void>();
 }
 
 describe('DirectivoPage', () => {
@@ -27,13 +24,11 @@ describe('DirectivoPage', () => {
 
   beforeEach(async () => {
 
-    presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar', 'pagarLicenciaColegio'], {
+    presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar'], {
       mensajeBienvenida: signal('Cargando...'),
       schoolOverview: signal(null),
       loading: signal(false),
-      error: signal(null),
-      pagandoLicencia: signal(false),
-      errorPagoLicencia: signal(null)
+      error: signal(null)
     });
     authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
 
