@@ -49,6 +49,30 @@ describe('AuthService', () => {
 
       expect(servicioPerfil.limpiar).not.toHaveBeenCalled();
     });
+
+    it('dado que no hay sesion, cuando hago login, deberia limpiar el perfil antes de redirigir', async () => {
+      givenSesionAutenticada(false);
+
+      try {
+        await service.login();
+      } catch {
+        /* noop */
+      }
+
+      expect(servicioPerfil.limpiar).toHaveBeenCalled();
+    });
+  });
+
+  describe('logout', () => {
+    it('cuando llamo logout, deberia limpiar el perfil en el finally', async () => {
+      try {
+        await service.logout();
+      } catch {
+        /* noop */
+      }
+
+      expect(servicioPerfil.limpiar).toHaveBeenCalled();
+    });
   });
 
   describe('esperarAutenticacion', () => {

@@ -220,12 +220,38 @@ describe('InventarioRealtimeService', () => {
       whenDisparoNotifyRefresh(EventoInventarioMother.crearRefresh());
       expect(onRefresh).not.toHaveBeenCalled();
     });
+
+    it('dado una conexion activa, cuando llamo disconnect, deberia abortar el controller compartido y quedar disconnected', () => {
+      whenConectoAlBuffet('buffet-1', { onRefresh: jasmine.createSpy() });
+      interno.sharedAbortController = new AbortController();
+      const abortSpy = spyOn(interno.sharedAbortController, 'abort').and.callThrough();
+
+      whenLlamoDisconnect();
+
+      expect(abortSpy).toHaveBeenCalled();
+      expect(interno.sharedAbortController).toBeNull();
+      expect(interno.status).toBe('disconnected');
+    });
   });
 
   describe('recordRefetch', () => {
     it('dado el service, cuando llamo recordRefetch, no deberia romper', () => {
       expect(() => service.recordRefetch('inventario')).not.toThrow();
     });
+
+    it('dado environment.production true, recordRefetch no deberia acumular ni programar timeout', fakeAsync(() => {
+      const infoSpy = spyOn(console, 'info');
+      const original = environment.production;
+      environment.production = true;
+
+      try {
+        service.recordRefetch('panel');
+        tick(60000);
+        expect(infoSpy).not.toHaveBeenCalled();
+      } finally {
+        environment.production = original;
+      }
+    }));
   });
 
   describe('metricas por ventana', () => {

@@ -104,6 +104,55 @@ describe('FavoritosAlumnoPage', () => {
       expect(component.favoritos()).toEqual([]);
       expect(component.cargando()).toBeFalse();
     });
+
+    it('dado que getFavoritos devuelve null, deberia manejarlo como lista vacia', () => {
+      favoritosService.getFavoritos.and.returnValue(of(null as unknown as Producto[]));
+
+      fixture.detectChanges();
+
+      expect(component.favoritos()).toEqual([]);
+      expect(component.cargando()).toBeFalse();
+    });
+
+    it('dado que el buffet no se puede obtener, deberia usar solo la imagen del favorito', () => {
+      const favorito = ProductoMother.crear({ imagen: 'https://cdn/original.png' });
+      favoritosService.getFavoritos.and.returnValue(of([favorito]));
+      buffetService.obtenerBuffetDelAlumno.and.returnValue(throwError(() => new Error('boom')) as never);
+
+      fixture.detectChanges();
+
+      expect(component.favoritos()[0].imagen).toBe('https://cdn/original.png');
+    });
+
+    it('dado un favorito sin imagen y buffet sin match, imagen deberia ser string vacio', () => {
+      const favorito = ProductoMother.crear({ id: 'p-1', imagen: '' });
+      favoritosService.getFavoritos.and.returnValue(of([favorito]));
+      buffetService.getProductosDelBuffet.and.returnValue(of([]));
+
+      fixture.detectChanges();
+
+      expect(component.favoritos()[0].imagen).toBe('');
+    });
+
+    it('dado un producto en el buffet sin imagen, no deberia entrar al mapa (branch del filter)', () => {
+      const favorito = ProductoMother.crear({ id: 'p-1', imagen: 'https://original.png' });
+      const buffetSinImagen = ProductoMother.crear({ id: 'p-1', imagen: '' });
+      favoritosService.getFavoritos.and.returnValue(of([favorito]));
+      buffetService.getProductosDelBuffet.and.returnValue(of([buffetSinImagen]));
+
+      fixture.detectChanges();
+
+      expect(component.favoritos()[0].imagen).toBe('https://original.png');
+    });
+
+    it('dado un alumnoId que no esta en la lista de alumnos, el alumno deberia quedar null', () => {
+      alumnoIdSignal.set('alumno-desconocido');
+      alumnosSignal.set([AlumnoMother.crear({ id: 'otro' })]);
+
+      fixture.detectChanges();
+
+      expect(component.alumno()).toBeNull();
+    });
   });
 
   describe('nombreAlumno', () => {

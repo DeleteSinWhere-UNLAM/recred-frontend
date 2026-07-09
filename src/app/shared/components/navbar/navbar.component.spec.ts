@@ -24,14 +24,18 @@ interface NavbarProtegido {
   menuNotifAbierto: ReturnType<typeof signal<boolean>>;
   menuKiosqueroAbierto: ReturnType<typeof signal<boolean>>;
   menuBilleteraAbierto: ReturnType<typeof signal<boolean>>;
+  menuMobileAbierto: ReturnType<typeof signal<boolean>>;
   toggleTema: () => void;
   irAlCarrito: () => void;
   irAMovimientos: () => void;
   irAInicio: (event: Event) => void;
   toggleMenu: () => void;
+  toggleMenuMobile: () => void;
   toggleMenuBilletera: () => void;
   toggleNotificaciones: () => void;
+  marcarTodasComoLeidas: () => void;
   clickEnNotificacion: (notif: Notificacion) => void;
+  comprarSugerencia: (event: Event, notif: Notificacion) => Promise<void>;
   toggleMenuKiosquero: () => void;
   irARecomendacionesEstacionales: () => void;
   irAPanelControl: (event?: Event) => void;
@@ -41,6 +45,7 @@ interface NavbarProtegido {
   irABilletera: () => void;
   irABilleteraDeHijo: (alumnoId: string) => void;
   irAPremium: () => void;
+  irAAgregarHijo: () => void;
   cerrarSesion: () => Promise<void>;
   onDocumentClick: (event: MouseEvent) => void;
   onEscape: () => void;
@@ -91,7 +96,7 @@ describe('NavbarComponent', () => {
 
     servicioCarrito = jasmine.createSpyObj<CarritoService>(
       'CarritoService',
-      [],
+      ['agregar'],
       { cantidadTotal: cartCountSignal.asReadonly() },
     );
     servicioUsuario = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['homeUrl'], {
@@ -103,7 +108,7 @@ describe('NavbarComponent', () => {
     servicioUsuario.homeUrl.and.returnValue('/tutor');
     servicioAlumnos = jasmine.createSpyObj<AlumnosService>(
       'AlumnosService',
-      ['asegurarCargados'],
+      ['asegurarCargados', 'getAlumnoById'],
       { alumnos: alumnosSignal.asReadonly() },
     );
     servicioAlumnos.asegurarCargados.and.resolveTo([]);
@@ -112,7 +117,7 @@ describe('NavbarComponent', () => {
     (servicioPerfil.rol as jasmine.Spy).and.callFake(() => perfilSignal()?.rol ?? null);
     servicioNotif = jasmine.createSpyObj<NotificacionesService>(
       'NotificacionesService',
-      ['obtenerNotificaciones'],
+      ['obtenerNotificaciones', 'marcarTodasComoLeidas', 'marcarComoLeida'],
       {
         notificaciones: notificacionesSignal.asReadonly(),
         cantidad: notifCantidadSignal.asReadonly(),
@@ -514,6 +519,235 @@ describe('NavbarComponent', () => {
       interno.onEscape();
 
       expect(interno.menuAbierto()).toBeFalse();
+    });
+  });
+
+  describe('toggleMenuMobile', () => {
+    it('dado el menu mobile cerrado, cuando lo abro, deberia cerrar los otros menus', () => {
+      interno.menuAbierto.set(true);
+      interno.menuNotifAbierto.set(true);
+      interno.menuKiosqueroAbierto.set(true);
+
+      interno.toggleMenuMobile();
+
+      expect(interno.menuMobileAbierto()).toBeTrue();
+      expect(interno.menuAbierto()).toBeFalse();
+      expect(interno.menuNotifAbierto()).toBeFalse();
+      expect(interno.menuKiosqueroAbierto()).toBeFalse();
+    });
+
+    it('dado el menu mobile abierto, cuando lo cierro, no deberia tocar otros menus', () => {
+      interno.toggleMenuMobile();
+      interno.menuAbierto.set(true);
+
+      interno.toggleMenuMobile();
+
+      expect(interno.menuMobileAbierto()).toBeFalse();
+      expect(interno.menuAbierto()).toBeTrue();
+    });
+  });
+
+  describe('marcarTodasComoLeidas', () => {
+    it('deberia delegar al servicio de notificaciones', () => {
+      interno.marcarTodasComoLeidas();
+
+      expect(servicioNotif.marcarTodasComoLeidas).toHaveBeenCalled();
+    });
+  });
+
+  describe('irAAgregarHijo', () => {
+    it('deberia cerrar los menus y navegar a /crear-hijo', () => {
+      interno.menuAbierto.set(true);
+      interno.menuBilleteraAbierto.set(true);
+
+      interno.irAAgregarHijo();
+
+      expect(interno.menuAbierto()).toBeFalse();
+      expect(interno.menuBilleteraAbierto()).toBeFalse();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/crear-hijo');
+    });
+  });
+
+  describe('clickEnNotificacion - vista tutor', () => {
+    it('dado tipo ESTADO_COMPRA con alumnoId y compraId, deberia setear el contexto y navegar con id', () => {
+      interno.clickEnNotificacion({ id: 'n1', tipo: 'ESTADO_COMPRA', alumnoId: 'a1', compraId: 'c1' });
+
+      expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith('a1');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/movimientos?id=c1');
+      expect(servicioNotif.marcarComoLeida).toHaveBeenCalledWith('n1');
+    });
+
+    it('dado tipo ESTADO_COMPRA sin alumnoId, deberia limpiar el contexto', () => {
+      interno.clickEnNotificacion({ tipo: 'ESTADO_COMPRA' });
+
+      expect(servicioContexto.limpiar).toHaveBeenCalled();
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/movimientos');
+    });
+
+    it('dado tipo SALDO_BAJO con alumnoId, deberia setear contexto y navegar a /billetera', () => {
+      interno.clickEnNotificacion({ tipo: 'SALDO_BAJO', alumnoId: 'a1' });
+
+      expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith('a1');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/billetera');
+    });
+
+    it('dado tipo ALERTA_PRESUPUESTO, deberia navegar a /presupuesto', () => {
+      interno.clickEnNotificacion({ tipo: 'ALERTA_PRESUPUESTO', alumnoId: 'a1' });
+
+      expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith('a1');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/presupuesto');
+    });
+
+    it('dado tipo ALERTA_RESTRICCION, deberia navegar a /restricciones-horarias', () => {
+      interno.clickEnNotificacion({ tipo: 'ALERTA_RESTRICCION', alumnoId: 'a1' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/restricciones-horarias');
+    });
+
+    it('dado tipo SUGERENCIA_IA, deberia navegar a /preferencias-detectadas', () => {
+      interno.clickEnNotificacion({ tipo: 'SUGERENCIA_IA' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/preferencias-detectadas');
+    });
+
+    it('dado tipo ALERTA_PRECIO, deberia navegar a /notificaciones-precio', () => {
+      interno.clickEnNotificacion({ tipo: 'ALERTA_PRECIO' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/notificaciones-precio');
+    });
+
+    it('dado tipo AGREGAR_PRODUCTO, deberia navegar a /sugerencias-agregar', () => {
+      interno.clickEnNotificacion({ tipo: 'AGREGAR_PRODUCTO' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/sugerencias-agregar');
+    });
+
+    it('dado vista alumno y tipo desconocido, deberia navegar al fallback /alumno', () => {
+      esVistaAlumnoSignal.set(true);
+
+      interno.clickEnNotificacion({ tipo: 'DESCONOCIDO' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/alumno');
+    });
+  });
+
+  describe('clickEnNotificacion - vista kiosquero', () => {
+    beforeEach(() => {
+      givenPerfil({ rol: 'VENDEDOR' });
+    });
+
+    it('dado tipo ESTADO_COMPRA con compraId, deberia navegar a pedidos-tracking con id', () => {
+      interno.clickEnNotificacion({ tipo: 'ESTADO_COMPRA', compraId: 'c1' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/pedidos-tracking?id=c1');
+    });
+
+    it('dado tipo AGREGAR_PRODUCTO, deberia navegar a /sugerencias-agregar', () => {
+      interno.clickEnNotificacion({ tipo: 'AGREGAR_PRODUCTO' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/sugerencias-agregar');
+    });
+
+    it('dado tipo SISTEMA, deberia navegar a /admin-productos', () => {
+      interno.clickEnNotificacion({ tipo: 'SISTEMA' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/admin-productos');
+    });
+
+    it('dado tipo desconocido, deberia navegar a /kiosquero', () => {
+      interno.clickEnNotificacion({ tipo: 'DESCONOCIDO' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero');
+    });
+  });
+
+  describe('comprarSugerencia', () => {
+    const producto = { id: 'prod-1', nombre: 'Alfajor', precio: 500 } as unknown as NonNullable<Notificacion['producto']>;
+
+    it('dado sin producto, no deberia hacer nada', async () => {
+      await interno.comprarSugerencia(new Event('click'), {
+        alumnoId: 'a1',
+        sugerenciaId: 's1',
+      });
+
+      expect(servicioAlumnos.asegurarCargados).not.toHaveBeenCalled();
+    });
+
+    it('dado sin alumnoId, no deberia hacer nada', async () => {
+      await interno.comprarSugerencia(new Event('click'), {
+        producto,
+        sugerenciaId: 's1',
+      });
+
+      expect(servicioAlumnos.asegurarCargados).not.toHaveBeenCalled();
+    });
+
+    it('dado alumno no encontrado, deberia mostrar toast de error y no agregar al carrito', async () => {
+      servicioAlumnos.getAlumnoById.and.returnValue(undefined);
+
+      await interno.comprarSugerencia(new Event('click'), {
+        producto,
+        alumnoId: 'a1',
+        sugerenciaId: 's1',
+      });
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'No pudimos encontrar la información del alumno.',
+        'error',
+      );
+      expect(servicioCarrito.agregar).not.toHaveBeenCalled();
+    });
+
+    it('dado saldo suficiente, deberia agregar al carrito, setear sugerencia y navegar a /compra', async () => {
+      servicioAlumnos.getAlumnoById.and.returnValue({ id: 'a1', saldo: 1000 } as ReturnType<AlumnosService['getAlumnoById']>);
+      spyOn(router, 'navigate').and.stub();
+
+      await interno.comprarSugerencia(new Event('click'), {
+        id: 'n1',
+        producto,
+        alumnoId: 'a1',
+        sugerenciaId: 's1',
+      });
+
+      expect(servicioCarrito.agregar).toHaveBeenCalledWith(producto, 'a1', 1);
+      expect(servicioCompra.setSugerenciaPendiente).toHaveBeenCalledWith('s1');
+      expect(router.navigate).toHaveBeenCalledWith(['/compra']);
+      expect(servicioNotif.marcarComoLeida).toHaveBeenCalledWith('n1');
+    });
+
+    it('dado saldo insuficiente, deberia mostrar toast con link de mercado pago', async () => {
+      servicioAlumnos.getAlumnoById.and.returnValue({ id: 'a1', saldo: 100 } as ReturnType<AlumnosService['getAlumnoById']>);
+      servicioMercadoPago.generarLinkPago.and.resolveTo('https://mp/link');
+
+      await interno.comprarSugerencia(new Event('click'), {
+        producto,
+        alumnoId: 'a1',
+        sugerenciaId: 's1',
+      });
+
+      expect(servicioMercadoPago.generarLinkPago).toHaveBeenCalledWith('a1', 500);
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        jasmine.stringContaining('Saldo insuficiente'),
+        'error',
+        8000,
+      );
+      expect(servicioCarrito.agregar).not.toHaveBeenCalled();
+    });
+
+    it('dado un error inesperado, deberia mostrar un toast generico', async () => {
+      spyOn(console, 'error');
+      servicioAlumnos.asegurarCargados.and.rejectWith(new Error('boom'));
+
+      await interno.comprarSugerencia(new Event('click'), {
+        producto,
+        alumnoId: 'a1',
+        sugerenciaId: 's1',
+      });
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        jasmine.stringContaining('Hubo un error'),
+        'error',
+      );
     });
   });
 

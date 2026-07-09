@@ -127,6 +127,26 @@ describe('AsistenteVirtualService', () => {
     });
   });
 
+  describe('base path por rol', () => {
+    it('dado rol ADMIN, deberia usar el path /admin/asistente', async () => {
+      const promesa = whenListoSesiones('ADMIN');
+      const req = thenSeHizoGetASesiones('ADMIN');
+      req.flush([]);
+      await promesa;
+
+      expect(req.request.url).toContain('/admin/asistente');
+    });
+
+    it('dado rol DIRECTIVO_COLEGIO, deberia usar el path /directivos/me/asistente', async () => {
+      const promesa = whenListoSesiones('DIRECTIVO_COLEGIO');
+      const req = thenSeHizoGetASesiones('DIRECTIVO_COLEGIO');
+      req.flush([]);
+      await promesa;
+
+      expect(req.request.url).toContain('/directivos/me/asistente');
+    });
+  });
+
   function contextoPara(rol: RolUsuario): ContextoAsistente {
     return { rol };
   }

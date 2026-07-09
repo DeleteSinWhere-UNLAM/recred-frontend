@@ -157,6 +157,36 @@ describe('AcreditarMercadoPagoPage', () => {
     });
   });
 
+  describe('saldoFormateado', () => {
+    it('dado un alumno con saldo, deberia formatearlo en ARS', () => {
+      presenterFake.alumno.set(AlumnoMother.crear({ saldo: 2500 }));
+      whenMonto();
+
+      const salida = (component as unknown as { saldoFormateado: string }).saldoFormateado;
+
+      expect(salida).toContain('2');
+      expect(salida).toContain('500');
+    });
+
+    it('dado sin alumno, deberia formatear 0', () => {
+      presenterFake.alumno.set(undefined);
+      whenMonto();
+
+      const salida = (component as unknown as { saldoFormateado: string }).saldoFormateado;
+
+      expect(salida).toContain('0');
+    });
+
+    it('dado un alumno sin saldo definido, deberia usar 0 como fallback', () => {
+      presenterFake.alumno.set(AlumnoMother.crear({ saldo: undefined as unknown as number }));
+      whenMonto();
+
+      const salida = (component as unknown as { saldoFormateado: string }).saldoFormateado;
+
+      expect(salida).toContain('0');
+    });
+  });
+
   function crearPresenterFake(): PresenterFake {
     const spy = jasmine.createSpyObj('AcreditarMercadoPagoPresenter', [
       'init',
