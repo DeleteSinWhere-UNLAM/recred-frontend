@@ -6,13 +6,12 @@
       <p>Cargando información...</p>
     </div>
     } @else {
+    <h3 class="transferir-page__main-title">¿Cuánto querés transferir de {{ presenter.nombreCompleto() }}?</h3>
     <div class="transferir-page__grid">
 
       <section class="transferir-page__form-section">
-        <h3>¿Cuánto querés transferir de {{ presenter.nombreCompleto() }}?</h3>
         <p class="transferir-page__description">
-          Saldo actual: <strong>{{ saldoFormateado }}</strong>. Ingresá el monto, elegí a quién transferirle y confirmá
-          la operación.
+          Ingresá el monto, elegí a quién transferirle y confirmá la operación.
         </p>
 
         <form class="transferir-page__form" (submit)="onSubmit($event)">

@@ -31,6 +31,15 @@
   gap: 12px;
 }
 
+.transferir-page__main-title {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  margin: 0 0 20px 0;
+}
+
 /* Two-column layout grid */
 .transferir-page__grid {
   display: grid;
@@ -45,6 +54,7 @@
 @media (min-width: 768px) {
   .transferir-page__grid {
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
   }
 }
 
