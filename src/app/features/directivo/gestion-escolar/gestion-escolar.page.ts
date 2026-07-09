@@ -30,8 +30,6 @@ type FranjaForm = FormGroup<{
   descripcion: FormControl<string>;
   horaInicio: FormControl<string>;
   horaFin: FormControl<string>;
-  cupoMaximo: FormControl<number | null>;
-  minutosCorte: FormControl<number | null>;
 }>;
 
 type BajaPendiente =
@@ -68,8 +66,6 @@ export class GestionEscolarPage implements OnInit {
       descripcion: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
       horaInicio: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
       horaFin: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-      cupoMaximo: new FormControl<number | null>(null, { validators: [Validators.min(0)] }),
-      minutosCorte: new FormControl<number | null>(0, { validators: [Validators.min(0)] }),
     },
     { validators: [horarioValidoValidator] },
   );
@@ -132,8 +128,6 @@ export class GestionEscolarPage implements OnInit {
       descripcion: value.descripcion.trim(),
       horaInicio: this.normalizarHora(value.horaInicio),
       horaFin: this.normalizarHora(value.horaFin),
-      cupoMaximo: this.normalizarNumero(value.cupoMaximo),
-      minutosCorte: this.normalizarNumero(value.minutosCorte),
     };
     const ok = await this.presenter.guardarFranja(payload, this.franjaEditando()?.id);
     if (ok) this.cancelarEdicionFranja();
@@ -145,8 +139,6 @@ export class GestionEscolarPage implements OnInit {
       descripcion: franja.descripcion,
       horaInicio: this.horaInput(franja.horaInicio),
       horaFin: this.horaInput(franja.horaFin),
-      cupoMaximo: franja.cupoMaximo ?? null,
-      minutosCorte: franja.minutosCorte ?? 0,
     });
   }
 
@@ -156,8 +148,6 @@ export class GestionEscolarPage implements OnInit {
       descripcion: '',
       horaInicio: '',
       horaFin: '',
-      cupoMaximo: null,
-      minutosCorte: 0,
     });
   }
 
@@ -171,16 +161,6 @@ export class GestionEscolarPage implements OnInit {
 
   protected horaCorta(hora: string): string {
     return this.horaInput(hora);
-  }
-
-  protected cupoTexto(franja: FranjaHorariaColegio): string {
-    const cupo = franja.cupoMaximo ?? 0;
-    return cupo > 0 ? `${cupo} cupos` : 'Sin limite';
-  }
-
-  protected corteTexto(franja: FranjaHorariaColegio): string {
-    const minutos = franja.minutosCorte ?? 0;
-    return minutos > 0 ? `${minutos} min antes` : 'Sin corte';
   }
 
   protected accionActual(accion: string): boolean {
@@ -203,7 +183,7 @@ export class GestionEscolarPage implements OnInit {
       return `${baja.item.nivelDescripcion} - Año ${baja.item.año} - Division ${baja.item.division}`;
     }
 
-    return `${this.horaCorta(baja.item.horaInicio)} a ${this.horaCorta(baja.item.horaFin)} - ${this.cupoTexto(baja.item)} - ${this.corteTexto(baja.item)}`;
+    return `${this.horaCorta(baja.item.horaInicio)} a ${this.horaCorta(baja.item.horaFin)}`;
   }
 
   protected accionBajaPendiente(): string {
@@ -252,10 +232,6 @@ export class GestionEscolarPage implements OnInit {
     return hora.length === 5 ? `${hora}:00` : hora;
   }
 
-  private normalizarNumero(valor: number | null): number | null {
-    if (valor === null || Number.isNaN(valor)) return null;
-    return Number(valor);
-  }
 }
 
 function horarioValidoValidator(control: AbstractControl): ValidationErrors | null {
