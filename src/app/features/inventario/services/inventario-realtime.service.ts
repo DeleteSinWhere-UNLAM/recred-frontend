@@ -230,7 +230,7 @@ export class InventarioRealtimeService {
   private scheduleIdleDisconnect(): void {
     this.clearIdleDisconnect();
 
-    this.idleDisconnectTimeoutId = window.setTimeout(() => {
+    this.idleDisconnectTimeoutId = setTimeout(() => {
       if (this.subscribers.size === 0) {
         this.closeSharedConnection();
       }
@@ -242,7 +242,7 @@ export class InventarioRealtimeService {
       return;
     }
 
-    window.clearTimeout(this.idleDisconnectTimeoutId);
+    clearTimeout(this.idleDisconnectTimeoutId);
     this.idleDisconnectTimeoutId = null;
   }
 
@@ -270,14 +270,14 @@ export class InventarioRealtimeService {
     metricMap.set(key, (metricMap.get(key) ?? 0) + 1);
 
     if (metricType === 'sse' && this.sseMetricsTimeoutId === null) {
-      this.sseMetricsTimeoutId = window.setTimeout(() => {
+      this.sseMetricsTimeoutId = setTimeout(() => {
         this.logMetrics('Eventos SSE por minuto', this.sseEventCounts);
         this.sseMetricsTimeoutId = null;
       }, REALTIME_METRICS_WINDOW_MS);
     }
 
     if (metricType === 'refetch' && this.refetchMetricsTimeoutId === null) {
-      this.refetchMetricsTimeoutId = window.setTimeout(() => {
+      this.refetchMetricsTimeoutId = setTimeout(() => {
         this.logMetrics('Refetch realtime por minuto', this.refetchCounts);
         this.refetchMetricsTimeoutId = null;
       }, REALTIME_METRICS_WINDOW_MS);
