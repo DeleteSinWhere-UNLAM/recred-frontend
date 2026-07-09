@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { PromocionesPagePresenter, PromotionWithProducts } from './presenter/promociones.presenter';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { EditarPromocionModalComponent } from './components/editar-promocion-modal/editar-promocion-modal.component';
 
 @Component({
   selector: 'app-promociones-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, EditarPromocionModalComponent],
   providers: [PromocionesPagePresenter],
   templateUrl: './promociones.page.html',
   styleUrls: ['./promociones.page.css']

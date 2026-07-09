@@ -31,8 +31,6 @@ interface PresenterFake {
   puedeAgregarRegla: WritableSignal<boolean>;
   topeCompletado: WritableSignal<boolean>;
   porcentajeValido: WritableSignal<boolean>;
-  prediccion: WritableSignal<unknown>;
-  nivelAlerta: WritableSignal<string>;
   periodos: readonly Periodo[];
 }
 
@@ -223,8 +221,6 @@ describe('PresupuestoPage', () => {
       puedeAgregarRegla: signal(true),
       topeCompletado: signal(false),
       porcentajeValido: signal(true),
-      prediccion: signal<unknown>(undefined),
-      nivelAlerta: signal('ok'),
       periodos: ['DIARIO', 'SEMANAL', 'QUINCENAL', 'MENSUAL'] as const,
       totalPorcentaje: () => 0,
     }) as unknown as PresenterFake;
