@@ -11,7 +11,7 @@
       <p>Visualizá y gestioná las promociones creadas en tu kiosco.</p>
     </div>
     <div class="header-actions">
-      <button type="button" class="btn btn-primary" (click)="presenter.nuevaPromocion()">
+      <button type="button" class="btn btn-primary" (click)="openTypeModal()">
         <i class="fa-solid fa-plus"></i> Nueva Promoción
       </button>
     </div>
@@ -132,5 +132,62 @@
     </div>
     }
   </div>
+  }
+
+  @if (isModalOpen && selectedPromotion) {
+    <app-editar-promocion-modal
+      [promotion]="selectedPromotion"
+      [isOpen]="isModalOpen"
+      (closeModalEvent)="closeModal()"
+      (save)="savePromotion($event)">
+    </app-editar-promocion-modal>
+  }
+
+  @if (isTypeModalOpen) {
+    <div class="modal-overlay" (click)="closeTypeModal()" (keydown.enter)="closeTypeModal()" tabindex="0" role="button">
+      <div class="type-modal-container" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0" role="dialog">
+        <div class="type-modal-header">
+          <div class="type-header-content">
+            <h2>Crear Promoción</h2>
+            <p>¿Cómo deseas crear tu nueva promoción?</p>
+          </div>
+          <button class="type-close-btn" (click)="closeTypeModal()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        
+        <div class="type-modal-body">
+          <button class="type-option-btn" (click)="navigateTo('/recomendaciones-estacionales')">
+            <div class="type-icon-wrapper">
+              <i class="fa-solid fa-leaf"></i>
+            </div>
+            <div class="type-content-wrapper">
+              <div class="type-title-row">
+                <h3>Recomendaciones Estacionales</h3>
+              </div>
+              <p>Alta asistida usando foto y procesado automático</p>
+            </div>
+            <div class="type-arrow">
+              <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </button>
+          
+          <button class="type-option-btn" (click)="navigateTo('/kiosquero/inteligencia-comercial')">
+            <div class="type-icon-wrapper">
+              <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div class="type-content-wrapper">
+              <div class="type-title-row">
+                <h3>Impulsar Baja Rotación</h3>
+              </div>
+              <p>Sube un archivo PDF para procesar múltiples productos a la vez</p>
+            </div>
+            <div class="type-arrow">
+              <i class="fa-solid fa-chevron-right"></i>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
   }
 </main>
