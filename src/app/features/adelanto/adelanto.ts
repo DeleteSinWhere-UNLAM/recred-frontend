@@ -28,6 +28,7 @@ export class AdelantoPage {
   alumno = signal<Alumno | null>(null);
   creditoActivo = signal<SchoolCredit | null>(null);
   cargando = signal<boolean>(true);
+  procesando = signal<boolean>(false);
   
   historialSaldados = signal<SchoolCredit[]>([]);
   
@@ -112,13 +113,18 @@ export class AdelantoPage {
       return;
     }
 
+    if (this.procesando()) return;
+    this.procesando.set(true);
+
     this.microcreditosService.requestCredit(al.id, parentId, finalAmount, this.cuotas())
       .subscribe({
         next: async (res) => {
+          this.procesando.set(false);
           await this.dialogService.alert('Adelanto habilitado exitosamente por: $' + res.amount, 'Adelanto Habilitado');
           this.creditoActivo.set(res);
         },
         error: async (err) => {
+          this.procesando.set(false);
           console.error('Error HTTP:', err);
           if (err.status === 409) {
             await this.dialogService.alert('El alumno ya tiene un adelanto activo.', 'Adelanto Activo');

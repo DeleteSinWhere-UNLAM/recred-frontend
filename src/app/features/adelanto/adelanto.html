@@ -71,8 +71,8 @@
             </div>
 
             <div class="adelanto-page__actions">
-              <button (click)="confirmarMicrocredito()" class="btn-confirm">
-                Habilitar Adelanto
+              <button (click)="confirmarMicrocredito()" class="btn-confirm" [disabled]="procesando()">
+                {{ procesando() ? 'Procesando...' : 'Habilitar Adelanto' }}
               </button>
             </div>
           </div>
