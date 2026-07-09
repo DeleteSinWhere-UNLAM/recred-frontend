@@ -195,10 +195,10 @@ describe('AlumnoCardComponent', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/tutor/estadistica']);
     });
 
-    it('dado ruta /adelanto y esPremium true, deberia permitir navegar', () => {
+    it('dado ruta /adelanto y plan AVANZADO, deberia permitir navegar', () => {
       const router = TestBed.inject(Router);
       spyOn(router, 'navigate');
-      spyOnProperty(component, 'esPremium', 'get').and.returnValue(true);
+      perfilSignal.set({ ...perfilSignal()!, plan: 'AVANZADO' });
 
       component.navegar('/adelanto');
 
@@ -206,10 +206,10 @@ describe('AlumnoCardComponent', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/adelanto']);
     });
 
-    it('dado ruta /adelanto y esPremium false, no deberia permitir navegar', () => {
+    it('dado ruta /adelanto y plan INTERMEDIO, no deberia permitir navegar', () => {
       const router = TestBed.inject(Router);
       spyOn(router, 'navigate');
-      spyOnProperty(component, 'esPremium', 'get').and.returnValue(false);
+      perfilSignal.set({ ...perfilSignal()!, plan: 'INTERMEDIO' });
 
       component.navegar('/adelanto');
 
