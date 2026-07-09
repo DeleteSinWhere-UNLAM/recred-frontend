@@ -380,7 +380,6 @@
   overflow-y: auto;
 }
 
-/* Custom premium scrollbar */
 .navbar__notif-list::-webkit-scrollbar {
   width: 6px;
 }
@@ -416,11 +415,11 @@
 }
 
 .navbar__notif-item--unread {
-  background-color: #fffdeb; /* Amarillo muy claro */
+  background-color: #fffdeb;
 }
 
 .navbar__notif-item--read {
-  background-color: var(--color-superficie); /* Blanco / color superficie del tema */
+  background-color: var(--color-superficie);
 }
 
 .navbar__notif-item--unread:hover,
@@ -527,8 +526,8 @@
     min-height: auto;
     padding-top: 10px;
     padding-bottom: 10px;
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .navbar__brand,
@@ -538,8 +537,8 @@
   }
 
   .navbar__brand {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .navbar__kiosk-nav,
@@ -561,7 +560,7 @@
 
 @media (max-width: 768px) {
   .navbar__logo-text {
-    display: none; /* Hide redundant text earlier to prevent overlap */
+    display: none;
   }
 
   .navbar__actions .navbar__premium-badge {
@@ -580,7 +579,7 @@
   }
 
   .navbar:not(.navbar--kiosquero) .navbar__actions {
-    gap: 8px; /* Reduce gap on mobile to prevent overflow */
+    gap: 8px; 
   }
 
   .navbar__kiosk-link,
@@ -636,13 +635,6 @@
   }
 }
 
-/* =========================================================
-   Scope navbar kiosquero
-   - No modifica visualmente el navbar de alumno/tutor
-   - Alinea el ancho del navbar kiosquero con la home
-   ========================================================= */
-
-/* Restaurar comportamiento base para vistas que NO son kiosquero */
 .navbar:not(.navbar--kiosquero) {
   background:
     linear-gradient(135deg, rgba(58, 90, 138, 0.96), rgba(74, 111, 165, 0.98));
@@ -694,7 +686,6 @@
   display: none;
 }
 
-/* Variante kiosquero */
 .navbar--kiosquero {
   background: linear-gradient(135deg, #0c3670, #123f80);
   box-shadow: 0 12px 30px rgba(15, 52, 117, 0.22);
@@ -733,7 +724,6 @@
   justify-content: flex-start;
 }
 
-/* Mismo criterio responsive que la home */
 @media (max-width: 1280px) {
   .navbar--kiosquero .navbar__inner {
     max-width: 1180px;
@@ -746,8 +736,8 @@
     min-height: auto;
     padding-top: 10px;
     padding-bottom: 10px;
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .navbar--kiosquero .navbar__brand,
@@ -757,8 +747,8 @@
   }
 
   .navbar--kiosquero .navbar__brand {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .navbar--kiosquero .navbar__kiosk-nav,
@@ -777,7 +767,6 @@
     justify-content: flex-start;
   }
 
-  /* Evita que el responsive global afecte a no-kiosquero */
   .navbar:not(.navbar--kiosquero) .navbar__inner {
     min-height: 64px;
     height: 64px;
@@ -837,7 +826,6 @@
   }
 }
 
-/* Navbar con azul institucional anterior */
 .navbar,
 .navbar--kiosquero {
   background:
@@ -852,10 +840,6 @@
 .navbar__notif-badge {
   box-shadow: 0 0 0 2px var(--color-pizarra);
 }
-
-/* =========================================================
-   Navbar kiosquero: todos los botones con estilo "blanquito"
-   ========================================================= */
 
 .navbar--kiosquero .navbar__kiosk-link,
 .navbar--kiosquero .navbar__notif,
@@ -909,7 +893,6 @@
   transform: translateY(0);
 }
 
-/* Links internos: Pedidos / Stock / Reportes */
 .navbar--kiosquero .navbar__kiosk-link {
   display: inline-flex;
   align-items: center;
@@ -932,7 +915,6 @@
   flex: 0 0 auto;
 }
 
-/* Notificaciones y escáner más anchos */
 .navbar--kiosquero .navbar__notif--wide,
 .navbar--kiosquero .navbar__scan,
 .navbar--kiosquero .navbar__kiosk-tools {
@@ -945,13 +927,11 @@
   padding: 0 18px;
 }
 
-/* Perfil queda cuadrado, pero con el mismo estilo */
 .navbar--kiosquero .navbar__perfil {
   width: 42px;
   padding: 0;
 }
 
-/* Badge de notificaciones */
 .navbar--kiosquero .navbar__notif-badge {
   background-color: var(--color-dorado);
   color: var(--color-texto-oscuro);
@@ -1056,7 +1036,6 @@
   padding-top: 8px;
 }
 
-/* Hamburguesa Menu Mobile */
 .navbar__burger {
   display: none;
   background: none;
@@ -1073,16 +1052,16 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 514px) {
+@media (max-width: 980px) {
   .navbar__burger {
     display: block;
   }
 
-  .navbar:not(.navbar--kiosquero) .navbar__actions {
+  .navbar .navbar__actions {
     display: none;
   }
 
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open {
+  .navbar .navbar__actions.navbar__actions--open {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -1100,19 +1079,32 @@
     align-items: stretch;
     max-height: 85vh;
     overflow-y: auto;
+    z-index: 1000;
   }
 
-  /* Enlaces de texto ocupan el 100% */
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > a {
+  .navbar .navbar__actions.navbar__actions--open > a,
+  .navbar .navbar__actions.navbar__actions--open > .navbar__kiosk-tools-wrap {
     width: 100% !important;
     height: 48px !important;
+    justify-content: flex-start;
+    padding: 0 !important;
+    flex: none; 
+  }
+
+  .navbar .navbar__actions.navbar__actions--open > a {
+    padding: 0 16px !important;
+  }
+
+  .navbar .navbar__actions.navbar__actions--open > .navbar__kiosk-tools-wrap > button.navbar__kiosk-tools {
+    width: 100% !important;
+    height: 100% !important;
     justify-content: flex-start;
     padding: 0 16px !important;
   }
 
-  /* Los 3 botones finales comparten la última fila */
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > div,
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > button.navbar__cart {
+  .navbar .navbar__actions.navbar__actions--open > .navbar__perfil-wrap,
+  .navbar .navbar__actions.navbar__actions--open > .navbar__notif-wrap,
+  .navbar .navbar__actions.navbar__actions--open > button.navbar__cart {
     flex: 1;
     width: auto !important;
     height: 48px !important;
@@ -1122,28 +1114,33 @@
     align-items: center;
   }
 
-  /* Asegurar que los botones internos se estiren al 100% de sus contenedores */
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__notif,
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__perfil {
+  .navbar .navbar__actions.navbar__actions--open .navbar__notif,
+  .navbar .navbar__actions.navbar__actions--open .navbar__perfil {
     width: 100% !important;
     height: 100% !important;
     border-radius: 12px !important;
   }
 
-  /* Si un botón abre su menú, lo forzamos a ocupar el 100% para que empuje el contenido hacia abajo */
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open > div:has(.navbar__menu) {
+  .navbar .navbar__actions.navbar__actions--open > div:has(.navbar__menu) {
     flex-basis: 100% !important;
     height: auto !important;
     flex-direction: column;
     background: transparent !important;
   }
 
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .max-xl\:hidden {
+  .navbar .navbar__actions.navbar__actions--open .max-xl\\:hidden {
     display: inline-block !important;
     margin-left: 12px;
   }
 
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu {
+  /* Mostrar textos de los botones principales en mobile */
+  .navbar .navbar__actions.navbar__actions--open > a span:not(.navbar__premium-badge),
+  .navbar .navbar__actions.navbar__actions--open .navbar__kiosk-tools-wrap button.navbar__kiosk-tools span {
+    display: inline-block !important;
+    margin-left: 8px;
+  }
+
+  .navbar .navbar__actions.navbar__actions--open .navbar__menu {
     position: relative;
     top: 0;
     left: 0;
@@ -1157,13 +1154,11 @@
     background: var(--color-superficie);
   }
 
-  /* Ocultar el piquito superior del menú en la versión móvil */
-  .navbar:not(.navbar--kiosquero) .navbar__actions.navbar__actions--open .navbar__menu::before {
+  .navbar .navbar__actions.navbar__actions--open .navbar__menu::before {
     display: none;
   }
 }
 
-/* Botón Comprar en notificaciones */
 .btn-buy {
   background-color: var(--color-menta, #81b29a);
   color: white;
