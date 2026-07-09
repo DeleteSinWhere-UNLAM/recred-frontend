@@ -338,7 +338,6 @@
 .adelanto-page__history-list-container {
   flex: 1;
   position: relative;
-  min-height: 350px;
 }
 
 .adelanto-page__history-list {
