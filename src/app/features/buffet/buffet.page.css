@@ -1544,6 +1544,7 @@
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
   text-align: center;
+  container-type: inline-size;
 }
 
 .calendar-grid-header {
@@ -1558,7 +1559,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  aspect-ratio: 1;
+  height: calc((100cqw - 24px) / 7);
   border-radius: 50%;
   font-size: 12px;
   font-weight: 700;
