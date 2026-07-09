@@ -77,7 +77,7 @@ describe('InteligenciaComercial Integration', () => {
     fixture.detectChanges();
 
     const texto = fixture.nativeElement.textContent;
-    expect(texto).toContain('Diagnostico comercial');
+    expect(texto).toContain('Diagnóstico comercial');
     expect(texto).toContain('Para incorporar');
     expect(texto).toContain('$4.000');
     expect(texto).toContain('Stock inmovilizado');

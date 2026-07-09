@@ -144,4 +144,13 @@ export class ModalTablaCargaMasivaComponent implements OnChanges {
     
     return esBebida ? ['ml', 'l'] : ['g', 'kg'];
   }
+
+  downloadExample(): void {
+    const link = document.createElement("a");
+    link.href = "/CargaMasivaEjemplo.pdf";
+    link.download = "CargaMasivaEjemplo.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
