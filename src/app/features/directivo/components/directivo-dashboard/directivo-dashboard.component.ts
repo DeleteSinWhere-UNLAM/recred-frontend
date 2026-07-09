@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
-import { SchoolOverview, Vendedor } from '../../models/directivo.model';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Buffet, SchoolOverview, Vendedor } from '../../models/directivo.model';
 
 import { RouterModule } from '@angular/router';
 
@@ -17,13 +17,25 @@ export class DirectivoDashboardComponent {
   @Input() error: string | null = null;
 
   public vendedorSeleccionado = signal<Vendedor | null>(null);
+  public buffetSeleccionado = signal<Buffet | null>(null);
 
-  public verDetalleVendedor(vendedor: Vendedor): void {
+  @Output() onReenviarCredenciales = new EventEmitter<string>();
+
+  public emitirReenviarCredenciales(): void {
+    const vendedor = this.vendedorSeleccionado();
+    if (vendedor) {
+      this.onReenviarCredenciales.emit(vendedor.id);
+    }
+  }
+
+  public verDetalleVendedor(vendedor: Vendedor, buffet: Buffet): void {
     this.vendedorSeleccionado.set(vendedor);
+    this.buffetSeleccionado.set(buffet);
   }
 
   public cerrarModal(): void {
     this.vendedorSeleccionado.set(null);
+    this.buffetSeleccionado.set(null);
   }
 
   public buffetsConVendedor(): number {

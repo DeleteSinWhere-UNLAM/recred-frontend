@@ -6,6 +6,7 @@
       [data]="presenter.schoolOverview()"
       [loading]="presenter.loading()"
       [error]="presenter.error()"
+      (onReenviarCredenciales)="presenter.reenviarCredenciales($event)"
     ></app-directivo-dashboard>
   </div>
 </main>
