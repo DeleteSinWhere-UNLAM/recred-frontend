@@ -122,6 +122,7 @@ describe('Buffet Integration', () => {
       'cargarPresupuestoYConsumo',
       'getSeleccionRetiro',
       'setSeleccionRetiro',
+      'clearSeleccionRetiro',
       'cantidadDe',
       'puedeAgregar',
       'validarAgregar',
@@ -240,6 +241,14 @@ describe('Buffet Integration', () => {
     expect(root.textContent).toContain('Julián');
     expect(root.textContent).toContain('Fernando Fader');
     expect(root.textContent).toContain('25.000');
+  }));
+
+  it('dado que el colegio no tiene franjas horarias, deberia mostrar el aviso en el panel derecho', fakeAsync(() => {
+    whenMontoLaPagina();
+
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.textContent).toContain('No hay franjas horarias disponibles.');
+    expect(root.querySelectorAll('.recreo-option-btn').length).toBe(0);
   }));
 
   it('dado la pagina montada, cuando hago click en volver, deberia navegar al home del rol', fakeAsync(() => {

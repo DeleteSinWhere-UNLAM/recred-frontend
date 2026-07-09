@@ -96,7 +96,7 @@ export class AcreditarMercadoPagoPresenter {
     const alumno = this.alumnoState();
     if (!alumno) return;
 
-    if (monto <= 0) {
+    if (!Number.isFinite(monto) || monto <= 0) {
       this.toastService.mostrar('El monto debe ser mayor a 0.', 'error');
       return;
     }

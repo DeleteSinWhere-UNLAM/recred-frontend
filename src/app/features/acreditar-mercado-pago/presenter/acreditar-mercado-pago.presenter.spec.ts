@@ -193,12 +193,13 @@ describe('AcreditarMercadoPagoPresenter', () => {
       expect(servicioMercadoPago.generarLinkPago).not.toHaveBeenCalled();
     });
 
-    it('dado un monto menor o igual a 0, cuando acredito, deberia mostrar toast y no llamar al service', async () => {
+    it('dado un monto no positivo o invalido, cuando acredito, deberia mostrar toast y no llamar al service', async () => {
       givenAlumnoEncontrado(AlumnoMother.crear({ id: 'alumno-1' }));
       await presenter.init('alumno-1');
 
       await presenter.acreditar(0);
       await presenter.acreditar(-50);
+      await presenter.acreditar(Number.NaN);
 
       expect(servicioToast.mostrar).toHaveBeenCalledWith(
         'El monto debe ser mayor a 0.',

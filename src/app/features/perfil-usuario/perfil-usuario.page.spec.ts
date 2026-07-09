@@ -17,6 +17,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { ToastService } from '../../shared/services/toast.service';
 import { CropModalComponent } from './components/crop-modal/crop-modal.component';
 import { PerfilUsuarioPage } from './perfil-usuario.page';
+import { AuthService } from '../../core/auth/services/auth.service';
 
 interface WritableSignalLike<T> {
   (): T;
@@ -117,6 +118,7 @@ describe('PerfilUsuarioPage', () => {
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioPayout: jasmine.SpyObj<PayoutConfigService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioAuth: jasmine.SpyObj<AuthService>;
   let homeUrlSignal: ReturnType<typeof signal<string>>;
   let nombreNavbarSignal: ReturnType<typeof signal<string>>;
   let esVistaAlumnoSignal: ReturnType<typeof signal<boolean>>;
@@ -147,6 +149,8 @@ describe('PerfilUsuarioPage', () => {
       'guardarConfiguracion',
     ]);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+    servicioAuth = jasmine.createSpyObj<AuthService>('AuthService', ['cambiarPassword']);
+    servicioAuth.cambiarPassword.and.resolveTo();
 
     givenUsuarioLogueado(UsuarioLogueadoMother.crear());
     givenPerfilCargado(PerfilUsuarioMother.crear());
@@ -163,6 +167,7 @@ describe('PerfilUsuarioPage', () => {
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: PayoutConfigService, useValue: servicioPayout },
         { provide: ToastService, useValue: servicioToast },
+        { provide: AuthService, useValue: servicioAuth },
       ],
     })
       .overrideComponent(PerfilUsuarioPage, {
@@ -655,7 +660,238 @@ describe('PerfilUsuarioPage', () => {
       thenEstadoLicenciaColegioEs('Activa');
       thenVigenciaLicenciaColegioEs('05/08/2026');
     }));
+
+    it('dado estado PENDING, estadoLicenciaColegio deberia devolver "Pendiente"', fakeAsync(() => {
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({ role: 'DIRECTIVO_COLEGIO', estadoLicenciaColegio: 'PENDING' }));
+
+      whenMontoYAvanzo();
+
+      thenEstadoLicenciaColegioEs('Pendiente');
+    }));
+
+    it('dado estado EXPIRED, estadoLicenciaColegio deberia devolver "Vencida"', fakeAsync(() => {
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({ role: 'DIRECTIVO_COLEGIO', estadoLicenciaColegio: 'EXPIRED' }));
+
+      whenMontoYAvanzo();
+
+      thenEstadoLicenciaColegioEs('Vencida');
+    }));
+
+    it('dado estado CANCELLED, estadoLicenciaColegio deberia devolver "Cancelada"', fakeAsync(() => {
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({ role: 'DIRECTIVO_COLEGIO', estadoLicenciaColegio: 'CANCELLED' }));
+
+      whenMontoYAvanzo();
+
+      thenEstadoLicenciaColegioEs('Cancelada');
+    }));
+
+    it('dado estado no mapeado, estadoLicenciaColegio deberia devolver ese estado tal cual', fakeAsync(() => {
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({ role: 'DIRECTIVO_COLEGIO', estadoLicenciaColegio: 'EXOTICO' }));
+
+      whenMontoYAvanzo();
+
+      thenEstadoLicenciaColegioEs('EXOTICO');
+    }));
+
+    it('dado sin licencia colegio y sin fecha, restanteLicenciaColegio deberia devolver "Sin licencia registrada"', fakeAsync(() => {
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({ role: 'DIRECTIVO_COLEGIO' }));
+
+      whenMontoYAvanzo();
+
+      const priv = component as unknown as { restanteLicenciaColegio(): string };
+      expect(priv.restanteLicenciaColegio()).toBe('Sin licencia registrada');
+    }));
+
+    it('dado licencia colegio vencida ayer, restanteLicenciaColegio deberia devolver "Licencia vencida"', fakeAsync(() => {
+      const ayer = new Date(Date.now() - 86_400_000).toISOString();
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({
+        role: 'DIRECTIVO_COLEGIO',
+        fechaVencimientoLicenciaColegio: ayer,
+      }));
+
+      whenMontoYAvanzo();
+
+      const priv = component as unknown as { restanteLicenciaColegio(): string };
+      expect(priv.restanteLicenciaColegio()).toBe('Licencia vencida');
+    }));
+
+    it('dado licencia colegio que vence manana, restanteLicenciaColegio deberia devolver "Resta 1 dia"', fakeAsync(() => {
+      const manana = new Date(Date.now() + 86_400_000).toISOString();
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({
+        role: 'DIRECTIVO_COLEGIO',
+        fechaVencimientoLicenciaColegio: manana,
+      }));
+
+      whenMontoYAvanzo();
+
+      const priv = component as unknown as { restanteLicenciaColegio(): string };
+      expect(priv.restanteLicenciaColegio()).toBe('Resta 1 dia');
+    }));
+
+    it('dado licencia colegio que vence en varios dias, restanteLicenciaColegio deberia devolver el conteo pluralizado', fakeAsync(() => {
+      const enCincoDias = new Date(Date.now() + 5 * 86_400_000).toISOString();
+      givenUsuarioConRol('DIRECTIVO_COLEGIO');
+      givenPerfilCargado(PerfilUsuarioMother.crear({
+        role: 'DIRECTIVO_COLEGIO',
+        fechaVencimientoLicenciaColegio: enCincoDias,
+      }));
+
+      whenMontoYAvanzo();
+
+      const priv = component as unknown as { restanteLicenciaColegio(): string };
+      expect(priv.restanteLicenciaColegio()).toMatch(/Restan \d+ dias/);
+    }));
   });
+
+  describe('cambio de password', () => {
+    it('dado la page cargada, cuando abro el modal, deberia mostrarlo y resetear los flags', fakeAsync(() => {
+      whenMontoYAvanzo();
+
+      (component as unknown as { abrirModalPassword: () => void }).abrirModalPassword();
+
+      expect(rawSignal('mostrarModalPassword')).toBeTrue();
+      expect(rawSignal('mostrarOldPassword')).toBeFalse();
+      expect(rawSignal('mostrarNewPassword')).toBeFalse();
+      expect(rawSignal('mostrarConfirmPassword')).toBeFalse();
+    }));
+
+    it('dado el modal abierto, cuando lo cierro, deberia esconderlo y resetear el form', fakeAsync(() => {
+      whenMontoYAvanzo();
+      (component as unknown as { abrirModalPassword: () => void }).abrirModalPassword();
+      passwordForm().patchValue({ oldPassword: 'algo', newPassword: 'otra12345', confirmPassword: 'otra12345' });
+
+      (component as unknown as { cerrarModalPassword: () => void }).cerrarModalPassword();
+
+      expect(rawSignal('mostrarModalPassword')).toBeFalse();
+      expect(passwordForm().get('oldPassword')?.value ?? '').toBe('');
+    }));
+
+    it('dado el form vacio, cuando cambio la password, deberia mostrar toast de error y no llamar a auth', fakeAsync(() => {
+      whenMontoYAvanzo();
+
+      void (component as unknown as { cambiarPassword: () => Promise<void> }).cambiarPassword();
+      tick();
+
+      expect(servicioAuth.cambiarPassword).not.toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Revisá los campos del cambio de contraseña.',
+        'error',
+      );
+    }));
+
+    it('dado newPassword y confirmPassword distintas, deberia mostrar toast y no llamar a auth', fakeAsync(() => {
+      whenMontoYAvanzo();
+      passwordForm().patchValue({
+        oldPassword: 'vieja1234',
+        newPassword: 'nueva1234',
+        confirmPassword: 'otra12345',
+      });
+
+      void (component as unknown as { cambiarPassword: () => Promise<void> }).cambiarPassword();
+      tick();
+
+      expect(servicioAuth.cambiarPassword).not.toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'La nueva contraseña y la confirmación no coinciden.',
+        'error',
+      );
+    }));
+
+    it('dado un form valido, cuando cambio la password, deberia llamar a auth, mostrar toast de exito y bajar el flag de guardado', fakeAsync(() => {
+      whenMontoYAvanzo();
+      (component as unknown as { abrirModalPassword: () => void }).abrirModalPassword();
+      passwordForm().patchValue({
+        oldPassword: 'vieja1234',
+        newPassword: 'nueva12345',
+        confirmPassword: 'nueva12345',
+      });
+
+      void (component as unknown as { cambiarPassword: () => Promise<void> }).cambiarPassword();
+      tick();
+
+      expect(servicioAuth.cambiarPassword).toHaveBeenCalledWith('vieja1234', 'nueva12345');
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Contraseña cambiada exitosamente.', 'success');
+      expect(rawSignal('guardandoPassword')).toBeFalse();
+    }));
+
+    it('dado que auth.cambiarPassword falla con Error, deberia mostrar el mensaje del error', fakeAsync(() => {
+      spyOn(console, 'error');
+      servicioAuth.cambiarPassword.and.rejectWith(new Error('Contraseña actual incorrecta'));
+      whenMontoYAvanzo();
+      passwordForm().patchValue({
+        oldPassword: 'vieja1234',
+        newPassword: 'nueva12345',
+        confirmPassword: 'nueva12345',
+      });
+
+      void (component as unknown as { cambiarPassword: () => Promise<void> }).cambiarPassword();
+      tick();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Contraseña actual incorrecta', 'error');
+    }));
+
+    it('dado que auth falla con algo que no es Error, deberia mostrar un mensaje generico', fakeAsync(() => {
+      spyOn(console, 'error');
+      servicioAuth.cambiarPassword.and.rejectWith('string raro' as never);
+      whenMontoYAvanzo();
+      passwordForm().patchValue({
+        oldPassword: 'vieja1234',
+        newPassword: 'nueva12345',
+        confirmPassword: 'nueva12345',
+      });
+
+      void (component as unknown as { cambiarPassword: () => Promise<void> }).cambiarPassword();
+      tick();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Error al cambiar la contraseña. Verificá los datos.',
+        'error',
+      );
+    }));
+
+    it('dado campoPasswordInvalido con un control invalido y tocado, deberia devolver true', fakeAsync(() => {
+      whenMontoYAvanzo();
+      const oldControl = passwordForm().get('oldPassword');
+      oldControl?.markAsTouched();
+
+      const invalido = (component as unknown as {
+        campoPasswordInvalido: (c: 'oldPassword' | 'newPassword' | 'confirmPassword') => boolean;
+      }).campoPasswordInvalido('oldPassword');
+
+      expect(invalido).toBeTrue();
+    }));
+
+    it('dado guardandoPassword en curso, cuando cierro el modal, no deberia esconderlo', fakeAsync(() => {
+      whenMontoYAvanzo();
+      (component as unknown as { abrirModalPassword: () => void }).abrirModalPassword();
+      (component as unknown as { guardandoPassword: { set: (v: boolean) => void } }).guardandoPassword.set(true);
+
+      (component as unknown as { cerrarModalPassword: () => void }).cerrarModalPassword();
+
+      expect(rawSignal('mostrarModalPassword')).toBeTrue();
+    }));
+
+    it('dado guardandoPassword en curso, cuando llamo cambiarPassword de nuevo, no deberia llamar a auth', fakeAsync(() => {
+      whenMontoYAvanzo();
+      (component as unknown as { guardandoPassword: { set: (v: boolean) => void } }).guardandoPassword.set(true);
+
+      void (component as unknown as { cambiarPassword: () => Promise<void> }).cambiarPassword();
+      tick();
+
+      expect(servicioAuth.cambiarPassword).not.toHaveBeenCalled();
+    }));
+  });
+
+  function passwordForm(): FormGroup {
+    return (component as unknown as { passwordForm: FormGroup }).passwordForm;
+  }
 
   function givenUsuarioLogueado(usuario: UsuarioLogueado): void {
     servicioPerfilUsuario.obtenerUsuarioLogueado.and.resolveTo(usuario);

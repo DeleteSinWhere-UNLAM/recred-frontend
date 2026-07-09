@@ -371,8 +371,16 @@
   border: 1px solid var(--color-borde-fuerte);
   width: 90%;
   max-width: 550px;
-  padding: 24px;
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 20px;
   animation: slideInTop var(--transition-ui);
+}
+
+.modal-dialog::-webkit-scrollbar {
+  display: none;
 }
 
 .modal-dialog--confirm {
@@ -383,7 +391,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .modal-title {
@@ -407,7 +415,7 @@
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .form-group {
@@ -470,9 +478,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  border-top: 1px solid var(--color-borde);
-  padding-top: 16px;
+  margin-top: 12px;
 }
 
 .modal-btn {

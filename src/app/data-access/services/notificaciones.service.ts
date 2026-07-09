@@ -91,7 +91,6 @@ export class NotificacionesService {
   obtenerNotificaciones(): void {
     this.http.get<NotificacionesResponse>(`${environment.apiUrl}/notifications/me?size=50`).subscribe({
       next: (data) => {
-        console.log('Lista de notificaciones:', data);
         const items: NotificacionBackend[] = Array.isArray(data)
           ? data
           : (data as { notifications: NotificacionBackend[] })?.notifications || [];
@@ -148,13 +147,10 @@ export class NotificacionesService {
     if (!notificationId) return;
     this.http.put<void>(`${environment.apiUrl}/notifications/${notificationId}/already-read`, {}).subscribe({
       next: () => {
-        console.log(`Notificación ${notificationId} marcada como leída`);
-        // La eliminamos de la lista para que desaparezca
         this.eliminarNotificacionLocal(notificationId);
       },
       error: (err) => {
         console.error(`Error al marcar notificación ${notificationId} como leída:`, err);
-        // La eliminamos localmente igual para mejor UX
         this.eliminarNotificacionLocal(notificationId);
       }
     });

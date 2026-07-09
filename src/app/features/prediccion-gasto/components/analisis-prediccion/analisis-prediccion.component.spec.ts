@@ -47,16 +47,23 @@ describe('AnalisisPrediccionComponent', () => {
   });
 
   describe('analisis IA', () => {
-    it('dado analisisIa, cuando renderizo, deberia mostrar el resumen y el modelo', () => {
+    it('dado analisisIa, cuando renderizo, deberia mostrar el resumen', () => {
       givenAnalisisIa(AnalisisIaMother.crear({
         resumen: 'Estas dentro del presupuesto.',
-        modelo: 'gpt-4o-mini',
       }));
       fixture.detectChanges();
 
       const texto = textoRenderizado();
       expect(texto).toContain('Estas dentro del presupuesto');
-      expect(texto).toContain('gpt-4o-mini');
+    });
+
+    it('dado analisisIa con modelo, cuando renderizo, no deberia mostrar el nombre del modelo', () => {
+      givenAnalisisIa(AnalisisIaMother.crear({
+        modelo: 'gpt-4o-mini',
+      }));
+      fixture.detectChanges();
+
+      expect(textoRenderizado()).not.toContain('gpt-4o-mini');
     });
 
     it('dado alertas en el analisis, cuando renderizo, deberia renderizar el bloque "Alertas" con cada item', () => {

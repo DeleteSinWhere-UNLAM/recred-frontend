@@ -1609,6 +1609,26 @@
   gap: 8px;
 }
 
+.recreos-empty-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: var(--color-superficie);
+  border: 1px dashed var(--color-borde-fuerte);
+  border-radius: 12px;
+  color: var(--color-texto-claro);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.recreos-empty-state i {
+  color: var(--color-pizarra);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
 .recreo-option-btn {
   display: flex;
   flex-direction: column;
@@ -3314,4 +3334,46 @@
   transform: translateY(100%);
   opacity: 0;
   pointer-events: none;
+}
+
+/* FAB Scroll Bottom Button */
+.buffet__scroll-fab {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 99;
+  transition: all var(--transition-ui);
+}
+
+.buffet__scroll-fab:hover {
+  transform: translateY(-2px);
+  background-color: var(--color-pizarra-dark);
+}
+
+@media (min-width: 992px) {
+  .buffet__scroll-fab {
+    display: none !important;
+  }
+}
+
+:host:has(.buffet__footer-cart:not(.footer-hidden)) .buffet__scroll-fab {
+  bottom: 110px;
+}
+
+@media (max-width: 992px) {
+  .buffet__sidebar {
+    padding-bottom: 110px;
+  }
 }

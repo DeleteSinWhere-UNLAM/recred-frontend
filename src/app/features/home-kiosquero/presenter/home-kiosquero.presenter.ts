@@ -1054,6 +1054,14 @@ export class HomeKiosqueroPresenter {
       return;
     }
 
+    const licencia = perfil?.estadoLicenciaColegio;
+    if (licencia && licencia !== 'ACTIVA' && licencia !== 'EN_GRACIA') {
+      this.errorMessageState.set(
+        'El colegio asociado al buffet no cuenta con una suscripción activa.',
+      );
+      return;
+    }
+
     this.cargarPanel();
     this.connectRealtime(buffetId);
   }
@@ -1084,6 +1092,14 @@ export class HomeKiosqueroPresenter {
 
     this.selectedRangePresetState.set('TODAY');
     this.applyReportRangePreset('TODAY');
+    const licencia = perfil?.estadoLicenciaColegio;
+    if (licencia && licencia !== 'ACTIVA' && licencia !== 'EN_GRACIA') {
+      this.errorMessageState.set(
+        'El colegio asociado al buffet no cuenta con una suscripción activa.',
+      );
+      return;
+    }
+
     this.cargarPanelReportes();
     this.connectRealtime(buffetId);
   }
@@ -1233,7 +1249,7 @@ export class HomeKiosqueroPresenter {
     }
 
     this.homeKiosqueroService
-      .getPanel(buffetId, selectedDate)
+      .getPanel(buffetId, selectedDate, 'home')
       .pipe(
         finalize(() => {
           if (showLoading && requestId === this.requestSeq) {

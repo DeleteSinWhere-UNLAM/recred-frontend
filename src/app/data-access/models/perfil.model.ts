@@ -35,4 +35,5 @@ export interface Perfil {
   readonly fechaVencimientoLicenciaColegio?: string | null;
   readonly fechaVencimientoLicencia?: string | null;
   readonly fechaVencimientoSuscripcionColegio?: string | null;
+  readonly hasUsedTrial?: boolean | null;
 }

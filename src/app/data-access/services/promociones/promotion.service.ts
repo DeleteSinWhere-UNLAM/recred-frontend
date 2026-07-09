@@ -43,6 +43,16 @@ export class PromotionService {
     return this.http.post<Promotion>(this.apiUrl, payload);
   }
 
+  actualizarPromocion(id: string, promotion: Partial<Promotion>): Observable<Promotion> {
+    const buffetId = promotion.buffetId ?? this.perfilService.obtenerBuffetId() ?? '';
+    const payload = { ...promotion, buffetId };
+    return this.http.put<Promotion>(`${this.apiUrl}/${id}`, payload);
+  }
+
+  cambiarEstadoPromocion(id: string): Observable<Promotion> {
+    return this.http.patch<Promotion>(`${this.apiUrl}/${id}/toggle-status`, {});
+  }
+
   getPromotionById(id: string): Observable<Promotion> {
     return this.http.get<Promotion>(`${this.apiUrl}/${id}`);
   }

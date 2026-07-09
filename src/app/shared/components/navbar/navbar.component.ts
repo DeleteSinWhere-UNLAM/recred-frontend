@@ -139,7 +139,6 @@ export class NavbarComponent implements OnInit {
 
   protected clickEnNotificacion(notif: Notificacion): void {
     this.menuNotifAbierto.set(false);
-    console.log('Notificacion clickeada:', notif);
 
     if (notif.id) {
       this.notificacionesService.marcarComoLeida(notif.id);
@@ -150,23 +149,18 @@ export class NavbarComponent implements OnInit {
                           (typeof this.esVistaKiosquero === 'function' && this.esVistaKiosquero()) ||
                           (this.esVistaKiosquero as unknown) === true;
 
-      console.log('¿Es vista kiosquero?', esKiosquero);
 
       if (esKiosquero) {
         if (notif.tipo === 'ESTADO_COMPRA' || notif.tipo === 'RETIRO_PROGRAMADO') {
           const url = notif.compraId 
             ? `/kiosquero/pedidos-tracking?id=${notif.compraId}`
             : '/kiosquero/pedidos-tracking';
-          console.log('Navegando a (Kiosquero):', url);
           void this.router.navigateByUrl(url);
         } else if (notif.tipo === 'AGREGAR_PRODUCTO') {
-          console.log('Navegando a (Kiosquero Agregar Producto): /sugerencias-agregar');
           void this.router.navigateByUrl('/sugerencias-agregar');
         } else if (notif.tipo === 'SISTEMA') {
-          console.log('Navegando a (Kiosquero Stock): /admin-productos');
           void this.router.navigateByUrl('/admin-productos');
         } else {
-          console.log('Navegando a (Kiosquero Home): /kiosquero');
           void this.router.navigateByUrl('/kiosquero');
         }
         return;
@@ -181,7 +175,6 @@ export class NavbarComponent implements OnInit {
         const url = notif.compraId 
           ? `/movimientos?id=${notif.compraId}`
           : '/movimientos';
-        console.log('Navegando a (Tutor):', url);
         void this.router.navigateByUrl(url);
       } else if (notif.tipo === 'RESUMEN_SEMANAL') {
         void this.router.navigateByUrl('/resumen-semanal');
@@ -208,7 +201,6 @@ export class NavbarComponent implements OnInit {
         void this.router.navigateByUrl('/sugerencias-agregar');
       } else {
         const fallbackUrl = this.esVistaAlumno() ? '/alumno' : '/tutor-dashboard';
-        console.log('Navegando a fallback:', fallbackUrl);
         void this.router.navigateByUrl(fallbackUrl);
       }
     } catch (error) {
@@ -323,6 +315,12 @@ export class NavbarComponent implements OnInit {
   protected irAPremium(): void {
     this.menuAbierto.set(false);
     this.router.navigateByUrl('/suscripcion');
+  }
+
+  protected irAAgregarHijo(): void {
+    this.menuAbierto.set(false);
+    this.menuBilleteraAbierto.set(false);
+    void this.router.navigateByUrl('/crear-hijo');
   }
 
   protected planBloqueado(planRequerido: 'INTERMEDIO' | 'AVANZADO'): boolean {

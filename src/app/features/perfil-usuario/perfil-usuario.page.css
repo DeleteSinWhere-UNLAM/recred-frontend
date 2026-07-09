@@ -396,14 +396,19 @@
 }
 
 .payout-destacado {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
+  display: flex;
+  flex: 1 1 100%;
+  align-items: flex-start;
   gap: 10px;
   background-color: color-mix(in srgb, var(--color-dorado) 35%, var(--color-superficie));
   color: var(--color-pizarra);
-  padding: 6px 12px;
-  border-radius: 0; /* Sin vértices redondeados */
+  padding: 8px 12px;
+  border-radius: 8px;
+  word-break: break-word;
+}
+
+.payout-destacado i {
+  margin-top: 2px;
 }
 
 .payout-destacado i,
@@ -653,4 +658,280 @@
   box-shadow: 0 2px 5px rgba(212, 175, 55, 0.35);
   text-transform: uppercase;
 }
+
+/* ── Botón "Cambiar contraseña" en tarjeta Usuario ── */
+.perfil-usuario__datos-acciones {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-borde);
+}
+
+.perfil-usuario__boton-cambiar-password {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-borde-fuerte);
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.perfil-usuario__boton-cambiar-password:hover {
+  background-color: color-mix(in srgb, var(--color-pizarra) 6%, var(--color-superficie));
+  border-color: var(--color-pizarra);
+}
+
+.perfil-usuario__boton-cambiar-password:active {
+  transform: scale(0.98);
+}
+
+.perfil-usuario__boton-cambiar-password i {
+  font-size: 13px;
+  color: var(--color-pizarra);
+  opacity: 0.7;
+}
+
+/* ── Modal cambiar contraseña ── */
+.pw-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: pw-fade-in 0.18s ease;
+}
+
+@keyframes pw-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pw-modal__panel {
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 22px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22);
+  width: min(460px, 100%);
+  padding: 28px;
+  animation: pw-slide-up 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pw-slide-up {
+  from { transform: translateY(20px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1);       opacity: 1; }
+}
+
+.pw-modal__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.pw-modal__icono-wrapper {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-pizarra), var(--color-menta));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+}
+
+.pw-modal__titulo {
+  margin: 0 0 3px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--color-pizarra);
+}
+
+.pw-modal__subtitulo {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-texto-claro);
+}
+
+.pw-modal__cerrar {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--color-borde);
+  background-color: transparent;
+  color: var(--color-texto-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pw-modal__cerrar:hover {
+  background-color: color-mix(in srgb, var(--color-melocoton) 10%, var(--color-superficie));
+  color: var(--color-melocoton);
+  border-color: var(--color-melocoton);
+}
+
+.pw-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pw-modal__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pw-modal__label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+}
+
+.pw-modal__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-borde-fuerte);
+  border-radius: 12px;
+  background-color: var(--color-superficie);
+  transition: border-color var(--transition-ui), box-shadow var(--transition-ui);
+}
+
+.pw-modal__input-wrapper:focus-within {
+  border-color: var(--color-pizarra);
+  box-shadow: 0 0 0 4px var(--color-foco);
+}
+
+.pw-modal__input-wrapper--error {
+  border-color: var(--color-melocoton);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-melocoton) 16%, transparent);
+}
+
+.pw-modal__input {
+  flex: 1;
+  height: 46px;
+  padding: 0 44px 0 14px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-texto-oscuro);
+  font-size: 14px;
+  border-radius: 12px;
+}
+
+.pw-modal__ojo {
+  position: absolute;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-texto-claro);
+  transition: color 0.15s ease;
+  border-radius: 6px;
+}
+
+.pw-modal__ojo:hover {
+  color: var(--color-pizarra);
+}
+
+.pw-modal__error {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-melocoton);
+}
+
+.pw-modal__acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.pw-modal__btn {
+  flex: 1;
+  height: 46px;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pw-modal__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pw-modal__btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.pw-modal__btn--cancelar {
+  background-color: var(--color-superficie);
+  color: var(--color-pizarra);
+  border: 1px solid var(--color-borde);
+}
+
+.pw-modal__btn--cancelar:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-pizarra) 6%, var(--color-superficie));
+}
+
+.pw-modal__btn--confirmar {
+  background-color: var(--color-pizarra);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(74, 111, 165, 0.32);
+}
+
+.pw-modal__btn--confirmar:hover:not(:disabled) {
+  background-color: var(--color-pizarra-dark);
+  transform: translateY(-1px);
+}
+
+.pw-modal__spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: perfil-usuario-girar 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .pw-modal__acciones {
+    flex-direction: column-reverse;
+  }
+}
+
 

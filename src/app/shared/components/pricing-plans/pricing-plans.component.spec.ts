@@ -11,17 +11,21 @@ describe('PricingPlansComponent', () => {
   let fixture: ComponentFixture<PricingPlansComponent>;
   let perfilSignal: ReturnType<typeof signal<Perfil | null>>;
   let asegurarPerfilSpy: jasmine.Spy;
+  let cargarPerfilSpy: jasmine.Spy;
   let servicioSuscripcion: jasmine.SpyObj<SubscriptionPaymentService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
     perfilSignal = signal<Perfil | null>(perfilVendedor());
     asegurarPerfilSpy = jasmine.createSpy('asegurarPerfil').and.resolveTo(perfilVendedor());
+    cargarPerfilSpy = jasmine.createSpy('cargarPerfil').and.resolveTo();
     servicioSuscripcion = jasmine.createSpyObj<SubscriptionPaymentService>('SubscriptionPaymentService', [
       'crearSuscripcionUsuario',
+      'activarPruebaUsuario',
     ]);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
     givenCrearSuscripcionResuelve();
+    servicioSuscripcion.activarPruebaUsuario.and.resolveTo({});
 
     await TestBed.configureTestingModule({
       imports: [PricingPlansComponent],
@@ -31,6 +35,7 @@ describe('PricingPlansComponent', () => {
           useValue: {
             perfil: perfilSignal.asReadonly(),
             asegurarPerfil: asegurarPerfilSpy,
+            cargarPerfil: cargarPerfilSpy,
           },
         },
         { provide: SubscriptionPaymentService, useValue: servicioSuscripcion },
@@ -302,6 +307,83 @@ describe('PricingPlansComponent', () => {
       checkbox.dispatchEvent(new Event('change'));
 
       expect(spyToggle).toHaveBeenCalled();
+    });
+  });
+
+  describe('diasRestantes', () => {
+    beforeEach(() => {
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date('2026-07-09T00:00:00Z'));
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('deberia calcular 0 si no hay fecha de vencimiento', () => {
+      perfilSignal.set(perfilVendedor({ fechaVencimientoPlan: null }));
+      expect(component.diasRestantes()).toBe(0);
+    });
+
+    it('deberia calcular los dias restantes correctamente si la fecha es futura', () => {
+      perfilSignal.set(perfilVendedor({ fechaVencimientoPlan: '2026-07-19T00:00:00Z' }));
+      expect(component.diasRestantes()).toBe(10);
+    });
+
+    it('deberia retornar 0 si la fecha ya paso', () => {
+      perfilSignal.set(perfilVendedor({ fechaVencimientoPlan: '2026-07-01T00:00:00Z' }));
+      expect(component.diasRestantes()).toBe(0);
+    });
+  });
+
+  describe('esElegibleParaTrial', () => {
+    it('deberia retornar false si el plan no es avanzado', () => {
+      expect(component.esElegibleParaTrial('basico')).toBeFalse();
+      expect(component.esElegibleParaTrial('intermedio')).toBeFalse();
+    });
+
+    it('deberia retornar false si ya tiene el plan avanzado', () => {
+      givenPerfilPlan('AVANZADO');
+      expect(component.esElegibleParaTrial('avanzado')).toBeFalse();
+    });
+
+    it('deberia retornar false si el plan actual es intermedio aunque sea avanzado el parametro', () => {
+      givenPerfilPlan('INTERMEDIO');
+      expect(component.esElegibleParaTrial('avanzado')).toBeFalse();
+    });
+
+    it('deberia retornar true si el plan es GRATUITO y no ha usado el trial', () => {
+      perfilSignal.set(perfilVendedor({ plan: 'GRATUITO', hasUsedTrial: false }));
+      expect(component.esElegibleParaTrial('avanzado')).toBeTrue();
+    });
+
+    it('deberia retornar false si el plan es GRATUITO pero ya uso el trial', () => {
+      perfilSignal.set(perfilVendedor({ plan: 'GRATUITO', hasUsedTrial: true }));
+      expect(component.esElegibleParaTrial('avanzado')).toBeFalse();
+    });
+  });
+
+  describe('selectTrial', () => {
+    it('cuando se activa exitosamente, debe llamar al backend, refrescar perfil y mostrar toast de exito', async () => {
+      servicioSuscripcion.activarPruebaUsuario.and.resolveTo({});
+
+      await component.selectTrial('avanzado');
+
+      expect(servicioSuscripcion.activarPruebaUsuario).toHaveBeenCalledWith({
+        usuarioId: 'usuario-1',
+        plan: 'AVANZADO',
+      });
+      expect(cargarPerfilSpy).toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('¡Periodo de prueba de 1 mes activado!', 'success');
+    });
+
+    it('cuando falla, debe capturar el error, setear errorCompra y mostrar toast de error', async () => {
+      servicioSuscripcion.activarPruebaUsuario.and.rejectWith(new Error('Backend error'));
+
+      await component.selectTrial('avanzado');
+
+      expect(component.errorCompra()).toBe('No pudimos activar el periodo de prueba. Intenta de nuevo.');
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('No pudimos activar el periodo de prueba.', 'error');
     });
   });
 

@@ -11,15 +11,21 @@ export interface DashboardRangeParams {
   to: string;
 }
 
+export type DashboardView = 'home' | 'dashboard';
+
 @Injectable({ providedIn: 'root' })
 export class HomeKiosqueroService {
   private readonly http = inject(HttpClient);
   private readonly kiosquerosUrl = `${environment.apiUrl}/kiosqueros`;
 
-  getPanel(buffetId: string, date?: string): Observable<PanelKiosquero> {
+  getPanel(
+    buffetId: string,
+    date?: string,
+    view?: DashboardView,
+  ): Observable<PanelKiosquero> {
     return this.http.get<PanelKiosquero>(
       `${this.kiosquerosUrl}/${buffetId}/dashboard`,
-      { params: this.buildDateParams(date) },
+      { params: this.buildDateParams(date, view) },
     );
   }
 
@@ -46,10 +52,18 @@ export class HomeKiosqueroService {
     return 'Carlos';
   }
 
-  private buildDateParams(date?: string): HttpParams {
-    const params = new HttpParams();
+  private buildDateParams(date?: string, view?: DashboardView): HttpParams {
+    let params = new HttpParams();
 
-    return date ? params.set('date', date) : params;
+    if (date) {
+      params = params.set('date', date);
+    }
+
+    if (view) {
+      params = params.set('view', view);
+    }
+
+    return params;
   }
 
   private buildRangeParams(range: DashboardRangeParams): HttpParams {

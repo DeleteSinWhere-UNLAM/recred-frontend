@@ -208,6 +208,40 @@ describe('OrdenAlumnoCardComponent', () => {
     });
   });
 
+  describe('branches sin alumno', () => {
+    it('dado un alumno sin urlFotoPerfil, urlFotoPerfil deberia devolver null', () => {
+      component.alumno = AlumnoMother.crear({ nombre: 'X', apellido: 'Y', urlFotoPerfil: null });
+      whenMonto();
+
+      expect(component.urlFotoPerfil()).toBeNull();
+    });
+
+    it('dado un alumno vacio (sin nombre/apellido), iniciales deberia devolver string vacio', () => {
+      component.alumno = AlumnoMother.crear({ nombre: '', apellido: '' });
+      esVistaAlumnoSignal.set(true);
+      whenMonto();
+
+      expect(component.iniciales()).toBe('');
+    });
+
+    it('dado un alumno con solo primer caracter del apellido undefined, iniciales deberia manejarlo', () => {
+      component.alumno = AlumnoMother.crear({ nombre: 'A', apellido: '' });
+      esVistaAlumnoSignal.set(true);
+      whenMonto();
+
+      expect(component.iniciales()).toBe('A');
+    });
+  });
+
+  describe('recreoLabel fallback', () => {
+    it('dado un recreo con valor desconocido, recreoLabel deberia devolverlo tal cual', () => {
+      component.recreo = 'DESCONOCIDO' as never;
+      whenMonto();
+
+      expect(component.recreoLabel()).toBe('DESCONOCIDO');
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }

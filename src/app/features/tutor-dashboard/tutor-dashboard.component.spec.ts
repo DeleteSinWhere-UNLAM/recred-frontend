@@ -149,7 +149,10 @@ describe('TutorDashboardComponent', () => {
     component = fixture.componentInstance;
   }
 
-  afterEach(() => localStorage.clear());
+  afterEach(() => {
+    fixture?.destroy();
+    localStorage.clear();
+  });
 
   describe('constructor', () => {
     it('dado un perfil con nombre, cuando se construye, deberia setear /tutor como home y el nombre en la navbar', async () => {

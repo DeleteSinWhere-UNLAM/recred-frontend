@@ -13,7 +13,7 @@
             Saldo actual: <strong>{{ saldoFormateado }}</strong>. Ingresá el monto y te redirigiremos a Mercado Pago para completar la operación.
           </p>
 
-          <form class="acreditar-page__form" (submit)="onSubmit($event)">
+          <form class="acreditar-page__form" (submit)="onSubmit($event)" novalidate>
             <div class="acreditar-page__input-group">
               <label for="monto">Monto a cargar ($)</label>
               <div class="acreditar-page__input-wrapper">
@@ -22,11 +22,10 @@
                   type="number" 
                   id="monto" 
                   name="monto" 
-                  min="1" 
+                  min="100" 
                   step="100"
                   placeholder="Ej: 5000"
                   (input)="onMontoChange($event)"
-                  required
                 />
                 <div class="acreditar-page__mp-logo" aria-hidden="true">
                   <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="acreditar-page__mp-svg">

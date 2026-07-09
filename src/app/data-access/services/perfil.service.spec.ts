@@ -198,6 +198,16 @@ describe('PerfilService', () => {
 
       expect(service.getPerfil()?.fechaVencimientoPlan).toBeNull();
     });
+
+    it('dado hasUsedTrial en el update, cuando actualizo, deberia persistir la propiedad hasUsedTrial', async () => {
+      const service = whenInstancioElService();
+      const perfil = PerfilMother.crear({ id: 'p1', hasUsedTrial: false });
+      await whenCargoElPerfilYElBackDevuelve(service, perfil);
+
+      service.actualizarDatosUsuario({ hasUsedTrial: true });
+
+      expect(service.getPerfil()?.hasUsedTrial).toBeTrue();
+    });
   });
 
   describe('obtenerBuffetId', () => {

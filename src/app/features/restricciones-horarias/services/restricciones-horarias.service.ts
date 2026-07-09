@@ -11,14 +11,11 @@ export class RestriccionesHorariasService {
 
   getRestriccionesPorAlumno(alumnoId: string): Promise<RestriccionHoraria[]> {
     const url = `${this.base}/student/${alumnoId}`;
-    console.log('Obteniendo restricciones desde:', url);
     return firstValueFrom(
       this.http.get<RestriccionHoraria[]>(url),
     ).then(data => {
-      console.log('Restricciones recibidas (RAW):', data);
       return data;
     }).catch(err => {
-      console.error('Error al obtener restricciones del alumno:', err);
       throw err;
     });
   }

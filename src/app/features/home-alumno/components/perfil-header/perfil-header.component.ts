@@ -35,6 +35,10 @@ export class PerfilHeaderComponent {
 
   readonly menuAbierto = signal(false);
 
+  get nombreLargo(): boolean {
+    return this.nombreCompleto.length > 20;
+  }
+
   readonly opciones: readonly OpcionFondo[] = [
     { id: 'nubes',       label: 'Nubes',         preview: '/nube.png',        previewEsImagen: true },
     { id: 'minecraft',   label: 'Minecraft',     preview: '/creeper.png',     previewEsImagen: true },

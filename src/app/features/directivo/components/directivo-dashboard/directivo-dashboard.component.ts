@@ -29,6 +29,14 @@ export class DirectivoDashboardComponent {
     this.vendedorSeleccionado.set(null);
   }
 
+  public buffetsConVendedor(): number {
+    return this.data?.buffets.filter((buffet) => !!buffet.vendedor).length ?? 0;
+  }
+
+  public buffetsSinVendedor(): number {
+    return this.data?.buffets.filter((buffet) => !buffet.vendedor).length ?? 0;
+  }
+
   public iniciarPagoLicencia(): void {
     if (this.pagandoLicencia) return;
     this.pagarLicencia.emit();
@@ -121,6 +129,7 @@ export class DirectivoDashboardComponent {
     if (normalizado === 'PENDIENTE' || normalizado === 'PENDING') return 'Pendiente';
     if (normalizado === 'VENCIDA' || normalizado === 'EXPIRED') return 'Vencida';
     if (normalizado === 'CANCELADA' || normalizado === 'CANCELLED') return 'Cancelada';
+    if (normalizado === 'SIN_LICENCIA' || normalizado === 'NO_LICENSE') return 'Sin licencia';
     return estado;
   }
 }

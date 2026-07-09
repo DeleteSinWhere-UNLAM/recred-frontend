@@ -71,7 +71,7 @@ npm run build -- --configuration=production
 
 ## 💡 Comando rápido "Todo en Uno"
 
-Ejecuta el linter, los tests y el build en secuencia. Si alguno falla, el proceso se detendrá para que puedas corregirlo antes de subirlo.
+Ejecuta el linter, los tests y el build. Si alguno falla, el proceso se detendrá para que puedas corregirlo antes de subirlo.
 
 
 ```bash

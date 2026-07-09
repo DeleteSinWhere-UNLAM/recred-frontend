@@ -57,4 +57,16 @@ export class SubscriptionPaymentService {
       ),
     );
   }
+
+  activarPruebaUsuario(request: {
+    usuarioId: string;
+    plan: PlanSuscripcionUsuario;
+  }): Promise<unknown> {
+    return firstValueFrom(
+      this.http.post<unknown>(
+        `${this.apiBase}/payments/subscriptions/user/trial`,
+        request,
+      ),
+    );
+  }
 }

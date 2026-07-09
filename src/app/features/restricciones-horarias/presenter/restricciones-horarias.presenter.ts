@@ -100,7 +100,6 @@ export class RestriccionesHorariasPresenter {
           this.nutricionalesService.getRestriccionesAlumno(alumnoId)
         ]);
 
-        console.log('Datos cargados (RAW):', restricciones);
         this.franjasState.set(franjas);
         this.restriccionesState.set(restricciones || []);
         this.draftRestricciones.set(JSON.parse(JSON.stringify(restricciones || [])));

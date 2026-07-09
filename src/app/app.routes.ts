@@ -57,6 +57,18 @@ export const routes: Routes = [
           import('./features/directivo/invitar-tutor/invitar-tutor.page').then((m) => m.InvitarTutorPage),
       },
       {
+        path: 'grados',
+        data: { tab: 'grados' },
+        loadComponent: () =>
+          import('./features/directivo/gestion-escolar/gestion-escolar.page').then((m) => m.GestionEscolarPage),
+      },
+      {
+        path: 'franjas-horarias',
+        data: { tab: 'franjas' },
+        loadComponent: () =>
+          import('./features/directivo/gestion-escolar/gestion-escolar.page').then((m) => m.GestionEscolarPage),
+      },
+      {
         path: 'importar-tutores',
         loadComponent: () =>
           import('./features/directivo/importar-tutores/importar-tutores.page').then((m) => m.ImportarTutoresPage),

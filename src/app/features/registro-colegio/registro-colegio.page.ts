@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { RegistroColegioPresenter } from './presenter/registro-colegio.presenter';
 import { SchoolRegistrationPayload } from './models/registro-colegio.model';
 
@@ -16,6 +17,7 @@ import { SchoolRegistrationPayload } from './models/registro-colegio.model';
 export class RegistroColegioPage implements OnInit {
   readonly presenter = inject(RegistroColegioPresenter);
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   form!: FormGroup;
 
@@ -54,5 +56,9 @@ export class RegistroColegioPage implements OnInit {
     };
 
     this.presenter.enviarSolicitud(payload);
+  }
+
+  volver(): void {
+    void this.router.navigateByUrl('/');
   }
 }

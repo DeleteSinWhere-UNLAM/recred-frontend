@@ -133,6 +133,53 @@ describe('PromotionService', () => {
     });
   });
 
+  describe('actualizarPromocion', () => {
+    it('dado una promocion con buffetId explicito, cuando la actualizo, deberia hacer PUT con ese buffetId', () => {
+      const cambios: Partial<Promotion> = { name: 'Nuevo nombre', buffetId: 'buffet-explicit' };
+
+      service.actualizarPromocion('promo-1', cambios).subscribe();
+
+      const req = httpMock.expectOne(URL_PROMOTION_BY_ID('promo-1'));
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual({ ...cambios, buffetId: 'buffet-explicit' });
+      expect(mockPerfilService.obtenerBuffetId).not.toHaveBeenCalled();
+      req.flush({});
+    });
+
+    it('dado una promocion sin buffetId, deberia tomarlo del perfil', () => {
+      givenBuffetIdEnPerfil('buffet-perfil');
+      const cambios: Partial<Promotion> = { discountPercentage: 30 };
+
+      service.actualizarPromocion('promo-1', cambios).subscribe();
+
+      const req = httpMock.expectOne(URL_PROMOTION_BY_ID('promo-1'));
+      expect(req.request.body).toEqual({ ...cambios, buffetId: 'buffet-perfil' });
+      req.flush({});
+    });
+
+    it('dado sin buffetId ni en promo ni en perfil, deberia mandar string vacio', () => {
+      givenBuffetIdEnPerfil(null);
+      const cambios: Partial<Promotion> = { name: 'X' };
+
+      service.actualizarPromocion('promo-1', cambios).subscribe();
+
+      const req = httpMock.expectOne(URL_PROMOTION_BY_ID('promo-1'));
+      expect((req.request.body as { buffetId: string }).buffetId).toBe('');
+      req.flush({});
+    });
+  });
+
+  describe('cambiarEstadoPromocion', () => {
+    it('dado un id, cuando cambio el estado, deberia hacer PATCH /promotions/:id/toggle-status con body vacio', () => {
+      service.cambiarEstadoPromocion('promo-1').subscribe();
+
+      const req = httpMock.expectOne(`${URL_PROMOTION_BY_ID('promo-1')}/toggle-status`);
+      expect(req.request.method).toBe('PATCH');
+      expect(req.request.body).toEqual({});
+      req.flush(PromotionMother.crear({ id: 'promo-1' }));
+    });
+  });
+
   function givenBuffetIdEnPerfil(buffetId: string | null): void {
     mockPerfilService.obtenerBuffetId.and.returnValue(buffetId);
   }

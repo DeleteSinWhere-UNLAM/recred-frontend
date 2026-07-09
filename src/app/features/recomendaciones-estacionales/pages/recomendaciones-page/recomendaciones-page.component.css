@@ -301,12 +301,27 @@
   .seasonal-page__cabecera {
     padding: 14px 16px;
     gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .seasonal-page__icono {
     width: 46px;
     height: 46px;
     font-size: 19px;
+  }
+
+  .seasonal-page__identidad {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .seasonal-page__titulo-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .seasonal-page__titulo {

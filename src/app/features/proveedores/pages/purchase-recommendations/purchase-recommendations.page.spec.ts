@@ -461,6 +461,226 @@ describe('PurchaseRecommendationsPage', () => {
     });
   });
 
+  describe('modal de alternativas', () => {
+    beforeEach(() => {
+      build();
+      whenMonto();
+    });
+
+    it('dado el modal cerrado, cuando abro para un producto, deberia setear el activo y abrirlo', () => {
+      const evento = new Event('click');
+      const stopSpy = spyOn(evento, 'stopPropagation');
+
+      component.openAlternativesModal('prod-agua', evento);
+
+      expect(stopSpy).toHaveBeenCalled();
+      expect(component.isAlternativesModalOpen()).toBeTrue();
+      expect(component.activeAlternativesProductId()).toBe('prod-agua');
+    });
+
+    it('dado el modal abierto, cuando lo cierro sin evento, deberia cerrarlo y limpiar el activo', () => {
+      component.openAlternativesModal('prod-agua', new Event('click'));
+
+      component.closeAlternativesModal();
+
+      expect(component.isAlternativesModalOpen()).toBeFalse();
+      expect(component.activeAlternativesProductId()).toBeNull();
+    });
+
+    it('dado el modal abierto, cuando cierro con click en el overlay, deberia cerrarlo', () => {
+      component.openAlternativesModal('prod-agua', new Event('click'));
+      const overlay = document.createElement('div');
+      overlay.classList.add('modal-overlay');
+      const evento = { target: overlay } as unknown as Event;
+
+      component.closeAlternativesModal(evento);
+
+      expect(component.isAlternativesModalOpen()).toBeFalse();
+    });
+
+    it('dado el modal abierto, cuando el click viene de otro elemento, no deberia cerrarlo', () => {
+      component.openAlternativesModal('prod-agua', new Event('click'));
+      const dentro = document.createElement('div');
+      const evento = { target: dentro } as unknown as Event;
+
+      component.closeAlternativesModal(evento);
+
+      expect(component.isAlternativesModalOpen()).toBeTrue();
+    });
+  });
+
+  describe('chooseAlternative y helpers de chosen', () => {
+    beforeEach(() => {
+      build();
+      whenMonto();
+    });
+
+    it('dado una opcion, cuando la elijo, deberia guardarla en chosenRecommendations y cerrar el modal', () => {
+      component.openAlternativesModal('prod-agua', new Event('click'));
+      const opcion = {
+        proveedorId: 'sup-1',
+        nombreProveedor: 'Proveedor A',
+        precio: 1000,
+        unidad: '6x1L',
+        precioUnitario: 166,
+        isRecommended: false,
+      };
+
+      component.chooseAlternative('prod-agua', opcion);
+
+      expect(component.getChosenSupplierName('prod-agua')).toBe('Proveedor A');
+      expect(component.getChosenPrice('prod-agua')).toBe(1000);
+      expect(component.getChosenUnit('prod-agua')).toBe('6x1L');
+      expect(component.getChosenUnitPrice('prod-agua')).toBe(166);
+      expect(component.hasChosenEquivalent('prod-agua')).toBeTrue();
+      expect(component.isAlternativesModalOpen()).toBeFalse();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        jasmine.stringMatching(/Se seleccionó la oferta de Proveedor A/),
+        'success',
+      );
+    });
+
+    it('dado sin chosen para el producto, los getters deberian devolver defaults vacios', () => {
+      expect(component.getChosenSupplierName('prod-x')).toBe('');
+      expect(component.getChosenPrice('prod-x')).toBe(0);
+      expect(component.getChosenUnit('prod-x')).toBe('');
+      expect(component.hasChosenEquivalent('prod-x')).toBeFalse();
+    });
+
+    it('dado un chosen cuyo precio unitario coincide con el precio, hasChosenEquivalent deberia ser false', () => {
+      component.openAlternativesModal('prod-agua', new Event('click'));
+      component.chooseAlternative('prod-agua', {
+        proveedorId: 's',
+        nombreProveedor: 'X',
+        precio: 100,
+        unidad: 'u',
+        precioUnitario: 100,
+        isRecommended: false,
+      });
+
+      expect(component.hasChosenEquivalent('prod-agua')).toBeFalse();
+    });
+  });
+
+  describe('hasRecommendation / hasNoQuote / hasAlternatives', () => {
+    beforeEach(() => {
+      build();
+      whenMonto();
+    });
+
+    it('dado una recomendacion con proveedorRecomendadoId, hasRecommendation deberia ser true', () => {
+      component.recommendations.set([
+        RecomendacionProveedorMother.crear({ productoInventarioId: 'p1', proveedorRecomendadoId: 'sup' }),
+      ]);
+
+      expect(component.hasRecommendation('p1')).toBeTrue();
+      expect(component.hasNoQuote('p1')).toBeFalse();
+    });
+
+    it('dado una recomendacion sin proveedor recomendado, hasNoQuote deberia ser true', () => {
+      component.recommendations.set([
+        RecomendacionProveedorMother.crear({ productoInventarioId: 'p1', proveedorRecomendadoId: '' }),
+      ]);
+
+      expect(component.hasRecommendation('p1')).toBeFalse();
+      expect(component.hasNoQuote('p1')).toBeTrue();
+    });
+
+    it('dado una recomendacion con alternativas, hasAlternatives deberia ser true', () => {
+      component.recommendations.set([
+        RecomendacionProveedorMother.crear({
+          productoInventarioId: 'p1',
+          alternativas: [
+            { proveedorId: 's1', nombreProveedor: 'A', precio: 100, unidad: 'u', precioUnitario: 100 },
+          ],
+        }),
+      ]);
+
+      expect(component.hasAlternatives('p1')).toBeTrue();
+    });
+  });
+
+  describe('getAllOptionsForProduct e isCurrentChosenOption', () => {
+    beforeEach(() => {
+      build();
+      whenMonto();
+    });
+
+    it('dado una recomendacion con proveedor recomendado y alternativas, deberia devolver todas las opciones', () => {
+      component.recommendations.set([
+        RecomendacionProveedorMother.crear({
+          productoInventarioId: 'p1',
+          proveedorRecomendadoId: 'sup-rec',
+          nombreProveedorRecomendado: 'Recomendado',
+          mejorPrecio: 500,
+          unidad: 'u',
+          mejorPrecioUnitario: 500,
+          alternativas: [
+            { proveedorId: 'sup-alt', nombreProveedor: 'Alternativo', precio: 600, unidad: 'u', precioUnitario: 600 },
+          ],
+        }),
+      ]);
+
+      const opciones = component.getAllOptionsForProduct('p1');
+
+      expect(opciones.length).toBe(2);
+      expect(opciones[0].isRecommended).toBeTrue();
+      expect(opciones[1].isRecommended).toBeFalse();
+    });
+
+    it('dado sin recomendacion, deberia devolver array vacio', () => {
+      expect(component.getAllOptionsForProduct('inexistente')).toEqual([]);
+    });
+
+    it('dado un chosen y una opcion identica, isCurrentChosenOption deberia ser true', () => {
+      component.openAlternativesModal('p1', new Event('click'));
+      const opcion = {
+        proveedorId: 's1',
+        nombreProveedor: 'A',
+        precio: 200,
+        unidad: 'u',
+        precioUnitario: 200,
+        isRecommended: true,
+      };
+      component.chooseAlternative('p1', opcion);
+
+      expect(component.isCurrentChosenOption('p1', opcion)).toBeTrue();
+    });
+  });
+
+  describe('getActiveProductName', () => {
+    beforeEach(() => {
+      build();
+      whenMonto();
+    });
+
+    it('dado un activeAlternativesProductId, deberia devolver el nombre del producto', () => {
+      component.activeAlternativesProductId.set('prod-agua');
+
+      expect(component.getActiveProductName()).toBe('Agua Mineral');
+    });
+
+    it('dado sin activeAlternativesProductId, deberia devolver string vacio', () => {
+      expect(component.getActiveProductName()).toBe('');
+    });
+  });
+
+  describe('loadSuppliersAndProducts (error branch)', () => {
+    it('dado que getSuppliers falla, deberia mostrar toast pero igual cargar productos', () => {
+      spyOn(console, 'error');
+      servicioSupplier.getSuppliers.and.returnValue(throwError(() => new Error('boom')));
+      build();
+
+      whenMonto();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'Error al cargar información de mapeos',
+        'error',
+      );
+      expect(servicioProducto.getAll).toHaveBeenCalled();
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }

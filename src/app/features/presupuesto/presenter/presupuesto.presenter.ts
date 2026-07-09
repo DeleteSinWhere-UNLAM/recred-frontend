@@ -6,13 +6,10 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { CategoriaProducto } from '../../buffet/models/producto.model';
 import { PresupuestoService } from '../services/presupuesto.service';
 import {
-  NivelAlerta,
   PERIODOS,
   Periodo,
-  PrediccionGasto,
   Presupuesto,
   ReglaCategoria,
-  nivelAlertaDePorcentaje,
   presupuestoPorDefecto,
   recalcularMontosReglas,
   sumaPorcentajes,
@@ -29,9 +26,6 @@ export class PresupuestoPresenter {
   private readonly presupuestoState = signal<Presupuesto>(
     presupuestoPorDefecto(''),
   );
-  private readonly prediccionState = signal<PrediccionGasto | undefined>(
-    undefined,
-  );
   private readonly categoriasDisponiblesState = signal<CategoriaProducto[]>([]);
   private readonly cargandoState = signal(false);
   private readonly guardandoState = signal(false);
@@ -39,8 +33,6 @@ export class PresupuestoPresenter {
   readonly periodos = PERIODOS;
   readonly alumno: Signal<Alumno | undefined> = this.alumnoState.asReadonly();
   readonly presupuesto: Signal<Presupuesto> = this.presupuestoState.asReadonly();
-  readonly prediccion: Signal<PrediccionGasto | undefined> =
-    this.prediccionState.asReadonly();
   readonly categoriasDisponibles: Signal<CategoriaProducto[]> =
     this.categoriasDisponiblesState.asReadonly();
   readonly cargando = this.cargandoState.asReadonly();
@@ -70,12 +62,6 @@ export class PresupuestoPresenter {
   );
 
   readonly porcentajeValido = computed(() => this.totalPorcentaje() <= 100);
-
-  readonly nivelAlerta: Signal<NivelAlerta> = computed(() => {
-    const p = this.prediccionState();
-    if (!p) return 'ok';
-    return nivelAlertaDePorcentaje(p.porcentajePresupuesto);
-  });
 
   readonly categoriasUsables = computed<CategoriaProducto[]>(() => {
     const yaUsadas = new Set(
@@ -112,13 +98,6 @@ export class PresupuestoPresenter {
       if (presupuesto) {
         this.presupuestoState.set(presupuesto);
       }
-
-      const periodoPrediccion = this.presupuestoState().periodo;
-      const prediccion = await this.presupuestoService.cargarPrediccion(
-        alumnoId,
-        periodoPrediccion,
-      );
-      this.prediccionState.set(prediccion);
     } catch (error) {
       console.warn('[Presupuesto] error cargando', error);
       this.toastService.mostrar(

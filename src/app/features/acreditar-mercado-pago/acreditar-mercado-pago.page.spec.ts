@@ -85,6 +85,16 @@ describe('AcreditarMercadoPagoPage', () => {
 
       expect(component.montoIngresado).toBe(2500);
     });
+
+    it('dado el input de monto, deberia definir los minimos y steps nativos de recarga', () => {
+      whenMonto();
+
+      const input = queryElemento('#monto') as HTMLInputElement;
+
+      expect(input.getAttribute('min')).toBe('100');
+      expect(input.hasAttribute('max')).toBeFalse();
+      expect(input.getAttribute('step')).toBe('100');
+    });
   });
 
   describe('submit del formulario', () => {
@@ -144,6 +154,36 @@ describe('AcreditarMercadoPagoPage', () => {
 
       const items = fixture.nativeElement.querySelectorAll('.acreditar-page__history-item');
       expect(items.length).toBe(2);
+    });
+  });
+
+  describe('saldoFormateado', () => {
+    it('dado un alumno con saldo, deberia formatearlo en ARS', () => {
+      presenterFake.alumno.set(AlumnoMother.crear({ saldo: 2500 }));
+      whenMonto();
+
+      const salida = (component as unknown as { saldoFormateado: string }).saldoFormateado;
+
+      expect(salida).toContain('2');
+      expect(salida).toContain('500');
+    });
+
+    it('dado sin alumno, deberia formatear 0', () => {
+      presenterFake.alumno.set(undefined);
+      whenMonto();
+
+      const salida = (component as unknown as { saldoFormateado: string }).saldoFormateado;
+
+      expect(salida).toContain('0');
+    });
+
+    it('dado un alumno sin saldo definido, deberia usar 0 como fallback', () => {
+      presenterFake.alumno.set(AlumnoMother.crear({ saldo: undefined as unknown as number }));
+      whenMonto();
+
+      const salida = (component as unknown as { saldoFormateado: string }).saldoFormateado;
+
+      expect(salida).toContain('0');
     });
   });
 

@@ -85,6 +85,10 @@ textarea,
   caret-color: auto;
 }
 
+html {
+  background-color: var(--color-fondo);
+}
+
 html,
 body {
   height: 100%;
@@ -133,28 +137,6 @@ button {
   opacity: 0.9;
   transform: translateY(-1px);
 }
-
-/*
-.btn-buy {
-  background-color: var(--color-menta);
-  color: white;
-  border: none;
-  border-radius: var(--radius-button, 12px);
-  padding: 10px 20px;
-  font-weight: 700;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(129, 178, 154, 0.3);
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.btn-buy:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}*/
 
 button:disabled {
   cursor: not-allowed;
@@ -212,5 +194,15 @@ textarea {
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {
+  bottom: 110px !important;
+}
+
+@media (min-width: 768px) {
+  body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {
+    bottom: 120px !important;
   }
 }
