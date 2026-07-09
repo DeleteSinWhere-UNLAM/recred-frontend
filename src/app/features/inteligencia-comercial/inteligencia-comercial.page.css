@@ -477,10 +477,19 @@
   }
 
   .si__encabezado-principal {
+    flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
   }
 
-  .si__fila-titulo,
+  .si__fila-titulo {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
   .si__pestanias {
     display: flex;
     flex-direction: column;
