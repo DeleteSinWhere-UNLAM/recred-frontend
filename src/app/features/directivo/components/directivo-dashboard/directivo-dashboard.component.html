@@ -13,49 +13,6 @@
     </div>
   }
 
-  @if (!loading && error) {
-    <section class="pv__panel pv__license-panel" aria-label="Pago de licencia del colegio">
-      <div class="pv__section-title">
-        <span aria-hidden="true">
-          <i class="fa-solid fa-file-invoice-dollar"></i>
-        </span>
-        <div>
-          <p class="pv__section-kicker">Acceso del colegio</p>
-          <h2>Licencia</h2>
-        </div>
-      </div>
-
-      <div class="pv__license-card pv__license-card--standalone">
-        <div class="pv__license-main">
-          <span class="pv__license-icon" aria-hidden="true">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
-          </span>
-          <div>
-            <p class="pv__license-label">Licencia colegio</p>
-            <strong>{{ montoLicencia() }}</strong>
-          </div>
-        </div>
-        <div class="pv__license-details">
-          <span>{{ estadoLicencia() }}</span>
-          <span>{{ vigenciaLicencia() }}</span>
-          <small>{{ restanteLicencia() }}</small>
-        </div>
-        <button type="button" class="pv__license-button" [disabled]="pagandoLicencia" (click)="iniciarPagoLicencia()">
-          @if (pagandoLicencia) {
-            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-            <span>Redirigiendo...</span>
-          } @else {
-            <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
-            <span>Pagar licencia</span>
-          }
-        </button>
-        @if (errorPagoLicencia) {
-          <p class="pv__license-error">{{ errorPagoLicencia }}</p>
-        }
-      </div>
-    </section>
-  }
-
   @if (!loading && !error && data) {
     <header class="pv__hero">
       <div class="pv__hero-main">
@@ -67,34 +24,6 @@
           <h1 id="pv-title">{{ data.nombre }}</h1>
           <p class="pv__school-meta">CUE {{ data.cue }}</p>
         </div>
-      </div>
-      <div class="pv__license-card" [class.pv__license-card--active]="licenciaActiva()">
-        <div class="pv__license-main">
-          <span class="pv__license-icon" aria-hidden="true">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
-          </span>
-          <div>
-            <p class="pv__license-label">Licencia colegio</p>
-            <strong>{{ montoLicencia() }}</strong>
-          </div>
-        </div>
-        <div class="pv__license-details">
-          <span>{{ estadoLicencia() }}</span>
-          <span>{{ vigenciaLicencia() }}</span>
-          <small>{{ restanteLicencia() }}</small>
-        </div>
-        <button type="button" class="pv__license-button" [disabled]="pagandoLicencia" (click)="iniciarPagoLicencia()">
-          @if (pagandoLicencia) {
-            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-            <span>Redirigiendo...</span>
-          } @else {
-            <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
-            <span>{{ licenciaActiva() ? 'Renovar' : 'Pagar licencia' }}</span>
-          }
-        </button>
-        @if (errorPagoLicencia) {
-          <p class="pv__license-error">{{ errorPagoLicencia }}</p>
-        }
       </div>
     </header>
 

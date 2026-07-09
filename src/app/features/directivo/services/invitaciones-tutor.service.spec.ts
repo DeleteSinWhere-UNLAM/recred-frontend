@@ -47,6 +47,7 @@ describe('InvitacionesTutorService', () => {
   const URL_INVITAR = `${API}/colegio/tutores/invitaciones`;
   const URL_IMPORTAR = `${API}/colegio/tutores/invitaciones/import`;
   const URL_VALIDAR = (token: string): string => `${API}/invitaciones/tutor/${encodeURIComponent(token)}`;
+  const URL_PREPARAR = (token: string): string => `${API}/invitaciones/tutor/${encodeURIComponent(token)}/preparar-cuenta`;
   const URL_ACEPTAR = (token: string): string => `${API}/invitaciones/tutor/${encodeURIComponent(token)}/aceptar`;
   const URL_COLEGIOS = `${API}/tutores/me/colegios`;
 
@@ -129,6 +130,44 @@ describe('InvitacionesTutorService', () => {
       req.flush(null);
 
       await expectAsync(promesa).toBeResolved();
+    });
+  });
+
+  describe('prepararCuenta', () => {
+    it('dado un token, cuando preparo cuenta, deberia hacer POST a la url con /preparar-cuenta', async () => {
+      const response = {
+        invitationId: 'inv-1',
+        schoolId: 'school-1',
+        schoolName: 'Colegio Central',
+        email: 'tutor@example.com',
+        result: 'LOGIN_REQUIRED' as const,
+      };
+
+      const promesa = service.prepararCuenta('token-abc');
+      const req = httpMock.expectOne(URL_PREPARAR('token-abc'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toBeNull();
+      req.flush(response);
+
+      await expectAsync(promesa).toBeResolvedTo(response);
+    });
+
+    it('dado un username, cuando preparo cuenta, deberia enviarlo en el body', async () => {
+      const response = {
+        invitationId: 'inv-1',
+        schoolId: 'school-1',
+        schoolName: 'Colegio Central',
+        email: 'tutor@example.com',
+        result: 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT' as const,
+      };
+
+      const promesa = service.prepararCuenta('token-abc', 'arruaclotilde');
+      const req = httpMock.expectOne(URL_PREPARAR('token-abc'));
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ username: 'arruaclotilde' });
+      req.flush(response);
+
+      await expectAsync(promesa).toBeResolvedTo(response);
     });
   });
 
