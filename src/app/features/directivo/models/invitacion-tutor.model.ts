@@ -1,5 +1,6 @@
 export type EstadoInvitacionTutor =
   | 'PENDING'
+  | 'ACCOUNT_CREATED'
   | 'ACCEPTED'
   | 'EXPIRED'
   | 'CANCELLED';
@@ -11,6 +12,11 @@ export type ResultadoInvitacionTutor =
   | 'CREATED_EMAIL_ERROR'
   | 'RESENT_EMAIL_ERROR'
   | 'VALIDATED';
+
+export type ResultadoPreparacionCuentaTutor =
+  | 'LOGIN_REQUIRED'
+  | 'USERNAME_REQUIRED'
+  | 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT';
 
 export interface InvitacionTutorPayload {
   email: string;
@@ -31,6 +37,14 @@ export interface InvitacionTutor {
   expiresAt: string;
   invitationLink: string | null;
   result: ResultadoInvitacionTutor;
+}
+
+export interface PreparacionCuentaTutor {
+  invitationId: string;
+  schoolId: string;
+  schoolName: string;
+  email: string;
+  result: ResultadoPreparacionCuentaTutor;
 }
 
 export interface ErrorFilaCsv {
