@@ -42,7 +42,7 @@ describe('FavoritosPage', () => {
       'obtenerBuffetDelAlumno',
       'getProductosDelBuffet'
     ]);
-    servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(of({ id: 'buffet-1' } as any));
+    servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(of({ id: 'buffet-1' } as never));
     servicioBuffet.getProductosDelBuffet.and.returnValue(of([]));
 
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);
