@@ -27,4 +27,17 @@ export class DirectivoService {
       this.http.post<CrearVendedorResponse>(`${environment.apiUrl}/buffets/${buffetId}/sellers`, request)
     );
   }
+
+  public reenviarCredenciales(sellerId: string): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>(`${environment.apiUrl}/sellers/${sellerId}/resend-credentials`, {})
+    );
+  }
+
+  public reemplazarVendedor(buffetId: string, request: CrearVendedorRequest): Promise<CrearVendedorResponse> {
+    return firstValueFrom(
+      this.http.post<CrearVendedorResponse>(`${environment.apiUrl}/buffets/${buffetId}/sellers/replace`, request)
+    );
+  }
 }
+

@@ -5,6 +5,14 @@ import { CrearBuffetPage } from './crear-buffet.page';
 import { CrearBuffetFormComponent } from './components/crear-buffet-form/crear-buffet-form.component';
 import { CrearBuffetPresenter } from './presenter/crear-buffet.presenter';
 import { CrearBuffetRequest } from '../models/directivo.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true,
+})
+class NavbarStub {}
 
 @Component({
   selector: 'app-crear-buffet-form',
@@ -47,11 +55,11 @@ describe('CrearBuffetPage', () => {
     })
       .overrideComponent(CrearBuffetPage, {
         remove: {
-          imports: [CrearBuffetFormComponent],
+          imports: [CrearBuffetFormComponent, NavbarComponent],
           providers: [CrearBuffetPresenter],
         },
         add: {
-          imports: [CrearBuffetFormStub],
+          imports: [CrearBuffetFormStub, NavbarStub],
           providers: [{ provide: CrearBuffetPresenter, useValue: presenter }],
         },
       })

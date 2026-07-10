@@ -71,12 +71,12 @@ describe('Landing Integration', () => {
     component.ngOnDestroy();
   });
 
-  it('dado un usuario no autenticado, cuando se monta la pagina, deberia renderizar los dos CTAs en el DOM', fakeAsync(() => {
+  it('dado un usuario no autenticado, cuando se monta la pagina, deberia renderizar los CTAs en el DOM (registro en header desktop y en seccion mobile, login en main)', fakeAsync(() => {
     givenUsuarioNoAutenticado();
 
     whenMontoLaPagina();
 
-    thenLosCtasEnElDomSon(['Registrar institución', 'Iniciar sesión']);
+    thenLosCtasEnElDomSon(['Registrar institución', 'Iniciar sesión', 'Registrar institución']);
   }));
 
   it('dado un usuario no autenticado, cuando hago click en el CTA de login, deberia invocar AuthService.login a traves del presenter real', fakeAsync(() => {

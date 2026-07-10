@@ -41,12 +41,12 @@
           <i class="fa-solid fa-circle-info"></i>
           @if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
             <p>
-              Te enviamos usuario y contrasena temporal a <strong>{{ invitacion.email }}</strong>.
+              Te enviamos usuario y contraseña temporal a <strong>{{ invitacion.email }}</strong>.
               Inicia sesion para activar tu vinculo con el colegio.
             </p>
           } @else if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
             <p>
-              Elegi un nombre de usuario para crear tu cuenta. Vas a recibir la contrasena temporal en
+              Elegi un nombre de usuario para crear tu cuenta. Vas a recibir la contraseña temporal en
               <strong>{{ invitacion.email }}</strong>.
             </p>
           } @else {

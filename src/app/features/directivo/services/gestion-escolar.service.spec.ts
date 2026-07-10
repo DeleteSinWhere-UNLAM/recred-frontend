@@ -115,8 +115,6 @@ describe('GestionEscolarService', () => {
       descripcion: 'Primer recreo',
       horaInicio: '09:30:00',
       horaFin: '09:45:00',
-      cupoMaximo: 80,
-      minutosCorte: 10,
     };
     const respuesta = franja();
 
@@ -135,8 +133,6 @@ describe('GestionEscolarService', () => {
       descripcion: 'Segundo recreo',
       horaInicio: '10:00:00',
       horaFin: '10:15:00',
-      cupoMaximo: null,
-      minutosCorte: 0,
     };
     const respuesta = franja({ id: 'f1', descripcion: 'Segundo recreo' });
 

@@ -14,7 +14,7 @@
         </span>
         <div>
           <div class="si__fila-titulo">
-            <h1 id="si-title">Diagnostico comercial</h1>
+            <h1 id="si-title" class="">Diagnóstico comercial</h1>
             <span class="si__insignia-premium">AVANZADO</span>
           </div>
           <p>Revisa oportunidades de stock y acciones para recuperar ventas de productos quietos en una sola vista.</p>
@@ -25,7 +25,7 @@
     @if (presenter.estaCargando) {
     <div class="si__aviso" role="status">
       <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-      <span>Cargando diagnostico comercial.</span>
+      <span>Cargando diagnóstico comercial.</span>
     </div>
     }
 
@@ -73,7 +73,7 @@
     <section class="si__area-trabajo" aria-label="Diagnostico comercial">
       <div class="si__diagnostico-header">
         <div>
-          <span>Diagnostico comercial</span>
+          <span>Diagnóstico comercial</span>
           <h2>Oportunidades para decidir que reponer y que impulsar</h2>
         </div>
         <div class="si__diagnostico-contadores" aria-label="Resumen de oportunidades">
@@ -150,11 +150,8 @@
         @if (presenter.principalesBajaRotacion.length > 0) {
         <div class="si__tarjetas">
           @for (tarjeta of presenter.principalesBajaRotacion; track tarjeta.id) {
-          <article
-            class="si__tarjeta"
-            [class.si__tarjeta--advertencia]="tarjeta.tono === 'advertencia'"
-            [class.si__tarjeta--peligro]="tarjeta.tono === 'peligro'"
-          >
+          <article class="si__tarjeta" [class.si__tarjeta--advertencia]="tarjeta.tono === 'advertencia'"
+            [class.si__tarjeta--peligro]="tarjeta.tono === 'peligro'">
             <div class="si__titulo-tarjeta">
               <span aria-hidden="true"><i class="fa-solid fa-box-open"></i></span>
               <strong>{{ tarjeta.titulo }}</strong>
@@ -172,7 +169,7 @@
             </div>
             <button type="button" class="si__accion-tarjeta" (click)="presenter.abrirPromocionParaProducto(tarjeta.id)">
               <i class="fa-solid fa-tags" aria-hidden="true"></i>
-              <span>Crear promocion</span>
+              <span>Crear promoción</span>
             </button>
           </article>
           }
@@ -189,11 +186,8 @@
   </div>
 
   @if (presenter.modalComboAbierto$ | async) {
-  <app-combo-promotion-modal
-    [baseProductName]="(presenter.bajaRotacionSeleccionada$ | async)?.productoOriginal ?? ''"
+  <app-combo-promotion-modal [baseProductName]="(presenter.bajaRotacionSeleccionada$ | async)?.productoOriginal ?? ''"
     [suggestedProducts]="(presenter.productosSugeridos$ | async) ?? []"
-    (confirmPromotion)="presenter.generarPromocion($event)"
-    (closeModal)="presenter.cerrarModalCombo()"
-  />
+    (confirmPromotion)="presenter.generarPromocion($event)" (closeModal)="presenter.cerrarModalCombo()" />
   }
 </main>

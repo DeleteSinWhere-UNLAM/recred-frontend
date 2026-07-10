@@ -65,4 +65,25 @@ export class DirectivoPresenter {
       this._loading.set(false);
     }
   }
+
+  public async reenviarCredenciales(sellerId: string): Promise<void> {
+    try {
+      await this.directivoService.reenviarCredenciales(sellerId);
+      this.toastService.mostrar('Las credenciales fueron reenviadas exitosamente al correo del vendedor.', 'success');
+    } catch (err: unknown) {
+      if (err instanceof HttpErrorResponse) {
+        if (err.status === 401) {
+          this.toastService.mostrar('Sesión expirada. Por favor, vuelva a iniciar sesión.', 'error');
+        } else if (err.status === 403) {
+          this.toastService.mostrar('No tienes permisos para realizar esta acción.', 'error');
+        } else if (err.status === 400) {
+          this.toastService.mostrar('El vendedor no existe o es inválido.', 'error');
+        } else {
+          this.toastService.mostrar('Ocurrió un error al reenviar las credenciales.', 'error');
+        }
+      } else {
+        this.toastService.mostrar('Error inesperado al reenviar credenciales.', 'error');
+      }
+    }
+  }
 }

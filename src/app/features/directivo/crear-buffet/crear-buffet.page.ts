@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { CrearBuffetPresenter } from './presenter/crear-buffet.presenter';
 import { CrearBuffetFormComponent } from './components/crear-buffet-form/crear-buffet-form.component';
 import { CrearBuffetRequest } from '../models/directivo.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-crear-buffet-page',
   standalone: true,
-  imports: [CrearBuffetFormComponent],
+  imports: [CrearBuffetFormComponent, NavbarComponent],
   templateUrl: './crear-buffet.page.html',
   providers: [CrearBuffetPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush
