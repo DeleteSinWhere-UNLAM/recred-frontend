@@ -27,8 +27,23 @@ export class AsignarVendedorFormComponent {
     lastName: ['', Validators.required],
     dni: ['', Validators.required],
     phone: ['', Validators.required],
-    cuit: ['', Validators.required]
+    cuit: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]]
   });
+
+  normalizarCuit(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cuit = input.value.replace(/\D/g, '').slice(0, 11);
+
+    if (input.value !== cuit) {
+      input.value = cuit;
+    }
+
+    if (this.form.controls.cuit.value !== cuit) {
+      this.form.controls.cuit.setValue(cuit, { emitEvent: false });
+    }
+
+    this.form.controls.cuit.markAsDirty();
+  }
 
   onSubmit() {
     if (this.form.valid && !this.loading) {
