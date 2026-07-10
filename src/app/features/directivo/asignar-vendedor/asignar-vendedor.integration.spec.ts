@@ -65,7 +65,7 @@ describe('AsignarVendedor (Integración)', () => {
     dniInput.dispatchEvent(new Event('input'));
 
     const cuitInput = fixture.debugElement.query(By.css('#cuit')).nativeElement;
-    cuitInput.value = '201234561';
+    cuitInput.value = '20123456786';
     cuitInput.dispatchEvent(new Event('input'));
 
     const phoneInput = fixture.debugElement.query(By.css('#phone')).nativeElement;

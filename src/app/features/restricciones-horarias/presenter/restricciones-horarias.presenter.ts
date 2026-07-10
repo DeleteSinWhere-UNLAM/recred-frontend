@@ -146,6 +146,12 @@ export class RestriccionesHorariasPresenter {
   }
 
   isManageableRestriction(r: RestriccionHoraria): boolean {
+    const valId = r.categoryId || r.classificationId || r.categoria?.id || r.clasificacionSalud?.id;
+    if (!valId) {
+      // Un bloqueo total de recreo es manejable
+      return true;
+    }
+
     const categories = this.categorias();
     const health = this.catalogoSaludState();
 
@@ -167,8 +173,7 @@ export class RestriccionesHorariasPresenter {
     if (salSodio) manageableIds.add(salSodio.id);
     if (salLacteos) manageableIds.add(salLacteos.id);
 
-    const valId = r.categoryId || r.classificationId || r.categoria?.id || r.clasificacionSalud?.id;
-    return !!valId && manageableIds.has(valId);
+    return manageableIds.has(valId);
   }
 
   async guardarCambios(): Promise<boolean> {

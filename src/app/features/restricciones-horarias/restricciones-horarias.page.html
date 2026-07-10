@@ -156,6 +156,15 @@
 
           </div>
         </article>
+
+        <button
+          type="button"
+          class="restricciones__guardar"
+          (click)="presenter.guardarCambios()"
+          [disabled]="presenter.cargando()"
+        >
+          Guardar cambios
+        </button>
       }
     }
 
