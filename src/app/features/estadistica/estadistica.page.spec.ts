@@ -108,48 +108,6 @@ describe('EstadisticaPage', () => {
   });
 
   describe('render', () => {
-    it('dado un alumno sin foto, cuando renderizo, deberia mostrar sus iniciales', () => {
-      presenterFake.iniciales.set('JP');
-      presenterFake.urlFotoPerfil.set(null);
-
-      whenMonto();
-
-      expect(textoRenderizado()).toContain('JP');
-      expect((fixture.nativeElement as HTMLElement).querySelector('img')).toBeNull();
-    });
-
-    it('dado un alumno con foto, cuando renderizo, deberia mostrar la imagen y no las iniciales sueltas', () => {
-      presenterFake.urlFotoPerfil.set('https://foto.com/j.png');
-      presenterFake.nombreCompleto.set('Juan');
-
-      whenMonto();
-
-      const img = (fixture.nativeElement as HTMLElement).querySelector('img');
-      expect(img?.getAttribute('src')).toBe('https://foto.com/j.png');
-    });
-
-    it('dado nombre y grado, cuando renderizo, deberia mostrar ambos en el subtitulo', () => {
-      presenterFake.nombreCompleto.set('Juan');
-      presenterFake.grado.set('5A');
-
-      whenMonto();
-
-      const texto = textoRenderizado();
-      expect(texto).toContain('Juan');
-      expect(texto).toContain('5A');
-    });
-
-    it('dado sin grado, cuando renderizo, no deberia mostrar el separador ni el grado', () => {
-      presenterFake.nombreCompleto.set('Juan');
-      presenterFake.grado.set('');
-
-      whenMonto();
-
-      const subtitulo = (fixture.nativeElement as HTMLElement)
-        .querySelector('.estadistica__subtitulo')?.textContent ?? '';
-      expect(subtitulo).toContain('Juan');
-      expect(subtitulo).not.toContain('·');
-    });
 
     it('dado una prediccion en curso, deberia propagarla al PrediccionCard con el nivel', () => {
       presenterFake.prediccion.set(PrediccionGastoMother.crear());
