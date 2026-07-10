@@ -221,10 +221,6 @@
   align-items: flex-start;
 }
 
-.prediccion-card__resumen i {
-  color: var(--color-dorado);
-  margin-top: 2px;
-}
 
 .prediccion-card__badges {
   list-style: none;
