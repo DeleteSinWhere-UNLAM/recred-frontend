@@ -17,26 +17,15 @@
     }
     
     <header class="movimientos__header">
-
-      <div class="movimientos__titulo-area" [class.movimientos__titulo-area--alumno]="esVistaAlumno()">
-        <div class="movimientos__icono">
-          <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-        </div>
-        <div class="movimientos__titulo-texto">
-          @if (esVistaIndividual() && !esVistaAlumno()) {
-            <h1 id="page-title" class="movimientos__titulo">Movimientos de {{ nombreAlumno() }}</h1>
-            <p class="movimientos__subtitulo">Historial completo de compras y consumos</p>
-          } @else {
-            <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
-            @if (!esVistaAlumno()) {
-              <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
-            }
-          }
-        </div>
-        @if (esVistaAlumno()) {
-          <span class="movimientos__ola" aria-hidden="true"></span>
+      @if (esVistaIndividual() && !esVistaAlumno()) {
+        <h1 id="page-title" class="movimientos__titulo">Movimientos de {{ nombreAlumno() }}</h1>
+        <p class="movimientos__subtitulo">Historial completo de compras y consumos</p>
+      } @else {
+        <h1 id="page-title" class="movimientos__titulo">Historial de Movimientos</h1>
+        @if (!esVistaAlumno()) {
+          <p class="movimientos__subtitulo">Revisá las compras y consumos realizados por tus hijos</p>
         }
-      </div>
+      }
     </header>
 
     
