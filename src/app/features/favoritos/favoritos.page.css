@@ -1,6 +1,6 @@
 .favoritos {
   min-height: calc(100vh - 64px);
-  padding: 32px 0 60px;
+  padding: 16px 0 60px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 240px),
     var(--color-fondo);

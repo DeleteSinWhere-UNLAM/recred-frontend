@@ -1,4 +1,5 @@
 .prediction-page {
+  padding-top: 16px;
   position: relative;
   width: 100%;
 }
@@ -134,6 +135,7 @@
 
 @media (max-width: 960px) {
   .prediction-page {
+  padding-top: 16px;
     padding-top: 80px;
   }
 
@@ -151,6 +153,7 @@
 
 @media (max-width: 640px) {
   .prediction-page {
+  padding-top: 16px;
     padding: 72px 0 24px;
   }
 
@@ -171,6 +174,7 @@
 
 @media (max-width: 480px) {
   .prediction-page {
+  padding-top: 16px;
     padding-top: 64px;
     padding-bottom: 20px;
   }

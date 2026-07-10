@@ -5,6 +5,7 @@
 }
 
 .preferencias {
+  padding-top: 16px;
   position: relative;
   width: 100%;
   display: flex;
@@ -127,6 +128,7 @@
 
 @media (max-width: 960px) {
   .preferencias {
+  padding-top: 16px;
     padding-top: 80px;
   }
 
@@ -144,6 +146,7 @@
 
 @media (max-width: 640px) {
   .preferencias {
+  padding-top: 16px;
     padding: 72px 0 24px;
   }
 
@@ -164,6 +167,7 @@
 
 @media (max-width: 480px) {
   .preferencias {
+  padding-top: 16px;
     padding-top: 64px;
     padding-bottom: 20px;
   }

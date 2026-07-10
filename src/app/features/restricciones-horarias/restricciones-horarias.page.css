@@ -9,6 +9,7 @@
 }
 
 .restricciones {
+  padding-top: 16px;
   width: 100%;
   flex: 1;
   display: flex;
@@ -30,7 +31,8 @@
 .restricciones__header {
   width: 100%;
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+  padding-bottom: 8px;
 }
 
 .restricciones__titulo {
