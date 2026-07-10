@@ -478,7 +478,7 @@
 /* Fila de Movimiento individual */
 .movimientos__fila {
   display: grid;
-  grid-template-columns: 1fr 120px 180px 200px;
+  grid-template-columns: minmax(0, 1fr) 120px 180px 200px;
   align-items: center;
   gap: 20px;
   padding: 18px 24px;
@@ -494,6 +494,7 @@
   align-items: center;
   gap: 18px;
   flex: 1;
+  min-width: 0;
 }
 
 .movimientos__iniciales {
