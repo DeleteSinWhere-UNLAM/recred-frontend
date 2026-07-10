@@ -9,6 +9,7 @@ import {
 } from '../../directivo/models/invitacion-tutor.model';
 import { InvitacionesTutorService } from '../../directivo/services/invitaciones-tutor.service';
 import { InvitacionTokenStorageService } from '../services/invitacion-token-storage.service';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Injectable()
 export class AceptarInvitacionTutorPresenter {
@@ -17,6 +18,7 @@ export class AceptarInvitacionTutorPresenter {
   private readonly tokenStorage = inject(InvitacionTokenStorageService);
   private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   private readonly _loading = signal<boolean>(true);
   private readonly _invitacion = signal<InvitacionTutor | null>(null);
@@ -84,10 +86,14 @@ export class AceptarInvitacionTutorPresenter {
     }
 
     if (await this.authService.isAutenticado()) {
-      await this.service.aceptarInvitacion(token);
-      this.tokenStorage.limpiar();
-      this.perfilService.limpiar();
-      await this.router.navigateByUrl('/tutor');
+      try {
+        await this.service.aceptarInvitacion(token);
+        this.tokenStorage.limpiar();
+        this.perfilService.limpiar();
+        await this.router.navigateByUrl('/tutor');
+      } catch {
+        this.toastService.mostrar('Cierra tu sesión actual para ingresar con el email invitado.', 'info');
+      }
       return;
     }
 
