@@ -1,245 +1,261 @@
 <div class="pv">
   @if (loading) {
-    <div class="pv__notice" role="status">
-      <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-      <span>Cargando panel de administración...</span>
-    </div>
+  <div class="pv__notice" role="status">
+    <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+    <span>Cargando panel de administración...</span>
+  </div>
   }
 
   @if (error) {
-    <div class="pv__notice pv__notice--error" role="alert">
-      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-      <span>{{ error }}</span>
-    </div>
+  <div class="pv__notice pv__notice--error" role="alert">
+    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+    <span>{{ error }}</span>
+  </div>
   }
 
   @if (!loading && !error && data) {
-    <header class="pv__hero">
-      <div class="pv__hero-main">
-        <div class="pv__avatar" aria-hidden="true">
-          <span><i class="fa-solid fa-school"></i></span>
-        </div>
-        <div class="pv__hero-copy">
-          <p class="pv__greeting">Panel administrativo</p>
-          <h1 id="pv-title">{{ data.nombre }}</h1>
-          <p class="pv__school-meta">CUE {{ data.cue }}</p>
-        </div>
+  <header class="pv__hero">
+    <div class="pv__hero-main">
+      <div class="pv__avatar" aria-hidden="true">
+        <span><i class="fa-solid fa-school"></i></span>
       </div>
-    </header>
+      <div class="pv__hero-copy">
+        <p class="pv__greeting">Panel administrativo</p>
+        <h1 id="pv-title">{{ data.nombre }}</h1>
+        <p class="pv__school-meta">CUE {{ data.cue }}</p>
+      </div>
+    </div>
+  </header>
 
-    <section class="pv__panel" aria-labelledby="kioscos-title">
-      <div class="pv__panel-header">
-        <div class="pv__section-title">
-          <span aria-hidden="true">
-            <i class="fa-solid fa-store"></i>
-          </span>
-          <div>
-            <p class="pv__section-kicker">Operación</p>
-            <h2 id="kioscos-title">Kiosco del colegio</h2>
-          </div>
+  <div class="info-card">
+    <h2 class="info-card__title">Continuá con tu registro</h2>
+    <p class="info-card__description"> Para finalizar el flujo de registro de manera exitosa, debes completar los
+      siguientes pasos <strong>obligatorios</strong>: </p>
+    <ul class="info-card__list">
+      <li><i class="fa-solid fa-store"></i> Configurar un <strong>NUEVO KIOSCO</strong></li>
+      <li><i class="fa-solid fa-school"></i> Completar una escuela con <strong>GRADOS y FRANJAS HORARIAS</strong></li>
+      <li><i class="fa-solid fa-envelope-open-text"></i> <strong>INVITAR TUTOR</strong></li>
+    </ul>
+  </div>
+
+  <section class="pv__panel" aria-labelledby="kioscos-title">
+    <div class="pv__panel-header">
+      <div class="pv__section-title">
+        <span aria-hidden="true">
+          <i class="fa-solid fa-store"></i>
+        </span>
+        <div>
+          <p class="pv__section-kicker">Operación</p>
+          <h2 id="kioscos-title">Kiosco del colegio</h2>
         </div>
-
-        @if (data.buffets.length === 0) {
-          <button type="button" class="pv__primary-action" [routerLink]="['/directivo/crear-buffet']" [state]="{ schoolId: data.id }">
-            <span class="pv__primary-action-icon" aria-hidden="true">
-              <i class="fa-solid fa-plus"></i>
-            </span>
-            <strong>Nuevo kiosco</strong>
-            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-          </button>
-        }
       </div>
 
       @if (data.buffets.length === 0) {
-        <div class="pv__ok-state">
-          <span aria-hidden="true">
-            <i class="fa-solid fa-circle-info"></i>
-          </span>
-          <div>
-            <strong>Sin kioscos registrados</strong>
-            <p>No hay buffets registrados en este colegio todavía.</p>
-          </div>
-        </div>
+      <button type="button" class="pv__primary-action" [routerLink]="['/directivo/crear-buffet']"
+        [state]="{ schoolId: data.id }">
+        <span class="pv__primary-action-icon" aria-hidden="true">
+          <i class="fa-solid fa-plus"></i>
+        </span>
+        <strong>Nuevo kiosco</strong>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
       }
+    </div>
 
-      @if (data.buffets.length > 0) {
-        <div class="pv__operation-grid">
-          @for (buffet of data.buffets; track buffet.id) {
-            <article class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
-              <div class="pv__operation-icon" aria-hidden="true">
-                <i class="fa-solid fa-store"></i>
-              </div>
+    @if (data.buffets.length === 0) {
+    <div class="pv__ok-state">
+      <span aria-hidden="true">
+        <i class="fa-solid fa-circle-info"></i>
+      </span>
+      <div>
+        <strong>Sin kioscos registrados</strong>
+        <p>No hay buffets registrados en este colegio todavía.</p>
+      </div>
+    </div>
+    }
 
-              <div class="pv__operation-body">
-                <span class="pv__status" [class.pv__status--active]="buffet.activo">
-                  {{ buffet.activo ? 'Activo' : 'Inactivo' }}
-                </span>
-                <strong>{{ buffet.nombre }}</strong>
+    @if (data.buffets.length > 0) {
+    <div class="pv__operation-grid">
+      @for (buffet of data.buffets; track buffet.id) {
+      <article class="pv__operation-card" [class.pv__operation-card--warning]="!buffet.vendedor">
+        <div class="pv__operation-icon" aria-hidden="true">
+          <i class="fa-solid fa-store"></i>
+        </div>
 
-                @if (buffet.vendedor) {
-                  <small class="pv__operation-detail">
-                    <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
-                    {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
-                  </small>
-                } @else {
-                  <small class="pv__operation-detail pv__operation-detail--warning">
-                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                    Sin vendedor asignado
-                  </small>
-                }
-              </div>
+        <div class="pv__operation-body">
+          <span class="pv__status" [class.pv__status--active]="buffet.activo">
+            {{ buffet.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+          <strong>{{ buffet.nombre }}</strong>
 
-              <div class="pv__operation-actions">
-                @if (!buffet.vendedor) {
-                  <button type="button" class="pv__mini-action pv__mini-action--warning" [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
-                    <span>Asignar vendedor</span>
-                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                  </button>
-                } @else {
-                  <button type="button" class="pv__mini-action" (click)="verDetalleVendedor(buffet.vendedor, buffet)">
-                    <span>Ver vendedor</span>
-                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
-                  </button>
-                }
-              </div>
-            </article>
+          @if (buffet.vendedor) {
+          <small class="pv__operation-detail">
+            <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+            {{ buffet.vendedor.nombre }} {{ buffet.vendedor.apellido }}
+          </small>
+          } @else {
+          <small class="pv__operation-detail pv__operation-detail--warning">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            Sin vendedor asignado
+          </small>
           }
         </div>
+
+        <div class="pv__operation-actions">
+          @if (!buffet.vendedor) {
+          <button type="button" class="pv__mini-action pv__mini-action--warning"
+            [routerLink]="['/directivo/asignar-vendedor']" [state]="{ buffetId: buffet.id, buffetName: buffet.nombre }">
+            <span>Asignar vendedor</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+          } @else {
+          <button type="button" class="pv__mini-action" (click)="verDetalleVendedor(buffet.vendedor, buffet)">
+            <span>Ver vendedor</span>
+            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+          </button>
+          }
+        </div>
+      </article>
       }
-    </section>
+    </div>
+    }
+  </section>
 
-    <section class="pv__panel" aria-labelledby="gestion-escolar-title">
-      <div class="pv__panel-header">
-        <div class="pv__section-title">
-          <span aria-hidden="true">
-            <i class="fa-solid fa-school-flag"></i>
-          </span>
-          <div>
-            <p class="pv__section-kicker">Configuración</p>
-            <h2 id="gestion-escolar-title">Gestión escolar</h2>
-          </div>
+  <section class="pv__panel" aria-labelledby="gestion-escolar-title">
+    <div class="pv__panel-header">
+      <div class="pv__section-title">
+        <span aria-hidden="true">
+          <i class="fa-solid fa-school-flag"></i>
+        </span>
+        <div>
+          <p class="pv__section-kicker">Configuración</p>
+          <h2 id="gestion-escolar-title">Gestión escolar</h2>
         </div>
       </div>
+    </div>
 
-      <div class="pv__action-grid">
-        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/grados']">
-          <span class="pv__quick-icon" aria-hidden="true">
-            <i class="fa-solid fa-layer-group"></i>
-          </span>
-          <span class="pv__action-copy">
-            <strong>Grados</strong>
-            <small>Altas, bajas y modificaciones</small>
-          </span>
-          <span class="pv__quick-arrow" aria-hidden="true">
-            <i class="fa-solid fa-arrow-right"></i>
-          </span>
-        </button>
+    <div class="pv__action-grid">
+      <button type="button" class="pv__action-tile" [routerLink]="['/directivo/grados']">
+        <span class="pv__quick-icon" aria-hidden="true">
+          <i class="fa-solid fa-layer-group"></i>
+        </span>
+        <span class="pv__action-copy">
+          <strong>Grados</strong>
+          <small>Altas, bajas y modificaciones</small>
+        </span>
+        <span class="pv__quick-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+      </button>
 
-        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/franjas-horarias']">
-          <span class="pv__quick-icon" aria-hidden="true">
-            <i class="fa-solid fa-clock"></i>
-          </span>
-          <span class="pv__action-copy">
-            <strong>Franjas horarias</strong>
-            <small>Horarios de atencion</small>
-          </span>
-          <span class="pv__quick-arrow" aria-hidden="true">
-            <i class="fa-solid fa-arrow-right"></i>
-          </span>
-        </button>
-      </div>
-    </section>
+      <button type="button" class="pv__action-tile" [routerLink]="['/directivo/franjas-horarias']">
+        <span class="pv__quick-icon" aria-hidden="true">
+          <i class="fa-solid fa-clock"></i>
+        </span>
+        <span class="pv__action-copy">
+          <strong>Franjas horarias</strong>
+          <small>Horarios de atencion</small>
+        </span>
+        <span class="pv__quick-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+      </button>
+    </div>
+  </section>
 
-    <section class="pv__panel" aria-labelledby="tutores-title">
-      <div class="pv__panel-header">
-        <div class="pv__section-title">
-          <span aria-hidden="true">
-            <i class="fa-solid fa-user-group"></i>
-          </span>
-          <div>
-            <p class="pv__section-kicker">Comunidad</p>
-            <h2 id="tutores-title">Tutores del colegio</h2>
-          </div>
+  <section class="pv__panel" aria-labelledby="tutores-title">
+    <div class="pv__panel-header">
+      <div class="pv__section-title">
+        <span aria-hidden="true">
+          <i class="fa-solid fa-user-group"></i>
+        </span>
+        <div>
+          <p class="pv__section-kicker">Comunidad</p>
+          <h2 id="tutores-title">Tutores del colegio</h2>
         </div>
       </div>
+    </div>
 
-      <div class="pv__action-grid">
-        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/invitar-tutor']">
-          <span class="pv__quick-icon" aria-hidden="true">
-            <i class="fa-solid fa-envelope-open-text"></i>
-          </span>
-          <span class="pv__action-copy">
-            <strong>Invitar tutor</strong>
-            <small>Enviar link único por email</small>
-          </span>
-          <span class="pv__quick-arrow" aria-hidden="true">
-            <i class="fa-solid fa-arrow-right"></i>
-          </span>
-        </button>
+    <div class="pv__action-grid">
+      <button type="button" class="pv__action-tile" [routerLink]="['/directivo/invitar-tutor']">
+        <span class="pv__quick-icon" aria-hidden="true">
+          <i class="fa-solid fa-envelope-open-text"></i>
+        </span>
+        <span class="pv__action-copy">
+          <strong>Invitar tutor</strong>
+          <small>Enviar link único por email</small>
+        </span>
+        <span class="pv__quick-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+      </button>
 
-        <button type="button" class="pv__action-tile" [routerLink]="['/directivo/importar-tutores']">
-          <span class="pv__quick-icon" aria-hidden="true">
-            <i class="fa-solid fa-file-csv"></i>
-          </span>
-          <span class="pv__action-copy">
-            <strong>Importar tutores por CSV</strong>
-            <small>Alta masiva desde archivo</small>
-          </span>
-          <span class="pv__quick-arrow" aria-hidden="true">
-            <i class="fa-solid fa-arrow-right"></i>
-          </span>
-        </button>
-      </div>
-    </section>
+      <button type="button" class="pv__action-tile" [routerLink]="['/directivo/importar-tutores']">
+        <span class="pv__quick-icon" aria-hidden="true">
+          <i class="fa-solid fa-file-csv"></i>
+        </span>
+        <span class="pv__action-copy">
+          <strong>Importar tutores por CSV</strong>
+          <small>Alta masiva desde archivo</small>
+        </span>
+        <span class="pv__quick-arrow" aria-hidden="true">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+      </button>
+    </div>
+  </section>
   }
 </div>
 
 @if (vendedorSeleccionado()) {
-  <div class="pv-modal-overlay" (click)="cerrarModal()" (keydown.enter)="cerrarModal()" tabindex="0" role="button">
-    <div class="pv-modal" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0" role="dialog" aria-labelledby="modal-title">
-      <header class="pv-modal__header">
-        <div class="pv-modal__title-group">
-          <span class="pv-modal__icon" aria-hidden="true">
-            <i class="fa-solid fa-user-tie"></i>
-          </span>
-          <h2 id="modal-title">Datos del vendedor</h2>
-        </div>
-        <button class="pv-modal__close" (click)="cerrarModal()" aria-label="Cerrar modal">
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-        </button>
-      </header>
-
-      <div class="pv-modal__body">
-        <div class="pv-modal__data-row">
-          <small>Nombre completo</small>
-          <p><strong>{{ vendedorSeleccionado()?.nombre }} {{ vendedorSeleccionado()?.apellido }}</strong></p>
-        </div>
-        <div class="pv-modal__data-row">
-          <small>Email</small>
-          <p>{{ vendedorSeleccionado()?.email }}</p>
-        </div>
-        <div class="pv-modal__data-row">
-          <small>CUIT</small>
-          <p>{{ vendedorSeleccionado()?.cuit }}</p>
-        </div>
+<div class="pv-modal-overlay" (click)="cerrarModal()" (keydown.enter)="cerrarModal()" tabindex="0" role="button">
+  <div class="pv-modal" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0"
+    role="dialog" aria-labelledby="modal-title">
+    <header class="pv-modal__header">
+      <div class="pv-modal__title-group">
+        <span class="pv-modal__icon" aria-hidden="true">
+          <i class="fa-solid fa-user-tie"></i>
+        </span>
+        <h2 id="modal-title">Datos del vendedor</h2>
       </div>
+      <button class="pv-modal__close" (click)="cerrarModal()" aria-label="Cerrar modal">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </header>
 
-      <div class="pv-modal__footer" style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem; padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
-        <button type="button" class="pv__primary-action" style="width: 100%; justify-content: center;" (click)="emitirReenviarCredenciales()">
-          <span class="pv__primary-action-icon" aria-hidden="true">
-            <i class="fa-solid fa-envelope"></i>
-          </span>
-          <strong>Reenviar Credenciales</strong>
-        </button>
-
-        <button type="button" class="pv__mini-action pv__mini-action--warning" style="width: 100%; justify-content: center; padding: 0.75rem;"
-          [routerLink]="['/directivo/asignar-vendedor']"
-          [state]="{ buffetId: buffetSeleccionado()?.id, buffetName: buffetSeleccionado()?.nombre, mode: 'replace' }"
-          (click)="cerrarModal()">
-          <i class="fa-solid fa-user-pen" aria-hidden="true"></i>
-          <span style="margin-left: 0.5rem;">Reemplazar Vendedor</span>
-        </button>
+    <div class="pv-modal__body">
+      <div class="pv-modal__data-row">
+        <small>Nombre completo</small>
+        <p><strong>{{ vendedorSeleccionado()?.nombre }} {{ vendedorSeleccionado()?.apellido }}</strong></p>
+      </div>
+      <div class="pv-modal__data-row">
+        <small>Email</small>
+        <p>{{ vendedorSeleccionado()?.email }}</p>
+      </div>
+      <div class="pv-modal__data-row">
+        <small>CUIT</small>
+        <p>{{ vendedorSeleccionado()?.cuit }}</p>
       </div>
     </div>
+
+    <div class="pv-modal__footer"
+      style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem; padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+      <button type="button" class="pv__primary-action" style="width: 100%; justify-content: center;"
+        (click)="emitirReenviarCredenciales()">
+        <span class="pv__primary-action-icon" aria-hidden="true">
+          <i class="fa-solid fa-envelope"></i>
+        </span>
+        <strong>Reenviar Credenciales</strong>
+      </button>
+
+      <button type="button" class="pv__mini-action pv__mini-action--warning"
+        style="width: 100%; justify-content: center; padding: 0.75rem;" [routerLink]="['/directivo/asignar-vendedor']"
+        [state]="{ buffetId: buffetSeleccionado()?.id, buffetName: buffetSeleccionado()?.nombre, mode: 'replace' }"
+        (click)="cerrarModal()">
+        <i class="fa-solid fa-user-pen" aria-hidden="true"></i>
+        <span style="margin-left: 0.5rem;">Reemplazar Vendedor</span>
+      </button>
+    </div>
   </div>
+</div>
 }
