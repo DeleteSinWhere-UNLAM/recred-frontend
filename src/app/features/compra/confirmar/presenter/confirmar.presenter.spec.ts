@@ -132,7 +132,7 @@ describe('ConfirmarPresenter', () => {
       expect(servicioSugerencias.comprarSugerencia).not.toHaveBeenCalled();
       expect(servicioCompra.procesarPago).not.toHaveBeenCalled();
       expect(servicioToast.mostrar).toHaveBeenCalledWith(
-        'Comprar sugerencias IA esta disponible con plan Avanzado.',
+        'Comprar sugerencias IA está disponible con plan Avanzado.',
         'info',
       );
       expect(router.navigateByUrl).toHaveBeenCalledWith('/suscripcion');

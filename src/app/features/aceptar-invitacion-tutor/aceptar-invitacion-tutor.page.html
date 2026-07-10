@@ -42,7 +42,7 @@
           @if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
             <p>
               Te enviamos usuario y contraseña temporal a <strong>{{ invitacion.email }}</strong>.
-              Inicia sesion para activar tu vinculo con el colegio.
+              Inicia sesión para activar tu vínculo con el colegio.
             </p>
           } @else if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
             <p>
@@ -51,7 +51,7 @@
             </p>
           } @else {
             <p>
-              Vas a iniciar sesion con el email <strong>{{ invitacion.email }}</strong>.
+              Vas a iniciar sesión con el email <strong>{{ invitacion.email }}</strong>.
               Usa ese mismo email para que podamos asociarte al colegio.
             </p>
           }
@@ -93,7 +93,7 @@
             @if (presenter.preparandoCuenta()) {
               Preparando cuenta...
             } @else if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
-              Iniciar sesion
+              Iniciar sesión
             } @else {
               Continuar con Recred
             }
@@ -102,7 +102,7 @@
         }
 
         <p class="pie">
-          La asociacion con el colegio se activa despues de iniciar sesion correctamente.
+          La asociación con el colegio se activa después de iniciar sesión correctamente.
         </p>
       </section>
     }

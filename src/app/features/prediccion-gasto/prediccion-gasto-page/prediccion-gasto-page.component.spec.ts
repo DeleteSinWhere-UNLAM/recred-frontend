@@ -130,7 +130,7 @@ describe('PrediccionGastoPageComponent', () => {
 
       whenMonto();
 
-      expect(component.errorMessage).toContain('No se pudo cargar la prediccion');
+      expect(component.errorMessage).toContain('No se pudo cargar la predicción');
       expect(component.isLoading).toBeFalse();
     });
   });

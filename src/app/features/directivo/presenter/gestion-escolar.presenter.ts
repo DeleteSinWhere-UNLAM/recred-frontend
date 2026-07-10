@@ -297,12 +297,12 @@ export class GestionEscolarPresenter {
       const code = this.codigoBackend(err);
       if (code === 'TIME_SLOT_OVERLAP') return 'Ya existe una franja activa en ese horario.';
       if (code === 'TIME_SLOT_IN_USE') return 'La franja tiene compras futuras activas.';
-      if (code === 'INVALID_TIME_SLOT') return 'La franja horaria no es valida.';
+      if (code === 'INVALID_TIME_SLOT') return 'La franja horaria no es válida.';
       if (code === 'GRADE_ALREADY_EXISTS') return 'Ya existe un grado activo con esos datos.';
-      if (code === 'INVALID_GRADE') return 'Los datos del grado no son validos.';
+      if (code === 'INVALID_GRADE') return 'Los datos del grado no son válidos.';
       if (code === 'FORBIDDEN' || err.status === 403) return 'No tenes permisos para administrar este colegio.';
       if (err.status === 404) return 'No encontramos el recurso solicitado.';
-      if (err.status >= 500) return 'Error del servidor. Intenta mas tarde.';
+      if (err.status >= 500) return 'Error del servidor. Intenta más tarde.';
     }
     return fallback;
   }

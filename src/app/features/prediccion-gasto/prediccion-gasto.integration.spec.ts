@@ -39,7 +39,7 @@ describe('PrediccionGasto Integration', () => {
     whenMonto();
 
     const texto = textoRenderizado();
-    expect(texto).toContain('No se pudo cargar la prediccion');
+    expect(texto).toContain('No se pudo cargar la predicción');
     expect(texto).toContain('Reintentar');
   });
 

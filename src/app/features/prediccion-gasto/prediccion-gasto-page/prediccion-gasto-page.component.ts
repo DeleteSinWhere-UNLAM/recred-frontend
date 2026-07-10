@@ -90,7 +90,7 @@ export class PrediccionGastoPageComponent {
       error: (err) => {
         console.error(err);
         this.errorMessage =
-          'No se pudo cargar la prediccion de gastos. Por favor, intenta de nuevo mas tarde.';
+          'No se pudo cargar la predicción de gastos. Por favor, intenta de nuevo más tarde.';
         this.isLoading = false;
         this.cdr.markForCheck();
       },

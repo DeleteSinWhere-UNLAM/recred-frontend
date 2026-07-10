@@ -58,7 +58,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
       await whenValido(null);
 
       expect(servicioInvitaciones.validarToken).not.toHaveBeenCalled();
-      expect(presenter.error()).toBe('El link de invitacion no es valido: falta el token.');
+      expect(presenter.error()).toBe('El link de invitación no es válido: falta el token.');
       expect(presenter.loading()).toBeFalse();
     });
 
@@ -79,7 +79,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('Esta invitacion no existe o ya fue usada.');
+      expect(presenter.error()).toBe('Esta invitación no existe o ya fue usada.');
     });
 
     it('dado un token que devuelve 410, cuando valido, deberia mostrar mensaje de invitacion vencida', async () => {
@@ -88,7 +88,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
       await whenValido('abc123');
 
       expect(presenter.error()).toBe(
-        'Esta invitacion vencio. Pedile a tu colegio que te reenvie una nueva.',
+        'Esta invitación venció. Pedile a tu colegio que te reenvíe una nueva.',
       );
     });
 
@@ -97,7 +97,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('Esta invitacion ya fue aceptada.');
+      expect(presenter.error()).toBe('Esta invitación ya fue aceptada.');
     });
 
     it('dado un error 500 con mensaje del back, cuando valido, deberia usar ese mensaje', async () => {
@@ -113,7 +113,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('No pudimos validar el link de invitacion. Intenta mas tarde.');
+      expect(presenter.error()).toBe('No pudimos validar el link de invitación. Intenta más tarde.');
     });
 
     it('dado un error 500 con solo mensaje en espanol, cuando valido, deberia usar ese mensaje', async () => {
@@ -133,7 +133,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('No pudimos validar el link de invitacion. Intenta mas tarde.');
+      expect(presenter.error()).toBe('No pudimos validar el link de invitación. Intenta más tarde.');
     });
   });
 
@@ -179,7 +179,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('No pudimos validar el link de invitacion. Intenta mas tarde.');
+      expect(presenter.error()).toBe('No pudimos validar el link de invitación. Intenta más tarde.');
     });
 
     it('dado un error 500 con err.error string en preparar cuenta, deberia caer al mensaje generico', async () => {

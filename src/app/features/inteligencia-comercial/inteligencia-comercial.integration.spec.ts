@@ -86,7 +86,7 @@ describe('InteligenciaComercial Integration', () => {
     const cardsAgregar = fixture.debugElement.queryAll(By.css('.si__tarjeta--exito'));
     expect(cardsAgregar.length).toBe(3);
 
-    expect(fixture.nativeElement.textContent).toContain('Impulsar baja rotacion');
+    expect(fixture.nativeElement.textContent).toContain('Impulsar baja rotación');
     expect(fixture.nativeElement.textContent).toContain('Producto 2');
   });
 
