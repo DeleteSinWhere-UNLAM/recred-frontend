@@ -11,6 +11,7 @@ import { ProductoFavoritoMother } from './favoritos.mother';
 import { FavoritosPage } from './favoritos.page';
 import { FavoritosService } from './services/favoritos.service';
 import { BuffetService } from '../buffet/services/buffet.service';
+import { Buffet } from '../buffet/models/buffet.model';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
 class NavbarStub {
@@ -42,7 +43,7 @@ describe('FavoritosPage', () => {
       'obtenerBuffetDelAlumno',
       'getProductosDelBuffet'
     ]);
-    servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(of({ id: 'buffet-1' } as never));
+    servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(of({ id: 'buffet-1' } as Buffet));
     servicioBuffet.getProductosDelBuffet.and.returnValue(of([]));
 
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);
