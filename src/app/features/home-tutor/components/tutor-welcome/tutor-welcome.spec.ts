@@ -289,7 +289,7 @@ describe('TutorWelcome', () => {
 
       component.irAcreditar('alumno-1');
 
-      expect(router.navigate).toHaveBeenCalledWith(['/tutor/acreditar', 'alumno-1']);
+      expect(router.navigate).toHaveBeenCalledWith(['/acreditar-mercado-pago']);
     });
 
     it('dado un click en movimientos, deberia limpiar el contexto y navegar a /movimientos', () => {
