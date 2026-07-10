@@ -9,9 +9,7 @@
       <div class="acreditar-page__grid">
                 <section class="acreditar-page__form-section">
           <h3>¿Cuánto querés acreditarle a {{ presenter.alumno()?.nombre }}?</h3>
-          <p class="acreditar-page__description">
-            Saldo actual: <strong>{{ saldoFormateado }}</strong>. Ingresá el monto y te redirigiremos a Mercado Pago para completar la operación.
-          </p>
+
 
           <form class="acreditar-page__form" (submit)="onSubmit($event)" novalidate>
             <div class="acreditar-page__input-group">
