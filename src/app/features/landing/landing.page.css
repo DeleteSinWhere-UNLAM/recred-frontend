@@ -315,6 +315,43 @@
   margin-top: 12px;
 }
 
+.landing__login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+}
+
+.landing__leyenda-registro {
+  align-self: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+}
+
+.landing__leyenda-registro:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+.landing__link-registro {
+  color: var(--color-primario, #3b82f6);
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.landing__link-registro:hover {
+  filter: brightness(1.1);
+}
+
 .landing__media {
   display: none;
 }
@@ -342,4 +379,74 @@
   object-position: left center;
   border-radius: calc(var(--radius-card) - 6px);
   display: block;
+}
+
+/* Modal Thematic Overrides */
+.landing__modal-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  margin-top: -12px;
+}
+
+.landing__modal-logo {
+  width: 64px;
+  height: auto;
+}
+
+::ng-deep .landing-modal {
+  background-color: #1f2a3a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+::ng-deep .landing-modal .modal__title {
+  color: #fff !important;
+  font-family: var(--font-display) !important;
+  text-align: center;
+}
+
+::ng-deep .landing-modal .modal__message {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-family: var(--font-display) !important;
+  text-align: center;
+}
+
+.landing__roles-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.landing__role-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.landing__role-icon {
+  font-size: 1.25rem;
+  color: var(--color-dorado);
+  width: 24px;
+  text-align: center;
+}
+
+.landing__role-text {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+.modal-br-desktop {
+  display: none;
+}
+
+@media (min-width: 880px) {
+  .modal-br-desktop {
+    display: block;
+  }
 }

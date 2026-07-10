@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Hub } from 'aws-amplify/utils';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { RolUsuario } from '../../data-access/models/perfil.model';
@@ -13,6 +13,7 @@ import { InvitacionesTutorService } from '../directivo/services/invitaciones-tut
 import { LandingCtaButtonComponent } from './components/landing-cta-button/landing-cta-button.component';
 import { CtaLanding } from './models/cta-landing.model';
 import { LandingPresenter } from './presenter/landing.presenter';
+import { ModalComponent } from '../../shared/components/modal-component/modal-component';
 
 const ROL_A_RUTA: Record<RolUsuario, string> = {
   PADRE: '/tutor',
@@ -26,7 +27,7 @@ const ROL_A_RUTA: Record<RolUsuario, string> = {
   selector: 'app-landing-page',
   templateUrl: './landing.page.html',
   styleUrl: './landing.page.css',
-  imports: [LandingCtaButtonComponent],
+  imports: [LandingCtaButtonComponent, ModalComponent, RouterLink],
   providers: [LandingPresenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -41,6 +42,7 @@ export class LandingPage implements OnInit, OnDestroy {
 
   protected readonly cargando = signal<boolean>(true);
   protected readonly errorInvitacion = signal<string | null>(null);
+  protected readonly mostrarModalRegistro = signal(false);
 
   private hubUnsubscribe?: () => void;
   private redirigiendo = false;
