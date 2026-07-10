@@ -234,9 +234,11 @@ export class AsistenteVirtualPresenter {
     const sesionId = this.sesionIdState();
 
     this.sesionIdState.set(null);
+    this.sesionHistorialState.set(null);
     this.limpiarAccionInteractiva();
     this.historialVisibleState.set(false);
-    this.historialDisponibleState.set(this.sesionHistorialState() !== null);
+    this.historialDisponibleState.set(false);
+    this.historialRevisadoState.set(false);
     this.mensajesState.set([this.crearMensajeCred(this.mensajeBienvenida(), false)]);
 
     if (!contexto || !sesionId) return;
@@ -275,6 +277,10 @@ export class AsistenteVirtualPresenter {
       this.mensajesState.set([this.crearSeparadorHistorial(), ...mapeados]);
     } catch (err) {
       console.warn('No se pudo cargar el historial del asistente:', err);
+      this.sesionHistorialState.set(null);
+      this.historialVisibleState.set(false);
+      this.historialDisponibleState.set(false);
+      this.historialRevisadoState.set(false);
     } finally {
       this.cargandoHistorialState.set(false);
     }

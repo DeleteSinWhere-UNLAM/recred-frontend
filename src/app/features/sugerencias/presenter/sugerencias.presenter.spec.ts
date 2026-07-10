@@ -8,6 +8,7 @@ import { SugerenciaProducto } from '../models/sugerencia-producto.model';
 import { SugerenciasService } from '../services/sugerencias.service';
 import {
   ComboSuggestionMother,
+  EstadisticasVentaMother,
   ProductoMother,
   SugerenciaProductoMother,
 } from '../sugerencias.mother';
@@ -175,6 +176,48 @@ describe('SugerenciasPresenter', () => {
 
       expect(presenter.chartDiasSinVenta).toEqual([]);
       expect(presenter.chartStockVsVentas).toEqual([]);
+    });
+
+    it('dado todas las sugerencias con diasSinVenta = 0, cuando pido chartDiasSinVenta, deberia usar 1 como maximo para no dividir por cero', () => {
+      givenSugerenciasDelBack([
+        SugerenciaProductoMother.crear({
+          productoOriginal: 'A',
+          estadisticasVenta: EstadisticasVentaMother.crear({ productoId: 'p1', diasSinVenta: 0 }),
+        }),
+        SugerenciaProductoMother.crear({
+          productoOriginal: 'B',
+          estadisticasVenta: EstadisticasVentaMother.crear({ productoId: 'p2', diasSinVenta: 0 }),
+        }),
+      ]);
+      presenter.initialize('user-1');
+
+      const chart = presenter.chartDiasSinVenta;
+
+      expect(chart.every((c) => c.percent === 0)).toBeTrue();
+    });
+  });
+
+  describe('totales con estadisticas incompletas', () => {
+    it('dado una sugerencia con stockActual undefined, cuando pido totalStockInmovilizado, deberia contarlo como 0', () => {
+      const stats = EstadisticasVentaMother.crear();
+      const conStockUndefined = SugerenciaProductoMother.crear({
+        estadisticasVenta: { ...stats, stockActual: undefined as unknown as number },
+      });
+      givenSugerenciasDelBack([conStockUndefined]);
+      presenter.initialize('user-1');
+
+      expect(presenter.totalStockInmovilizado).toBe(0);
+    });
+
+    it('dado una sugerencia con diasSinVenta undefined, cuando pido promedioDiasSinVenta, deberia contarlo como 0', () => {
+      const stats = EstadisticasVentaMother.crear();
+      const conDiasUndefined = SugerenciaProductoMother.crear({
+        estadisticasVenta: { ...stats, diasSinVenta: undefined as unknown as number },
+      });
+      givenSugerenciasDelBack([conDiasUndefined]);
+      presenter.initialize('user-1');
+
+      expect(presenter.promedioDiasSinVenta).toBe(0);
     });
   });
 

@@ -88,6 +88,14 @@ describe('CloudinaryCollageHelper', () => {
     });
   });
 
+  describe('getCloudinaryPublicId con URL de cloudinary sin "/image/upload/"', () => {
+    it('dado una URL de cloudinary que no contiene /image/upload/, deberia devolver el fallback', () => {
+      const result = whenPidoElPublicIdDe('https://res.cloudinary.com/djzfudbze/otra-ruta/algo.png');
+
+      thenElPublicIdEs(result, 'logo_sin_fondo_ikciro');
+    });
+  });
+
   function whenPidoElPublicIdDe(url: string): string {
     return getCloudinaryPublicId(url);
   }

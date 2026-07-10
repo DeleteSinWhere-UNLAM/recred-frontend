@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { UsuarioService } from '../../../data-access/services/usuario.service';
@@ -96,6 +96,17 @@ describe('ConfirmarPage', () => {
 
       expect(component['lineas']()[0].subtotal).toBe(500);
       expect(component['lineas']()[0].incluido).toBeTrue();
+    });
+
+    it('dado vista alumno, cuando calculo lineas, deberia mostrar "nombre apellido"', async () => {
+      await givenPageConfigurada({ vacia: false });
+      const usuarioService = TestBed.inject(UsuarioService) as unknown as {
+        esVistaAlumno: WritableSignal<boolean>;
+      };
+      usuarioService.esVistaAlumno.set(true);
+      whenMonto();
+
+      expect(component['lineas']()[0].nombre).toContain(' ');
     });
   });
 

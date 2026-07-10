@@ -130,6 +130,15 @@ describe('VentaEspontaneaPageComponent', () => {
       expect(localStorage.getItem('recred_habilitar_fines_semana')).toBe('true');
     });
 
+    it('cuando toggleo el checkbox a false, deberia persistir "false" en localStorage', () => {
+      const event = { target: { checked: false } } as unknown as Event;
+
+      component.toggleDiasNoLaborables(event);
+
+      expect(component.ventasDiasNoLaborablesHabilitadas()).toBeFalse();
+      expect(localStorage.getItem('recred_habilitar_fines_semana')).toBe('false');
+    });
+
     it('cuando habilito los dias no laborables, deberia setear localStorage a true y actualizar el bloqueo', () => {
       component.esDiaNoLaborable.set(true);
 
@@ -328,6 +337,24 @@ describe('VentaEspontaneaPageComponent', () => {
       component.confirmarVenta();
 
       expect(component.mensajeError()).toBe('Timeout');
+    });
+
+    it('dado que el service falla sin mensaje ni err.message, cuando confirmo, deberia usar "Error desconocido"', () => {
+      givenCarritoConItems();
+      service.procesarVenta.and.returnValue(throwError(() => ({})));
+
+      component.confirmarVenta();
+
+      expect(component.mensajeError()).toBe('Error desconocido');
+    });
+  });
+
+  describe('restar sobre un producto ausente en el carrito', () => {
+    it('dado un producto que nunca estuvo en el carrito, cuando resto, no deberia romper y deberia quedar en 0', () => {
+      const p = ProductoVentaMother.crear();
+
+      expect(() => component.restar(p)).not.toThrow();
+      expect(component.getCantidad(p)).toBe(0);
     });
   });
 

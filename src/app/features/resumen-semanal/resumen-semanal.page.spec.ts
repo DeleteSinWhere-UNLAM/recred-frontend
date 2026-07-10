@@ -114,6 +114,48 @@ describe('ResumenSemanalPage', () => {
 
       expect(fixture.componentInstance.resumenProcesado?.mensajes).toEqual([]);
     });
+
+    it('dado un mensaje sin nombre, cuando se procesa, nombre deberia quedar vacio', () => {
+      givenPerfilEnLocalStorage('user-id-vacio');
+      servicioResumen.getResumen.and.returnValue(
+        of(
+          ResumenSemanalMother.crear({
+            resumen: JSON.stringify({
+              hijos: {},
+              mensaje: JSON.stringify([{ mensaje: 'sin nombre' }]),
+            }),
+          }),
+        ),
+      );
+
+      const fixture = TestBed.createComponent(ResumenSemanalPage);
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.resumenProcesado?.mensajes[0].nombre).toBe('');
+    });
+
+    it('dado un hijo con totalGastado null, cuando calculo el porcentaje, deberia usar 0', () => {
+      givenPerfilEnLocalStorage('user-id-null');
+      servicioResumen.getResumen.and.returnValue(
+        of(
+          ResumenSemanalMother.crear({
+            resumen: JSON.stringify({
+              hijos: {
+                'Ana': HijoResumenMother.crear({ totalGastado: 1000 }),
+                'Sin Gasto': HijoResumenMother.crear({ totalGastado: null as unknown as number }),
+              },
+              mensaje: JSON.stringify([]),
+            }),
+          }),
+        ),
+      );
+
+      const fixture = TestBed.createComponent(ResumenSemanalPage);
+      fixture.detectChanges();
+
+      const sinGasto = fixture.componentInstance.hijosResumen.find((h) => h.nombre === 'Sin');
+      expect(sinGasto?.porcentaje).toBe(0);
+    });
   });
 
   function givenPerfilEnLocalStorage(id: string): void {

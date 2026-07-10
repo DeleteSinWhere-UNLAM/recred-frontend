@@ -312,6 +312,15 @@ describe('NavbarComponent', () => {
       expect(interno.menuKiosqueroAbierto()).toBeFalse();
       expect(router.navigateByUrl).toHaveBeenCalledWith('/promociones');
     });
+
+    it('dado plan intermedio, cuando llamo irAPromociones, deberia mostrar bloqueo y no navegar', () => {
+      givenPerfil({ plan: 'INTERMEDIO' });
+
+      interno.irAPromociones();
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Avanzado.', 'info');
+      expect(router.navigateByUrl).not.toHaveBeenCalledWith('/promociones');
+    });
   });
 
   describe('toggleMenu', () => {
@@ -520,6 +529,14 @@ describe('NavbarComponent', () => {
 
       expect(interno.menuAbierto()).toBeFalse();
     });
+
+    it('dado el menu mobile abierto, cuando aprieto escape, deberia cerrarlo', () => {
+      interno.menuMobileAbierto.set(true);
+
+      interno.onEscape();
+
+      expect(interno.menuMobileAbierto()).toBeFalse();
+    });
   });
 
   describe('toggleMenuMobile', () => {
@@ -640,6 +657,12 @@ describe('NavbarComponent', () => {
       interno.clickEnNotificacion({ tipo: 'ESTADO_COMPRA', compraId: 'c1' });
 
       expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/pedidos-tracking?id=c1');
+    });
+
+    it('dado tipo ESTADO_COMPRA sin compraId, deberia navegar a pedidos-tracking sin id', () => {
+      interno.clickEnNotificacion({ tipo: 'ESTADO_COMPRA' });
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/kiosquero/pedidos-tracking');
     });
 
     it('dado tipo AGREGAR_PRODUCTO, deberia navegar a /sugerencias-agregar', () => {

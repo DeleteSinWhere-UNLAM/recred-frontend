@@ -5,6 +5,7 @@ import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { Presupuesto } from '../../presupuesto/models/presupuesto.model';
 import { PresupuestoService } from '../../presupuesto/services/presupuesto.service';
 import { MovimientosService } from '../../movimientos/services/movimientos.service';
+import { Movimiento } from '../../movimientos/models/movimiento.model';
 import { ProductoMother } from '../compra.mother';
 import { CarritoService } from './carrito.service';
 
@@ -318,6 +319,114 @@ describe('CarritoService', () => {
       await service.cargarPresupuestoYConsumo('alumno-1');
 
       expect(console.error).toHaveBeenCalled();
+    });
+
+    it('dado que el back devuelve history null, deberia borrar la entrada del mapa de purchases', async () => {
+      servicioMovimientos.getHistorialAlumno.and.returnValue(of([{ id: 'm1' }] as unknown as Movimiento[]));
+      servicioPresupuesto.getPresupuesto.and.resolveTo(null as unknown as Presupuesto);
+      await service.cargarPresupuestoYConsumo('alumno-1');
+      expect(service.purchases().has('alumno-1')).toBeTrue();
+
+      servicioMovimientos.getHistorialAlumno.and.returnValue(of(null as unknown as Movimiento[]));
+      await service.cargarPresupuestoYConsumo('alumno-1');
+
+      expect(service.purchases().has('alumno-1')).toBeFalse();
+    });
+  });
+
+  describe('agregar y setCantidad con varios items en el carrito', () => {
+    it('dado dos productos distintos en el carrito, cuando agrego mas de uno, deberia dejar al otro intacto', () => {
+      const chocolate = ProductoMother.crear({ id: 'p-choco', precio: 500 });
+      const galleta = ProductoMother.crear({ id: 'p-galle', precio: 300 });
+      service.agregar(chocolate, 'alumno-1', 1);
+      service.agregar(galleta, 'alumno-1', 1);
+
+      service.agregar(chocolate, 'alumno-1', 2);
+
+      expect(service.cantidadDe('p-choco', 'alumno-1')).toBe(3);
+      expect(service.cantidadDe('p-galle', 'alumno-1')).toBe(1);
+    });
+
+    it('dado dos items en el carrito del mismo alumno, cuando cambio la cantidad de uno, el otro deberia quedar igual', () => {
+      const chocolate = ProductoMother.crear({ id: 'p-choco' });
+      const galleta = ProductoMother.crear({ id: 'p-galle' });
+      service.agregar(chocolate, 'alumno-1', 1);
+      service.agregar(galleta, 'alumno-1', 2);
+      const idGalleta = service.itemsPorAlumno().get('alumno-1')!.find((i) => i.producto.id === 'p-galle')!.id;
+
+      service.setCantidad(idGalleta, 5);
+
+      expect(service.cantidadDe('p-choco', 'alumno-1')).toBe(1);
+      expect(service.cantidadDe('p-galle', 'alumno-1')).toBe(5);
+    });
+  });
+
+  describe('validarAgregar sin alumno', () => {
+    it('dado un presupuesto vigente pero sin alumno cargado, cuando valido, deberia permitirlo (limite saldo = Infinity)', async () => {
+      await givenPresupuestoCon({ montoLimiteGeneral: 5000, reglasCategoria: [] });
+      servicioAlumnos.getAlumnoById.and.returnValue(undefined);
+      const producto = ProductoMother.crear({ precio: 100 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeTrue();
+    });
+
+    it('dado un presupuesto vigente con seleccion de retiro, cuando valido, deberia usar la fecha de la seleccion como referencia', async () => {
+      await givenPresupuestoCon({ montoLimiteGeneral: 5000, reglasCategoria: [] });
+      service.setSeleccionRetiro('alumno-1', '2030-07-15', 'PRIMER_RECREO');
+      const producto = ProductoMother.crear({ precio: 100 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeTrue();
+    });
+
+    it('dado un presupuesto vigente con saldo insuficiente, cuando valido, deberia rechazar por saldo', async () => {
+      await givenPresupuestoCon({ montoLimiteGeneral: 100000, reglasCategoria: [] });
+      servicioAlumnos.getAlumnoById.and.returnValue(
+        AlumnoMother.crear({ id: 'alumno-1', saldo: 100 }),
+      );
+      const producto = ProductoMother.crear({ precio: 500 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeFalse();
+      expect(resultado.razon).toBe('saldo');
+    });
+
+    it('dado un historial con compras de status desconocido, cuando valido, deberia ignorarlas al calcular el gasto pasado', async () => {
+      const budget = {
+        id: 'b',
+        fechaInicio: '2026-01-01',
+        alumnoId: 'alumno-1',
+        activo: true,
+        periodo: 'SEMANAL' as const,
+        montoLimiteGeneral: 5000,
+        reglasCategoria: [],
+      };
+      servicioPresupuesto.getPresupuesto.and.resolveTo(budget);
+      servicioMovimientos.getHistorialAlumno.and.returnValue(
+        of([
+          {
+            id: 'm-desconocido',
+            status: 'ESTADO_INEXISTENTE',
+            totalAmount: 9999,
+            date: new Date().toISOString(),
+            pickupDate: null,
+            items: [],
+          },
+        ] as unknown as Movimiento[]),
+      );
+      servicioAlumnos.getAlumnoById.and.returnValue(
+        AlumnoMother.crear({ id: 'alumno-1', saldo: 10000 }),
+      );
+      await service.cargarPresupuestoYConsumo('alumno-1');
+      const producto = ProductoMother.crear({ precio: 200 });
+
+      const resultado = service.validarAgregar(producto, 'alumno-1', 1);
+
+      expect(resultado.permitido).toBeTrue();
     });
   });
 
