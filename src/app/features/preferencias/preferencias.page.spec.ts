@@ -137,6 +137,16 @@ describe('PreferenciasPage', () => {
     });
   });
 
+  describe('preferencias con data null del back', () => {
+    it('dado que el back devuelve null, cuando se monta, preferencias deberia caer al arreglo vacio', () => {
+      servicioPreferencias.getPreferencias.and.returnValue(of(null as unknown as never[]));
+      const nuevaFixture = TestBed.createComponent(PreferenciasPage);
+      nuevaFixture.detectChanges();
+
+      expect(nuevaFixture.componentInstance.preferencias).toEqual([]);
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }

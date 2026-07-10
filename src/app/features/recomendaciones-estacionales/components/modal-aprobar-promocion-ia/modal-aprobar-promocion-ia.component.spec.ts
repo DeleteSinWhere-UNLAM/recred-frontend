@@ -28,6 +28,16 @@ describe('ModalAprobarPromocionIaComponent', () => {
       expect(component.promotionForm.get('discountPercentage')?.value).toBe(20);
       expect(component.selectedProductIds.size).toBe(0);
     });
+
+    it('dado un suggestedPromotion sin descuento, cuando se monta, el form deberia caer al fallback 10', () => {
+      const nuevoFixture = TestBed.createComponent(ModalAprobarPromocionIaComponent);
+      nuevoFixture.componentInstance.suggestedPromotion = PromocionSugeridaMother.crear({
+        descuento: 0,
+      });
+      nuevoFixture.detectChanges();
+
+      expect(nuevoFixture.componentInstance.promotionForm.get('discountPercentage')?.value).toBe(10);
+    });
   });
 
   describe('toggleProductSelection', () => {
@@ -57,6 +67,12 @@ describe('ModalAprobarPromocionIaComponent', () => {
       givenDescuento(50);
 
       expect(component.getDiscountedPrice(500)).toBe(250);
+    });
+
+    it('dado un descuento null en el form, getDiscountedPrice deberia devolver el precio original (fallback 0)', () => {
+      component.promotionForm.patchValue({ discountPercentage: null });
+
+      expect(component.getDiscountedPrice(1000)).toBe(1000);
     });
   });
 

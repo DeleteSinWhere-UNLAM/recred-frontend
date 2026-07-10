@@ -161,7 +161,7 @@ describe('AceptarInvitacionTutorPage', () => {
 
     await whenMontoLaPagina();
 
-    thenElDomContieneTexto('Te enviamos usuario y contrasena temporal');
+    thenElDomContieneTexto('Te enviamos usuario y contraseña temporal');
     thenElDomContieneTexto('Iniciar sesion');
   });
 

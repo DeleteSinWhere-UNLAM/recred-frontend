@@ -189,6 +189,39 @@ describe('CrearHijoPage', () => {
     expect(component['form'].controls.username.errors?.['emailFormat']).toBeUndefined();
   });
 
+  it('dado un username no-string en runtime, la validadora deberia caer al fallback vacio sin marcar error', () => {
+    whenMontoLaPagina();
+
+    component['form'].controls.username.setValue(42 as unknown as string);
+
+    expect(component['form'].controls.username.errors?.['emailFormat']).toBeUndefined();
+  });
+
+  it('dado que getPerfil devuelve null, cuando monto la pagina, nombreUsuario deberia caer al usuario actual', async () => {
+    servicioPerfil.getPerfil.and.returnValue(null);
+    const nuevoFixture = TestBed.createComponent(CrearHijoPage);
+    const nuevoComponente = nuevoFixture.componentInstance;
+
+    nuevoFixture.detectChanges();
+
+    expect((nuevoComponente as unknown as { nombreUsuario: string }).nombreUsuario).toBe(
+      'Usuario Test',
+    );
+  });
+
+  it('dado un unico colegio disponible, cuando el effect corre, deberia auto-setear el colegioId del form', async () => {
+    servicioColegios.obtenerColegiosDelTutor.and.resolveTo([ColegioMother.crearLista()[0]]);
+    const nuevoFixture = TestBed.createComponent(CrearHijoPage);
+
+    nuevoFixture.detectChanges();
+    await nuevoFixture.whenStable();
+    nuevoFixture.detectChanges();
+
+    expect(nuevoFixture.componentInstance['form'].controls.colegioId.value).toBe(
+      ColegioMother.crearLista()[0].id,
+    );
+  });
+
   function whenMontoLaPagina(): void {
     fixture.detectChanges();
   }

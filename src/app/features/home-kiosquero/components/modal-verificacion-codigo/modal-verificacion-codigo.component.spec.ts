@@ -187,6 +187,14 @@ describe('ModalVerificacionCodigoComponent', () => {
     });
   });
 
+  describe('getStatusLabel con estado desconocido', () => {
+    it('dado un status no mapeado, deberia devolver el status crudo como fallback', () => {
+      const priv = component as unknown as { getStatusLabel(s: string): string };
+
+      expect(priv.getStatusLabel('ESTADO_INEXISTENTE')).toBe('ESTADO_INEXISTENTE');
+    });
+  });
+
   function givenPickupsDelBack(pickups: ScheduledPickup[]): void {
     trackingService.getScheduledPickups.and.returnValue(of(pickups));
   }

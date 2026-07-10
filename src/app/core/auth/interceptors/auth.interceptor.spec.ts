@@ -148,6 +148,30 @@ describe('authInterceptor', () => {
     }
   });
 
+  it('dado un POST a /school-registrations, cuando hago request, no deberia pedir token ni agregar Authorization', async () => {
+    const url = `${environment.apiUrl}/school-registrations`;
+
+    const promesa = firstValueFrom(http.post(url, { nombre: 'colegio' }));
+    const req = httpMock.expectOne(url);
+
+    expect(req.request.headers.get('Authorization')).toBeNull();
+    req.flush({});
+    await promesa;
+    expect(servicioSesion.obtenerAccessTokenParaApi).not.toHaveBeenCalled();
+  });
+
+  it('dado un POST a /invitaciones/tutor/{token}/preparar-cuenta, no deberia pedir token ni agregar Authorization', async () => {
+    const url = `${environment.apiUrl}/invitaciones/tutor/tok-1/preparar-cuenta`;
+
+    const promesa = firstValueFrom(http.post(url, {}));
+    const req = httpMock.expectOne(url);
+
+    expect(req.request.headers.get('Authorization')).toBeNull();
+    req.flush({});
+    await promesa;
+    expect(servicioSesion.obtenerAccessTokenParaApi).not.toHaveBeenCalled();
+  });
+
   function givenTokensDisponibles(...tokens: (string | null)[]): void {
     servicioSesion.obtenerAccessTokenParaApi.and.returnValues(
       ...tokens.map((t) => Promise.resolve(t)),

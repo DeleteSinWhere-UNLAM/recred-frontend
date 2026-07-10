@@ -19,21 +19,29 @@
 
 /* Back Button */
 .back-btn {
+  justify-self: start;
+  align-self: flex-start;
+  width: fit-content;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 18px;
+  background-color: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--color-borde);
   color: var(--color-pizarra);
-  background: transparent;
-  padding: 8px 12px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
   border-radius: var(--radius-button);
+  box-shadow: 0 10px 26px rgba(51, 65, 85, 0.08);
   transition: all var(--transition-ui);
+  margin-bottom: 12px;
 }
 
 .back-btn:hover {
-  background-color: var(--color-superficie-alt);
+  background-color: var(--color-superficie);
+  border-color: var(--color-borde-fuerte);
   color: var(--color-pizarra-dark);
 }
 

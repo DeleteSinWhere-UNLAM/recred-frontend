@@ -114,6 +114,12 @@ describe('CodigoRetiroCardComponent', () => {
 
       expect(component.iniciales()).toBe('P');
     });
+
+    it('dado un alumno con nombre "Juan" y apellido "", iniciales deberia ser "J"', () => {
+      component.alumno = AlumnoMother.crear({ nombre: 'Juan', apellido: '' });
+
+      expect(component.iniciales()).toBe('J');
+    });
   });
 
   function whenMonto(): void {

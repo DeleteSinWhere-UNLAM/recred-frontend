@@ -180,7 +180,13 @@ export class HomeKiosqueroPage implements OnInit {
       next: (res) => {
         this.bulkProductsData = res.products;
         this.isProcessingFile = false;
-        this.toastService.mostrar('Archivo procesado correctamente', 'success');
+        
+        if (res.products && res.products.length > 0) {
+          this.toastService.mostrar('Archivo procesado correctamente', 'success');
+        } else {
+          this.toastService.mostrar('Formato inválido o vacío. Por favor, usá la Tabla de Ejemplo.', 'error');
+        }
+        
         this.cdr.markForCheck();
       },
       error: () => {

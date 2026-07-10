@@ -209,6 +209,60 @@ describe('TransferirSaldoPresenter', () => {
     });
   });
 
+  describe('urlFotoPerfil', () => {
+    it('dado un alumno origen con urlFotoPerfil, deberia devolver esa url', async () => {
+      alumnosService.getAlumnoById.and.returnValue(
+        AlumnoMother.crear({ id: ALUMNO_ID, urlFotoPerfil: 'https://cdn/foto.png' }),
+      );
+
+      await presenter.init(ALUMNO_ID);
+
+      expect(presenter.urlFotoPerfil()).toBe('https://cdn/foto.png');
+    });
+
+    it('dado un alumno origen sin urlFotoPerfil, deberia devolver null', async () => {
+      await presenter.init(ALUMNO_ID);
+
+      expect(presenter.urlFotoPerfil()).toBeNull();
+    });
+  });
+
+  describe('signals derivadas sin alumno origen', () => {
+    it('dado el presenter recien creado sin alumno, cuando pido nombreCompleto, deberia devolver string vacio', () => {
+      expect(presenter.nombreCompleto()).toBe('');
+    });
+
+    it('dado el presenter recien creado sin alumno, cuando pido grado, deberia devolver string vacio', () => {
+      expect(presenter.grado()).toBe('');
+    });
+  });
+
+  describe('transferir early returns', () => {
+    it('dado sin alumno origen inicializado, cuando transfiero, deberia devolver false sin llamar al service', async () => {
+      const resultado = await presenter.transferir(OTRO_ALUMNO_ID, 100);
+
+      expect(resultado).toBeFalse();
+      expect(billeteraService.transferirSaldo).not.toHaveBeenCalled();
+    });
+
+    it('dado que init sigue en curso, cuando transfiero, deberia devolver false por estado cargando', async () => {
+      let resolverAsegurar!: (v: never[]) => void;
+      alumnosService.asegurarCargados.and.returnValue(
+        new Promise<never[]>((resolve) => {
+          resolverAsegurar = resolve;
+        }),
+      );
+
+      const initEnCurso = presenter.init(ALUMNO_ID);
+      const resultado = await presenter.transferir(OTRO_ALUMNO_ID, 100);
+      resolverAsegurar([]);
+      await initEnCurso;
+
+      expect(resultado).toBeFalse();
+      expect(billeteraService.transferirSaldo).not.toHaveBeenCalled();
+    });
+  });
+
   function givenAlumnoInexistente(): void {
     alumnosService.getAlumnoById.and.returnValue(undefined);
   }

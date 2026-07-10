@@ -38,6 +38,7 @@ export class App implements OnInit {
         this.autenticado() &&
         rol !== null &&
         rol !== 'DIRECTIVO_COLEGIO' &&
+        rol !== 'ADMIN' &&
         !RUTAS_SIN_ASISTENTE.has(this.rutaActual())
       );
     },

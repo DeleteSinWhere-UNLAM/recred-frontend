@@ -48,7 +48,6 @@ export class SupplierService {
     );
   }
 
-  // Confirmación y Edición de Mapeo de Producto (Auto-matching)
   updateMapping(itemId: string, productoInventarioId: string | null): Observable<ItemListaPrecioProveedorResponse> {
     return this.http.patch<ItemListaPrecioProveedorResponse>(
       `${this.baseUrl}/price-list-items/${itemId}/mapping`,
@@ -56,7 +55,6 @@ export class SupplierService {
     );
   }
 
-  // Recomendaciones de Compra por Mejor Precio
   getPurchaseRecommendations(productosIds: string[]): Observable<RecomendacionProveedor[]> {
     return this.http.post<RecomendacionProveedor[]>(
       `${this.baseUrl}/purchase-recommendations`,

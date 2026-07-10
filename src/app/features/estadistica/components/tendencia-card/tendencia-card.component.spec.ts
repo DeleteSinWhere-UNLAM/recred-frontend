@@ -117,6 +117,47 @@ describe('TendenciaCardComponent', () => {
     });
   });
 
+  describe('tooltip callback', () => {
+    interface FakeTooltipContext {
+      dataset: { label?: string };
+      parsed: { y: number | null };
+    }
+
+    function invocarTooltipLabel(context: FakeTooltipContext): string {
+      const cb = component.lineChartOptions!.plugins!.tooltip!.callbacks!.label!;
+      return cb.call({} as never, context as never) as string;
+    }
+
+    it('dado dataset con label y y numerico, deberia devolver "label: $monto"', () => {
+      const resultado = invocarTooltipLabel({
+        dataset: { label: 'Gasto Diario' },
+        parsed: { y: 1500 },
+      });
+
+      expect(resultado).toContain('Gasto Diario:');
+      expect(resultado).toContain('1.500');
+    });
+
+    it('dado dataset sin label (string vacio), no deberia anteponer ": "', () => {
+      const resultado = invocarTooltipLabel({
+        dataset: { label: '' },
+        parsed: { y: 100 },
+      });
+
+      expect(resultado.startsWith(':')).toBeFalse();
+      expect(resultado).toContain('100');
+    });
+
+    it('dado parsed.y null, deberia devolver solo el label sin monto', () => {
+      const resultado = invocarTooltipLabel({
+        dataset: { label: 'Gasto Diario' },
+        parsed: { y: null },
+      });
+
+      expect(resultado).toBe('Gasto Diario: ');
+    });
+  });
+
   function givenHistorial(historial: Movimiento[]): void {
     component.historial = historial;
     component.ngOnChanges({

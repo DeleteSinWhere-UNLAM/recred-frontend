@@ -2,7 +2,7 @@
   @if (loading) {
     <div class="pv__notice" role="status">
       <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-      <span>Cargando panel de administracion...</span>
+      <span>Cargando panel de administración...</span>
     </div>
   }
 
@@ -34,7 +34,7 @@
             <i class="fa-solid fa-store"></i>
           </span>
           <div>
-            <p class="pv__section-kicker">Operacion</p>
+            <p class="pv__section-kicker">Operación</p>
             <h2 id="kioscos-title">Kiosco del colegio</h2>
           </div>
         </div>
@@ -57,7 +57,7 @@
           </span>
           <div>
             <strong>Sin kioscos registrados</strong>
-            <p>No hay buffets registrados en este colegio todavia.</p>
+            <p>No hay buffets registrados en este colegio todavía.</p>
           </div>
         </div>
       }
@@ -96,7 +96,7 @@
                     <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                   </button>
                 } @else {
-                  <button type="button" class="pv__mini-action" (click)="verDetalleVendedor(buffet.vendedor)">
+                  <button type="button" class="pv__mini-action" (click)="verDetalleVendedor(buffet.vendedor, buffet)">
                     <span>Ver vendedor</span>
                     <i class="fa-solid fa-eye" aria-hidden="true"></i>
                   </button>
@@ -115,8 +115,8 @@
             <i class="fa-solid fa-school-flag"></i>
           </span>
           <div>
-            <p class="pv__section-kicker">Configuracion</p>
-            <h2 id="gestion-escolar-title">Gestion escolar</h2>
+            <p class="pv__section-kicker">Configuración</p>
+            <h2 id="gestion-escolar-title">Gestión escolar</h2>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@
           </span>
           <span class="pv__action-copy">
             <strong>Invitar tutor</strong>
-            <small>Enviar link unico por email</small>
+            <small>Enviar link único por email</small>
           </span>
           <span class="pv__quick-arrow" aria-hidden="true">
             <i class="fa-solid fa-arrow-right"></i>
@@ -222,6 +222,23 @@
           <small>CUIT</small>
           <p>{{ vendedorSeleccionado()?.cuit }}</p>
         </div>
+      </div>
+
+      <div class="pv-modal__footer" style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem; padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+        <button type="button" class="pv__primary-action" style="width: 100%; justify-content: center;" (click)="emitirReenviarCredenciales()">
+          <span class="pv__primary-action-icon" aria-hidden="true">
+            <i class="fa-solid fa-envelope"></i>
+          </span>
+          <strong>Reenviar Credenciales</strong>
+        </button>
+
+        <button type="button" class="pv__mini-action pv__mini-action--warning" style="width: 100%; justify-content: center; padding: 0.75rem;"
+          [routerLink]="['/directivo/asignar-vendedor']"
+          [state]="{ buffetId: buffetSeleccionado()?.id, buffetName: buffetSeleccionado()?.nombre, mode: 'replace' }"
+          (click)="cerrarModal()">
+          <i class="fa-solid fa-user-pen" aria-hidden="true"></i>
+          <span style="margin-left: 0.5rem;">Reemplazar Vendedor</span>
+        </button>
       </div>
     </div>
   </div>
