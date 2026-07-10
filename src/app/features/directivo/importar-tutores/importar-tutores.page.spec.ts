@@ -114,6 +114,46 @@ describe('ImportarTutoresPage', () => {
     expect((fixture.nativeElement as HTMLElement).querySelector('.errores')).toBeNull();
   });
 
+  it('dado un input sin files, cuando disparo change, archivoSeleccionado deberia quedar en null', () => {
+    whenMontoLaPagina();
+    const input = (fixture.nativeElement as HTMLElement).querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    Object.defineProperty(input, 'files', { value: null, configurable: true });
+
+    input.dispatchEvent(new Event('change'));
+
+    expect(
+      (fixture.componentInstance as unknown as { archivoSeleccionado: () => File | null })
+        .archivoSeleccionado(),
+    ).toBeNull();
+  });
+
+  it('dado un input con files vacio (length 0), cuando disparo change, archivoSeleccionado deberia quedar en null', () => {
+    whenMontoLaPagina();
+    const input = (fixture.nativeElement as HTMLElement).querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    Object.defineProperty(input, 'files', { value: [] as unknown as FileList, configurable: true });
+
+    input.dispatchEvent(new Event('change'));
+
+    expect(
+      (fixture.componentInstance as unknown as { archivoSeleccionado: () => File | null })
+        .archivoSeleccionado(),
+    ).toBeNull();
+  });
+
+  it('dado que presenter esta loading, cuando submiteo, no deberia invocar al presenter', async () => {
+    loadingSignal.set(true);
+    whenMontoLaPagina();
+    whenElijoUnArchivo(new File(['a'], 'x.csv', { type: 'text/csv' }));
+
+    await whenSubmiteoElForm();
+
+    expect(presenterStub.importar).not.toHaveBeenCalled();
+  });
+
   function whenMontoLaPagina(): void {
     fixture.detectChanges();
   }

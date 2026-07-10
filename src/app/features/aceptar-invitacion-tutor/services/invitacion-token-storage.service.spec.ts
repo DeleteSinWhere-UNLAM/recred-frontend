@@ -59,6 +59,36 @@ describe('InvitacionTokenStorageService', () => {
     });
   });
 
+  describe('guards de localStorage indefinido (SSR)', () => {
+    let descriptorOriginal: PropertyDescriptor | undefined;
+
+    beforeEach(() => {
+      descriptorOriginal = Object.getOwnPropertyDescriptor(window, 'localStorage');
+      Object.defineProperty(window, 'localStorage', {
+        value: undefined,
+        configurable: true,
+      });
+    });
+
+    afterEach(() => {
+      if (descriptorOriginal) {
+        Object.defineProperty(window, 'localStorage', descriptorOriginal);
+      }
+    });
+
+    it('dado localStorage indefinido, cuando guardo, no deberia romper', () => {
+      expect(() => service.guardar('token-x')).not.toThrow();
+    });
+
+    it('dado localStorage indefinido, cuando leo, deberia devolver null', () => {
+      expect(service.leer()).toBeNull();
+    });
+
+    it('dado localStorage indefinido, cuando limpio, no deberia romper', () => {
+      expect(() => service.limpiar()).not.toThrow();
+    });
+  });
+
   function whenGuardo(token: string): void {
     service.guardar(token);
   }

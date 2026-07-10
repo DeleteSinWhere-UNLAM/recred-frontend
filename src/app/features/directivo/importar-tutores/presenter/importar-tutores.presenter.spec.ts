@@ -123,6 +123,18 @@ describe('ImportarTutoresPresenter', () => {
     });
   });
 
+  describe('mapearError con message undefined en el body', () => {
+    it('dado un error 400 con message undefined, cuando importo, deberia caer al mensaje por status', async () => {
+      servicioInvitaciones.importarCsv.and.rejectWith(
+        new HttpErrorResponse({ status: 400, error: { message: undefined } }),
+      );
+
+      await whenImporto(new File([''], 'x.csv'));
+
+      expect(presenter.error()).toBe('El archivo CSV es inválido.');
+    });
+  });
+
   function givenElBackDevuelve(reporte: ReporteImportacionCsv): void {
     servicioInvitaciones.importarCsv.and.resolveTo(reporte);
   }

@@ -51,6 +51,17 @@ describe('ModalSeleccionCargaComponent', () => {
     thenSeEmitio(spyEmit);
   });
 
+  it('dado plan gratuito, cuando hago click en Carga Asistida, deberia emitir planBlocked con "Intermedio"', () => {
+    component.planActual = 'GRATUITO';
+    const spyIa = spyOn(component.iaUpload, 'emit');
+    const spyBloqueo = spyOn(component.planBlocked, 'emit');
+
+    whenHagoClickEnCargaAsistida();
+
+    expect(spyIa).not.toHaveBeenCalled();
+    expect(spyBloqueo).toHaveBeenCalledWith('Intermedio');
+  });
+
   it('dado el modal, cuando hago click en Cancelar o presiono esc/backdrop, deberia emitir closeModal', () => {
     const spyEmit = spyOn(component.closeModal, 'emit');
 

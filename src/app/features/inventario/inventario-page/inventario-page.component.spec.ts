@@ -974,6 +974,69 @@ describe('InventarioPageComponent', () => {
     });
   });
 
+  describe('getInventoryErrorMessage', () => {
+    it('dado un HttpErrorResponse con status 403 y sin code conocido, deberia devolver el mensaje de permisos', () => {
+      const mensaje = invocarGetInventoryErrorMessage(
+        new HttpErrorResponse({ status: 403, statusText: 'Forbidden' }),
+      );
+
+      expect(mensaje).toContain('permisos');
+    });
+
+    it('dado un HttpErrorResponse con status 404 y sin code conocido, deberia devolver el mensaje de no encontrado', () => {
+      const mensaje = invocarGetInventoryErrorMessage(
+        new HttpErrorResponse({ status: 404, statusText: 'Not Found' }),
+      );
+
+      expect(mensaje).toContain('encontr');
+    });
+
+    it('dado un HttpErrorResponse con status 400 y sin code conocido, deberia devolver el mensaje de datos ingresados', () => {
+      const mensaje = invocarGetInventoryErrorMessage(
+        new HttpErrorResponse({ status: 400, statusText: 'Bad Request' }),
+      );
+
+      expect(mensaje).toContain('datos');
+    });
+
+    it('dado un error que no es HttpErrorResponse, deberia devolver el mensaje generico', () => {
+      const mensaje = invocarGetInventoryErrorMessage(new Error('otro'));
+
+      expect(mensaje).toContain('inesperado');
+    });
+
+    it('dado un HttpErrorResponse con code conocido en el body, deberia devolver el mensaje mapeado', () => {
+      const mensaje = invocarGetInventoryErrorMessage(
+        new HttpErrorResponse({ status: 409, error: { code: 'STOCK_INSUFFICIENT' } }),
+      );
+
+      expect(mensaje).toContain('stock');
+    });
+
+    function invocarGetInventoryErrorMessage(error: unknown): string {
+      whenMonto();
+      const priv = component as unknown as { getInventoryErrorMessage(e: unknown): string };
+      return priv.getInventoryErrorMessage(error);
+    }
+  });
+
+  describe('setDefaultInventoryManagementMotivo con modo desconocido', () => {
+    it('dado un modo sin motivo default mapeado, deberia patchear motivo con string vacio', () => {
+      whenMonto();
+      const priv = component as unknown as {
+        setDefaultInventoryManagementMotivo(): void;
+        getInventoryManagementMode(): string;
+        inventoryManagementForm: { patchValue: (v: unknown) => void; get(name: string): { value: unknown } | null };
+      };
+      spyOn(priv, 'getInventoryManagementMode').and.returnValue('MODO_INEXISTENTE' as never);
+      spyOn(priv.inventoryManagementForm, 'patchValue');
+
+      priv.setDefaultInventoryManagementMotivo();
+
+      expect(priv.inventoryManagementForm.patchValue).toHaveBeenCalledWith({ motivo: '' });
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }

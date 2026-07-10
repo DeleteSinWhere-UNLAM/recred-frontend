@@ -469,6 +469,45 @@ describe('SupplierDetailPage', () => {
       expect(precios.length).toBe(1);
       expect(precios[0].nombre).toBe('Coca-Cola');
     });
+
+    it('dado una lista sin items, getLatestPrices deberia continuar sin romper', () => {
+      component.supplier.set(
+        SupplierResponseMother.crear({
+          listasPrecios: [
+            ListaPrecioProveedorMother.crear({ id: 'lp-vacia', items: undefined as unknown as [] }),
+            ListaPrecioProveedorMother.crear({
+              id: 'lp-ok',
+              items: [ItemListaPrecioMother.crear({ nombreProductoProveedor: 'Coca' })],
+            }),
+          ],
+        }),
+      );
+
+      const precios = component.getLatestPrices();
+
+      expect(precios.some((p) => p.nombre === 'Coca')).toBeTrue();
+    });
+
+    it('dado un item sin unidad, getLatestPrices deberia usar "unidad" como fallback', () => {
+      component.supplier.set(
+        SupplierResponseMother.crear({
+          listasPrecios: [
+            ListaPrecioProveedorMother.crear({
+              items: [
+                ItemListaPrecioMother.crear({
+                  nombreProductoProveedor: 'Alfajor',
+                  unidad: undefined as unknown as string,
+                }),
+              ],
+            }),
+          ],
+        }),
+      );
+
+      const precios = component.getLatestPrices();
+
+      expect(precios[0].unidad).toBe('unidad');
+    });
   });
 
   function whenMonto(): void {

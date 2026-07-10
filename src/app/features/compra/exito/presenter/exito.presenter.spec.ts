@@ -52,6 +52,12 @@ describe('ExitoPresenter', () => {
       expect(presenter.ordenes()).toEqual([]);
       expect(presenter.total()).toBe(0);
     });
+
+    it('dado sin ultima orden, cuando leo codigos, deberia devolver un objeto vacio', () => {
+      givenSinUltimaOrden();
+
+      expect(presenter.codigos()).toEqual({});
+    });
   });
 
   describe('codigoDe', () => {

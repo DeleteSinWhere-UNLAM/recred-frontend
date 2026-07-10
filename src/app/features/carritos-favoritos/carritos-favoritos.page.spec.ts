@@ -317,6 +317,14 @@ describe('CarritosFavoritosPage', () => {
     });
   });
 
+  describe('todosHijosColapsados sin hijos', () => {
+    it('dado que no hay grupos de hijos, todosHijosColapsados deberia devolver false', () => {
+      component.gruposHijos.set([]);
+
+      expect(component.todosHijosColapsados()).toBeFalse();
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }
