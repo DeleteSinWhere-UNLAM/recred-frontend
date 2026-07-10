@@ -78,8 +78,8 @@ export class TutorWelcome implements OnInit {
             })
             .map(p => ({ ...p, alumnoNombre: alumno.nombre }));
           todosPendientes.push(...mapeados);
-          // Ordenamos por fecha de retiro programado
-          todosPendientes.sort((a, b) => new Date(a.pickupDate!).getTime() - new Date(b.pickupDate!).getTime());
+          // Ordenamos por fecha de retiro programado de más tarde a más temprano
+          todosPendientes.sort((a, b) => new Date(b.pickupDate!).getTime() - new Date(a.pickupDate!).getTime());
           this.pedidosPendientes.set([...todosPendientes].slice(0, 5));
         });
       }
