@@ -191,10 +191,6 @@ describe('CrearHijo Integration', () => {
     expect(opciones[1].textContent?.trim()).toBe(texto);
   }
 
-  function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error'): void {
-    expect(servicioToast.mostrar).toHaveBeenCalledWith(mensaje, tipo);
-  }
-
   function thenSeNavegoA(url: string): void {
     expect(router.navigateByUrl).toHaveBeenCalledWith(url);
   }
