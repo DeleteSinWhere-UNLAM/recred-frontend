@@ -31,119 +31,24 @@
   gap: 12px;
 }
 
-/* Header Student Card */
-.acreditar-page__alumno {
+/* Global Page Header */
+.acreditar-page__header {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  background: var(--color-superficie);
-  padding: 24px 32px;
-  border-radius: 24px;
-  box-shadow: var(--shadow-card);
-  border: 1px solid var(--color-borde);
-  margin-bottom: 16px;
-}
-
-.acreditar-page__alumno-left {
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 20px;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
 }
 
-.acreditar-page__avatar-wrap {
-  flex-shrink: 0;
-}
-
-.acreditar-page__avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: var(--color-pizarra); /* Deep slate blue */
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.acreditar-page__titulo {
   font-family: var(--font-display);
+  text-align: center;
   font-size: 24px;
-  font-weight: 700;
-  box-shadow:
-    0 0 0 3px var(--color-superficie),
-    0 0 0 5px var(--color-dorado),
-    0 8px 16px rgba(74, 111, 165, 0.08);
-  overflow: hidden;
-}
-
-.acreditar-page__avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.acreditar-page__alumno-info h2 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 22px;
   font-weight: 800;
   color: var(--color-texto-oscuro);
   line-height: 1.2;
-}
-
-.acreditar-page__alumno-info p {
-  margin: 4px 0 0 0;
-  color: var(--color-texto-claro);
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.acreditar-page__alumno-info p i {
-  color: var(--color-menta);
-}
-
-/* Yellow Saldo total display */
-.acreditar-page__alumno-saldo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 18px;
-  background-color: var(--color-dorado);
-  border-radius: 12px;
-  color: #1a3b5c;
-  flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(242, 183, 5, 0.15);
-}
-
-.acreditar-page__saldo-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.acreditar-page__saldo-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: rgba(26, 59, 92, 0.8);
-  letter-spacing: 0.5px;
-}
-
-.acreditar-page__saldo-valor {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.acreditar-page__saldo-icon {
-  opacity: 0.2;
-  display: flex;
-  align-items: center;
-}
-
-.acreditar-page__card-svg {
-  width: 24px;
-  height: 24px;
+  margin: 0 0 4px;
 }
 
 /* Two-column layout grid */
@@ -187,7 +92,6 @@
 }
 
 
-.acreditar-page__form-section h3,
 .acreditar-page__history-section h3 {
   margin: 0 0 8px 0;
   font-family: var(--font-display);
@@ -525,20 +429,7 @@
     padding: 24px 16px;
   }
 
-  .acreditar-page__alumno {
-    padding: 16px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
 
-  .acreditar-page__alumno-left {
-    justify-content: center;
-  }
-
-  .acreditar-page__alumno-saldo {
-    justify-content: center;
-  }
 
   .acreditar-page__form-section,
   .acreditar-page__history-section {
