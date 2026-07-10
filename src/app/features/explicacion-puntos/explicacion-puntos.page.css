@@ -2,9 +2,9 @@
   position: relative;
   min-height: calc(100vh - 64px);
   padding: 16px 0 32px;
-  background-color: #f0f4f8;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  color: #333;
+  background-color: var(--color-fondo);
+  font-family: var(--font-body);
+  color: var(--color-texto-oscuro);
 }
 
 .explicacion-container {
@@ -34,7 +34,7 @@
 }
 
 .btn-volver {
-  background: white;
+  background: var(--color-superficie);
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -45,7 +45,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   margin-right: 16px;
-  color: #333;
+  color: var(--color-texto-oscuro);
   transition: transform 0.2s ease;
 }
 
@@ -54,10 +54,11 @@
 }
 
 .explicacion-header h1 {
+  font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 800;
   margin: 0;
-  color: #2c3e50;
+  color: var(--color-texto-oscuro);
 }
 
 .explicacion-content {
@@ -68,17 +69,18 @@
 }
 
 .card {
-  background: white;
+  background: var(--color-superficie);
   border-radius: 20px;
   padding: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .card h2 {
+  font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0 0 12px 0;
-  color: #2c3e50;
+  color: var(--color-texto-oscuro);
 }
 
 .card p {
@@ -89,10 +91,11 @@
 }
 
 .niveles-section h2 {
+  font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 16px;
-  color: #2c3e50;
+  color: var(--color-texto-oscuro);
   text-align: center;
 }
 
@@ -115,6 +118,20 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   position: relative;
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: nivel-card-in 0.5s ease forwards;
+}
+
+.nivel-card:nth-child(1) { animation-delay: 0.05s; }
+.nivel-card:nth-child(2) { animation-delay: 0.15s; }
+.nivel-card:nth-child(3) { animation-delay: 0.25s; }
+
+@keyframes nivel-card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .nivel-icon {
@@ -123,6 +140,7 @@
 }
 
 .nivel-card h3 {
+  font-family: var(--font-display);
   font-weight: 800;
   margin: 0 0 4px 0;
   font-size: 1.1rem;
@@ -130,6 +148,7 @@
 }
 
 .puntos-rango {
+  font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.6);
@@ -171,15 +190,16 @@
 .rachas-list li {
   display: flex;
   align-items: center;
-  background: #f8f9fa;
+  background: var(--color-superficie-alt);
   padding: 8px 12px;
   border-radius: 12px;
   gap: 12px;
 }
 
 .racha-puntos {
-  background: #4A6FA5;
+  background: var(--color-pizarra);
   color: white;
+  font-family: var(--font-display);
   font-weight: 800;
   padding: 8px 12px;
   border-radius: 12px;
@@ -189,12 +209,6 @@
 
 .racha-desc {
   font-size: 0.95rem;
-  color: #444;
+  color: var(--color-texto-oscuro);
   line-height: 1.4;
-}
-
-.call-to-action {
-  margin-top: 4px;
-  display: flex;
-  justify-content: center;
 }

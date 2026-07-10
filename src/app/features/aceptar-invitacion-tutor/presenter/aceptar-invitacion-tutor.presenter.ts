@@ -56,7 +56,7 @@ export class AceptarInvitacionTutorPresenter {
   public async validar(token: string | null): Promise<void> {
     if (!token) {
       this._loading.set(false);
-      this._error.set('El link de invitacion no es valido: falta el token.');
+      this._error.set('El link de invitación no es válido: falta el token.');
       return;
     }
 
@@ -154,11 +154,11 @@ export class AceptarInvitacionTutorPresenter {
 
   private mapearError(err: unknown): string {
     if (err instanceof HttpErrorResponse) {
-      if (err.status === 404) return 'Esta invitacion no existe o ya fue usada.';
+      if (err.status === 404) return 'Esta invitación no existe o ya fue usada.';
       if (err.status === 410) {
-        return 'Esta invitacion vencio. Pedile a tu colegio que te reenvie una nueva.';
+        return 'Esta invitación venció. Pedile a tu colegio que te reenvíe una nueva.';
       }
-      if (err.status === 409) return 'Esta invitacion ya fue aceptada.';
+      if (err.status === 409) return 'Esta invitación ya fue aceptada.';
       const backendMsg =
         err.error && typeof err.error === 'object'
           ? String(
@@ -169,6 +169,6 @@ export class AceptarInvitacionTutorPresenter {
           : '';
       if (backendMsg) return backendMsg;
     }
-    return 'No pudimos validar el link de invitacion. Intenta mas tarde.';
+    return 'No pudimos validar el link de invitación. Intenta más tarde.';
   }
 }

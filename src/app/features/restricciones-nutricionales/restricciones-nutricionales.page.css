@@ -9,6 +9,7 @@
 }
 
 .restricciones {
+  padding-top: 16px;
   width: 100%;
   flex: 1;
   display: flex;
@@ -32,15 +33,17 @@
 
 
 .restricciones__header {
-  margin-bottom: 8px;
+  margin-bottom: 24px;
+  padding-bottom: 8px;
 }
 
 .restricciones__titulo {
   font-family: var(--font-display);
-  font-size: 28px;
+  text-align: center;
+  font-size: 24px;
   font-weight: 800;
-  color: var(--color-texto-oscuro);
-  margin: 0;
+  color: var(--color-pizarra);
+  margin: 0 0 4px;
   line-height: 1.15;
 }
 

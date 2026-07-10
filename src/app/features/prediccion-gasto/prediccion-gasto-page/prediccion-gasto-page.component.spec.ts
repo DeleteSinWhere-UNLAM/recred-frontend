@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { AnalisisIa } from '../models/analisis-ia.interface';
 import {
   CategoriaMasConsumida,
@@ -47,6 +48,7 @@ describe('PrediccionGastoPageComponent', () => {
   let component: PrediccionGastoPageComponent;
   let fixture: ComponentFixture<PrediccionGastoPageComponent>;
   let servicioPrediccion: jasmine.SpyObj<PrediccionGastoService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
   let alumnoIdSignal: WritableSignal<string>;
   let router: Router;
 
@@ -59,6 +61,7 @@ describe('PrediccionGastoPageComponent', () => {
       imports: [PrediccionGastoPageComponent],
       providers: [
         { provide: PrediccionGastoService, useValue: servicioPrediccion },
+        { provide: AlumnosService, useValue: servicioAlumnos },
         {
           provide: AlumnoContextoService,
           useValue: { alumnoId: alumnoIdSignal.asReadonly() },
@@ -83,6 +86,8 @@ describe('PrediccionGastoPageComponent', () => {
   beforeEach(() => {
     servicioPrediccion = jasmine.createSpyObj('PrediccionGastoService', ['getPrediction']);
     servicioPrediccion.getPrediction.and.returnValue(of(PrediccionGastoMother.crear()));
+    servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
+    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as unknown as ReturnType<AlumnosService['getAlumnoById']>);
     alumnoIdSignal = signal<string>('');
   });
 
@@ -125,7 +130,7 @@ describe('PrediccionGastoPageComponent', () => {
 
       whenMonto();
 
-      expect(component.errorMessage).toContain('No se pudo cargar la prediccion');
+      expect(component.errorMessage).toContain('No se pudo cargar la predicción');
       expect(component.isLoading).toBeFalse();
     });
   });

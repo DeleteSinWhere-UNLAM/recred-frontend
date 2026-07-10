@@ -68,7 +68,7 @@ describe('AceptarInvitacionTutor Integration', () => {
 
     await whenMontoLaPagina();
 
-    thenElDomContieneTexto('Esta invitacion no existe o ya fue usada.');
+    thenElDomContieneTexto('Esta invitación no existe o ya fue usada.');
   });
 
   it('dada la invitacion de usuario existente, cuando hago click en continuar, deberia guardar el token y disparar login', async () => {

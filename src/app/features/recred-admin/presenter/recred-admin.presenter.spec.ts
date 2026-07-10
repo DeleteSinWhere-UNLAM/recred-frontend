@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { RecredAdminPresenter } from './recred-admin.presenter';
 import { RecredAdminService } from '../services/recred-admin.service';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -76,7 +77,7 @@ describe('RecredAdminPresenter', () => {
     it('dado que approveRegistration falla, cuando apruebo, deberia mostrar toast de error y no modificar la lista', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
       givenSolicitudesPendientes(solicitudes);
-      servicio.approveRegistration.and.returnValue(throwError(() => new Error('API Error')));
+      servicio.approveRegistration.and.returnValue(throwError(() => new Error('API Error')).pipe(delay(0)));
       presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
       presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => (lista = v));
@@ -108,7 +109,7 @@ describe('RecredAdminPresenter', () => {
     it('dado que rejectRegistration falla, cuando rechazo, deberia mostrar toast de error y no modificar la lista', () => {
       const solicitudes = RecredAdminMother.crearListaSolicitudes();
       givenSolicitudesPendientes(solicitudes);
-      servicio.rejectRegistration.and.returnValue(throwError(() => new Error('API Error')));
+      servicio.rejectRegistration.and.returnValue(throwError(() => new Error('API Error')).pipe(delay(0)));
       presenter.initialize();
       let lista: SchoolRegistration[] | undefined;
       presenter.solicitudes$.subscribe((v: SchoolRegistration[]) => (lista = v));
@@ -125,6 +126,6 @@ describe('RecredAdminPresenter', () => {
   }
 
   function givenGetPendingRegistrationsFalla(): void {
-    servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')));
+    servicio.getPendingRegistrations.and.returnValue(throwError(() => new Error('API Error')).pipe(delay(0)));
   }
 });

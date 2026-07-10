@@ -12,83 +12,94 @@
       <p>{{ errorMsg }}</p>
     </section>
     } @else if (presenter.invitacion(); as invitacion) {
-    <section class="card">
-      <div class="card__hero">
-        <i class="fa-solid fa-envelope-open-text"></i>
-        <h1>Bienvenida/o a Recred</h1>
-        <p>
-          <strong>{{ invitacion.schoolName }}</strong> te invito a asociarte como tutor.
-        </p>
-      </div>
-
-      <dl class="datos">
-        <div>
-          <dt>Colegio</dt>
-          <dd>{{ invitacion.schoolName }}</dd>
+      <section class="card">
+        <div class="card__hero">
+          <i class="fa-solid fa-envelope-open-text"></i>
+          <h1>Bienvenida/o a Recred</h1>
+          <p>
+            <strong>{{ invitacion.schoolName }}</strong> te invito a asociarte como tutor.
+          </p>
         </div>
-        <div>
-          <dt>Email invitado</dt>
-          <dd>{{ invitacion.email }}</dd>
+
+        <dl class="datos">
+          <div>
+            <dt>Colegio</dt>
+            <dd>{{ invitacion.schoolName }}</dd>
+          </div>
+          <div>
+            <dt>Email invitado</dt>
+            <dd>{{ invitacion.email }}</dd>
+          </div>
+        </dl>
+
+        <div class="aviso">
+          <i class="fa-solid fa-circle-info"></i>
+          @if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
+            <p>
+              Te enviamos usuario y contraseña temporal a <strong>{{ invitacion.email }}</strong>.
+              Inicia sesión para activar tu vínculo con el colegio.
+            </p>
+          } @else if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
+            <p>
+              Elegi un nombre de usuario para crear tu cuenta. Vas a recibir la contraseña temporal en
+              <strong>{{ invitacion.email }}</strong>.
+            </p>
+          } @else {
+            <p>
+              Vas a iniciar sesión con el email <strong>{{ invitacion.email }}</strong>.
+              Usa ese mismo email para que podamos asociarte al colegio.
+            </p>
+          }
         </div>
-      </dl>
 
-      <div class="aviso">
-        <i class="fa-solid fa-circle-info"></i>
-        @if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
-        <p>
-          Te enviamos usuario y contraseña temporal a <strong>{{ invitacion.email }}</strong>.
-          Inicia sesion para activar tu vinculo con el colegio.
-        </p>
-        } @else if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
-        <p>
-          Elegi un nombre de usuario para crear tu cuenta. Vas a recibir la contraseña temporal en
-          <strong>{{ invitacion.email }}</strong>.
-        </p>
+        @if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
+          <label class="campo">
+            <span>Nombre de usuario</span>
+            <input
+              #usernameInput
+              type="text"
+              autocomplete="username"
+              inputmode="text"
+              placeholder="arruaclotilde"
+              [class.campo__input--error]="presenter.usernameError()" />
+          </label>
+          @if (presenter.usernameError(); as usernameError) {
+            <p class="campo__error">{{ usernameError }}</p>
+          }
+
+          <button
+            type="button"
+            class="btn btn--primary"
+            (click)="onIniciarLogin(usernameInput.value)"
+            [disabled]="presenter.preparandoCuenta()">
+            @if (presenter.preparandoCuenta()) {
+              Preparando cuenta...
+            } @else {
+              Crear cuenta
+            }
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
         } @else {
-        <p>
-          Vas a iniciar sesion con el email <strong>{{ invitacion.email }}</strong>.
-          Usa ese mismo email para que podamos asociarte al colegio.
+          <button
+            type="button"
+            class="btn btn--primary"
+            (click)="onIniciarLogin()"
+            [disabled]="presenter.preparandoCuenta()">
+            @if (presenter.preparandoCuenta()) {
+              Preparando cuenta...
+            } @else if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
+              Iniciar sesión
+            } @else {
+              Continuar con Recred
+            }
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        }
+
+        <p class="pie">
+          La asociación con el colegio se activa después de iniciar sesión correctamente.
         </p>
-        }
-      </div>
-
-      @if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
-      <label class="campo">
-        <span>Nombre de usuario</span>
-        <input #usernameInput type="text" autocomplete="username" inputmode="text" placeholder="arruaclotilde"
-          [class.campo__input--error]="presenter.usernameError()" />
-      </label>
-      @if (presenter.usernameError(); as usernameError) {
-      <p class="campo__error">{{ usernameError }}</p>
-      }
-
-      <button type="button" class="btn btn--primary" (click)="onIniciarLogin(usernameInput.value)"
-        [disabled]="presenter.preparandoCuenta()">
-        @if (presenter.preparandoCuenta()) {
-        Preparando cuenta...
-        } @else {
-        Crear cuenta
-        }
-        <i class="fa-solid fa-arrow-right"></i>
-      </button>
-      } @else {
-      <button type="button" class="btn btn--primary" (click)="onIniciarLogin()"
-        [disabled]="presenter.preparandoCuenta()">
-        @if (presenter.preparandoCuenta()) {
-        Preparando cuenta...
-        } @else if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
-        Iniciar sesion
-        } @else {
-        Continuar con Recred
-        }
-        <i class="fa-solid fa-arrow-right"></i>
-      </button>
-      }
-
-      <p class="pie">
-        La asociacion con el colegio se activa despues de iniciar sesion correctamente.
-      </p>
-    </section>
+      </section>
     }
   </div>
 </div>

@@ -1,7 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 
 import { FavoritosService } from './services/favoritos.service';
+import { BuffetService } from '../buffet/services/buffet.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
 import { PerfilService } from '../../data-access/services/perfil.service';
 import { CarritoService } from '../compra/services/carrito.service';
@@ -18,6 +21,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 })
 export class FavoritosPage {
   private readonly favoritosService = inject(FavoritosService);
+  private readonly buffetService = inject(BuffetService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly carritoService = inject(CarritoService);
@@ -46,13 +50,36 @@ export class FavoritosPage {
   }
 
   cargarFavoritos(): void {
-    this.favoritosService.getFavoritos(this.alumnoId).subscribe({
-      next: (data) => {
-        this.favoritos = data;
-      },
-      error: (err) => {
+    this.favoritosService.getFavoritos(this.alumnoId).pipe(
+      switchMap(favs => {
+        const favoritos = favs || [];
+        return forkJoin({
+          favoritos: of(favoritos),
+          buffet: this.buffetService.obtenerBuffetDelAlumno(this.alumnoId).pipe(
+            switchMap(buffet => 
+              this.buffetService.getProductosDelBuffet(buffet.id, this.alumnoId)
+            ),
+            catchError(() => of([] as Producto[]))
+          )
+        });
+      }),
+      catchError((err) => {
         console.error('Error al cargar favoritos:', err);
-      }
+        return of({ favoritos: [] as Producto[], buffet: [] as Producto[] });
+      })
+    ).subscribe(({ favoritos, buffet }) => {
+      const buffetMap = new Map<string, Producto>(
+        buffet.map(p => [p.id, p])
+      );
+
+      this.favoritos = favoritos.map(fav => {
+        const buffetProd = buffetMap.get(fav.id);
+        return {
+          ...fav,
+          imagen: buffetProd?.imagen || fav.imagen || '',
+          estadoStock: buffetProd ? buffetProd.estadoStock : fav.estadoStock
+        };
+      });
     });
   }
 

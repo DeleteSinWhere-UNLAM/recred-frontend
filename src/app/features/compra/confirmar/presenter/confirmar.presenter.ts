@@ -45,7 +45,7 @@ export class ConfirmarPresenter {
     if (this.cargandoState() || this.vacia()) return;
     const ordenActual = this.orden();
     if (ordenActual?.sugerenciaId && !this.tienePlanAvanzado()) {
-      this.toastService.mostrar('Comprar sugerencias IA esta disponible con plan Avanzado.', 'info');
+      this.toastService.mostrar('Comprar sugerencias IA está disponible con plan Avanzado.', 'info');
       if (this.perfilService.rol() === 'PADRE') {
         this.router.navigateByUrl('/suscripcion');
       }

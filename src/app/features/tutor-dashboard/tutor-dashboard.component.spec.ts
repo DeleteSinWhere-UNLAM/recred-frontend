@@ -435,7 +435,7 @@ describe('TutorDashboardComponent', () => {
 
       whenAbroTransferModal(ChildDashboardSummaryMother.crear());
 
-      thenSeMostroAlerta({ matcher: 'La transferencia entre hijos esta disponible con plan Avanzado.', titulo: 'Plan Avanzado' });
+      thenSeMostroAlerta({ matcher: 'La transferencia entre hijos está disponible con plan Avanzado.', titulo: 'Plan Avanzado' });
       thenElTransferModalEsta(false);
     });
 

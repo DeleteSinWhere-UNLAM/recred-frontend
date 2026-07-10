@@ -10,6 +10,8 @@ import { CarritoService } from '../compra/services/carrito.service';
 import { ProductoFavoritoMother } from './favoritos.mother';
 import { FavoritosPage } from './favoritos.page';
 import { FavoritosService } from './services/favoritos.service';
+import { BuffetService } from '../buffet/services/buffet.service';
+import { Buffet } from '../buffet/models/buffet.model';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
 class NavbarStub {
@@ -22,6 +24,7 @@ describe('FavoritosPage', () => {
   let component: FavoritosPage;
   let fixture: ComponentFixture<FavoritosPage>;
   let servicioFavoritos: jasmine.SpyObj<FavoritosService>;
+  let servicioBuffet: jasmine.SpyObj<BuffetService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
   let servicioCarrito: jasmine.SpyObj<CarritoService>;
@@ -35,6 +38,13 @@ describe('FavoritosPage', () => {
       'removerFavorito',
     ]);
     servicioFavoritos.getFavoritos.and.returnValue(of([ProductoFavoritoMother.crearAlfajor()]));
+
+    servicioBuffet = jasmine.createSpyObj<BuffetService>('BuffetService', [
+      'obtenerBuffetDelAlumno',
+      'getProductosDelBuffet'
+    ]);
+    servicioBuffet.obtenerBuffetDelAlumno.and.returnValue(of({ id: 'buffet-1' } as Buffet));
+    servicioBuffet.getProductosDelBuffet.and.returnValue(of([]));
 
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerAlumnoId']);
     servicioPerfil.obtenerAlumnoId.and.returnValue(ID_ALUMNO_CONTEXT);
@@ -58,6 +68,7 @@ describe('FavoritosPage', () => {
       imports: [FavoritosPage],
       providers: [
         { provide: FavoritosService, useValue: servicioFavoritos },
+        { provide: BuffetService, useValue: servicioBuffet },
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: UsuarioService, useValue: servicioUsuario },
         { provide: CarritoService, useValue: servicioCarrito },

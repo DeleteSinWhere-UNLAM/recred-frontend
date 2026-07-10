@@ -142,7 +142,8 @@ export class TutorWelcome implements OnInit {
   }
 
   irAcreditar(alumnoId: string) {
-    this.router.navigate(['/tutor/acreditar', alumnoId]);
+    this.contextoService.setAlumnoId(alumnoId);
+    void this.router.navigate(['/acreditar-mercado-pago']);
   }
 
   irAMovimientos() {
@@ -157,7 +158,7 @@ export class TutorWelcome implements OnInit {
   }
 
   formatARS(amount: number): string {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(Math.floor(amount));
   }
 
   getStatusLabel(status: string, defaultLabel?: string): string {

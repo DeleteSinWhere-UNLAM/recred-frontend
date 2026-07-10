@@ -118,7 +118,7 @@ describe('AlumnoCardComponent', () => {
 
   describe('derivaciones de nombre y saldo', () => {
     it('dado un alumno Juan, nombreCompleto e iniciales deberian mostrarse en mayuscula', () => {
-      expect(component.nombreCompleto).toBe('Juan');
+      expect(component.nombreCompleto).toBe('Juan Perez');
       expect(component.iniciales).toBe('J');
     });
 

@@ -97,10 +97,10 @@ export class CrearHijoPresenter {
 
       if (backendMsg) return backendMsg;
 
-      if (err.status === 400) return 'Datos invalidos. Revisa los campos.';
+      if (err.status === 400) return 'Datos inválidos. Revisa los campos.';
       if (err.status === 403) return 'No tenes permiso para crear un hijo.';
       if (err.status === 409) return 'Ya existe un alumno con esos datos.';
-      if (err.status >= 500) return 'Error del servidor. Intenta mas tarde.';
+      if (err.status >= 500) return 'Error del servidor. Intenta más tarde.';
     }
     return 'No se pudo crear el hijo. Intenta nuevamente.';
   }

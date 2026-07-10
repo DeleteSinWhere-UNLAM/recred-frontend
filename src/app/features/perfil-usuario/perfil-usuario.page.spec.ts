@@ -732,7 +732,7 @@ describe('PerfilUsuarioPage', () => {
       whenMontoYAvanzo();
 
       const priv = component as unknown as { restanteLicenciaColegio(): string };
-      expect(priv.restanteLicenciaColegio()).toBe('Resta 1 dia');
+      expect(priv.restanteLicenciaColegio()).toBe('Resta 1 día');
     }));
 
     it('dado licencia colegio que vence en varios dias, restanteLicenciaColegio deberia devolver el conteo pluralizado', fakeAsync(() => {
@@ -746,7 +746,7 @@ describe('PerfilUsuarioPage', () => {
       whenMontoYAvanzo();
 
       const priv = component as unknown as { restanteLicenciaColegio(): string };
-      expect(priv.restanteLicenciaColegio()).toMatch(/Restan \d+ dias/);
+      expect(priv.restanteLicenciaColegio()).toMatch(/Restan \d+ días/);
     }));
   });
 

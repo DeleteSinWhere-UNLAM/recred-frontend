@@ -1,4 +1,5 @@
 .prediction-page {
+  padding-top: 16px;
   position: relative;
   width: 100%;
 }
@@ -44,45 +45,22 @@
 }
 
 .prediction-page__cabecera {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 14px;
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: 20px;
-  padding: 16px 20px;
-  box-shadow: var(--shadow-card);
-  min-width: 0;
-}
-
-.prediction-page__icono {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background-color: color-mix(in srgb, var(--color-dorado) 18%, var(--color-fondo));
-  color: var(--color-dorado-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  box-shadow: inset 0 0 0 1px rgba(242, 183, 5, 0.16);
-  flex-shrink: 0;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
 }
 
 .prediction-page__titulo {
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--color-pizarra);
   line-height: 1.2;
-  margin: 0 0 2px;
-}
-
-.prediction-page__subtitulo {
-  font-size: 13px;
-  color: var(--color-texto-claro);
-  font-weight: 500;
-  margin: 0;
+  margin: 0 0 4px;
 }
 
 .prediction-page__estado {
@@ -157,6 +135,7 @@
 
 @media (max-width: 960px) {
   .prediction-page {
+  padding-top: 16px;
     padding-top: 80px;
   }
 
@@ -174,6 +153,7 @@
 
 @media (max-width: 640px) {
   .prediction-page {
+  padding-top: 16px;
     padding: 72px 0 24px;
   }
 
@@ -187,19 +167,14 @@
     gap: 12px;
   }
 
-  .prediction-page__icono {
-    width: 46px;
-    height: 46px;
-    font-size: 19px;
-  }
-
   .prediction-page__titulo {
-    font-size: 18px;
+    font-size: 22px;
   }
 }
 
 @media (max-width: 480px) {
   .prediction-page {
+  padding-top: 16px;
     padding-top: 64px;
     padding-bottom: 20px;
   }
@@ -224,18 +199,7 @@
     border-radius: 16px;
   }
 
-  .prediction-page__icono {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    font-size: 17px;
-  }
-
   .prediction-page__titulo {
-    font-size: 17px;
-  }
-
-  .prediction-page__subtitulo {
-    font-size: 12px;
+    font-size: 20px;
   }
 }
