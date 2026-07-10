@@ -269,9 +269,15 @@
 }
 
 .acreditar-page__presets-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 4px;
+}
+.acreditar-page__presets-grid::-webkit-scrollbar {
+  display: none;
 }
 
 .acreditar-page__preset-btn {
@@ -286,6 +292,8 @@
   border-radius: 12px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  flex: 1 0 auto;
+  min-width: 85px;
 }
 
 .acreditar-page__preset-btn:hover {
@@ -349,12 +357,12 @@
 /* Actions buttons (Continuar / Cancelar) */
 .acreditar-page__actions {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  margin-top: auto;
 }
 
 .acreditar-page__btn {
-  width: 100%;
+  flex: 1;
   padding: 14px;
   font-family: var(--font-display);
   font-size: 15px;
@@ -535,9 +543,5 @@
   .acreditar-page__form-section,
   .acreditar-page__history-section {
     padding: 24px 16px;
-  }
-
-  .acreditar-page__presets-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
