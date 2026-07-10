@@ -2,9 +2,10 @@ import { Component, effect, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 
-import { Preferencia } from './models/preferencia.model';
 import { PreferenciasService } from './services/preferencias.service';
+import { Preferencia } from './models/preferencia.model';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
 
 import { PreferenciaCardComponent } from './components/preferencia-card/preferencia-card.component';
 import { } from '../../shared/components/navbar/navbar.component';
@@ -19,10 +20,12 @@ export class PreferenciasPage {
   private readonly preferenciasService = inject(PreferenciasService);
   private readonly usuarioService = inject(UsuarioService);
   private readonly contextoService = inject(AlumnoContextoService);
+  private readonly alumnosService = inject(AlumnosService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly nombreUsuario = this.usuarioService.getUsuarioActual().nombre;
+  nombreAlumno = '';
 
   preferencias: Preferencia[] = [];
 
@@ -35,6 +38,10 @@ export class PreferenciasPage {
 
     effect(() => {
       const alumnoId = this.contextoService.alumnoId() || undefined;
+      if (alumnoId) {
+        const alumno = this.alumnosService.getAlumnoById(alumnoId);
+        this.nombreAlumno = alumno ? alumno.nombre : '';
+      }
       this.preferenciasService.getPreferencias(alumnoId).subscribe((data) => {
         this.preferencias = data ?? [];
         this.cdr.markForCheck();

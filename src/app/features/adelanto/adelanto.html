@@ -1,11 +1,6 @@
 <div class="adelanto-page">
   <header class="adelanto-page__header">
-    <div class="adelanto-page__title-wrap">
-      <h1 class="adelanto-page__title">Adelanto</h1>
-      @if (alumno()) {
-        <p class="adelanto-page__subtitle">¿Cuánto querés acreditarle a {{ alumno()?.nombre }}?</p>
-      }
-    </div>
+    <h1 class="adelanto-page__title">Adelantos de {{ alumno()?.nombre }}</h1>
   </header>
 
   @if (cargando()) {
@@ -71,8 +66,8 @@
             </div>
 
             <div class="adelanto-page__actions">
-              <button (click)="confirmarMicrocredito()" class="btn-confirm">
-                Habilitar Adelanto
+              <button (click)="confirmarMicrocredito()" class="btn-confirm" [disabled]="procesando()">
+                {{ procesando() ? 'Procesando...' : 'Habilitar Adelanto' }}
               </button>
             </div>
           </div>

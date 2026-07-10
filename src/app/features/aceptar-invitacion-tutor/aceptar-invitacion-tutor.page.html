@@ -1,21 +1,16 @@
 <div class="page">
   <div class="page__container">
-    <header class="brand">
-      <span class="brand__logo">RC</span>
-      <span class="brand__name">Recred</span>
-    </header>
-
     @if (presenter.loading()) {
-      <section class="card card--estado" role="status">
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        <h1>Validando tu invitacion...</h1>
-      </section>
+    <section class="card card--estado" role="status">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <h1>Validando tu invitacion...</h1>
+    </section>
     } @else if (presenter.error(); as errorMsg) {
-      <section class="card card--estado card--error" role="alert">
-        <i class="fa-solid fa-circle-xmark"></i>
-        <h1>No podemos usar este link</h1>
-        <p>{{ errorMsg }}</p>
-      </section>
+    <section class="card card--estado card--error" role="alert">
+      <i class="fa-solid fa-circle-xmark"></i>
+      <h1>No podemos usar este link</h1>
+      <p>{{ errorMsg }}</p>
+    </section>
     } @else if (presenter.invitacion(); as invitacion) {
       <section class="card">
         <div class="card__hero">

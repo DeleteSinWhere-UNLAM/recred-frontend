@@ -41,7 +41,6 @@ export class FavoritosAlumnoPage {
       this.cargando.set(true);
       this.favoritos.set([]);
 
-      // Obtener favoritos y enriquecer con imágenes reales del buffet en paralelo
       this.favoritosService.getFavoritos(alumnoId).pipe(
         switchMap(favs => {
           const favoritos = favs || [];
@@ -57,18 +56,18 @@ export class FavoritosAlumnoPage {
         }),
         catchError(() => of({ favoritos: [] as Producto[], buffet: [] as Producto[] }))
       ).subscribe(({ favoritos, buffet }) => {
-        // Mapa id → imagen real proveniente del buffet (fuente de verdad)
-        const imagenesBuffet = new Map<string, string>(
-          buffet
-            .filter(p => p.imagen)
-            .map(p => [p.id, p.imagen as string])
+        const buffetMap = new Map<string, Producto>(
+          buffet.map(p => [p.id, p])
         );
 
-        // Priorizar imagen del buffet; si no existe, mantener la de favoritos
-        const enriquecidos = favoritos.map(fav => ({
-          ...fav,
-          imagen: imagenesBuffet.get(fav.id) || fav.imagen || ''
-        }));
+        const enriquecidos = favoritos.map(fav => {
+          const buffetProd = buffetMap.get(fav.id);
+          return {
+            ...fav,
+            imagen: buffetProd?.imagen || fav.imagen || '',
+            estadoStock: buffetProd ? buffetProd.estadoStock : fav.estadoStock
+          };
+        });
 
         this.favoritos.set(enriquecidos);
         this.cargando.set(false);

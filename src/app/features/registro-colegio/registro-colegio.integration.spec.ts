@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of, throwError } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RegistroColegioPage } from './registro-colegio.page';
 import { RegistroColegioService } from './services/registro-colegio.service';
@@ -74,7 +75,7 @@ describe('RegistroColegio Integration', () => {
   }
 
   function givenSubmitRegistrationFalla(): void {
-    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Error 500')));
+    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Error 500')).pipe(delay(0)));
   }
 
   function whenCompletoFormEnDOM(): void {

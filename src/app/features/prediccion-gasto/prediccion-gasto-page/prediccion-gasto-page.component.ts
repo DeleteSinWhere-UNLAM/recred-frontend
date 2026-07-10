@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, inject, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import { } from '../../../shared/components/navbar/navbar.component';
 import { AnalisisPrediccionComponent } from '../components/analisis-prediccion/analisis-prediccion.component';
 import { ResumenPrediccionComponent } from '../components/resumen-prediccion/resumen-prediccion.component';
@@ -22,6 +23,7 @@ import { PrediccionGastoService } from '../services/prediccion-gasto.service';
 export class PrediccionGastoPageComponent {
   private readonly predictionService = inject(PrediccionGastoService);
   private readonly contextoService = inject(AlumnoContextoService);
+  private readonly alumnosService = inject(AlumnosService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -29,6 +31,7 @@ export class PrediccionGastoPageComponent {
   predictionData: PrediccionGasto | null = null;
   isLoading = false;
   errorMessage: string | null = null;
+  nombreAlumno = '';
   private alumnoIdActual = '';
 
   constructor() {
@@ -44,6 +47,8 @@ export class PrediccionGastoPageComponent {
       }
 
       this.alumnoIdActual = alumnoId;
+      const alumno = this.alumnosService.getAlumnoById(alumnoId);
+      this.nombreAlumno = alumno ? alumno.nombre : '';
       this.loadPrediction(alumnoId);
     });
   }

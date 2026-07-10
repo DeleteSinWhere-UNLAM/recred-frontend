@@ -80,34 +80,37 @@
       </section>
     }
 
-    <section class="prediccion-card__ia" aria-label="Análisis IA">
-      <p class="prediccion-card__resumen">
-        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-        {{ prediccion.resumenIa }}
-      </p>
+    @if (prediccion.resumenIa || prediccion.alertas.length || prediccion.recomendaciones.length) {
+      <section class="prediccion-card__ia" aria-label="Análisis IA">
+        @if (prediccion.resumenIa) {
+          <p class="prediccion-card__resumen">
+            {{ prediccion.resumenIa }}
+          </p>
+        }
 
-      @if (prediccion.alertas.length) {
-        <ul class="prediccion-card__badges prediccion-card__badges--alerta" role="list">
-          @for (alerta of prediccion.alertas; track alerta) {
-            <li>
-              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-              {{ alerta }}
-            </li>
-          }
-        </ul>
-      }
+        @if (prediccion.alertas.length) {
+          <ul class="prediccion-card__badges prediccion-card__badges--alerta" role="list">
+            @for (alerta of prediccion.alertas; track alerta) {
+              <li>
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                {{ alerta }}
+              </li>
+            }
+          </ul>
+        }
 
-      @if (prediccion.recomendaciones.length) {
-        <ul class="prediccion-card__badges prediccion-card__badges--recomendacion" role="list">
-          @for (reco of prediccion.recomendaciones; track reco) {
-            <li>
-              <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
-              {{ reco }}
-            </li>
-          }
-        </ul>
-      }
-    </section>
+        @if (prediccion.recomendaciones.length) {
+          <ul class="prediccion-card__badges prediccion-card__badges--recomendacion" role="list">
+            @for (reco of prediccion.recomendaciones; track reco) {
+              <li>
+                <i class="fa-solid fa-lightbulb" aria-hidden="true"></i>
+                {{ reco }}
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
   </article>
 } @else {
   <article class="prediccion-card prediccion-card--vacio">

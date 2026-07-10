@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { Preferencia } from './models/preferencia.model';
 import { ALUMNO_ID_TEST, PreferenciaMother } from './preferencias.mother';
 import { PreferenciasPage } from './preferencias.page';
@@ -14,6 +15,7 @@ describe('Preferencias Integration', () => {
   let fixture: ComponentFixture<PreferenciasPage>;
   let servicioPreferencias: jasmine.SpyObj<PreferenciasService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
 
   beforeEach(async () => {
     servicioPreferencias = jasmine.createSpyObj('PreferenciasService', ['getPreferencias']);
@@ -21,12 +23,15 @@ describe('Preferencias Integration', () => {
     servicioUsuario.getUsuarioActual.and.returnValue({
       nombre: 'Tutor Integration',
     } as ReturnType<UsuarioService['getUsuarioActual']>);
+    servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
+    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as unknown as ReturnType<AlumnosService['getAlumnoById']>);
 
     await TestBed.configureTestingModule({
       imports: [PreferenciasPage],
       providers: [
         { provide: PreferenciasService, useValue: servicioPreferencias },
         { provide: UsuarioService, useValue: servicioUsuario },
+        { provide: AlumnosService, useValue: servicioAlumnos },
         {
           provide: AlumnoContextoService,
           useValue: { alumnoId: signal(ALUMNO_ID_TEST).asReadonly() },
