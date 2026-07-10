@@ -60,9 +60,9 @@ describe('RegistroColegioPresenter', () => {
   });
 
   describe('Envio fallido', () => {
-    it('dado un payload valido, cuando envio y el servicio falla, deberia emitir el mensaje de error y mostrar toast', () => {
+    it('dado un payload valido, cuando envio y ocurre un error generico, deberia mostrar toast de error y mensaje generico', () => {
       const payload: SchoolRegistrationPayload = RegistroColegioMother.crearPayload();
-      givenSubmitRegistrationFalla();
+      givenSubmitRegistrationFallaGenerico();
       let error: RegistroError | null | undefined;
       let enviado: boolean | undefined;
       presenter.error$.subscribe((v) => (error = v));
@@ -70,9 +70,35 @@ describe('RegistroColegioPresenter', () => {
 
       presenter.enviarSolicitud(payload);
 
-      expect(error?.mensaje).toContain('error al enviar');
+      expect(error?.mensaje).toContain('intente nuevamente');
       expect(enviado).toBeFalse();
       expect(toast.mostrar).toHaveBeenCalledWith('Error al enviar la solicitud.', 'error');
+    });
+
+    it('dado un payload valido, cuando ocurre error estructural, deberia extraer el campo y mensaje y mostrar toast', () => {
+      const payload: SchoolRegistrationPayload = RegistroColegioMother.crearPayload();
+      givenSubmitRegistrationFallaEstructural('schoolEmail: Email inválido');
+      let error: RegistroError | null | undefined;
+      presenter.error$.subscribe((v) => (error = v));
+
+      presenter.enviarSolicitud(payload);
+
+      expect(error?.campo).toBe('schoolEmail');
+      expect(error?.mensaje).toBe('Email inválido');
+      expect(toast.mostrar).toHaveBeenCalledWith('Revisa los campos del formulario.', 'error');
+    });
+
+    it('dado un payload valido, cuando ocurre regla de negocio, deberia mostrar toast especifico', () => {
+      const payload: SchoolRegistrationPayload = RegistroColegioMother.crearPayload();
+      givenSubmitRegistrationFallaNegocio('El CUE ya está registrado');
+      let error: RegistroError | null | undefined;
+      presenter.error$.subscribe((v) => (error = v));
+
+      presenter.enviarSolicitud(payload);
+
+      expect(error?.campo).toBeUndefined();
+      expect(error?.mensaje).toBe('El CUE ya está registrado');
+      expect(toast.mostrar).toHaveBeenCalledWith('El CUE ya está registrado', 'error');
     });
   });
 
@@ -80,7 +106,29 @@ describe('RegistroColegioPresenter', () => {
     servicio.submitRegistration.and.returnValue(of(undefined));
   }
 
-  function givenSubmitRegistrationFalla(): void {
-    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Error 500')));
+  function givenSubmitRegistrationFallaGenerico(): void {
+    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Network error')));
+  }
+
+  function givenSubmitRegistrationFallaEstructural(mensaje: string): void {
+    servicio.submitRegistration.and.returnValue(
+      throwError(() => ({
+        error: {
+          error: 'Error de validación',
+          mensaje: mensaje,
+        },
+      }))
+    );
+  }
+
+  function givenSubmitRegistrationFallaNegocio(mensaje: string): void {
+    servicio.submitRegistration.and.returnValue(
+      throwError(() => ({
+        error: {
+          error: 'Regla de Negocio Inválida',
+          mensaje: mensaje,
+        },
+      }))
+    );
   }
 });

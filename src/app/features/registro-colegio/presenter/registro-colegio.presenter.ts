@@ -36,29 +36,27 @@ export class RegistroColegioPresenter {
       error: (err) => {
         console.error('Error al enviar la solicitud de registro:', err);
 
+        const tipoError = err?.error?.error as string | undefined;
         const mensajeBackend = err?.error?.mensaje as string | undefined;
+        
         let campoAfectado: string | undefined;
+        let mensajeMostrar = mensajeBackend ?? 'Hubo un error al enviar la solicitud. Por favor intente nuevamente.';
 
-        if (mensajeBackend) {
-          const m = mensajeBackend.toLowerCase();
-          if (m.includes('email del directivo') || m.includes('email personal')) {
-            campoAfectado = 'directorEmail';
-          } else if (m.includes('email institucional') || m.includes('email del colegio')) {
-            campoAfectado = 'schoolEmail';
-          } else if (m.includes('cue')) {
-            campoAfectado = 'schoolCue';
-          } else if (m.includes('usuario') || m.includes('username')) {
-            campoAfectado = 'directorUsername';
-          } else if (m.includes('dni')) {
-            campoAfectado = 'directorDni';
+        if (tipoError === 'Error de validación' && mensajeBackend) {
+          const partes = mensajeBackend.split(': ');
+          if (partes.length >= 2) {
+            campoAfectado = partes[0].trim();
+            mensajeMostrar = partes.slice(1).join(': ').trim();
           }
+          this.toastService.mostrar('Revisa los campos del formulario.', 'error');
+        } else if (tipoError === 'Regla de Negocio Inválida' && mensajeBackend) {
+          this.toastService.mostrar(mensajeBackend, 'error');
+        } else {
+          this.toastService.mostrar('Error al enviar la solicitud.', 'error');
         }
 
-        const mensajeError = mensajeBackend ?? 'Hubo un error al enviar la solicitud. Por favor intente nuevamente.';
-
         this._cargando.next(false);
-        this._error.next({ campo: campoAfectado, mensaje: mensajeError });
-        this.toastService.mostrar('Error al enviar la solicitud.', 'error');
+        this._error.next({ campo: campoAfectado, mensaje: mensajeMostrar });
       },
     });
   }
