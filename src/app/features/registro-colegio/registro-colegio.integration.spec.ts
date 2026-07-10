@@ -10,12 +10,12 @@ import { ToastService } from '../../shared/services/toast.service';
 const CAMPOS_FORM_VALIDOS = {
   schoolName: 'Instituto Test',
   schoolEmail: 'test@test.com',
-  schoolPhone: '011-1234',
-  schoolCue: '123',
+  schoolPhone: '01112345678',
+  schoolCue: '123456789',
   directorFirstName: 'Juan',
   directorLastName: 'Pérez',
   directorEmail: 'juan@test.com',
-  directorPhone: '15-1234',
+  directorPhone: '1512345678',
   directorDni: '12345678',
   directorUsername: 'juanperez',
 };

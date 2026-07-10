@@ -22,19 +22,55 @@ export class RegistroColegioPage implements OnInit {
   form!: FormGroup;
 
   ngOnInit(): void {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{8,15}$/;
+
     this.form = this.fb.group({
       schoolName: ['', Validators.required],
-      schoolEmail: ['', [Validators.required, Validators.email]],
-      schoolPhone: ['', Validators.required],
-      schoolCue: ['', Validators.required],
+      schoolEmail: ['', [Validators.required, Validators.pattern(emailRegex)]],
+      schoolPhone: ['', [Validators.required, Validators.pattern(phoneRegex)]],
+      schoolCue: ['', [Validators.required, Validators.pattern(/^[0-9]{9}$/)]],
 
       directorFirstName: ['', Validators.required],
       directorLastName: ['', Validators.required],
-      directorEmail: ['', [Validators.required, Validators.email]],
-      directorPhone: ['', Validators.required],
-      directorDni: ['', Validators.required],
-      directorUsername: ['', Validators.required],
+      directorEmail: ['', [Validators.required, Validators.pattern(emailRegex)]],
+      directorPhone: ['', [Validators.required, Validators.pattern(phoneRegex)]],
+      directorDni: ['', [Validators.required, Validators.pattern(/^[0-9]{7,8}$/)]],
+      directorUsername: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_.-]+$/), Validators.maxLength(20)]],
     });
+
+    this.presenter.error$.subscribe((err) => {
+      if (err?.campo && this.form.get(err.campo)) {
+        this.form.get(err.campo)?.setErrors({ serverError: err.mensaje });
+      }
+    });
+  }
+
+  onInputNumeros(event: Event, controlName: string): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value.replace(/\D/g, '');
+    if (input.value !== cleanValue) {
+      this.form.get(controlName)?.setValue(cleanValue, { emitEvent: false });
+      input.value = cleanValue;
+    }
+  }
+
+  onInputEmail(event: Event, controlName: string): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value.toLowerCase().replace(/\s/g, '');
+    if (input.value !== cleanValue) {
+      this.form.get(controlName)?.setValue(cleanValue, { emitEvent: false });
+      input.value = cleanValue;
+    }
+  }
+
+  onInputUsername(event: Event, controlName: string): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value.replace(/[^a-zA-Z0-9_.-]/g, '');
+    if (input.value !== cleanValue) {
+      this.form.get(controlName)?.setValue(cleanValue, { emitEvent: false });
+      input.value = cleanValue;
+    }
   }
 
   enviar(): void {
