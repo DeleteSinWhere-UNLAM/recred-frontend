@@ -43,7 +43,7 @@ export class GuardarFavoritoModalComponent implements OnInit {
     effect(() => {
       this.nombre = this.initialNombre;
       this.alumnoId = this.initialAlumnoId;
-    }, { allowSignalWrites: true });
+    });
   }
 
   ngOnInit(): void {
