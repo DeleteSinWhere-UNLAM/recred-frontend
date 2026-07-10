@@ -531,8 +531,9 @@
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 700;
-  color: var(--color-texto-oscuro); /* Navy blue */
+  color: var(--color-texto-oscuro);
   margin: 0;
+  word-break: break-word;
 }
 
 .movimientos__fila-resumen {
@@ -551,6 +552,7 @@
   font-size: 12px;
   color: var(--color-texto-claro);
   margin: 2px 0 0 0;
+  word-break: break-word;
 }
 
 .movimientos__fila-clave strong {
