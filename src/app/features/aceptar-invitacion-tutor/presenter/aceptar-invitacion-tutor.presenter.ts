@@ -115,6 +115,14 @@ export class AceptarInvitacionTutorPresenter {
         return;
       }
 
+      if (preparacion.result === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
+        this.toastService.mostrar(
+          'Revisa tu casilla de SPAM. Te enviamos usuario y contraseña provisoria al correo.',
+          'success',
+          6000
+        );
+      }
+
       this.tokenStorage.guardar(token);
 
       if (preparacion.result === 'LOGIN_REQUIRED') {

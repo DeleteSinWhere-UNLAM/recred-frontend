@@ -1,3 +1,11 @@
+.page-title {
+  margin: 0 0 24px 0;
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.1;
+  color: #172554;
+}
+
 .pv-modal-overlay {
   position: fixed;
   inset: 0;
@@ -19,11 +27,19 @@
   background: #fff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   animation: modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 1rem;
 }
 
 @keyframes modal-pop {
-  0% { transform: scale(0.94); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .pv-modal__header {
@@ -95,7 +111,8 @@
   justify-content: flex-end;
 }
 
-.pv__primary-action, .pv__mini-action {
+.pv__primary-action,
+.pv__mini-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
