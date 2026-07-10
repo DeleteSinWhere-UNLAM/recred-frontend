@@ -38,9 +38,9 @@
 .restricciones__titulo {
   font-family: var(--font-display);
   text-align: center;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
-  color: var(--color-texto-oscuro);
+  color: var(--color-pizarra);
   margin: 0;
   line-height: 1.15;
 }
