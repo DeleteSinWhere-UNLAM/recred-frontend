@@ -178,7 +178,7 @@ describe('CrearHijoPresenter', () => {
 
       await whenCreo(CrearHijoFormMother.crear());
 
-      expect(presenter.error()).toBe('Datos invalidos. Revisa los campos.');
+      expect(presenter.error()).toBe('Datos inválidos. Revisa los campos.');
     });
 
     it('dado un error 403 sin body, cuando creo el hijo, deberia usar el mensaje de permisos', async () => {
@@ -194,7 +194,7 @@ describe('CrearHijoPresenter', () => {
 
       await whenCreo(CrearHijoFormMother.crear());
 
-      expect(presenter.error()).toBe('Error del servidor. Intenta mas tarde.');
+      expect(presenter.error()).toBe('Error del servidor. Intenta más tarde.');
     });
 
     it('dado un error 500 con error string, cuando creo el hijo, deberia usar ese string como mensaje', async () => {
@@ -212,7 +212,7 @@ describe('CrearHijoPresenter', () => {
 
       await whenCreo(CrearHijoFormMother.crear());
 
-      expect(presenter.error()).toBe('Datos invalidos. Revisa los campos.');
+      expect(presenter.error()).toBe('Datos inválidos. Revisa los campos.');
     });
   });
 

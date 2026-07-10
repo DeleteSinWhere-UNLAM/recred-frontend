@@ -134,8 +134,8 @@ export class PerfilUsuarioPage implements OnInit {
     if (dias === null) return 'Sin licencia registrada';
     if (dias < 0) return 'Licencia vencida';
     if (dias === 0) return 'Vence hoy';
-    if (dias === 1) return 'Resta 1 dia';
-    return `Restan ${dias} dias`;
+    if (dias === 1) return 'Resta 1 día';
+    return `Restan ${dias} días`;
   });
 
   protected readonly payoutForm = new FormGroup({
