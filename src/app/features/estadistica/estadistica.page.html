@@ -1,9 +1,10 @@
 <main class="estadistica">
 
-
   <div class="estadistica__container">
 
-
+    <header class="estadistica__cabecera">
+      <h1 class="estadistica__titulo">Estadísticas de {{ presenter.nombreCompleto() }}</h1>
+    </header>
     <div class="estadistica__graficos">
       <app-prediccion-card
         [prediccion]="presenter.prediccion()"
