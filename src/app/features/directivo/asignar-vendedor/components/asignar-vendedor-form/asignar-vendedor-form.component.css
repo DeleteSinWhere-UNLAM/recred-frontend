@@ -64,6 +64,17 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.15);
 }
 
+input.input-error {
+  border-color: var(--color-melocoton);
+}
+
+.help-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 2px;
+}
+
 .error-text {
   font-size: 0.8rem;
   font-weight: 600;

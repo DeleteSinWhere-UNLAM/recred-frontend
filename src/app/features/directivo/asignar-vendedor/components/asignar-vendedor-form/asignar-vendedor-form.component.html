@@ -39,7 +39,21 @@
       </div>
       <div class="form-group">
         <label for="cuit">CUIT *</label>
-        <input id="cuit" formControlName="cuit" type="text" />
+        <input
+          id="cuit"
+          formControlName="cuit"
+          type="text"
+          inputmode="numeric"
+          maxlength="11"
+          placeholder="20304567890"
+          aria-describedby="cuit-help cuit-error"
+          [class.input-error]="form.get('cuit')?.touched && form.get('cuit')?.invalid"
+          (input)="normalizarCuit($event)"
+        />
+        <span id="cuit-help" class="help-text">Ingresar solo números, sin guiones.</span>
+        @if (form.get('cuit')?.touched && form.get('cuit')?.invalid) {
+          <span id="cuit-error" class="error-text">El CUIT debe tener exactamente 11 dígitos numéricos.</span>
+        }
       </div>
     </div>
 
