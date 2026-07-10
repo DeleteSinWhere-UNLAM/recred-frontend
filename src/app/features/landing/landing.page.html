@@ -1,40 +1,33 @@
 @if (cargando()) {
-  <div class="dino-loader" role="status" aria-live="polite">
-    <div class="dino-loader__stage">
-      <div class="dino-loader__dino" aria-hidden="true"></div>
-      <div class="dino-loader__ground"></div>
-    </div>
-    <p class="dino-loader__texto">
-      Cargando<span class="dino-loader__puntos" aria-hidden="true"></span>
-    </p>
-    <span class="dino-loader__sr-only">Cargando tu perfil</span>
+<div class="dino-loader" role="status" aria-live="polite">
+  <div class="dino-loader__stage">
+    <div class="dino-loader__dino" aria-hidden="true"></div>
+    <div class="dino-loader__ground"></div>
   </div>
+  <p class="dino-loader__texto">
+    Cargando<span class="dino-loader__puntos" aria-hidden="true"></span>
+  </p>
+  <span class="dino-loader__sr-only">Cargando tu perfil</span>
+</div>
 } @else {
-  <div class="landing-container">
-    @if (errorInvitacion(); as errMsg) {
-      <div class="landing__aviso-error" role="alert">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <span>{{ errMsg }}</span>
-      </div>
-    }
-    <div class="landing">
+<div class="landing-container">
+  @if (errorInvitacion(); as errMsg) {
+  <div class="landing__aviso-error" role="alert">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>{{ errMsg }}</span>
+  </div>
+  }
+  <div class="landing">
     <header class="landing__header">
       <div class="landing__header-brand">
-        <img
-          class="landing__logo"
-          src="logoHeader.png"
-          alt="Logo RECRED"
-        />
+        <img class="landing__logo" src="logoHeader.png" alt="Logo RECRED" />
         <span class="landing__marca">RECRED</span>
       </div>
-      <div class="landing__header-cta">
+      <div class="landing__header-cta landing__header-cta--desktop">
         @for (cta of presenter.ctas; track cta.ruta) {
-          @if (cta.ruta !== 'login') {
-            <app-landing-cta-button
-              [cta]="cta"
-              (clicked)="onCtaClick(cta)"
-            />
-          }
+        @if (cta.ruta !== 'login') {
+        <app-landing-cta-button [cta]="cta" (clicked)="onCtaClick(cta)" />
+        }
         }
         <span class="landing__header-cta-leyenda">Solo para instituciones educativas</span>
       </div>
@@ -54,28 +47,72 @@
         </p>
 
         <div class="landing__ctas">
-          @for (cta of presenter.ctas; track cta.ruta) {
+          <div class="landing__login-container">
+            @for (cta of presenter.ctas; track cta.ruta) {
             @if (cta.ruta === 'login') {
-              <app-landing-cta-button
-                [cta]="cta"
-                (clicked)="onCtaClick(cta)"
-              />
+            <app-landing-cta-button [cta]="cta" (clicked)="onCtaClick(cta)" />
             }
-          }
+            }
+            <button class="landing__leyenda-registro" (click)="mostrarModalRegistro.set(true)">
+              ¿No tenés usuario?
+            </button>
+          </div>
+
+          <div class="landing__header-cta landing__header-cta--mobile">
+            @for (cta of presenter.ctas; track cta.ruta) {
+            @if (cta.ruta !== 'login') {
+            <app-landing-cta-button [cta]="cta" (clicked)="onCtaClick(cta)" />
+            }
+            }
+            <span class="landing__header-cta-leyenda">Solo para instituciones educativas</span>
+          </div>
         </div>
       </section>
 
       <aside class="landing__media">
         <div class="landing__media-frame">
-          <img
-            class="landing__media-img"
-            src="landing.png"
-            alt="Buffet escolar con frutas, sandwiches y bebidas saludables"
-            (error)="onImagenError($event)"
-          />
+          <img class="landing__media-img" src="landing.png"
+            alt="Buffet escolar con frutas, sandwiches y bebidas saludables" (error)="onImagenError($event)" />
         </div>
       </aside>
     </main>
   </div>
-  </div>
+
+  <app-modal-component [isOpen]="mostrarModalRegistro()" customClass="landing-modal" title="¿No tenés usuario?"
+    [showCancel]="false" confirmText="Cerrar" confirmVariant="primary" (confirm)="mostrarModalRegistro.set(false)">
+    <div class="landing__modal-logo-container">
+      <img src="logoHeader.png" alt="Logo RECRED" class="landing__logo landing__modal-logo" />
+    </div>
+    <ul class="landing__roles-list">
+      <li class="landing__role-item">
+        <i class="fa-solid fa-school landing__role-icon"></i>
+        <div class="landing__role-text">
+          <strong>Escuela: </strong>
+          <a routerLink="/registro-colegio" class="landing__link-registro">Ingresá aquí</a> para registrarla.
+        </div>
+      </li>
+      <li class="landing__role-item">
+        <i class="fa-solid fa-user-group landing__role-icon"></i>
+        <div class="landing__role-text">
+          <strong>Tutor:</strong>
+          Pedile a tu escuela que te invite.
+        </div>
+      </li>
+      <li class="landing__role-item">
+        <i class="fa-solid fa-child landing__role-icon"></i>
+        <div class="landing__role-text">
+          <strong>Alumno:</strong>
+          Pedile a un tutor/adulto responsable que cree tu perfil.
+        </div>
+      </li>
+      <li class="landing__role-item">
+        <i class="fa-solid fa-store landing__role-icon"></i>
+        <div class="landing__role-text">
+          <strong>Kiosco:</strong>
+          Solicitá a la escuela que te registre.
+        </div>
+      </li>
+    </ul>
+  </app-modal-component>
+</div>
 }

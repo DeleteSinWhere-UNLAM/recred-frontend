@@ -89,6 +89,7 @@ describe('AsistenteVirtualPresenter', () => {
 
       expect(opciones.length).toBeGreaterThan(0);
       expect(opciones[0].id).toBe('saldo');
+      expect(opciones.some((opcion) => opcion.id === 'cancelar-pedido')).toBeFalse();
     });
 
     it('dado que no hay rol en el perfil, cuando leo las opciones, deberia devolver una lista vacia', () => {
@@ -478,6 +479,22 @@ describe('AsistenteVirtualPresenter', () => {
 
       expect(servicioAsistente.cerrarSesion).not.toHaveBeenCalled();
     });
+
+    it('dado un historial disponible, cuando inicio una nueva conversacion, deberia ocultarlo y no reutilizar su sesionId', async () => {
+      givenSesionViejaConMensajes('sesion-vieja', [
+        MensajeAsistenteResponseMother.crearUsuario(),
+      ]);
+      presenter.abrir();
+      await flushPromises();
+      expect(presenter.puedeVerHistorial()).toBeTrue();
+
+      await presenter.nuevaConversacion();
+      servicioAsistente.obtenerMensajes.calls.reset();
+      await presenter.verMensajesAnteriores();
+
+      expect(presenter.puedeVerHistorial()).toBeFalse();
+      expect(servicioAsistente.obtenerMensajes).not.toHaveBeenCalled();
+    });
   });
 
   describe('Historial de sesiones anteriores', () => {
@@ -519,6 +536,24 @@ describe('AsistenteVirtualPresenter', () => {
       await flushPromises();
 
       expect(presenter.puedeVerHistorial()).toBeFalse();
+    });
+
+    it('dado que falla la carga del historial, deberia invalidar la sesion cacheada', async () => {
+      spyOn(console, 'warn');
+      givenSesionViejaConMensajes('sesion-vieja', [
+        MensajeAsistenteResponseMother.crearUsuario(),
+      ]);
+      presenter.abrir();
+      await flushPromises();
+      servicioAsistente.obtenerMensajes.calls.reset();
+      servicioAsistente.obtenerMensajes.and.rejectWith(new Error('not found'));
+
+      await presenter.verMensajesAnteriores();
+      servicioAsistente.obtenerMensajes.calls.reset();
+      await presenter.verMensajesAnteriores();
+
+      expect(presenter.puedeVerHistorial()).toBeFalse();
+      expect(servicioAsistente.obtenerMensajes).not.toHaveBeenCalled();
     });
   });
 

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { UsuarioService } from '../../data-access/services/usuario.service';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { PreferenciaCardComponent } from './components/preferencia-card/preferencia-card.component';
 import { Preferencia } from './models/preferencia.model';
 import { ALUMNO_ID_TEST, PreferenciaMother } from './preferencias.mother';
@@ -23,6 +24,7 @@ describe('PreferenciasPage', () => {
   let fixture: ComponentFixture<PreferenciasPage>;
   let servicioPreferencias: jasmine.SpyObj<PreferenciasService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
   let alumnoIdSignal: WritableSignal<string>;
   let router: Router;
 
@@ -35,6 +37,9 @@ describe('PreferenciasPage', () => {
       nombre: 'Tutor Test',
     } as ReturnType<UsuarioService['getUsuarioActual']>);
 
+    servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
+    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as unknown as ReturnType<AlumnosService['getAlumnoById']>);
+
     alumnoIdSignal = signal<string>(ALUMNO_ID_TEST);
 
     await TestBed.configureTestingModule({
@@ -42,6 +47,7 @@ describe('PreferenciasPage', () => {
       providers: [
         { provide: PreferenciasService, useValue: servicioPreferencias },
         { provide: UsuarioService, useValue: servicioUsuario },
+        { provide: AlumnosService, useValue: servicioAlumnos },
         {
           provide: AlumnoContextoService,
           useValue: { alumnoId: alumnoIdSignal.asReadonly() },
@@ -134,6 +140,16 @@ describe('PreferenciasPage', () => {
   describe('nombreUsuario', () => {
     it('dado un usuario en UsuarioService, nombreUsuario deberia exponerse en la instancia', () => {
       expect(component.nombreUsuario).toBe('Tutor Test');
+    });
+  });
+
+  describe('preferencias con data null del back', () => {
+    it('dado que el back devuelve null, cuando se monta, preferencias deberia caer al arreglo vacio', () => {
+      servicioPreferencias.getPreferencias.and.returnValue(of(null as unknown as never[]));
+      const nuevaFixture = TestBed.createComponent(PreferenciasPage);
+      nuevaFixture.detectChanges();
+
+      expect(nuevaFixture.componentInstance.preferencias).toEqual([]);
     });
   });
 

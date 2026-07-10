@@ -66,7 +66,12 @@ export class MovimientosPendientesPage {
 
     if (query) {
       filtered = filtered.filter((m) => {
-        return m.items.some((item) => item.productName.toLowerCase().includes(query));
+        const matchesProduct = m.items?.some((item) => item.productName.toLowerCase().includes(query));
+        const alumno = this.alumnosService.getAlumnoById(m.studentId);
+        const matchesStudent = alumno ? `${alumno.nombre} ${alumno.apellido}`.toLowerCase().includes(query) : false;
+        const matchesCode = m.withdrawalCode?.toLowerCase().includes(query);
+        const matchesId = m.id.toLowerCase().includes(query);
+        return matchesProduct || matchesStudent || matchesCode || matchesId;
       });
     }
 

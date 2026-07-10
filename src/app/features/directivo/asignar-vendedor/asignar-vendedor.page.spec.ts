@@ -5,6 +5,14 @@ import { AsignarVendedorPage } from './asignar-vendedor.page';
 import { AsignarVendedorFormComponent } from './components/asignar-vendedor-form/asignar-vendedor-form.component';
 import { AsignarVendedorPresenter } from './presenter/asignar-vendedor.presenter';
 import { CrearVendedorRequest } from '../models/directivo.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+
+@Component({
+  selector: 'app-navbar',
+  template: '',
+  standalone: true,
+})
+class NavbarStub {}
 
 @Component({
   selector: 'app-asignar-vendedor-form',
@@ -47,11 +55,11 @@ describe('AsignarVendedorPage', () => {
     })
       .overrideComponent(AsignarVendedorPage, {
         remove: {
-          imports: [AsignarVendedorFormComponent],
+          imports: [AsignarVendedorFormComponent, NavbarComponent],
           providers: [AsignarVendedorPresenter],
         },
         add: {
-          imports: [AsignarVendedorFormStub],
+          imports: [AsignarVendedorFormStub, NavbarStub],
           providers: [{ provide: AsignarVendedorPresenter, useValue: presenter }],
         },
       })
@@ -140,6 +148,35 @@ describe('AsignarVendedorPage', () => {
       whenMonto();
 
       expect((fixture.nativeElement as HTMLElement).textContent).toContain('Kiosco Central');
+    });
+
+    it('dado buffetId sin buffetName en el state, buffetName deberia quedar en string vacio', () => {
+      history.replaceState({ buffetId: 'b1' }, '', location.href);
+
+      whenMonto();
+
+      expect(component.buffetName).toBe('');
+    });
+
+    it('dado getCurrentNavigation con state, deberia leer el buffetName desde ahi', () => {
+      router.getCurrentNavigation.and.returnValue({
+        extras: { state: { buffetId: 'b-nav', buffetName: 'Buffet Desde Nav' } },
+      } as unknown as Navigation);
+
+      whenMonto();
+
+      expect(component.buffetId).toBe('b-nav');
+      expect(component.buffetName).toBe('Buffet Desde Nav');
+    });
+
+    it('dado getCurrentNavigation con state pero sin buffetName, buffetName deberia caer al string vacio', () => {
+      router.getCurrentNavigation.and.returnValue({
+        extras: { state: { buffetId: 'b-nav' } },
+      } as unknown as Navigation);
+
+      whenMonto();
+
+      expect(component.buffetName).toBe('');
     });
   });
 

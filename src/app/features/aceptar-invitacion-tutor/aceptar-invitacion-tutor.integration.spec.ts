@@ -7,6 +7,7 @@ import { InvitacionesTutorService } from '../directivo/services/invitaciones-tut
 import { AceptarInvitacionTutorPage } from './aceptar-invitacion-tutor.page';
 import { InvitacionValidadaMother } from './aceptar-invitacion-tutor.mother';
 import { InvitacionTokenStorageService } from './services/invitacion-token-storage.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 describe('AceptarInvitacionTutor Integration', () => {
   let fixture: ComponentFixture<AceptarInvitacionTutorPage>;
@@ -40,6 +41,7 @@ describe('AceptarInvitacionTutor Integration', () => {
         { provide: InvitacionTokenStorageService, useValue: tokenStorage },
         { provide: PerfilService, useValue: perfilService },
         { provide: Router, useValue: router },
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['mostrar']) },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -68,7 +70,7 @@ describe('AceptarInvitacionTutor Integration', () => {
 
     await whenMontoLaPagina();
 
-    thenElDomContieneTexto('Esta invitacion no existe o ya fue usada.');
+    thenElDomContieneTexto('Esta invitación no existe o ya fue usada.');
   });
 
   it('dada la invitacion de usuario existente, cuando hago click en continuar, deberia guardar el token y disparar login', async () => {
@@ -125,7 +127,7 @@ describe('AceptarInvitacionTutor Integration', () => {
     whenCompletoCampo('input[autocomplete="username"]', 'arruaclotilde');
     await whenHagoClickEn('.btn--primary');
 
-    thenElDomContieneTexto('Te enviamos usuario y contrasena temporal');
+    thenElDomContieneTexto('Te enviamos usuario y contraseña temporal');
     expect(servicioInvitaciones.prepararCuenta).toHaveBeenCalledWith('abc123', 'arruaclotilde');
     expect(tokenStorage.guardar).toHaveBeenCalledWith('abc123');
     expect(servicioAuth.login).not.toHaveBeenCalled();

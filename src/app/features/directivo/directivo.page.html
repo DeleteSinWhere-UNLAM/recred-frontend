@@ -2,10 +2,8 @@
 
 <main class="directivo-page">
   <div class="directivo-page__container">
-    <app-directivo-dashboard
-      [data]="presenter.schoolOverview()"
-      [loading]="presenter.loading()"
+    <app-directivo-dashboard [data]="presenter.schoolOverview()" [loading]="presenter.loading()"
       [error]="presenter.error()"
-    ></app-directivo-dashboard>
+      (reenviarCredencialesRequested)="presenter.reenviarCredenciales($event)"></app-directivo-dashboard>
   </div>
 </main>

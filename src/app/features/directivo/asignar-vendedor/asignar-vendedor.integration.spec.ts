@@ -5,6 +5,12 @@ import { AsignarVendedorPresenter } from './presenter/asignar-vendedor.presenter
 import { Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { ToastService } from '../../../shared/services/toast.service';
+
+@Component({ selector: 'app-navbar', template: '', standalone: true })
+class NavbarStub {}
 
 describe('AsignarVendedor (Integración)', () => {
   let fixture: ComponentFixture<AsignarVendedorPage>;
@@ -17,15 +23,18 @@ describe('AsignarVendedor (Integración)', () => {
     
     routerSpy.getCurrentNavigation.and.returnValue({
       extras: { state: { buffetId: 'buffet-123', buffetName: 'Mi Kiosco' } }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    } as unknown as ReturnType<Router['getCurrentNavigation']>);
 
     await TestBed.configureTestingModule({
       imports: [AsignarVendedorPage],
       providers: [
         { provide: DirectivoService, useValue: directivoServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['mostrar']) }
       ]
+    }).overrideComponent(AsignarVendedorPage, {
+      remove: { imports: [NavbarComponent] },
+      add: { imports: [NavbarStub] }
     }).compileComponents();
   });
 
@@ -93,7 +102,7 @@ describe('AsignarVendedor (Integración)', () => {
     fixture.detectChanges();
 
     const errorAlert = fixture.debugElement.query(By.css('.error-alert'));
-    expect(errorAlert.nativeElement.textContent).toContain('El correo o nombre de usuario ya está registrado.');
+    expect(errorAlert.nativeElement.textContent).toContain('Error: El correo electrónico ya está registrado o es inválido. Por favor, intenta de nuevo.');
     expect(routerSpy.navigate).not.toHaveBeenCalledWith(['/directivo']);
   });
 });

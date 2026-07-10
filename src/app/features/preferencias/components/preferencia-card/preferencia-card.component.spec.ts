@@ -6,18 +6,25 @@ import { PreferenciaCardComponent } from './preferencia-card.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FavoritosService } from '../../../favoritos/services/favoritos.service';
+import { DialogService } from '../../../../shared/services/dialog.service';
 
 describe('PreferenciaCardComponent', () => {
   let component: PreferenciaCardComponent;
   let fixture: ComponentFixture<PreferenciaCardComponent>;
   let favoritosService: jasmine.SpyObj<FavoritosService>;
+  let dialogService: jasmine.SpyObj<DialogService>;
 
   beforeEach(async () => {
     favoritosService = jasmine.createSpyObj('FavoritosService', [
       'agregarFavorito',
+      'getFavoritos',
       'obtenerImagenProducto',
     ]);
     favoritosService.obtenerImagenProducto.and.returnValue('https://cdn/inferida.png');
+    favoritosService.getFavoritos.and.returnValue(of([]));
+
+    dialogService = jasmine.createSpyObj('DialogService', ['alert']);
+    dialogService.alert.and.returnValue(Promise.resolve(true));
 
     await TestBed.configureTestingModule({
       imports: [PreferenciaCardComponent],
@@ -25,6 +32,7 @@ describe('PreferenciaCardComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: FavoritosService, useValue: favoritosService },
+        { provide: DialogService, useValue: dialogService },
       ],
     }).compileComponents();
 
@@ -133,11 +141,42 @@ describe('PreferenciaCardComponent', () => {
     });
   });
 
-  describe('agregarAFavoritos', () => {
-    beforeEach(() => {
-      spyOn(window, 'alert');
+  describe('esFavorito (ngOnInit)', () => {
+    it('dado que el producto ya esta en la lista de favoritos, esFavorito deberia ser true al montar', () => {
+      component.preferencia = PreferenciaMother.crear({ productoId: 'prod-1' });
+      component.alumnoId = 'alumno-1';
+      favoritosService.getFavoritos.and.returnValue(
+        of([{ id: 'prod-1', nombre: 'Alfajor', precio: 500, descripcion: '',
+               categoria: { id: 'c', descripcion: 'C' }, clasificacionesSalud: [],
+               imagen: '', estadoStock: 'DISPONIBLE' as const }])
+      );
+
+      fixture.detectChanges();
+
+      expect(component.esFavorito).toBeTrue();
     });
 
+    it('dado que el producto no esta en la lista de favoritos, esFavorito deberia ser false al montar', () => {
+      component.preferencia = PreferenciaMother.crear({ productoId: 'prod-1' });
+      component.alumnoId = 'alumno-1';
+      favoritosService.getFavoritos.and.returnValue(of([]));
+
+      fixture.detectChanges();
+
+      expect(component.esFavorito).toBeFalse();
+    });
+
+    it('dado sin alumnoId, no deberia llamar a getFavoritos', () => {
+      component.preferencia = PreferenciaMother.crear();
+      component.alumnoId = undefined;
+
+      fixture.detectChanges();
+
+      expect(favoritosService.getFavoritos).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('agregarAFavoritos', () => {
     it('dado sin alumnoId, no deberia llamar al servicio', () => {
       component.preferencia = PreferenciaMother.crear();
       component.alumnoId = undefined;
@@ -176,7 +215,7 @@ describe('PreferenciaCardComponent', () => {
       expect(productoArg.precio).toBe(500);
     });
 
-    it('dado el servicio responde ok, deberia dejar isAdding en false y alertar exito', () => {
+    it('dado el servicio responde ok, deberia dejar isAdding en false, esFavorito en true y mostrar dialogo de exito', () => {
       component.preferencia = PreferenciaMother.crear();
       component.alumnoId = 'alumno-1';
       favoritosService.agregarFavorito.and.returnValue(of(undefined));
@@ -184,10 +223,11 @@ describe('PreferenciaCardComponent', () => {
       component.agregarAFavoritos();
 
       expect(component.isAdding).toBeFalse();
-      expect(window.alert).toHaveBeenCalledWith('¡Añadido a favoritos!');
+      expect(component.esFavorito).toBeTrue();
+      expect(dialogService.alert).toHaveBeenCalledWith('¡Añadido a favoritos!', 'Favoritos');
     });
 
-    it('dado el servicio falla, deberia dejar isAdding en false y alertar error', () => {
+    it('dado el servicio falla, deberia dejar isAdding en false y mostrar dialogo de error', () => {
       component.preferencia = PreferenciaMother.crear();
       component.alumnoId = 'alumno-1';
       favoritosService.agregarFavorito.and.returnValue(throwError(() => new Error('boom')));
@@ -195,7 +235,8 @@ describe('PreferenciaCardComponent', () => {
       component.agregarAFavoritos();
 
       expect(component.isAdding).toBeFalse();
-      expect(window.alert).toHaveBeenCalledWith('Error al añadir a favoritos');
+      expect(component.esFavorito).toBeFalse();
+      expect(dialogService.alert).toHaveBeenCalledWith('Error al añadir a favoritos', 'Error');
     });
   });
 

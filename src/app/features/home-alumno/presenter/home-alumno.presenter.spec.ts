@@ -401,6 +401,40 @@ describe('HomeAlumnoPresenter', () => {
     spyOn(localStorage, 'getItem').and.returnValue(valor);
   }
 
+  describe('rewardStatus con thresholds extremos', () => {
+    it('dado totalPoints=0 y pointsToNextLevel=0 (threshold=0), porcentajeProgreso deberia ser 100 (fallback)', async () => {
+      givenAlumnosCargados([AlumnoMother.crear({ id: 'a1' })], 'a1');
+      servicioHomeAlumno.getRecompensasSaludables.and.returnValue(
+        of({
+          totalPoints: 0,
+          currentLevel: 'PRINCIPIANTE',
+          levelMessage: 'msg',
+          pointsToNextLevel: 0,
+          nextLevelName: 'CRACK',
+        }),
+      );
+      await whenInicializo();
+
+      expect(presenter.rewardStatus().porcentajeProgreso).toBe(100);
+    });
+
+    it('dado nextLevelName vacio, porcentajeProgreso deberia ser 100 (jugador ya al maximo)', async () => {
+      givenAlumnosCargados([AlumnoMother.crear({ id: 'a1' })], 'a1');
+      servicioHomeAlumno.getRecompensasSaludables.and.returnValue(
+        of({
+          totalPoints: 100,
+          currentLevel: 'CRACK',
+          levelMessage: 'top',
+          pointsToNextLevel: 0,
+          nextLevelName: '',
+        }),
+      );
+      await whenInicializo();
+
+      expect(presenter.rewardStatus().porcentajeProgreso).toBe(100);
+    });
+  });
+
   async function whenInicializo(): Promise<void> {
     presenter.init();
     await flushPromises();

@@ -6,7 +6,7 @@
       <i class="fa-solid fa-arrow-left"></i> Volver a Ficha
     </button>
     <div class="mapping-header__info">
-      <h1 class="mapping-header__title">Mapeo de Productos</h1>
+      <h1 class="mapping-header__title">Carga de Productos</h1>
       <p class="mapping-header__subtitle">
         Proveedor: <strong>{{ supplier()?.nombre }}</strong> &bull; Lista: <strong>{{ priceList()?.nombreOriginal
           }}</strong>
@@ -17,7 +17,7 @@
   @if (isLoading()) {
   <div class="loading-state">
     <i class="fa-solid fa-spinner fa-spin loading-state__spinner"></i>
-    <p>Procesando información y cargando mapeos...</p>
+    <p>Procesando información y cargando productos...</p>
   </div>
   }
 
@@ -85,7 +85,7 @@
                   <span class="badge badge--confirmed"><i class="fa-solid fa-check"></i> Confirmado</span>
                   }
                   } @else {
-                  <span class="unmapped-placeholder">Sin Mapear</span>
+                  <span class="unmapped-placeholder">Sin Cargar</span>
                   <span class="badge badge--unmapped">Requerido</span>
                   }
                 </div>
@@ -133,7 +133,7 @@
             <td>
               @if (item.productoInventarioId && !item.mappingConfirmado) {
               <button class="confirm-btn" (click)="confirmMapping(item)" title="Confirmar sugerencia de IA">
-                Confirmar Mapeo
+                Confirmar Carga
               </button>
               } @else {
               <span class="confirm-placeholder">-</span>

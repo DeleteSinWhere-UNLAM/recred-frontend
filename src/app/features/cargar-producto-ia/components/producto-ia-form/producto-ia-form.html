@@ -49,17 +49,17 @@
       </div>
 
       <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('categoriaId')">
-        <label for="ai-categoria" class="ai-product-form__label">Categoria</label>
+        <label for="ai-categoria" class="ai-product-form__label">Categoría</label>
         <select
           id="ai-categoria"
           class="ai-product-form__input ai-product-form__input--select"
           formControlName="categoriaId"
         >
-          <option [ngValue]="null" disabled>Selecciona una categoria</option>
+          <option [ngValue]="null" disabled>Selecciona una categoría</option>
           @for (cat of categories; track cat.id) {
             <option [value]="cat.id">{{ cat.descripcion }}</option>
           }
-          <option value="NEW">+ Crear nueva categoria</option>
+          <option value="NEW">+ Crear nueva categoría</option>
         </select>
         @if (hasError('categoriaId')) {
           <span class="ai-product-form__error">{{ getErrorMessage('categoriaId') }}</span>
@@ -68,7 +68,7 @@
 
       @if (productForm.get('categoriaId')?.value === 'NEW') {
         <div class="ai-product-form__group" [class.ai-product-form__group--error]="hasError('nuevaCategoriaNombre')">
-          <label for="ai-nueva-categoria" class="ai-product-form__label">Nombre de la nueva categoria</label>
+          <label for="ai-nueva-categoria" class="ai-product-form__label">Nombre de la nueva categoría</label>
           <input
             id="ai-nueva-categoria"
             class="ai-product-form__input"
@@ -139,7 +139,7 @@
 
     <div class="ai-product-form__toggles">
       <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Requiere preparacion</span>
+        <span class="ai-product-form__toggle-label">Requiere preparación</span>
         <input type="checkbox" formControlName="requierePreparacion">
         <span class="ai-product-form__toggle-switch"></span>
       </label>

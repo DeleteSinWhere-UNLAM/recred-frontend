@@ -201,6 +201,101 @@ describe('HomeAlumnoService', () => {
     expect(service.getPedidoEnCurso(ALUMNO_ID)?.retiraEn).toBe('');
   });
 
+  it('dado que el back devuelve lista vacia, cuando cargo pedido en curso, deberia quedar en null', async () => {
+    givenPendientesDelAlumno([]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)).toBeUndefined();
+  });
+
+  it('dado un movimiento sin date pero con pickupDate, deberia usar pickupDate para el orden', async () => {
+    const soloConPickup = MovimientoPendienteMother.crear({
+      id: 'con-pickup',
+      status: 'PENDIENTE',
+      date: undefined as unknown as string,
+      pickupDate: '2026-06-27',
+    });
+    givenPendientesDelAlumno([soloConPickup]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.id).toBe('con-pickup');
+  });
+
+  it('dado dos movimientos, uno solo con pickupDate y otro con date, deberia ordenarlos usando esa fecha', async () => {
+    const soloConPickup = MovimientoPendienteMother.crear({
+      id: 'con-pickup',
+      status: 'PENDIENTE',
+      date: undefined as unknown as string,
+      pickupDate: '2026-06-20',
+    });
+    const conDate = MovimientoPendienteMother.crear({
+      id: 'con-date',
+      status: 'PENDIENTE',
+      date: '2026-06-27T10:00:00',
+    });
+    givenPendientesDelAlumno([soloConPickup, conDate]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.id).toBe('con-date');
+  });
+
+  it('dado un movimiento sin date ni pickupDate, elegirUltimoPedido deberia usar 0 como timestamp fallback', async () => {
+    const invalido = MovimientoPendienteMother.crear({
+      id: 'sin-fecha',
+      status: 'PENDIENTE',
+      date: undefined as unknown as string,
+      pickupDate: undefined,
+    });
+    givenPendientesDelAlumno([invalido]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.id).toBe('sin-fecha');
+  });
+
+  it('dado dos movimientos donde uno no tiene fecha, el ordenamiento no deberia romper y el que tiene fecha valida deberia quedar primero', async () => {
+    const invalido = MovimientoPendienteMother.crear({
+      id: 'sin-fecha',
+      status: 'PENDIENTE',
+      date: undefined as unknown as string,
+      pickupDate: undefined,
+    });
+    const conFecha = MovimientoPendienteMother.crear({
+      id: 'con-fecha',
+      status: 'PENDIENTE',
+      date: '2026-06-27T10:00:00',
+    });
+    givenPendientesDelAlumno([invalido, conFecha]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.id).toBe('con-fecha');
+  });
+
+  it('dado un movimiento sin status, deberia mapear a CONFIRMADO por default', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({ status: undefined as unknown as string }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    expect(service.getPedidoEnCurso(ALUMNO_ID)?.estado).toBe('CONFIRMADO');
+  });
+
+  it('dado un movimiento sin totalAmount, totalFormateado deberia usar 0', async () => {
+    givenPendientesDelAlumno([
+      MovimientoPendienteMother.crear({ totalAmount: undefined as unknown as number }),
+    ]);
+
+    await whenCargoPedidoEnCurso(ALUMNO_ID);
+
+    const pedido = service.getPedidoEnCurso(ALUMNO_ID);
+    expect(pedido?.totalFormateado).toContain('0');
+  });
+
   function givenPendientesDelAlumno(pendientes: Movimiento[]): void {
     servicioMovimientos.getPendientesAlumno.and.returnValue(of(pendientes));
   }

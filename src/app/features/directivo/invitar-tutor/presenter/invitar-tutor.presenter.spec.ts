@@ -135,6 +135,18 @@ describe('InvitarTutorPresenter', () => {
     });
   });
 
+  describe('mapearError con message undefined en el body', () => {
+    it('dado un error 400 con message undefined, cuando invito, deberia caer al mensaje por status', async () => {
+      servicioInvitaciones.invitarTutor.and.rejectWith(
+        new HttpErrorResponse({ status: 400, error: { message: undefined } }),
+      );
+
+      await whenInvito(InvitarTutorPayloadMother.crear());
+
+      expect(presenter.error()).toBe('Datos inválidos. Revisá el email.');
+    });
+  });
+
   function givenElBackDevuelve(invitacion: InvitacionTutor): void {
     servicioInvitaciones.invitarTutor.and.resolveTo(invitacion);
   }

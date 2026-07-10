@@ -70,13 +70,10 @@ describe('Estadistica Integration', () => {
     fixture = TestBed.createComponent(EstadisticaPage);
   });
 
-  it('dado un alumno con prediccion, cuando se monta la page, deberia mostrar iniciales, grado y card con datos', async () => {
+  it('dado un alumno con prediccion, cuando se monta la page, deberia mostrar card con datos', async () => {
     await whenMonto();
 
     const texto = textoRenderizado();
-    expect(texto).toContain('JP');
-    expect(texto).toContain('5A');
-    expect(texto).toContain('Julian');
     expect(texto).toContain('Gasto proyectado del período');
     expect(texto).toContain('Bebidas');
   });

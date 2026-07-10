@@ -56,6 +56,24 @@ describe('UsuarioService', () => {
       expect(service.homeUrl()).toBe('/tutor');
     });
 
+    it('dado un perfil DIRECTIVO_COLEGIO en localStorage, cuando instancio, deberia derivar /directivo', () => {
+      givenPerfilEnStorage({ rol: 'DIRECTIVO_COLEGIO' as never });
+
+      const service = whenInstancio();
+
+      expect(service.homeUrl()).toBe('/directivo');
+      expect(service.esVistaDirectivo()).toBeTrue();
+    });
+
+    it('dado un perfil ADMIN en localStorage, cuando instancio, deberia derivar /recred-admin', () => {
+      givenPerfilEnStorage({ rol: 'ADMIN' as never });
+
+      const service = whenInstancio();
+
+      expect(service.homeUrl()).toBe('/recred-admin');
+      expect(service.esVistaAdmin()).toBeTrue();
+    });
+
     it('dado un perfil corrupto en localStorage, cuando instancio, deberia caer al default /tutor', () => {
       localStorage.setItem(KEY_PERFIL, '{corrupto');
 
@@ -78,6 +96,14 @@ describe('UsuarioService', () => {
       const service = whenInstancio();
 
       expect(service.nombreNavbar()).toBe('Rocio');
+    });
+
+    it('dado un perfil en storage, cuando instancio, nombreNavbar deberia usar el nombre del perfil', () => {
+      localStorage.setItem(KEY_PERFIL, JSON.stringify({ rol: 'PADRE', nombre: 'Ana Perez' }));
+
+      const service = whenInstancio();
+
+      expect(service.nombreNavbar()).toBe('Ana Perez');
     });
   });
 

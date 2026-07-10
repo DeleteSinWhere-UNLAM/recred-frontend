@@ -39,16 +39,22 @@
         <div class="rc__row">
           <div class="rc__field">
             <label class="rc__label" for="schoolEmail">Email institucional *</label>
-            <input id="schoolEmail" class="rc__input" type="email" formControlName="schoolEmail" placeholder="contacto@colegio.edu.ar" />
-            @if (form.get('schoolEmail')?.invalid && form.get('schoolEmail')?.touched) {
-              <span class="rc__error">Email inválido</span>
+            <input id="schoolEmail" class="rc__input" type="email" formControlName="schoolEmail" placeholder="contacto@colegio.edu.ar" (input)="onInputEmail($event, 'schoolEmail')" />
+            @if (form.get('schoolEmail')?.hasError('required') && form.get('schoolEmail')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            } @else if (form.get('schoolEmail')?.hasError('pattern') && form.get('schoolEmail')?.touched) {
+              <span class="rc__error">Por favor, ingresa un correo electrónico válido (ej: nombre@empresa.com).</span>
+            } @else if (form.get('schoolEmail')?.hasError('serverError')) {
+              <span class="rc__error">{{ form.get('schoolEmail')?.getError('serverError') }}</span>
             }
           </div>
           <div class="rc__field">
             <label class="rc__label" for="schoolPhone">Teléfono *</label>
-            <input id="schoolPhone" class="rc__input" type="text" formControlName="schoolPhone" placeholder="011-4444-5555" />
-            @if (form.get('schoolPhone')?.invalid && form.get('schoolPhone')?.touched) {
+            <input id="schoolPhone" class="rc__input" type="tel" inputmode="numeric" maxlength="15" formControlName="schoolPhone" placeholder="011-4444-5555" (input)="onInputNumeros($event, 'schoolPhone')" />
+            @if (form.get('schoolPhone')?.hasError('required') && form.get('schoolPhone')?.touched) {
               <span class="rc__error">Campo requerido</span>
+            } @else if (form.get('schoolPhone')?.hasError('pattern') && form.get('schoolPhone')?.touched) {
+              <span class="rc__error">El teléfono debe tener entre 8 y 15 números, sin letras ni caracteres especiales.</span>
             }
           </div>
         </div>
@@ -56,9 +62,13 @@
         <div class="rc__row">
           <div class="rc__field">
             <label class="rc__label" for="schoolCue">CUE del establecimiento *</label>
-            <input id="schoolCue" class="rc__input" type="text" formControlName="schoolCue" placeholder="Ej: 123456789" />
-            @if (form.get('schoolCue')?.invalid && form.get('schoolCue')?.touched) {
+            <input id="schoolCue" class="rc__input" type="text" inputmode="numeric" maxlength="9" formControlName="schoolCue" placeholder="Ej: 123456789" (input)="onInputNumeros($event, 'schoolCue')" />
+            @if (form.get('schoolCue')?.hasError('required') && form.get('schoolCue')?.touched) {
               <span class="rc__error">Campo requerido</span>
+            } @else if (form.get('schoolCue')?.hasError('pattern') && form.get('schoolCue')?.touched) {
+              <span class="rc__error">El CUE debe contener exactamente 9 números, sin letras ni espacios.</span>
+            } @else if (form.get('schoolCue')?.hasError('serverError')) {
+              <span class="rc__error">{{ form.get('schoolCue')?.getError('serverError') }}</span>
             }
           </div>
 
@@ -88,16 +98,22 @@
         <div class="rc__row">
           <div class="rc__field">
             <label class="rc__label" for="directorEmail">Email personal *</label>
-            <input id="directorEmail" class="rc__input" type="email" formControlName="directorEmail" placeholder="director@email.com" />
-            @if (form.get('directorEmail')?.invalid && form.get('directorEmail')?.touched) {
-              <span class="rc__error">Email inválido</span>
+            <input id="directorEmail" class="rc__input" type="email" formControlName="directorEmail" placeholder="director@email.com" (input)="onInputEmail($event, 'directorEmail')" />
+            @if (form.get('directorEmail')?.hasError('required') && form.get('directorEmail')?.touched) {
+              <span class="rc__error">Campo requerido</span>
+            } @else if (form.get('directorEmail')?.hasError('pattern') && form.get('directorEmail')?.touched) {
+              <span class="rc__error">Por favor, ingresa un correo electrónico válido (ej: nombre@empresa.com).</span>
+            } @else if (form.get('directorEmail')?.hasError('serverError')) {
+              <span class="rc__error">{{ form.get('directorEmail')?.getError('serverError') }}</span>
             }
           </div>
           <div class="rc__field">
             <label class="rc__label" for="directorPhone">Teléfono *</label>
-            <input id="directorPhone" class="rc__input" type="text" formControlName="directorPhone" placeholder="011-15-2222-3333" />
-            @if (form.get('directorPhone')?.invalid && form.get('directorPhone')?.touched) {
+            <input id="directorPhone" class="rc__input" type="tel" inputmode="numeric" maxlength="15" formControlName="directorPhone" placeholder="011-15-2222-3333" (input)="onInputNumeros($event, 'directorPhone')" />
+            @if (form.get('directorPhone')?.hasError('required') && form.get('directorPhone')?.touched) {
               <span class="rc__error">Campo requerido</span>
+            } @else if (form.get('directorPhone')?.hasError('pattern') && form.get('directorPhone')?.touched) {
+              <span class="rc__error">El teléfono debe tener entre 8 y 15 números, sin letras ni caracteres especiales.</span>
             }
           </div>
         </div>
@@ -105,23 +121,33 @@
         <div class="rc__row">
           <div class="rc__field">
             <label class="rc__label" for="directorDni">DNI *</label>
-            <input id="directorDni" class="rc__input" type="text" formControlName="directorDni" placeholder="20123456" />
-            @if (form.get('directorDni')?.invalid && form.get('directorDni')?.touched) {
+            <input id="directorDni" class="rc__input" type="text" inputmode="numeric" maxlength="8" formControlName="directorDni" placeholder="20123456" (input)="onInputNumeros($event, 'directorDni')" />
+            @if (form.get('directorDni')?.hasError('required') && form.get('directorDni')?.touched) {
               <span class="rc__error">Campo requerido</span>
+            } @else if (form.get('directorDni')?.hasError('pattern') && form.get('directorDni')?.touched) {
+              <span class="rc__error">El DNI debe tener 7 u 8 números, sin puntos ni espacios.</span>
+            } @else if (form.get('directorDni')?.hasError('serverError')) {
+              <span class="rc__error">{{ form.get('directorDni')?.getError('serverError') }}</span>
             }
           </div>
           <div class="rc__field">
             <label class="rc__label" for="directorUsername">Nombre de usuario *</label>
-            <input id="directorUsername" class="rc__input" type="text" formControlName="directorUsername" placeholder="carlosperez" />
-            @if (form.get('directorUsername')?.invalid && form.get('directorUsername')?.touched) {
+            <input id="directorUsername" class="rc__input" type="text" maxlength="20" formControlName="directorUsername" placeholder="carlosperez" (input)="onInputUsername($event, 'directorUsername')" />
+            @if (form.get('directorUsername')?.hasError('required') && form.get('directorUsername')?.touched) {
               <span class="rc__error">Campo requerido</span>
+            } @else if (form.get('directorUsername')?.hasError('pattern') && form.get('directorUsername')?.touched) {
+              <span class="rc__error">El usuario solo puede contener letras, números, puntos y guiones sin espacios.</span>
+            } @else if (form.get('directorUsername')?.hasError('serverError')) {
+              <span class="rc__error">{{ form.get('directorUsername')?.getError('serverError') }}</span>
             }
           </div>
         </div>
       </section>
 
-      @if (presenter.error$ | async; as error) {
-        <div class="rc__error-banner" id="panel-error">{{ error }}</div>
+      @if (presenter.error$ | async; as errorObj) {
+        @if (!errorObj.campo) {
+          <div class="rc__error-banner" id="panel-error">{{ errorObj.mensaje }}</div>
+        }
       }
 
       <div class="rc__actions">

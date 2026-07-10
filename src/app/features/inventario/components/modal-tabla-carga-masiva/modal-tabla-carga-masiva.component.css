@@ -136,6 +136,27 @@
   color: white;
 }
 
+.bulk-upload-modal__btn-example {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: var(--color-texto-claro);
+  border: 1px dashed var(--color-borde-fuerte, #cbd5e1);
+  border-radius: var(--radius-button, 12px);
+  cursor: pointer;
+  font-weight: 600;
+  font-family: var(--font-display);
+  transition: all 0.2s ease;
+}
+
+.bulk-upload-modal__btn-example:hover {
+  background-color: rgba(74, 111, 165, 0.04);
+  color: var(--color-pizarra);
+  border-color: var(--color-pizarra);
+}
+
 .bulk-upload-modal__file-input {
   display: none;
 }

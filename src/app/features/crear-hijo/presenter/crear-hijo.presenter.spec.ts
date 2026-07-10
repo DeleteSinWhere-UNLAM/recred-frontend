@@ -126,7 +126,7 @@ describe('CrearHijoPresenter', () => {
 
       expect(ok).toBeTrue();
       expect(servicioAlumnos.crearHijo).toHaveBeenCalledWith(req);
-      thenSeMostroToast('Juan Pérez fue agregado como hijo', 'success');
+      thenSeMostroToast('Juan fue agregado. Revisa su casilla de SPAM, enviamos las credenciales provisorias a su correo.', 'success', 7000);
       thenSeNavegoA('/tutor');
       expect(presenter.guardando()).toBeFalse();
       expect(presenter.error()).toBeNull();
@@ -153,7 +153,7 @@ describe('CrearHijoPresenter', () => {
 
       expect(ok).toBeFalse();
       expect(presenter.error()).toBe('El DNI ya existe');
-      thenSeMostroToast('El DNI ya existe', 'error');
+      thenSeMostroToast('El DNI ya existe', 'error', 6000);
       expect(router.navigateByUrl).not.toHaveBeenCalled();
     });
 
@@ -162,7 +162,7 @@ describe('CrearHijoPresenter', () => {
 
       await whenCreo(CrearHijoFormMother.crear());
 
-      expect(presenter.error()).toBe('Ya existe un alumno con esos datos.');
+      expect(presenter.error()).toBe('Error: El correo electrónico o DNI ya están registrados. Por favor, intenta con otro correo distinto.');
     });
 
     it('dado un error que no es HTTP, cuando creo el hijo, deberia usar el mensaje generico', async () => {
@@ -171,6 +171,48 @@ describe('CrearHijoPresenter', () => {
       await whenCreo(CrearHijoFormMother.crear());
 
       expect(presenter.error()).toBe('No se pudo crear el hijo. Intenta nuevamente.');
+    });
+
+    it('dado un error 400 sin body, cuando creo el hijo, deberia usar el mensaje de datos invalidos', async () => {
+      givenCrearHijoRechazaConStatus(400);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Datos inválidos. Verifica que el correo esté bien escrito antes de reintentar.');
+    });
+
+    it('dado un error 403 sin body, cuando creo el hijo, deberia usar el mensaje de permisos', async () => {
+      givenCrearHijoRechazaConStatus(403);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('No tienes permiso para crear un hijo.');
+    });
+
+    it('dado un error 500 sin body, cuando creo el hijo, deberia usar el mensaje del servidor', async () => {
+      givenCrearHijoRechazaConStatus(500);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Error del servidor. Intenta más tarde.');
+    });
+
+    it('dado un error 500 con error string, cuando creo el hijo, deberia usar ese string como mensaje', async () => {
+      servicioAlumnos.crearHijo.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: 'Servidor caido' }),
+      );
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Servidor caido');
+    });
+
+    it('dado un error con error.message undefined, cuando creo el hijo, deberia caer al mensaje por status', async () => {
+      givenCrearHijoRechazaConErrorObjetoSinMensaje(400);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Datos inválidos. Verifica que el correo esté bien escrito antes de reintentar.');
     });
   });
 
@@ -217,6 +259,16 @@ describe('CrearHijoPresenter', () => {
     servicioAlumnos.crearHijo.and.rejectWith(new Error('boom'));
   }
 
+  function givenCrearHijoRechazaConStatus(status: number): void {
+    servicioAlumnos.crearHijo.and.rejectWith(new HttpErrorResponse({ status }));
+  }
+
+  function givenCrearHijoRechazaConErrorObjetoSinMensaje(status: number): void {
+    servicioAlumnos.crearHijo.and.rejectWith(
+      new HttpErrorResponse({ status, error: { message: undefined } }),
+    );
+  }
+
   function whenCargoColegios(): Promise<void> {
     return presenter.cargarColegios();
   }
@@ -233,8 +285,12 @@ describe('CrearHijoPresenter', () => {
     expect(servicioColegios.obtenerColegiosDelTutor).toHaveBeenCalledTimes(cantidad);
   }
 
-  function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error'): void {
-    expect(servicioToast.mostrar).toHaveBeenCalledWith(mensaje, tipo);
+  function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error', duration?: number): void {
+    if (duration) {
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(mensaje, tipo, duration);
+    } else {
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(mensaje, tipo);
+    }
   }
 
   function thenSeNavegoA(url: string): void {

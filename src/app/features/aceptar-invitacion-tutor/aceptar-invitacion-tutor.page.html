@@ -1,21 +1,16 @@
 <div class="page">
   <div class="page__container">
-    <header class="brand">
-      <span class="brand__logo">RC</span>
-      <span class="brand__name">Recred</span>
-    </header>
-
     @if (presenter.loading()) {
-      <section class="card card--estado" role="status">
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        <h1>Validando tu invitacion...</h1>
-      </section>
+    <section class="card card--estado" role="status">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <h1>Validando tu invitacion...</h1>
+    </section>
     } @else if (presenter.error(); as errorMsg) {
-      <section class="card card--estado card--error" role="alert">
-        <i class="fa-solid fa-circle-xmark"></i>
-        <h1>No podemos usar este link</h1>
-        <p>{{ errorMsg }}</p>
-      </section>
+    <section class="card card--estado card--error" role="alert">
+      <i class="fa-solid fa-circle-xmark"></i>
+      <h1>No podemos usar este link</h1>
+      <p>{{ errorMsg }}</p>
+    </section>
     } @else if (presenter.invitacion(); as invitacion) {
       <section class="card">
         <div class="card__hero">
@@ -41,17 +36,17 @@
           <i class="fa-solid fa-circle-info"></i>
           @if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
             <p>
-              Te enviamos usuario y contrasena temporal a <strong>{{ invitacion.email }}</strong>.
-              Inicia sesion para activar tu vinculo con el colegio.
+              Te enviamos usuario y contraseña temporal a <strong>{{ invitacion.email }}</strong>.
+              Inicia sesión para activar tu vínculo con el colegio.
             </p>
           } @else if (presenter.resultadoPreparacion() === 'USERNAME_REQUIRED') {
             <p>
-              Elegi un nombre de usuario para crear tu cuenta. Vas a recibir la contrasena temporal en
+              Elegi un nombre de usuario para crear tu cuenta. Vas a recibir la contraseña temporal en
               <strong>{{ invitacion.email }}</strong>.
             </p>
           } @else {
             <p>
-              Vas a iniciar sesion con el email <strong>{{ invitacion.email }}</strong>.
+              Vas a iniciar sesión con el email <strong>{{ invitacion.email }}</strong>.
               Usa ese mismo email para que podamos asociarte al colegio.
             </p>
           }
@@ -93,7 +88,7 @@
             @if (presenter.preparandoCuenta()) {
               Preparando cuenta...
             } @else if (presenter.resultadoPreparacion() === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
-              Iniciar sesion
+              Iniciar sesión
             } @else {
               Continuar con Recred
             }
@@ -102,7 +97,7 @@
         }
 
         <p class="pie">
-          La asociacion con el colegio se activa despues de iniciar sesion correctamente.
+          La asociación con el colegio se activa después de iniciar sesión correctamente.
         </p>
       </section>
     }

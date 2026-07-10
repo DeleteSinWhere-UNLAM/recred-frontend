@@ -52,6 +52,7 @@
 
 .confirmar-page__titulo {
   font-family: var(--font-display);
+  text-align: center;
   font-size: 26px;
   font-weight: 800;
   color: var(--color-pizarra);

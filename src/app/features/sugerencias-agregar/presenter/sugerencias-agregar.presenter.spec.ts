@@ -101,10 +101,27 @@ describe('SugerenciasAgregarPresenter', () => {
 
     it('dado una lista vacia, cuando leo chartData y productCards, deberia devolver arrays vacios', () => {
       givenSugerenciasDelBack([]);
+
       presenter.initialize();
 
       expect(presenter.chartData).toEqual([]);
       expect(presenter.productCards).toEqual([]);
+    });
+
+    it('dado sugerencias con totalRevenue = 0, chartData deberia usar 1 como maximo para no dividir por cero', () => {
+      const sugerenciaConIngresoCero = {
+        ...SugerenciaAgregarProductoMother.crear(),
+        metadata: {
+          ...SugerenciaAgregarProductoMother.crear().metadata,
+          totalRevenue: 0,
+        },
+      };
+      givenSugerenciasDelBack([sugerenciaConIngresoCero]);
+      presenter.initialize();
+
+      const datos = presenter.chartData;
+
+      expect(datos[0].ingresoPercent).toBe(0);
     });
   });
 

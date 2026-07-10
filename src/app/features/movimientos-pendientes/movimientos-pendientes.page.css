@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  container-type: inline-size;
 }
 
 /* Cabecera */
@@ -47,31 +48,14 @@
   box-shadow: var(--shadow-neu-concave);
 }
 
-.movimientos__titulo-area {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
 
-.movimientos__icono {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background-color: color-mix(in srgb, var(--color-pizarra) 14%, var(--color-superficie));
-  color: var(--color-pizarra);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  box-shadow: inset 0 0 0 1px rgba(74, 111, 165, 0.15);
-  flex-shrink: 0;
-}
 
 .movimientos__titulo {
   font-family: var(--font-display);
+  text-align: center;
   font-size: 24px;
   font-weight: 800;
-  color: var(--color-texto-oscuro);
+  color: var(--color-pizarra);
   line-height: 1.2;
   margin: 0 0 4px;
 }
@@ -81,6 +65,7 @@
   color: var(--color-texto-claro);
   font-weight: 500;
   margin: 0;
+  text-align: center;
 }
 
 /* Panel de Controles y Filtros */
@@ -386,7 +371,7 @@
 /* Fila de Movimiento individual */
 .movimientos__fila {
   display: grid;
-  grid-template-columns: 1fr 140px 300px 240px;
+  grid-template-columns: minmax(0, 1fr) 120px 220px 180px;
   align-items: center;
   gap: 20px;
   padding: 18px 24px;
@@ -401,7 +386,7 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  flex: 1;
+  min-width: 0;
 }
 
 .movimientos__iniciales {
@@ -440,6 +425,7 @@
   font-weight: 700;
   color: var(--color-texto-oscuro);
   margin: 0;
+  word-break: break-word;
 }
 
 .movimientos__fila-resumen {
@@ -458,6 +444,7 @@
   font-size: 12px;
   color: #64748b;
   margin: 2px 0 0 0;
+  word-break: break-word;
 }
 
 .movimientos__fila-clave strong {
@@ -522,9 +509,9 @@
 .movimientos__fila-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   justify-content: flex-end;
-  min-width: 240px;
+  min-width: 180px;
   flex-shrink: 0;
 }
 
@@ -733,7 +720,7 @@
 }
 
 /* Responsive */
-@media (max-width: 992px) {
+@container (max-width: 800px) {
   .movimientos__fila {
     display: flex;
     flex-wrap: wrap;

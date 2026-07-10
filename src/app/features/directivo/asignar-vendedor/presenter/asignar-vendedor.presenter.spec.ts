@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CrearVendedorRequest } from '../../models/directivo.model';
 import { DirectivoService } from '../../services/directivo.service';
 import { AsignarVendedorPresenter } from './asignar-vendedor.presenter';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 class CrearVendedorRequestMother {
   static crear(override: Partial<CrearVendedorRequest> = {}): CrearVendedorRequest {
@@ -34,6 +35,7 @@ describe('AsignarVendedorPresenter', () => {
         AsignarVendedorPresenter,
         { provide: DirectivoService, useValue: directivoService },
         { provide: Router, useValue: router },
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['mostrar']) }
       ],
     });
 
@@ -66,7 +68,7 @@ describe('AsignarVendedorPresenter', () => {
 
       await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
 
-      expect(presenter.error()).toBe('El correo o nombre de usuario ya está registrado.');
+      expect(presenter.error()).toBe('Error: El correo electrónico ya está registrado o es inválido. Por favor, intenta de nuevo.');
       expect(router.navigate).not.toHaveBeenCalled();
     });
 

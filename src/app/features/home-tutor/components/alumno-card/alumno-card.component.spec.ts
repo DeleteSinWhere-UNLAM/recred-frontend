@@ -118,7 +118,7 @@ describe('AlumnoCardComponent', () => {
 
   describe('derivaciones de nombre y saldo', () => {
     it('dado un alumno Juan, nombreCompleto e iniciales deberian mostrarse en mayuscula', () => {
-      expect(component.nombreCompleto).toBe('Juan');
+      expect(component.nombreCompleto).toBe('Juan Perez');
       expect(component.iniciales).toBe('J');
     });
 
@@ -383,6 +383,152 @@ describe('AlumnoCardComponent', () => {
       whenMonto();
 
       expect(component.creditoActivo()).toBeNull();
+    });
+  });
+
+  describe('cargarPresupuestoYConsumo con budget activo', () => {
+    const presupuestoActivo = {
+      id: 'b1',
+      alumnoId: 'alumno-1',
+      montoLimiteGeneral: 2000,
+      periodo: 'SEMANAL',
+      fechaInicio: '2026-01-01',
+      activo: true,
+      reglasCategoria: [],
+    } as unknown as import('../../../presupuesto/models/presupuesto.model').Presupuesto;
+
+    it('dado un budget activo y una compra APPROVED en el periodo, deberia calcular budgetSpent', async () => {
+      servicioPresupuesto.getPresupuesto.and.resolveTo(presupuestoActivo);
+      const hoy = new Date().toISOString().slice(0, 10);
+      servicioMovimientos.getHistorialAlumno.and.returnValue(
+        of([
+          { status: 'APPROVED', totalAmount: 700, date: hoy, items: [] },
+        ] as unknown as never[]),
+      );
+
+      whenMonto();
+      await fixture.whenStable();
+
+      expect(component.hasBudget()).toBeTrue();
+      expect(component.budgetLimit()).toBe(2000);
+      expect(component.budgetSpent()).toBe(700);
+    });
+
+    it('dado un budget activo y history null, deberia dejar budgetSpent en 0', async () => {
+      servicioPresupuesto.getPresupuesto.and.resolveTo(presupuestoActivo);
+      servicioMovimientos.getHistorialAlumno.and.returnValue(of(null as unknown as never[]));
+
+      whenMonto();
+      await fixture.whenStable();
+
+      expect(component.budgetSpent()).toBe(0);
+    });
+
+    it('dado un budget activo y compras con status desconocido, deberia excluirlas del gasto', async () => {
+      servicioPresupuesto.getPresupuesto.and.resolveTo(presupuestoActivo);
+      const hoy = new Date().toISOString().slice(0, 10);
+      servicioMovimientos.getHistorialAlumno.and.returnValue(
+        of([
+          { status: 'DESCONOCIDO', totalAmount: 999, date: hoy, items: [] },
+        ] as unknown as never[]),
+      );
+
+      whenMonto();
+      await fixture.whenStable();
+
+      expect(component.budgetSpent()).toBe(0);
+    });
+
+    it('dado un budget activo y falla getHistorialAlumno, deberia loguear y dejar budgetSpent en 0', async () => {
+      spyOn(console, 'error');
+      servicioPresupuesto.getPresupuesto.and.resolveTo(presupuestoActivo);
+      servicioMovimientos.getHistorialAlumno.and.returnValue(throwError(() => new Error('boom')));
+
+      whenMonto();
+      await fixture.whenStable();
+
+      expect(component.budgetSpent()).toBe(0);
+    });
+  });
+
+  describe('planLabel y navegarConPlan con plan AVANZADO', () => {
+    it('dado plan gratuito y accion que requiere AVANZADO, deberia mostrar el toast con "Avanzado"', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+
+      component.navegarConPlan('/prediccion-gasto', 'AVANZADO');
+
+      expect(servicioToast.mostrar).toHaveBeenCalledWith('Disponible con plan Avanzado.', 'info');
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onFotoRecortada sin archivo original', () => {
+    it('dado que el input pierde su files antes del recorte, no deberia subir foto ni mostrar toast', async () => {
+      const original = new File([''], 'foto.jpg', { type: 'image/jpeg' });
+      await seleccionarArchivo(original);
+      const event = (component as unknown as ProtectedFoto).fotoEvent();
+      const input = event!.target as HTMLInputElement;
+      Object.defineProperty(input, 'files', { value: null, writable: false, configurable: true });
+
+      await (component as unknown as ProtectedFoto).onFotoRecortada(
+        new Blob(['crop'], { type: 'image/webp' }),
+      );
+
+      expect(servicioAlumnos.subirFotoAlumno).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('isActive', () => {
+    it('dado que el contexto coincide pero la url no incluye la ruta, deberia devolver false', () => {
+      (servicioContexto as unknown as { alumnoId: unknown }).alumnoId = signal('alumno-1').asReadonly();
+
+      expect(component.isActive('/otra-ruta')).toBeFalse();
+    });
+
+    it('dado que el contexto coincide y la url incluye la ruta, deberia devolver true', () => {
+      Object.defineProperty(servicioContexto, 'alumnoId', {
+        value: signal('alumno-1').asReadonly(),
+        configurable: true,
+      });
+
+      expect(component.isActive('/')).toBeTrue();
+    });
+
+    it('dado que el currentUrl es vacio, isActive deberia devolver false por early return', () => {
+      Object.defineProperty(component, 'currentUrl', {
+        value: () => '',
+        configurable: true,
+      });
+
+      expect(component.isActive('/algo')).toBeFalse();
+    });
+  });
+
+  describe('cargarPresupuestoYConsumo con compras que tienen pickupDate', () => {
+    const presupuestoActivo = {
+      id: 'b1',
+      alumnoId: 'alumno-1',
+      montoLimiteGeneral: 2000,
+      periodo: 'SEMANAL',
+      fechaInicio: '2026-01-01',
+      activo: true,
+      reglasCategoria: [],
+    } as unknown as import('../../../presupuesto/models/presupuesto.model').Presupuesto;
+
+    it('dado un budget activo y una compra con pickupDate dentro del rango, deberia calcular budgetSpent usando pickupDate', async () => {
+      servicioPresupuesto.getPresupuesto.and.resolveTo(presupuestoActivo);
+      const hoy = new Date().toISOString().slice(0, 10);
+      servicioMovimientos.getHistorialAlumno.and.returnValue(
+        of([
+          { status: 'APPROVED', totalAmount: 900, date: '', pickupDate: hoy, items: [] },
+        ] as unknown as never[]),
+      );
+
+      whenMonto();
+      await fixture.whenStable();
+
+      expect(component.budgetSpent()).toBe(900);
     });
   });
 

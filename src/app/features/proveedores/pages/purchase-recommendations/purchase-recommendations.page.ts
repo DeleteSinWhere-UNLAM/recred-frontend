@@ -51,7 +51,6 @@ export class PurchaseRecommendationsPage implements OnInit {
 
   readonly nombreKiosquero = this.usuarioService.nombreNavbar;
 
-  // States
   products = signal<Producto[]>([]);
   searchQuery = signal<string>('');
   selectedCategory = signal<string>('TODAS');
@@ -64,11 +63,9 @@ export class PurchaseRecommendationsPage implements OnInit {
 
   chosenRecommendations = signal<Map<string, ChosenRecommendation>>(new Map());
 
-  // Alternatives Modal state
   isAlternativesModalOpen = signal<boolean>(false);
   activeAlternativesProductId = signal<string | null>(null);
 
-  // Derived categories list
   readonly categories = computed(() => {
     const list = this.products();
     const map = new Map<string, string>();
@@ -82,7 +79,6 @@ export class PurchaseRecommendationsPage implements OnInit {
     return Array.from(map.entries()).map(([id, desc]) => ({ id, desc }));
   });
 
-  // Derived filtered products list
   readonly filteredProducts = computed(() => {
     let list = this.products();
     const query = this.searchQuery().toLowerCase().trim();
@@ -115,7 +111,6 @@ export class PurchaseRecommendationsPage implements OnInit {
     });
   });
 
-  // UI Accordion State
   expandedProductAccordions = signal<Set<string>>(new Set<string>());
 
   hasRecommendation(productId: string): boolean {
@@ -154,7 +149,6 @@ export class PurchaseRecommendationsPage implements OnInit {
     return !!(rec && rec.alternativas && rec.alternativas.length > 0);
   }
 
-  // Modal Methods
   openAlternativesModal(productId: string, event: Event): void {
     event.stopPropagation();
     this.activeAlternativesProductId.set(productId);
@@ -265,8 +259,7 @@ export class PurchaseRecommendationsPage implements OnInit {
       next: (data) => {
         this.products.set(data);
         this.isLoading.set(false);
-        
-        // Auto-select low stock products if the query parameter is present
+
         this.route.queryParams.subscribe(params => {
           if (params['preselect'] === 'low-stock') {
             this.autoSelectLowStock();
@@ -349,7 +342,6 @@ export class PurchaseRecommendationsPage implements OnInit {
     this.isFetchingRecommendations.set(true);
     this.supplierService.getPurchaseRecommendations(ids).subscribe({
       next: (results) => {
-        // Sort recommendations: items with quotations first, non-quoted at the end
         const sorted = [...results].sort((a, b) => {
           const aHas = !!a.proveedorRecomendadoId;
           const bHas = !!b.proveedorRecomendadoId;
@@ -358,7 +350,6 @@ export class PurchaseRecommendationsPage implements OnInit {
         });
         this.recommendations.set(sorted);
 
-        // Initialize chosen recommendations with backend suggestions
         const chosenMap = new Map<string, ChosenRecommendation>();
         results.forEach(rec => {
           if (rec.proveedorRecomendadoId) {
@@ -374,7 +365,7 @@ export class PurchaseRecommendationsPage implements OnInit {
         this.chosenRecommendations.set(chosenMap);
 
         this.isFetchingRecommendations.set(false);
-        this.expandedProductAccordions.set(new Set<string>()); // Reset accordions
+        this.expandedProductAccordions.set(new Set<string>());
         this.toastService.mostrar('Comparación finalizada con éxito', 'success');
       },
       error: (err) => {
@@ -390,7 +381,7 @@ export class PurchaseRecommendationsPage implements OnInit {
     if (list.length === 0) return;
 
     const chosen = this.chosenRecommendations();
-    let csvContent = '\uFEFF'; // BOM to support Excel Spanish characters
+    let csvContent = '\uFEFF';
     csvContent += 'Producto;Proveedor Recomendado;Precio de Compra;Unidad;Precio Unitario\n';
 
     list.forEach((rec) => {
@@ -426,7 +417,6 @@ export class PurchaseRecommendationsPage implements OnInit {
 
     const chosen = this.chosenRecommendations();
 
-    // Group chosen recommendations by supplier name
     const grouped = new Map<string, GroupedRecommendation[]>();
     const noQuote: RecomendacionProveedor[] = [];
 
@@ -478,7 +468,6 @@ export class PurchaseRecommendationsPage implements OnInit {
         <p>Generado el: ${dateStr}</p>
     `;
 
-    // Render grouped tables
     grouped.forEach((items, supplierName) => {
       html += `
         <div class="supplier-section">
@@ -516,7 +505,6 @@ export class PurchaseRecommendationsPage implements OnInit {
       `;
     });
 
-    // Render unquoted items if any
     if (noQuote.length > 0) {
       html += `
         <div class="supplier-section">

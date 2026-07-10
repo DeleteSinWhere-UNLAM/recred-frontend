@@ -169,6 +169,24 @@ describe('PriceListMappingPage', () => {
 
       expect(component.isLoading()).toBeFalse();
     });
+
+    it('dado que el detalle devuelve la lista sin items, items del state deberia caer al arreglo vacio', () => {
+      const listaSinItems = ListaPrecioProveedorMother.crear({
+        id: 'lp-1',
+        items: undefined as unknown as [],
+      });
+      const proveedorSinItems = SupplierResponseMother.crear({
+        id: SUPPLIER_ID_TEST,
+        listasPrecios: [listaSinItems],
+      });
+      servicioSupplier.getSuppliers.and.returnValue(of([proveedorSinItems]));
+      servicioSupplier.getSupplierById.and.returnValue(of(proveedorSinItems));
+
+      build();
+      whenMonto();
+
+      expect(component.items()).toEqual([]);
+    });
   });
 
   describe('confirmMapping', () => {
@@ -209,6 +227,19 @@ describe('PriceListMappingPage', () => {
       component.confirmMapping(item1);
 
       expect(servicioToast.mostrar).toHaveBeenCalledWith('Error al confirmar el mapeo', 'error');
+    });
+
+    it('dado varios items en el state, cuando confirmo uno, los demas deberian quedar intactos', () => {
+      const item2 = ItemListaPrecioMother.crear({ id: 'i-2', nombreProductoProveedor: 'Coca x6' });
+      component.items.set([item1, item2]);
+      const actualizado = ItemListaPrecioMother.crear({ id: 'i-1', mappingConfirmado: true });
+      servicioSupplier.updateMapping.and.returnValue(of(actualizado));
+
+      component.confirmMapping(item1);
+
+      const stateFinal = component.items();
+      expect(stateFinal.find((i) => i.id === 'i-1')?.mappingConfirmado).toBeTrue();
+      expect(stateFinal.find((i) => i.id === 'i-2')).toEqual(item2);
     });
   });
 

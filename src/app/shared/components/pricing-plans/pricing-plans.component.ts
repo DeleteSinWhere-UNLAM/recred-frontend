@@ -85,7 +85,7 @@ export class PricingPlansComponent {
         'Panel de control',
         'Carga de producto con imagen',
         'Carga de stock masiva',
-        'Diagnostico comercial',
+        'Diagnóstico comercial',
         'Promociones'
       ];
 

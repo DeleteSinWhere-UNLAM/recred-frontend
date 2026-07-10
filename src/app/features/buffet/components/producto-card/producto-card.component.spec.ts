@@ -355,6 +355,37 @@ describe('ProductoCardComponent', () => {
     });
   });
 
+  describe('computed cuando no hay producto o alumnoId', () => {
+    beforeEach(() => {
+      (component as unknown as { productoState: { set: (v: unknown) => void } }).productoState.set(undefined);
+      (component as unknown as { alumnoIdState: { set: (v: string) => void } }).alumnoIdState.set('');
+    });
+
+    it('disponible deberia devolver false cuando no hay producto', () => {
+      expect(component.disponible()).toBeFalse();
+    });
+
+    it('razonRechazo deberia devolver null cuando no hay producto o alumnoId', () => {
+      expect(component.razonRechazo()).toBeNull();
+    });
+
+    it('superaPresupuestoUnitario deberia devolver false cuando no hay producto o alumnoId', () => {
+      expect(component.superaPresupuestoUnitario()).toBeFalse();
+    });
+
+    it('deshabilitarSumar deberia devolver true cuando no hay producto o alumnoId', () => {
+      expect(component.deshabilitarSumar()).toBeTrue();
+    });
+
+    it('precioFormateado deberia devolver string vacio cuando no hay producto', () => {
+      expect(component.precioFormateado()).toBe('');
+    });
+
+    it('cantidadEnCarrito deberia devolver 0 cuando no hay producto o alumnoId', () => {
+      expect(component.cantidadEnCarrito()).toBe(0);
+    });
+  });
+
   describe('onImagenError', () => {
     it('dado una imagen que falla y no es el fallback, deberia asignar el fallback', () => {
       const img = document.createElement('img');

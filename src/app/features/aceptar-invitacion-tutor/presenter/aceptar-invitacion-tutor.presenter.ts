@@ -9,6 +9,7 @@ import {
 } from '../../directivo/models/invitacion-tutor.model';
 import { InvitacionesTutorService } from '../../directivo/services/invitaciones-tutor.service';
 import { InvitacionTokenStorageService } from '../services/invitacion-token-storage.service';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Injectable()
 export class AceptarInvitacionTutorPresenter {
@@ -17,6 +18,7 @@ export class AceptarInvitacionTutorPresenter {
   private readonly tokenStorage = inject(InvitacionTokenStorageService);
   private readonly perfilService = inject(PerfilService);
   private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   private readonly _loading = signal<boolean>(true);
   private readonly _invitacion = signal<InvitacionTutor | null>(null);
@@ -54,7 +56,7 @@ export class AceptarInvitacionTutorPresenter {
   public async validar(token: string | null): Promise<void> {
     if (!token) {
       this._loading.set(false);
-      this._error.set('El link de invitacion no es valido: falta el token.');
+      this._error.set('El link de invitación no es válido: falta el token.');
       return;
     }
 
@@ -84,10 +86,14 @@ export class AceptarInvitacionTutorPresenter {
     }
 
     if (await this.authService.isAutenticado()) {
-      await this.service.aceptarInvitacion(token);
-      this.tokenStorage.limpiar();
-      this.perfilService.limpiar();
-      await this.router.navigateByUrl('/tutor');
+      try {
+        await this.service.aceptarInvitacion(token);
+        this.tokenStorage.limpiar();
+        this.perfilService.limpiar();
+        await this.router.navigateByUrl('/tutor');
+      } catch {
+        this.toastService.mostrar('Cierra tu sesión actual para ingresar con el email invitado.', 'info');
+      }
       return;
     }
 
@@ -107,6 +113,14 @@ export class AceptarInvitacionTutorPresenter {
 
       if (preparacion.result === 'USERNAME_REQUIRED') {
         return;
+      }
+
+      if (preparacion.result === 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT') {
+        this.toastService.mostrar(
+          'Revisa tu casilla de SPAM. Te enviamos usuario y contraseña provisoria al correo.',
+          'success',
+          6000
+        );
       }
 
       this.tokenStorage.guardar(token);
@@ -148,11 +162,11 @@ export class AceptarInvitacionTutorPresenter {
 
   private mapearError(err: unknown): string {
     if (err instanceof HttpErrorResponse) {
-      if (err.status === 404) return 'Esta invitacion no existe o ya fue usada.';
+      if (err.status === 404) return 'Esta invitación no existe o ya fue usada.';
       if (err.status === 410) {
-        return 'Esta invitacion vencio. Pedile a tu colegio que te reenvie una nueva.';
+        return 'Esta invitación venció. Pedile a tu colegio que te reenvíe una nueva.';
       }
-      if (err.status === 409) return 'Esta invitacion ya fue aceptada.';
+      if (err.status === 409) return 'Esta invitación ya fue aceptada.';
       const backendMsg =
         err.error && typeof err.error === 'object'
           ? String(
@@ -163,6 +177,6 @@ export class AceptarInvitacionTutorPresenter {
           : '';
       if (backendMsg) return backendMsg;
     }
-    return 'No pudimos validar el link de invitacion. Intenta mas tarde.';
+    return 'No pudimos validar el link de invitación. Intenta más tarde.';
   }
 }

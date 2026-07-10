@@ -7,7 +7,7 @@
     var(--color-fondo, #f8fafc);
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .page__container {
@@ -118,7 +118,7 @@
   border: 1px solid var(--color-borde, #e2e8f0);
 }
 
-.datos > div {
+.datos>div {
   display: flex;
   justify-content: space-between;
   gap: 12px;

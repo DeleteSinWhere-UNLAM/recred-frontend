@@ -58,7 +58,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
       await whenValido(null);
 
       expect(servicioInvitaciones.validarToken).not.toHaveBeenCalled();
-      expect(presenter.error()).toBe('El link de invitacion no es valido: falta el token.');
+      expect(presenter.error()).toBe('El link de invitación no es válido: falta el token.');
       expect(presenter.loading()).toBeFalse();
     });
 
@@ -79,7 +79,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('Esta invitacion no existe o ya fue usada.');
+      expect(presenter.error()).toBe('Esta invitación no existe o ya fue usada.');
     });
 
     it('dado un token que devuelve 410, cuando valido, deberia mostrar mensaje de invitacion vencida', async () => {
@@ -88,7 +88,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
       await whenValido('abc123');
 
       expect(presenter.error()).toBe(
-        'Esta invitacion vencio. Pedile a tu colegio que te reenvie una nueva.',
+        'Esta invitación venció. Pedile a tu colegio que te reenvíe una nueva.',
       );
     });
 
@@ -97,7 +97,7 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('Esta invitacion ya fue aceptada.');
+      expect(presenter.error()).toBe('Esta invitación ya fue aceptada.');
     });
 
     it('dado un error 500 con mensaje del back, cuando valido, deberia usar ese mensaje', async () => {
@@ -113,7 +113,100 @@ describe('AceptarInvitacionTutorPresenter', () => {
 
       await whenValido('abc123');
 
-      expect(presenter.error()).toBe('No pudimos validar el link de invitacion. Intenta mas tarde.');
+      expect(presenter.error()).toBe('No pudimos validar el link de invitación. Intenta más tarde.');
+    });
+
+    it('dado un error 500 con solo mensaje en espanol, cuando valido, deberia usar ese mensaje', async () => {
+      servicioInvitaciones.validarToken.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: { mensaje: 'Fallo generico' } }),
+      );
+
+      await whenValido('abc123');
+
+      expect(presenter.error()).toBe('Fallo generico');
+    });
+
+    it('dado un error 500 con body vacio, cuando valido, deberia caer al mensaje generico', async () => {
+      servicioInvitaciones.validarToken.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: {} }),
+      );
+
+      await whenValido('abc123');
+
+      expect(presenter.error()).toBe('No pudimos validar el link de invitación. Intenta más tarde.');
+    });
+  });
+
+  describe('iniciarLogin errores del back', () => {
+    it('dado un error 500 con solo mensaje en espanol al preparar cuenta, deberia usar ese mensaje', async () => {
+      givenElBackDevuelve(InvitacionValidadaMother.crear());
+      await whenValido('abc123');
+      servicioInvitaciones.prepararCuenta.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: { mensaje: 'Detalle en espanol' } }),
+      );
+
+      await presenter.iniciarLogin();
+
+      expect(presenter.error()).toBe('Detalle en espanol');
+    });
+
+    it('dado un error 500 con body vacio al preparar cuenta, deberia caer al mensaje generico', async () => {
+      givenElBackDevuelve(InvitacionValidadaMother.crear());
+      await whenValido('abc123');
+      servicioInvitaciones.prepararCuenta.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: {} }),
+      );
+
+      await presenter.iniciarLogin();
+
+      expect(presenter.error()).toBe('No pudimos preparar tu cuenta. Intenta nuevamente en unos minutos.');
+    });
+
+    it('dado un error no HTTP al preparar cuenta, deberia usar el mensaje generico', async () => {
+      givenElBackDevuelve(InvitacionValidadaMother.crear());
+      await whenValido('abc123');
+      servicioInvitaciones.prepararCuenta.and.rejectWith(new Error('boom'));
+
+      await presenter.iniciarLogin();
+
+      expect(presenter.error()).toBe('No pudimos preparar tu cuenta. Intenta nuevamente en unos minutos.');
+    });
+
+    it('dado un error 500 con err.error string en validar, deberia caer al mensaje generico', async () => {
+      servicioInvitaciones.validarToken.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: 'texto plano' }),
+      );
+
+      await whenValido('abc123');
+
+      expect(presenter.error()).toBe('No pudimos validar el link de invitación. Intenta más tarde.');
+    });
+
+    it('dado un error 500 con err.error string en preparar cuenta, deberia caer al mensaje generico', async () => {
+      givenElBackDevuelve(InvitacionValidadaMother.crear());
+      await whenValido('abc123');
+      servicioInvitaciones.prepararCuenta.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: 'texto plano' }),
+      );
+
+      await presenter.iniciarLogin();
+
+      expect(presenter.error()).toBe('No pudimos preparar tu cuenta. Intenta nuevamente en unos minutos.');
+    });
+
+    it('dado que preparar cuenta falla mientras hay USERNAME_REQUIRED, deberia poner el error en el signal de username', async () => {
+      givenElBackDevuelve(InvitacionValidadaMother.crear());
+      givenPreparacionDevuelve('USERNAME_REQUIRED');
+      givenUsuarioNoAutenticado();
+      await whenValido('abc123');
+      await presenter.iniciarLogin();
+      servicioInvitaciones.prepararCuenta.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: { message: 'Boom al crear' } }),
+      );
+
+      await presenter.iniciarLogin('parent');
+
+      expect(presenter.usernameError()).toBe('Boom al crear');
     });
   });
 

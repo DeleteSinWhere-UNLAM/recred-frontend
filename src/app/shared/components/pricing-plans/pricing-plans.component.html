@@ -4,7 +4,7 @@
     <p>Elige el plan que mejor se adapte a tus necesidades. Cancela en cualquier momento.</p>
     @if (planActual() !== 'GRATUITO' && diasRestantes() > 0) {
       <div class="current-plan-summary">
-        Plan actual: <strong>{{ planActualLabel() }}</strong> (Quedan {{ diasRestantes() }} días de prueba)
+        Plan actual: <strong>{{ planActualLabel() }}</strong> (Quedan {{ diasRestantes() }} días)
       </div>
     }
   </div>

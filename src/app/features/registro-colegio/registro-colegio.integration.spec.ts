@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of, throwError } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RegistroColegioPage } from './registro-colegio.page';
 import { RegistroColegioService } from './services/registro-colegio.service';
@@ -9,12 +10,12 @@ import { ToastService } from '../../shared/services/toast.service';
 const CAMPOS_FORM_VALIDOS = {
   schoolName: 'Instituto Test',
   schoolEmail: 'test@test.com',
-  schoolPhone: '011-1234',
-  schoolCue: '123',
+  schoolPhone: '01112345678',
+  schoolCue: '123456789',
   directorFirstName: 'Juan',
   directorLastName: 'Pérez',
   directorEmail: 'juan@test.com',
-  directorPhone: '15-1234',
+  directorPhone: '1512345678',
   directorDni: '12345678',
   directorUsername: 'juanperez',
 };
@@ -74,7 +75,7 @@ describe('RegistroColegio Integration', () => {
   }
 
   function givenSubmitRegistrationFalla(): void {
-    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Error 500')));
+    servicio.submitRegistration.and.returnValue(throwError(() => new Error('Error 500')).pipe(delay(0)));
   }
 
   function whenCompletoFormEnDOM(): void {

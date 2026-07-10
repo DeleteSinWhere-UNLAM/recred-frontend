@@ -32,7 +32,10 @@ export class TransferirSaldoPresenter {
 
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoOrigenState();
-    return alumno ? `${alumno.nombre} ${alumno.apellido}`.trim() : '';
+    if (!alumno) return '';
+    const primerNombre = (alumno.nombre || '').trim().split(' ')[0];
+    const primerApellido = (alumno.apellido || '').trim().split(' ')[0];
+    return `${primerNombre} ${primerApellido}`.trim();
   });
 
   readonly grado = computed(() => this.alumnoOrigenState()?.grado ?? '');
@@ -43,6 +46,13 @@ export class TransferirSaldoPresenter {
     if (!origen) return [];
     return this.alumnosService.alumnos().filter((a) => a.id !== origen.id);
   });
+
+  formatShortName(alumno: Alumno): string {
+    if (!alumno) return '';
+    const primerNombre = (alumno.nombre || '').trim().split(' ')[0];
+    const primerApellido = (alumno.apellido || '').trim().split(' ')[0];
+    return `${primerNombre} ${primerApellido}`.trim();
+  }
 
   async init(alumnoId: string): Promise<void> {
     this.cargandoState.set(true);
@@ -111,7 +121,11 @@ export class TransferirSaldoPresenter {
       return false;
     }
 
-    if (amount > origen.saldo) {
+    const numAmount = Number(amount);
+    const numSaldo = Number(origen.saldo);
+    
+    // We add a small epsilon to avoid floating point precision issues causing a rejection when they are virtually equal.
+    if (numAmount > numSaldo + 0.01) {
       this.toastService.mostrar('El monto a transferir no puede superar el saldo actual.', 'error');
       return false;
     }
