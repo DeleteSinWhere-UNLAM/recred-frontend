@@ -89,6 +89,7 @@ describe('AsistenteVirtualPresenter', () => {
 
       expect(opciones.length).toBeGreaterThan(0);
       expect(opciones[0].id).toBe('saldo');
+      expect(opciones.some((opcion) => opcion.id === 'cancelar-pedido')).toBeFalse();
     });
 
     it('dado que no hay rol en el perfil, cuando leo las opciones, deberia devolver una lista vacia', () => {

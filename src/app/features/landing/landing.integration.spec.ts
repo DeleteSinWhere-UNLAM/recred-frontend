@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Router } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { LandingPage } from './landing.page';
 import { LandingCtaButtonComponent } from './components/landing-cta-button/landing-cta-button.component';
 import { AuthService } from '../../core/auth/services/auth.service';
@@ -11,7 +11,7 @@ import { AlumnosService } from '../../data-access/services/alumnos.service';
 import { InvitacionTokenStorageService } from '../aceptar-invitacion-tutor/services/invitacion-token-storage.service';
 import { InvitacionesTutorService } from '../directivo/services/invitaciones-tutor.service';
 import { CtaLanding } from './models/cta-landing.model';
-import { PerfilMother, AlumnoMother } from '../../data-access/services/alumno.mother';
+import { PerfilMother } from '../../data-access/services/alumno.mother';
 import { RolUsuario } from '../../data-access/models/perfil.model';
 
 @Component({
@@ -27,7 +27,7 @@ class LandingCtaButtonStub {
 describe('Landing Integration', () => {
   let fixture: ComponentFixture<LandingPage>;
   let component: LandingPage;
-  let router: jasmine.SpyObj<Router>;
+  let router: Router;
   let servicioAuth: jasmine.SpyObj<AuthService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
@@ -35,7 +35,6 @@ describe('Landing Integration', () => {
   let servicioInvitaciones: jasmine.SpyObj<InvitacionesTutorService>;
 
   beforeEach(async () => {
-    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
     servicioAuth = jasmine.createSpyObj('AuthService', ['isAutenticado', 'esperarAutenticacion', 'login']);
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['cargarPerfil']);
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['cargarHijosDelTutor']);
@@ -49,7 +48,7 @@ describe('Landing Integration', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: Router, useValue: router },
+        provideRouter([]),
         { provide: AuthService, useValue: servicioAuth },
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: AlumnosService, useValue: servicioAlumnos },
@@ -65,6 +64,8 @@ describe('Landing Integration', () => {
 
     fixture = TestBed.createComponent(LandingPage);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigateByUrl');
   });
 
   afterEach(() => {
@@ -88,28 +89,55 @@ describe('Landing Integration', () => {
     expect(servicioAuth.login).toHaveBeenCalled();
   }));
 
-  it('dado un usuario autenticado con rol ALUMNO, cuando se monta la pagina, deberia redirigir a /alumno', fakeAsync(() => {
+  it('dado un token de invitacion pendiente, cuando se monta la pagina, deberia aceptar la invitacion y limpiar el token', fakeAsync(() => {
     givenUsuarioAutenticadoConRol('ALUMNO');
+    givenTokenDeInvitacionPendiente('token-abc');
+    servicioInvitaciones.aceptarInvitacion.and.resolveTo();
 
     whenMontoLaPagina();
 
-    thenSeRedirigioA('/alumno');
+    thenSeAceptoLaInvitacionCon('token-abc');
+    thenElTokenFueLimpiado();
   }));
 
-  it('dado un PADRE autenticado sin hijos, cuando se monta la pagina, deberia redirigir a /crear-hijo', fakeAsync(() => {
-    givenPadreAutenticadoConHijos([]);
+  it('dado un token de invitacion pendiente que falla, cuando se monta la pagina, deberia registrar el error de invitacion y limpiar el token de todas formas', fakeAsync(() => {
+    givenUsuarioAutenticadoConRol('ALUMNO');
+    givenTokenDeInvitacionPendiente('token-roto');
+    servicioInvitaciones.aceptarInvitacion.and.rejectWith(new Error('error de red'));
+    spyOn(console, 'error');
 
     whenMontoLaPagina();
 
-    thenSeRedirigioA('/crear-hijo');
+    thenElErrorDeInvitacionFueRegistrado();
+    thenElTokenFueLimpiado();
   }));
 
-  it('dado un PADRE autenticado con hijos, cuando se monta la pagina, deberia redirigir a /tutor', fakeAsync(() => {
-    givenPadreAutenticadoConHijos([AlumnoMother.crearHijoDelTutor()]);
+  it('dado un token de invitacion que falla y un perfil que tambien falla, cuando se monta la pagina, deberia mostrar el aviso de error en el DOM', fakeAsync(() => {
+    givenAutenticadoConInvitacionYPerfilQuefallan();
+    spyOn(console, 'error');
 
     whenMontoLaPagina();
 
-    thenSeRedirigioA('/tutor');
+    thenElAvisoDeErrorEsVisibleEnElDom();
+  }));
+
+  it('dado un usuario no autenticado, cuando hace click en el boton No tenes usuario, deberia abrir el modal en el DOM', fakeAsync(() => {
+    givenUsuarioNoAutenticado();
+    whenMontoLaPagina();
+
+    whenHagoClickEnBotonNoTengoUsuario();
+
+    thenElModalEsVisibleEnElDom();
+  }));
+
+  it('dado el modal abierto, cuando hace click en Cerrar, deberia cerrar el modal en el DOM', fakeAsync(() => {
+    givenUsuarioNoAutenticado();
+    whenMontoLaPagina();
+    whenHagoClickEnBotonNoTengoUsuario();
+
+    whenHagoClickEnCerrarModal();
+
+    thenElModalNoEsVisibleEnElDom();
   }));
 
   function givenUsuarioNoAutenticado(): void {
@@ -122,11 +150,16 @@ describe('Landing Integration', () => {
     servicioPerfil.cargarPerfil.and.resolveTo(PerfilMother.crear({ rol }));
   }
 
-  function givenPadreAutenticadoConHijos(hijos: ReturnType<typeof AlumnoMother.crearHijoDelTutor>[]): void {
+  function givenAutenticadoConInvitacionYPerfilQuefallan(): void {
     servicioAuth.isAutenticado.and.resolveTo(true);
     servicioAuth.esperarAutenticacion.and.resolveTo(true);
-    servicioPerfil.cargarPerfil.and.resolveTo(PerfilMother.crearTutor());
-    servicioAlumnos.cargarHijosDelTutor.and.resolveTo(hijos);
+    servicioTokenInvitacion.leer.and.returnValue('token-roto');
+    servicioInvitaciones.aceptarInvitacion.and.rejectWith(new Error('error de red'));
+    servicioPerfil.cargarPerfil.and.rejectWith(new Error('backend caido'));
+  }
+
+  function givenTokenDeInvitacionPendiente(token: string): void {
+    servicioTokenInvitacion.leer.and.returnValue(token);
   }
 
   function whenMontoLaPagina(): void {
@@ -144,6 +177,18 @@ describe('Landing Integration', () => {
     tick();
   }
 
+  function whenHagoClickEnBotonNoTengoUsuario(): void {
+    const boton = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.landing__leyenda-registro');
+    boton?.click();
+    fixture.detectChanges();
+  }
+
+  function whenHagoClickEnCerrarModal(): void {
+    const botonCerrar = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.modal__acciones button');
+    botonCerrar?.click();
+    fixture.detectChanges();
+  }
+
   function thenLosCtasEnElDomSon(textosEsperados: string[]): void {
     const ctas = (fixture.nativeElement as HTMLElement).querySelectorAll('.cta-stub');
     const textos = Array.from(ctas).map((b) => b.textContent?.trim());
@@ -151,7 +196,32 @@ describe('Landing Integration', () => {
     expect(textos).toEqual(textosEsperados);
   }
 
-  function thenSeRedirigioA(url: string): void {
-    expect(router.navigateByUrl).toHaveBeenCalledWith(url);
+  function thenElAvisoDeErrorEsVisibleEnElDom(): void {
+    const aviso = (fixture.nativeElement as HTMLElement).querySelector('.landing__aviso-error');
+    expect(aviso).not.toBeNull();
+    expect(aviso?.textContent).toContain('No pudimos asociar tu invitación');
+  }
+
+  function thenElModalEsVisibleEnElDom(): void {
+    const overlay = (fixture.nativeElement as HTMLElement).querySelector('.modal__overlay');
+    expect(overlay).not.toBeNull();
+  }
+
+  function thenElModalNoEsVisibleEnElDom(): void {
+    const overlay = (fixture.nativeElement as HTMLElement).querySelector('.modal__overlay');
+    expect(overlay).toBeNull();
+  }
+
+  function thenSeAceptoLaInvitacionCon(token: string): void {
+    expect(servicioInvitaciones.aceptarInvitacion).toHaveBeenCalledWith(token);
+  }
+
+  function thenElTokenFueLimpiado(): void {
+    expect(servicioTokenInvitacion.limpiar).toHaveBeenCalled();
+  }
+
+  function thenElErrorDeInvitacionFueRegistrado(): void {
+    const page = component as unknown as { errorInvitacion: () => string | null };
+    expect(page.errorInvitacion()).toContain('No pudimos asociar tu invitaci\u00f3n');
   }
 });

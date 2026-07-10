@@ -1,13 +1,16 @@
 @if (isOpen) {
   <div class="modal__overlay">
-    <div class="modal__dialog">
+    <div class="modal__dialog" [class]="customClass">
       <h2 class="modal__title">
         {{ title }}
       </h2>
 
-      <p class="modal__message">
-        {{ message }}
-      </p>
+      <div class="modal__message">
+        @if (message) {
+          <p>{{ message }}</p>
+        }
+        <ng-content></ng-content>
+      </div>
 
       <div class="modal__acciones">
         @if (showCancel) {
@@ -15,7 +18,7 @@
             {{ cancelText }}
           </app-button-component>
         }
-        <app-button-component variant="success" (Click)="confirm.emit()">
+        <app-button-component [variant]="confirmVariant" (Click)="confirm.emit()">
           {{ confirmText }}
         </app-button-component>
       </div>

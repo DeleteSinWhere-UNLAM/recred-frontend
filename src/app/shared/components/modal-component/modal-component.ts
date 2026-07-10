@@ -13,8 +13,10 @@ export class ModalComponent {
   @Input() title = '';
   @Input() message = '';
   @Input() confirmText = 'Aceptar';
+  @Input() confirmVariant: 'primary' | 'success' | 'danger' | 'outline' = 'success';
   @Input() cancelText = 'Cancelar';
   @Input() showCancel = true;
+  @Input() customClass = '';
 
   @Output() confirm = new EventEmitter<void>();
   @Output() dismiss = new EventEmitter<void>();
