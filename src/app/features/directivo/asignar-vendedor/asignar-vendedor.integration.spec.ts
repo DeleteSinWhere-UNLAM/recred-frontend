@@ -22,8 +22,7 @@ describe('AsignarVendedor (Integración)', () => {
     
     routerSpy.getCurrentNavigation.and.returnValue({
       extras: { state: { buffetId: 'buffet-123', buffetName: 'Mi Kiosco' } }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    } as unknown as ReturnType<Router['getCurrentNavigation']>);
 
     await TestBed.configureTestingModule({
       imports: [AsignarVendedorPage],
