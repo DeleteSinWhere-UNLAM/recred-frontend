@@ -34,26 +34,13 @@
   transform: translateY(-2px);
 }
 
-.adelanto-page__title-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
 .adelanto-page__title {
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 800;
   color: var(--color-texto-oscuro);
   margin: 0;
-}
-
-.adelanto-page__subtitle {
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--color-texto-claro);
-  margin: 4px 0 0 0;
+  text-align: center;
 }
 
 .adelanto-page__grid {
