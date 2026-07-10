@@ -330,7 +330,7 @@ export class TrackingPedidosPage implements OnInit {
   protected getEstadoCompraLabel(status: EstadoCompra | ''): string {
     const labels: Record<EstadoCompra, string> = {
       PENDIENTE: 'A preparar',
-      EN_PREPARACION: 'En preparacion',
+      EN_PREPARACION: 'En preparación',
       LISTO: 'Listo para retirar',
       ENTREGADO: 'Entregado',
       CANCELADO: 'Cancelado',

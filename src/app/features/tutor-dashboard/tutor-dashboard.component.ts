@@ -211,7 +211,7 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
     target.classList.remove('drag-over');
 
     if (!this.tienePlanAvanzado) {
-      await this.dialogService.alert('La transferencia entre hijos esta disponible con plan Avanzado.', 'Plan Avanzado');
+      await this.dialogService.alert('La transferencia entre hijos está disponible con plan Avanzado.', 'Plan Avanzado');
       return;
     }
 
@@ -251,7 +251,7 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
   // Button Transfer Logic
   openTransferModal(sourceChild: ChildDashboardSummary): void {
     if (!this.tienePlanAvanzado) {
-      this.dialogService.alert('La transferencia entre hijos esta disponible con plan Avanzado.', 'Plan Avanzado');
+      this.dialogService.alert('La transferencia entre hijos está disponible con plan Avanzado.', 'Plan Avanzado');
       return;
     }
     
