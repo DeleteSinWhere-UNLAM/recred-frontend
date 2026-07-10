@@ -231,6 +231,36 @@ describe('OrdenAlumnoCardComponent', () => {
 
       expect(component.iniciales()).toBe('A');
     });
+
+    it('dado sin alumno cargado en el estado, iniciales deberia devolver string vacio', () => {
+      givenSinAlumnoEnEstado();
+
+      expect(component.iniciales()).toBe('');
+    });
+
+    it('dado sin alumno cargado, nombreCompleto deberia devolver string vacio', () => {
+      givenSinAlumnoEnEstado();
+
+      expect(component.nombreCompleto()).toBe('');
+    });
+
+    it('dado sin alumno cargado, saldoFormateado deberia devolver string vacio', () => {
+      givenSinAlumnoEnEstado();
+
+      expect(component.saldoFormateado()).toBe('');
+    });
+
+    it('dado sin alumno cargado, saldoInsuficiente deberia devolver false', () => {
+      givenSinAlumnoEnEstado();
+
+      expect(component.saldoInsuficiente()).toBeFalse();
+    });
+
+    it('dado vista tutor con nombre vacio, iniciales deberia devolver string vacio', () => {
+      component.alumno = AlumnoMother.crear({ nombre: '', apellido: 'X' });
+
+      expect(component.iniciales()).toBe('');
+    });
   });
 
   describe('recreoLabel fallback', () => {
@@ -248,5 +278,11 @@ describe('OrdenAlumnoCardComponent', () => {
 
   function textoRenderizado(): string {
     return (fixture.nativeElement as HTMLElement).textContent ?? '';
+  }
+
+  function givenSinAlumnoEnEstado(): void {
+    (component as unknown as { alumnoState: { set: (v: undefined) => void } }).alumnoState.set(
+      undefined,
+    );
   }
 });

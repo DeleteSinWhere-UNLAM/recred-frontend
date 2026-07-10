@@ -139,6 +139,14 @@ describe('EditarPromocionModalComponent', () => {
     it('dado un string vacio, deberia devolver un string vacio', () => {
       expect(component.formatDateForServer('', false)).toBe('');
     });
+
+    it('dado una fecha sin especificar isEnd, deberia usar el default false (medianoche)', () => {
+      const salida = component.formatDateForServer('2026-07-15');
+      const fecha = new Date(salida);
+
+      expect(fecha.getHours()).toBe(0);
+      expect(fecha.getMinutes()).toBe(0);
+    });
   });
 
   describe('closeModal', () => {

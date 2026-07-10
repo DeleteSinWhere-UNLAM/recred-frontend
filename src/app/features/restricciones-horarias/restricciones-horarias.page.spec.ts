@@ -193,6 +193,61 @@ describe('RestriccionesHorariasPage', () => {
     });
   });
 
+  describe('activeItem con id no matcheado', () => {
+    it('dado un selectedFranjaId que no coincide con ninguna franja, activeItem deberia devolver la primera', () => {
+      presenter.franjasConRestricciones.set([
+        FranjaConRestriccionesMother.crear({ franja: TimeSlotMother.crear() }),
+        FranjaConRestriccionesMother.crear({ franja: TimeSlotMother.crearSegundo() }),
+      ]);
+      whenMonto();
+      component['selectedFranjaId'].set('id-inexistente');
+
+      expect(component['activeItem']()?.franja.id).toBe('ts-001');
+    });
+
+    it('dado sin franjas cargadas, activeItem deberia ser undefined', () => {
+      whenMonto();
+
+      expect(component['activeItem']()).toBeUndefined();
+    });
+  });
+
+  describe('currentIndex con selectedFranjaId vacio', () => {
+    it('dado selectedFranjaId vacio y franjas cargadas, currentIndex deberia caer en la primera franja', () => {
+      presenter.franjasConRestricciones.set([
+        FranjaConRestriccionesMother.crear({ franja: TimeSlotMother.crear() }),
+        FranjaConRestriccionesMother.crear({ franja: TimeSlotMother.crearSegundo() }),
+      ]);
+      whenMonto();
+      component['selectedFranjaId'].set('');
+
+      expect(component.currentIndex()).toBe(0);
+    });
+  });
+
+  describe('quitarBloqueoTotal', () => {
+    it('dado un item sin restriccion total, quitarBloqueoTotal no deberia llamar al presenter', () => {
+      whenMonto();
+      const slot = FranjaConRestriccionesMother.crear({ tieneBloqueoTotal: false, restricciones: [] });
+
+      (component as unknown as { quitarBloqueoTotal(s: FranjaConRestricciones): void }).quitarBloqueoTotal(slot);
+
+      expect(presenter.quitarRestriccion).not.toHaveBeenCalled();
+    });
+
+    it('dado un item con restriccion total, quitarBloqueoTotal deberia llamar al presenter con ese id', () => {
+      whenMonto();
+      const slot = FranjaConRestriccionesMother.crear({
+        tieneBloqueoTotal: true,
+        restricciones: [RestriccionHorariaMother.crearBloqueoTotal({ id: 'restriccion-total' })],
+      });
+
+      (component as unknown as { quitarBloqueoTotal(s: FranjaConRestricciones): void }).quitarBloqueoTotal(slot);
+
+      expect(presenter.quitarRestriccion).toHaveBeenCalledWith('restriccion-total');
+    });
+  });
+
   function whenMonto(): void {
     fixture.detectChanges();
   }

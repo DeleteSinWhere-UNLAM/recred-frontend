@@ -75,6 +75,25 @@ describe('SugerenciasCarritoComponent', () => {
     });
   });
 
+  describe('branches defensivas', () => {
+    it('dado sugerencias null, cuando lo asigno via Input, deberia caer a arreglo vacio', () => {
+      component.sugerencias = null as unknown as never[];
+
+      expect(component.vistas()).toEqual([]);
+      expect(component.hayResultados()).toBeFalse();
+    });
+
+    it('dado una sugerencia con source desconocido, deberia usar la etiqueta fallback "Sugerido"', () => {
+      component.sugerencias = [
+        SugerenciaCarritoMother.crear({ source: 'ORIGEN_INEXISTENTE' as never }),
+      ];
+
+      whenMonto();
+
+      expect(textoRenderizado()).toContain('Sugerido');
+    });
+  });
+
   describe('onAgregar', () => {
     it('cuando hago click en agregar en un item, deberia emitir agregar con la sugerencia', () => {
       const sugerencia = SugerenciaCarritoMother.crear();

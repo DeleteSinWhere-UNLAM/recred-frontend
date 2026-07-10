@@ -154,6 +154,10 @@ describe('ProductoIaForm', () => {
 
       expect(component.getErrorMessage('precio')).toContain('0.01');
     });
+
+    it('dado un campo inexistente, getErrorMessage deberia devolver string vacio', () => {
+      expect(component.getErrorMessage('inexistente')).toBe('');
+    });
   });
 
   function whenPrefill(data: RespuestaProductoIa): void {

@@ -307,6 +307,86 @@ describe('PresupuestoPresenter', () => {
     });
   });
 
+  describe('urlFotoPerfil', () => {
+    it('dado un alumno con urlFotoPerfil, deberia devolver esa url', async () => {
+      const alumnoConFoto = AlumnoMother.crear({
+        id: ALUMNO_ID_TEST,
+        urlFotoPerfil: 'https://cdn/foto.png',
+      });
+      servicioAlumnos.getAlumnoById.and.returnValue(alumnoConFoto);
+
+      await presenter.init(ALUMNO_ID_TEST);
+
+      expect(presenter.urlFotoPerfil()).toBe('https://cdn/foto.png');
+    });
+
+    it('dado un alumno sin urlFotoPerfil, deberia devolver null', async () => {
+      await presenter.init(ALUMNO_ID_TEST);
+
+      expect(presenter.urlFotoPerfil()).toBeNull();
+    });
+  });
+
+  describe('signals derivadas sin alumno', () => {
+    it('dado el presenter recien creado sin alumno, cuando pido grado, deberia devolver string vacio', () => {
+      expect(presenter.grado()).toBe('');
+    });
+
+    it('dado el presenter recien creado sin alumno, cuando pido iniciales, deberia devolver string vacio', () => {
+      expect(presenter.iniciales()).toBe('');
+    });
+
+    it('dado un alumno con nombre y apellido vacios, cuando pido iniciales, deberia devolver string vacio', async () => {
+      const alumnoSinNombre = AlumnoMother.crear({
+        id: ALUMNO_ID_TEST,
+        nombre: '',
+        apellido: '',
+      });
+      servicioAlumnos.getAlumnoById.and.returnValue(alumnoSinNombre);
+
+      await presenter.init(ALUMNO_ID_TEST);
+
+      expect(presenter.iniciales()).toBe('');
+    });
+  });
+
+  describe('guardar (early returns)', () => {
+    it('dado que ya estoy guardando, cuando llamo guardar de nuevo, no deberia llamar al service', async () => {
+      await presenter.init(ALUMNO_ID_TEST);
+      const presupuestoResultado = PresupuestoMother.crear({ id: 'pres-1' });
+      let resolverGuardar!: (v: typeof presupuestoResultado) => void;
+      servicioPresupuesto.guardar.and.returnValue(
+        new Promise<typeof presupuestoResultado>((resolve) => {
+          resolverGuardar = resolve;
+        }),
+      );
+
+      const primera = presenter.guardar();
+      const segunda = presenter.guardar();
+      resolverGuardar(presupuestoResultado);
+      await Promise.all([primera, segunda]);
+
+      expect(servicioPresupuesto.guardar).toHaveBeenCalledTimes(1);
+    });
+
+    it('dado que estoy cargando el init, cuando disparo guardar, no deberia llamar al service', async () => {
+      const categorias = CategoriaProductoMother.crearVarias();
+      let resolverInit!: (v: typeof categorias) => void;
+      servicioPresupuesto.getCategoriasDisponibles.and.returnValue(
+        new Promise<typeof categorias>((resolve) => {
+          resolverInit = resolve;
+        }),
+      );
+
+      const initEnCurso = presenter.init(ALUMNO_ID_TEST);
+      const resultado = presenter.guardar();
+      resolverInit(categorias);
+      await Promise.all([initEnCurso, resultado]);
+
+      expect(servicioPresupuesto.guardar).not.toHaveBeenCalled();
+    });
+  });
+
   function givenAlumnoInexistente(): void {
     servicioAlumnos.getAlumnoById.and.returnValue(undefined);
   }

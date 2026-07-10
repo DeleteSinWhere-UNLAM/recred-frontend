@@ -141,6 +141,35 @@ describe('AsignarVendedorPage', () => {
 
       expect((fixture.nativeElement as HTMLElement).textContent).toContain('Kiosco Central');
     });
+
+    it('dado buffetId sin buffetName en el state, buffetName deberia quedar en string vacio', () => {
+      history.replaceState({ buffetId: 'b1' }, '', location.href);
+
+      whenMonto();
+
+      expect(component.buffetName).toBe('');
+    });
+
+    it('dado getCurrentNavigation con state, deberia leer el buffetName desde ahi', () => {
+      router.getCurrentNavigation.and.returnValue({
+        extras: { state: { buffetId: 'b-nav', buffetName: 'Buffet Desde Nav' } },
+      } as unknown as Navigation);
+
+      whenMonto();
+
+      expect(component.buffetId).toBe('b-nav');
+      expect(component.buffetName).toBe('Buffet Desde Nav');
+    });
+
+    it('dado getCurrentNavigation con state pero sin buffetName, buffetName deberia caer al string vacio', () => {
+      router.getCurrentNavigation.and.returnValue({
+        extras: { state: { buffetId: 'b-nav' } },
+      } as unknown as Navigation);
+
+      whenMonto();
+
+      expect(component.buffetName).toBe('');
+    });
   });
 
   function whenMonto(): void {

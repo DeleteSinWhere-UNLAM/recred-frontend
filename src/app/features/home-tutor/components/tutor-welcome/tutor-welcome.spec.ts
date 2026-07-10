@@ -45,7 +45,7 @@ describe('TutorWelcome', () => {
     servicioFavoritos = jasmine.createSpyObj('FavoritosService', ['getFavoritos']);
     servicioFavoritos.getFavoritos.and.returnValue(of([]));
 
-    servicioContexto = jasmine.createSpyObj('AlumnoContextoService', ['limpiar']);
+    servicioContexto = jasmine.createSpyObj('AlumnoContextoService', ['limpiar', 'setAlumnoId']);
 
     await TestBed.configureTestingModule({
       imports: [TutorWelcome],
@@ -349,6 +349,54 @@ describe('TutorWelcome', () => {
     it('dado un status desconocido, deberia devolver el defaultLabel o el status crudo', () => {
       expect(component.getStatusLabel('DESCONOCIDO', 'label default')).toBe('label default');
       expect(component.getStatusLabel('DESCONOCIDO')).toBe('DESCONOCIDO');
+    });
+  });
+
+  describe('getCantidadProductos', () => {
+    it('dado un pedido sin items, deberia devolver 0', () => {
+      const pedido = crearMovimiento('m-x', { items: undefined as unknown as [] });
+
+      expect(component.getCantidadProductos(pedido)).toBe(0);
+    });
+
+    it('dado un pedido con items, deberia sumar las quantities', () => {
+      const pedido = crearMovimiento('m-y', {
+        items: [
+          { productId: 'p1', productName: 'A', quantity: 2, unitPrice: 100 },
+          { productId: 'p2', productName: 'B', quantity: 3, unitPrice: 200 },
+        ],
+      });
+
+      expect(component.getCantidadProductos(pedido)).toBe(5);
+    });
+  });
+
+  describe('verDetallePedido', () => {
+    it('dado un pedido con studentId, deberia setear el contexto y navegar a /tutor-movimientos/{id}', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+      const pedido = crearMovimiento('m-1', { studentId: 'alumno-x' });
+
+      component.verDetallePedido(pedido);
+
+      expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith('alumno-x');
+      expect(router.navigate).toHaveBeenCalledWith(
+        ['/tutor-movimientos/alumno-x'],
+        jasmine.objectContaining({ queryParams: { id: 'm-1' } }),
+      );
+    });
+
+    it('dado un pedido sin studentId, deberia navegar a /tutor-movimientos sin contexto', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+      const pedido = crearMovimiento('m-2', { studentId: undefined as unknown as string });
+
+      component.verDetallePedido(pedido);
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        ['/tutor-movimientos'],
+        jasmine.objectContaining({ queryParams: { id: 'm-2' } }),
+      );
     });
   });
 

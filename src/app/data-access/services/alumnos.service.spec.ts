@@ -80,6 +80,28 @@ describe('AlumnosService', () => {
       expect(alumno.id).toBe('new-1');
       thenElEstadoContieneAlumnoConId('new-1');
     });
+
+    it('dado un payload sin gradoId, cuando creo un hijo, deberia mandar gradoId null en el body', async () => {
+      const payloadSinGrado = CrearHijoRequestMother.create({ gradoId: undefined });
+
+      const promesa = whenCreoUnHijo(payloadSinGrado);
+
+      const req = httpMock.expectOne(URL_HIJOS_TUTOR_POST);
+      expect(req.request.body.gradoId).toBeNull();
+      req.flush(StudentDtoMother.create({ id: 'sin-grado' }));
+      await promesa;
+    });
+
+    it('dado un payload con gradoId de solo espacios, cuando creo un hijo, deberia mandar gradoId null en el body', async () => {
+      const payloadGradoBlanco = CrearHijoRequestMother.create({ gradoId: '   ' });
+
+      const promesa = whenCreoUnHijo(payloadGradoBlanco);
+
+      const req = httpMock.expectOne(URL_HIJOS_TUTOR_POST);
+      expect(req.request.body.gradoId).toBeNull();
+      req.flush(StudentDtoMother.create({ id: 'espacios' }));
+      await promesa;
+    });
   });
 
   describe('cargarHijosDelTutor', () => {
@@ -125,6 +147,23 @@ describe('AlumnosService', () => {
       expect(alumnos[0].id).toBe('a1');
     });
 
+    it('dado un dto con grado/colegioId/saldo en null, cuando cargo el perfil, deberia mapear a defaults vacios y saldo 0', async () => {
+      const dto = StudentDtoMother.create({
+        id: 'sin-datos',
+        grado: null,
+        colegioId: null,
+        saldo: null,
+      });
+
+      const promesa = whenCargoPerfilAlumno();
+
+      thenSeHizoGetPerfilAlumno().flush(dto);
+      const alumnos = await promesa;
+      expect(alumnos[0].grado).toBe('');
+      expect(alumnos[0].colegioId).toBe('');
+      expect(alumnos[0].saldo).toBe(0);
+    });
+
     it('dado que el back responde null y hay perfil ALUMNO, cuando cargo el perfil, deberia devolver el mock con el id del perfil', async () => {
       givenPerfilDeAlumnoCon('julian-garcia');
 
@@ -133,6 +172,27 @@ describe('AlumnosService', () => {
       thenSeHizoGetPerfilAlumno().flush(null);
       const alumnos = await promesa;
       expect(alumnos[0].id).toBe('julian-garcia');
+    });
+
+    it('dado que el back responde null, hay perfil ALUMNO y obtenerAlumnoId devuelve null, cuando cargo el perfil, deberia usar el id del mock', async () => {
+      givenPerfilDeAlumnoConIdNull();
+
+      const promesa = whenCargoPerfilAlumno();
+
+      thenSeHizoGetPerfilAlumno().flush(null);
+      const alumnos = await promesa;
+      expect(alumnos[0].id).toBe(AlumnoMother.alumnoActual().id);
+    });
+
+    it('dado que el back responde null y ya hay alumnos en estado, cuando cargo el perfil, deberia devolver los cargados sin tocar el mock', async () => {
+      givenAlumnoEnEstado(AlumnoMother.hijoDelTutor());
+
+      const promesa = whenCargoPerfilAlumno();
+
+      thenSeHizoGetPerfilAlumno().flush(null);
+      const alumnos = await promesa;
+      expect(alumnos.length).toBe(1);
+      expect(alumnos[0].id).toBe('alumno-1');
     });
 
     it('dado que el back falla y hay perfil ALUMNO, cuando cargo el perfil, deberia devolver el mock', async () => {
@@ -148,6 +208,28 @@ describe('AlumnosService', () => {
   });
 
   describe('asegurarCargados', () => {
+    it('dado que ya hay alumnos en estado y no fuerzo, cuando aseguro cargados, deberia devolver los actuales sin llamar al back', async () => {
+      givenAlumnoEnEstado(AlumnoMother.hijoDelTutor());
+
+      const alumnos = await service.asegurarCargados();
+
+      thenNoSeHizoGetHijos();
+      expect(alumnos.length).toBe(1);
+      expect(alumnos[0].id).toBe('alumno-1');
+    });
+
+    it('dado que aseguro cargados dos veces en paralelo, cuando espero ambas, deberia hacer una sola request y compartir la promesa', async () => {
+      givenPerfilDeTutor();
+
+      const primera = service.asegurarCargados();
+      const segunda = service.asegurarCargados();
+
+      thenSeHizoGetHijos().flush([StudentDtoMother.create({ id: 'alumno-1' })]);
+      const [a, b] = await Promise.all([primera, segunda]);
+      expect(a).toEqual(b);
+      expect(a.length).toBe(1);
+    });
+
     it('dado que no hay perfil de usuario, cuando aseguro cargados, deberia retornar arreglo vacio', async () => {
       givenSinPerfil();
 
@@ -229,6 +311,23 @@ describe('AlumnosService', () => {
 
       expect(alumno).toBeUndefined();
     });
+
+    it('dado que no hay perfil pero el id coincide con el del mock, cuando busco por ese id, deberia devolver el mock sin datos del perfil', () => {
+      givenSinPerfil();
+      const mock = AlumnoMother.alumnoActual();
+
+      const alumno = service.getAlumnoById(mock.id);
+
+      expect(alumno).toEqual(mock);
+    });
+
+    it('dado que obtenerAlumnoId es null, cuando busco por el id del mock, deberia devolver el alumno usando el fallback del mock.id', () => {
+      givenPerfilDeAlumnoConIdNull();
+
+      const alumno = service.getAlumnoById(AlumnoMother.alumnoActual().id);
+
+      expect(alumno?.id).toBe(AlumnoMother.alumnoActual().id);
+    });
   });
 
   describe('subirFotoAlumno', () => {
@@ -250,6 +349,18 @@ describe('AlumnosService', () => {
       const alumno = await promesa;
       expect(alumno.urlFotoPerfil).toBe('url.png');
       expect(service.getAlumnoById('alumno-1')?.urlFotoPerfil).toBe('url.png');
+    });
+
+    it('dado varios alumnos en estado, cuando subo la foto de uno, deberia dejar a los otros sin cambios', async () => {
+      const hermano = AlumnoMother.create({ id: 'alumno-2', nombre: 'Ana' });
+      givenAlumnosEnEstado([AlumnoMother.hijoDelTutor(), hermano]);
+      const dto = StudentDtoMother.create({ id: 'alumno-1', urlFotoPerfil: 'nueva.png' });
+
+      const promesa = service.subirFotoAlumno('alumno-1', unArchivoPng());
+
+      thenSeHizoPostFotoDeAlumno('alumno-1').flush(dto);
+      await promesa;
+      expect(service.getAlumnoById('alumno-2')).toEqual(hermano);
     });
   });
 
@@ -346,6 +457,11 @@ describe('AlumnosService', () => {
     perfilServiceSpy.obtenerAlumnoId.and.returnValue(id);
   }
 
+  function givenPerfilDeAlumnoConIdNull(): void {
+    perfilServiceSpy.getPerfil.and.returnValue(PerfilMother.alumnoCon('julian-garcia'));
+    perfilServiceSpy.obtenerAlumnoId.and.returnValue(null);
+  }
+
   function givenPerfilDeTutor(): void {
     perfilServiceSpy.getPerfil.and.returnValue(PerfilMother.tutor());
   }
@@ -355,9 +471,13 @@ describe('AlumnosService', () => {
   }
 
   function givenAlumnoEnEstado(alumno: Alumno): void {
-    (service as unknown as { alumnosState: { set: (a: Alumno[]) => void } }).alumnosState.set([
-      alumno,
-    ]);
+    givenAlumnosEnEstado([alumno]);
+  }
+
+  function givenAlumnosEnEstado(alumnos: Alumno[]): void {
+    (service as unknown as { alumnosState: { set: (a: Alumno[]) => void } }).alumnosState.set(
+      alumnos,
+    );
   }
 
   function whenCreoUnHijo(payload: CrearHijoRequest): Promise<Alumno> {
