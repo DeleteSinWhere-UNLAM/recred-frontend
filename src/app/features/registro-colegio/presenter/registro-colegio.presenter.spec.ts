@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { RegistroColegioPresenter } from './registro-colegio.presenter';
+import { RegistroColegioPresenter, RegistroError } from './registro-colegio.presenter';
 import { RegistroColegioService } from '../services/registro-colegio.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { RegistroColegioMother } from '../registro-colegio.mother';
@@ -30,7 +30,7 @@ describe('RegistroColegioPresenter', () => {
     it('dado el presenter recien instanciado, cuando leo los estados, deberia iniciar sin errores, sin carga y sin exito', () => {
       let cargando: boolean | undefined;
       let enviado: boolean | undefined;
-      let error: any;
+      let error: RegistroError | null | undefined;
       presenter.cargando$.subscribe((v: boolean) => (cargando = v));
       presenter.enviado$.subscribe((v: boolean) => (enviado = v));
       presenter.error$.subscribe((v) => (error = v));
@@ -63,7 +63,7 @@ describe('RegistroColegioPresenter', () => {
     it('dado un payload valido, cuando envio y el servicio falla, deberia emitir el mensaje de error y mostrar toast', () => {
       const payload: SchoolRegistrationPayload = RegistroColegioMother.crearPayload();
       givenSubmitRegistrationFalla();
-      let error: any;
+      let error: RegistroError | null | undefined;
       let enviado: boolean | undefined;
       presenter.error$.subscribe((v) => (error = v));
       presenter.enviado$.subscribe((v: boolean) => (enviado = v));
