@@ -77,6 +77,7 @@
 
 .buffet__titulo {
   font-family: var(--font-display);
+  text-align: center;
   font-size: 34px;
   font-weight: 800;
   color: var(--color-pizarra);

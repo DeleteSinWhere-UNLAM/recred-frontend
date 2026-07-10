@@ -92,6 +92,7 @@
 
 .favoritos__titulo {
   font-family: var(--font-display);
+  text-align: center;
   font-size: 20px;
   font-weight: 700;
   color: var(--color-melocoton);
