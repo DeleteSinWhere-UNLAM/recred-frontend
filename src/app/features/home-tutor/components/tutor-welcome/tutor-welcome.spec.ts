@@ -138,6 +138,9 @@ describe('TutorWelcome', () => {
     });
 
     it('dado dos alumnos con pendientes, deberia consolidarlos ordenados por fecha desc y limitar a 5', () => {
+      const hoy = new Date();
+      const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
       alumnosSignal.set([
         AlumnoMother.crear({ id: 'a-1', nombre: 'Julián' }),
         AlumnoMother.crear({ id: 'a-2', nombre: 'Ana' }),
@@ -145,11 +148,11 @@ describe('TutorWelcome', () => {
       servicioMovimientos.getPendientesAlumno.and.callFake((alumnoId: string) => {
         if (alumnoId === 'a-1') {
           return of([
-            crearMovimiento('p-1', { date: '2026-07-01T10:00:00' }),
-            crearMovimiento('p-2', { date: '2026-07-03T10:00:00' }),
+            crearMovimiento('p-1', { date: `${hoyStr}T10:00:00`, pickupDate: `${hoyStr}T10:00:00` }),
+            crearMovimiento('p-2', { date: `${hoyStr}T12:00:00`, pickupDate: `${hoyStr}T12:00:00` }),
           ]);
         }
-        return of([crearMovimiento('p-3', { date: '2026-07-02T10:00:00' })]);
+        return of([crearMovimiento('p-3', { date: `${hoyStr}T11:00:00`, pickupDate: `${hoyStr}T11:00:00` })]);
       });
 
       whenMonto();

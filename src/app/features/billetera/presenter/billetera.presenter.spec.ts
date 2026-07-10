@@ -380,6 +380,7 @@ describe('BilleteraPresenter', () => {
   }
 
   function givenQueElServicioFalla(mensaje: string): void {
+    spyOn(console, 'error');
     billeteraServiceSpy.getResumen.and.returnValue(
       throwError(() => new Error(mensaje)) as unknown as Observable<BilleteraResumen>,
     );
