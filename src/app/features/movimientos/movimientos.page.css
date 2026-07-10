@@ -12,11 +12,13 @@
 
 .movimientos__container {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  container-type: inline-size;
 }
 
 /* Cabecera */
@@ -477,8 +479,8 @@
 
 /* Fila de Movimiento individual */
 .movimientos__fila {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 180px 200px;
   align-items: center;
   gap: 20px;
   padding: 18px 24px;
@@ -493,7 +495,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  flex: 1 1 250px;
   min-width: 0;
 }
 
@@ -826,7 +827,7 @@
 }
 
 /* Responsive */
-@media (max-width: 992px) {
+@container (max-width: 800px) {
   .movimientos__fila {
     display: flex;
     flex-wrap: wrap;
