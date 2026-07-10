@@ -640,6 +640,47 @@ describe('MovimientosPage', () => {
     }));
   });
 
+  describe('activeChips con filtros parciales', () => {
+    it('dado filtroPrecioMin sin max, el chip rango deberia usar "Max" como fallback', fakeAsync(() => {
+      whenMonto();
+      tick();
+      component.filtroPrecioMin.set(100);
+      component.filtroPrecioMax.set(null);
+
+      const chip = component.activeChips.find((c) => c.id === 'rango');
+      expect(chip?.label).toContain('Max');
+    }));
+
+    it('dado filtroFechaDesde sin hasta, el chip fecha deberia usar "Fin" como fallback', fakeAsync(() => {
+      whenMonto();
+      tick();
+      component.filtroFechaDesde.set('2026-06-01');
+      component.filtroFechaHasta.set('');
+
+      const chip = component.activeChips.find((c) => c.id === 'fecha');
+      expect(chip?.label).toContain('Fin');
+    }));
+
+    it('dado filtroFechaHasta sin desde, el chip fecha deberia usar "Inicio" como fallback', fakeAsync(() => {
+      whenMonto();
+      tick();
+      component.filtroFechaDesde.set('');
+      component.filtroFechaHasta.set('2026-06-15');
+
+      const chip = component.activeChips.find((c) => c.id === 'fecha');
+      expect(chip?.label).toContain('Inicio');
+    }));
+
+    it('dado un filtroEstado no mapeado, el chip estado deberia usar el valor crudo', fakeAsync(() => {
+      whenMonto();
+      tick();
+      component.filtroEstado.set('CUSTOM');
+
+      const chip = component.activeChips.find((c) => c.id === 'estado');
+      expect(chip?.label).toContain('CUSTOM');
+    }));
+  });
+
   describe('MovimientoMother.crearCancelado', () => {
     it('dado ningun override, deberia devolver un movimiento cancelado por defecto', () => {
       const cancelado = MovimientoMother.crearCancelado();

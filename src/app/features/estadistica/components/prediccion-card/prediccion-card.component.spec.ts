@@ -87,6 +87,12 @@ describe('PrediccionCardComponent', () => {
       const [lleno] = component.dashArray().split(' ').map(Number);
       expect(lleno).toBeCloseTo(component.circumferencia, 3);
     });
+
+    it('dado prediccion undefined, porcentajeRedondeado deberia caer al fallback 0', () => {
+      whenRenderoCon(undefined, 'ok');
+
+      expect(component.porcentajeRedondeado()).toBe(0);
+    });
   });
 
   describe('nivelLabel', () => {

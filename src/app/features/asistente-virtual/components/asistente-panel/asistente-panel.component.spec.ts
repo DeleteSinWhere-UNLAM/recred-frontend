@@ -17,6 +17,8 @@ interface ProtegidoAsistente {
   trackByOpcion(index: number, opcion: SugerenciaCapacidad): string;
   gruposOpciones(): readonly { id: string; label: string; opciones: readonly SugerenciaCapacidad[] }[];
   accionesAbiertas_(): boolean;
+  scrollAlFondo(): void;
+  scrollEl?: { nativeElement: HTMLElement };
 }
 
 class SugerenciaCapacidadMother {
@@ -205,6 +207,14 @@ describe('AsistentePanelComponent', () => {
       const grupos = protegido().gruposOpciones();
 
       expect(grupos.map((g) => g.id)).toEqual(['cuenta']);
+    });
+  });
+
+  describe('scrollAlFondo', () => {
+    it('dado scrollEl sin nativeElement disponible, scrollAlFondo no deberia romper', () => {
+      protegido().scrollEl = undefined;
+
+      expect(() => protegido().scrollAlFondo()).not.toThrow();
     });
   });
 

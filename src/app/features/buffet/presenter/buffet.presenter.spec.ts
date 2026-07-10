@@ -1091,4 +1091,209 @@ describe('BuffetPresenter', () => {
       expect(priv.matchesDescription('', 'PRIMER_RECREO')).toBeFalse();
     });
   });
+
+  describe('iniciales con nombre/apellido vacios', () => {
+    it('dado vista alumno y alumno con nombre y apellido vacios, iniciales deberia devolver string vacio', fakeAsync(() => {
+      givenVistaAlumno(true);
+      servicioAlumnos.getAlumnoById.and.returnValue(
+        AlumnoMother.crear({ id: 'a-vacio', nombre: '', apellido: '', colegioId: 'colegio-1' }),
+      );
+
+      whenInicializo('a-vacio');
+
+      expect(presenter.iniciales()).toBe('');
+    }));
+
+    it('dado vista tutor y alumno con nombre vacio, iniciales deberia devolver string vacio', fakeAsync(() => {
+      givenVistaAlumno(false);
+      servicioAlumnos.getAlumnoById.and.returnValue(
+        AlumnoMother.crear({ id: 'a-vacio', nombre: '', apellido: 'Perez', colegioId: 'colegio-1' }),
+      );
+
+      whenInicializo('a-vacio');
+
+      expect(presenter.iniciales()).toBe('');
+    }));
+  });
+
+  describe('nombreColegio sin match', () => {
+    it('dado que el colegioId del alumno no matchea ninguno cargado, nombreColegio deberia devolver string vacio', fakeAsync(() => {
+      servicioColegios.getColegios.and.returnValue([]);
+
+      whenInicializo('alumno-1');
+
+      expect(presenter.nombreColegio()).toBe('');
+    }));
+  });
+
+  describe('presupuestoDisponible ramas defensivas', () => {
+    it('dado un budget con activo=false, presupuestoDisponible deberia devolver null', fakeAsync(() => {
+      whenInicializo('alumno-1');
+      const budgets = new Map<string, unknown>([
+        ['alumno-1', { activo: false, periodo: 'SEMANAL', montoLimiteGeneral: 1000, reglasCategoria: [] }],
+      ]);
+      (servicioCarrito as unknown as { budgets: unknown }).budgets = signal(budgets);
+
+      expect(presenter.presupuestoDisponible()).toBeNull();
+    }));
+
+    it('dado un budget activo con reglas donde una tiene activo=false, deberia omitir esa regla en reglasCategorias', fakeAsync(() => {
+      whenInicializo('alumno-1');
+      const budgets = new Map<string, unknown>([
+        [
+          'alumno-1',
+          {
+            activo: true,
+            periodo: 'SEMANAL',
+            montoLimiteGeneral: 1000,
+            reglasCategoria: [
+              {
+                id: 'r-1',
+                categoriaId: 'bebidas',
+                descripcionCategoria: 'Bebidas',
+                porcentajeLimite: 20,
+                montoLimiteCalculado: 200,
+                activo: false,
+              },
+              {
+                id: 'r-2',
+                categoriaId: 'snacks',
+                descripcionCategoria: 'Snacks',
+                porcentajeLimite: 30,
+                montoLimiteCalculado: 300,
+                activo: true,
+              },
+            ],
+          },
+        ],
+      ]);
+      (servicioCarrito as unknown as { budgets: unknown }).budgets = signal(budgets);
+
+      const result = presenter.presupuestoDisponible();
+      expect(result?.reglasCategorias.length).toBe(1);
+      expect(result?.reglasCategorias[0].categoriaId).toBe('snacks');
+    }));
+  });
+
+  describe('restriccionesHorariasInformativas con timeSlotId', () => {
+    it('dado una restriccion sin franjaHoraria pero con timeSlotId, deberia marcar el slot como bloqueado', fakeAsync(() => {
+      const slot = crearSlot('s-1', '10:00', 'PRIMER RECREO');
+      servicioFranjas.getFranjasHorarias.and.resolveTo([slot]);
+      servicioRestriccionesHorarias.getRestriccionesPorAlumno.and.resolveTo([
+        crearRestriccion({ timeSlotId: 's-1' }),
+      ]);
+
+      whenInicializo('alumno-1');
+
+      const info = presenter.restriccionesHorariasInformativas();
+      expect(info[0].bloqueado).toBeTrue();
+    }));
+  });
+
+  describe('helpers privados de fecha', () => {
+    it('esFinDeSemana con string vacio deberia devolver false', () => {
+      const priv = presenter as unknown as { esFinDeSemana(f: string): boolean };
+      expect(priv.esFinDeSemana('')).toBeFalse();
+    });
+
+    it('getFechaHoraConsulta con fecha vacia deberia devolver string vacio', () => {
+      const priv = presenter as unknown as { getFechaHoraConsulta(f: string, r: string): string };
+      expect(priv.getFechaHoraConsulta('', 'PRIMER_RECREO')).toBe('');
+    });
+
+    it('consultarPresupuestoPorFecha con alumnoId vacio no deberia consultar', () => {
+      const priv = presenter as unknown as {
+        consultarPresupuestoPorFecha(id: string, f: string): void;
+      };
+      servicioPresupuesto.checkBudgetDates.calls.reset();
+
+      priv.consultarPresupuestoPorFecha('', '2030-07-15');
+
+      expect(servicioPresupuesto.checkBudgetDates).not.toHaveBeenCalled();
+    });
+
+    it('calcularFechaMinima con slots sin horaFin deberia usar fallback y elegir un dia habil', () => {
+      const priv = presenter as unknown as {
+        calcularFechaMinima(slots: TimeSlot[]): string;
+      };
+
+      const resultado = priv.calcularFechaMinima([
+        { id: 's', colegioId: 'c', descripcion: 'X', horaInicio: '10:00', horaFin: '', activo: true } as TimeSlot,
+      ]);
+
+      expect(resultado).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+  });
+
+  describe('setFecha con fecha en el pasado', () => {
+    beforeEach(fakeAsync(() => {
+      servicioFranjas.getFranjasHorarias.and.resolveTo([
+        crearSlot('s-1', '10:00', 'Primer Recreo'),
+      ]);
+      whenInicializo('alumno-1');
+    }));
+
+    it('dado una fecha anterior a la minima, setFecha deberia ajustarla a fechaMinima', () => {
+      const minima = presenter.fechaMinima();
+
+      presenter.setFecha('1990-01-01');
+
+      expect(presenter.fechaSeleccionada() >= minima).toBeTrue();
+    });
+  });
+
+  describe('productosFiltrados sort — orden de bloqueados vs libres', () => {
+    it('dado dos productos con distinto estado de bloqueo, el libre deberia quedar antes que el bloqueado', fakeAsync(() => {
+      givenVistaAlumno(false);
+      const libre = ProductoMother.crearDisponible();
+      const bloq = ProductoMother.crearBloqueadoPorTutor();
+      servicioBuffet.getProductosDelBuffet.and.returnValue(of([bloq, libre]));
+
+      whenInicializo('alumno-1');
+
+      const filtrados = presenter.productosFiltrados();
+      expect(filtrados[0].id).toBe(libre.id);
+      expect(filtrados[1].id).toBe(bloq.id);
+    }));
+  });
+
+  describe('toggleFavorito con favoritosTotalesFamiliaState = null', () => {
+    it('dado plan no gratuito, el state de total familia queda null y toggleFavorito no rompe', fakeAsync(() => {
+      (perfilService.esPlanGratuito as unknown as { set: (v: boolean) => void }).set(false);
+
+      whenInicializo('alumno-1');
+      expect(
+        (presenter as unknown as { favoritosTotalesFamiliaState: () => number | null })
+          .favoritosTotalesFamiliaState(),
+      ).toBeNull();
+
+      presenter.toggleFavorito(PRODUCTO_DISPONIBLE);
+
+      expect(presenter.favoritos().has(PRODUCTO_DISPONIBLE.id)).toBeTrue();
+      expect(
+        (presenter as unknown as { favoritosTotalesFamiliaState: () => number | null })
+          .favoritosTotalesFamiliaState(),
+      ).toBeNull();
+
+      presenter.toggleFavorito(PRODUCTO_DISPONIBLE);
+
+      expect(presenter.favoritos().has(PRODUCTO_DISPONIBLE.id)).toBeFalse();
+    }));
+  });
+
+  describe('cargarCantidadFavoritosFamilia con rol ALUMNO', () => {
+    it('dado plan gratuito y perfil no PADRE, deberia usar los favoritos actuales sin sumar familia', fakeAsync(() => {
+      (perfilService.perfil as unknown as { set: (v: unknown) => void }).set({
+        rol: 'ALUMNO',
+      });
+      servicioFavoritos.getFavoritos.and.returnValue(of([{ id: 'f-1' }]) as unknown as Observable<Producto[]>);
+
+      whenInicializo('alumno-1');
+
+      expect(
+        (presenter as unknown as { favoritosTotalesFamiliaState: () => number | null })
+          .favoritosTotalesFamiliaState(),
+      ).toBe(1);
+    }));
+  });
 });

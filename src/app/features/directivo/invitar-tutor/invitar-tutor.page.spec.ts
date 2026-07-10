@@ -97,6 +97,16 @@ describe('InvitarTutorPage', () => {
     });
   });
 
+  it('dado firstName con solo espacios, cuando submiteo, deberia enviar firstName undefined', async () => {
+    whenMontoLaPagina();
+    whenSeteoElEmail('maria@test.com');
+    whenSeteoElCampo('firstName', '   ');
+
+    await whenSubmiteoElForm();
+
+    expect(presenterStub.invitar).toHaveBeenCalledWith(jasmine.objectContaining({ firstName: undefined }));
+  });
+
   it('dado un resultado CREATED en el presenter, cuando renderiza, deberia mostrar el mensaje de invitacion enviada y el link en el input', () => {
     resultadoSignal.set(InvitacionTutorMother.creada());
 

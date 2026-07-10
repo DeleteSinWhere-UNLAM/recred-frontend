@@ -172,6 +172,48 @@ describe('CrearHijoPresenter', () => {
 
       expect(presenter.error()).toBe('No se pudo crear el hijo. Intenta nuevamente.');
     });
+
+    it('dado un error 400 sin body, cuando creo el hijo, deberia usar el mensaje de datos invalidos', async () => {
+      givenCrearHijoRechazaConStatus(400);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Datos invalidos. Revisa los campos.');
+    });
+
+    it('dado un error 403 sin body, cuando creo el hijo, deberia usar el mensaje de permisos', async () => {
+      givenCrearHijoRechazaConStatus(403);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('No tenes permiso para crear un hijo.');
+    });
+
+    it('dado un error 500 sin body, cuando creo el hijo, deberia usar el mensaje del servidor', async () => {
+      givenCrearHijoRechazaConStatus(500);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Error del servidor. Intenta mas tarde.');
+    });
+
+    it('dado un error 500 con error string, cuando creo el hijo, deberia usar ese string como mensaje', async () => {
+      servicioAlumnos.crearHijo.and.rejectWith(
+        new HttpErrorResponse({ status: 500, error: 'Servidor caido' }),
+      );
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Servidor caido');
+    });
+
+    it('dado un error con error.message undefined, cuando creo el hijo, deberia caer al mensaje por status', async () => {
+      givenCrearHijoRechazaConErrorObjetoSinMensaje(400);
+
+      await whenCreo(CrearHijoFormMother.crear());
+
+      expect(presenter.error()).toBe('Datos invalidos. Revisa los campos.');
+    });
   });
 
   function givenColegiosDelBack(colegios: ReturnType<typeof ColegioMother.crearLista>): void {
@@ -215,6 +257,16 @@ describe('CrearHijoPresenter', () => {
 
   function givenCrearHijoRechazaConErrorGenerico(): void {
     servicioAlumnos.crearHijo.and.rejectWith(new Error('boom'));
+  }
+
+  function givenCrearHijoRechazaConStatus(status: number): void {
+    servicioAlumnos.crearHijo.and.rejectWith(new HttpErrorResponse({ status }));
+  }
+
+  function givenCrearHijoRechazaConErrorObjetoSinMensaje(status: number): void {
+    servicioAlumnos.crearHijo.and.rejectWith(
+      new HttpErrorResponse({ status, error: { message: undefined } }),
+    );
   }
 
   function whenCargoColegios(): Promise<void> {

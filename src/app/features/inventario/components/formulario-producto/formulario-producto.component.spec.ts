@@ -424,6 +424,70 @@ describe('FormularioProductoComponent', () => {
     });
   });
 
+  describe('aplicarDatosIniciales con campos undefined', () => {
+    it('dado datosIniciales con todos los campos undefined, deberia patchar con defaults vacios/null', () => {
+      component.product = null;
+      component.datosIniciales = {
+        nombre: undefined as unknown as string,
+        descripcion: undefined as unknown as string,
+        precio: undefined as unknown as number,
+        peso: undefined as unknown as number,
+        stockActual: undefined as unknown as number,
+      };
+
+      component.ngOnChanges({
+        datosIniciales: {
+          currentValue: component.datosIniciales,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.productForm.get('nombre')?.value).toBe('');
+      expect(component.productForm.get('descripcion')?.value).toBe('');
+      expect(component.productForm.get('precio')?.value).toBeNull();
+      expect(component.productForm.get('peso')?.value).toBeNull();
+      expect(component.productForm.get('stockActual')?.value).toBeNull();
+    });
+  });
+
+  describe('ngOnChanges con producto cuyo categoriaId no existe en la lista', () => {
+    it('dado un producto con categoriaId inexistente, isBeverage deberia quedar false', () => {
+      const producto = ProductoMother.crear({ categoriaId: 'inexistente', categoriaNombre: undefined });
+
+      whenSeAsignaElProducto(producto);
+
+      expect(component.isBeverage()).toBeFalse();
+    });
+  });
+
+  describe('ngOnChanges con producto sin categoriaId ni categoriaNombre', () => {
+    it('dado un producto sin categoriaId ni categoriaNombre, isBeverage deberia quedar false', () => {
+      const producto = ProductoMother.crear({ categoriaId: null, categoriaNombre: undefined });
+
+      whenSeAsignaElProducto(producto);
+
+      expect(component.isBeverage()).toBeFalse();
+    });
+
+    it('dado un producto sin categoriaId pero con categoriaNombre no bebida, nuevaCategoriaNombre deberia tomarlo', () => {
+      const producto = ProductoMother.crear({ categoriaId: null, categoriaNombre: 'Snacks' });
+
+      whenSeAsignaElProducto(producto);
+
+      expect(component.productForm.get('nuevaCategoriaNombre')?.value).toBe('Snacks');
+    });
+
+    it('dado un producto sin categoriaId ni categoriaNombre, nuevaCategoriaNombre deberia caer al fallback vacio', () => {
+      const producto = ProductoMother.crear({ categoriaId: null, categoriaNombre: undefined });
+
+      whenSeAsignaElProducto(producto);
+
+      expect(component.productForm.get('nuevaCategoriaNombre')?.value).toBe('');
+    });
+  });
+
   function givenFileSelectedEvent(file: File): Event {
     const input = document.createElement('input');
     input.type = 'file';

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { PerfilService } from '../../../data-access/services/perfil.service';
@@ -114,6 +114,30 @@ describe('CarritoPage', () => {
       whenMonto();
 
       expect(console.error).toHaveBeenCalled();
+    });
+  });
+
+  describe('lineasResumen', () => {
+    it('dado vista alumno, cada linea deberia mostrar "nombre apellido"', async () => {
+      await givenPageConfigurada();
+      const usuarioService = TestBed.inject(UsuarioService) as unknown as {
+        esVistaAlumno: WritableSignal<boolean>;
+      };
+      usuarioService.esVistaAlumno.set(true);
+      whenMonto();
+
+      const lineas = (component as unknown as { lineasResumen(): { nombre: string }[] }).lineasResumen();
+
+      expect(lineas[0].nombre).toContain(' ');
+    });
+
+    it('dado vista tutor, cada linea deberia mostrar solo el nombre', async () => {
+      await givenPageConfigurada();
+      whenMonto();
+
+      const lineas = (component as unknown as { lineasResumen(): { nombre: string }[] }).lineasResumen();
+
+      expect(lineas[0].nombre.includes(' ')).toBeFalse();
     });
   });
 

@@ -151,6 +151,25 @@ describe('AuthSessionService', () => {
 
       expect(obtenerSesionSpy).toHaveBeenCalledWith(true);
     });
+
+    it('dado que no hay datos de sesion en storage, cuando espero, deberia devolver null sin consultar Amplify', async () => {
+      localStorage.clear();
+
+      const resultado = await service.esperarSesionAutenticada();
+
+      expect(resultado).toBeNull();
+      expect(obtenerSesionSpy).not.toHaveBeenCalled();
+    });
+
+    it('dado datos de sesion con prefix amplify- en storage, cuando espero, deberia consultar Amplify', async () => {
+      localStorage.clear();
+      localStorage.setItem('amplify-signin-with-hostedUI', 'true');
+      givenSesion(AuthSessionMother.crearCompleta());
+
+      await service.esperarSesionAutenticada();
+
+      expect(obtenerSesionSpy).toHaveBeenCalled();
+    });
   });
 
   describe('obtenerAccessTokenParaApi', () => {

@@ -85,6 +85,23 @@ describe('PresupuestoService', () => {
       await expectAsync(promesa).toBeRejected();
     });
 
+    it('dado que el back devuelve reglasCategoria undefined, cuando pido el presupuesto, deberia mapear con reglas vacias', async () => {
+      const promesa = service.getPresupuesto('alumno-sin-reglas');
+      const req = httpMock.expectOne(URL_BUDGET_ACTIVO('alumno-sin-reglas'));
+      req.flush({
+        id: 'pres-x',
+        alumnoId: 'alumno-sin-reglas',
+        montoLimiteGeneral: 5000,
+        periodo: 'MENSUAL',
+        fechaInicio: '2026-06-01',
+        activo: true,
+        reglasCategoria: undefined,
+      });
+
+      const resultado = await promesa;
+      expect(resultado?.reglasCategoria).toEqual([]);
+    });
+
     it('dado un alumnoId con caracteres especiales, cuando pido el presupuesto, deberia encodearlo en la URL', async () => {
       const promesa = service.getPresupuesto('id con espacio');
       const req = httpMock.expectOne(URL_BUDGET_ACTIVO('id con espacio'));
@@ -198,6 +215,15 @@ describe('PresupuestoService', () => {
       const resultado = await promesa;
       expect(resultado.length).toBe(2);
       expect(resultado[1].blocked).toBeTrue();
+    });
+
+    it('dado que el back devuelve null como response, cuando llamo, deberia devolver arreglo vacio', async () => {
+      const promesa = service.checkBudgetDates(ALUMNO_ID_TEST, ['2026-07-05'], []);
+      const req = httpMock.expectOne(`${API}/budgets/student/${ALUMNO_ID_TEST}/check-dates`);
+      req.flush(null);
+
+      const resultado = await promesa;
+      expect(resultado).toEqual([]);
     });
   });
 
