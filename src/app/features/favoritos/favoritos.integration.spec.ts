@@ -19,6 +19,8 @@ class NavbarStub {
 
 describe('Favoritos Integration', () => {
   const URL_LISTAR = `${environment.apiUrl}/alumnos/${UUID_ALUMNO}/preferencias/favoritos`;
+  const URL_BUFFET = `${environment.apiUrl}/alumnos/${UUID_ALUMNO}/buffet`;
+  const URL_MENU_BUFFET = `${environment.apiUrl}/alumnos/${UUID_ALUMNO}/menu-buffet?buffetId=buffet-1`;
   const URL_ELIMINAR = (productoId: string): string =>
     `${environment.apiUrl}/alumnos/${UUID_ALUMNO}/preferencias/favoritos/${productoId}`;
 
@@ -107,6 +109,8 @@ describe('Favoritos Integration', () => {
     fixture.detectChanges();
 
     httpMock.expectOne(URL_LISTAR).flush('boom', { status: 500, statusText: 'Server Error' });
+    httpMock.expectOne(URL_BUFFET).flush({ id: 'buffet-1' });
+    httpMock.expectOne(URL_MENU_BUFFET).flush([]);
     fixture.detectChanges();
 
     expect(fixture.componentInstance.favoritos).toEqual([]);
@@ -115,6 +119,8 @@ describe('Favoritos Integration', () => {
   function whenMontoYElBackDevuelveFavoritos(favoritos: ReturnType<typeof ProductDTOMother.crear>[]): void {
     fixture.detectChanges();
     httpMock.expectOne(URL_LISTAR).flush(favoritos);
+    httpMock.expectOne(URL_BUFFET).flush({ id: 'buffet-1' });
+    httpMock.expectOne(URL_MENU_BUFFET).flush([]);
     fixture.detectChanges();
   }
 

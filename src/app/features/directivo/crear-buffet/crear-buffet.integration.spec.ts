@@ -20,8 +20,7 @@ describe('CrearBuffet (Integración)', () => {
     
     routerSpy.getCurrentNavigation.and.returnValue({
       extras: { state: { schoolId: 'school-123' } }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    } as unknown as ReturnType<Router['getCurrentNavigation']>);
 
     await TestBed.configureTestingModule({
       imports: [CrearBuffetPage],

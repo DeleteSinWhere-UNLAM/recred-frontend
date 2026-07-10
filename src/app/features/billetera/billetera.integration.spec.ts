@@ -2,6 +2,7 @@ import { Component, Input, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 import { BilleteraPage } from './billetera.page';
 import { BilleteraService } from './services/billetera.service';
@@ -126,7 +127,7 @@ describe('Billetera Integration', () => {
   }
 
   function givenElServicioFalla(): void {
-    servicioBilletera.getResumen.and.returnValue(throwError(() => new Error('API Error')));
+    servicioBilletera.getResumen.and.returnValue(throwError(() => new Error('API Error al intentar cargar el resumen')).pipe(delay(0)));
   }
 
   async function whenMontoLaPagina(): Promise<void> {

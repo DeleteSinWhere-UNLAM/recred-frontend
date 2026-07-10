@@ -87,7 +87,7 @@ describe('AcreditarMercadoPago Integration', () => {
   it('dado que se monta la page con un alumno del contexto, deberia pedir el resumen y renderizar el titulo con el nombre', async () => {
     await whenMonto();
 
-    const titulo = queryTexto('.acreditar-page__form-section h3');
+    const titulo = queryTexto('.acreditar-page__titulo');
     expect(titulo).toContain('Juan');
     expect(servicioBilletera.getResumen).toHaveBeenCalledWith('alumno-1');
   });

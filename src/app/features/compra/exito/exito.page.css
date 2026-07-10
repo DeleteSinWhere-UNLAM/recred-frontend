@@ -44,6 +44,7 @@
 
 .exito-page__titulo {
   font-family: var(--font-display);
+  text-align: center;
   font-size: 28px;
   font-weight: 800;
   color: var(--color-texto-oscuro);

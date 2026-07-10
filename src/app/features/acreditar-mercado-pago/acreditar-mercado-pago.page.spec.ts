@@ -121,7 +121,7 @@ describe('AcreditarMercadoPagoPage', () => {
       thenElLoaderEstaVisible();
     });
 
-    it('dado un alumno cargado, deberia mostrar el nombre en el titulo del formulario', () => {
+    it('dado un alumno cargado, deberia mostrar el nombre en el titulo principal', () => {
       presenterFake.alumno.set(
         AlumnoMother.crear({ nombre: 'Juan', apellido: 'Perez', saldo: 3000 }),
       );
@@ -129,7 +129,7 @@ describe('AcreditarMercadoPagoPage', () => {
 
       whenMonto();
 
-      const titulo = queryHTMLTexto('.acreditar-page__form-section h3');
+      const titulo = queryHTMLTexto('.acreditar-page__titulo');
       expect(titulo).toContain('Juan');
     });
 

@@ -1,6 +1,6 @@
 .favoritos {
   min-height: calc(100vh - 64px);
-  padding: 32px 0 60px;
+  padding: 16px 0 60px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 240px),
     var(--color-fondo);
@@ -46,64 +46,20 @@
 .favoritos__cabecera {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 14px;
-  background: linear-gradient(180deg, #fdecea 0%, #ffffff 70%);
-  border: 1px solid rgba(231, 111, 81, 0.28);
-  border-radius: 20px;
-  padding: 16px 20px 30px;
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-}
-
-.favoritos__icono {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-melocoton) 0%, #c75a3f 100%);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  box-shadow: 0 8px 18px rgba(231, 111, 81, 0.22);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.favoritos__identidad {
-  position: relative;
-  z-index: 1;
-}
-
-.favoritos__ola {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 26px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%23E76F51' fill-opacity='0.5'/></svg>");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-position: bottom center;
-  pointer-events: none;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
 }
 
 .favoritos__titulo {
   font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-melocoton);
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-pizarra);
   line-height: 1.2;
-  margin: 0 0 2px;
-}
-
-.favoritos__subtitulo {
-  font-size: 13px;
-  color: var(--color-texto-claro);
-  font-weight: 500;
-  margin: 0;
+  margin: 0 0 4px;
 }
 
 /* Secciones de la página */
@@ -333,51 +289,5 @@
   .favoritos__container {
     padding: 0 16px;
     gap: 12px;
-  }
-
-  .favoritos__cabecera {
-    padding: 14px 16px 28px;
-    gap: 12px;
-  }
-
-  .favoritos__icono {
-    width: 46px;
-    height: 46px;
-    font-size: 19px;
-  }
-
-  .favoritos__titulo {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-  .favoritos {
-    padding: 20px 0 20px;
-  }
-
-  .favoritos__container {
-    padding: 0 12px;
-    gap: 10px;
-  }
-
-  .favoritos__cabecera {
-    padding: 12px 14px 26px;
-    gap: 10px;
-    border-radius: 16px;
-  }
-
-  .favoritos__icono {
-    width: 42px;
-    height: 42px;
-    font-size: 17px;
-  }
-
-  .favoritos__titulo {
-    font-size: 17px;
-  }
-
-  .favoritos__subtitulo {
-    font-size: 12px;
   }
 }
