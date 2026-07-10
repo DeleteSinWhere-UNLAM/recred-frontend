@@ -62,14 +62,24 @@ export class TutorWelcome implements OnInit {
       });
 
       // 2. Pedidos pendientes (consolidados de todos los alumnos)
+      // Solo se muestran los pedidos cuyo retiro programado (pickupDate) es la fecha de hoy
+      const hoy = new Date();
+      const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
       const todosPendientes: (Movimiento & { alumnoNombre: string })[] = [];
       
       for (const alumno of alumnosActuales) {
         this.movimientosService.getPendientesAlumno(alumno.id).subscribe(pendientes => {
-          const mapeados = pendientes.map(p => ({ ...p, alumnoNombre: alumno.nombre }));
+          const mapeados = pendientes
+            .filter(p => {
+              if (!p.pickupDate) return false;
+              // Comparamos solo la parte de fecha (YYYY-MM-DD) de pickupDate con hoy
+              return p.pickupDate.startsWith(hoyStr);
+            })
+            .map(p => ({ ...p, alumnoNombre: alumno.nombre }));
           todosPendientes.push(...mapeados);
-          // Ordenamos por fecha
-          todosPendientes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          // Ordenamos por fecha de retiro programado
+          todosPendientes.sort((a, b) => new Date(a.pickupDate!).getTime() - new Date(b.pickupDate!).getTime());
           this.pedidosPendientes.set([...todosPendientes].slice(0, 5));
         });
       }
