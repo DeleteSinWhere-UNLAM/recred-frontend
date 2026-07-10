@@ -91,7 +91,7 @@ export class AceptarInvitacionTutorPresenter {
         this.tokenStorage.limpiar();
         this.perfilService.limpiar();
         await this.router.navigateByUrl('/tutor');
-      } catch (error) {
+      } catch {
         this.toastService.mostrar('Cierra tu sesión actual para ingresar con el email invitado.', 'info');
       }
       return;
