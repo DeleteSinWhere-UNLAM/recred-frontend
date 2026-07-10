@@ -30,10 +30,10 @@ describe('RegistroColegioPresenter', () => {
     it('dado el presenter recien instanciado, cuando leo los estados, deberia iniciar sin errores, sin carga y sin exito', () => {
       let cargando: boolean | undefined;
       let enviado: boolean | undefined;
-      let error: string | null | undefined;
+      let error: any;
       presenter.cargando$.subscribe((v: boolean) => (cargando = v));
       presenter.enviado$.subscribe((v: boolean) => (enviado = v));
-      presenter.error$.subscribe((v: string | null) => (error = v));
+      presenter.error$.subscribe((v) => (error = v));
 
       expect(cargando).toBeFalse();
       expect(enviado).toBeFalse();
@@ -63,14 +63,14 @@ describe('RegistroColegioPresenter', () => {
     it('dado un payload valido, cuando envio y el servicio falla, deberia emitir el mensaje de error y mostrar toast', () => {
       const payload: SchoolRegistrationPayload = RegistroColegioMother.crearPayload();
       givenSubmitRegistrationFalla();
-      let error: string | null | undefined;
+      let error: any;
       let enviado: boolean | undefined;
-      presenter.error$.subscribe((v: string | null) => (error = v));
+      presenter.error$.subscribe((v) => (error = v));
       presenter.enviado$.subscribe((v: boolean) => (enviado = v));
 
       presenter.enviarSolicitud(payload);
 
-      expect(error).toContain('error al enviar');
+      expect(error?.mensaje).toContain('error al enviar');
       expect(enviado).toBeFalse();
       expect(toast.mostrar).toHaveBeenCalledWith('Error al enviar la solicitud.', 'error');
     });
