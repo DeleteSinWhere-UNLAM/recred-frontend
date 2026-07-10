@@ -149,7 +149,5 @@ describe('EstadisticaPage', () => {
     fixture.detectChanges();
   }
 
-  function textoRenderizado(): string {
-    return (fixture.nativeElement as HTMLElement).textContent ?? '';
-  }
+
 });

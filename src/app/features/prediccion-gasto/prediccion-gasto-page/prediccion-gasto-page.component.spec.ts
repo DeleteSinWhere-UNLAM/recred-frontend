@@ -87,7 +87,7 @@ describe('PrediccionGastoPageComponent', () => {
     servicioPrediccion = jasmine.createSpyObj('PrediccionGastoService', ['getPrediction']);
     servicioPrediccion.getPrediction.and.returnValue(of(PrediccionGastoMother.crear()));
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
-    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as any);
+    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as unknown as ReturnType<AlumnosService['getAlumnoById']>);
     alumnoIdSignal = signal<string>('');
   });
 

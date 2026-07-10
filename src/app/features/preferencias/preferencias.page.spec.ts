@@ -38,7 +38,7 @@ describe('PreferenciasPage', () => {
     } as ReturnType<UsuarioService['getUsuarioActual']>);
 
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
-    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as any);
+    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as unknown as ReturnType<AlumnosService['getAlumnoById']>);
 
     alumnoIdSignal = signal<string>(ALUMNO_ID_TEST);
 

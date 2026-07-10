@@ -24,7 +24,7 @@ describe('Preferencias Integration', () => {
       nombre: 'Tutor Integration',
     } as ReturnType<UsuarioService['getUsuarioActual']>);
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['getAlumnoById']);
-    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as any);
+    servicioAlumnos.getAlumnoById.and.returnValue({ nombre: 'Emmanuel' } as unknown as ReturnType<AlumnosService['getAlumnoById']>);
 
     await TestBed.configureTestingModule({
       imports: [PreferenciasPage],
