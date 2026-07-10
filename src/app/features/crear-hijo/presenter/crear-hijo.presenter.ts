@@ -72,15 +72,16 @@ export class CrearHijoPresenter {
     try {
       const alumno = await this.alumnosService.crearHijo(req);
       this.toastService.mostrar(
-        `${alumno.nombre} ${alumno.apellido} fue agregado como hijo`,
+        `${alumno.nombre} fue agregado. Revisa su casilla de SPAM, enviamos las credenciales provisorias a su correo.`,
         'success',
+        7000
       );
       await this.router.navigateByUrl('/tutor');
       return true;
     } catch (err) {
       const mensaje = this.mensajeDeError(err);
       this.errorState.set(mensaje);
-      this.toastService.mostrar(mensaje, 'error');
+      this.toastService.mostrar(mensaje, 'error', 6000);
       return false;
     } finally {
       this.guardandoState.set(false);
@@ -97,9 +98,9 @@ export class CrearHijoPresenter {
 
       if (backendMsg) return backendMsg;
 
-      if (err.status === 400) return 'Datos inválidos. Revisa los campos.';
-      if (err.status === 403) return 'No tenes permiso para crear un hijo.';
-      if (err.status === 409) return 'Ya existe un alumno con esos datos.';
+      if (err.status === 400) return 'Datos inválidos. Verifica que el correo esté bien escrito antes de reintentar.';
+      if (err.status === 403) return 'No tienes permiso para crear un hijo.';
+      if (err.status === 409) return 'Error: El correo electrónico o DNI ya están registrados. Por favor, intenta con otro correo distinto.';
       if (err.status >= 500) return 'Error del servidor. Intenta más tarde.';
     }
     return 'No se pudo crear el hijo. Intenta nuevamente.';

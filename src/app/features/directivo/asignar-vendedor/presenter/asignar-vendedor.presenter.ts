@@ -28,16 +28,21 @@ export class AsignarVendedorPresenter {
 
     try {
       await this.directivoService.registrarVendedor(buffetId, vendedorData);
+      this.toastService.mostrar('Vendedor asignado. Se enviaron las credenciales al correo registrado.', 'success');
       this.router.navigate(['/directivo']);
     } catch (err: unknown) {
       if (err instanceof HttpErrorResponse) {
         if (err.status === 409 && err.error?.code === 'USERNAME_EXISTS') {
-          this._error.set('El correo o nombre de usuario ya está registrado.');
+          const msg = 'Error: El correo electrónico ya está registrado o es inválido. Por favor, intenta de nuevo.';
+          this._error.set(msg);
+          this.toastService.mostrar(msg, 'error');
         } else {
           this._error.set('Ocurrió un error al asignar el vendedor.');
+          this.toastService.mostrar('Ocurrió un error al asignar el vendedor.', 'error');
         }
       } else {
         this._error.set('Error inesperado.');
+        this.toastService.mostrar('Error inesperado.', 'error');
       }
     } finally {
       this._loading.set(false);
@@ -50,21 +55,31 @@ export class AsignarVendedorPresenter {
 
     try {
       await this.directivoService.reemplazarVendedor(buffetId, vendedorData);
-      this.toastService.mostrar('Vendedor reemplazado exitosamente.', 'success');
+      this.toastService.mostrar('Vendedor reemplazado. Se enviaron las nuevas credenciales al correo registrado.', 'success');
       this.router.navigate(['/directivo']);
     } catch (err: unknown) {
       if (err instanceof HttpErrorResponse) {
         if (err.status === 403) {
-          this._error.set('No tienes permisos para realizar esta acción.');
+          const msg = 'No tienes permisos para realizar esta acción.';
+          this._error.set(msg);
+          this.toastService.mostrar(msg, 'error');
         } else if (err.status === 400) {
-          this._error.set('Los datos proporcionados son inválidos.');
+          const msg = 'Los datos proporcionados son inválidos. Verifica el correo electrónico.';
+          this._error.set(msg);
+          this.toastService.mostrar(msg, 'error');
         } else if (err.status === 409) {
-          this._error.set('Conflicto: El correo o nombre de usuario ya está registrado.');
+          const msg = 'Error: El correo electrónico ya está registrado o es inválido. Por favor, intenta de nuevo.';
+          this._error.set(msg);
+          this.toastService.mostrar(msg, 'error');
         } else {
-          this._error.set('Ocurrió un error al reemplazar el vendedor.');
+          const msg = 'Ocurrió un error al reemplazar el vendedor.';
+          this._error.set(msg);
+          this.toastService.mostrar(msg, 'error');
         }
       } else {
-        this._error.set('Error inesperado.');
+        const msg = 'Error inesperado.';
+        this._error.set(msg);
+        this.toastService.mostrar(msg, 'error');
       }
     } finally {
       this._loading.set(false);

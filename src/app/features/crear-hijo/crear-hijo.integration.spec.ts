@@ -134,7 +134,7 @@ describe('CrearHijo Integration', () => {
     await whenSubmiteoElForm();
 
     expect(servicioAlumnos.crearHijo).toHaveBeenCalledWith(REQUEST_ESPERADO);
-    thenSeMostroToast('Juan Pérez fue agregado como hijo', 'success');
+    expect(servicioToast.mostrar).toHaveBeenCalledWith('Juan fue agregado. Revisa su casilla de SPAM, enviamos las credenciales provisorias a su correo.', 'success', 7000);
     thenSeNavegoA('/tutor');
   });
 
@@ -145,7 +145,7 @@ describe('CrearHijo Integration', () => {
 
     await whenSubmiteoElForm();
 
-    thenSeMostroToast('No se pudo crear el hijo. Intenta nuevamente.', 'error');
+    expect(servicioToast.mostrar).toHaveBeenCalledWith('No se pudo crear el hijo. Intenta nuevamente.', 'error', 6000);
     expect(router.navigateByUrl).not.toHaveBeenCalled();
   });
 
@@ -189,10 +189,6 @@ describe('CrearHijo Integration', () => {
       'select[formControlName="colegioId"] option',
     );
     expect(opciones[1].textContent?.trim()).toBe(texto);
-  }
-
-  function thenSeMostroToast(mensaje: string, tipo: 'success' | 'error'): void {
-    expect(servicioToast.mostrar).toHaveBeenCalledWith(mensaje, tipo);
   }
 
   function thenSeNavegoA(url: string): void {

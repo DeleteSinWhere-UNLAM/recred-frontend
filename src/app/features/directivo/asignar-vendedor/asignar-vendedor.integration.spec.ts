@@ -7,6 +7,7 @@ import { By } from '@angular/platform-browser';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
 class NavbarStub {}
@@ -28,7 +29,8 @@ describe('AsignarVendedor (Integración)', () => {
       imports: [AsignarVendedorPage],
       providers: [
         { provide: DirectivoService, useValue: directivoServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['mostrar']) }
       ]
     }).overrideComponent(AsignarVendedorPage, {
       remove: { imports: [NavbarComponent] },
@@ -100,7 +102,7 @@ describe('AsignarVendedor (Integración)', () => {
     fixture.detectChanges();
 
     const errorAlert = fixture.debugElement.query(By.css('.error-alert'));
-    expect(errorAlert.nativeElement.textContent).toContain('El correo o nombre de usuario ya está registrado.');
+    expect(errorAlert.nativeElement.textContent).toContain('Error: El correo electrónico ya está registrado o es inválido. Por favor, intenta de nuevo.');
     expect(routerSpy.navigate).not.toHaveBeenCalledWith(['/directivo']);
   });
 });

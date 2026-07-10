@@ -7,6 +7,7 @@ import { InvitacionesTutorService } from '../directivo/services/invitaciones-tut
 import { AceptarInvitacionTutorPage } from './aceptar-invitacion-tutor.page';
 import { InvitacionValidadaMother } from './aceptar-invitacion-tutor.mother';
 import { InvitacionTokenStorageService } from './services/invitacion-token-storage.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 describe('AceptarInvitacionTutor Integration', () => {
   let fixture: ComponentFixture<AceptarInvitacionTutorPage>;
@@ -40,6 +41,7 @@ describe('AceptarInvitacionTutor Integration', () => {
         { provide: InvitacionTokenStorageService, useValue: tokenStorage },
         { provide: PerfilService, useValue: perfilService },
         { provide: Router, useValue: router },
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['mostrar']) },
         {
           provide: ActivatedRoute,
           useValue: {
