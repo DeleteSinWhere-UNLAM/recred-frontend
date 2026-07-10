@@ -2,24 +2,7 @@
 
 
   <div class="estadistica__container">
-    <header class="estadistica__cabecera">
-      <div class="estadistica__avatar" aria-hidden="true">
-        @if (presenter.urlFotoPerfil()) {
-          <img [src]="presenter.urlFotoPerfil()" [alt]="'Foto de ' + presenter.nombreCompleto()" class="estadistica__avatar-img" />
-        } @else {
-          <span>{{ presenter.iniciales() }}</span>
-        }
-      </div>
-      <div class="estadistica__identidad">
-        <h2 class="estadistica__titulo">Estadística</h2>
-        <p class="estadistica__subtitulo">
-          {{ presenter.nombreCompleto() }}
-          @if (presenter.grado()) {
-            <span aria-hidden="true"> · </span>{{ presenter.grado() }}
-          }
-        </p>
-      </div>
-    </header>
+
 
     <div class="estadistica__graficos">
       <app-prediccion-card
