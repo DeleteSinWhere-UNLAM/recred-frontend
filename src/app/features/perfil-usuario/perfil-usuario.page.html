@@ -305,6 +305,41 @@
       </form>
       }
     </section>
+
+    <div class="perfil-usuario__divider" aria-hidden="true"></div>
+
+    <section class="perfil-usuario__payout-section" aria-label="Configuración de Buffet">
+      <div class="perfil-usuario__panel perfil-usuario__form">
+        <div class="perfil-usuario__form-header">
+          <h2 class="perfil-usuario__panel-titulo">Configuración de Ventas</h2>
+          @if (habilitarFinesDeSemana.dirty) {
+          <span class="perfil-usuario__cambios">Cambios sin guardar</span>
+          }
+        </div>
+
+        <label class="perfil-usuario__campo perfil-usuario__campo--checkbox">
+          <input type="checkbox" [formControl]="habilitarFinesDeSemana" />
+          <span>Habilitar retiro de ventas anticipadas los fines de semana y feriados (Horarios fijos: 11:00 o 16:00 hs)</span>
+        </label>
+
+        <div class="perfil-usuario__acciones">
+          <button type="button" class="perfil-usuario__boton perfil-usuario__boton--secundario"
+            [disabled]="guardandoBuffetSettings() || !habilitarFinesDeSemana.dirty"
+            (click)="habilitarFinesDeSemana.reset(); cargarConfiguracionBuffet()">
+            Descartar
+          </button>
+          <button type="button" class="perfil-usuario__boton perfil-usuario__boton--primario"
+            [disabled]="guardandoBuffetSettings() || !habilitarFinesDeSemana.dirty"
+            (click)="guardarBuffetSettings()">
+            @if (guardandoBuffetSettings()) {
+            Guardando...
+            } @else {
+            Guardar configuración
+            }
+          </button>
+        </div>
+      </div>
+    </section>
     }
     }
   </div>

@@ -16,6 +16,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { ToastService } from '../../shared/services/toast.service';
 import { CropModalComponent } from './components/crop-modal/crop-modal.component';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { BuffetService } from '../buffet/services/buffet.service';
 
 type PerfilUsuarioForm = FormGroup<{
   firstName: FormControl<string>;
@@ -39,6 +40,7 @@ export class PerfilUsuarioPage implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly buffetService = inject(BuffetService);
 
   protected readonly usuario = signal<UsuarioLogueado | null>(null);
   protected readonly passwordForm = new FormGroup({
@@ -76,6 +78,9 @@ export class PerfilUsuarioPage implements OnInit {
   protected readonly ultimaEjecucion = signal<string | null>(null);
   protected readonly cvuGuardado = signal<string | null>(null);
   protected readonly cuitGuardado = signal<string | null>(null);
+
+  protected readonly habilitarFinesDeSemana = new FormControl<boolean>(false);
+  protected readonly guardandoBuffetSettings = signal(false);
 
   protected readonly esKiosquero = computed(() => {
     const role = this.usuario()?.role || this.perfil()?.role;
@@ -268,6 +273,7 @@ export class PerfilUsuarioPage implements OnInit {
 
       if (role === 'VENDEDOR') {
         await this.cargarConfiguracionPayout();
+        this.cargarConfiguracionBuffet();
       }
     } catch (err) {
       console.error('Error cargando el perfil del usuario:', err);
@@ -603,6 +609,46 @@ export class PerfilUsuarioPage implements OnInit {
   protected campoPayoutInvalido(campo: keyof typeof this.payoutForm.controls): boolean {
     const control = this.payoutForm.controls[campo];
     return control.invalid && (control.dirty || control.touched);
+  }
+
+  protected cargarConfiguracionBuffet(): void {
+    const kiosqueroId = this.usuario()?.id || this.perfil()?.id;
+    if (!kiosqueroId) return;
+
+    const buffetId = this.perfilService.obtenerBuffetId();
+    if (!buffetId) return;
+
+    this.buffetService.obtenerBuffetDelAlumno(kiosqueroId).subscribe({
+      next: (buffet) => {
+        if (buffet) {
+          this.habilitarFinesDeSemana.setValue(!!buffet.habilitarVentasAnticipadasNoLaborables, { emitEvent: false });
+        }
+      },
+      error: (err) => console.warn('No se pudo cargar la configuración del buffet:', err)
+    });
+  }
+
+  protected guardarBuffetSettings(): void {
+    if (this.guardandoBuffetSettings()) return;
+    
+    const buffetId = this.perfilService.obtenerBuffetId();
+    if (!buffetId) return;
+
+    this.guardandoBuffetSettings.set(true);
+    const value = !!this.habilitarFinesDeSemana.value;
+    
+    this.buffetService.updateSettings(buffetId, value).subscribe({
+      next: () => {
+        this.toastService.mostrar('Configuración de ventas anticipadas actualizada', 'success');
+        this.habilitarFinesDeSemana.markAsPristine();
+      },
+      error: () => {
+        this.toastService.mostrar('Error al guardar configuración de ventas anticipadas', 'error');
+      },
+      complete: () => {
+        this.guardandoBuffetSettings.set(false);
+      }
+    });
   }
 
   protected abrirModalPassword(): void {

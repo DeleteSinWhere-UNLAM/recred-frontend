@@ -50,6 +50,13 @@ export class BuffetService {
     );
   }
 
+  updateSettings(buffetId: string, habilitarVentasAnticipadasNoLaborables: boolean): Observable<any> {
+    return this.http.patch(
+      `${environment.apiUrl}/kiosqueros/${buffetId}/settings`,
+      { habilitarVentasAnticipadasNoLaborables }
+    );
+  }
+
   getProductosDelBuffet(
     buffetId: string,
     alumnoId?: string,

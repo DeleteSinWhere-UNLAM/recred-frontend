@@ -5,7 +5,9 @@ export type Recreo =
   | 'PRIMER_RECREO'
   | 'SEGUNDO_RECREO'
   | 'MEDIODIA'
-  | 'FUERA_HORA';
+  | 'FUERA_HORA'
+  | 'ONCE_AM'
+  | 'DIECISEIS_PM';
 
 export interface OrdenAlumno {
   alumno: Alumno;
@@ -29,4 +31,6 @@ export const RECREO_LABELS: Record<Recreo, string> = {
   SEGUNDO_RECREO: '2do Recreo',
   MEDIODIA: 'Mediodía',
   FUERA_HORA: 'Fuera de hora',
+  ONCE_AM: '11:00 hs',
+  DIECISEIS_PM: '16:00 hs',
 };

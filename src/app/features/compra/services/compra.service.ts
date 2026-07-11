@@ -69,7 +69,9 @@ export class CompraService {
         PRIMER_RECREO: 'FIRST_RECESS',
         SEGUNDO_RECREO: 'SECOND_RECESS',
         MEDIODIA: 'NOON',
-        FUERA_HORA: 'AFTER_HOURS'
+        FUERA_HORA: 'AFTER_HOURS',
+        ONCE_AM: 'ELEVEN_AM',
+        DIECISEIS_PM: 'FOUR_PM'
       };
 
       return {

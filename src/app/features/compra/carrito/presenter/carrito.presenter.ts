@@ -96,60 +96,72 @@ export class CarritoPresenter {
         (a.horaInicio || '').localeCompare(b.horaInicio || ''),
       );
       const options: RecreoOpcion[] = [];
-      const recreosPosibles: Recreo[] = [
-        'PRIMER_RECREO',
-        'SEGUNDO_RECREO',
-        'MEDIODIA',
-        'FUERA_HORA',
-      ];
+      
+      const buffet = this.buffetCache.get(alumnoId);
+      const allowWeekends = !!buffet?.habilitarVentasAnticipadasNoLaborables;
+      const isWeekend = this.esFinDeSemana(selectedDateStr);
+      
+      if (isWeekend && allowWeekends) {
+        options.push(
+          { recreo: 'ONCE_AM', descripcion: '11:00 hs', bloqueado: false },
+          { recreo: 'DIECISEIS_PM', descripcion: '16:00 hs', bloqueado: false }
+        );
+      } else {
+        const recreosPosibles: Recreo[] = [
+          'PRIMER_RECREO',
+          'SEGUNDO_RECREO',
+          'MEDIODIA',
+          'FUERA_HORA',
+        ];
 
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      const todayStr = `${yyyy}-${mm}-${dd}`;
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
 
-      for (const slot of sortedSlots) {
-        let matchedRecreo: Recreo | undefined;
-        for (const rec of recreosPosibles) {
-          if (this.matchesDescription(slot.descripcion, rec)) {
-            matchedRecreo = rec;
-            break;
-          }
-        }
-
-        if (!matchedRecreo) {
-          const idx = sortedSlots.indexOf(slot);
-          if (idx >= 0 && idx < recreosPosibles.length) {
-            matchedRecreo = recreosPosibles[idx];
-          }
-        }
-
-        if (matchedRecreo) {
-          let isBlocked = generalRestrictions.some(
-            (r) => r.franjaHoraria?.id === slot.id || r.timeSlotId === slot.id,
-          );
-          let motivo: 'tutor' | 'tiempo' = 'tutor';
-
-          if (selectedDateStr === todayStr && slot.horaInicio) {
-            const [hours, minutes] = slot.horaInicio.split(':').map(Number);
-            const slotTime = new Date(now);
-            slotTime.setHours(hours, minutes, 0, 0);
-
-            const diffMs = slotTime.getTime() - now.getTime();
-            if (diffMs <= 3600000) {
-              isBlocked = true;
-              motivo = 'tiempo';
+        for (const slot of sortedSlots) {
+          let matchedRecreo: Recreo | undefined;
+          for (const rec of recreosPosibles) {
+            if (this.matchesDescription(slot.descripcion, rec)) {
+              matchedRecreo = rec;
+              break;
             }
           }
 
-          if (!options.some((o) => o.recreo === matchedRecreo)) {
-            options.push({
-              recreo: matchedRecreo,
-              descripcion: slot.descripcion,
-              bloqueado: isBlocked,
-              motivo: isBlocked ? motivo : undefined,
-            });
+          if (!matchedRecreo) {
+            const idx = sortedSlots.indexOf(slot);
+            if (idx >= 0 && idx < recreosPosibles.length) {
+              matchedRecreo = recreosPosibles[idx];
+            }
+          }
+
+          if (matchedRecreo) {
+            let isBlocked = generalRestrictions.some(
+              (r) => r.franjaHoraria?.id === slot.id || r.timeSlotId === slot.id,
+            );
+            let motivo: 'tutor' | 'tiempo' = 'tutor';
+
+            if (selectedDateStr === todayStr && slot.horaInicio) {
+              const [hours, minutes] = slot.horaInicio.split(':').map(Number);
+              const slotTime = new Date(now);
+              slotTime.setHours(hours, minutes, 0, 0);
+
+              const diffMs = slotTime.getTime() - now.getTime();
+              if (diffMs <= 3600000) {
+                isBlocked = true;
+                motivo = 'tiempo';
+              }
+            }
+
+            if (!options.some((o) => o.recreo === matchedRecreo)) {
+              options.push({
+                recreo: matchedRecreo,
+                descripcion: slot.descripcion,
+                bloqueado: isBlocked,
+                motivo: isBlocked ? motivo : undefined,
+              });
+            }
           }
         }
       }
@@ -189,7 +201,8 @@ export class CarritoPresenter {
 
     for (const alumnoId of itemsPorAlumno.keys()) {
       const slots = franjas[alumnoId] || [];
-      result[alumnoId] = this.calcularFechaMinimaParaAlumno(slots);
+      const allowWeekends = !!this.buffetCache.get(alumnoId)?.habilitarVentasAnticipadasNoLaborables;
+      result[alumnoId] = this.calcularFechaMinimaParaAlumno(slots, allowWeekends);
     }
     return result;
   });
@@ -217,7 +230,7 @@ export class CarritoPresenter {
         items,
         subtotal,
         seleccionado: seleccion[alumnoId] ?? true,
-        fecha: retiro?.fecha ?? fechas[alumnoId] ?? (this.fechaMinimaMap()[alumnoId] || this.fechaMinima),
+        fecha: retiro?.fecha ?? fechas[alumnoId] ?? (this.fechaMinimaMap()[alumnoId]),
         recreo: retiro?.recreo ?? recreos[alumnoId] ?? 'PRIMER_RECREO',
       });
     }
@@ -261,8 +274,9 @@ export class CarritoPresenter {
     const disponiblesMap = this.recreosDisponiblesMap();
     for (const g of this.grupos()) {
       if (g.seleccionado) {
-        const studentMin = this.fechaMinimaMap()[g.alumno.id] || this.fechaMinima;
-        if (g.fecha < studentMin || this.esFinDeSemana(g.fecha)) {
+        const studentMin = this.fechaMinimaMap()[g.alumno.id];
+        const allowWeekends = !!this.buffetCache.get(g.alumno.id)?.habilitarVentasAnticipadasNoLaborables;
+        if (g.fecha < studentMin || (this.esFinDeSemana(g.fecha) && !allowWeekends)) {
           return false;
         }
         const options = disponiblesMap[g.alumno.id] || [];
@@ -278,8 +292,9 @@ export class CarritoPresenter {
   readonly advertencia = computed<string | null>(() => {
     const conFechaInvalida = this.grupos().filter((g) => {
       if (!g.seleccionado || !g.fecha) return false;
-      const studentMin = this.fechaMinimaMap()[g.alumno.id] || this.fechaMinima;
-      return g.fecha < studentMin || this.esFinDeSemana(g.fecha);
+      const studentMin = this.fechaMinimaMap()[g.alumno.id];
+      const allowWeekends = !!this.buffetCache.get(g.alumno.id)?.habilitarVentasAnticipadasNoLaborables;
+      return g.fecha < studentMin || (this.esFinDeSemana(g.fecha) && !allowWeekends);
     });
 
     if (conFechaInvalida.length > 0) {
@@ -477,13 +492,14 @@ export class CarritoPresenter {
   }
 
   setFecha(alumnoId: string, fecha: string): void {
-    const minDate = this.fechaMinimaMap()[alumnoId] || this.fechaMinima;
+    const minDate = this.fechaMinimaMap()[alumnoId];
+    const allowWeekends = !!this.buffetCache.get(alumnoId)?.habilitarVentasAnticipadasNoLaborables;
     let adjustedFecha = fecha;
     if (fecha < minDate) {
       adjustedFecha = minDate;
     }
-    if (this.esFinDeSemana(adjustedFecha)) {
-      adjustedFecha = this.siguienteDiaHabilDesdeString(adjustedFecha);
+    if (this.esFinDeSemana(adjustedFecha) && !allowWeekends) {
+      adjustedFecha = this.siguienteDiaHabilDesdeString(adjustedFecha, allowWeekends);
     }
     this.fechasState.update((actual) => ({ ...actual, [alumnoId]: adjustedFecha }));
     setTimeout(() => {
@@ -659,7 +675,7 @@ export class CarritoPresenter {
     }
   }
 
-  private calcularFechaMinimaParaAlumno(slots: TimeSlot[]): string {
+  private calcularFechaMinimaParaAlumno(slots: TimeSlot[], allowWeekends: boolean = false): string {
     const now = new Date();
     let startFromTomorrow = false;
     
@@ -686,7 +702,7 @@ export class CarritoPresenter {
     
     while (true) {
       const day = candidate.getDay();
-      if (day === 0 || day === 6) {
+      if ((day === 0 || day === 6) && !allowWeekends) {
         candidate.setDate(candidate.getDate() + 1);
       } else {
         break;
@@ -706,7 +722,8 @@ export class CarritoPresenter {
 
     for (const [alumnoId, minDate] of Object.entries(minMap)) {
       const current = actualFechas[alumnoId];
-      if (!current || current < minDate || this.esFinDeSemana(current)) {
+      const allowWeekends = !!this.buffetCache.get(alumnoId)?.habilitarVentasAnticipadasNoLaborables;
+      if (!current || current < minDate || (this.esFinDeSemana(current) && !allowWeekends)) {
         actualFechas[alumnoId] = minDate;
         changed = true;
       }
@@ -724,12 +741,12 @@ export class CarritoPresenter {
     return day === 0 || day === 6;
   }
 
-  private siguienteDiaHabilDesdeString(fechaStr: string): string {
+  private siguienteDiaHabilDesdeString(fechaStr: string, allowWeekends: boolean = false): string {
     const dateObj = new Date(fechaStr + 'T00:00:00');
     while (true) {
       dateObj.setDate(dateObj.getDate() + 1);
       const day = dateObj.getDay();
-      if (day !== 0 && day !== 6) {
+      if (allowWeekends || (day !== 0 && day !== 6)) {
         break;
       }
     }

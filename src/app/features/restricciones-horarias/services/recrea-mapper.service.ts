@@ -8,6 +8,8 @@ export class RecreaMapperService {
     SEGUNDO_RECREO: 'ts-002',
     MEDIODIA: 'ts-003',
     FUERA_HORA: 'ts-004',
+    ONCE_AM: 'ELEVEN_AM',
+    DIECISEIS_PM: 'FOUR_PM',
   };
 
   private readonly mapeoTimeSlotARecrea: Record<string, Recreo> = {
@@ -15,6 +17,8 @@ export class RecreaMapperService {
     'ts-002': 'SEGUNDO_RECREO',
     'ts-003': 'MEDIODIA',
     'ts-004': 'FUERA_HORA',
+    'ELEVEN_AM': 'ONCE_AM',
+    'FOUR_PM': 'DIECISEIS_PM',
   };
 
   recreoATimeSlotId(recreo: Recreo): string {
