@@ -198,6 +198,21 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scrollbar styling for the list to make it look neat */
+.welcome__pedidos-list::-webkit-scrollbar {
+  width: 6px;
+}
+.welcome__pedidos-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.welcome__pedidos-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-borde-fuerte);
+  border-radius: 10px;
 }
 
 .pedido-item {

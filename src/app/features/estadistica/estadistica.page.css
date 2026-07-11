@@ -52,7 +52,6 @@
 
 @media (max-width: 960px) {
   .estadistica {
-  padding-top: 16px;
     padding-top: 84px;
   }
 
@@ -67,7 +66,6 @@
 
 @media (max-width: 640px) {
   .estadistica {
-  padding-top: 16px;
     padding: 76px 0 32px;
   }
 
@@ -88,9 +86,7 @@
 
 @media (max-width: 480px) {
   .estadistica {
-  padding-top: 16px;
-    padding-top: 70px;
-    padding-bottom: 24px;
+    padding: 70px 0 24px;
   }
 
   .estadistica__container {
