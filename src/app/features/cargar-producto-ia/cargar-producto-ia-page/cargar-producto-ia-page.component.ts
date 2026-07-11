@@ -12,6 +12,11 @@ import { CapturaCamara } from '../components/captura-camara/captura-camara';
 import { EscanerLoader } from '../components/escaner-loader/escaner-loader';
 import { ProductoIaForm } from '../components/producto-ia-form/producto-ia-form';
 import { DialogService } from '../../../shared/services/dialog.service';
+import {
+    ClasificacionSaludBackend,
+    RestriccionesNutricionalesService,
+} from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
+import { ordenarClasificacionesSalud } from '../../restricciones-nutricionales/models/restricciones-nutricionales.model';
 
 @Component({
     selector: 'app-ai-product-upload-page',
@@ -27,8 +32,10 @@ export class CargarProductoIaPageComponent implements OnInit {
     private usuarioService = inject(UsuarioService);
     private perfilService = inject(PerfilService);
     private dialogService = inject(DialogService);
+    private restriccionesNutricionalesService = inject(RestriccionesNutricionalesService);
 
     categories: Categoria[] = [];
+    healthClassifications: ClasificacionSaludBackend[] = [];
     buffetId = '';
 
     isLoading = false;
@@ -56,6 +63,15 @@ export class CargarProductoIaPageComponent implements OnInit {
                 console.error('Error fetching categories', err);
             }
         });
+
+        this.restriccionesNutricionalesService.getCatalogo()
+            .then((data) => {
+                this.healthClassifications = ordenarClasificacionesSalud(data);
+            })
+            .catch((err) => {
+                console.error('Error fetching health classifications', err);
+                this.healthClassifications = [];
+            });
     }
 
     handlePhoto(file: File) {

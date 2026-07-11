@@ -139,11 +139,11 @@
           <div class="product-info-block">
             <span class="product-item__name">{{ prod.nombre }}</span>
             <div class="product-meta-row">
-              <span class="product-item__stock" [class.product-item__stock--critical]="isLowStock(prod)">
-                Stock: {{ prod.stockActual }} un.
+              <span class="product-item__stock" [class.product-item__stock--critical]="hasStockAlert(prod)">
+                {{ formatStockLabel(prod) }}
               </span>
-              @if (isLowStock(prod)) {
-              <span class="badge-critical"><i class="fa-solid fa-triangle-exclamation"></i> Bajo Stock</span>
+              @if (stockBadgeLabel(prod); as stockBadge) {
+              <span class="badge-critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ stockBadge }}</span>
               }
             </div>
           </div>

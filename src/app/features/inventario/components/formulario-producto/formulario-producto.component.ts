@@ -4,6 +4,7 @@ import { Producto } from "../../models/producto.interface";
 import { Categoria } from "../../models/categoria.interface";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../../../environments/environment";
+import { ClasificacionSaludCatalogoItem } from "../../../restricciones-nutricionales/models/restricciones-nutricionales.model";
 
 export interface DatosFormularioProducto {
   nombre: string;
@@ -14,10 +15,7 @@ export interface DatosFormularioProducto {
   categoriaId: string | null;
   nuevaCategoriaNombre: string;
   requierePreparacion: boolean;
-  contiene_azucar: boolean;
-  contiene_mani: boolean;
-  contiene_lactosa: boolean;
-  contiene_tacc: boolean;
+  clasificacionesSaludIds: string[];
   urlImagen?: string | null;
 }
 
@@ -42,6 +40,7 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
   @Input() isSaving = false;
   @Input() buffetId: string | null = null;
   @Input() datosIniciales: DatosInicialesProducto | null = null;
+  @Input() healthClassifications: ClasificacionSaludCatalogoItem[] = [];
   @Output() formSubmit = new EventEmitter<DatosFormularioProducto>();
   @Output() formCancel = new EventEmitter<void>();
 
@@ -60,10 +59,7 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
     categoriaId: [null, Validators.required],
     nuevaCategoriaNombre: [""],
     requierePreparacion: [false],
-    contiene_azucar: [false],
-    contiene_mani: [false],
-    contiene_lactosa: [false],
-    contiene_tacc: [false],
+    clasificacionesSaludIds: [[] as string[]],
     urlImagen: [null],
   });
 
@@ -107,37 +103,34 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["product"] && this.product) {
+      const categoryId = this.getProductCategoryId(this.product);
+      const categoryName = this.getProductCategoryName(this.product);
+
       this.productForm.patchValue({
         nombre: this.product.nombre,
         descripcion: this.product.descripcion,
         precio: this.product.precio,
         peso: this.product.peso,
         stockActual: this.product.stockActual,
-        categoriaId: this.product.categoriaId || "NEW",
-        nuevaCategoriaNombre: this.product.categoriaId ? "" : (this.product.categoriaNombre || ""),
+        categoriaId: categoryId || "NEW",
+        nuevaCategoriaNombre: categoryId ? "" : categoryName,
         requierePreparacion: this.product.requierePreparacion,
-        contiene_azucar: this.product.clasificacionesSalud ? !this.product.clasificacionesSalud.some(c => c.descripcion === "Sin Azúcar") : false,
-        contiene_mani: false,
-        contiene_lactosa: this.product.clasificacionesSalud ? this.product.clasificacionesSalud.some(c => c.descripcion === "Contiene Lácteos") : false,
-        contiene_tacc: this.product.clasificacionesSalud ? !this.product.clasificacionesSalud.some(c => c.descripcion === "Sin TACC") : false,
+        clasificacionesSaludIds: this.product.clasificacionesSalud?.map(c => c.id) ?? [],
         urlImagen: this.product.urlImagen
       });
       this.imagePreview.set(this.product.urlImagen || null);
       
-      if (this.product.categoriaId) {
-        this.isBeverage.set(this.checkIfBeverage(this.product.categoriaId));
+      if (categoryId) {
+        this.isBeverage.set(this.checkIfBeverage(categoryId));
       } else {
-        this.isBeverage.set(this.checkIfBeverageName(this.product.categoriaNombre));
+        this.isBeverage.set(this.checkIfBeverageName(categoryName));
       }
     }
 
     if (changes["product"] && !this.product) {
       this.productForm.reset({
         requierePreparacion: false,
-        contiene_azucar: false,
-        contiene_mani: false,
-        contiene_lactosa: false,
-        contiene_tacc: false,
+        clasificacionesSaludIds: [],
       });
       this.imagePreview.set(null);
     }
@@ -155,10 +148,7 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
       peso: datos.peso ?? null,
       stockActual: datos.stockActual ?? null,
       requierePreparacion: false,
-      contiene_azucar: false,
-      contiene_mani: false,
-      contiene_lactosa: false,
-      contiene_tacc: false,
+      clasificacionesSaludIds: [],
       urlImagen: null,
     });
     this.imagePreview.set(null);
@@ -201,10 +191,44 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
 
   submitForm(): void {
     if (this.productForm.valid) {
-      this.formSubmit.emit(this.productForm.value);
+      this.formSubmit.emit({
+        ...this.productForm.value,
+        clasificacionesSaludIds: this.getSelectedHealthClassificationIds(),
+      } as DatosFormularioProducto);
     } else {
       this.productForm.markAllAsTouched();
     }
+  }
+
+  isHealthClassificationSelected(id: string): boolean {
+    return this.getSelectedHealthClassificationIds().includes(id);
+  }
+
+  toggleHealthClassification(id: string, event: Event): void {
+    const checked = (event.target as HTMLInputElement | null)?.checked ?? false;
+    const selected = new Set(this.getSelectedHealthClassificationIds());
+
+    if (checked) {
+      selected.add(id);
+    } else {
+      selected.delete(id);
+    }
+
+    this.productForm.patchValue({ clasificacionesSaludIds: [...selected] });
+    this.productForm.get("clasificacionesSaludIds")?.markAsDirty();
+  }
+
+  private getSelectedHealthClassificationIds(): string[] {
+    const value = this.productForm.get("clasificacionesSaludIds")?.value;
+    return Array.isArray(value) ? value : [];
+  }
+
+  private getProductCategoryId(product: Producto): string | null {
+    return product.categoriaId ?? product.categoria?.id ?? null;
+  }
+
+  private getProductCategoryName(product: Producto): string {
+    return product.categoriaNombre ?? product.categoria?.descripcion ?? "";
   }
 
   hasError(field: string): boolean {

@@ -9,6 +9,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { CurrencyPipe } from '@angular/common';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 
 export interface RecommendationOption {
   proveedorId: string;
@@ -34,6 +35,13 @@ export interface GroupedRecommendation {
   mejorPrecioUnitario: number;
 }
 
+interface ProductoConInventario {
+  stockActual?: number | null;
+  stockDisponible?: number | null;
+  stockMinimo?: number | null;
+  estadoInventario?: string | null;
+}
+
 @Component({
   selector: 'app-purchase-recommendations',
   standalone: true,
@@ -48,6 +56,7 @@ export class PurchaseRecommendationsPage implements OnInit {
   private readonly productService = inject(ProductoService);
   private readonly toastService = inject(ToastService);
   private readonly usuarioService = inject(UsuarioService);
+  private readonly perfilService = inject(PerfilService);
 
   readonly nombreKiosquero = this.usuarioService.nombreNavbar;
 
@@ -255,7 +264,15 @@ export class PurchaseRecommendationsPage implements OnInit {
   }
 
   loadProducts(): void {
-    this.productService.getAll().subscribe({
+    const buffetId = this.perfilService.obtenerBuffetId();
+    if (!buffetId) {
+      this.products.set([]);
+      this.toastService.mostrar('No se pudo identificar el buffet para cargar el stock', 'error');
+      this.isLoading.set(false);
+      return;
+    }
+
+    this.productService.getAllByBuffetId(buffetId).subscribe({
       next: (data) => {
         this.products.set(data);
         this.isLoading.set(false);
@@ -285,7 +302,41 @@ export class PurchaseRecommendationsPage implements OnInit {
   }
 
   isLowStock(product: Producto): boolean {
-    return product.stockActual <= 5;
+    const estado = this.getInventoryStatus(product);
+    if (estado === 'BAJO_STOCK') return true;
+
+    const stock = this.getComparableStock(product);
+    return stock !== null && stock <= 5;
+  }
+
+  hasStockAlert(product: Producto): boolean {
+    return this.isOutOfStock(product) || this.isLowStock(product);
+  }
+
+  stockBadgeLabel(product: Producto): string | null {
+    if (this.isOutOfStock(product)) return 'Sin stock';
+    if (this.isLowStock(product)) return 'Bajo stock';
+    return null;
+  }
+
+  formatStockLabel(product: Producto): string {
+    if (this.isOutOfStock(product)) return 'Sin stock';
+
+    const disponible = this.getStockDisponible(product);
+    if (disponible !== null) {
+      const minimo = this.getStockMinimo(product);
+      if (this.isLowStock(product) && minimo !== null) {
+        return `Disponible: ${this.formatStockNumber(disponible)} un. / minimo ${this.formatStockNumber(minimo)}`;
+      }
+      return `Disponible: ${this.formatStockNumber(disponible)} un.`;
+    }
+
+    const actual = this.getStockActual(product);
+    if (actual !== null) {
+      return `Stock: ${this.formatStockNumber(actual)} un.`;
+    }
+
+    return 'Stock no configurado';
   }
 
   isProductMapped(productId: string): boolean {
@@ -579,5 +630,51 @@ export class PurchaseRecommendationsPage implements OnInit {
 
   volver(): void {
     this.router.navigateByUrl('/kiosquero/proveedores');
+  }
+
+  private isOutOfStock(product: Producto): boolean {
+    const estado = this.getInventoryStatus(product);
+    if (estado === 'SIN_STOCK' || estado === 'AGOTADO') return true;
+
+    const stock = this.getComparableStock(product);
+    return stock === 0;
+  }
+
+  private getComparableStock(product: Producto): number | null {
+    return this.getStockDisponible(product) ?? this.getStockActual(product);
+  }
+
+  private getStockActual(product: Producto): number | null {
+    return this.toNullableNumber((product as unknown as ProductoConInventario).stockActual);
+  }
+
+  private getStockDisponible(product: Producto): number | null {
+    return this.toNullableNumber((product as unknown as ProductoConInventario).stockDisponible);
+  }
+
+  private getStockMinimo(product: Producto): number | null {
+    return this.toNullableNumber((product as unknown as ProductoConInventario).stockMinimo);
+  }
+
+  private getInventoryStatus(product: Producto): string | null {
+    const value = (product as unknown as ProductoConInventario).estadoInventario;
+    if (typeof value !== 'string') return null;
+    const normalized = value.trim().toUpperCase();
+    return normalized.length > 0 ? normalized : null;
+  }
+
+  private toNullableNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (typeof value === 'string' && value.trim().length > 0) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+    return null;
+  }
+
+  private formatStockNumber(value: number): string {
+    return new Intl.NumberFormat('es-AR', {
+      maximumFractionDigits: 2,
+    }).format(value);
   }
 }

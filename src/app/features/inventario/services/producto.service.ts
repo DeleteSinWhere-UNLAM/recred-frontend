@@ -70,8 +70,13 @@ export class ProductoService {
     );
   }
 
-  getById(id: string): Observable<Producto> {
-    return this.http.get<Producto>(`${this.baseUrl}/${id}`);
+  getById(id: string, buffetId?: string): Observable<Producto> {
+    const url = `${this.baseUrl}/${id}`;
+    if (buffetId) {
+      return this.http.get<Producto>(url, { params: { buffetId } });
+    }
+
+    return this.http.get<Producto>(url);
   }
 
   create(payload: SolicitudCrearProducto): Observable<Producto> {

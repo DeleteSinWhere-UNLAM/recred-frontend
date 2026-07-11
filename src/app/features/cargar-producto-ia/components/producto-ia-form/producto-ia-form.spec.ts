@@ -10,6 +10,8 @@ import { ProductoIaForm } from './producto-ia-form';
 const ID_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
 const ID_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
 const ID_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+const ID_TIENE_MANI = 'mani-id';
+const ID_CONTIENE_PESCADO = 'pescado-id';
 
 describe('ProductoIaForm', () => {
   const BUFFET_ID = 'buffet-test-123';
@@ -26,6 +28,13 @@ describe('ProductoIaForm', () => {
     component = fixture.componentInstance;
     component.buffetId = BUFFET_ID;
     component.categories = [CategoriaMother.crear()];
+    component.healthClassifications = [
+      { id: ID_SIN_TACC, descripcion: 'Sin TACC' },
+      { id: ID_SIN_AZUCAR, descripcion: 'Sin Azúcar' },
+      { id: ID_CONTIENE_LACTEOS, descripcion: 'Contiene Lácteos' },
+      { id: ID_TIENE_MANI, descripcion: 'Tiene Maní' },
+      { id: ID_CONTIENE_PESCADO, descripcion: 'Contiene Pescado' },
+    ];
     fixture.detectChanges();
   });
 
@@ -45,6 +54,7 @@ describe('ProductoIaForm', () => {
       expect(component.productForm.value.peso).toBeCloseTo(0.12, 5);
       expect(component.productForm.value.nombre).toBe('Alfajor de chocolate');
       expect(component.productForm.value.contiene_azucar).toBeTrue();
+      expect(component.productForm.value.clasificacionesSaludIds).toEqual([ID_CONTIENE_LACTEOS]);
     });
 
     it('dado un peso en kilogramos, cuando llega prefillData, deberia mantenerlo tal cual', () => {
@@ -61,6 +71,31 @@ describe('ProductoIaForm', () => {
       whenPrefill(data);
 
       expect(component.productForm.value.peso).toBe(0);
+    });
+
+    it('dado un producto precargado, cuando prefillData vuelve a null, deberia resetear el formulario', () => {
+      const data = RespuestaProductoIaMother.crearConAlergenos({ url_imagen: 'https://img.test/prod.png' });
+      whenPrefill(data);
+      component.productForm.patchValue({
+        precio: 1500,
+        stockActual: 8,
+        categoriaId: 'cat-1',
+      });
+
+      whenPrefillSeLimpia(data);
+
+      expect(component.productForm.value).toEqual(jasmine.objectContaining({
+        nombre: '',
+        descripcion: '',
+        peso: 0,
+        precio: 0,
+        stockActual: 0,
+        categoriaId: null,
+        clasificacionesSaludIds: [],
+        urlImagen: '',
+      }));
+      expect(component.productForm.pristine).toBeTrue();
+      expect(component.productForm.untouched).toBeTrue();
     });
   });
 
@@ -108,19 +143,29 @@ describe('ProductoIaForm', () => {
       expect(emitido.nuevaCategoriaNombre).toBe('');
     });
 
-    it('dado un producto sin TACC y sin azucar, cuando submit, deberia mandar las clasificaciones sin-TACC y sin-azucar', () => {
+    it('dado un producto con clasificaciones seleccionadas, cuando submit, deberia mandarlas en el request', () => {
       spyOn(component.save, 'emit');
       llenarFormularioValido('cat-1');
+      component.productForm.patchValue({
+        clasificacionesSaludIds: [ID_SIN_TACC, ID_SIN_AZUCAR, ID_CONTIENE_PESCADO],
+      });
 
       component.submitForm();
 
-      expect(ultimoEmit().clasificacionesSaludIds).toEqual([ID_SIN_TACC, ID_SIN_AZUCAR]);
+      expect(ultimoEmit().clasificacionesSaludIds).toEqual([
+        ID_SIN_TACC,
+        ID_SIN_AZUCAR,
+        ID_CONTIENE_PESCADO,
+      ]);
     });
 
-    it('dado un producto con lactosa, cuando submit, deberia incluir la clasificacion contiene-lacteos', () => {
+    it('dado que marco una clasificacion manualmente, cuando submit, deberia incluirla', () => {
       spyOn(component.save, 'emit');
       llenarFormularioValido('cat-1');
-      component.productForm.patchValue({ contiene_lactosa: true });
+      component.toggleHealthClassification(
+        ID_CONTIENE_LACTEOS,
+        { target: { checked: true } } as unknown as Event,
+      );
 
       component.submitForm();
 
@@ -164,6 +209,13 @@ describe('ProductoIaForm', () => {
     component.prefillData = data;
     component.ngOnChanges({
       prefillData: new SimpleChange(null, data, true),
+    });
+  }
+
+  function whenPrefillSeLimpia(dataAnterior: RespuestaProductoIa): void {
+    component.prefillData = null;
+    component.ngOnChanges({
+      prefillData: new SimpleChange(dataAnterior, null, false),
     });
   }
 

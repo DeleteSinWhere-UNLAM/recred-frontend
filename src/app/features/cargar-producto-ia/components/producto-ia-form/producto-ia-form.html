@@ -144,29 +144,17 @@
         <span class="ai-product-form__toggle-switch"></span>
       </label>
 
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene azucar</span>
-        <input type="checkbox" formControlName="contiene_azucar">
-        <span class="ai-product-form__toggle-switch"></span>
-      </label>
-
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene mani</span>
-        <input type="checkbox" formControlName="contiene_mani">
-        <span class="ai-product-form__toggle-switch"></span>
-      </label>
-
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene lactosa</span>
-        <input type="checkbox" formControlName="contiene_lactosa">
-        <span class="ai-product-form__toggle-switch"></span>
-      </label>
-
-      <label class="ai-product-form__toggle">
-        <span class="ai-product-form__toggle-label">Contiene TACC</span>
-        <input type="checkbox" formControlName="contiene_tacc">
-        <span class="ai-product-form__toggle-switch"></span>
-      </label>
+      @for (clasificacion of healthClassifications; track clasificacion.id) {
+        <label class="ai-product-form__toggle">
+          <span class="ai-product-form__toggle-label">{{ clasificacion.descripcion }}</span>
+          <input
+            type="checkbox"
+            [checked]="isHealthClassificationSelected(clasificacion.id)"
+            (change)="toggleHealthClassification(clasificacion.id, $event)"
+          >
+          <span class="ai-product-form__toggle-switch"></span>
+        </label>
+      }
     </div>
   </section>
 

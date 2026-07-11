@@ -34,6 +34,12 @@ export interface DescriptorRestriccion {
   palabrasClave: readonly string[];
 }
 
+export interface ClasificacionSaludCatalogoItem {
+  readonly id: string;
+  readonly descripcion: string;
+  readonly activo?: boolean;
+}
+
 export const RESTRICCIONES_CATALOGO: readonly DescriptorRestriccion[] = [
   {
     clave: 'sinTacc',
@@ -137,4 +143,46 @@ export function normalizarDescripcion(texto: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '');
+}
+
+export function obtenerClasificacionPorClave<T extends ClasificacionSaludCatalogoItem>(
+  catalogo: readonly T[],
+  clave: ClaveRestriccion,
+): T | undefined {
+  const descriptor = RESTRICCIONES_CATALOGO.find((item) => item.clave === clave);
+  if (!descriptor) return undefined;
+
+  return catalogo.find((clasificacion) => {
+    if (clasificacion.activo === false) return false;
+    const descripcion = normalizarDescripcion(clasificacion.descripcion ?? '');
+    return descriptor.palabrasClave.some((palabra) => descripcion.includes(palabra));
+  });
+}
+
+export function obtenerIdClasificacionPorClave(
+  catalogo: readonly ClasificacionSaludCatalogoItem[],
+  clave: ClaveRestriccion,
+): string | null {
+  return obtenerClasificacionPorClave(catalogo, clave)?.id ?? null;
+}
+
+export function ordenarClasificacionesSalud<T extends ClasificacionSaludCatalogoItem>(
+  catalogo: readonly T[],
+): T[] {
+  const activas = catalogo.filter((clasificacion) => clasificacion.activo !== false);
+  const agregadas = new Set<string>();
+  const ordenadas: T[] = [];
+
+  for (const descriptor of RESTRICCIONES_CATALOGO) {
+    const match = obtenerClasificacionPorClave(activas, descriptor.clave);
+    if (match && !agregadas.has(match.id)) {
+      ordenadas.push(match);
+      agregadas.add(match.id);
+    }
+  }
+
+  return [
+    ...ordenadas,
+    ...activas.filter((clasificacion) => !agregadas.has(clasificacion.id)),
+  ];
 }
