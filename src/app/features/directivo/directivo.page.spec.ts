@@ -7,7 +7,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { DirectivoDashboardComponent } from './components/directivo-dashboard/directivo-dashboard.component';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
-class NavbarStubComponent { }
+class NavbarStubComponent {}
 
 @Component({ selector: 'app-directivo-dashboard', template: '', standalone: true })
 class DashboardStubComponent {
@@ -23,12 +23,11 @@ describe('DirectivoPage', () => {
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-
     presenterSpy = jasmine.createSpyObj('DirectivoPresenter', ['inicializar'], {
       mensajeBienvenida: signal('Cargando...'),
       schoolOverview: signal(null),
       loading: signal(false),
-      error: signal(null)
+      error: signal(null),
     });
     authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
 
@@ -38,15 +37,15 @@ describe('DirectivoPage', () => {
       .overrideComponent(DirectivoPage, {
         remove: {
           imports: [NavbarComponent, DirectivoDashboardComponent],
-          providers: [DirectivoPresenter]
+          providers: [DirectivoPresenter],
         },
         add: {
           imports: [NavbarStubComponent, DashboardStubComponent],
           providers: [
             { provide: DirectivoPresenter, useValue: presenterSpy },
-            { provide: AuthService, useValue: authServiceSpy }
-          ]
-        }
+            { provide: AuthService, useValue: authServiceSpy },
+          ],
+        },
       })
       .compileComponents();
 
@@ -56,9 +55,16 @@ describe('DirectivoPage', () => {
   });
 
   it('dado el componente montado, cuando corre ngOnInit, deberia inicializar el presenter', () => {
-    component.ngOnInit();
-    expect(presenterSpy.inicializar).toHaveBeenCalled();
+    whenLlamoNgOnInit();
+
+    thenSeInicializoElPresenter();
   });
 
+  function whenLlamoNgOnInit(): void {
+    component.ngOnInit();
+  }
 
+  function thenSeInicializoElPresenter(): void {
+    expect(presenterSpy.inicializar).toHaveBeenCalled();
+  }
 });

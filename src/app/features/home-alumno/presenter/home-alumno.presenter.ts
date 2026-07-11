@@ -214,7 +214,9 @@ export class HomeAlumnoPresenter {
 
   verPedido(): void {
     if (this.tienePedidoEnCurso()) {
-      this.router.navigateByUrl('/compra');
+      this.router.navigate(['/movimientos'], {
+        queryParams: { estado: 'PENDIENTE,EN_PREPARACION,LISTO' },
+      });
     } else {
       this.irAlBuffet();
     }

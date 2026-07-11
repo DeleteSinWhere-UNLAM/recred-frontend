@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { CrearVendedorRequest } from '../../models/directivo.model';
+import { CrearVendedorRequest, CrearVendedorResponse } from '../../models/directivo.model';
 import { DirectivoService } from '../../services/directivo.service';
 import { AsignarVendedorPresenter } from './asignar-vendedor.presenter';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -21,7 +21,19 @@ class CrearVendedorRequestMother {
   }
 }
 
+class CrearVendedorResponseMother {
+  static crear(override: Partial<CrearVendedorResponse> = {}): CrearVendedorResponse {
+    return {
+      kiosqueroId: 'k1',
+      usuarioId: 'u1',
+      ...override,
+    };
+  }
+}
+
 describe('AsignarVendedorPresenter', () => {
+  const BUFFET_ID = 'buffet-1';
+
   let presenter: AsignarVendedorPresenter;
   let directivoService: jasmine.SpyObj<DirectivoService>;
   let router: jasmine.SpyObj<Router>;
@@ -35,7 +47,7 @@ describe('AsignarVendedorPresenter', () => {
         AsignarVendedorPresenter,
         { provide: DirectivoService, useValue: directivoService },
         { provide: Router, useValue: router },
-        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['mostrar']) }
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['mostrar']) },
       ],
     });
 
@@ -44,92 +56,136 @@ describe('AsignarVendedorPresenter', () => {
 
   describe('estado inicial', () => {
     it('dado el presenter recien creado, deberia estar sin loading y sin error', () => {
-      expect(presenter.loading()).toBeFalse();
-      expect(presenter.error()).toBeNull();
+      thenLoadingEs(false);
+      thenErrorEs(null);
     });
   });
 
   describe('asignar', () => {
-    it('dado que el registro es exitoso, deberia navegar a /directivo y bajar loading', async () => {
-      directivoService.registrarVendedor.and.resolveTo({ kiosqueroId: 'k1', usuarioId: 'u1' });
+    it('dado que el registro es exitoso, cuando asigno, deberia navegar a /directivo y bajar loading', async () => {
+      givenElRegistroEsExitoso();
 
-      await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
+      await whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
 
-      expect(directivoService.registrarVendedor).toHaveBeenCalledWith('buffet-1', CrearVendedorRequestMother.crear());
-      expect(router.navigate).toHaveBeenCalledWith(['/directivo']);
-      expect(presenter.loading()).toBeFalse();
-      expect(presenter.error()).toBeNull();
+      thenSeLlamoRegistrarVendedorCon(BUFFET_ID, CrearVendedorRequestMother.crear());
+      thenSeNavegoA(['/directivo']);
+      thenLoadingEs(false);
+      thenErrorEs(null);
     });
 
-    it('dado HttpErrorResponse 409 con code USERNAME_EXISTS, deberia setear mensaje de usuario ya registrado', async () => {
-      directivoService.registrarVendedor.and.rejectWith(
-        new HttpErrorResponse({ status: 409, error: { code: 'USERNAME_EXISTS' } }),
+    it('dado un 409 con code USERNAME_EXISTS, cuando asigno, deberia mostrar mensaje de correo ya registrado', async () => {
+      givenElRegistroFallaCon(new HttpErrorResponse({ status: 409, error: { code: 'USERNAME_EXISTS' } }));
+
+      await whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
+
+      thenErrorEs(
+        'Error: El correo electrónico ya está registrado o es inválido. Por favor, intenta de nuevo.',
       );
-
-      await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
-
-      expect(presenter.error()).toBe('Error: El correo electrónico ya está registrado o es inválido. Por favor, intenta de nuevo.');
-      expect(router.navigate).not.toHaveBeenCalled();
+      thenNoSeNavego();
     });
 
-    it('dado HttpErrorResponse 409 sin code, deberia setear mensaje generico de asignar', async () => {
-      directivoService.registrarVendedor.and.rejectWith(new HttpErrorResponse({ status: 409 }));
+    it('dado un 409 sin code, cuando asigno, deberia mostrar mensaje generico de asignar', async () => {
+      givenElRegistroFallaCon(new HttpErrorResponse({ status: 409 }));
 
-      await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
+      await whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
 
-      expect(presenter.error()).toBe('Ocurrió un error al asignar el vendedor.');
+      thenErrorEs('Ocurrió un error al asignar el vendedor.');
     });
 
-    it('dado HttpErrorResponse con otro status, deberia setear mensaje generico', async () => {
-      directivoService.registrarVendedor.and.rejectWith(new HttpErrorResponse({ status: 500 }));
+    it('dado un HttpErrorResponse con otro status, cuando asigno, deberia mostrar mensaje generico', async () => {
+      givenElRegistroFallaCon(new HttpErrorResponse({ status: 500 }));
 
-      await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
+      await whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
 
-      expect(presenter.error()).toBe('Ocurrió un error al asignar el vendedor.');
+      thenErrorEs('Ocurrió un error al asignar el vendedor.');
     });
 
-    it('dado un error inesperado (no HttpErrorResponse), deberia setear "Error inesperado"', async () => {
-      directivoService.registrarVendedor.and.rejectWith(new Error('boom'));
+    it('dado un error inesperado (no HttpErrorResponse), cuando asigno, deberia mostrar "Error inesperado"', async () => {
+      givenElRegistroFallaCon(new Error('boom'));
 
-      await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
+      await whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
 
-      expect(presenter.error()).toBe('Error inesperado.');
-      expect(presenter.loading()).toBeFalse();
+      thenErrorEs('Error inesperado.');
+      thenLoadingEs(false);
     });
 
     it('cuando arranca la asignacion, deberia setear loading en true antes de resolver', async () => {
-      let resolver: (() => void) | null = null;
-      directivoService.registrarVendedor.and.returnValue(
-        new Promise((res) => {
-          resolver = () => res({ kiosqueroId: 'k', usuarioId: 'u' } as never);
-        }),
-      );
+      const [pendiente, resolver] = givenElRegistroQuedaPendiente();
 
-      const promesa = presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
-      expect(presenter.loading()).toBeTrue();
+      const promesa = whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
+      thenLoadingEs(true);
 
-      resolver!();
+      resolver(CrearVendedorResponseMother.crear());
+      await pendiente;
       await promesa;
-      expect(presenter.loading()).toBeFalse();
+      thenLoadingEs(false);
     });
 
-    it('cuando reintento despues de un error, deberia limpiar el error previo', async () => {
-      directivoService.registrarVendedor.and.rejectWith(new Error('boom'));
-      await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
-      expect(presenter.error()).toBe('Error inesperado.');
+    it('dado un error previo, cuando reintento asignar exitosamente, deberia limpiar el error', async () => {
+      givenElRegistroFallaCon(new Error('boom'));
+      await whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
+      thenErrorEs('Error inesperado.');
+      givenElRegistroEsExitoso();
 
-      directivoService.registrarVendedor.and.resolveTo({ kiosqueroId: 'k', usuarioId: 'u' });
-      await presenter.asignar('buffet-1', CrearVendedorRequestMother.crear());
+      await whenAsigno(BUFFET_ID, CrearVendedorRequestMother.crear());
 
-      expect(presenter.error()).toBeNull();
+      thenErrorEs(null);
     });
   });
 
   describe('cancelar', () => {
-    it('deberia navegar al dashboard directivo', () => {
-      presenter.cancelar();
+    it('cuando cancelo, deberia navegar al dashboard directivo', () => {
+      whenCancelo();
 
-      expect(router.navigate).toHaveBeenCalledWith(['/directivo']);
+      thenSeNavegoA(['/directivo']);
     });
   });
+
+  function givenElRegistroEsExitoso(): void {
+    directivoService.registrarVendedor.and.resolveTo(CrearVendedorResponseMother.crear());
+  }
+
+  function givenElRegistroFallaCon(err: unknown): void {
+    directivoService.registrarVendedor.and.rejectWith(err);
+  }
+
+  function givenElRegistroQuedaPendiente(): [
+    Promise<CrearVendedorResponse>,
+    (v: CrearVendedorResponse) => void,
+  ] {
+    let resolver!: (v: CrearVendedorResponse) => void;
+    const pendiente = new Promise<CrearVendedorResponse>((resolve) => {
+      resolver = resolve;
+    });
+    directivoService.registrarVendedor.and.returnValue(pendiente);
+    return [pendiente, resolver];
+  }
+
+  function whenAsigno(buffetId: string, payload: CrearVendedorRequest): Promise<void> {
+    return presenter.asignar(buffetId, payload);
+  }
+
+  function whenCancelo(): void {
+    presenter.cancelar();
+  }
+
+  function thenLoadingEs(esperado: boolean): void {
+    expect(presenter.loading()).toBe(esperado);
+  }
+
+  function thenErrorEs(esperado: string | null): void {
+    expect(presenter.error()).toBe(esperado);
+  }
+
+  function thenSeLlamoRegistrarVendedorCon(buffetId: string, payload: CrearVendedorRequest): void {
+    expect(directivoService.registrarVendedor).toHaveBeenCalledWith(buffetId, payload);
+  }
+
+  function thenSeNavegoA(ruta: string[]): void {
+    expect(router.navigate).toHaveBeenCalledWith(ruta);
+  }
+
+  function thenNoSeNavego(): void {
+    expect(router.navigate).not.toHaveBeenCalled();
+  }
 });
