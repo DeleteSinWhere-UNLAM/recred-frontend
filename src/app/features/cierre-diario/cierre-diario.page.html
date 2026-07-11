@@ -743,8 +743,8 @@
           <button
             type="button"
             class="daily-close__secondary"
-            [disabled]="loadingHistory() || !buffetId()"
-            (click)="loadCloseHistory()"
+            [disabled]="historySearchDisabled()"
+            (click)="searchCloseHistory()"
           >
             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             Buscar

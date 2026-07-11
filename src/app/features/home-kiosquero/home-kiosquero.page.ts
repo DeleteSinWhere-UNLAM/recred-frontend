@@ -21,6 +21,11 @@ import { Categoria } from '../inventario/models/categoria.interface';
 import { SolicitudCrearProducto } from '../inventario/models/requests/crear-producto-request.interface';
 import { FormularioProductoComponent, DatosFormularioProducto } from '../inventario/components/formulario-producto/formulario-producto.component';
 import { ModalVerificacionCodigoComponent } from './components/modal-verificacion-codigo/modal-verificacion-codigo.component';
+import {
+  ClasificacionSaludBackend,
+  RestriccionesNutricionalesService,
+} from '../restricciones-nutricionales/services/restricciones-nutricionales.service';
+import { ordenarClasificacionesSalud } from '../restricciones-nutricionales/models/restricciones-nutricionales.model';
 
 const IMAGEN_FALLBACK =
   'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
@@ -43,6 +48,7 @@ export class HomeKiosqueroPage implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly perfilService = inject(PerfilService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly restriccionesNutricionalesService = inject(RestriccionesNutricionalesService);
   protected readonly presenter = inject(HomeKiosqueroPresenter);
 
   protected readonly IMAGEN_FALLBACK = IMAGEN_FALLBACK;
@@ -55,6 +61,7 @@ export class HomeKiosqueroPage implements OnInit {
   isVerificationModalVisible = false;
   bulkProductsData: RespuestaProductoMasivo[] = [];
   categories: Categoria[] = [];
+  healthClassifications: ClasificacionSaludBackend[] = [];
 
   ngOnInit(): void {
     this.usuarioService.setHomeUrl('/kiosquero');
@@ -66,6 +73,7 @@ export class HomeKiosqueroPage implements OnInit {
 
     if (!licencia || licencia === 'ACTIVA' || licencia === 'EN_GRACIA') {
       this.loadCategories();
+      this.loadHealthClassifications();
     }
   }
 
@@ -78,6 +86,18 @@ export class HomeKiosqueroPage implements OnInit {
         this.toastService.mostrar('Error al cargar las categorías', 'error');
       },
     });
+  }
+
+  loadHealthClassifications(): void {
+    this.restriccionesNutricionalesService
+      .getCatalogo()
+      .then((catalogo) => {
+        this.healthClassifications = ordenarClasificacionesSalud(catalogo);
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.healthClassifications = [];
+      });
   }
 
   onImagenError(event: Event): void {
@@ -262,18 +282,6 @@ export class HomeKiosqueroPage implements OnInit {
 
     this.isSavingManualProduct = true;
     
-    const CLASIFICACION_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
-    const CLASIFICACION_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
-    const CLASIFICACION_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
-
-    const buildHealthClassificationIds = (formData: DatosFormularioProducto): string[] => {
-      const ids: string[] = [];
-      if (!formData.contiene_tacc) ids.push(CLASIFICACION_SIN_TACC);
-      if (!formData.contiene_azucar) ids.push(CLASIFICACION_SIN_AZUCAR);
-      if (formData.contiene_lactosa) ids.push(CLASIFICACION_CONTIENE_LACTEOS);
-      return ids;
-    };
-
     const isNewCategory = data.categoriaId === "NEW";
     const payload: SolicitudCrearProducto = {
       nombre: data.nombre,
@@ -285,7 +293,7 @@ export class HomeKiosqueroPage implements OnInit {
       nuevaCategoriaNombre: isNewCategory ? data.nuevaCategoriaNombre : "",
       buffetId: currentBuffetId,
       stockActual: data.stockActual,
-      clasificacionesSaludIds: buildHealthClassificationIds(data),
+      clasificacionesSaludIds: data.clasificacionesSaludIds ?? [],
       tiposIds: null,
       urlImagen: data.urlImagen
     };

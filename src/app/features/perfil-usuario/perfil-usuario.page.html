@@ -195,18 +195,18 @@
           }
         </div>
 
-        @if (proximaEjecucion()) {
+        @if (proximaEjecucionFormateada()) {
         <div class="perfil-usuario__payout-info perfil-usuario__payout-info--limpio perfil-usuario__campo--full">
           <div class="perfil-usuario__payout-info-item payout-destacado">
             <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
-            <strong class="info-value">Próximo cobro programado para el {{ proximaEjecucion() }}</strong>
+            <strong class="info-value">Próximo cobro programado para el {{ proximaEjecucionFormateada() }}</strong>
           </div>
-          @if (ultimaEjecucion()) {
+          @if (ultimaEjecucionFormateada()) {
           <div class="perfil-usuario__payout-info-item">
             <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
             <div>
               <span class="info-label">Último pago realizado:</span>
-              <strong class="info-value">{{ ultimaEjecucion() }}</strong>
+              <strong class="info-value">{{ ultimaEjecucionFormateada() }}</strong>
             </div>
           </div>
           }
@@ -417,4 +417,3 @@
   </div>
 </div>
 }
-

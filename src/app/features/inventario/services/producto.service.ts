@@ -71,11 +71,12 @@ export class ProductoService {
   }
 
   getById(id: string, buffetId?: string | null): Observable<Producto> {
-    const params: Record<string, string> = {};
+    const url = `${this.baseUrl}/${id}`;
     if (buffetId) {
-      params['buffetId'] = buffetId;
+      return this.http.get<Producto>(url, { params: { buffetId } });
     }
-    return this.http.get<Producto>(`${this.baseUrl}/${id}`, { params });
+
+    return this.http.get<Producto>(url);
   }
 
   create(payload: SolicitudCrearProducto): Observable<Producto> {

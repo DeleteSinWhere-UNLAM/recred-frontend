@@ -76,6 +76,12 @@ export class PerfilUsuarioPage implements OnInit {
   protected readonly ultimaEjecucion = signal<string | null>(null);
   protected readonly cvuGuardado = signal<string | null>(null);
   protected readonly cuitGuardado = signal<string | null>(null);
+  protected readonly proximaEjecucionFormateada = computed(() =>
+    this.formatearFechaPayout(this.proximaEjecucion()),
+  );
+  protected readonly ultimaEjecucionFormateada = computed(() =>
+    this.formatearFechaPayout(this.ultimaEjecucion()),
+  );
 
   protected readonly esKiosquero = computed(() => {
     const role = this.usuario()?.role || this.perfil()?.role;
@@ -457,9 +463,15 @@ export class PerfilUsuarioPage implements OnInit {
   }
 
   private formatearFechaVencimiento(fecha: string | null | undefined): string | null {
-    if (!fecha?.trim()) return null;
+    const valor = fecha?.trim();
+    if (!valor) return null;
 
-    const date = new Date(fecha);
+    const fechaIso = /^(\d{4})-(\d{2})-(\d{2})/.exec(valor);
+    if (fechaIso) {
+      return `${fechaIso[3]}/${fechaIso[2]}/${fechaIso[1]}`;
+    }
+
+    const date = new Date(valor);
     if (Number.isNaN(date.getTime())) return null;
 
     const day = String(date.getDate()).padStart(2, '0');
@@ -467,6 +479,13 @@ export class PerfilUsuarioPage implements OnInit {
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
+  }
+
+  private formatearFechaPayout(fecha: string | null | undefined): string | null {
+    const valor = fecha?.trim();
+    if (!valor) return null;
+
+    return this.formatearFechaVencimiento(valor) ?? valor;
   }
 
   private fechaVencimientoLicenciaColegio(): string | null | undefined {
@@ -580,7 +599,7 @@ export class PerfilUsuarioPage implements OnInit {
 
       let mensajeExito = 'Vinculación exitosa y configuración guardada correctamente.';
       if (proxima) {
-        mensajeExito += ` Próximo pago programado para: ${proxima}`;
+        mensajeExito += ` Próximo pago programado para: ${this.formatearFechaPayout(proxima)}`;
       }
 
       this.toastService.mostrar(mensajeExito, 'success');
@@ -657,4 +676,3 @@ export class PerfilUsuarioPage implements OnInit {
     return control.invalid && (control.dirty || control.touched);
   }
 }
-

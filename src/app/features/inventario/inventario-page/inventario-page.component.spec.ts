@@ -16,11 +16,11 @@ import { Producto } from '../models/producto.interface';
 import { InventarioRealtimeService } from '../services/inventario-realtime.service';
 import { ProductoService } from '../services/producto.service';
 import { InventarioPageComponent } from './inventario-page.component';
+import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 
-const ID_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
-const ID_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
-const ID_CONT_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
 const BUFFET_ID_TEST = 'buffet-test-123';
+const ID_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
+const ID_CONTIENE_PESCADO = 'pescado-id';
 
 class CategoriaMother {
   static crear(override: Partial<Categoria> = {}): Categoria {
@@ -141,10 +141,7 @@ class DatosFormularioMother {
       categoriaId: 'c1',
       nuevaCategoriaNombre: '',
       requierePreparacion: false,
-      contiene_azucar: false,
-      contiene_mani: false,
-      contiene_lactosa: false,
-      contiene_tacc: false,
+      clasificacionesSaludIds: [],
       ...override,
     };
   }
@@ -157,6 +154,7 @@ describe('InventarioPageComponent', () => {
   let servicioToast: jasmine.SpyObj<ToastService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioRealtime: jasmine.SpyObj<InventarioRealtimeService>;
+  let servicioRestricciones: jasmine.SpyObj<RestriccionesNutricionalesService>;
   let activatedRoute: {
     snapshot: { queryParamMap: ReturnType<typeof convertToParamMap> };
   };
@@ -198,6 +196,7 @@ describe('InventarioPageComponent', () => {
       'connect',
       'recordRefetch',
     ]);
+    servicioRestricciones = jasmine.createSpyObj('RestriccionesNutricionalesService', ['getCatalogo']);
 
     servicioProducto.getCategories.and.returnValue(of(categorias));
     servicioProducto.getInventoryOverview.and.returnValue(of(inventario));
@@ -210,6 +209,10 @@ describe('InventarioPageComponent', () => {
     servicioPerfil.obtenerBuffetId.and.returnValue(BUFFET_ID_TEST);
     servicioPerfil.getPerfil.and.returnValue(null);
     servicioRealtime.connect.and.returnValue(new AbortController());
+    servicioRestricciones.getCatalogo.and.resolveTo([
+      { id: ID_SIN_TACC, descripcion: 'Sin TACC' },
+      { id: ID_CONTIENE_PESCADO, descripcion: 'Contiene Pescado' },
+    ]);
     activatedRoute = { snapshot: { queryParamMap: convertToParamMap({}) } };
 
     await TestBed.configureTestingModule({
@@ -219,6 +222,7 @@ describe('InventarioPageComponent', () => {
         { provide: ToastService, useValue: servicioToast },
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: InventarioRealtimeService, useValue: servicioRealtime },
+        { provide: RestriccionesNutricionalesService, useValue: servicioRestricciones },
         provideRouter([]),
         { provide: ActivatedRoute, useValue: activatedRoute },
         provideHttpClient(),
@@ -490,67 +494,23 @@ describe('InventarioPageComponent', () => {
     });
   });
 
-  describe('buildHealthClassificationIds', () => {
-    it('dado un producto sin TACC, sin azucar y sin lacteos, deberia incluir Sin TACC y Sin Azucar', () => {
-      component.selectedProduct = null;
-      component.handleFormSubmit(
-        DatosFormularioMother.crearBase({ contiene_tacc: false, contiene_azucar: false, contiene_lactosa: false }),
-      );
-
-      const payload = servicioProducto.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_TACC);
-      expect(payload.clasificacionesSaludIds).toContain(ID_SIN_AZUCAR);
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
-    });
-
-    it('dado un producto con TACC, no deberia incluir la clasificacion Sin TACC', () => {
-      component.selectedProduct = null;
-      component.handleFormSubmit(
-        DatosFormularioMother.crearBase({ contiene_tacc: true }),
-      );
-
-      const payload = servicioProducto.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
-    });
-
-    it('dado un producto con azucar, no deberia incluir la clasificacion Sin Azucar', () => {
-      component.selectedProduct = null;
-      component.handleFormSubmit(
-        DatosFormularioMother.crearBase({ contiene_azucar: true }),
-      );
-
-      const payload = servicioProducto.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
-    });
-
-    it('dado un producto con lacteos, deberia incluir la clasificacion Contiene Lacteos', () => {
-      component.selectedProduct = null;
-      component.handleFormSubmit(
-        DatosFormularioMother.crearBase({ contiene_lactosa: true }),
-      );
-
-      const payload = servicioProducto.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).toContain(ID_CONT_LACTEOS);
-    });
-
-    it('dado un producto con TACC y azucar sin lacteos, no deberia incluir ninguna de las 3 relevantes', () => {
+  describe('clasificacionesSaludIds', () => {
+    it('dado un producto con clasificaciones seleccionadas, deberia enviarlas al crear', () => {
       component.selectedProduct = null;
       component.handleFormSubmit(
         DatosFormularioMother.crearBase({
-          contiene_tacc: true,
-          contiene_azucar: true,
-          contiene_lactosa: false,
+          clasificacionesSaludIds: [ID_SIN_TACC, ID_CONTIENE_PESCADO],
         }),
       );
 
       const payload = servicioProducto.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_TACC);
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_SIN_AZUCAR);
-      expect(payload.clasificacionesSaludIds).not.toContain(ID_CONT_LACTEOS);
+      expect(payload.clasificacionesSaludIds).toEqual([ID_SIN_TACC, ID_CONTIENE_PESCADO]);
     });
 
     it('dado el mismo producto, deberia enviar las mismas clasificaciones al crear y al actualizar', () => {
-      const datos = DatosFormularioMother.crearBase({ contiene_lactosa: true });
+      const datos = DatosFormularioMother.crearBase({
+        clasificacionesSaludIds: [ID_CONTIENE_PESCADO],
+      });
 
       component.selectedProduct = null;
       component.handleFormSubmit(datos);
@@ -855,6 +815,21 @@ describe('InventarioPageComponent', () => {
       component.openEditFormFromInventory(inventario[0]);
 
       expect(servicioToast.mostrar).toHaveBeenCalledWith('Error al cargar el producto', 'error');
+    });
+
+    it('dado openEditFormFromInventory sin buffetId, no deberia pedir detalle', () => {
+      whenMonto();
+      servicioProducto.getById.calls.reset();
+      servicioPerfil.obtenerBuffetId.and.returnValue(null);
+      component.buffetId = null;
+
+      component.openEditFormFromInventory(inventario[0]);
+
+      expect(servicioProducto.getById).not.toHaveBeenCalled();
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        jasmine.stringMatching(/buffet/i),
+        'error',
+      );
     });
   });
 

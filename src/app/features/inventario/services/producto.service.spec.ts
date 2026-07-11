@@ -72,7 +72,9 @@ describe('ProductoService', () => {
 
       const promesa = firstValueFrom(service.getById(PRODUCTO_ID_TEST, BUFFET_ID_TEST));
       const req = httpMock.expectOne(
-        (r) => r.url === `${PRODUCTS}/${PRODUCTO_ID_TEST}` && r.params.get('buffetId') === BUFFET_ID_TEST,
+        (r) =>
+          r.url === `${PRODUCTS}/${PRODUCTO_ID_TEST}` &&
+          r.params.get('buffetId') === BUFFET_ID_TEST,
       );
       expect(req.request.method).toBe('GET');
       expect(req.request.params.get('buffetId')).toBe(BUFFET_ID_TEST);

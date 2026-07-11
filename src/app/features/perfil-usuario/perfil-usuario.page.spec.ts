@@ -522,6 +522,19 @@ describe('PerfilUsuarioPage', () => {
   });
 
   describe('branches puntuales — payout con fields ausentes', () => {
+    it('dado un payout config con fechas ISO, deberia exponerlas formateadas para la vista', fakeAsync(() => {
+      givenUsuarioConRol('VENDEDOR');
+      givenPayoutExistente(PayoutConfigMother.crearCompleta({
+        proximaEjecucion: '2026-08-01',
+        ultimaEjecucion: '2026-07-31',
+      }));
+
+      whenMontoYAvanzoDosTicks();
+
+      thenLaProximaEjecucionFormateadaEs('01/08/2026');
+      thenLaUltimaEjecucionFormateadaEs('31/07/2026');
+    }));
+
     it('dado un payout config con todos los fields en falsy, cuando cargo, deberia hidratar el form con defaults', fakeAsync(() => {
       servicioPerfil.obtenerBuffetId.and.returnValue('kiosco-1');
       givenPayoutExistente({} as unknown as PayoutConfig);
@@ -1206,6 +1219,16 @@ describe('PerfilUsuarioPage', () => {
   function thenLaProximaEjecucionEs(esperado: string | null): void {
     const priv = component as unknown as { proximaEjecucion(): string | null };
     expect(priv.proximaEjecucion()).toBe(esperado);
+  }
+
+  function thenLaProximaEjecucionFormateadaEs(esperado: string | null): void {
+    const priv = component as unknown as { proximaEjecucionFormateada(): string | null };
+    expect(priv.proximaEjecucionFormateada()).toBe(esperado);
+  }
+
+  function thenLaUltimaEjecucionFormateadaEs(esperado: string | null): void {
+    const priv = component as unknown as { ultimaEjecucionFormateada(): string | null };
+    expect(priv.ultimaEjecucionFormateada()).toBe(esperado);
   }
 
   function thenTienePayoutExistenteEs(esperado: boolean): void {
