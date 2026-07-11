@@ -1,1 +1,800 @@
-.alumno-card {  display: flex;  flex-direction: column;  gap: 16px;  padding: 16px;  background-color: var(--color-superficie);  border: 1px solid var(--color-borde);  border-radius: 20px;  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);}.alumno-card__header {  display: flex;  align-items: flex-start;  justify-content: space-between;  gap: 12px;}.alumno-card__identidad {  display: flex;  align-items: center;  gap: 12px;  min-width: 0;  flex: 1;}.alumno-card__avatar-wrap {  flex-shrink: 0;  position: relative;  display: inline-flex;}.alumno-card__avatar {  width: 64px;  height: 64px;  border-radius: 50%;  background-color: var(--color-pizarra);  color: #ffffff;  display: flex;  align-items: center;  justify-content: center;  font-family: var(--font-display);  font-weight: 700;  font-size: 24px;  letter-spacing: 0.5px;  overflow: hidden;  box-shadow:    0 0 0 3px var(--color-superficie),    0 0 0 5px var(--color-dorado),    0 8px 16px rgba(74, 111, 165, 0.1);}.alumno-card__avatar--foto {  object-fit: cover;  background: none;}.alumno-card__avatar-editar {  position: absolute;  inset: 0;  width: 100%;  height: 100%;  border-radius: 50%;  background-color: rgba(0, 0, 0, 0);  color: transparent;  display: flex;  align-items: center;  justify-content: center;  font-size: 15px;  transition:    background-color 0.2s ease,    color 0.2s ease;  cursor: pointer;}.alumno-card__avatar-wrap:hover .alumno-card__avatar-editar,.alumno-card__avatar-editar:focus-visible {  background-color: rgba(0, 0, 0, 0.44);  color: #fff;}.alumno-card__avatar-editar:disabled {  cursor: not-allowed;}.alumno-card__avatar-loader {  width: 16px;  height: 16px;  border-radius: 50%;  border: 2px solid rgba(255, 255, 255, 0.35);  border-top-color: #fff;  animation: alumno-card-girar 0.8s linear infinite;  display: inline-block;}@keyframes alumno-card-girar {  to { transform: rotate(360deg); }}.alumno-card__input-foto {  position: absolute;  inset: 0;  opacity: 0;  width: 0;  height: 0;  pointer-events: none;}.alumno-card__texto {  min-width: 0;  display: flex;  flex-direction: column;  gap: 4px;  flex: 1;}.alumno-card__nombre {  font-family: var(--font-display);  font-size: 19px;  font-weight: 800;  color: var(--color-texto-oscuro);  line-height: 1.2;  margin: 0;}.alumno-card__grado {  display: inline-flex;  align-items: center;  gap: 6px;  margin: 0;  font-size: 13px;  font-weight: 600;  color: var(--color-texto-claro);}.alumno-card__grado i {  color: var(--color-menta);   font-size: 14px;}.alumno-card__saldo {  display: inline-flex;  flex-direction: column;  align-items: flex-end;  gap: 2px;  padding: 8px 16px;  background-color: var(--color-superficie-alt);  border: 1px solid var(--color-borde);  border-radius: 12px;  color: var(--color-texto-oscuro);  flex-shrink: 0;}.alumno-card__saldo--negativo {  background-color: color-mix(in srgb, var(--color-melocoton) 12%, transparent);  border-color: color-mix(in srgb, var(--color-melocoton) 25%, transparent);  color: var(--color-melocoton);}.alumno-card__saldo--bajo {  background-color: color-mix(in srgb, var(--color-melocoton) 12%, transparent);  border-color: var(--color-melocoton);   color: var(--color-melocoton);}.alumno-card__saldo-label {  font-family: var(--font-body);  font-size: 12px;  font-weight: 600;  color: var(--color-texto-claro);}.alumno-card__saldo-valor {  font-family: var(--font-display);  font-size: 22px;  font-weight: 800;  line-height: 1.1;}.alumno-card__acciones-grid {  display: grid;  grid-template-columns: repeat(3, 1fr);  gap: 10px;}.alumno-card__btn {  position: relative;  display: inline-flex;  flex-direction: column;  align-items: center;  justify-content: flex-start;  gap: 6px;  min-height: 74px;  padding: 8px 4px;  background-color: var(--color-superficie, #ffffff);  border: 1px solid transparent;  border-radius: 12px;  cursor: pointer;  text-decoration: none;  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;}.alumno-card__btn:hover {  transform: translateY(-2px);  border-color: rgba(74, 111, 165, 0.15);  box-shadow: 0 4px 10px rgba(74, 111, 165, 0.04);}.alumno-card__btn--locked {  cursor: not-allowed;  opacity: 0.78;}.alumno-card__plan-badge {  position: absolute;  top: 4px;  right: 4px;  display: inline-flex;  align-items: center;  gap: 3px;  max-width: calc(100% - 8px);  padding: 2px 5px;  border-radius: 5px;  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);  color: #1e293b;  font-family: var(--font-display);  font-size: 7.5px;  font-weight: 900;  line-height: 1;  text-transform: uppercase;  box-shadow: 0 1px 4px rgba(212, 175, 55, 0.28);}.alumno-card__plan-badge i {  font-size: 7px;}.alumno-card__btn-icono {  position: relative;  display: inline-flex;  align-items: center;  justify-content: center;  width: 34px;  height: 34px;  border-radius: 50%;  font-size: 13px;  background: linear-gradient(135deg, #FFFDE7 0%, #FFF59D 50%, #FFE082 100%);  flex-shrink: 0;  box-shadow:     0 2px 6px rgba(212, 175, 55, 0.12),    inset 0 0 0 1px rgba(212, 175, 55, 0.2);  transition: background-color 0.15s ease;}.alumno-card__btn-icono i {  color: var(--color-pizarra-dark);  transition: color 0.15s ease;}.alumno-card__btn-label {  font-family: var(--font-body);  font-size: 10.5px;  font-weight: 700;  color: var(--color-texto-claro);  text-align: center;  line-height: 1.1;  word-break: break-word;  transition: color 0.15s ease;}.alumno-card__btn.active {  background: linear-gradient(135deg, var(--color-pizarra-dark), var(--color-pizarra)) !important;  border-color: transparent !important;  box-shadow: 0 4px 12px rgba(58, 90, 138, 0.16);}.alumno-card__btn.active .alumno-card__btn-label {  color: #ffffff !important;}.alumno-card__btn.active .alumno-card__btn-icono {  background: #ffffff !important;}.alumno-card__btn.active .alumno-card__btn-icono i {  color: var(--color-pizarra-dark) !important;}.alumno-card__btn-badge {  position: absolute;  top: -4px;  right: -4px;  display: inline-flex;  align-items: center;  justify-content: center;  background-color: #3b82f6;   color: #ffffff;  font-size: 9px;  font-weight: 850;  border-radius: 50%;  width: 15px;  height: 15px;  line-height: 1;  border: 1px solid #ffffff;}.alumno-card__budget {  display: flex;  align-items: center;  gap: 12px;  padding: 4px;  font-family: var(--font-body);  font-size: 13px;  font-weight: 700;  color: var(--color-texto-oscuro);}.alumno-card__budget-label {  color: var(--color-texto-claro);  flex-shrink: 0;}.alumno-card__budget-bar {  flex: 1;  height: 8px;  background-color: var(--color-superficie-alt);  border-radius: 999px;  overflow: hidden;  position: relative;}.alumno-card__budget-progress {  height: 100%;  background-color: var(--color-menta);   border-radius: 999px;}.alumno-card__budget-percentage {  color: var(--color-texto-claro);  font-weight: 800;  flex-shrink: 0;}.alumno-card__budget-fraction {  color: var(--color-texto-oscuro);  font-weight: 800;  flex-shrink: 0;  font-size: 12px;  background-color: var(--color-superficie-alt);  padding: 3px 8px;  border-radius: 6px;}.alumno-card__cta {  display: inline-flex;  align-items: center;  justify-content: center;  gap: 10px;  width: 100%;  padding: 14px;  background-color: var(--color-dorado);  color: #1a3b5c;   border-radius: 16px;  font-family: var(--font-display);  font-size: 15px;  font-weight: 800;  letter-spacing: 0.3px;  text-decoration: none;  box-shadow: 0 8px 20px rgba(242, 183, 5, 0.18);  transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease;}.alumno-card__cta:hover {  background-color: var(--color-dorado-dark);}.alumno-card__cta:active {  transform: scale(0.98);  box-shadow: inset 0 0 0 1px rgba(180, 130, 0, 0.26);}.alumno-card__extra-wrapper {  overflow: hidden;  max-height: 500px;  opacity: 1;  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-in-out, margin-top 0.3s ease;  margin-top: 10px;}.alumno-card__extra-wrapper.collapsed {  max-height: 0 !important;  opacity: 0 !important;  margin-top: 0 !important;  pointer-events: none;}.alumno-card__extra-grid {  display: grid;  grid-template-columns: repeat(3, 1fr);  gap: 10px;}.alumno-card__toggle-wrapper {  display: flex;  justify-content: center;  margin-top: 4px;}.alumno-card__toggle-btn {  background: none;  border: none;  color: var(--color-pizarra, #475569);  font-family: var(--font-display);  font-size: 13px;  font-weight: 800;  cursor: pointer;  display: inline-flex;  align-items: center;  gap: 6px;  padding: 8px 16px;  border-radius: 12px;  transition: all 0.2s ease;}.alumno-card__toggle-btn:hover {  background-color: rgba(74, 111, 165, 0.08);  color: var(--color-pizarra-dark, #1e293b);}@media (max-width: 480px) {  .alumno-card {    padding: 20px;  }  .alumno-card__btn-label {    font-size: 9px;    letter-spacing: -0.2px;  }  .alumno-card__header {    flex-direction: column;    align-items: stretch;    gap: 16px;  }  .alumno-card__identidad {    width: 100%;  }  .alumno-card__saldo {    flex-direction: row;    align-items: center;    justify-content: space-between;    width: 100%;    padding: 12px 16px;  }  .alumno-card__budget {    flex-wrap: wrap;    gap: 8px;  }  .alumno-card__budget-bar {    width: 100%;    order: 4;    flex: none;  }}.modal-overlay {  position: fixed;  top: 0; left: 0; right: 0; bottom: 0;  z-index: 1000;  display: flex;  align-items: center;  justify-content: center;  background-color: rgba(15, 23, 42, 0.6);  padding: 16px;  backdrop-filter: blur(4px);}.modal-content {  background-color: var(--color-superficie);  border-radius: 24px;  box-shadow: var(--shadow-elevated);  max-width: 400px;  width: 100%;  padding: 32px 24px;  position: relative;  font-family: var(--font-body);  animation: modalEnter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}@keyframes modalEnter {  from { opacity: 0; transform: translateY(20px) scale(0.95); }  to { opacity: 1; transform: translateY(0) scale(1); }}.modal-close {  position: absolute;  top: 16px;  right: 16px;  background: none;  border: none;  color: var(--color-texto-claro);  font-size: 20px;  cursor: pointer;  transition: color 0.2s;  padding: 4px 8px;  border-radius: 8px;}.modal-close:hover {  color: var(--color-texto-oscuro);  background-color: var(--color-superficie-alt);}.modal-title {  font-family: var(--font-display);  font-size: 22px;  font-weight: 800;  color: var(--color-texto-oscuro);  margin: 0 0 24px 0;  display: flex;  align-items: center;  gap: 10px;}.modal-title i {  color: var(--color-menta);}.modal-loading {  text-align: center;  padding: 32px 0;  color: var(--color-texto-claro);}.modal-loading i {  font-size: 32px;  color: var(--color-menta);  margin-bottom: 12px;}.modal-body {  display: flex;  flex-direction: column;  gap: 20px;}.modal-field {  display: flex;  flex-direction: column;  gap: 8px;}.modal-label {  font-size: 14px;  font-weight: 700;  color: var(--color-texto-oscuro);  margin: 0;}.modal-radio-group {  display: flex;  gap: 16px;}.modal-radio {  display: flex;  align-items: center;  gap: 6px;  cursor: pointer;  font-size: 14px;  color: var(--color-texto-claro);}.modal-radio input {  accent-color: var(--color-menta);  width: 16px;  height: 16px;}.modal-alert {  background-color: color-mix(in srgb, var(--color-dorado) 10%, var(--color-superficie));  border: 1px solid color-mix(in srgb, var(--color-dorado) 30%, var(--color-borde-fuerte));  border-radius: 12px;  padding: 12px;}.modal-alert p {  margin: 0 0 12px 0;  font-size: 13px;  color: color-mix(in srgb, var(--color-dorado) 90%, var(--color-texto-oscuro));  line-height: 1.4;}.modal-input-wrap {  position: relative;}.modal-input-prefix {  position: absolute;  left: 12px;  top: 50%;  transform: translateY(-50%);  color: var(--color-texto-claro);  font-weight: 600;}.modal-input {  width: 100%;  padding: 12px 12px 12px 28px;  border: 2px solid var(--color-borde-fuerte);  background-color: var(--color-superficie-alt);  border-radius: 12px;  font-size: 16px;  font-weight: 600;  color: var(--color-texto-oscuro);  outline: none;  transition: border-color 0.2s;  box-sizing: border-box;}.modal-input:focus {  border-color: var(--color-menta);}.mt-2 {  margin-top: 8px;}.mb-2 {  margin-bottom: 8px;}.modal-info {  background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-superficie));  border: 1px solid color-mix(in srgb, var(--color-pizarra) 30%, var(--color-borde-fuerte));  border-radius: 10px;  padding: 10px 12px;  display: flex;  align-items: flex-start;  gap: 8px;  margin-top: 6px;}.modal-info i {  color: var(--color-pizarra);  margin-top: 2px;}.modal-info p {  margin: 0;  font-size: 12.5px;  color: var(--color-texto-oscuro);  line-height: 1.4;}.modal-flex-between {  display: flex;  justify-content: space-between;  align-items: center;}.modal-monto-resaltado {  font-family: var(--font-display);  font-size: 20px;  font-weight: 800;  color: var(--color-menta);}.modal-slider {  width: 100%;  height: 6px;  background-color: var(--color-superficie-alt);  border-radius: 4px;  appearance: none;  outline: none;  accent-color: var(--color-menta);}.modal-hint {  margin: 4px 0 0 0;  font-size: 12px;  color: var(--color-texto-claro);  text-align: right;}.modal-quick-buttons {  display: flex;  gap: 8px;}.modal-btn-quick {  flex: 1;  padding: 8px;  background-color: var(--color-superficie-alt);  border: none;  border-radius: 8px;  color: var(--color-texto-claro);  font-weight: 700;  font-size: 14px;  cursor: pointer;  transition: all 0.2s;}.modal-btn-quick:hover {  background-color: var(--color-borde-fuerte);}.modal-btn-quick.active {  background-color: var(--color-menta);  color: #ffffff;}.modal-actions {  display: flex;  gap: 12px;  margin-top: 28px;}.modal-btn-cancelar {  flex: 1;  padding: 14px;  background-color: var(--color-superficie-alt);  color: var(--color-texto-claro);  border: none;  border-radius: 14px;  font-weight: 700;  font-size: 15px;  cursor: pointer;  transition: background-color 0.2s;}.modal-btn-cancelar:hover {  background-color: var(--color-borde-fuerte);}.modal-btn-confirmar {  flex: 1;  padding: 14px;  background-color: var(--color-dorado);  color: #1a3b5c;  border: none;  border-radius: 14px;  font-weight: 800;  font-size: 15px;  cursor: pointer;  transition: transform 0.1s, background-color 0.2s;  box-shadow: 0 4px 12px rgba(242, 183, 5, 0.2);}.modal-btn-confirmar:hover {  background-color: #e6a200;}.modal-btn-confirmar:active {  transform: scale(0.97);}.modal-alert {  background-color: color-mix(in srgb, var(--color-dorado) 10%, var(--color-superficie));  border: 1px solid color-mix(in srgb, var(--color-dorado) 30%, var(--color-borde-fuerte));  border-radius: 10px;  padding: 12px;  color: color-mix(in srgb, var(--color-dorado) 90%, var(--color-texto-oscuro));  font-size: 14px;}.modal-alert p {  display: flex;  align-items: center;  gap: 8px;  margin: 0;}.modal-alert--info {  background-color: color-mix(in srgb, var(--color-menta) 10%, var(--color-superficie));  border: 1px solid color-mix(in srgb, var(--color-menta) 30%, var(--color-borde-fuerte));  color: var(--color-menta);}.alumno-card__btn-badge--info {  background-color: #3b82f6;  color: white;}.btn-disabled {  opacity: 0.5;  cursor: not-allowed !important;}.alumno-card__btn--disabled {  opacity: 0.6;  cursor: not-allowed !important;  pointer-events: none;}
+.alumno-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
+}
+
+.alumno-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.alumno-card__identidad {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.alumno-card__avatar-wrap {
+  flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
+}
+
+.alumno-card__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px var(--color-superficie),
+    0 0 0 5px var(--color-dorado),
+    0 8px 16px rgba(74, 111, 165, 0.1);
+}
+
+.alumno-card__avatar--foto {
+  object-fit: cover;
+  background: none;
+}
+
+.alumno-card__avatar-editar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+  cursor: pointer;
+}
+
+.alumno-card__avatar-wrap:hover .alumno-card__avatar-editar,
+.alumno-card__avatar-editar:focus-visible {
+  background-color: rgba(0, 0, 0, 0.44);
+  color: #fff;
+}
+
+.alumno-card__avatar-editar:disabled {
+  cursor: not-allowed;
+}
+
+.alumno-card__avatar-loader {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: alumno-card-girar 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes alumno-card-girar {
+  to { transform: rotate(360deg); }
+}
+
+.alumno-card__input-foto {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.alumno-card__texto {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.alumno-card__nombre {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.alumno-card__grado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+}
+
+.alumno-card__grado i {
+  color: var(--color-menta); /* Green cap matching SALDADO */
+  font-size: 14px;
+}
+
+/* Saldo Display Box */
+.alumno-card__saldo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 8px 16px;
+  background-color: var(--color-superficie-alt);
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  color: var(--color-texto-oscuro);
+  flex-shrink: 0;
+}
+
+.alumno-card__saldo--negativo {
+  background-color: color-mix(in srgb, var(--color-melocoton) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-melocoton) 25%, transparent);
+  color: var(--color-melocoton);
+}
+
+.alumno-card__saldo--bajo {
+  background-color: color-mix(in srgb, var(--color-melocoton) 12%, transparent);
+  border-color: var(--color-melocoton); /* red frame border */
+  color: var(--color-melocoton);
+}
+
+.alumno-card__saldo-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+}
+
+.alumno-card__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+/* 3x3 Actions Grid */
+.alumno-card__acciones-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.alumno-card__btn {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-height: 74px;
+  padding: 8px 4px;
+  background-color: var(--color-superficie, #ffffff);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.alumno-card__btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(74, 111, 165, 0.15);
+  box-shadow: 0 4px 10px rgba(74, 111, 165, 0.04);
+}
+
+.alumno-card__btn--locked {
+  cursor: not-allowed;
+  opacity: 0.78;
+}
+
+.alumno-card__plan-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  max-width: calc(100% - 8px);
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  color: #1e293b;
+  font-family: var(--font-display);
+  font-size: 7.5px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(212, 175, 55, 0.28);
+}
+
+.alumno-card__plan-badge i {
+  font-size: 7px;
+}
+
+.alumno-card__btn-icono {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 13px;
+  background: linear-gradient(135deg, #FFFDE7 0%, #FFF59D 50%, #FFE082 100%);
+  flex-shrink: 0;
+  box-shadow: 
+    0 2px 6px rgba(212, 175, 55, 0.12),
+    inset 0 0 0 1px rgba(212, 175, 55, 0.2);
+  transition: background-color 0.15s ease;
+}
+
+.alumno-card__btn-icono i {
+  color: var(--color-pizarra-dark);
+  transition: color 0.15s ease;
+}
+
+.alumno-card__btn-label {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-texto-claro);
+  text-align: center;
+  line-height: 1.1;
+  word-break: break-word;
+  transition: color 0.15s ease;
+}
+
+/* Estado activo cuando la ruta coincide */
+.alumno-card__btn.active {
+  background: linear-gradient(135deg, var(--color-pizarra-dark), var(--color-pizarra)) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(58, 90, 138, 0.16);
+}
+
+.alumno-card__btn.active .alumno-card__btn-label {
+  color: #ffffff !important;
+}
+
+.alumno-card__btn.active .alumno-card__btn-icono {
+  background: #ffffff !important;
+}
+
+.alumno-card__btn.active .alumno-card__btn-icono i {
+  color: var(--color-pizarra-dark) !important;
+}
+
+/* Badge count inside the icon circle */
+.alumno-card__btn-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3b82f6; /* Blue badge */
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 850;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  line-height: 1;
+  border: 1px solid #ffffff;
+}
+
+/* Budget Row Style */
+.alumno-card__budget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+}
+
+.alumno-card__budget-label {
+  color: var(--color-texto-claro);
+  flex-shrink: 0;
+}
+
+.alumno-card__budget-bar {
+  flex: 1;
+  height: 8px;
+  background-color: var(--color-superficie-alt);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.alumno-card__budget-progress {
+  height: 100%;
+  background-color: var(--color-menta); /* dark green progress matching SALDADO */
+  border-radius: 999px;
+}
+
+.alumno-card__budget-percentage {
+  color: var(--color-texto-claro);
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.alumno-card__budget-fraction {
+  color: var(--color-texto-oscuro);
+  font-weight: 800;
+  flex-shrink: 0;
+  font-size: 12px;
+  background-color: var(--color-superficie-alt);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* CTA "Ir al Buffet" Button */
+.alumno-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background-color: var(--color-dorado);
+  color: #1a3b5c; /* High contrast text */
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(242, 183, 5, 0.18);
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.alumno-card__cta:hover {
+  background-color: var(--color-dorado-dark);
+}
+
+.alumno-card__cta:active {
+  transform: scale(0.98);
+  box-shadow: inset 0 0 0 1px rgba(180, 130, 0, 0.26);
+}
+
+.alumno-card__extra-wrapper {
+  overflow: hidden;
+  max-height: 500px;
+  opacity: 1;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-in-out, margin-top 0.3s ease;
+  margin-top: 10px;
+}
+.alumno-card__extra-wrapper.collapsed {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  margin-top: 0 !important;
+  pointer-events: none;
+}
+.alumno-card__extra-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.alumno-card__toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+.alumno-card__toggle-btn {
+  background: none;
+  border: none;
+  color: var(--color-pizarra, #475569);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+.alumno-card__toggle-btn:hover {
+  background-color: rgba(74, 111, 165, 0.08);
+  color: var(--color-pizarra-dark, #1e293b);
+}
+
+@media (max-width: 480px) {
+  .alumno-card {
+    padding: 20px;
+  }
+  
+  .alumno-card__btn-label {
+    font-size: 9px;
+    letter-spacing: -0.2px;
+  }
+  
+  .alumno-card__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .alumno-card__identidad {
+    width: 100%;
+  }
+
+  .alumno-card__saldo {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 16px;
+  }
+
+  .alumno-card__budget {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .alumno-card__budget-bar {
+    width: 100%;
+    order: 4;
+    flex: none;
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(15, 23, 42, 0.6);
+  padding: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background-color: var(--color-superficie);
+  border-radius: 24px;
+  box-shadow: var(--shadow-elevated);
+  max-width: 400px;
+  width: 100%;
+  padding: 32px 24px;
+  position: relative;
+  font-family: var(--font-body);
+  animation: modalEnter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--color-texto-claro);
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.modal-close:hover {
+  color: var(--color-texto-oscuro);
+  background-color: var(--color-superficie-alt);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  margin: 0 0 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title i {
+  color: var(--color-menta);
+}
+
+.modal-loading {
+  text-align: center;
+  padding: 32px 0;
+  color: var(--color-texto-claro);
+}
+
+.modal-loading i {
+  font-size: 32px;
+  color: var(--color-menta);
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  margin: 0;
+}
+
+.modal-radio-group {
+  display: flex;
+  gap: 16px;
+}
+
+.modal-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-texto-claro);
+}
+
+.modal-radio input {
+  accent-color: var(--color-menta);
+  width: 16px;
+  height: 16px;
+}
+
+.modal-alert {
+  background-color: color-mix(in srgb, var(--color-dorado) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-dorado) 30%, var(--color-borde-fuerte));
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.modal-alert p {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-dorado) 90%, var(--color-texto-oscuro));
+  line-height: 1.4;
+}
+
+.modal-input-wrap {
+  position: relative;
+}
+
+.modal-input-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-texto-claro);
+  font-weight: 600;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 12px 12px 12px 28px;
+  border: 2px solid var(--color-borde-fuerte);
+  background-color: var(--color-superficie-alt);
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-texto-oscuro);
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.modal-input:focus {
+  border-color: var(--color-menta);
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.modal-info {
+  background-color: color-mix(in srgb, var(--color-pizarra) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-pizarra) 30%, var(--color-borde-fuerte));
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.modal-info i {
+  color: var(--color-pizarra);
+  margin-top: 2px;
+}
+
+.modal-info p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-texto-oscuro);
+  line-height: 1.4;
+}
+
+.modal-flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-monto-resaltado {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-menta);
+}
+
+.modal-slider {
+  width: 100%;
+  height: 6px;
+  background-color: var(--color-superficie-alt);
+  border-radius: 4px;
+  appearance: none;
+  outline: none;
+  accent-color: var(--color-menta);
+}
+
+.modal-hint {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: var(--color-texto-claro);
+  text-align: right;
+}
+
+.modal-quick-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-btn-quick {
+  flex: 1;
+  padding: 8px;
+  background-color: var(--color-superficie-alt);
+  border: none;
+  border-radius: 8px;
+  color: var(--color-texto-claro);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-quick:hover {
+  background-color: var(--color-borde-fuerte);
+}
+
+.modal-btn-quick.active {
+  background-color: var(--color-menta);
+  color: #ffffff;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.modal-btn-cancelar {
+  flex: 1;
+  padding: 14px;
+  background-color: var(--color-superficie-alt);
+  color: var(--color-texto-claro);
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-btn-cancelar:hover {
+  background-color: var(--color-borde-fuerte);
+}
+
+.modal-btn-confirmar {
+  flex: 1;
+  padding: 14px;
+  background-color: var(--color-dorado);
+  color: #1a3b5c;
+  border: none;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 4px 12px rgba(242, 183, 5, 0.2);
+}
+
+.modal-btn-confirmar:hover {
+  background-color: #e6a200;
+}
+
+.modal-btn-confirmar:active {
+  transform: scale(0.97);
+}
+
+.modal-alert {
+  background-color: color-mix(in srgb, var(--color-dorado) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-dorado) 30%, var(--color-borde-fuerte));
+  border-radius: 10px;
+  padding: 12px;
+  color: color-mix(in srgb, var(--color-dorado) 90%, var(--color-texto-oscuro));
+  font-size: 14px;
+}
+
+.modal-alert p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.modal-alert--info {
+  background-color: color-mix(in srgb, var(--color-menta) 10%, var(--color-superficie));
+  border: 1px solid color-mix(in srgb, var(--color-menta) 30%, var(--color-borde-fuerte));
+  color: var(--color-menta);
+}
+
+.alumno-card__btn-badge--info {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+.alumno-card__btn--disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}

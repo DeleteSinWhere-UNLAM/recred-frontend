@@ -1,1 +1,14 @@
-.directivo-page {  min-height: calc(100vh - 64px);  padding: 24px 0 46px;  background:    radial-gradient(circle at 18% 12%, rgba(242, 183, 5, 0.14), transparent 28%),    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 244, 248, 0) 300px),    var(--color-fondo);}.directivo-page__container {  max-width: 1280px;  margin: 0 auto;  padding: 0 28px;}
+.directivo-page {
+  min-height: calc(100vh - 64px);
+  padding: 24px 0 46px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(242, 183, 5, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 244, 248, 0) 300px),
+    var(--color-fondo);
+}
+
+.directivo-page__container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 28px;
+}

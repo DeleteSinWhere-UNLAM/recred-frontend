@@ -1,1 +1,265 @@
-:host {  display: flex;  flex-direction: column;  flex: 1;  min-height: 0;}:host.colegio-section-colapsado {  flex: 0 0 auto;  min-height: auto;}.colegio-section {  display: flex;  flex-direction: column;  flex: 1;  min-height: 0;}:host.colegio-section-colapsado .colegio-section,:host.colegio-section-colapsado .colegio-section__sidebar {  flex: 0 0 auto;  min-height: auto;}.colegio-section__layout {  display: flex;  flex-direction: column;  gap: 16px;}.colegio-section__sidebar {  border-radius: 24px;  padding: 16px;  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);  display: flex;  flex-direction: column;  flex: 1;  min-height: 0;  transition: all 0.2s ease;  background-color: var(--color-superficie);}.colegio-section__sidebar--colapsado {  padding: 16px 20px;}.colegio-section__sidebar-header {  display: flex;  align-items: center;  gap: 16px;  width: 100%;  background: none;  border: none;  padding: 0;  text-align: left;  cursor: pointer;  outline: none;}.colegio-section__icono {  display: inline-flex;  align-items: center;  justify-content: center;  width: 46px;  height: 46px;  border-radius: 14px;  background-color: rgba(74, 111, 165, 0.08);  color: var(--color-pizarra);  font-size: 18px;  flex-shrink: 0;}.colegio-section__header-text {  flex: 1;  display: flex;  flex-direction: column;  align-items: flex-start;  gap: 4px;  min-width: 0;}.colegio-section__nombre {  font-family: var(--font-display);  font-size: 20px;  font-weight: 800;  color: var(--color-texto-oscuro);  margin: 0;  min-width: 0;}.colegio-section__alumnos-count {  display: inline-flex;  align-items: center;  gap: 6px;  font-family: var(--font-body);  font-size: 13px;  font-weight: 600;  color: var(--color-texto-claro);}.colegio-section__alumnos-count i {  color: var(--color-pizarra);  font-size: 13px;}.colegio-section__chevron {  display: inline-flex;  align-items: center;  justify-content: center;  width: 32px;  height: 32px;  border-radius: 50%;  background-color: rgba(74, 111, 165, 0.05);  color: var(--color-texto-claro);  font-size: 13px;  transition: transform 0.25s ease;  flex-shrink: 0;}.colegio-section__chevron--rotado {  transform: rotate(180deg);  color: var(--color-pizarra);}.colegio-section__sidebar-body-wrapper {  display: grid;  grid-template-rows: 0fr;  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);  overflow: hidden;  width: 100%;}.colegio-section__sidebar-body-wrapper--expandido {  grid-template-rows: 1fr;}.colegio-section__sidebar-body {  display: flex;  flex-direction: column;  gap: 12px;  margin-top: 16px;  flex: 1;  min-height: 0;  opacity: 0;  transition: opacity 0.2s ease-out;}.colegio-section__sidebar-body-wrapper--expandido .colegio-section__sidebar-body {  opacity: 1;  transition: opacity 0.25s ease-out 0.05s;}.colegio-section__saldo-row {  display: flex;  flex-direction: column;  gap: 4px;}.colegio-section__saldo-label {  font-family: var(--font-body);  font-size: 13px;  font-weight: 600;  color: var(--color-texto-claro);}.colegio-section__saldo-valor {  font-family: var(--font-display);  font-size: 28px;  font-weight: 800;  color: var(--color-texto-oscuro);  line-height: 1.1;}.colegio-section__ilustracion {  margin: 16px -24px -24px -24px;  padding: 16px 24px 0 24px;  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--color-fondo) 40%, transparent) 100%);  border-bottom-left-radius: 24px;  border-bottom-right-radius: 24px;  display: flex;  justify-content: center;  align-items: flex-end;  overflow: hidden;  margin-top: auto;}.colegio-section__ilustracion svg {  width: 100%;  max-width: 220px;  height: auto;  display: block;}.colegio-section__content {  width: 100%;  margin-top: 0px;  flex: 1;  min-height: 0;  overflow-y: auto;  padding-right: 12px;}.colegio-section__content::-webkit-scrollbar {  width: 8px;}.colegio-section__content::-webkit-scrollbar-track {  background: transparent;}.colegio-section__content::-webkit-scrollbar-thumb {  background: var(--color-pizarra);  border-radius: 6px;}.colegio-section__content::-webkit-scrollbar-thumb:hover {  background: var(--color-pizarra-dark);}.colegio-section__grid {  display: grid;  grid-template-columns: 1fr;  gap: 24px;  animation: colegio-fade-in 0.25s ease;}@keyframes colegio-fade-in {  from {    opacity: 0;    transform: translateY(4px);  }  to {    opacity: 1;    transform: translateY(0);  }}@media (min-width: 900px) {  .colegio-section__grid {    grid-template-columns: 1fr;  }}@media (min-width: 1280px) {  .colegio-section__grid {    grid-template-columns: 1fr;  }}@media (max-width: 520px) {  .colegio-section__sidebar {    padding: 20px;  }  .colegio-section__nombre {    font-size: 18px;  }  .colegio-section__saldo-valor {    font-size: 24px;  }}
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+:host.colegio-section-colapsado {
+  flex: 0 0 auto;
+  min-height: auto;
+}
+
+.colegio-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+:host.colegio-section-colapsado .colegio-section,
+:host.colegio-section-colapsado .colegio-section__sidebar {
+  flex: 0 0 auto;
+  min-height: auto;
+}
+
+.colegio-section__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.colegio-section__sidebar {
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(51, 65, 85, 0.04);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  transition: all 0.2s ease;  background-color: var(--color-superficie);
+}
+
+.colegio-section__sidebar--colapsado {
+  padding: 16px 20px;
+}
+
+.colegio-section__sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.colegio-section__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background-color: rgba(74, 111, 165, 0.08);
+  color: var(--color-pizarra);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.colegio-section__header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.colegio-section__nombre {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  margin: 0;
+  min-width: 0;
+}
+
+.colegio-section__alumnos-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+}
+
+.colegio-section__alumnos-count i {
+  color: var(--color-pizarra);
+  font-size: 13px;
+}
+
+.colegio-section__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(74, 111, 165, 0.05);
+  color: var(--color-texto-claro);
+  font-size: 13px;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.colegio-section__chevron--rotado {
+  transform: rotate(180deg);
+  color: var(--color-pizarra);
+}
+
+/* Sidebar Body Wrapper & Animation */
+.colegio-section__sidebar-body-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  width: 100%;
+}
+
+.colegio-section__sidebar-body-wrapper--expandido {
+  grid-template-rows: 1fr;
+}
+
+.colegio-section__sidebar-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  flex: 1;
+  min-height: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.colegio-section__sidebar-body-wrapper--expandido .colegio-section__sidebar-body {
+  opacity: 1;
+  transition: opacity 0.25s ease-out 0.05s;
+}
+
+.colegio-section__saldo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.colegio-section__saldo-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+}
+
+.colegio-section__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-texto-oscuro);
+  line-height: 1.1;
+}
+
+/* Illustration building at the bottom */
+.colegio-section__ilustracion {
+  margin: 16px -24px -24px -24px;
+  padding: 16px 24px 0 24px;
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--color-fondo) 40%, transparent) 100%);
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  overflow: hidden;
+  margin-top: auto;
+}
+
+.colegio-section__ilustracion svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  display: block;
+}
+
+.colegio-section__content {
+  width: 100%;
+  margin-top: 0px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+.colegio-section__content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.colegio-section__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.colegio-section__content::-webkit-scrollbar-thumb {
+  background: var(--color-pizarra);
+  border-radius: 6px;
+}
+
+.colegio-section__content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-pizarra-dark);
+}
+
+.colegio-section__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  animation: colegio-fade-in 0.25s ease;
+}
+
+@keyframes colegio-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Rules for Desktop */
+@media (min-width: 900px) {
+  .colegio-section__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1280px) {
+  .colegio-section__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .colegio-section__sidebar {
+    padding: 20px;
+  }
+  
+  .colegio-section__nombre {
+    font-size: 18px;
+  }
+
+  .colegio-section__saldo-valor {
+    font-size: 24px;
+  }
+}

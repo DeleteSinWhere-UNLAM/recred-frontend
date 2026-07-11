@@ -1,1 +1,71 @@
-.tendencia-card {  background: white;  border-radius: var(--radius-lg);  padding: var(--spacing-xl);  box-shadow: var(--shadow-sm);  transition: transform 0.3s ease, box-shadow 0.3s ease;  display: flex;  flex-direction: column;  justify-content: center;  height: 100%;}.tendencia-card:hover {  transform: translateY(-2px);  box-shadow: var(--shadow-md);}.tendencia-card__header {  margin-bottom: var(--spacing-lg);}.tendencia-card__title {  font-size: var(--font-size-lg);  font-weight: 600;  color: var(--text-primary);  margin: 0;}.tendencia-card__chart-container {  position: relative;  height: 250px;  width: 100%;}.tendencia-card__empty {  display: flex;  align-items: center;  justify-content: center;  height: 100%;  color: var(--text-secondary);  font-size: var(--font-size-sm);  text-align: center;  background-color: var(--surface-hover);  border-radius: var(--radius-md);}@media (max-width: 640px) {  .tendencia-card {    padding: 22px;    border-radius: 20px;  }  .tendencia-card__title {    font-size: 18px;  }  .tendencia-card__chart-container {    height: 220px;  }}@media (max-width: 480px) {  .tendencia-card {    padding: 18px;    border-radius: 18px;  }  .tendencia-card__chart-container {    height: 200px;  }}
+.tendencia-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.tendencia-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.tendencia-card__header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.tendencia-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tendencia-card__chart-container {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+.tendencia-card__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  background-color: var(--surface-hover);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 640px) {
+  .tendencia-card {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .tendencia-card__title {
+    font-size: 18px;
+  }
+
+  .tendencia-card__chart-container {
+    height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tendencia-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .tendencia-card__chart-container {
+    height: 200px;
+  }
+}

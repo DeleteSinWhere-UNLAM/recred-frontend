@@ -1,1 +1,272 @@
-.accion-tile {  position: relative;  display: flex;  flex-direction: column;  width: 100%;  height: 100%;  min-height: 156px;  padding: 22px 22px 34px;  border: 1px solid var(--color-borde);  border-radius: 20px;  cursor: pointer;  font-family: var(--font-display);  text-align: left;  overflow: hidden;  background-color: var(--color-superficie);  box-shadow: var(--shadow-card);  transition:    transform 0.2s ease,    box-shadow 0.2s ease;}.accion-tile:hover {  transform: translateY(-3px);  box-shadow: var(--shadow-elevated);}.accion-tile:hover .accion-tile__flecha {  transform: translateX(4px);}.accion-tile:active {  transform: scale(0.98);}.accion-tile:focus-visible {  outline: 3px solid var(--color-pizarra);  outline-offset: 3px;}.accion-tile__cuerpo {  display: flex;  align-items: flex-start;  gap: 16px;  position: relative;  z-index: 1;}.accion-tile__icono {  width: 60px;  height: 60px;  border-radius: 50%;  display: flex;  align-items: center;  justify-content: center;  font-size: 24px;  color: #fff;  flex-shrink: 0;  box-shadow: 0 8px 18px rgba(51, 65, 85, 0.12);}.accion-tile__texto {  display: flex;  flex-direction: column;  gap: 4px;  min-width: 0;  padding-top: 4px;}.accion-tile__label {  font-size: 19px;  font-weight: 800;  line-height: 1.15;}.accion-tile__descripcion {  font-family: var(--font-body);  font-size: 13px;  font-weight: 600;  color: var(--color-texto-claro);  line-height: 1.3;}.accion-tile__pie {  display: flex;  justify-content: flex-end;  margin-top: auto;  padding-top: 14px;  position: relative;  z-index: 1;}.accion-tile__flecha {  width: 36px;  height: 36px;  border-radius: 50%;  display: flex;  align-items: center;  justify-content: center;  font-size: 14px;  transition: transform 0.2s ease;  background-color: rgba(255, 255, 255, 0.7);}.accion-tile__ola {  position: absolute;  left: 0;  right: 0;  bottom: 0;  height: 30px;  background-repeat: no-repeat;  background-size: 100% 100%;  background-position: bottom center;  pointer-events: none;}.accion-tile__badge {  position: absolute;  top: 12px;  right: 12px;  padding: 4px 10px;  background-color: rgba(255, 255, 255, 0.92);  color: var(--color-texto-oscuro);  border-radius: 999px;  font-family: var(--font-display);  font-size: 10px;  font-weight: 800;  letter-spacing: 0.6px;  text-transform: uppercase;  z-index: 2;}.accion-tile--menta {  background: linear-gradient(180deg, #f1f8f4 0%, #ffffff 70%);  border-color: rgba(129, 178, 154, 0.28);}.accion-tile--menta .accion-tile__icono {  background: linear-gradient(135deg, var(--color-menta) 0%, #6da085 100%);}.accion-tile--menta .accion-tile__label {  color: var(--color-menta);}.accion-tile--menta .accion-tile__flecha {  background-color: rgba(129, 178, 154, 0.22);  color: var(--color-menta);}.accion-tile--menta .accion-tile__ola {  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%2381B29A' fill-opacity='0.55'/></svg>");}.accion-tile--mandarina {  background: linear-gradient(180deg, #fff4ea 0%, #ffffff 70%);  border-color: rgba(244, 162, 97, 0.3);}.accion-tile--mandarina .accion-tile__icono {  background: linear-gradient(135deg, #f4a261 0%, #d97f3e 100%);}.accion-tile--mandarina .accion-tile__label {  color: #d97f3e;}.accion-tile--mandarina .accion-tile__flecha {  background-color: rgba(244, 162, 97, 0.22);  color: #d97f3e;}.accion-tile--mandarina .accion-tile__ola {  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%23f4a261' fill-opacity='0.6'/></svg>");}.accion-tile--melocoton {  background: linear-gradient(180deg, #fdecea 0%, #ffffff 70%);  border-color: rgba(231, 111, 81, 0.28);}.accion-tile--melocoton .accion-tile__icono {  background: linear-gradient(135deg, var(--color-melocoton) 0%, #c75a3f 100%);}.accion-tile--melocoton .accion-tile__label {  color: var(--color-melocoton);}.accion-tile--melocoton .accion-tile__flecha {  background-color: rgba(231, 111, 81, 0.22);  color: var(--color-melocoton);}.accion-tile--melocoton .accion-tile__ola {  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%23E76F51' fill-opacity='0.5'/></svg>");}.accion-tile--pizarra {  background: linear-gradient(180deg, #eaf0f8 0%, #ffffff 70%);  border-color: rgba(74, 111, 165, 0.28);}.accion-tile--pizarra .accion-tile__icono {  background: linear-gradient(135deg, var(--color-pizarra) 0%, var(--color-pizarra-dark) 100%);}.accion-tile--pizarra .accion-tile__label {  color: var(--color-pizarra);}.accion-tile--pizarra .accion-tile__flecha {  background-color: rgba(74, 111, 165, 0.18);  color: var(--color-pizarra);}.accion-tile--dorado {  background: linear-gradient(180deg, #fff8e0 0%, #ffffff 70%);  border-color: rgba(242, 183, 5, 0.32);}.accion-tile--dorado .accion-tile__icono {  background: linear-gradient(135deg, var(--color-dorado) 0%, var(--color-dorado-dark) 100%);  color: var(--color-texto-oscuro);}.accion-tile--dorado .accion-tile__label {  color: var(--color-dorado-dark);}.accion-tile--dorado .accion-tile__flecha {  background-color: rgba(242, 183, 5, 0.2);  color: var(--color-dorado-dark);}@media (min-width: 768px) {  .accion-tile {    min-height: 172px;    padding: 26px 26px 38px;  }  .accion-tile__cuerpo {    gap: 20px;  }  .accion-tile__icono {    width: 68px;    height: 68px;    font-size: 28px;  }  .accion-tile__label {    font-size: 22px;  }  .accion-tile__descripcion {    font-size: 14px;  }  .accion-tile__flecha {    width: 42px;    height: 42px;    font-size: 16px;  }  .accion-tile__ola {    height: 36px;  }}
+.accion-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 156px;
+  padding: 22px 22px 34px;
+  border: 1px solid var(--color-borde);
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  text-align: left;
+  overflow: hidden;
+  background-color: var(--color-superficie);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.accion-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.accion-tile:hover .accion-tile__flecha {
+  transform: translateX(4px);
+}
+
+.accion-tile:active {
+  transform: scale(0.98);
+}
+
+.accion-tile:focus-visible {
+  outline: 3px solid var(--color-pizarra);
+  outline-offset: 3px;
+}
+
+.accion-tile__cuerpo {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.accion-tile__icono {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 8px 18px rgba(51, 65, 85, 0.12);
+}
+
+.accion-tile__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.accion-tile__label {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.accion-tile__descripcion {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texto-claro);
+  line-height: 1.3;
+}
+
+.accion-tile__pie {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.accion-tile__flecha {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.accion-tile__ola {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: bottom center;
+  pointer-events: none;
+}
+
+.accion-tile__badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: var(--color-texto-oscuro);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+/* === Variante MENTA (Ir al buffet) === */
+.accion-tile--menta {
+  background: linear-gradient(180deg, #f1f8f4 0%, #ffffff 70%);
+  border-color: rgba(129, 178, 154, 0.28);
+}
+
+.accion-tile--menta .accion-tile__icono {
+  background: linear-gradient(135deg, var(--color-menta) 0%, #6da085 100%);
+}
+
+.accion-tile--menta .accion-tile__label {
+  color: var(--color-menta);
+}
+
+.accion-tile--menta .accion-tile__flecha {
+  background-color: rgba(129, 178, 154, 0.22);
+  color: var(--color-menta);
+}
+
+.accion-tile--menta .accion-tile__ola {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%2381B29A' fill-opacity='0.55'/></svg>");
+}
+
+/* === Variante MANDARINA (Mis pedidos) === */
+.accion-tile--mandarina {
+  background: linear-gradient(180deg, #fff4ea 0%, #ffffff 70%);
+  border-color: rgba(244, 162, 97, 0.3);
+}
+
+.accion-tile--mandarina .accion-tile__icono {
+  background: linear-gradient(135deg, #f4a261 0%, #d97f3e 100%);
+}
+
+.accion-tile--mandarina .accion-tile__label {
+  color: #d97f3e;
+}
+
+.accion-tile--mandarina .accion-tile__flecha {
+  background-color: rgba(244, 162, 97, 0.22);
+  color: #d97f3e;
+}
+
+.accion-tile--mandarina .accion-tile__ola {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%23f4a261' fill-opacity='0.6'/></svg>");
+}
+
+/* === Variante MELOCOTON (Mis favoritos) === */
+.accion-tile--melocoton {
+  background: linear-gradient(180deg, #fdecea 0%, #ffffff 70%);
+  border-color: rgba(231, 111, 81, 0.28);
+}
+
+.accion-tile--melocoton .accion-tile__icono {
+  background: linear-gradient(135deg, var(--color-melocoton) 0%, #c75a3f 100%);
+}
+
+.accion-tile--melocoton .accion-tile__label {
+  color: var(--color-melocoton);
+}
+
+.accion-tile--melocoton .accion-tile__flecha {
+  background-color: rgba(231, 111, 81, 0.22);
+  color: var(--color-melocoton);
+}
+
+.accion-tile--melocoton .accion-tile__ola {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 40' preserveAspectRatio='none'><path d='M0 24 Q 50 4 100 24 T 200 24 T 300 24 T 400 24 L 400 40 L 0 40 Z' fill='%23E76F51' fill-opacity='0.5'/></svg>");
+}
+
+/* === Variantes legacy === */
+.accion-tile--pizarra {
+  background: linear-gradient(180deg, #eaf0f8 0%, #ffffff 70%);
+  border-color: rgba(74, 111, 165, 0.28);
+}
+
+.accion-tile--pizarra .accion-tile__icono {
+  background: linear-gradient(135deg, var(--color-pizarra) 0%, var(--color-pizarra-dark) 100%);
+}
+
+.accion-tile--pizarra .accion-tile__label {
+  color: var(--color-pizarra);
+}
+
+.accion-tile--pizarra .accion-tile__flecha {
+  background-color: rgba(74, 111, 165, 0.18);
+  color: var(--color-pizarra);
+}
+
+.accion-tile--dorado {
+  background: linear-gradient(180deg, #fff8e0 0%, #ffffff 70%);
+  border-color: rgba(242, 183, 5, 0.32);
+}
+
+.accion-tile--dorado .accion-tile__icono {
+  background: linear-gradient(135deg, var(--color-dorado) 0%, var(--color-dorado-dark) 100%);
+  color: var(--color-texto-oscuro);
+}
+
+.accion-tile--dorado .accion-tile__label {
+  color: var(--color-dorado-dark);
+}
+
+.accion-tile--dorado .accion-tile__flecha {
+  background-color: rgba(242, 183, 5, 0.2);
+  color: var(--color-dorado-dark);
+}
+
+@media (min-width: 768px) {
+  .accion-tile {
+    min-height: 172px;
+    padding: 26px 26px 38px;
+  }
+
+  .accion-tile__cuerpo {
+    gap: 20px;
+  }
+
+  .accion-tile__icono {
+    width: 68px;
+    height: 68px;
+    font-size: 28px;
+  }
+
+  .accion-tile__label {
+    font-size: 22px;
+  }
+
+  .accion-tile__descripcion {
+    font-size: 14px;
+  }
+
+  .accion-tile__flecha {
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .accion-tile__ola {
+    height: 36px;
+  }
+}

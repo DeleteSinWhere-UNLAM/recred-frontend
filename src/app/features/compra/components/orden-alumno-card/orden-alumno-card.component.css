@@ -1,1 +1,331 @@
-.orden-alumno {  display: flex;  flex-direction: column;  gap: 16px;  padding: 22px;  background-color: var(--color-superficie);  border-radius: var(--radius-card);  box-shadow: var(--shadow-card);  border: 1px solid var(--color-borde);  transition: border-color 0.2s ease;}.orden-alumno--seleccionado {  border-color: var(--color-dorado);  box-shadow:    0 16px 36px rgba(217, 163, 4, 0.14),    0 3px 10px rgba(74, 111, 165, 0.06);}.orden-alumno__cabecera {  display: flex;  align-items: center;  gap: 14px;}.orden-alumno__check {  position: relative;  display: inline-flex;  cursor: pointer;}.orden-alumno__check input {  position: absolute;  inset: 0;  opacity: 0;  cursor: pointer;}.orden-alumno__check-box {  width: 24px;  height: 24px;  border-radius: 8px;  background-color: var(--color-superficie);  border: 1px solid var(--color-borde);  box-shadow: none;  display: inline-flex;  align-items: center;  justify-content: center;  color: transparent;  font-size: 12px;  transition: background-color 0.15s ease, color 0.15s ease;}.orden-alumno__check input:checked + .orden-alumno__check-box {  background-color: var(--color-dorado);  color: var(--color-texto-oscuro);  box-shadow: none;}.orden-alumno__avatar {  width: 44px;  height: 44px;  border-radius: 50%;  background-color: var(--color-pizarra);  color: #fff;  font-family: var(--font-display);  font-weight: 700;  font-size: 16px;  display: inline-flex;  align-items: center;  justify-content: center;  flex-shrink: 0;  overflow: hidden;}.orden-alumno__avatar-img {  width: 100%;  height: 100%;  object-fit: cover;}.orden-alumno__identidad {  flex: 1;  min-width: 0;}.orden-alumno__nombre {  font-family: var(--font-display);  font-size: 16px;  font-weight: 700;  color: var(--color-texto-oscuro);  line-height: 1.2;}.orden-alumno__grado {  font-size: 12px;  color: var(--color-texto-claro);  margin-top: 2px;}.orden-alumno__saldo {  display: flex;  flex-direction: column;  align-items: flex-end;  gap: 2px;}.orden-alumno__saldo-label {  font-size: 9px;  font-weight: 700;  letter-spacing: 0.8px;  color: var(--color-texto-claro);}.orden-alumno__saldo-valor {  font-family: var(--font-display);  font-size: 16px;  font-weight: 800;  color: var(--color-pizarra);}.orden-alumno__saldo-valor--negativo {  color: var(--color-melocoton);}.orden-alumno__alerta {  display: inline-flex;  align-items: center;  gap: 8px;  padding: 10px 14px;  background-color: rgba(231, 111, 81, 0.12);  border: 1px solid rgba(231, 111, 81, 0.18);  color: var(--color-melocoton);  border-radius: var(--radius-button);  font-size: 13px;  font-weight: 600;}.orden-alumno__items {  display: flex;  flex-direction: column;  gap: 10px;}.orden-alumno__opciones {  display: grid;  grid-template-columns: 1fr 1fr;  gap: 12px;}.orden-alumno__campo {  display: flex;  flex-direction: column;  gap: 6px;}.orden-alumno__campo-label {  font-size: 11px;  font-weight: 700;  letter-spacing: 0.6px;  text-transform: uppercase;  color: var(--color-texto-claro);}.orden-alumno__input {  padding: 10px 12px;  background-color: var(--color-superficie);  border-radius: var(--radius-button);  box-shadow: none;  border: 1px solid var(--color-borde);  color: var(--color-texto-oscuro);  font-family: var(--font-body);  font-size: 14px;  font-weight: 600;}.orden-alumno__input:focus {  outline: none;  border-color: var(--color-pizarra);  box-shadow: 0 0 0 4px var(--color-foco);}.orden-alumno__pie {  display: flex;  align-items: center;  justify-content: space-between;  padding-top: 12px;  border-top: 1px dashed rgba(74, 111, 165, 0.2);}.orden-alumno__pie-label {  font-family: var(--font-display);  font-size: 13px;  font-weight: 700;  letter-spacing: 0.5px;  text-transform: uppercase;  color: var(--color-texto-claro);}.orden-alumno__pie-valor {  font-family: var(--font-display);  font-size: 22px;  font-weight: 800;  color: var(--color-pizarra);}@media (max-width: 640px) {  .orden-alumno__opciones {    grid-template-columns: 1fr;  }  .orden-alumno__saldo {    display: none;  }}.orden-alumno__pie-resumen {  display: flex;  flex-direction: column;  align-items: flex-end;}.orden-alumno__favorito-btn {  display: inline-flex;  align-items: center;  gap: 8px;  padding: 8px 14px;  border-radius: var(--radius-button);  border: 1px solid rgba(74, 111, 165, 0.3);  color: var(--color-pizarra);  font-family: var(--font-body);  font-size: 13px;  font-weight: 600;  background-color: transparent;  transition: var(--transition-ui);}.orden-alumno__favorito-btn:hover {  background-color: rgba(74, 111, 165, 0.06);  border-color: var(--color-pizarra);  color: var(--color-pizarra-dark);}.orden-alumno__favorito-btn i {  font-size: 14px;  color: var(--color-melocoton);}.orden-alumno__favorito-btn:disabled {  background-color: #f1f5f9 !important;  border-color: #cbd5e1 !important;  color: #94a3b8 !important;  cursor: not-allowed !important;}.orden-alumno__favorito-btn:disabled i {  color: #94a3b8 !important;}.orden-alumno__retiro-lectura {  display: grid;  grid-template-columns: 1fr 1fr;  gap: 12px;  grid-column: 1 / -1;}.orden-alumno__retiro-dato {  display: flex;  flex-direction: column;  gap: 5px;  padding: 10px 14px;  background-color: rgba(74, 111, 165, 0.04);  border: 1px solid rgba(74, 111, 165, 0.12);  border-radius: var(--radius-button);}.orden-alumno__retiro-dato-label {  display: flex;  align-items: center;  gap: 5px;  font-size: 10px;  font-weight: 800;  text-transform: uppercase;  letter-spacing: 0.5px;  color: var(--color-texto-claro);}.orden-alumno__retiro-dato-label i {  color: var(--color-pizarra);  font-size: 11px;}.orden-alumno__retiro-dato-valor {  font-family: var(--font-display);  font-size: 15px;  font-weight: 800;  color: var(--color-pizarra);}.orden-alumno__retiro-editar {  display: inline-flex;  align-items: center;  justify-content: center;  gap: 7px;  min-height: 40px;  padding: 0 16px;  background-color: rgba(74, 111, 165, 0.07);  border: 1px solid rgba(74, 111, 165, 0.2);  border-radius: var(--radius-button);  color: var(--color-pizarra);  font-family: var(--font-display);  font-size: 13px;  font-weight: 800;  grid-column: 1 / -1;  transition: background-color var(--transition-ui), border-color var(--transition-ui);}.orden-alumno__retiro-editar:hover {  background-color: rgba(74, 111, 165, 0.12);  border-color: var(--color-pizarra);}.orden-alumno__retiro-editar i {  font-size: 13px;}@media (max-width: 640px) {  .orden-alumno__retiro-lectura {    grid-template-columns: 1fr;  }}
+.orden-alumno {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  background-color: var(--color-superficie);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-borde);
+  transition: border-color 0.2s ease;
+}
+
+.orden-alumno--seleccionado {
+  border-color: var(--color-dorado);
+  box-shadow:
+    0 16px 36px rgba(217, 163, 4, 0.14),
+    0 3px 10px rgba(74, 111, 165, 0.06);
+}
+
+.orden-alumno__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.orden-alumno__check {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.orden-alumno__check input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.orden-alumno__check-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background-color: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  font-size: 12px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.orden-alumno__check input:checked + .orden-alumno__check-box {
+  background-color: var(--color-dorado);
+  color: var(--color-texto-oscuro);
+  box-shadow: none;
+}
+
+.orden-alumno__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--color-pizarra);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.orden-alumno__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.orden-alumno__identidad {
+  flex: 1;
+  min-width: 0;
+}
+
+.orden-alumno__nombre {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-texto-oscuro);
+  line-height: 1.2;
+}
+
+.orden-alumno__grado {
+  font-size: 12px;
+  color: var(--color-texto-claro);
+  margin-top: 2px;
+}
+
+.orden-alumno__saldo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.orden-alumno__saldo-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__saldo-valor {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+.orden-alumno__saldo-valor--negativo {
+  color: var(--color-melocoton);
+}
+
+.orden-alumno__alerta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: rgba(231, 111, 81, 0.12);
+  border: 1px solid rgba(231, 111, 81, 0.18);
+  color: var(--color-melocoton);
+  border-radius: var(--radius-button);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.orden-alumno__items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.orden-alumno__opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.orden-alumno__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.orden-alumno__campo-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__input {
+  padding: 10px 12px;
+  background-color: var(--color-superficie);
+  border-radius: var(--radius-button);
+  box-shadow: none;
+  border: 1px solid var(--color-borde);
+  color: var(--color-texto-oscuro);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.orden-alumno__input:focus {
+  outline: none;
+  border-color: var(--color-pizarra);
+  box-shadow: 0 0 0 4px var(--color-foco);
+}
+
+.orden-alumno__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(74, 111, 165, 0.2);
+}
+
+.orden-alumno__pie-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__pie-valor {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+@media (max-width: 640px) {
+  .orden-alumno__opciones {
+    grid-template-columns: 1fr;
+  }
+  .orden-alumno__saldo {
+    display: none;
+  }
+}
+
+.orden-alumno__pie-resumen {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.orden-alumno__favorito-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-button);
+  border: 1px solid rgba(74, 111, 165, 0.3);
+  color: var(--color-pizarra);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  background-color: transparent;
+  transition: var(--transition-ui);
+}
+
+.orden-alumno__favorito-btn:hover {
+  background-color: rgba(74, 111, 165, 0.06);
+  border-color: var(--color-pizarra);
+  color: var(--color-pizarra-dark);
+}
+
+.orden-alumno__favorito-btn i {
+  font-size: 14px;
+  color: var(--color-melocoton);
+}
+
+.orden-alumno__favorito-btn:disabled {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+.orden-alumno__favorito-btn:disabled i {
+  color: #94a3b8 !important;
+}
+
+/* Read-only retiro display */
+.orden-alumno__retiro-lectura {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  grid-column: 1 / -1;
+}
+
+.orden-alumno__retiro-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 14px;
+  background-color: rgba(74, 111, 165, 0.04);
+  border: 1px solid rgba(74, 111, 165, 0.12);
+  border-radius: var(--radius-button);
+}
+
+.orden-alumno__retiro-dato-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-texto-claro);
+}
+
+.orden-alumno__retiro-dato-label i {
+  color: var(--color-pizarra);
+  font-size: 11px;
+}
+
+.orden-alumno__retiro-dato-valor {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-pizarra);
+}
+
+.orden-alumno__retiro-editar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 16px;
+  background-color: rgba(74, 111, 165, 0.07);
+  border: 1px solid rgba(74, 111, 165, 0.2);
+  border-radius: var(--radius-button);
+  color: var(--color-pizarra);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  grid-column: 1 / -1;
+  transition: background-color var(--transition-ui), border-color var(--transition-ui);
+}
+
+.orden-alumno__retiro-editar:hover {
+  background-color: rgba(74, 111, 165, 0.12);
+  border-color: var(--color-pizarra);
+}
+
+.orden-alumno__retiro-editar i {
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .orden-alumno__retiro-lectura {
+    grid-template-columns: 1fr;
+  }
+}
