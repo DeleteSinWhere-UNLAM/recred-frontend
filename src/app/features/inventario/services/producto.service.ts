@@ -70,7 +70,7 @@ export class ProductoService {
     );
   }
 
-  getById(id: string, buffetId?: string): Observable<Producto> {
+  getById(id: string, buffetId?: string | null): Observable<Producto> {
     const url = `${this.baseUrl}/${id}`;
     if (buffetId) {
       return this.http.get<Producto>(url, { params: { buffetId } });
