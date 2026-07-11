@@ -17,7 +17,7 @@
 
   @if (supplier(); as data) {
   <div class="detail-layout">
-    <!-- Profile Sidebar Card -->
+
     <aside class="profile-card">
       <div class="profile-card__header">
         <div class="profile-card__avatar">
@@ -56,9 +56,9 @@
       </div>
     </aside>
 
-    <!-- Upload Zone & History -->
+
     <section class="main-content" aria-label="Historial de listas de precios e IA">
-      <!-- File Upload Zone -->
+
       <article class="upload-card">
         <h2 class="section-title">Actualizar Lista de Precios</h2>
         <p class="section-description">Subí una nueva lista de precios para que se extraigan los
@@ -91,7 +91,7 @@
         }
       </article>
 
-      <!-- Price Lists History -->
+
       <article class="history-card">
         <h2 class="section-title">Historial de Listas Cargadas</h2>
 
@@ -154,7 +154,7 @@
     </section>
   </div>
   }
-  <!-- Consultar Precios Modal -->
+
   @if (isPricesModalOpen()) {
   <div class="modal-overlay" (click)="closePricesModal()" tabindex="-1" (keydown.enter)="closePricesModal()">
     <div class="modal-dialog modal-dialog--large" (click)="$event.stopPropagation()" tabindex="-1"

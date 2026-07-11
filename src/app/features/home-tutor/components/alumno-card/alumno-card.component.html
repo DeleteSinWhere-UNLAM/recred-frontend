@@ -1,4 +1,3 @@
-<!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
 <article class="alumno-card">
 
   <header class="alumno-card__header">
@@ -44,7 +43,7 @@
 
     <div class="alumno-card__acciones-grid" role="group" aria-label="Acciones principales de alumno">
 
-    <a class="alumno-card__btn alumno-card__btn--menta" (click)="navegar('/acreditar-mercado-pago')"
+    <a class="alumno-card__btn alumno-card__btn--menta" (click)="navegar('/acreditar-mercado-pago')" (keyup.enter)="navegar('/acreditar-mercado-pago')" tabindex="0"
       [class.active]="isActive('/acreditar-mercado-pago')">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-plus"></i>
@@ -52,7 +51,7 @@
       <span class="alumno-card__btn-label">Acreditar</span>
     </a>
 
-    <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')"
+    <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')" (keyup.enter)="navegar('/restricciones-horarias')" tabindex="0"
       [class.active]="isActive('/restricciones-horarias')">
     <span class="alumno-card__btn-icono" aria-hidden="true">
       <i class="fa-solid fa-clock"></i>
@@ -60,7 +59,7 @@
     <span class="alumno-card__btn-label">Horarios</span>
     </a>
 
-    <a class="alumno-card__btn alumno-card__btn--gris" (click)="navegar('/tutor-movimientos')"
+    <a class="alumno-card__btn alumno-card__btn--gris" (click)="navegar('/tutor-movimientos')" (keyup.enter)="navegar('/tutor-movimientos')" tabindex="0"
       [class.active]="isActive('/tutor-movimientos')">
       <span class="alumno-card__btn-icono" aria-hidden="true">
         <i class="fa-solid fa-list"></i>
@@ -72,7 +71,7 @@
   <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
     <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
 
-      <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')"
+      <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')" (keyup.enter)="navegar('/restricciones-nutricionales')" tabindex="0"
         [class.active]="isActive('/restricciones-nutricionales')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-shield"></i>
@@ -80,7 +79,7 @@
         <span class="alumno-card__btn-label">Restricciones</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')"
+      <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')" (keyup.enter)="navegar('/favoritos-alumno')" tabindex="0"
         [class.active]="isActive('/favoritos-alumno')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-heart"></i>
@@ -88,7 +87,7 @@
         <span class="alumno-card__btn-label">Favoritos</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--pizarra" (click)="navegar('/estadistica')"
+      <a class="alumno-card__btn alumno-card__btn--pizarra" (click)="navegar('/estadistica')" (keyup.enter)="navegar('/estadistica')" tabindex="0"
         [class.active]="isActive('/estadistica')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-chart-line"></i>
@@ -96,7 +95,7 @@
         <span class="alumno-card__btn-label">Estadística</span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--morado" (click)="navegar('/movimientos-pendientes')"
+      <a class="alumno-card__btn alumno-card__btn--morado" (click)="navegar('/movimientos-pendientes')" (keyup.enter)="navegar('/movimientos-pendientes')" tabindex="0"
         [class.active]="isActive('/movimientos-pendientes')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-clock-rotate-left"></i>
@@ -106,7 +105,7 @@
         </span>
         <span class="alumno-card__btn-label">Pendientes</span>
       </a>
-      <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')"
+      <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')" (keyup.enter)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')" tabindex="0"
         [class.active]="isActive('/prediccion-gasto')"
         [class.alumno-card__btn--disabled]="planBloqueado('INTERMEDIO')"
         [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
@@ -121,7 +120,7 @@
         </span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegarConPlan('/preferencias', 'INTERMEDIO')"
+      <a class="alumno-card__btn alumno-card__btn--violeta" (click)="navegarConPlan('/preferencias', 'INTERMEDIO')" (keyup.enter)="navegarConPlan('/preferencias', 'INTERMEDIO')" tabindex="0"
         [class.active]="isActive('/preferencias')"
         [class.alumno-card__btn--disabled]="planBloqueado('INTERMEDIO')"
         [attr.aria-disabled]="planBloqueado('INTERMEDIO')">
@@ -136,7 +135,7 @@
         </span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')"
+      <a class="alumno-card__btn alumno-card__btn--dorado" (click)="navegar('/presupuesto')" (keyup.enter)="navegar('/presupuesto')" tabindex="0"
         [class.active]="isActive('/presupuesto')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-piggy-bank"></i>
@@ -145,7 +144,7 @@
       </a>
 
       @if (esPadre) {
-      <a class="alumno-card__btn alumno-card__btn--menta" title="Adelanto" (click)="navegar('/adelanto')"
+      <a class="alumno-card__btn alumno-card__btn--menta" title="Adelanto" (click)="navegar('/adelanto')" (keyup.enter)="navegar('/adelanto')" tabindex="0"
         [class.active]="isActive('/adelanto')" [class.alumno-card__btn--disabled]="planBloqueado('AVANZADO')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
           <i class="fa-solid fa-hand-holding-dollar"></i>
@@ -158,7 +157,7 @@
         </span>
       </a>
 
-      <a class="alumno-card__btn alumno-card__btn--azul" title="Transferir" (click)="navegarConPlan('/transferir-saldo', 'AVANZADO')"
+      <a class="alumno-card__btn alumno-card__btn--azul" title="Transferir" (click)="navegarConPlan('/transferir-saldo', 'AVANZADO')" (keyup.enter)="navegarConPlan('/transferir-saldo', 'AVANZADO')" tabindex="0"
         [class.active]="isActive('/transferir-saldo')"
         [class.alumno-card__btn--disabled]="planBloqueado('AVANZADO')"
         [attr.aria-disabled]="planBloqueado('AVANZADO')">
@@ -194,7 +193,7 @@
     </div>
   }
 
-  <a class="alumno-card__cta" (click)="navegar('/buffet')">
+  <a class="alumno-card__cta" (click)="navegar('/buffet')" (keyup.enter)="navegar('/buffet')" tabindex="0">
     <i class="fa-solid fa-utensils" aria-hidden="true"></i>
     Ir al buffet
   </a>

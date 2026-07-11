@@ -49,25 +49,25 @@
           <tr class="mapping-row" [class.mapping-row--suggested]="item.productoInventarioId && !item.mappingConfirmado"
             [class.mapping-row--unmapped]="!item.productoInventarioId && !item.mappingConfirmado"
             [class.mapping-row--confirmed]="item.mappingConfirmado">
-            <!-- Supplier Product Name -->
+
             <td class="font-semibold">{{ item.nombreProductoProveedor }}</td>
 
-            <!-- Unit -->
+
             <td><span class="unit-pill">{{ item.unidad || 'unidad' }}</span></td>
 
-            <!-- Extracted Notes -->
+
             <td class="notes-cell">
               <span class="notes-text" [title]="item.notas">{{ item.notas || '-' }}</span>
             </td>
 
-            <!-- Cost -->
+
             <td class="font-semibold text-right">
               {{ item.precio | currency: 'ARS': 'symbol-narrow': '1.2-2' }}
             </td>
 
-            <!-- Product Mapped Dropdown Selector -->
+
             <td class="dropdown-cell">
-              <!-- Match Badge & Selector Box -->
+
               <div class="selector-box" (click)="openProductDropdown(item.id, $event)" tabindex="0"
                 (keydown.enter)="openProductDropdown(item.id, $event)"
                 [class.selector-box--suggested]="item.productoInventarioId && !item.mappingConfirmado"
@@ -92,9 +92,9 @@
                 <i class="fa-solid fa-chevron-down selector-box__arrow"></i>
               </div>
 
-              <!-- Dynamic Search Dropdown Overlay -->
+
               @if (activeDropdownRowId() === item.id) {
-              <!-- Full screen click-catcher for closing dropdown -->
+
               <div class="dropdown-overlay" (click)="closeProductDropdown()" tabindex="-1"
                 (keydown.enter)="closeProductDropdown()"></div>
 
@@ -129,7 +129,7 @@
               }
             </td>
 
-            <!-- Confirm Action Button -->
+
             <td>
               @if (item.productoInventarioId && !item.mappingConfirmado) {
               <button class="confirm-btn" (click)="confirmMapping(item)" title="Confirmar sugerencia de IA">

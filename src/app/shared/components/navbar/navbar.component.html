@@ -10,17 +10,16 @@
       </a>
     </div>
 
-    <button type="button" class="navbar__burger" (click)="toggleMenuMobile()" [attr.aria-expanded]="menuMobileAbierto()" aria-label="Abrir menú">
-      <i class="fa-solid" [class.fa-bars]="!menuMobileAbierto()" [class.fa-xmark]="menuMobileAbierto()" aria-hidden="true"></i>
+    <button type="button" class="navbar__burger" (click)="toggleMenuMobile()" [attr.aria-expanded]="menuMobileAbierto()"
+      aria-label="Abrir menú">
+      <i class="fa-solid" [class.fa-bars]="!menuMobileAbierto()" [class.fa-xmark]="menuMobileAbierto()"
+        aria-hidden="true"></i>
     </button>
 
     <nav class="navbar__actions" [class.navbar__actions--open]="menuMobileAbierto()" aria-label="Acciones principales">
       @if (!esVistaAlumno() && !esVistaKiosquero() && !esVistaDirectivo() && !esVistaAdmin()) {
-      <a class="navbar__dashboard-link"
-        [class.navbar__dashboard-link--locked]="planBloqueado('INTERMEDIO')"
-        [attr.aria-disabled]="planBloqueado('INTERMEDIO')"
-        href="/tutor-dashboard"
-        (click)="irAPanelTutor($event)"
+      <a class="navbar__dashboard-link" [class.navbar__dashboard-link--locked]="planBloqueado('INTERMEDIO')"
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')" href="/tutor-dashboard" (click)="irAPanelTutor($event)"
         title="Ir al panel de control">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span class="max-xl:hidden">Panel de Control</span>
@@ -31,11 +30,13 @@
           Intermedio
         </span>
       </a>
-      <a class="navbar__movimientos-link" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" tabindex="0" style="cursor: pointer;" title="Ver historial de movimientos">
+      <a class="navbar__movimientos-link" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()" tabindex="0"
+        style="cursor: pointer;" title="Ver historial de movimientos">
         <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
         <span class="max-xl:hidden">Ver movimientos</span>
       </a>
-      <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']" title="Gestionar carritos favoritos">
+      <a class="navbar__carritos-favoritos-link" [routerLink]="['/carritos-favoritos']"
+        title="Gestionar carritos favoritos">
         <i class="fa-regular fa-heart" aria-hidden="true"></i>
         <span class="max-xl:hidden">Carritos Favoritos</span>
       </a>
@@ -44,8 +45,7 @@
       @if (esVistaKiosquero()) {
       <a class="navbar__kiosk-link navbar__kiosk-link--premium"
         [class.navbar__kiosk-link--locked]="planBloqueado('INTERMEDIO')"
-        [attr.aria-disabled]="planBloqueado('INTERMEDIO')" href="/kiosquero/reportes"
-        (click)="irAPanelControl($event)">
+        [attr.aria-disabled]="planBloqueado('INTERMEDIO')" href="/kiosquero/reportes" (click)="irAPanelControl($event)">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <span class="max-xl:hidden">Panel de control</span>
         <span class="navbar__premium-badge">
@@ -64,9 +64,8 @@
         </button>
         @if (menuKiosqueroAbierto()) {
         <div class="navbar__menu navbar__menu--kiosk-tools" role="menu">
-          <button type="button" class="navbar__menu-item"
-            [class.navbar__menu-item--locked]="planBloqueado('AVANZADO')" role="menuitem"
-            [attr.aria-disabled]="planBloqueado('AVANZADO')" (click)="irARecomendacionesEstacionales()">
+          <button type="button" class="navbar__menu-item" [class.navbar__menu-item--locked]="planBloqueado('AVANZADO')"
+            role="menuitem" [attr.aria-disabled]="planBloqueado('AVANZADO')" (click)="irARecomendacionesEstacionales()">
             <i class="fa-solid fa-leaf" aria-hidden="true"></i>
             <span>Recomendaciones estacionales</span>
             <span class="navbar__premium-badge">
@@ -76,9 +75,8 @@
               Avanzado
             </span>
           </button>
-          <button type="button" class="navbar__menu-item"
-            [class.navbar__menu-item--locked]="planBloqueado('AVANZADO')" role="menuitem"
-            [attr.aria-disabled]="planBloqueado('AVANZADO')" (click)="irAPromociones()">
+          <button type="button" class="navbar__menu-item" [class.navbar__menu-item--locked]="planBloqueado('AVANZADO')"
+            role="menuitem" [attr.aria-disabled]="planBloqueado('AVANZADO')" (click)="irAPromociones()">
             <i class="fa-solid fa-tags" aria-hidden="true"></i>
             <span>Promociones</span>
             <span class="navbar__premium-badge">
@@ -94,9 +92,9 @@
       }
 
       <div class="navbar__notif-wrap">
-        <button type="button" class="navbar__notif"
-          [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'" [attr.aria-expanded]="menuNotifAbierto()"
-          aria-haspopup="menu" (click)="toggleNotificaciones()" title="Ver notificaciones">
+        <button type="button" class="navbar__notif" [attr.aria-label]="'Notificaciones, ' + notifCount() + ' nuevas'"
+          [attr.aria-expanded]="menuNotifAbierto()" aria-haspopup="menu" (click)="toggleNotificaciones()"
+          title="Ver notificaciones">
           <i class="fa-solid fa-bell" aria-hidden="true"></i>
           @if (notifCount() > 0) {
           <span class="navbar__notif-badge">{{ notifCount() }}</span>
@@ -107,8 +105,7 @@
           <div class="navbar__notif-header">
             <p class="navbar__menu-titulo">Notificaciones</p>
             @if (notifCount() > 0) {
-            <button type="button" class="navbar__notif-marcar-todas"
-              (click)="marcarTodasComoLeidas()"
+            <button type="button" class="navbar__notif-marcar-todas" (click)="marcarTodasComoLeidas()"
               title="Marcar todas como leídas">
               <i class="fa-solid fa-check-double" aria-hidden="true"></i>
               <span>Marcar todas</span>
@@ -120,21 +117,22 @@
           } @else {
           <div class="navbar__notif-list">
             @for (notif of notificaciones(); track notif.id || $index) {
-            <div class="navbar__notif-item"
-              [class.navbar__notif-item--unread]="!notif.read"
+            <div class="navbar__notif-item" [class.navbar__notif-item--unread]="!notif.read"
               [class.navbar__notif-item--read]="notif.read">
-              
-              <div class="navbar__notif-content" (click)="clickEnNotificacion(notif)" (keyup.enter)="clickEnNotificacion(notif)" tabindex="0" style="cursor: pointer;">
+
+              <div class="navbar__notif-content" (click)="clickEnNotificacion(notif)"
+                (keyup.enter)="clickEnNotificacion(notif)" tabindex="0" style="cursor: pointer;">
                 <span class="navbar__notif-titulo">{{ notif.titulo }}</span>
                 <span class="navbar__notif-mensaje">{{ notif.mensaje }}</span>
               </div>
 
               @if (notif.tipo === 'PURCHASE_SUGGESTION' && notif.producto && notif.alumnoId && notif.sugerenciaId) {
-                <div class="navbar__notif-actions" style="margin-top: 8px;">
-                   <button type="button" class="btn-buy" style="padding: 6px 12px; font-size: 14px; width: auto;" (click)="comprarSugerencia($event, notif)">
-                     <i class="fa-solid fa-cart-shopping"></i> Comprar
-                   </button>
-                </div>
+              <div class="navbar__notif-actions" style="margin-top: 8px;">
+                <button type="button" class="btn-buy" style="padding: 6px 12px; font-size: 14px; width: auto;"
+                  (click)="comprarSugerencia($event, notif)">
+                  <i class="fa-solid fa-cart-shopping"></i> Comprar
+                </button>
+              </div>
               }
             </div>
             }
@@ -153,16 +151,6 @@
         }
       </button>
       }
-
-      <!-- Ocultado momentáneamente a pedido del usuario -->
-      <!-- <button type="button" class="navbar__theme-toggle" (click)="toggleTema()"
-        [attr.aria-label]="temaActivo() === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'">
-        @if (temaActivo() === 'light') {
-        <i class="fa-solid fa-moon" aria-hidden="true"></i>
-        } @else {
-        <i class="fa-solid fa-sun" aria-hidden="true"></i>
-        }
-      </button> -->
 
       <div class="navbar__perfil-wrap">
         <button type="button" class="navbar__perfil" aria-label="Mi perfil" [attr.aria-expanded]="menuAbierto()"
@@ -201,8 +189,8 @@
             </button>
             }
             }
-            <button type="button" class="navbar__menu-item navbar__submenu-item navbar__submenu-item--add" role="menuitem"
-              (click)="irAAgregarHijo()">
+            <button type="button" class="navbar__menu-item navbar__submenu-item navbar__submenu-item--add"
+              role="menuitem" (click)="irAAgregarHijo()">
               <i class="fa-solid fa-circle-plus" aria-hidden="true" style="color: var(--color-pizarra);"></i>
               <span style="font-weight: 700; color: var(--color-pizarra);">Agregar hijo</span>
             </button>

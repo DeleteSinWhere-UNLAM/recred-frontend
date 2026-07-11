@@ -32,33 +32,27 @@
   </div>
 
   @if (montoLimite !== null) {
-    <div
-      class="prediction-summary__limite"
-      [class.prediction-summary__limite--danger]="(porcentajePresupuesto || 0) > 0.8"
-    >
-      <div class="prediction-summary__limite-info">
-        <span>Límite: {{ montoLimite | number:'1.2-2' }} $</span>
-        <strong>{{ (porcentajePresupuesto || 0) | percent:'1.0-2' }}</strong>
-      </div>
-      <div class="prediction-summary__barra">
-        <!-- Gasto Actual (Color Menta o Melocotón si supera límite) -->
-        <div
-          class="prediction-summary__barra-fill prediction-summary__barra-fill--actual"
-          [style.width.%]="porcentajeActualPorc"
-        ></div>
-        <!-- Gasto Predicho (Diferencia visual) -->
-        <div
-          class="prediction-summary__barra-fill prediction-summary__barra-fill--predicho"
-          [style.width.%]="porcentajePredichoPorc"
-          [style.left.%]="porcentajeActualPorc"
-          [style.width.%]="porcentajePredichoPorc - porcentajeActualPorc > 0 ? porcentajePredichoPorc - porcentajeActualPorc : 0"
-        ></div>
+  <div class="prediction-summary__limite"
+    [class.prediction-summary__limite--danger]="(porcentajePresupuesto || 0) > 0.8">
+    <div class="prediction-summary__limite-info">
+      <span>Límite: {{ montoLimite | number:'1.2-2' }} $</span>
+      <strong>{{ (porcentajePresupuesto || 0) | percent:'1.0-2' }}</strong>
+    </div>
+    <div class="prediction-summary__barra">
+
+      <div class="prediction-summary__barra-fill prediction-summary__barra-fill--actual"
+        [style.width.%]="porcentajeActualPorc"></div>
+
+      <div class="prediction-summary__barra-fill prediction-summary__barra-fill--predicho"
+        [style.width.%]="porcentajePredichoPorc" [style.left.%]="porcentajeActualPorc"
+        [style.width.%]="porcentajePredichoPorc - porcentajeActualPorc > 0 ? porcentajePredichoPorc - porcentajeActualPorc : 0">
       </div>
     </div>
+  </div>
   } @else {
-    <p class="prediction-summary__vacio">
-      No hay un límite de presupuesto definido para este período.
-    </p>
+  <p class="prediction-summary__vacio">
+    No hay un límite de presupuesto definido para este período.
+  </p>
   }
 
   <div class="prediction-summary__footer">
