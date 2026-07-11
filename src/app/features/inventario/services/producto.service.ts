@@ -71,7 +71,7 @@ export class ProductoService {
   }
 
   getById(id: string, buffetId?: string | null): Observable<Producto> {
-    const params: { [key: string]: string } = {};
+    const params: Record<string, string> = {};
     if (buffetId) {
       params['buffetId'] = buffetId;
     }
