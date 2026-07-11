@@ -262,6 +262,35 @@ describe('CierreDiarioPage', () => {
 
       thenSePidieronLosDailyCloses({ from: '2026-06-01', to: '2026-06-12' });
     });
+
+    it('dado que falta una fecha del historial, el boton buscar deberia estar deshabilitado', () => {
+      whenMonto();
+      whenAbroModalHistorial();
+
+      thenElBotonBuscarHistorialEstaDeshabilitado(true);
+
+      whenSeteoFiltroHistorial('2026-06-01', '');
+
+      thenElBotonBuscarHistorialEstaDeshabilitado(true);
+
+      whenSeteoFiltroHistorial('2026-06-01', '2026-06-12');
+
+      thenElBotonBuscarHistorialEstaDeshabilitado(false);
+    });
+
+    it('dado un rango de fechas invalido, no deberia buscar cierres y deberia mostrar error', () => {
+      whenMonto();
+      whenAbroModalHistorial();
+      const callsInicial = servicioCierre.getDailyCloses.calls.count();
+
+      whenSeteoFiltroHistorial('2026-06-12', '2026-06-01');
+      whenBuscoHistorialDesdeMetodo();
+      fixture.detectChanges();
+
+      thenElBotonBuscarHistorialEstaDeshabilitado(true);
+      expect(servicioCierre.getDailyCloses.calls.count()).toBe(callsInicial);
+      thenElContenidoContiene('La fecha desde no puede ser posterior a la fecha hasta.');
+    });
   });
 
   describe('cerrar el dia', () => {
@@ -814,12 +843,17 @@ describe('CierreDiarioPage', () => {
     desde.dispatchEvent(new Event('change'));
     hasta.value = hastaValor;
     hasta.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
   }
 
   function whenAplicoFiltroHistorial(): void {
     queryUno<HTMLButtonElement>(
       '.daily-close-modal--history .daily-close__history-filters button',
     )?.click();
+  }
+
+  function whenBuscoHistorialDesdeMetodo(): void {
+    (component as unknown as { searchCloseHistory(): void }).searchCloseHistory();
   }
 
   function whenSeleccionoCierreHistorial(cierre: ReturnType<typeof RegistroCierreDiarioMother.crear>): void {
@@ -911,6 +945,13 @@ describe('CierreDiarioPage', () => {
 
   function thenElSelectorExiste(selector: string): void {
     expect(queryUno(selector)).toBeTruthy();
+  }
+
+  function thenElBotonBuscarHistorialEstaDeshabilitado(esperado: boolean): void {
+    const boton = queryUno<HTMLButtonElement>(
+      '.daily-close-modal--history .daily-close__history-filters button',
+    );
+    expect(boton?.disabled).toBe(esperado);
   }
 
   function thenElPrimerProductoDeInventarioEs(nombre: string): void {

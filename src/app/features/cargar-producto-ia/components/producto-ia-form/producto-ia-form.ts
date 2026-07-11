@@ -3,6 +3,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angula
 import { RespuestaProductoIa } from "../../models/producto-ia-response.interface";
 import { SolicitudGuardarProducto } from "../../models/guardar-producto-request.interface";
 import { Categoria } from "../../../inventario/models/categoria.interface";
+import {
+  ClasificacionSaludCatalogoItem,
+  ClaveRestriccion,
+  obtenerIdClasificacionPorClave,
+} from "../../../restricciones-nutricionales/models/restricciones-nutricionales.model";
 
 @Component({
   selector: "app-ai-product-form",
@@ -14,6 +19,7 @@ import { Categoria } from "../../../inventario/models/categoria.interface";
 export class ProductoIaForm implements OnInit, OnChanges {
   @Input() prefillData: RespuestaProductoIa | null = null;
   @Input() categories: Categoria[] = [];
+  @Input() healthClassifications: ClasificacionSaludCatalogoItem[] = [];
   @Input() isSaving = false;
   @Input() buffetId = "";
   @Output() save = new EventEmitter<SolicitudGuardarProducto>();
@@ -32,6 +38,7 @@ export class ProductoIaForm implements OnInit, OnChanges {
     contiene_mani: [false],
     contiene_lactosa: [false],
     contiene_tacc: [false],
+    clasificacionesSaludIds: [[] as string[]],
     urlImagen: [""],
   });
 
@@ -45,7 +52,18 @@ export class ProductoIaForm implements OnInit, OnChanges {
         contiene_mani: this.prefillData.contiene_mani,
         contiene_lactosa: this.prefillData.contiene_lactosa,
         contiene_tacc: this.prefillData.contiene_tacc,
+        clasificacionesSaludIds: this.buildPrefillHealthClassificationIds(this.prefillData),
         urlImagen: this.prefillData.url_imagen || "",
+      });
+    } else if (changes["prefillData"] && this.prefillData === null) {
+      this.productForm.reset(this.getInitialFormValue());
+    } else if (
+      changes["healthClassifications"]
+      && this.prefillData
+      && this.getSelectedHealthClassificationIds().length === 0
+    ) {
+      this.productForm.patchValue({
+        clasificacionesSaludIds: this.buildPrefillHealthClassificationIds(this.prefillData),
       });
     }
   }
@@ -91,7 +109,7 @@ export class ProductoIaForm implements OnInit, OnChanges {
         nuevaCategoriaNombre: formValue.categoriaId === "NEW" ? formValue.nuevaCategoriaNombre : "",
         buffetId: this.buffetId,
         stockActual: formValue.stockActual,
-        clasificacionesSaludIds: this.buildHealthClassificationIds(formValue),
+        clasificacionesSaludIds: this.getSelectedHealthClassificationIds(),
         tiposIds: [],
         urlImagen: formValue.urlImagen,
       };
@@ -113,11 +131,66 @@ export class ProductoIaForm implements OnInit, OnChanges {
     return value / 1000;
   }
 
-  private buildHealthClassificationIds(formValue: Record<string, unknown>): string[] {
+  private getInitialFormValue(): Record<string, unknown> {
+    return {
+      nombre: "",
+      descripcion: "",
+      peso: 0,
+      precio: 0,
+      stockActual: 0,
+      categoriaId: null,
+      nuevaCategoriaNombre: "",
+      requierePreparacion: false,
+      contiene_azucar: false,
+      contiene_mani: false,
+      contiene_lactosa: false,
+      contiene_tacc: false,
+      clasificacionesSaludIds: [],
+      urlImagen: "",
+    };
+  }
+
+  isHealthClassificationSelected(id: string): boolean {
+    return this.getSelectedHealthClassificationIds().includes(id);
+  }
+
+  toggleHealthClassification(id: string, event: Event): void {
+    const checked = (event.target as HTMLInputElement | null)?.checked ?? false;
+    const selected = new Set(this.getSelectedHealthClassificationIds());
+
+    if (checked) {
+      selected.add(id);
+    } else {
+      selected.delete(id);
+    }
+
+    this.productForm.patchValue({ clasificacionesSaludIds: [...selected] });
+    this.productForm.get("clasificacionesSaludIds")?.markAsDirty();
+  }
+
+  private getSelectedHealthClassificationIds(): string[] {
+    const value = this.productForm.get("clasificacionesSaludIds")?.value;
+    return Array.isArray(value) ? value : [];
+  }
+
+  private buildPrefillHealthClassificationIds(prefill: RespuestaProductoIa): string[] {
     const ids: string[] = [];
-    if (!formValue["contiene_tacc"]) ids.push("15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8");
-    if (!formValue["contiene_azucar"]) ids.push("7e113952-93ca-4797-a80d-54f3a31b2165");
-    if (formValue["contiene_lactosa"]) ids.push("a087290b-474e-4a8c-9e5d-ce1c375d4009");
+    this.pushClassificationId(ids, "sinTacc", !prefill.contiene_tacc);
+    this.pushClassificationId(ids, "sinAzucar", !prefill.contiene_azucar);
+    this.pushClassificationId(ids, "contieneLacteos", prefill.contiene_lactosa);
+    this.pushClassificationId(ids, "tieneMani", prefill.contiene_mani);
+    this.pushClassificationId(ids, "contieneHuevo", prefill.contiene_huevo === true);
+    this.pushClassificationId(ids, "contienePescado", prefill.contiene_pescado === true);
+    this.pushClassificationId(ids, "contieneSoja", prefill.contiene_soja === true);
     return ids;
+  }
+
+  private pushClassificationId(ids: string[], clave: ClaveRestriccion, shouldInclude: boolean): void {
+    if (!shouldInclude) return;
+
+    const id = obtenerIdClasificacionPorClave(this.healthClassifications, clave);
+    if (id && !ids.includes(id)) {
+      ids.push(id);
+    }
   }
 }

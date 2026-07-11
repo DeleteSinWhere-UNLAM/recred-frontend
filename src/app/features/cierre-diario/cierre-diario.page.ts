@@ -116,6 +116,15 @@ export class CierreDiarioPage implements OnInit, OnDestroy {
     return 'Todavía no se hizo un cierre para esta fecha.';
   });
 
+  protected readonly historySearchDisabled = computed(
+    () =>
+      this.loadingHistory()
+      || !this.buffetId()
+      || !this.historyFrom()
+      || !this.historyTo()
+      || this.hasInvalidHistoryDateRange(),
+  );
+
   protected readonly summaryMetrics = computed<ReportMetric[]>(() => {
     const report = this.report();
     if (!report) return [];
@@ -412,6 +421,20 @@ export class CierreDiarioPage implements OnInit, OnDestroy {
       });
   }
 
+  protected searchCloseHistory(): void {
+    if (!this.historyFrom() || !this.historyTo()) {
+      this.historyErrorMessage.set('Ingresá fecha desde y hasta para buscar cierres.');
+      return;
+    }
+
+    if (this.hasInvalidHistoryDateRange()) {
+      this.historyErrorMessage.set('La fecha desde no puede ser posterior a la fecha hasta.');
+      return;
+    }
+
+    this.loadCloseHistory();
+  }
+
   protected openHistoryModal(): void {
     this.historyModalOpen.set(true);
     this.loadCloseHistory();
@@ -423,10 +446,31 @@ export class CierreDiarioPage implements OnInit, OnDestroy {
 
   protected onHistoryFromChange(event: Event): void {
     this.historyFrom.set(this.getInputValue(event));
+    this.validateHistoryDateRange();
   }
 
   protected onHistoryToChange(event: Event): void {
     this.historyTo.set(this.getInputValue(event));
+    this.validateHistoryDateRange();
+  }
+
+  private validateHistoryDateRange(): void {
+    if (!this.historyFrom() || !this.historyTo()) {
+      this.historyErrorMessage.set(null);
+      return;
+    }
+
+    this.historyErrorMessage.set(
+      this.hasInvalidHistoryDateRange()
+        ? 'La fecha desde no puede ser posterior a la fecha hasta.'
+        : null,
+    );
+  }
+
+  private hasInvalidHistoryDateRange(): boolean {
+    const from = this.historyFrom();
+    const to = this.historyTo();
+    return !!from && !!to && from > to;
   }
 
   protected selectDailyClose(close: RegistroCierreDiario): void {

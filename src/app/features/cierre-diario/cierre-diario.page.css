@@ -3137,6 +3137,7 @@
 }
 
 .daily-close-hero__metric {
+  container-type: inline-size;
   min-height: 118px;
   padding: 20px 24px;
 
@@ -3144,6 +3145,10 @@
   grid-template-columns: 54px minmax(0, 1fr);
   align-items: center;
   gap: 16px;
+}
+
+.daily-close-hero__metric>div {
+  min-width: 0;
 }
 
 .daily-close-hero__metric+.daily-close-hero__metric {
@@ -3186,13 +3191,14 @@
   display: block;
   margin-top: 7px;
 
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  overflow-wrap: normal;
+  text-overflow: clip;
   white-space: nowrap;
 
   color: var(--color-pizarra-dark);
   font-family: var(--font-display);
-  font-size: 31px;
+  font-size: clamp(23px, 8cqw, 31px);
   font-weight: 900;
   line-height: 1.05;
 }
@@ -5555,10 +5561,11 @@
 
 @media (max-width: 760px) {
   .dc-inventory-count,
-  .dc-products-chip,
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;
+  .dc-products-chip {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
 }
 
 .dc-sold-product-item {

@@ -27,17 +27,14 @@ import {
   compararPorEstadoOperativo,
   getEstadoOperativoStock,
 } from '../models/estado-visual-inventario';
-
-const CLASIFICACION_SIN_TACC = '15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8';
-const CLASIFICACION_SIN_AZUCAR = '7e113952-93ca-4797-a80d-54f3a31b2165';
-const CLASIFICACION_CONTIENE_LACTEOS = 'a087290b-474e-4a8c-9e5d-ce1c375d4009';
+import {
+  ClasificacionSaludBackend,
+  RestriccionesNutricionalesService,
+} from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
+import { ordenarClasificacionesSalud } from '../../restricciones-nutricionales/models/restricciones-nutricionales.model';
 
 function buildHealthClassificationIds(data: DatosFormularioProducto): string[] {
-  const ids: string[] = [];
-  if (!data.contiene_tacc) ids.push(CLASIFICACION_SIN_TACC);
-  if (!data.contiene_azucar) ids.push(CLASIFICACION_SIN_AZUCAR);
-  if (data.contiene_lactosa) ids.push(CLASIFICACION_CONTIENE_LACTEOS);
-  return ids;
+  return data.clasificacionesSaludIds ?? [];
 }
 
 const MENSAJES_ERROR_INVENTARIO: Record<string, string> = {
@@ -105,6 +102,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   private readonly usuarioService = inject(UsuarioService);
   private readonly perfilService = inject(PerfilService);
   private readonly inventoryRealtimeService = inject(InventarioRealtimeService);
+  private readonly restriccionesNutricionalesService = inject(RestriccionesNutricionalesService);
   private readonly zone = inject(NgZone);
   private readonly fb = inject(FormBuilder);
   private readonly purchaseTotalFormatter = new Intl.NumberFormat('es-AR', {
@@ -127,6 +125,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
 
   products: ItemResumenInventario[] = [];
   categories: Categoria[] = [];
+  healthClassifications: ClasificacionSaludBackend[] = [];
   isLoading = false;
   isRefreshing = false;
   isSaving = false;
@@ -196,6 +195,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
       this.route.snapshot.queryParamMap.get('productId');
     this.abrirAltaProductoDesdeQuery();
     this.loadCategories();
+    this.loadHealthClassifications();
     this.loadProducts();
 
     if (this.buffetId) {
@@ -310,6 +310,18 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadHealthClassifications(): void {
+    this.restriccionesNutricionalesService
+      .getCatalogo()
+      .then((catalogo) => {
+        this.healthClassifications = ordenarClasificacionesSalud(catalogo);
+      })
+      .catch(() => {
+        this.healthClassifications = [];
+        this.toastService.mostrar('Error al cargar las clasificaciones de salud', 'error');
+      });
+  }
+
   loadProducts(showLoading = true): void {
     const currentBuffetId = this.buffetId ?? this.obtenerBuffetIdActual();
     if (!currentBuffetId) {
@@ -360,7 +372,13 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   }
 
   openEditFormFromInventory(product: ItemResumenInventario): void {
-    this.productService.getById(product.productId).subscribe({
+    const currentBuffetId = this.buffetId ?? this.obtenerBuffetIdActual();
+    if (!currentBuffetId) {
+      this.toastService.mostrar('No se encontrÃƒÂ³ un buffet asociado a tu perfil', 'error');
+      return;
+    }
+
+    this.productService.getById(product.productId, currentBuffetId).subscribe({
       next: (fullProduct) => {
         this.openEditForm(this.normalizeEditableProduct(fullProduct));
       },
@@ -993,11 +1011,6 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     return 'Ocurrió un error inesperado al actualizar el inventario.';
   }
 }
-
-
-
-
-
 
 
 

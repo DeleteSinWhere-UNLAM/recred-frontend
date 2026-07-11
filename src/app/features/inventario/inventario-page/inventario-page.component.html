@@ -167,6 +167,7 @@
         [isSaving]="isSaving"
         [buffetId]="buffetId"
         [datosIniciales]="datosInicialesProducto"
+        [healthClassifications]="healthClassifications"
         (formSubmit)="handleFormSubmit($event)"
         (formCancel)="closeForm()">
       </app-product-form>
@@ -270,7 +271,6 @@
                     type="number"
                     min="0"
                     step="1"
-                    placeholder="Dejar igual"
                   >
                   @if (hasInventoryManagementError('stockActual')) {
                     <span class="quick-action-modal__error">Ingresa stock actual</span>
@@ -291,7 +291,6 @@
                     type="number"
                     min="0"
                     step="1"
-                    placeholder="Dejar igual"
                   >
                   @if (hasInventoryManagementError('stockMinimo')) {
                     <span class="quick-action-modal__error">Ingresa una cantidad</span>
@@ -315,7 +314,6 @@
                   type="number"
                   min="0"
                   step="1"
-                  placeholder="Dejar igual"
                 >
                 @if (hasInventoryManagementError('cupoMaximoDiario')) {
                   <span class="quick-action-modal__error">Ingresa un cupo válido</span>
