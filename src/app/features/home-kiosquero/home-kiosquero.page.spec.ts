@@ -14,6 +14,7 @@ import { Categoria } from '../inventario/models/categoria.interface';
 import { Producto } from '../inventario/models/producto.interface';
 import { CargaMasivaService, RespuestaCargaMasiva, RespuestaProductoMasivo } from '../inventario/services/carga-masiva.service';
 import { ProductoService } from '../inventario/services/producto.service';
+import { RestriccionesNutricionalesService } from '../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import { HomeKiosqueroPage } from './home-kiosquero.page';
 import { AccionKiosquero } from './models/accion-kiosquero.model';
 import { HomeKiosqueroPresenter } from './presenter/home-kiosquero.presenter';
@@ -49,10 +50,13 @@ class ModalTablaCargaMasivaStub {
   @Output() saveProducts = new EventEmitter<RespuestaProductoMasivo[]>();
 }
 
-@Component({ selector: 'app-formulario-producto', template: '', standalone: true })
+@Component({ selector: 'app-product-form', template: '', standalone: true })
 class FormularioProductoStub {
   @Input() categories: Categoria[] = [];
+  @Input() healthClassifications: unknown[] = [];
   @Input() product: unknown = null;
+  @Input() isSaving = false;
+  @Input() buffetId: string | null = null;
   @Output() formSubmit = new EventEmitter<DatosFormularioProducto>();
   @Output() formCancel = new EventEmitter<void>();
 }
@@ -68,10 +72,7 @@ class DatosFormularioMother {
       categoriaId: 'c1',
       nuevaCategoriaNombre: '',
       requierePreparacion: false,
-      contiene_azucar: false,
-      contiene_mani: false,
-      contiene_lactosa: false,
-      contiene_tacc: false,
+      clasificacionesSaludIds: [],
       ...override,
     };
   }
@@ -154,6 +155,7 @@ describe('HomeKiosqueroPage', () => {
   let servicioCargaMasiva: jasmine.SpyObj<CargaMasivaService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
+  let servicioRestricciones: jasmine.SpyObj<RestriccionesNutricionalesService>;
 
   beforeEach(async () => {
     presenter = PresenterMother.crear();
@@ -166,10 +168,12 @@ describe('HomeKiosqueroPage', () => {
     servicioCargaMasiva = jasmine.createSpyObj<CargaMasivaService>('CargaMasivaService', ['uploadFile']);
     servicioToast = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
     servicioPerfil = jasmine.createSpyObj<PerfilService>('PerfilService', ['obtenerBuffetId', 'getPerfil']);
+    servicioRestricciones = jasmine.createSpyObj<RestriccionesNutricionalesService>('RestriccionesNutricionalesService', ['getCatalogo']);
 
     servicioProducto.getCategories.and.returnValue(of([]));
     servicioProducto.create.and.returnValue(of({} as Producto));
     servicioProducto.createBulk.and.returnValue(of([] as Producto[]));
+    servicioRestricciones.getCatalogo.and.resolveTo([]);
     servicioCargaMasiva.uploadFile.and.returnValue(of({ products: [] } as RespuestaCargaMasiva));
     servicioPerfil.obtenerBuffetId.and.returnValue('buffet-1');
     givenPlanVendedor('GRATUITO');
@@ -183,6 +187,7 @@ describe('HomeKiosqueroPage', () => {
         { provide: CargaMasivaService, useValue: servicioCargaMasiva },
         { provide: ToastService, useValue: servicioToast },
         { provide: PerfilService, useValue: servicioPerfil },
+        { provide: RestriccionesNutricionalesService, useValue: servicioRestricciones },
       ],
     })
       .overrideComponent(HomeKiosqueroPage, {
@@ -427,12 +432,15 @@ describe('HomeKiosqueroPage', () => {
       expect(servicioProducto.create).not.toHaveBeenCalled();
     });
 
-    it('dado un producto sin TACC, sin azucar y sin lacteos, cuando guardo, deberia incluir Sin TACC y Sin Azucar en la payload', () => {
-      component.handleManualProductSubmit(DatosFormularioMother.crearBase());
+    it('dado un producto con clasificaciones seleccionadas, cuando guardo, deberia incluirlas en la payload', () => {
+      component.handleManualProductSubmit(
+        DatosFormularioMother.crearBase({
+          clasificacionesSaludIds: ['sin-tacc', 'pescado'],
+        }),
+      );
 
       const payload = servicioProducto.create.calls.mostRecent().args[0];
-      expect(payload.clasificacionesSaludIds).toContain('15b2fc3b-ea51-45a0-b26b-b09c3fadc8f8');
-      expect(payload.clasificacionesSaludIds).toContain('7e113952-93ca-4797-a80d-54f3a31b2165');
+      expect(payload.clasificacionesSaludIds).toEqual(['sin-tacc', 'pescado']);
     });
 
     it('dado creacion exitosa, cuando guardo manual, deberia cerrar el form, mostrar toast y navegar', () => {

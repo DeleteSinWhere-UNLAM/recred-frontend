@@ -1000,3 +1000,15 @@
 .movimientos__cancel-mini-btn.revert-btn:hover {
   background-color: #c7d2fe;
 }
+
+.movimientos__cancel-mini-btn.disabled-btn {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  border-color: rgba(156, 163, 175, 0.2);
+  cursor: not-allowed;
+}
+
+.movimientos__cancel-mini-btn.disabled-btn:hover {
+  background-color: #f3f4f6;
+  transform: none;
+}

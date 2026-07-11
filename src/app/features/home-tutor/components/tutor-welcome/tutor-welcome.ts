@@ -78,9 +78,9 @@ export class TutorWelcome implements OnInit {
             })
             .map(p => ({ ...p, alumnoNombre: alumno.nombre }));
           todosPendientes.push(...mapeados);
-          // Ordenamos por fecha de retiro programado de más tarde a más temprano
-          todosPendientes.sort((a, b) => new Date(b.pickupDate!).getTime() - new Date(a.pickupDate!).getTime());
-          this.pedidosPendientes.set([...todosPendientes].slice(0, 5));
+          // Ordenamos por fecha de retiro programado de más temprano a más tarde
+          todosPendientes.sort((a, b) => new Date(a.pickupDate!).getTime() - new Date(b.pickupDate!).getTime());
+          this.pedidosPendientes.set([...todosPendientes]);
         });
       }
 
@@ -168,7 +168,7 @@ export class TutorWelcome implements OnInit {
   }
 
   formatARS(amount: number): string {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(Math.floor(amount));
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(Math.round(amount));
   }
 
   getStatusLabel(status: string, defaultLabel?: string): string {

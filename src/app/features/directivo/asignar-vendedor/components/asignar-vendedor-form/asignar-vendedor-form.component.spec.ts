@@ -19,6 +19,7 @@ class CrearVendedorRequestMother {
 describe('AsignarVendedorFormComponent', () => {
   let component: AsignarVendedorFormComponent;
   let fixture: ComponentFixture<AsignarVendedorFormComponent>;
+  let emitSubmitFormSpy: jasmine.Spy;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -28,60 +29,98 @@ describe('AsignarVendedorFormComponent', () => {
     fixture = TestBed.createComponent(AsignarVendedorFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    emitSubmitFormSpy = spyOn(component.submitForm, 'emit');
   });
 
   describe('onSubmit', () => {
     it('dado el form valido y sin loading, cuando submiteo, deberia emitir submitForm con el payload', () => {
-      const emitSpy = spyOn(component.submitForm, 'emit');
-      component.form.setValue(CrearVendedorRequestMother.crearValido());
+      givenFormConPayload(CrearVendedorRequestMother.crearValido());
 
-      component.onSubmit();
+      whenSubmito();
 
-      expect(emitSpy).toHaveBeenCalledWith(CrearVendedorRequestMother.crearValido());
+      thenSeEmitioSubmitFormCon(CrearVendedorRequestMother.crearValido());
     });
 
     it('dado el form invalido, cuando submiteo, no deberia emitir y deberia marcar los campos como touched', () => {
-      const emitSpy = spyOn(component.submitForm, 'emit');
+      whenSubmito();
 
-      component.onSubmit();
-
-      expect(emitSpy).not.toHaveBeenCalled();
-      expect(component.form.touched).toBeTrue();
+      thenNoSeEmitio();
+      thenElFormEstaTouched();
     });
 
     it('dado un CUIT con menos de 11 digitos, cuando submiteo, no deberia emitir', () => {
-      const emitSpy = spyOn(component.submitForm, 'emit');
-      component.form.setValue({
-        ...CrearVendedorRequestMother.crearValido(),
-        cuit: '2012345678',
-      });
+      givenFormConPayload({ ...CrearVendedorRequestMother.crearValido(), cuit: '2012345678' });
 
-      component.onSubmit();
+      whenSubmito();
 
-      expect(emitSpy).not.toHaveBeenCalled();
-      expect(component.form.controls.cuit.invalid).toBeTrue();
+      thenNoSeEmitio();
+      thenElCuitEsInvalido();
     });
 
     it('dado el form valido pero loading, cuando submiteo, no deberia emitir', () => {
-      const emitSpy = spyOn(component.submitForm, 'emit');
-      component.form.setValue(CrearVendedorRequestMother.crearValido());
-      component.loading = true;
+      givenFormConPayload(CrearVendedorRequestMother.crearValido());
+      givenLoading();
 
-      component.onSubmit();
+      whenSubmito();
 
-      expect(emitSpy).not.toHaveBeenCalled();
+      thenNoSeEmitio();
     });
   });
 
   describe('normalizarCuit', () => {
-    it('dado un CUIT pegado con guiones y caracteres extra, deberia dejar solo 11 digitos', () => {
-      const input = document.createElement('input');
-      input.value = '20-12345678-6abc999';
+    it('dado un CUIT pegado con guiones y caracteres extra, cuando lo normalizo, deberia dejar solo 11 digitos', () => {
+      const input = givenInputCon('20-12345678-6abc999');
 
-      component.normalizarCuit({ target: input } as unknown as Event);
+      whenNormalizoElCuit(input);
 
-      expect(input.value).toBe('20123456786');
-      expect(component.form.controls.cuit.value).toBe('20123456786');
+      thenElInputEs(input, '20123456786');
+      thenElCuitDelFormEs('20123456786');
     });
   });
+
+  function givenFormConPayload(payload: CrearVendedorRequest): void {
+    component.form.setValue(payload);
+  }
+
+  function givenLoading(): void {
+    component.loading = true;
+  }
+
+  function givenInputCon(valor: string): HTMLInputElement {
+    const input = document.createElement('input');
+    input.value = valor;
+    return input;
+  }
+
+  function whenSubmito(): void {
+    component.onSubmit();
+  }
+
+  function whenNormalizoElCuit(input: HTMLInputElement): void {
+    component.normalizarCuit({ target: input } as unknown as Event);
+  }
+
+  function thenSeEmitioSubmitFormCon(payload: CrearVendedorRequest): void {
+    expect(emitSubmitFormSpy).toHaveBeenCalledWith(payload);
+  }
+
+  function thenNoSeEmitio(): void {
+    expect(emitSubmitFormSpy).not.toHaveBeenCalled();
+  }
+
+  function thenElFormEstaTouched(): void {
+    expect(component.form.touched).toBeTrue();
+  }
+
+  function thenElCuitEsInvalido(): void {
+    expect(component.form.controls.cuit.invalid).toBeTrue();
+  }
+
+  function thenElInputEs(input: HTMLInputElement, valor: string): void {
+    expect(input.value).toBe(valor);
+  }
+
+  function thenElCuitDelFormEs(valor: string): void {
+    expect(component.form.controls.cuit.value).toBe(valor);
+  }
 });

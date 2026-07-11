@@ -111,9 +111,9 @@
 }
 
 .widget-alert__item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   background: var(--color-superficie-alt);
   padding: 12px 16px;
   border-radius: 12px;
@@ -129,6 +129,8 @@
   font-family: var(--font-display);
   font-weight: 800;
   color: var(--color-melocoton);
+  justify-self: center;
+  text-align: center;
 }
 
 .widget-alert__btn {
@@ -138,6 +140,8 @@
   font-weight: 800;
   font-size: 12px;
   border-radius: 8px;
+  justify-self: end;
+
   cursor: pointer;
   border: none;
 }
@@ -194,6 +198,21 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scrollbar styling for the list to make it look neat */
+.welcome__pedidos-list::-webkit-scrollbar {
+  width: 6px;
+}
+.welcome__pedidos-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.welcome__pedidos-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-borde-fuerte);
+  border-radius: 10px;
 }
 
 .pedido-item {
@@ -400,11 +419,18 @@
   }
 
   .widget-alert__item {
-    flex-wrap: wrap;
+    grid-template-columns: 1fr auto;
     gap: 12px;
   }
 
+  .widget-alert__saldo {
+    justify-self: end;
+    text-align: right;
+  }
+
   .widget-alert__btn {
+    grid-column: 1 / -1;
+    justify-self: stretch;
     width: 100%;
     text-align: center;
   }

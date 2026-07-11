@@ -43,3 +43,29 @@
   background-color: var(--surface-hover);
   border-radius: var(--radius-md);
 }
+
+@media (max-width: 640px) {
+  .tendencia-card {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .tendencia-card__title {
+    font-size: 18px;
+  }
+
+  .tendencia-card__chart-container {
+    height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tendencia-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .tendencia-card__chart-container {
+    height: 200px;
+  }
+}

@@ -2,10 +2,11 @@ import { Component, Input, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { PerfilService } from '../../../../data-access/services/perfil.service';
 import { UsuarioService } from '../../../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { ProductoInventarioMother } from '../../../inventario/inventario.mother';
+import { BUFFET_ID_TEST, ProductoInventarioMother } from '../../../inventario/inventario.mother';
 import { ProductoService } from '../../../inventario/services/producto.service';
 import {
   RecomendacionProveedorMother,
@@ -27,6 +28,7 @@ describe('PurchaseRecommendationsPage', () => {
   let servicioSupplier: jasmine.SpyObj<SupplierService>;
   let servicioProducto: jasmine.SpyObj<ProductoService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let router: jasmine.SpyObj<Router>;
 
   const disponibleAgua = ProductoInventarioMother.crear({
@@ -57,6 +59,7 @@ describe('PurchaseRecommendationsPage', () => {
         { provide: SupplierService, useValue: servicioSupplier },
         { provide: ProductoService, useValue: servicioProducto },
         { provide: ToastService, useValue: servicioToast },
+        { provide: PerfilService, useValue: servicioPerfil },
         {
           provide: UsuarioService,
           useValue: jasmine.createSpyObj('UsuarioService', [], { nombreNavbar: signal('Kiosquero') }),
@@ -103,10 +106,13 @@ describe('PurchaseRecommendationsPage', () => {
     });
     servicioSupplier.getSuppliers.and.returnValue(of([mockSupplier]));
 
-    servicioProducto = jasmine.createSpyObj('ProductoService', ['getAll']);
+    servicioProducto = jasmine.createSpyObj('ProductoService', ['getAll', 'getAllByBuffetId']);
     servicioProducto.getAll.and.returnValue(of([disponibleAgua, bajoStockJugo, disponibleAlfajor]));
+    servicioProducto.getAllByBuffetId.and.returnValue(of([disponibleAgua, bajoStockJugo, disponibleAlfajor]));
 
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
+    servicioPerfil.obtenerBuffetId.and.returnValue(BUFFET_ID_TEST);
   });
 
   describe('carga inicial', () => {
@@ -114,7 +120,7 @@ describe('PurchaseRecommendationsPage', () => {
       build();
       whenMonto();
 
-      expect(servicioProducto.getAll).toHaveBeenCalled();
+      expect(servicioProducto.getAllByBuffetId).toHaveBeenCalledWith(BUFFET_ID_TEST);
       expect(component.products().length).toBe(3);
       expect(component.selectedProductIds().size).toBe(0);
       expect(component.isLoading()).toBeFalse();
@@ -135,13 +141,28 @@ describe('PurchaseRecommendationsPage', () => {
 
     it('dado que getAll falla, cuando se monta, deberia mostrar toast de error', () => {
       spyOn(console, 'error');
-      servicioProducto.getAll.and.returnValue(throwError(() => new Error('boom')));
+      servicioProducto.getAllByBuffetId.and.returnValue(throwError(() => new Error('boom')));
       build();
 
       whenMonto();
 
       expect(servicioToast.mostrar).toHaveBeenCalledWith(
         'Error al cargar productos para comparar',
+        'error',
+      );
+    });
+
+    it('dado sin buffetId, cuando carga productos, no deberia consultar productos sin contexto de stock', () => {
+      servicioPerfil.obtenerBuffetId.and.returnValue(null);
+      build();
+
+      whenMonto();
+
+      expect(servicioProducto.getAllByBuffetId).not.toHaveBeenCalled();
+      expect(servicioProducto.getAll).not.toHaveBeenCalled();
+      expect(component.products()).toEqual([]);
+      expect(servicioToast.mostrar).toHaveBeenCalledWith(
+        'No se pudo identificar el buffet para cargar el stock',
         'error',
       );
     });
@@ -156,6 +177,70 @@ describe('PurchaseRecommendationsPage', () => {
     it('dado stockActual > 5, deberia devolver false', () => {
       build();
       expect(component.isLowStock(disponibleAgua)).toBeFalse();
+    });
+
+    it('dado stock null, deberia devolver false', () => {
+      build();
+      const productoSinStockConfigurado = {
+        ...ProductoInventarioMother.crear({ stockActual: null as unknown as number }),
+        stockDisponible: null,
+        estadoInventario: null,
+      };
+
+      expect(component.isLowStock(productoSinStockConfigurado)).toBeFalse();
+    });
+
+    it('dado estadoInventario BAJO_STOCK, deberia devolver true', () => {
+      build();
+      const productoBajoStock = {
+        ...disponibleAgua,
+        stockActual: 20,
+        stockDisponible: 20,
+        estadoInventario: 'BAJO_STOCK',
+      };
+
+      expect(component.isLowStock(productoBajoStock)).toBeTrue();
+    });
+  });
+
+  describe('formatStockLabel y stockBadgeLabel', () => {
+    beforeEach(() => {
+      build();
+    });
+
+    it('dado stock null, deberia mostrar stock no configurado y no mostrar badge', () => {
+      const productoSinStockConfigurado = {
+        ...ProductoInventarioMother.crear({ stockActual: null as unknown as number }),
+        stockDisponible: null,
+        estadoInventario: null,
+      };
+
+      expect(component.formatStockLabel(productoSinStockConfigurado)).toBe('Stock no configurado');
+      expect(component.stockBadgeLabel(productoSinStockConfigurado)).toBeNull();
+    });
+
+    it('dado stock disponible bajo y minimo, deberia mostrar una leyenda clara', () => {
+      const productoBajoStock = {
+        ...bajoStockJugo,
+        stockDisponible: 3,
+        stockMinimo: 5,
+        estadoInventario: 'BAJO_STOCK',
+      };
+
+      expect(component.formatStockLabel(productoBajoStock)).toBe('Disponible: 3 un. / minimo 5');
+      expect(component.stockBadgeLabel(productoBajoStock)).toBe('Bajo stock');
+    });
+
+    it('dado estadoInventario SIN_STOCK, deberia mostrar sin stock', () => {
+      const productoSinStock = {
+        ...bajoStockJugo,
+        stockActual: 0,
+        stockDisponible: 0,
+        estadoInventario: 'SIN_STOCK',
+      };
+
+      expect(component.formatStockLabel(productoSinStock)).toBe('Sin stock');
+      expect(component.stockBadgeLabel(productoSinStock)).toBe('Sin stock');
     });
   });
 
@@ -677,7 +762,7 @@ describe('PurchaseRecommendationsPage', () => {
         'Error al cargar información de mapeos',
         'error',
       );
-      expect(servicioProducto.getAll).toHaveBeenCalled();
+      expect(servicioProducto.getAllByBuffetId).toHaveBeenCalledWith(BUFFET_ID_TEST);
     });
   });
 

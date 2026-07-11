@@ -158,7 +158,7 @@ describe('TutorWelcome', () => {
       whenMonto();
 
       const ids = component.pedidosPendientes().map((p) => p.id);
-      expect(ids).toEqual(['p-2', 'p-3', 'p-1']);
+      expect(ids).toEqual(['p-1', 'p-3', 'p-2']);
       expect(component.pedidosPendientes()[0].alumnoNombre).toBe('Julián');
     });
 

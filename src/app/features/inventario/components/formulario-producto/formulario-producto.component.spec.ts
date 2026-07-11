@@ -49,10 +49,7 @@ class DatosFormularioMother {
       categoriaId: 'c1',
       nuevaCategoriaNombre: '',
       requierePreparacion: false,
-      contiene_azucar: false,
-      contiene_mani: false,
-      contiene_lactosa: false,
-      contiene_tacc: false,
+      clasificacionesSaludIds: [],
       ...override,
     };
   }
@@ -78,6 +75,10 @@ describe('FormularioProductoComponent', () => {
     fixture = TestBed.createComponent(FormularioProductoComponent);
     component = fixture.componentInstance;
     component.categories = categorias;
+    component.healthClassifications = [
+      { id: 'sin-tacc', descripcion: 'Sin TACC' },
+      { id: 'pescado', descripcion: 'Contiene Pescado' },
+    ];
     httpMock = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });
@@ -102,6 +103,19 @@ describe('FormularioProductoComponent', () => {
       expect(component.productForm.get('nombre')?.value).toBe('Existing Producto');
       expect(component.productForm.get('categoriaId')?.value).toBe('c1');
       expect(component.productForm.get('requierePreparacion')?.value).toBeTrue();
+    });
+
+    it('dado un producto con categoria embebida, deberia seleccionar la categoria automaticamente', () => {
+      const producto = ProductoMother.crear({
+        categoriaId: null,
+        categoriaNombre: undefined,
+        categoria: { id: 'c2', descripcion: 'Categoria 2' },
+      });
+
+      whenSeAsignaElProducto(producto);
+
+      expect(component.productForm.get('categoriaId')?.value).toBe('c2');
+      expect(component.productForm.get('nuevaCategoriaNombre')?.value).toBe('');
     });
 
     it('dado datos iniciales sin producto, cuando cambian los inputs, deberia precompletar el form de creacion', () => {
@@ -189,9 +203,11 @@ describe('FormularioProductoComponent', () => {
   });
 
   describe('submit del form', () => {
-    it('dado un form valido, cuando hago submit, deberia emitir formSubmit con los datos y urlImagen null', () => {
+    it('dado un form valido, cuando hago submit, deberia emitir formSubmit con clasificaciones y urlImagen null', () => {
       const spyEmit = spyOn(component.formSubmit, 'emit');
-      const datos = DatosFormularioMother.crearValidos();
+      const datos = DatosFormularioMother.crearValidos({
+        clasificacionesSaludIds: ['sin-tacc', 'pescado'],
+      });
 
       component.productForm.patchValue(datos);
       expect(component.productForm.valid).toBeTrue();
@@ -224,42 +240,33 @@ describe('FormularioProductoComponent', () => {
   });
 
   describe('ngOnChanges con clasificacionesSalud', () => {
-    it('dado un producto sin "Sin Azúcar", cuando se asigna, contiene_azucar deberia ser true', () => {
+    it('dado un producto con clasificaciones, deberia setear sus ids en el form', () => {
       const producto = ProductoMother.crear({
-        clasificacionesSalud: [{ id: 'x', descripcion: 'Con Azúcar' }],
+        clasificacionesSalud: [{ id: 'pescado', descripcion: 'Contiene Pescado' }],
       });
 
       whenSeAsignaElProducto(producto);
 
-      expect(component.productForm.get('contiene_azucar')?.value).toBeTrue();
-      expect(component.productForm.get('contiene_tacc')?.value).toBeTrue();
-      expect(component.productForm.get('contiene_lactosa')?.value).toBeFalse();
+      expect(component.productForm.get('clasificacionesSaludIds')?.value).toEqual(['pescado']);
+      expect(component.isHealthClassificationSelected('pescado')).toBeTrue();
     });
 
-    it('dado un producto con "Contiene Lácteos" y "Sin Azúcar" y "Sin TACC", deberia setear los flags correctos', () => {
-      const producto = ProductoMother.crear({
-        clasificacionesSalud: [
-          { id: '1', descripcion: 'Contiene Lácteos' },
-          { id: '2', descripcion: 'Sin Azúcar' },
-          { id: '3', descripcion: 'Sin TACC' },
-        ],
-      });
+    it('dado que marco y desmarco una clasificacion, deberia actualizar los ids seleccionados', () => {
+      component.toggleHealthClassification('pescado', { target: { checked: true } } as unknown as Event);
 
-      whenSeAsignaElProducto(producto);
+      expect(component.productForm.get('clasificacionesSaludIds')?.value).toEqual(['pescado']);
 
-      expect(component.productForm.get('contiene_lactosa')?.value).toBeTrue();
-      expect(component.productForm.get('contiene_azucar')?.value).toBeFalse();
-      expect(component.productForm.get('contiene_tacc')?.value).toBeFalse();
+      component.toggleHealthClassification('pescado', { target: { checked: false } } as unknown as Event);
+
+      expect(component.productForm.get('clasificacionesSaludIds')?.value).toEqual([]);
     });
 
-    it('dado un producto sin clasificacionesSalud, deberia dejar los flags en false', () => {
+    it('dado un producto sin clasificacionesSalud, deberia dejar los ids vacios', () => {
       const producto = ProductoMother.crear({ clasificacionesSalud: undefined });
 
       whenSeAsignaElProducto(producto);
 
-      expect(component.productForm.get('contiene_azucar')?.value).toBeFalse();
-      expect(component.productForm.get('contiene_lactosa')?.value).toBeFalse();
-      expect(component.productForm.get('contiene_tacc')?.value).toBeFalse();
+      expect(component.productForm.get('clasificacionesSaludIds')?.value).toEqual([]);
     });
   });
 
@@ -280,6 +287,19 @@ describe('FormularioProductoComponent', () => {
 
       whenSeAsignaElProducto(producto);
 
+      expect(component.isBeverage()).toBeTrue();
+    });
+
+    it('dado un producto con categoria embebida Bebidas, deberia marcar isBeverage true', () => {
+      const producto = ProductoMother.crear({
+        categoriaId: null,
+        categoriaNombre: undefined,
+        categoria: { id: 'c3', descripcion: 'Bebidas' },
+      });
+
+      whenSeAsignaElProducto(producto);
+
+      expect(component.productForm.get('categoriaId')?.value).toBe('c3');
       expect(component.isBeverage()).toBeTrue();
     });
 

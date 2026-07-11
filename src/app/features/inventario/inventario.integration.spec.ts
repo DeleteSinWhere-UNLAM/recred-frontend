@@ -19,6 +19,7 @@ import { ItemResumenInventario } from './models/inventario.interface';
 import { Producto } from './models/producto.interface';
 import { InventarioRealtimeService } from './services/inventario-realtime.service';
 import { ProductoService } from './services/producto.service';
+import { RestriccionesNutricionalesService } from '../restricciones-nutricionales/services/restricciones-nutricionales.service';
 
 @Component({ selector: 'app-navbar', template: '', standalone: true })
 class NavbarStub {}
@@ -51,15 +52,17 @@ class ModalConfirmarEliminarStub {
 }
 
 @Component({
-  selector: 'app-inventory-product-form',
+  selector: 'app-product-form',
   template: '',
   standalone: true,
 })
 class FormularioProductoStub {
   @Input() product: Producto | null = null;
   @Input() categories: unknown[] = [];
+  @Input() healthClassifications: unknown[] = [];
   @Input() isSaving = false;
   @Input() buffetId: string | null = null;
+  @Input() datosIniciales: unknown = null;
   @Output() formSubmit = new EventEmitter<unknown>();
   @Output() formCancel = new EventEmitter<void>();
 }
@@ -71,6 +74,7 @@ describe('Inventario Integration', () => {
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioRestricciones: jasmine.SpyObj<RestriccionesNutricionalesService>;
   let router: Router;
 
   beforeEach(async () => {
@@ -111,6 +115,8 @@ describe('Inventario Integration', () => {
 
     servicioUsuario = jasmine.createSpyObj('UsuarioService', ['setHomeUrl']);
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    servicioRestricciones = jasmine.createSpyObj('RestriccionesNutricionalesService', ['getCatalogo']);
+    servicioRestricciones.getCatalogo.and.resolveTo([]);
 
     await TestBed.configureTestingModule({
       imports: [InventarioPageComponent],
@@ -120,6 +126,7 @@ describe('Inventario Integration', () => {
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: UsuarioService, useValue: servicioUsuario },
         { provide: ToastService, useValue: servicioToast },
+        { provide: RestriccionesNutricionalesService, useValue: servicioRestricciones },
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { queryParamMap: { get: () => null } } },

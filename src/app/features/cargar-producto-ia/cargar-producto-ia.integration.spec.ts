@@ -9,6 +9,10 @@ import { DialogService } from '../../shared/services/dialog.service';
 import { Categoria } from '../inventario/models/categoria.interface';
 import { ProductoService } from '../inventario/services/producto.service';
 import {
+  ClasificacionSaludBackend,
+  RestriccionesNutricionalesService,
+} from '../restricciones-nutricionales/services/restricciones-nutricionales.service';
+import {
   CategoriaMother,
   RespuestaProductoIaMother,
   SolicitudGuardarProductoMother,
@@ -55,6 +59,7 @@ class EscanerLoaderStub {
 class ProductoIaFormStub {
   @Input() prefillData: RespuestaProductoIa | null = null;
   @Input() categories: Categoria[] = [];
+  @Input() healthClassifications: ClasificacionSaludBackend[] = [];
   @Input() isSaving = false;
   @Input() buffetId = '';
   @Output() save = new EventEmitter<SolicitudGuardarProducto>();
@@ -66,6 +71,7 @@ describe('CargarProductoIa Integration', () => {
   let fixture: ComponentFixture<CargarProductoIaPageComponent>;
   let servicioIa: jasmine.SpyObj<IaVisionService>;
   let servicioProductos: jasmine.SpyObj<ProductoService>;
+  let servicioRestricciones: jasmine.SpyObj<RestriccionesNutricionalesService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
   let servicioDialog: jasmine.SpyObj<DialogService>;
@@ -77,6 +83,9 @@ describe('CargarProductoIa Integration', () => {
 
     servicioProductos = jasmine.createSpyObj('ProductoService', ['getCategories']);
     servicioProductos.getCategories.and.returnValue(of([CategoriaMother.crear()]));
+
+    servicioRestricciones = jasmine.createSpyObj('RestriccionesNutricionalesService', ['getCatalogo']);
+    servicioRestricciones.getCatalogo.and.resolveTo([{ id: 'pescado-id', descripcion: 'Contiene Pescado' }]);
 
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
     servicioPerfil.obtenerBuffetId.and.returnValue(BUFFET_ID);
@@ -91,6 +100,7 @@ describe('CargarProductoIa Integration', () => {
       providers: [
         { provide: IaVisionService, useValue: servicioIa },
         { provide: ProductoService, useValue: servicioProductos },
+        { provide: RestriccionesNutricionalesService, useValue: servicioRestricciones },
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: UsuarioService, useValue: servicioUsuario },
         { provide: DialogService, useValue: servicioDialog },

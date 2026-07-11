@@ -18,7 +18,7 @@
 }
 
 .prediction-analysis__titulo {
-  font-family: var(--font-display);
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: var(--color-pizarra);
@@ -198,6 +198,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .prediction-analysis__table th, .prediction-analysis__table td {

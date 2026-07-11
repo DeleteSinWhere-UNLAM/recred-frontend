@@ -146,29 +146,17 @@
             <span class="product-form__toggle-switch"></span>
           </label>
 
+          @for (clasificacion of healthClassifications; track clasificacion.id) {
           <label class="product-form__toggle">
-            <span class="product-form__toggle-label">Contiene azúcar</span>
-            <input type="checkbox" formControlName="contiene_azucar">
+            <span class="product-form__toggle-label">{{ clasificacion.descripcion }}</span>
+            <input
+              type="checkbox"
+              [checked]="isHealthClassificationSelected(clasificacion.id)"
+              (change)="toggleHealthClassification(clasificacion.id, $event)"
+            >
             <span class="product-form__toggle-switch"></span>
           </label>
-
-          <label class="product-form__toggle">
-            <span class="product-form__toggle-label">Contiene maní</span>
-            <input type="checkbox" formControlName="contiene_mani">
-            <span class="product-form__toggle-switch"></span>
-          </label>
-
-          <label class="product-form__toggle">
-            <span class="product-form__toggle-label">Contiene lactosa</span>
-            <input type="checkbox" formControlName="contiene_lactosa">
-            <span class="product-form__toggle-switch"></span>
-          </label>
-
-          <label class="product-form__toggle">
-            <span class="product-form__toggle-label">Contiene TACC</span>
-            <input type="checkbox" formControlName="contiene_tacc">
-            <span class="product-form__toggle-switch"></span>
-          </label>
+          }
         </div>
       </div>
     </div>

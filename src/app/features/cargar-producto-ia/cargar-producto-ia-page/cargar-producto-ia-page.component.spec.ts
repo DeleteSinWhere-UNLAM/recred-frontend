@@ -7,6 +7,7 @@ import { UsuarioService } from '../../../data-access/services/usuario.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { ProductoService } from '../../inventario/services/producto.service';
+import { RestriccionesNutricionalesService } from '../../restricciones-nutricionales/services/restricciones-nutricionales.service';
 import {
   CategoriaMother,
   RespuestaProductoIaMother,
@@ -29,6 +30,7 @@ describe('CargarProductoIaPageComponent', () => {
   let fixture: ComponentFixture<CargarProductoIaPageComponent>;
   let servicioIa: jasmine.SpyObj<IaVisionService>;
   let servicioProductos: jasmine.SpyObj<ProductoService>;
+  let servicioRestricciones: jasmine.SpyObj<RestriccionesNutricionalesService>;
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioUsuario: jasmine.SpyObj<UsuarioService>;
   let servicioDialog: jasmine.SpyObj<DialogService>;
@@ -39,6 +41,9 @@ describe('CargarProductoIaPageComponent', () => {
 
     servicioProductos = jasmine.createSpyObj('ProductoService', ['getCategories']);
     servicioProductos.getCategories.and.returnValue(of([CategoriaMother.crear()]));
+
+    servicioRestricciones = jasmine.createSpyObj('RestriccionesNutricionalesService', ['getCatalogo']);
+    servicioRestricciones.getCatalogo.and.resolveTo([{ id: 'pescado-id', descripcion: 'Contiene Pescado' }]);
 
     servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
     servicioPerfil.obtenerBuffetId.and.returnValue(BUFFET_ID);
@@ -53,6 +58,7 @@ describe('CargarProductoIaPageComponent', () => {
       providers: [
         { provide: IaVisionService, useValue: servicioIa },
         { provide: ProductoService, useValue: servicioProductos },
+        { provide: RestriccionesNutricionalesService, useValue: servicioRestricciones },
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: UsuarioService, useValue: servicioUsuario },
         { provide: DialogService, useValue: servicioDialog },
@@ -84,13 +90,16 @@ describe('CargarProductoIaPageComponent', () => {
   });
 
   describe('ngOnInit', () => {
-    it('dado un perfil con buffet, cuando inicializa, deberia cargar categorias y actualizar el buffetId', () => {
+    it('dado un perfil con buffet, cuando inicializa, deberia cargar categorias, clasificaciones y actualizar el buffetId', fakeAsync(() => {
       whenMonto();
+      tick();
 
       expect(servicioProductos.getCategories).toHaveBeenCalled();
+      expect(servicioRestricciones.getCatalogo).toHaveBeenCalled();
       expect(component.categories.length).toBe(1);
+      expect(component.healthClassifications.length).toBe(1);
       expect(component.buffetId).toBe(BUFFET_ID);
-    });
+    }));
 
     it('dado que getCategories falla, cuando inicializa, deberia loggear el error sin romper', () => {
       spyOn(console, 'error');

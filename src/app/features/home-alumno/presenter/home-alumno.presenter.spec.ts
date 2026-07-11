@@ -38,7 +38,7 @@ describe('HomeAlumnoPresenter', () => {
   let servicioContexto: jasmine.SpyObj<AlumnoContextoService>;
 
   beforeEach(() => {
-    router = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    router = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
     router.navigateByUrl.and.resolveTo(true);
 
     servicioUsuario = jasmine.createSpyObj('UsuarioService', ['getAlumnoActual']);
@@ -291,12 +291,12 @@ describe('HomeAlumnoPresenter', () => {
       thenSeNavegoA('/buffet');
     });
 
-    it('dado un pedido en curso, cuando invoco verPedido, deberia navegar a /compra', () => {
+    it('dado un pedido en curso, cuando invoco verPedido, deberia navegar a /movimientos filtrando por estados activos', () => {
       givenPedidoEnCurso(PedidoEnCursoMother.crear());
 
       presenter.verPedido();
 
-      thenSeNavegoA('/compra');
+      thenSeNavegoA(['/movimientos'], { estado: 'PENDIENTE,EN_PREPARACION,LISTO' });
     });
 
     it('dado que no hay pedido en curso, cuando invoco verPedido, deberia delegar a irAlBuffet', () => {
@@ -444,8 +444,16 @@ describe('HomeAlumnoPresenter', () => {
     expect(servicioContexto.setAlumnoId).toHaveBeenCalledWith(id);
   }
 
-  function thenSeNavegoA(url: string): void {
-    expect(router.navigateByUrl).toHaveBeenCalledWith(url);
+  function thenSeNavegoA(commands: string | string[], queryParams?: Record<string, string>): void {
+    if (typeof commands === 'string') {
+      expect(router.navigateByUrl).toHaveBeenCalledWith(commands);
+      return;
+    }
+    if (queryParams) {
+      expect(router.navigate).toHaveBeenCalledWith(commands, { queryParams });
+    } else {
+      expect(router.navigate).toHaveBeenCalledWith(commands);
+    }
   }
 
   function thenNoSeNavego(): void {

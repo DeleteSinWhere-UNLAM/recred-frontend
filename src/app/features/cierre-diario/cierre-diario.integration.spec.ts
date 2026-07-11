@@ -131,6 +131,8 @@ describe('CierreDiario Integration', () => {
     desde.dispatchEvent(new Event('change'));
     hasta.value = '2026-06-30';
     hasta.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
     (queryUno(
       '.daily-close-modal--history .daily-close__history-filters button',
     ) as HTMLButtonElement).click();
