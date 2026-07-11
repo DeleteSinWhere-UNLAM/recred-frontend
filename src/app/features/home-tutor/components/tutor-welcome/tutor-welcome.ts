@@ -168,7 +168,7 @@ export class TutorWelcome implements OnInit {
   }
 
   formatARS(amount: number): string {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(Math.floor(amount));
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(Math.round(amount));
   }
 
   getStatusLabel(status: string, defaultLabel?: string): string {
