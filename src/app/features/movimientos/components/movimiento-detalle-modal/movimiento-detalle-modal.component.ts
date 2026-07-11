@@ -132,7 +132,9 @@ export class MovimientoDetalleModalComponent {
   estaCancelado(): boolean {
     return !this.esVistaAlumno &&
            this.movimiento.tipo === 'ANTICIPADA' &&
-           this.movimiento.status === 'CANCELADO';
+           this.movimiento.status === 'CANCELADO' &&
+           this.movimiento.cancelledByRole !== 'VENDEDOR' &&
+           this.movimiento.cancelledByRole !== 'ADMIN';
   }
 
   onCancelar(): void {
