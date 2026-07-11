@@ -495,13 +495,11 @@ describe('PurchaseRecommendationsPage', () => {
     it('dado productos, si uno no esta mapeado, isProductMapped deberia retornar false y no deberia dejar seleccionarlo', () => {
       build();
       whenMonto();
-      // Remove prod-agua from mapped set manually to test unmapped behavior
       component.mappedProductIds.set(new Set(['prod-jugo', 'prod-alfajor']));
-      
+
       expect(component.isProductMapped('prod-agua')).toBeFalse();
       expect(component.isProductMapped('prod-jugo')).toBeTrue();
-      
-      // selectAll shouldn't select prod-agua
+
       component.selectAll();
       expect(component.selectedProductIds().has('prod-agua')).toBeFalse();
       expect(component.selectedProductIds().has('prod-jugo')).toBeTrue();
@@ -510,11 +508,11 @@ describe('PurchaseRecommendationsPage', () => {
     it('dado filtro mappedFilter seteado a MAPEADOS, deberia ocultar los no mapeados', () => {
       build();
       whenMonto();
-      // Only jugo and alfajor are mapped
+
       component.mappedProductIds.set(new Set(['prod-jugo', 'prod-alfajor']));
-      
-      expect(component.filteredProducts().length).toBe(3); // initially all since filter is TODOS
-      
+
+      expect(component.filteredProducts().length).toBe(3);
+
       component.mappedFilter.set('MAPEADOS');
       const filtered = component.filteredProducts();
       expect(filtered.length).toBe(2);
@@ -524,11 +522,11 @@ describe('PurchaseRecommendationsPage', () => {
     it('dado una lista mixta de productos, filteredProducts deberia ordenar los mapeados primero', () => {
       build();
       whenMonto();
-      // Only alfajor is mapped
+
       component.mappedProductIds.set(new Set(['prod-alfajor']));
-      
+
       const filtered = component.filteredProducts();
-      // Alfajor should be first
+
       expect(filtered[0].id).toBe('prod-alfajor');
       expect(filtered[1].id).not.toBe('prod-alfajor');
       expect(filtered[2].id).not.toBe('prod-alfajor');

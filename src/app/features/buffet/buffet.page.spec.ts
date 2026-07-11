@@ -850,7 +850,7 @@ describe('BuffetPage', () => {
 
     it('dado onCarouselScroll con un container sin cards, deberia setear index basado en scroll', () => {
       const container = document.createElement('div');
-      Object.defineProperty(container, 'scrollLeft', { value: 728 }); // 2 * (340 + 24) = 728
+      Object.defineProperty(container, 'scrollLeft', { value: 728 });
       const event = { target: container } as unknown as Event;
 
       (component as unknown as { onCarouselScroll(e: Event): void }).onCarouselScroll(event);
