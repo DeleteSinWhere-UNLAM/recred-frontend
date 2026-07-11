@@ -407,8 +407,16 @@ describe('CierreDiarioPage', () => {
       whenMonto();
 
       const priv = component as unknown as { statusMetrics?(): unknown[]; inventoryMetrics?(): unknown[] };
-      if (priv.statusMetrics) expect(priv.statusMetrics()).toEqual([]);
-      if (priv.inventoryMetrics) expect(priv.inventoryMetrics()).toEqual([]);
+      if (priv.statusMetrics) {
+        expect(priv.statusMetrics()).toEqual([]);
+      } else {
+        expect(priv.statusMetrics).toBeUndefined();
+      }
+      if (priv.inventoryMetrics) {
+        expect(priv.inventoryMetrics()).toEqual([]);
+      } else {
+        expect(priv.inventoryMetrics).toBeUndefined();
+      }
     });
 
     it('dado sin listas, soldProductsPageStart e inventoryPageStart deberian devolver 0', () => {

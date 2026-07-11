@@ -177,7 +177,10 @@ describe('BuffetService', () => {
     });
 
     it('dado alumnoId NO UUID, deberia caer al fallback de /products', (done) => {
-      service.getProductosDelBuffet(BUFFET_ID, 'no-uuid').subscribe(() => done());
+      service.getProductosDelBuffet(BUFFET_ID, 'no-uuid').subscribe((prods) => {
+        expect(prods).toEqual([]);
+        done();
+      });
 
       httpMock.expectOne((r) => r.url === `${environment.apiUrl}/products`).flush([]);
     });
@@ -206,7 +209,10 @@ describe('BuffetService', () => {
 
   describe('getProductosDelBuffet con fechaHoraConsulta y fallback', () => {
     it('dado fechaHoraConsulta, deberia agregarla como query param', (done) => {
-      service.getProductosDelBuffet(BUFFET_ID, ALUMNO_ID, '2026-07-15T10:00:00').subscribe(() => done());
+      service.getProductosDelBuffet(BUFFET_ID, ALUMNO_ID, '2026-07-15T10:00:00').subscribe((prods) => {
+        expect(prods).toEqual([]);
+        done();
+      });
 
       const req = httpMock.expectOne(
         (r) =>
@@ -218,7 +224,10 @@ describe('BuffetService', () => {
 
     it('dado que /menu-buffet falla, deberia hacer fallback a /products', (done) => {
       spyOn(console, 'warn');
-      service.getProductosDelBuffet(BUFFET_ID, ALUMNO_ID).subscribe(() => done());
+      service.getProductosDelBuffet(BUFFET_ID, ALUMNO_ID).subscribe((prods) => {
+        expect(prods).toEqual([]);
+        done();
+      });
 
       httpMock.expectOne(`${environment.apiUrl}/alumnos/${ALUMNO_ID}/menu-buffet?buffetId=${BUFFET_ID}`)
         .error(new ProgressEvent('boom'));
