@@ -55,15 +55,15 @@ export class ConfirmarPresenter {
     this.cargandoState.set(true);
     const obs$ = (ordenActual?.sugerenciaId)
       ? this.sugerenciasService.comprarSugerencia(ordenActual.sugerenciaId).pipe(
-          switchMap(() => this.compraService.procesarPago())
-        )
+        switchMap(() => this.compraService.procesarPago())
+      )
       : this.compraService.procesarPago();
 
     obs$.subscribe({
       next: (orden) => {
         if (ordenActual?.sugerenciaId) {
           this.toastService.mostrar('¡Compra exitosa! Sumaste puntos saludables.', 'success');
-          // Eliminamos la notificación de la sugerencia de la campanita
+
           this.notificacionesService.eliminarNotificacionLocal(ordenActual.sugerenciaId);
         }
         for (const o of orden.ordenes) {

@@ -25,9 +25,9 @@ describe('PuntosRecompensaBarComponent', () => {
 
   it('dado que se crea el componente, debería inicializarse correctamente', () => {
     givenStatus(StudentRewardStatusMother.principiante());
-    
+
     whenDetectoCambios();
-    
+
     expect(component).toBeTruthy();
   });
 
@@ -45,7 +45,7 @@ describe('PuntosRecompensaBarComponent', () => {
   describe('Visualización de datos', () => {
     it('dado un estado PRINCIPIANTE, cuando se renderiza, debería mostrar el puntaje y nivel correcto', () => {
       givenStatus(StudentRewardStatusMother.principiante());
-      
+
       whenDetectoCambios();
 
       thenDeberiaMostrarNivel('PRINCIPIANTE');
@@ -54,14 +54,12 @@ describe('PuntosRecompensaBarComponent', () => {
 
     it('dado un estado GOAT sin proximo nivel, cuando se renderiza, no debería mostrar puntos faltantes', () => {
       givenStatus(StudentRewardStatusMother.goat());
-      
+
       whenDetectoCambios();
 
       thenNoDeberiaMostrarPuntosFaltantes();
     });
   });
-
-  // --- Mothers & Helpers ---
 
   const StudentRewardStatusMother = {
     create(overrides: Partial<StudentRewardStatus> = {}): StudentRewardStatus {

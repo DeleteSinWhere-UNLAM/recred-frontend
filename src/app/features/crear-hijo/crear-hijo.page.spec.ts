@@ -184,7 +184,7 @@ describe('CrearHijoPage', () => {
   it('dado un username no-string, la funcion validadora deberia devolver null (safe)', () => {
     whenMontoLaPagina();
 
-    component['form'].controls.username.setValue('   '); // se trimea a vacio -> null
+    component['form'].controls.username.setValue('   ');
 
     expect(component['form'].controls.username.errors?.['emailFormat']).toBeUndefined();
   });

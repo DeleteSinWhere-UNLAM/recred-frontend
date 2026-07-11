@@ -65,7 +65,6 @@ export class TransferirSaldoPresenter {
       }
       this.alumnoOrigenState.set(alumno);
 
-      // Cargar historial de billetera y filtrar transferencias
       const resumen = await firstValueFrom(this.billeteraService.getResumen(alumnoId));
       if (resumen && resumen.movimientos) {
         const transferencias = resumen.movimientos
@@ -123,8 +122,7 @@ export class TransferirSaldoPresenter {
 
     const numAmount = Number(amount);
     const numSaldo = Number(origen.saldo);
-    
-    // We add a small epsilon to avoid floating point precision issues causing a rejection when they are virtually equal.
+
     if (numAmount > numSaldo + 0.01) {
       this.toastService.mostrar('El monto a transferir no puede superar el saldo actual.', 'error');
       return false;
@@ -134,11 +132,9 @@ export class TransferirSaldoPresenter {
     try {
       await firstValueFrom(this.billeteraService.transferirSaldo(origen.id, toStudentId, amount));
       this.toastService.mostrar('Transferencia realizada correctamente.', 'success');
-      
-      // Actualizar saldos locales de los hijos del tutor
+
       await this.alumnosService.cargarHijosDelTutor();
-      
-      // Recargar el estado de este componente
+
       await this.init(origen.id);
       return true;
     } catch (error) {

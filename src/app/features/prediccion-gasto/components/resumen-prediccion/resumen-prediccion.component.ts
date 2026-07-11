@@ -27,7 +27,6 @@ export class ResumenPrediccionComponent {
 
   get porcentajePredichoPorc(): number {
     if (!this.montoLimite || this.montoLimite <= 0) return 0;
-    // Calculate how much the predicted spending takes of the limit
     const predictedRatio = this.gastoPredicho / this.montoLimite;
     return Math.min(predictedRatio * 100, 100);
   }

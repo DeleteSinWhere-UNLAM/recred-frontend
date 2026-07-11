@@ -21,7 +21,7 @@ export interface ListaPrecioProveedorResponse {
   urlArchivo: string;
   nombreOriginal: string;
   activa: boolean;
-  creadoEn: string; // ISO-Date
+  creadoEn: string;
   items?: ItemListaPrecioProveedorResponse[];
 }
 

@@ -41,7 +41,6 @@ describe('ExplicacionPuntosPage', () => {
 
   });
 
-  // --- Helpers ---
 
   function whenHagoClickEnBotonVolver(): void {
     const btn = fixture.debugElement.query(By.css('.btn-volver'));

@@ -101,8 +101,6 @@ export class ModalTablaCargaMasivaComponent implements OnChanges {
       saludEtiquetasIds: [product?.saludEtiquetasIds ?? []],
       tipoEtiquetasIds: [product?.tipoEtiquetasIds ?? []],
     });
-
-    // Validar nuevaCategoriaNombre si categoriaId es 'NEW'
     row.get('categoriaId')?.valueChanges.subscribe(value => {
       const nuevaCatCtrl = row.get('nuevaCategoriaNombre');
       if (value === 'NEW') {
@@ -141,7 +139,7 @@ export class ModalTablaCargaMasivaComponent implements OnChanges {
 
     const desc = categoria.descripcion.toLowerCase();
     const esBebida = desc.includes('bebida') || desc.includes('jugo') || desc.includes('agua') || desc.includes('gaseosa') || desc.includes('liquido');
-    
+
     return esBebida ? ['ml', 'l'] : ['g', 'kg'];
   }
 

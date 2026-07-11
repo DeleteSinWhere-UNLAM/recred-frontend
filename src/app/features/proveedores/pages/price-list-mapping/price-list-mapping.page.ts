@@ -27,7 +27,7 @@ export class PriceListMappingPage implements OnInit {
 
   readonly nombreKiosquero = this.usuarioService.nombreNavbar;
 
-  // States
+
   listaPrecioId = '';
   supplier = signal<SupplierResponse | null>(null);
   priceList = signal<ListaPrecioProveedorResponse | null>(null);
@@ -35,7 +35,7 @@ export class PriceListMappingPage implements OnInit {
   inventoryProducts = signal<Producto[]>([]);
   isLoading = signal<boolean>(false);
 
-  // Dropdown states for each row
+
   activeDropdownRowId = signal<string | null>(null);
   productSearchQuery = signal<string>('');
 
@@ -85,7 +85,7 @@ export class PriceListMappingPage implements OnInit {
           this.supplier.set(foundSupplier);
           this.priceList.set(foundList);
 
-          // Fetch full supplier details to get items
+
           this.supplierService.getSupplierById(foundSupplier.id).subscribe({
             next: (detail) => {
               const listDetail = detail.listasPrecios?.find(list => list.id === this.listaPrecioId);
@@ -155,7 +155,7 @@ export class PriceListMappingPage implements OnInit {
     );
   }
 
-  // Dropdown UI Handlers
+
   openProductDropdown(rowId: string, event: Event): void {
     event.stopPropagation();
     this.activeDropdownRowId.set(rowId);

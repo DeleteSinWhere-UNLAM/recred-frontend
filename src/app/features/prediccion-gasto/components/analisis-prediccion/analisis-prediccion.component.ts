@@ -18,7 +18,6 @@ export class AnalisisPrediccionComponent implements OnChanges {
 
   totalCategorias = 0;
 
-  // Opciones del gráfico Doughnut
   public doughnutChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -29,20 +28,20 @@ export class AnalisisPrediccionComponent implements OnChanges {
       }
     }
   };
-  
+
   public doughnutChartData: ChartData<'doughnut'> = {
     labels: [],
     datasets: [
       { data: [], backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'] }
     ]
   };
-  
+
   public doughnutChartType: ChartType = 'doughnut';
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['categoriasMasConsumidas'] && this.categoriasMasConsumidas) {
       this.totalCategorias = this.categoriasMasConsumidas.reduce((sum, c) => sum + c.montoTotal, 0);
-      
+
       this.doughnutChartData = {
         labels: this.categoriasMasConsumidas.map(c => c.descripcion),
         datasets: [

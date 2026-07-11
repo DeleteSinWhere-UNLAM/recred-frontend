@@ -7,10 +7,10 @@
   </div>
 
   <div class="welcome__grid">
-    <!-- COLUMNA PRINCIPAL -->
+
     <div class="welcome__main-col">
 
-      <!-- Alertas de Saldo -->
+
       <section class="welcome__widget welcome__widget--alert"
         [class.welcome__widget--ok]="alumnosConSaldoBajo().length === 0">
         <div class="widget-alert__header" [class.widget-alert__header--ok]="alumnosConSaldoBajo().length === 0">
@@ -38,7 +38,7 @@
         }
       </section>
 
-      <!-- Promociones -->
+
       <section class="welcome__widget">
         <div class="widget__header">
           <i class="fa-solid fa-star"></i>
@@ -67,7 +67,6 @@
         }
       </section>
 
-      <!-- Pedidos del día -->
       <section class="welcome__widget">
         <div class="widget__header">
           <i class="fa-solid fa-clock-rotate-left"></i>
@@ -82,10 +81,11 @@
             <div class="pedido-item__info">
               <span class="pedido-item__name">Para {{ pedido.alumnoNombre }}</span>
               <span class="pedido-item__desc">
-                {{ getCantidadProductos(pedido) }} {{ getCantidadProductos(pedido) === 1 ? 'producto' : 'productos' }} - 
-                <a class="pedido-item__ver-mas" (click)="verDetallePedido(pedido)" role="button" tabindex="0">Ver más</a>
+                {{ getCantidadProductos(pedido) }} {{ getCantidadProductos(pedido) === 1 ? 'producto' : 'productos' }} -
+                <a class="pedido-item__ver-mas" (click)="verDetallePedido(pedido)" role="button" tabindex="0">Ver
+                  más</a>
                 @if (pedido.withdrawalCode) {
-                  • Clave: <strong>{{ pedido.withdrawalCode }}</strong>
+                • Clave: <strong>{{ pedido.withdrawalCode }}</strong>
                 }
               </span>
             </div>
@@ -109,9 +109,9 @@
       </section>
     </div>
 
-    <!-- COLUMNA LATERAL -->
+
     <div class="welcome__side-col">
-      <!-- Últimos movimientos -->
+
       <section class="welcome__widget">
         <div class="widget__header" tabindex="0" (click)="irAMovimientos()" (keyup.enter)="irAMovimientos()"
           style="cursor: pointer;" title="Ir a Movimientos">
@@ -130,10 +130,10 @@
             <div class="mov-item__info">
               <span class="mov-item__title">
                 @if (mov.paymentMethod === 'MERCADO_PAGO') {
-                  Recarga de Saldo
+                Recarga de Saldo
                 } @else {
-                  {{ getCantidadProductos(mov) }} {{ getCantidadProductos(mov) === 1 ? 'producto' : 'productos' }} - 
-                  <a class="pedido-item__ver-mas" (click)="verDetallePedido(mov)" role="button" tabindex="0">Ver más</a>
+                {{ getCantidadProductos(mov) }} {{ getCantidadProductos(mov) === 1 ? 'producto' : 'productos' }} -
+                <a class="pedido-item__ver-mas" (click)="verDetallePedido(mov)" role="button" tabindex="0">Ver más</a>
                 }
               </span>
               <span class="mov-item__date">
@@ -156,7 +156,7 @@
         }
       </section>
 
-      <!-- Productos Favoritos -->
+
       <section class="welcome__widget">
         <div class="widget__header">
           <i class="fa-solid fa-heart"></i>

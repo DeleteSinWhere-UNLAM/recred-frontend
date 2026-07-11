@@ -233,8 +233,7 @@ describe('PromocionesPageComponent', () => {
 
     const filter = signal<string>('ALL');
     const sort = signal<string>('DATE_DESC');
-    const filteredPromotions = promotions; // alias
-
+    const filteredPromotions = promotions;
     return {
       promotions,
       isLoading,

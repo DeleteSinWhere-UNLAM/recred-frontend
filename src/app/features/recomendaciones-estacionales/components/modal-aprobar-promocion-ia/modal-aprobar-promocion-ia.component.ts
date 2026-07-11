@@ -35,8 +35,6 @@ export class ModalAprobarPromocionIaComponent implements OnInit {
       endDate: [format(nextWeek), Validators.required]
     });
 
-    // Por requerimiento, los productos ya no se seleccionan por defecto.
-    // El usuario deberá elegir manualmente cuáles desea incluir en la promoción.
   }
 
   toggleProductSelection(productId: string): void {

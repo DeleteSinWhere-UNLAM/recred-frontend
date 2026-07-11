@@ -60,17 +60,17 @@ export class RestriccionesHorariasPresenter {
         return idRecreo === franja.id;
       });
 
-      const categoriasDisponibles = this.categoriasState().filter(cat => 
+      const categoriasDisponibles = this.categoriasState().filter(cat =>
         !deEstaFranja.some(r => r.categoria?.id === cat.id || r.categoryId === cat.id)
       );
-      
+
       const saludGlobal = this.saludGlobalAlumnoState();
-      const saludDisponible = this.catalogoSaludState().filter(salud => 
-        !saludGlobal.some(g => g.id === salud.id) && 
+      const saludDisponible = this.catalogoSaludState().filter(salud =>
+        !saludGlobal.some(g => g.id === salud.id) &&
         !deEstaFranja.some(r => r.clasificacionSalud?.id === salud.id || r.classificationId === salud.id)
       );
 
-      const tieneBloqueoTotal = deEstaFranja.some(r => 
+      const tieneBloqueoTotal = deEstaFranja.some(r =>
         !r.categoryId && !r.classificationId && !r.categoria && !r.clasificacionSalud
       );
 
@@ -148,7 +148,6 @@ export class RestriccionesHorariasPresenter {
   isManageableRestriction(r: RestriccionHoraria): boolean {
     const valId = r.categoryId || r.classificationId || r.categoria?.id || r.clasificacionSalud?.id;
     if (!valId) {
-      // Un bloqueo total de recreo es manejable
       return true;
     }
 
@@ -185,22 +184,18 @@ export class RestriccionesHorariasPresenter {
       const originales = this.restriccionesState();
       const actual = this.draftRestricciones();
 
-      // Find deleted manageable restrictions
-      const eliminadas = originales.filter(orig => 
+      const eliminadas = originales.filter(orig =>
         this.isManageableRestriction(orig) && !actual.some(act => act.id === orig.id)
       );
 
-      // Find added restrictions
-      const agregadas = actual.filter(act => 
+      const agregadas = actual.filter(act =>
         act.id.startsWith('temp-') || !originales.some(orig => orig.id === act.id)
       );
 
-      // Execute deletions
       for (const r of eliminadas) {
         await this.restriccionesService.deshabilitarRestriccion(r.id);
       }
 
-      // Execute additions
       for (const r of agregadas) {
         await this.restriccionesService.crearRestriccion({
           studentId: alumno.id,
@@ -210,7 +205,6 @@ export class RestriccionesHorariasPresenter {
         });
       }
 
-      // Reload
       const actualizadas = await this.restriccionesService.getRestriccionesPorAlumno(alumno.id);
       this.restriccionesState.set(actualizadas);
       this.draftRestricciones.set(JSON.parse(JSON.stringify(actualizadas)));

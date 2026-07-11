@@ -62,11 +62,7 @@
             <dt>Email</dt>
             <dd>{{ usuario()?.email || perfil()?.email || '-' }}</dd>
           </div>
-          <!-- Ocultamos el rol a pedido del usuario -->
-          <!-- <div>
-            <dt>Rol</dt>
-            <dd>{{ rolLabel(usuario()?.role || perfil()?.role) }}</dd>
-          </div> -->
+
           @if (esTutor() || esKiosquero()) {
           <div>
             <dt>Plan</dt>
@@ -149,16 +145,6 @@
           <small>El teléfono es demasiado largo.</small>
           }
         </label>
-
-        <!-- Ocultamos el documento a pedido del usuario -->
-        <!-- <label class="perfil-usuario__campo">
-          <span>DNI / documento</span>
-          <input type="text" formControlName="documentNumber" autocomplete="off" placeholder="40111222"
-            [class.perfil-usuario__input--error]="campoInvalido('documentNumber')" />
-          @if (campoInvalido('documentNumber')) {
-          <small>El documento es demasiado largo.</small>
-          }
-        </label> -->
 
         <div class="perfil-usuario__acciones">
           <button type="button" class="perfil-usuario__boton perfil-usuario__boton--secundario"
@@ -315,16 +301,9 @@
 }
 
 @if (mostrarModalPassword()) {
-<div class="pw-modal__backdrop"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="pw-modal-titulo"
-  (click)="cerrarModalPassword()"
-  (keydown.escape)="cerrarModalPassword()">
-  <div class="pw-modal__panel"
-    role="document"
-    (click)="$event.stopPropagation()"
-    (keydown)="$event.stopPropagation()">
+<div class="pw-modal__backdrop" role="dialog" aria-modal="true" aria-labelledby="pw-modal-titulo"
+  (click)="cerrarModalPassword()" (keydown.escape)="cerrarModalPassword()">
+  <div class="pw-modal__panel" role="document" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
     <div class="pw-modal__header">
       <div class="pw-modal__icono-wrapper" aria-hidden="true">
         <i class="fa-solid fa-shield-halved"></i>
@@ -342,13 +321,10 @@
 
       <div class="pw-modal__campo">
         <label class="pw-modal__label" for="pw-old">Contraseña actual</label>
-        <div class="pw-modal__input-wrapper" [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('oldPassword')">
-          <input id="pw-old"
-            [type]="mostrarOldPassword() ? 'text' : 'password'"
-            formControlName="oldPassword"
-            autocomplete="current-password"
-            class="pw-modal__input"
-            placeholder="••••••••" />
+        <div class="pw-modal__input-wrapper"
+          [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('oldPassword')">
+          <input id="pw-old" [type]="mostrarOldPassword() ? 'text' : 'password'" formControlName="oldPassword"
+            autocomplete="current-password" class="pw-modal__input" placeholder="••••••••" />
           <button type="button" class="pw-modal__ojo" (click)="mostrarOldPassword.set(!mostrarOldPassword())"
             [attr.aria-label]="mostrarOldPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
             <i [class]="mostrarOldPassword() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" aria-hidden="true"></i>
@@ -361,13 +337,10 @@
 
       <div class="pw-modal__campo">
         <label class="pw-modal__label" for="pw-new">Nueva contraseña</label>
-        <div class="pw-modal__input-wrapper" [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('newPassword')">
-          <input id="pw-new"
-            [type]="mostrarNewPassword() ? 'text' : 'password'"
-            formControlName="newPassword"
-            autocomplete="new-password"
-            class="pw-modal__input"
-            placeholder="Mínimo 8 caracteres" />
+        <div class="pw-modal__input-wrapper"
+          [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('newPassword')">
+          <input id="pw-new" [type]="mostrarNewPassword() ? 'text' : 'password'" formControlName="newPassword"
+            autocomplete="new-password" class="pw-modal__input" placeholder="Mínimo 8 caracteres" />
           <button type="button" class="pw-modal__ojo" (click)="mostrarNewPassword.set(!mostrarNewPassword())"
             [attr.aria-label]="mostrarNewPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
             <i [class]="mostrarNewPassword() ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" aria-hidden="true"></i>
@@ -380,12 +353,10 @@
 
       <div class="pw-modal__campo">
         <label class="pw-modal__label" for="pw-confirm">Confirmar nueva contraseña</label>
-        <div class="pw-modal__input-wrapper" [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('confirmPassword')">
-          <input id="pw-confirm"
-            [type]="mostrarConfirmPassword() ? 'text' : 'password'"
-            formControlName="confirmPassword"
-            autocomplete="new-password"
-            class="pw-modal__input"
+        <div class="pw-modal__input-wrapper"
+          [class.pw-modal__input-wrapper--error]="campoPasswordInvalido('confirmPassword')">
+          <input id="pw-confirm" [type]="mostrarConfirmPassword() ? 'text' : 'password'"
+            formControlName="confirmPassword" autocomplete="new-password" class="pw-modal__input"
             placeholder="Repetí la nueva contraseña" />
           <button type="button" class="pw-modal__ojo" (click)="mostrarConfirmPassword.set(!mostrarConfirmPassword())"
             [attr.aria-label]="mostrarConfirmPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">

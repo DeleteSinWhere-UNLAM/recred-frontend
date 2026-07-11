@@ -68,9 +68,9 @@ export class SugerenciasPresenter {
     const selected = this._sugerenciaSeleccionada.getValue();
     if (this.hasSelectedProduct(selected)) {
       const productIds = [selected.estadisticasVenta.productoId, ...formData.productIds];
-      
+
       forkJoin(
-        productIds.map(id => 
+        productIds.map(id =>
           this.productService.getById(id).pipe(
             catchError(() => of({
               id,
@@ -88,7 +88,7 @@ export class SugerenciasPresenter {
         switchMap((products) => {
           const imageUrls = products.map(p => p.urlImagen);
           const collageUrl = buildCloudinaryCollageUrl(imageUrls);
-          
+
           const promotionData = {
             name: `Combo ${selected.productoOriginal}`,
             discountPercentage: formData.discountPercentage,
@@ -97,7 +97,7 @@ export class SugerenciasPresenter {
             productIds: productIds,
             imageUrl: collageUrl
           };
-          
+
           return this.promotionService.createPromotion(promotionData);
         })
       ).subscribe({
@@ -148,7 +148,6 @@ export class SugerenciasPresenter {
     return this._sugerenciaSeleccionada.getValue()?.estadisticasVenta;
   }
 
-  /** Horizontal bar chart: days without sale per product (sorted worst → best) */
   get chartDiasSinVenta(): { nombre: string; dias: number; percent: number; stock: number; ventas: number }[] {
     const sugerencias = this._sugerencias.getValue();
     if (!this.hasSugerencias(sugerencias)) return [];
@@ -167,7 +166,6 @@ export class SugerenciasPresenter {
     }));
   }
 
-  /** Vertical bar chart: stock vs ventas per product */
   get chartStockVsVentas(): { nombre: string; stock: number; stockPercent: number; ventas: number; ventasPercent: number }[] {
     const sugerencias = this._sugerencias.getValue();
     if (!this.hasSugerencias(sugerencias)) return [];
