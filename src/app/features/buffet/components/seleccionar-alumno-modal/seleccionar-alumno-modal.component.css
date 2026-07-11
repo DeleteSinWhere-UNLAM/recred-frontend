@@ -1,182 +1,1 @@
-.modal-alumno__backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background-color: rgba(51, 65, 85, 0.48);
-  backdrop-filter: blur(5px);
-  animation: fadeIn 0.2s ease-out;
-}
-
-.modal-alumno {
-  width: 100%;
-  max-width: 440px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 24px;
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
-  box-shadow:
-    var(--shadow-elevated);
-  animation: popIn 0.22s ease-out;
-}
-
-.modal-alumno__cabecera {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.modal-alumno__titulo {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--color-pizarra);
-}
-
-.modal-alumno__cerrar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background-color: var(--color-superficie);
-  color: var(--color-texto-claro);
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-borde);
-  box-shadow: none;
-  transition: color 0.15s ease, transform 0.1s ease;
-}
-
-.modal-alumno__cerrar:hover {
-  color: var(--color-pizarra);
-}
-
-.modal-alumno__cerrar:active {
-  transform: scale(0.94);
-  box-shadow: var(--shadow-neu-concave);
-}
-
-.modal-alumno__lista {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0;
-  margin: 0;
-}
-
-.modal-alumno__item {
-  width: 100%;
-}
-
-.modal-alumno__opcion {
-  width: 100%;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  background-color: var(--color-superficie);
-  border-radius: 14px;
-  box-shadow: 0 6px 16px rgba(74, 111, 165, 0.06);
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  border: 2px solid transparent;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
-}
-
-.modal-alumno__opcion:hover {
-  border-color: rgba(242, 183, 5, 0.5);
-  box-shadow: var(--shadow-card);
-}
-
-.modal-alumno__opcion:active {
-  transform: scale(0.99);
-  box-shadow: var(--shadow-neu-concave);
-}
-
-.modal-alumno__opcion--actual {
-  border-color: var(--color-menta);
-}
-
-.modal-alumno__avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: var(--color-pizarra);
-  color: #fff;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.modal-alumno__avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.modal-alumno__datos {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.modal-alumno__nombre {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-texto-oscuro);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.modal-alumno__colegio {
-  font-size: 12px;
-  color: var(--color-texto-claro);
-}
-
-.modal-alumno__chevron {
-  color: var(--color-texto-claro);
-  font-size: 13px;
-}
-
-.modal-alumno__check {
-  color: var(--color-menta);
-  font-size: 20px;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: scale(0.94) translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
+.modal-alumno__backdrop {  position: fixed;  inset: 0;  z-index: 900;  display: flex;  align-items: center;  justify-content: center;  padding: 24px;  background-color: rgba(51, 65, 85, 0.48);  backdrop-filter: blur(5px);  animation: fadeIn 0.2s ease-out;}.modal-alumno {  width: 100%;  max-width: 440px;  display: flex;  flex-direction: column;  gap: 20px;  padding: 24px;  background-color: var(--color-superficie);  border: 1px solid var(--color-borde);  border-radius: var(--radius-card);  box-shadow:    var(--shadow-elevated);  animation: popIn 0.22s ease-out;}.modal-alumno__cabecera {  display: flex;  align-items: center;  justify-content: space-between;  gap: 16px;}.modal-alumno__titulo {  font-family: var(--font-display);  font-size: 20px;  font-weight: 800;  color: var(--color-pizarra);}.modal-alumno__cerrar {  width: 34px;  height: 34px;  border-radius: 50%;  background-color: var(--color-superficie);  color: var(--color-texto-claro);  font-size: 14px;  display: inline-flex;  align-items: center;  justify-content: center;  border: 1px solid var(--color-borde);  box-shadow: none;  transition: color 0.15s ease, transform 0.1s ease;}.modal-alumno__cerrar:hover {  color: var(--color-pizarra);}.modal-alumno__cerrar:active {  transform: scale(0.94);  box-shadow: var(--shadow-neu-concave);}.modal-alumno__lista {  list-style: none;  display: flex;  flex-direction: column;  gap: 10px;  padding: 0;  margin: 0;}.modal-alumno__item {  width: 100%;}.modal-alumno__opcion {  width: 100%;  display: grid;  grid-template-columns: auto 1fr auto;  align-items: center;  gap: 14px;  padding: 12px 16px;  background-color: var(--color-superficie);  border-radius: 14px;  box-shadow: 0 6px 16px rgba(74, 111, 165, 0.06);  text-align: left;  font: inherit;  color: inherit;  border: 2px solid transparent;  transition:    transform 0.1s ease,    box-shadow 0.15s ease,    border-color 0.15s ease;}.modal-alumno__opcion:hover {  border-color: rgba(242, 183, 5, 0.5);  box-shadow: var(--shadow-card);}.modal-alumno__opcion:active {  transform: scale(0.99);  box-shadow: var(--shadow-neu-concave);}.modal-alumno__opcion--actual {  border-color: var(--color-menta);}.modal-alumno__avatar {  width: 44px;  height: 44px;  border-radius: 50%;  background-color: var(--color-pizarra);  color: #fff;  font-family: var(--font-display);  font-weight: 700;  font-size: 15px;  display: inline-flex;  align-items: center;  justify-content: center;  overflow: hidden;}.modal-alumno__avatar-img {  width: 100%;  height: 100%;  object-fit: cover;}.modal-alumno__datos {  display: flex;  flex-direction: column;  gap: 2px;  min-width: 0;}.modal-alumno__nombre {  font-family: var(--font-display);  font-size: 15px;  font-weight: 700;  color: var(--color-texto-oscuro);  line-height: 1.2;  white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;}.modal-alumno__colegio {  font-size: 12px;  color: var(--color-texto-claro);}.modal-alumno__chevron {  color: var(--color-texto-claro);  font-size: 13px;}.modal-alumno__check {  color: var(--color-menta);  font-size: 20px;}@keyframes fadeIn {  from { opacity: 0; }  to { opacity: 1; }}@keyframes popIn {  from {    opacity: 0;    transform: scale(0.94) translateY(8px);  }  to {    opacity: 1;    transform: scale(1) translateY(0);  }}

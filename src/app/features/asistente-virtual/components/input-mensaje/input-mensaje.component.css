@@ -1,127 +1,1 @@
-.input-mensaje {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  background-color: var(--color-superficie);
-  border-top: 1px solid var(--color-borde);
-}
-
-.input-mensaje__acciones {
-  flex-shrink: 0;
-  height: 44px;
-  min-width: 96px;
-  padding: 0 12px;
-  border: 1px solid var(--color-borde-fuerte);
-  border-radius: 999px;
-  background-color: color-mix(in srgb, var(--color-pizarra) 7%, var(--color-superficie));
-  color: var(--color-pizarra);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  transition:
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    transform 0.18s ease;
-}
-
-.input-mensaje__acciones:hover {
-  background-color: color-mix(in srgb, var(--color-pizarra) 12%, var(--color-superficie));
-  border-color: var(--color-pizarra);
-  transform: translateY(-1px);
-}
-
-.input-mensaje__acciones:active {
-  transform: scale(0.96);
-}
-
-.input-mensaje__acciones:focus-visible {
-  outline: 2px solid var(--color-pizarra);
-  outline-offset: 3px;
-}
-
-.input-mensaje__acciones--abiertas {
-  background-color: var(--color-pizarra);
-  border-color: var(--color-pizarra);
-  color: #fff;
-}
-
-.input-mensaje__campo {
-  flex: 1;
-  min-width: 0;
-  height: 44px;
-  padding: 0 18px;
-  border: none;
-  border-radius: 999px;
-  background-color: var(--color-superficie);
-  color: var(--color-texto-oscuro);
-  font-family: var(--font-body);
-  font-size: 14px;
-  box-shadow: inset 0 0 0 1px var(--color-borde);
-  transition: box-shadow 0.2s ease;
-}
-
-.input-mensaje__campo::placeholder {
-  color: var(--color-texto-claro);
-}
-
-.input-mensaje__campo:focus {
-  outline: none;
-  box-shadow:
-    inset 0 0 0 1px var(--color-pizarra),
-    0 0 0 4px var(--color-foco);
-}
-
-.input-mensaje__campo:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.input-mensaje__enviar {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: linear-gradient(135deg, var(--color-dorado) 0%, var(--color-dorado-dark) 100%);
-  color: var(--color-texto-oscuro);
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 8px 16px rgba(217, 163, 4, 0.24),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.08);
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    opacity 0.18s ease;
-}
-
-.input-mensaje__enviar:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow:
-    0 10px 20px rgba(217, 163, 4, 0.28),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.input-mensaje__enviar:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.input-mensaje__enviar:focus-visible {
-  outline: 2px solid var(--color-pizarra);
-  outline-offset: 3px;
-}
-
-.input-mensaje__enviar:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  box-shadow: none;
-}
+.input-mensaje {  display: flex;  align-items: center;  gap: 8px;  padding: 10px 12px;  background-color: var(--color-superficie);  border-top: 1px solid var(--color-borde);}.input-mensaje__acciones {  flex-shrink: 0;  height: 44px;  min-width: 96px;  padding: 0 12px;  border: 1px solid var(--color-borde-fuerte);  border-radius: 999px;  background-color: color-mix(in srgb, var(--color-pizarra) 7%, var(--color-superficie));  color: var(--color-pizarra);  display: inline-flex;  align-items: center;  justify-content: center;  gap: 7px;  font-family: var(--font-display);  font-size: 12px;  font-weight: 800;  cursor: pointer;  transition:    background-color 0.18s ease,    border-color 0.18s ease,    transform 0.18s ease;}.input-mensaje__acciones:hover {  background-color: color-mix(in srgb, var(--color-pizarra) 12%, var(--color-superficie));  border-color: var(--color-pizarra);  transform: translateY(-1px);}.input-mensaje__acciones:active {  transform: scale(0.96);}.input-mensaje__acciones:focus-visible {  outline: 2px solid var(--color-pizarra);  outline-offset: 3px;}.input-mensaje__acciones--abiertas {  background-color: var(--color-pizarra);  border-color: var(--color-pizarra);  color: #fff;}.input-mensaje__campo {  flex: 1;  min-width: 0;  height: 44px;  padding: 0 18px;  border: none;  border-radius: 999px;  background-color: var(--color-superficie);  color: var(--color-texto-oscuro);  font-family: var(--font-body);  font-size: 14px;  box-shadow: inset 0 0 0 1px var(--color-borde);  transition: box-shadow 0.2s ease;}.input-mensaje__campo::placeholder {  color: var(--color-texto-claro);}.input-mensaje__campo:focus {  outline: none;  box-shadow:    inset 0 0 0 1px var(--color-pizarra),    0 0 0 4px var(--color-foco);}.input-mensaje__campo:disabled {  opacity: 0.6;  cursor: not-allowed;}.input-mensaje__enviar {  flex-shrink: 0;  width: 44px;  height: 44px;  border-radius: 50%;  border: none;  background: linear-gradient(135deg, var(--color-dorado) 0%, var(--color-dorado-dark) 100%);  color: var(--color-texto-oscuro);  font-size: 16px;  cursor: pointer;  display: flex;  align-items: center;  justify-content: center;  box-shadow:    0 8px 16px rgba(217, 163, 4, 0.24),    inset 0 -2px 4px rgba(0, 0, 0, 0.08);  transition:    transform 0.18s ease,    box-shadow 0.18s ease,    opacity 0.18s ease;}.input-mensaje__enviar:hover:not(:disabled) {  transform: translateY(-2px) scale(1.05);  box-shadow:    0 10px 20px rgba(217, 163, 4, 0.28),    inset 0 -2px 4px rgba(0, 0, 0, 0.08);}.input-mensaje__enviar:active:not(:disabled) {  transform: scale(0.95);}.input-mensaje__enviar:focus-visible {  outline: 2px solid var(--color-pizarra);  outline-offset: 3px;}.input-mensaje__enviar:disabled {  opacity: 0.4;  cursor: not-allowed;  box-shadow: none;}

@@ -1,208 +1,1 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  color-scheme: light;
-  --color-pizarra: #4A6FA5;
-  --color-pizarra-dark: #3a5a8a;
-  --color-dorado: #F2B705;
-  --color-dorado-dark: #d9a304;
-  --color-fondo: #F0F4F8;
-  --color-superficie: #FFFFFF;
-  --color-superficie-alt: #E8EDF3;
-  --color-texto-oscuro: #334155;
-  --color-texto-claro: #94A3B8;
-  --color-melocoton: #E76F51;
-  --color-menta: #81B29A;
-  --color-borde: rgba(74, 111, 165, 0.12);
-  --color-borde-fuerte: rgba(74, 111, 165, 0.2);
-  --color-foco: rgba(74, 111, 165, 0.24);
-
-  --shadow-neu-convex:
-    0 18px 44px rgba(51, 65, 85, 0.08),
-    0 6px 18px rgba(74, 111, 165, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  --shadow-neu-concave:
-    inset 0 0 0 1px rgba(74, 111, 165, 0.11),
-    0 1px 2px rgba(51, 65, 85, 0.04);
-  --shadow-card:
-    0 14px 34px rgba(51, 65, 85, 0.08),
-    0 3px 10px rgba(74, 111, 165, 0.06);
-  --shadow-elevated:
-    0 24px 60px rgba(51, 65, 85, 0.16),
-    0 8px 20px rgba(74, 111, 165, 0.12);
-
-  --radius-card: 18px;
-  --radius-button: 12px;
-  --radius-pill: 999px;
-
-  --font-display: 'Montserrat', 'Inter', sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --transition-ui: 200ms ease;
-  --body-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 260px);
-}
-
-[data-theme="dark"] {
-  color-scheme: dark;
-  --color-fondo: #0F172A;
-  --color-superficie: #1E293B;
-  --color-superficie-alt: #334155;
-  --color-texto-oscuro: #F8FAFC;
-  --color-texto-claro: #94A3B8;
-  --color-pizarra: #6C8EBF;
-  --color-pizarra-dark: #8FB4E6;
-  --color-borde: rgba(255, 255, 255, 0.08);
-  --color-borde-fuerte: rgba(255, 255, 255, 0.16);
-  --color-foco: rgba(108, 142, 191, 0.4);
-
-  --shadow-neu-convex:
-    0 18px 44px rgba(0, 0, 0, 0.3),
-    0 6px 18px rgba(0, 0, 0, 0.2);
-  --shadow-neu-concave:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-    0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-card:
-    0 14px 34px rgba(0, 0, 0, 0.25),
-    0 3px 10px rgba(0, 0, 0, 0.15);
-  --shadow-elevated:
-    0 24px 60px rgba(0, 0, 0, 0.4),
-    0 8px 20px rgba(0, 0, 0, 0.3);
-
-  --body-gradient: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0) 260px);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  caret-color: transparent;
-}
-
-input,
-textarea,
-[contenteditable] {
-  caret-color: auto;
-}
-
-html {
-  background-color: var(--color-fondo);
-}
-
-html,
-body {
-  height: 100%;
-  min-width: 320px;
-}
-
-body {
-  font-family: var(--font-body);
-  background:
-    var(--body-gradient),
-    var(--color-fondo);
-  color: var(--color-texto-oscuro);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background-color var(--transition-ui), color var(--transition-ui);
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-  color: inherit;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.boton-comprar {
-  background-color: var(--color-menta);
-  color: white;
-  border: none;
-  border-radius: var(--radius-button, 12px);
-  padding: 10px 20px;
-  font-weight: 700;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(129, 178, 154, 0.3);
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.boton-comprar {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-button:disabled {
-  cursor: not-allowed;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid var(--color-foco);
-  outline-offset: 3px;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-img {
-  max-width: 100%;
-}
-
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-  min-width: 0;
-}
-
-::selection {
-  background: rgba(242, 183, 5, 0.32);
-  color: var(--color-texto-oscuro);
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-@keyframes slideInTop {
-  from {
-    transform: translateY(-24px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {
-  bottom: 110px !important;
-}
-
-@media (min-width: 768px) {
-  body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {
-    bottom: 120px !important;
-  }
-}
+@tailwind base;@tailwind components;@tailwind utilities;:root {  color-scheme: light;  --color-pizarra: #4A6FA5;  --color-pizarra-dark: #3a5a8a;  --color-dorado: #F2B705;  --color-dorado-dark: #d9a304;  --color-fondo: #F0F4F8;  --color-superficie: #FFFFFF;  --color-superficie-alt: #E8EDF3;  --color-texto-oscuro: #334155;  --color-texto-claro: #94A3B8;  --color-melocoton: #E76F51;  --color-menta: #81B29A;  --color-borde: rgba(74, 111, 165, 0.12);  --color-borde-fuerte: rgba(74, 111, 165, 0.2);  --color-foco: rgba(74, 111, 165, 0.24);  --shadow-neu-convex:    0 18px 44px rgba(51, 65, 85, 0.08),    0 6px 18px rgba(74, 111, 165, 0.08),    inset 0 1px 0 rgba(255, 255, 255, 0.72);  --shadow-neu-concave:    inset 0 0 0 1px rgba(74, 111, 165, 0.11),    0 1px 2px rgba(51, 65, 85, 0.04);  --shadow-card:    0 14px 34px rgba(51, 65, 85, 0.08),    0 3px 10px rgba(74, 111, 165, 0.06);  --shadow-elevated:    0 24px 60px rgba(51, 65, 85, 0.16),    0 8px 20px rgba(74, 111, 165, 0.12);  --radius-card: 18px;  --radius-button: 12px;  --radius-pill: 999px;  --font-display: 'Montserrat', 'Inter', sans-serif;  --font-body: 'Inter', system-ui, sans-serif;  --transition-ui: 200ms ease;  --body-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(240, 244, 248, 0) 260px);}[data-theme="dark"] {  color-scheme: dark;  --color-fondo: #0F172A;  --color-superficie: #1E293B;  --color-superficie-alt: #334155;  --color-texto-oscuro: #F8FAFC;  --color-texto-claro: #94A3B8;  --color-pizarra: #6C8EBF;  --color-pizarra-dark: #8FB4E6;  --color-borde: rgba(255, 255, 255, 0.08);  --color-borde-fuerte: rgba(255, 255, 255, 0.16);  --color-foco: rgba(108, 142, 191, 0.4);  --shadow-neu-convex:    0 18px 44px rgba(0, 0, 0, 0.3),    0 6px 18px rgba(0, 0, 0, 0.2);  --shadow-neu-concave:    inset 0 0 0 1px rgba(255, 255, 255, 0.05),    0 1px 2px rgba(0, 0, 0, 0.2);  --shadow-card:    0 14px 34px rgba(0, 0, 0, 0.25),    0 3px 10px rgba(0, 0, 0, 0.15);  --shadow-elevated:    0 24px 60px rgba(0, 0, 0, 0.4),    0 8px 20px rgba(0, 0, 0, 0.3);  --body-gradient: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0) 260px);}* {  margin: 0;  padding: 0;  box-sizing: border-box;  caret-color: transparent;}input,textarea,[contenteditable] {  caret-color: auto;}html {  background-color: var(--color-fondo);}html,body {  height: 100%;  min-width: 320px;}body {  font-family: var(--font-body);  background:    var(--body-gradient),    var(--color-fondo);  color: var(--color-texto-oscuro);  font-size: 16px;  line-height: 1.5;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;  transition: background-color var(--transition-ui), color var(--transition-ui);}button {  font-family: inherit;  cursor: pointer;  border: none;  background: none;  color: inherit;  -webkit-tap-highlight-color: transparent;}.boton-comprar {  background-color: var(--color-menta);  color: white;  border: none;  border-radius: var(--radius-button, 12px);  padding: 10px 20px;  font-weight: 700;  font-size: 14px;  display: flex;  align-items: center;  gap: 8px;  cursor: pointer;  box-shadow: 0 4px 10px rgba(129, 178, 154, 0.3);  transition: opacity 0.2s, transform 0.2s;}.boton-comprar {  opacity: 0.9;  transform: translateY(-1px);}button:disabled {  cursor: not-allowed;}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible {  outline: 3px solid var(--color-foco);  outline-offset: 3px;}a {  color: inherit;  text-decoration: none;}img {  max-width: 100%;}input,select,textarea {  font: inherit;  color: inherit;  min-width: 0;}::selection {  background: rgba(242, 183, 5, 0.32);  color: var(--color-texto-oscuro);}@media (prefers-reduced-motion: reduce) {  *,  *::before,  *::after {    animation-duration: 0.01ms !important;    animation-iteration-count: 1 !important;    scroll-behavior: auto !important;    transition-duration: 0.01ms !important;  }}@keyframes slideInTop {  from {    transform: translateY(-24px);    opacity: 0;  }  to {    transform: translateY(0);    opacity: 1;  }}body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {  bottom: 110px !important;}@media (min-width: 768px) {  body:has(.buffet__footer-cart:not(.footer-hidden)) .asistente-fab {    bottom: 120px !important;  }}

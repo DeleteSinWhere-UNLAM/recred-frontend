@@ -1,34 +1,1 @@
-.card {
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card);
-  padding: 20px;
-  background: var(--color-superficie);
-  box-shadow: var(--shadow-card);
-}
-
-.alumno {
-  margin: 0 0 12px;
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--color-pizarra);
-}
-
-.producto,
-.frecuencia {
-  margin: 0 0 8px;
-  color: var(--color-texto-oscuro);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.recomendacion {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(74, 111, 165, 0.08);
-  color: var(--color-pizarra);
-  font-size: 13px;
-  font-weight: 700;
-}
+.card {  border: 1px solid var(--color-borde);  border-radius: var(--radius-card);  padding: 20px;  background: var(--color-superficie);  box-shadow: var(--shadow-card);}.alumno {  margin: 0 0 12px;  font-family: var(--font-display);  font-size: 18px;  font-weight: 800;  color: var(--color-pizarra);}.producto,.frecuencia {  margin: 0 0 8px;  color: var(--color-texto-oscuro);  font-size: 14px;  font-weight: 600;}.recomendacion {  display: inline-block;  margin-top: 10px;  padding: 10px 14px;  border-radius: 12px;  background: rgba(74, 111, 165, 0.08);  color: var(--color-pizarra);  font-size: 13px;  font-weight: 700;}

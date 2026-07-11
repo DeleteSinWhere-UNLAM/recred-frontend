@@ -1,144 +1,1 @@
-.notificacion-panel {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 9999;
-  width: min(360px, calc(100vw - 40px));
-  background-color: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radius-card, 18px);
-  padding: 24px;
-  box-shadow: var(--shadow-elevated);
-  animation: animate-fade-in-up 0.3s ease-out forwards;
-  transform-origin: bottom left;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .notificacion-panel {
-    bottom: 32px;
-    left: 32px;
-    width: 380px;
-  }
-}
-
-.notificacion-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.notificacion-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.notificacion-icon-bg {
-  background-color: color-mix(in srgb, var(--color-melocoton) 10%, transparent);
-  color: var(--color-melocoton);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.notificacion-title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 18px;
-  color: var(--color-pizarra);
-  margin: 0;
-}
-
-.notificacion-close {
-  background: none;
-  border: none;
-  color: var(--color-texto-claro);
-  font-size: 20px;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.notificacion-close:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  color: var(--color-texto-oscuro);
-}
-
-.notificacion-body {
-  color: var(--color-texto-oscuro);
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.notificacion-amount {
-  font-family: var(--font-display);
-  font-weight: 800;
-  color: var(--color-pizarra);
-}
-
-.notificacion-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.btn-later {
-  background: none;
-  border: none;
-  color: var(--color-texto-claro);
-  font-weight: 700;
-  font-size: 14px;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.btn-later:hover {
-  color: var(--color-pizarra);
-}
-
-.btn-buy {
-  background-color: var(--color-menta);
-  color: white;
-  border: none;
-  border-radius: var(--radius-button, 12px);
-  padding: 10px 20px;
-  font-weight: 700;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(129, 178, 154, 0.3);
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.btn-buy:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-@keyframes animate-fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+.notificacion-panel {  position: fixed;  bottom: 20px;  left: 20px;  z-index: 9999;  width: min(360px, calc(100vw - 40px));  background-color: var(--color-superficie);  border: 1px solid var(--color-borde);  border-radius: var(--radius-card, 18px);  padding: 24px;  box-shadow: var(--shadow-elevated);  animation: animate-fade-in-up 0.3s ease-out forwards;  transform-origin: bottom left;  display: flex;  flex-direction: column;  gap: 16px;}@media (min-width: 768px) {  .notificacion-panel {    bottom: 32px;    left: 32px;    width: 380px;  }}.notificacion-header {  display: flex;  justify-content: space-between;  align-items: flex-start;}.notificacion-title-wrap {  display: flex;  align-items: center;  gap: 12px;}.notificacion-icon-bg {  background-color: color-mix(in srgb, var(--color-melocoton) 10%, transparent);  color: var(--color-melocoton);  width: 40px;  height: 40px;  border-radius: 50%;  display: flex;  align-items: center;  justify-content: center;  font-size: 18px;}.notificacion-title {  font-family: var(--font-display);  font-weight: 800;  font-size: 18px;  color: var(--color-pizarra);  margin: 0;}.notificacion-close {  background: none;  border: none;  color: var(--color-texto-claro);  font-size: 20px;  cursor: pointer;  width: 32px;  height: 32px;  display: flex;  align-items: center;  justify-content: center;  border-radius: 50%;  transition: background-color 0.2s, color 0.2s;}.notificacion-close:hover {  background-color: rgba(0, 0, 0, 0.05);  color: var(--color-texto-oscuro);}.notificacion-body {  color: var(--color-texto-oscuro);  font-size: 14px;  line-height: 1.6;  margin: 0;}.notificacion-amount {  font-family: var(--font-display);  font-weight: 800;  color: var(--color-pizarra);}.notificacion-actions {  display: flex;  justify-content: flex-end;  gap: 12px;  margin-top: 8px;}.btn-later {  background: none;  border: none;  color: var(--color-texto-claro);  font-weight: 700;  font-size: 14px;  padding: 8px 16px;  cursor: pointer;  transition: color 0.2s;}.btn-later:hover {  color: var(--color-pizarra);}.btn-buy {  background-color: var(--color-menta);  color: white;  border: none;  border-radius: var(--radius-button, 12px);  padding: 10px 20px;  font-weight: 700;  font-size: 14px;  display: flex;  align-items: center;  gap: 8px;  cursor: pointer;  box-shadow: 0 4px 10px rgba(129, 178, 154, 0.3);  transition: opacity 0.2s, transform 0.2s;}.btn-buy:hover {  opacity: 0.9;  transform: translateY(-1px);}@keyframes animate-fade-in-up {  from {    opacity: 0;    transform: translateY(20px);  }  to {    opacity: 1;    transform: translateY(0);  }}

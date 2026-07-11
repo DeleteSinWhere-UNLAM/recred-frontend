@@ -1,284 +1,1 @@
-/* ==========================================================================
-   VISTA DE CONFIGURACIÓN DE RESTRICCIONES (TUTOR)
-   ========================================================================== */
-
-:host {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.restricciones {
-  padding-top: 16px;
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.restricciones__container {
-  width: 100%;
-  max-width: 680px;
-  padding: 0 24px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-
-
-
-
-.restricciones__header {
-  margin-bottom: 24px;
-  padding-bottom: 8px;
-}
-
-.restricciones__titulo {
-  font-family: var(--font-display);
-  text-align: center;
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--color-pizarra);
-  margin: 0 0 4px;
-  line-height: 1.15;
-}
-
-
-
-/* Listado de Restricciones Nutricionales (Grid) */
-.restricciones__lista {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  width: 100%;
-}
-
-/* Con 10 elementos el grid de 2 columnas queda siempre pareado */
-
-.restriccion-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background-color: var(--color-superficie-alt);
-  border: 1px solid var(--color-borde);
-  border-radius: 20px;
-  box-shadow: var(--shadow-neu-concave);
-  transition: all 0.2s ease;
-}
-
-.restriccion-item:hover {
-  background-color: var(--color-superficie);
-  border-color: var(--color-borde-fuerte);
-  box-shadow: var(--shadow-card);
-}
-
-/* Icon Container per Restriction */
-.restriccion-item__icono {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-/* Specific colors matching the icons in the reference screenshot */
-.restriccion-item__icono--sinTacc {
-  background-color: color-mix(in srgb, #e63946 15%, transparent);
-  color: #e63946; /* Orange-red TACC */
-}
-
-.restriccion-item__icono--sinAzucar {
-  background-color: color-mix(in srgb, #3b82f6 15%, transparent);
-  color: #3b82f6; /* Blue sugar */
-}
-
-.restriccion-item__icono--sinSodio {
-  background-color: color-mix(in srgb, #d97706 15%, transparent);
-  color: #d97706; /* Yellow-orange sodium */
-}
-
-.restriccion-item__icono--vegano {
-  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
-  color: var(--color-menta); /* Green vegan matching SALDADO */
-}
-
-.restriccion-item__icono--contieneLacteos {
-  background-color: color-mix(in srgb, #ea580c 15%, transparent);
-  color: #ea580c; /* Orange lacteos */
-}
-
-.restriccion-item__icono--tieneMani {
-  background-color: color-mix(in srgb, #92400e 15%, transparent);
-  color: color-mix(in srgb, #92400e 80%, var(--color-texto-oscuro)); /* Brown maní */
-}
-
-.restriccion-item__icono--contieneHuevo {
-  background-color: color-mix(in srgb, #a16207 15%, transparent);
-  color: color-mix(in srgb, #a16207 80%, var(--color-texto-oscuro)); /* Yellow-amber huevo */
-}
-
-.restriccion-item__icono--contienePescado {
-  background-color: color-mix(in srgb, #0369a1 15%, transparent);
-  color: #0369a1; /* Blue pescado */
-}
-
-.restriccion-item__icono--contieneSoja {
-  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
-  color: var(--color-menta); /* Green soja */
-}
-
-.restriccion-item__icono--aptoVegetariano {
-  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);
-  color: var(--color-menta); /* Fresh green vegetariano */
-}
-
-.restriccion-item__texto {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.restriccion-item__titulo {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--color-texto-oscuro);
-  line-height: 1.25;
-}
-
-.restriccion-item__descripcion {
-  font-size: 11px;
-  color: var(--color-texto-claro);
-  line-height: 1.3;
-}
-
-/* Premium Custom Toggle Switch */
-.toggle {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-.toggle__input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle__slider {
-  position: absolute;
-  inset: 0;
-  background-color: var(--color-borde-fuerte);
-  border-radius: 9999px;
-  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toggle__slider::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
-  background-color: var(--color-superficie);
-  border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toggle__input:checked + .toggle__slider {
-  background-color: color-mix(in srgb, var(--color-menta) 30%, transparent);
-}
-
-.toggle__input:checked + .toggle__slider::after {
-  transform: translateX(20px);
-  background-color: var(--color-menta);
-}
-
-.toggle__input:focus-visible + .toggle__slider {
-  outline: 2px solid var(--color-pizarra);
-  outline-offset: 2px;
-}
-
-/* Guardar Cambios Button */
-.restricciones__guardar {
-  width: 100%;
-  padding: 16px;
-  background-color: var(--color-dorado); /* Yellow button */
-  color: #1a3b5c;
-  border: none;
-  border-radius: 18px;
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  box-shadow: 0 8px 24px rgba(242, 183, 5, 0.22);
-  cursor: pointer;
-  transition: all 0.15s ease, transform 0.1s ease;
-  margin-top: 8px;
-}
-
-.restricciones__guardar:hover:not(:disabled) {
-  background-color: var(--color-dorado-dark);
-  box-shadow: 0 10px 28px rgba(242, 183, 5, 0.32);
-}
-
-.restricciones__guardar:active:not(:disabled) {
-  transform: scale(0.985);
-}
-
-.restricciones__guardar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* ==========================================================================
-   RESPONSIVIDAD
-   ========================================================================== */
-
-
-@media (max-width: 640px) {
-  .restricciones {
-    padding: 90px 0 40px;
-  }
-  
-  .restricciones__container {
-    padding: 0 16px;
-  }
-  
-
-
-  
-
-  
-  .restricciones__lista {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  /* Sin regla especial para last-child: 10 items en 2 columnas quedan parejos */
-  
-  .restriccion-item {
-    padding: 14px 16px;
-    gap: 14px;
-  }
-}
-
+:host {  display: flex;  flex-direction: column;  height: 100%;}.restricciones {  padding-top: 16px;  width: 100%;  flex: 1;  display: flex;  flex-direction: column;  align-items: center;  justify-content: center;}.restricciones__container {  width: 100%;  max-width: 680px;  padding: 0 24px;  box-sizing: border-box;  display: flex;  flex-direction: column;  align-items: center;}.restricciones__header {  margin-bottom: 24px;  padding-bottom: 8px;}.restricciones__titulo {  font-family: var(--font-display);  text-align: center;  font-size: 24px;  font-weight: 800;  color: var(--color-pizarra);  margin: 0 0 4px;  line-height: 1.15;}.restricciones__lista {  list-style: none;  padding: 0;  margin: 0;  display: grid;  grid-template-columns: repeat(2, 1fr);  gap: 16px;  width: 100%;}.restriccion-item {  display: grid;  grid-template-columns: auto 1fr auto;  align-items: center;  gap: 16px;  padding: 16px 20px;  background-color: var(--color-superficie-alt);  border: 1px solid var(--color-borde);  border-radius: 20px;  box-shadow: var(--shadow-neu-concave);  transition: all 0.2s ease;}.restriccion-item:hover {  background-color: var(--color-superficie);  border-color: var(--color-borde-fuerte);  box-shadow: var(--shadow-card);}.restriccion-item__icono {  width: 48px;  height: 48px;  border-radius: 50%;  display: flex;  align-items: center;  justify-content: center;  font-size: 18px;  flex-shrink: 0;}.restriccion-item__icono--sinTacc {  background-color: color-mix(in srgb, #e63946 15%, transparent);  color: #e63946; }.restriccion-item__icono--sinAzucar {  background-color: color-mix(in srgb, #3b82f6 15%, transparent);  color: #3b82f6; }.restriccion-item__icono--sinSodio {  background-color: color-mix(in srgb, #d97706 15%, transparent);  color: #d97706; }.restriccion-item__icono--vegano {  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);  color: var(--color-menta); }.restriccion-item__icono--contieneLacteos {  background-color: color-mix(in srgb, #ea580c 15%, transparent);  color: #ea580c; }.restriccion-item__icono--tieneMani {  background-color: color-mix(in srgb, #92400e 15%, transparent);  color: color-mix(in srgb, #92400e 80%, var(--color-texto-oscuro)); }.restriccion-item__icono--contieneHuevo {  background-color: color-mix(in srgb, #a16207 15%, transparent);  color: color-mix(in srgb, #a16207 80%, var(--color-texto-oscuro)); }.restriccion-item__icono--contienePescado {  background-color: color-mix(in srgb, #0369a1 15%, transparent);  color: #0369a1; }.restriccion-item__icono--contieneSoja {  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);  color: var(--color-menta); }.restriccion-item__icono--aptoVegetariano {  background-color: color-mix(in srgb, var(--color-menta) 15%, transparent);  color: var(--color-menta); }.restriccion-item__texto {  min-width: 0;  display: flex;  flex-direction: column;  gap: 2px;}.restriccion-item__titulo {  font-family: var(--font-display);  font-size: 15px;  font-weight: 800;  color: var(--color-texto-oscuro);  line-height: 1.25;}.restriccion-item__descripcion {  font-size: 11px;  color: var(--color-texto-claro);  line-height: 1.3;}.toggle {  position: relative;  display: inline-block;  width: 44px;  height: 24px;  flex-shrink: 0;  cursor: pointer;}.toggle__input {  position: absolute;  opacity: 0;  width: 0;  height: 0;}.toggle__slider {  position: absolute;  inset: 0;  background-color: var(--color-borde-fuerte);  border-radius: 9999px;  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);}.toggle__slider::after {  content: '';  position: absolute;  top: 3px;  left: 3px;  width: 18px;  height: 18px;  background-color: var(--color-superficie);  border-radius: 50%;  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);}.toggle__input:checked + .toggle__slider {  background-color: color-mix(in srgb, var(--color-menta) 30%, transparent);}.toggle__input:checked + .toggle__slider::after {  transform: translateX(20px);  background-color: var(--color-menta);}.toggle__input:focus-visible + .toggle__slider {  outline: 2px solid var(--color-pizarra);  outline-offset: 2px;}.restricciones__guardar {  width: 100%;  padding: 16px;  background-color: var(--color-dorado);   color: #1a3b5c;  border: none;  border-radius: 18px;  font-family: var(--font-display);  font-size: 15px;  font-weight: 800;  letter-spacing: 0.5px;  box-shadow: 0 8px 24px rgba(242, 183, 5, 0.22);  cursor: pointer;  transition: all 0.15s ease, transform 0.1s ease;  margin-top: 8px;}.restricciones__guardar:hover:not(:disabled) {  background-color: var(--color-dorado-dark);  box-shadow: 0 10px 28px rgba(242, 183, 5, 0.32);}.restricciones__guardar:active:not(:disabled) {  transform: scale(0.985);}.restricciones__guardar:disabled {  opacity: 0.6;  cursor: not-allowed;  box-shadow: none;}@media (max-width: 640px) {  .restricciones {    padding: 90px 0 40px;  }  .restricciones__container {    padding: 0 16px;  }  .restricciones__lista {    grid-template-columns: 1fr;    gap: 12px;  }  .restriccion-item {    padding: 14px 16px;    gap: 14px;  }}

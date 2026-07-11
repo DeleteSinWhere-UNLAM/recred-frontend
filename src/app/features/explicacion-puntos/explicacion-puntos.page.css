@@ -1,214 +1,1 @@
-.explicacion-page {
-  position: relative;
-  min-height: calc(100vh - 64px);
-  padding: 16px 0 32px;
-  background-color: var(--color-fondo);
-  font-family: var(--font-body);
-  color: var(--color-texto-oscuro);
-}
-
-.explicacion-container {
-  position: relative;
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 0 16px;
-  display: flex;
-  flex-direction: column;
-  z-index: 1;
-}
-
-@media (min-width: 768px) {
-  .explicacion-page {
-    padding: 24px 0 48px;
-  }
-
-  .explicacion-container {
-    padding: 0 28px;
-  }
-}
-
-.explicacion-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.btn-volver {
-  background: var(--color-superficie);
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  margin-right: 16px;
-  color: var(--color-texto-oscuro);
-  transition: transform 0.2s ease;
-}
-
-.btn-volver:active {
-  transform: scale(0.9);
-}
-
-.explicacion-header h1 {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 0;
-  color: var(--color-texto-oscuro);
-}
-
-.explicacion-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-bottom: 20px;
-}
-
-.card {
-  background: var(--color-superficie);
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.card h2 {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 12px 0;
-  color: var(--color-texto-oscuro);
-}
-
-.card p {
-  font-size: 1rem;
-  line-height: 1.5;
-  margin: 0;
-  color: #555;
-}
-
-.niveles-section h2 {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--color-texto-oscuro);
-  text-align: center;
-}
-
-.niveles-grid {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
-}
-
-.nivel-card {
-  border-radius: 20px;
-  padding: 12px;
-  flex: 1 1 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  position: relative;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: nivel-card-in 0.5s ease forwards;
-}
-
-.nivel-card:nth-child(1) { animation-delay: 0.05s; }
-.nivel-card:nth-child(2) { animation-delay: 0.15s; }
-.nivel-card:nth-child(3) { animation-delay: 0.25s; }
-
-@keyframes nivel-card-in {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.nivel-icon {
-  font-size: 2.5rem;
-  margin-bottom: 4px;
-}
-
-.nivel-card h3 {
-  font-family: var(--font-display);
-  font-weight: 800;
-  margin: 0 0 4px 0;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-}
-
-.puntos-rango {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.6);
-  padding: 2px 10px;
-  border-radius: 20px;
-  margin-bottom: 6px;
-}
-
-.nivel-card p {
-  font-size: 0.9rem;
-  margin: 0;
-  line-height: 1.4;
-}
-
-.principiante {
-  background: linear-gradient(135deg, #e0f2f1, #b2dfdb);
-  color: #00695c;
-}
-
-.crack {
-  background: linear-gradient(135deg, #fff3e0, #ffcc80);
-  color: #e65100;
-}
-
-.goat {
-  background: linear-gradient(135deg, #f3e5f5, #ce93d8);
-  color: #4a148c;
-}
-
-.rachas-list {
-  list-style: none;
-  padding: 0;
-  margin: 12px 0 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.rachas-list li {
-  display: flex;
-  align-items: center;
-  background: var(--color-superficie-alt);
-  padding: 8px 12px;
-  border-radius: 12px;
-  gap: 12px;
-}
-
-.racha-puntos {
-  background: var(--color-pizarra);
-  color: white;
-  font-family: var(--font-display);
-  font-weight: 800;
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  white-space: nowrap;
-}
-
-.racha-desc {
-  font-size: 0.95rem;
-  color: var(--color-texto-oscuro);
-  line-height: 1.4;
-}
+.explicacion-page {  position: relative;  min-height: calc(100vh - 64px);  padding: 16px 0 32px;  background-color: var(--color-fondo);  font-family: var(--font-body);  color: var(--color-texto-oscuro);}.explicacion-container {  position: relative;  max-width: 1180px;  margin: 0 auto;  padding: 0 16px;  display: flex;  flex-direction: column;  z-index: 1;}@media (min-width: 768px) {  .explicacion-page {    padding: 24px 0 48px;  }  .explicacion-container {    padding: 0 28px;  }}.explicacion-header {  display: flex;  align-items: center;  margin-bottom: 24px;}.btn-volver {  background: var(--color-superficie);  border: none;  border-radius: 50%;  width: 40px;  height: 40px;  display: flex;  justify-content: center;  align-items: center;  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  cursor: pointer;  margin-right: 16px;  color: var(--color-texto-oscuro);  transition: transform 0.2s ease;}.btn-volver:active {  transform: scale(0.9);}.explicacion-header h1 {  font-family: var(--font-display);  font-size: 1.5rem;  font-weight: 800;  margin: 0;  color: var(--color-texto-oscuro);}.explicacion-content {  display: flex;  flex-direction: column;  gap: 12px;  padding-bottom: 20px;}.card {  background: var(--color-superficie);  border-radius: 20px;  padding: 16px;  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);}.card h2 {  font-family: var(--font-display);  font-size: 1.25rem;  font-weight: 700;  margin: 0 0 12px 0;  color: var(--color-texto-oscuro);}.card p {  font-size: 1rem;  line-height: 1.5;  margin: 0;  color: #555;}.niveles-section h2 {  font-family: var(--font-display);  font-size: 1.25rem;  font-weight: 700;  margin-bottom: 16px;  color: var(--color-texto-oscuro);  text-align: center;}.niveles-grid {  display: flex;  flex-direction: row;  flex-wrap: wrap;  justify-content: center;  gap: 16px;}.nivel-card {  border-radius: 20px;  padding: 12px;  flex: 1 1 250px;  display: flex;  flex-direction: column;  align-items: center;  text-align: center;  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);  position: relative;  overflow: hidden;  opacity: 0;  transform: translateY(12px);  animation: nivel-card-in 0.5s ease forwards;}.nivel-card:nth-child(1) { animation-delay: 0.05s; }.nivel-card:nth-child(2) { animation-delay: 0.15s; }.nivel-card:nth-child(3) { animation-delay: 0.25s; }@keyframes nivel-card-in {  to {    opacity: 1;    transform: translateY(0);  }}.nivel-icon {  font-size: 2.5rem;  margin-bottom: 4px;}.nivel-card h3 {  font-family: var(--font-display);  font-weight: 800;  margin: 0 0 4px 0;  font-size: 1.1rem;  letter-spacing: 1px;}.puntos-rango {  font-family: var(--font-display);  font-size: 0.85rem;  font-weight: 700;  background: rgba(255, 255, 255, 0.6);  padding: 2px 10px;  border-radius: 20px;  margin-bottom: 6px;}.nivel-card p {  font-size: 0.9rem;  margin: 0;  line-height: 1.4;}.principiante {  background: linear-gradient(135deg, #e0f2f1, #b2dfdb);  color: #00695c;}.crack {  background: linear-gradient(135deg, #fff3e0, #ffcc80);  color: #e65100;}.goat {  background: linear-gradient(135deg, #f3e5f5, #ce93d8);  color: #4a148c;}.rachas-list {  list-style: none;  padding: 0;  margin: 12px 0 0 0;  display: flex;  flex-direction: column;  gap: 8px;}.rachas-list li {  display: flex;  align-items: center;  background: var(--color-superficie-alt);  padding: 8px 12px;  border-radius: 12px;  gap: 12px;}.racha-puntos {  background: var(--color-pizarra);  color: white;  font-family: var(--font-display);  font-weight: 800;  padding: 8px 12px;  border-radius: 12px;  font-size: 1.1rem;  white-space: nowrap;}.racha-desc {  font-size: 0.95rem;  color: var(--color-texto-oscuro);  line-height: 1.4;}
