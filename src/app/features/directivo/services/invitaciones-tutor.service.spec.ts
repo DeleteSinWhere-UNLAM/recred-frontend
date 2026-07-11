@@ -1,4 +1,4 @@
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../../../environments/environment';
@@ -6,6 +6,7 @@ import {
   ColegioAsociadoTutor,
   InvitacionTutor,
   InvitacionTutorPayload,
+  PreparacionCuentaTutor,
   ReporteImportacionCsv,
 } from '../models/invitacion-tutor.model';
 import { InvitacionesTutorService } from './invitaciones-tutor.service';
@@ -38,6 +39,28 @@ class ReporteImportacionCsvMother {
       alreadyAssociated: 1,
       errors: [],
       ...override,
+    };
+  }
+}
+
+class PreparacionCuentaTutorMother {
+  static crearLoginRequired(): PreparacionCuentaTutor {
+    return {
+      invitationId: 'inv-1',
+      schoolId: 'school-1',
+      schoolName: 'Colegio Central',
+      email: 'tutor@example.com',
+      result: 'LOGIN_REQUIRED',
+    };
+  }
+
+  static crearAccountCreated(): PreparacionCuentaTutor {
+    return {
+      invitationId: 'inv-1',
+      schoolId: 'school-1',
+      schoolName: 'Colegio Central',
+      email: 'tutor@example.com',
+      result: 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT',
     };
   }
 }
@@ -80,13 +103,10 @@ describe('InvitacionesTutorService', () => {
       };
       const response = InvitacionTutorMother.crear();
 
-      const promesa = service.invitarTutor(payload);
-      const req = httpMock.expectOne(URL_INVITAR);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(payload);
-      req.flush(response);
+      const promesa = whenInvitoTutor(payload);
 
-      await expectAsync(promesa).toBeResolvedTo(response);
+      thenSeHizoPostA(URL_INVITAR, payload).flush(response);
+      await thenLaPromesaResuelveA(promesa, response);
     });
   });
 
@@ -95,15 +115,12 @@ describe('InvitacionesTutorService', () => {
       const archivo = new File(['a,b,c'], 'tutores.csv', { type: 'text/csv' });
       const response = ReporteImportacionCsvMother.crear();
 
-      const promesa = service.importarCsv(archivo);
-      const req = httpMock.expectOne(URL_IMPORTAR);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body instanceof FormData).toBeTrue();
-      const formData = req.request.body as FormData;
-      expect(formData.get('file')).toBe(archivo);
-      req.flush(response);
+      const promesa = whenImportoCsv(archivo);
 
-      await expectAsync(promesa).toBeResolvedTo(response);
+      const req = thenSeHizoPost(URL_IMPORTAR);
+      thenElBodyEsFormDataConFile(req, archivo);
+      req.flush(response);
+      await thenLaPromesaResuelveA(promesa, response);
     });
   });
 
@@ -112,62 +129,39 @@ describe('InvitacionesTutorService', () => {
       const token = 'token/con-espacios y raros';
       const response = InvitacionTutorMother.crear();
 
-      const promesa = service.validarToken(token);
-      const req = httpMock.expectOne(URL_VALIDAR(token));
-      expect(req.request.method).toBe('GET');
-      req.flush(response);
+      const promesa = whenValidoToken(token);
 
-      await expectAsync(promesa).toBeResolvedTo(response);
+      thenSeHizoGetA(URL_VALIDAR(token)).flush(response);
+      await thenLaPromesaResuelveA(promesa, response);
     });
   });
 
   describe('aceptarInvitacion', () => {
     it('dado un token, cuando acepto, deberia hacer POST a la url con /aceptar', async () => {
-      const promesa = service.aceptarInvitacion('token-abc');
-      const req = httpMock.expectOne(URL_ACEPTAR('token-abc'));
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toBeNull();
-      req.flush(null);
+      const promesa = whenAceptoInvitacion('token-abc');
 
+      thenSeHizoPostA(URL_ACEPTAR('token-abc'), null).flush(null);
       await expectAsync(promesa).toBeResolved();
     });
   });
 
   describe('prepararCuenta', () => {
     it('dado un token, cuando preparo cuenta, deberia hacer POST a la url con /preparar-cuenta', async () => {
-      const response = {
-        invitationId: 'inv-1',
-        schoolId: 'school-1',
-        schoolName: 'Colegio Central',
-        email: 'tutor@example.com',
-        result: 'LOGIN_REQUIRED' as const,
-      };
+      const response = PreparacionCuentaTutorMother.crearLoginRequired();
 
-      const promesa = service.prepararCuenta('token-abc');
-      const req = httpMock.expectOne(URL_PREPARAR('token-abc'));
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toBeNull();
-      req.flush(response);
+      const promesa = whenPreparoCuenta('token-abc');
 
-      await expectAsync(promesa).toBeResolvedTo(response);
+      thenSeHizoPostA(URL_PREPARAR('token-abc'), null).flush(response);
+      await thenLaPromesaResuelveA(promesa, response);
     });
 
     it('dado un username, cuando preparo cuenta, deberia enviarlo en el body', async () => {
-      const response = {
-        invitationId: 'inv-1',
-        schoolId: 'school-1',
-        schoolName: 'Colegio Central',
-        email: 'tutor@example.com',
-        result: 'ACCOUNT_CREATED_TEMPORARY_PASSWORD_SENT' as const,
-      };
+      const response = PreparacionCuentaTutorMother.crearAccountCreated();
 
-      const promesa = service.prepararCuenta('token-abc', 'arruaclotilde');
-      const req = httpMock.expectOne(URL_PREPARAR('token-abc'));
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual({ username: 'arruaclotilde' });
-      req.flush(response);
+      const promesa = whenPreparoCuenta('token-abc', 'arruaclotilde');
 
-      await expectAsync(promesa).toBeResolvedTo(response);
+      thenSeHizoPostA(URL_PREPARAR('token-abc'), { username: 'arruaclotilde' }).flush(response);
+      await thenLaPromesaResuelveA(promesa, response);
     });
   });
 
@@ -178,12 +172,62 @@ describe('InvitacionesTutorService', () => {
         { id: 'col-2', nombre: 'Colegio B' },
       ];
 
-      const promesa = service.obtenerColegiosDelTutor();
-      const req = httpMock.expectOne(URL_COLEGIOS);
-      expect(req.request.method).toBe('GET');
-      req.flush(colegios);
+      const promesa = whenObtengoColegiosDelTutor();
 
-      await expectAsync(promesa).toBeResolvedTo(colegios);
+      thenSeHizoGetA(URL_COLEGIOS).flush(colegios);
+      await thenLaPromesaResuelveA(promesa, colegios);
     });
   });
+
+  function whenInvitoTutor(payload: InvitacionTutorPayload): Promise<InvitacionTutor> {
+    return service.invitarTutor(payload);
+  }
+
+  function whenImportoCsv(archivo: File): Promise<ReporteImportacionCsv> {
+    return service.importarCsv(archivo);
+  }
+
+  function whenValidoToken(token: string): Promise<InvitacionTutor> {
+    return service.validarToken(token);
+  }
+
+  function whenAceptoInvitacion(token: string): Promise<void> {
+    return service.aceptarInvitacion(token);
+  }
+
+  function whenPreparoCuenta(token: string, username?: string): Promise<PreparacionCuentaTutor> {
+    return service.prepararCuenta(token, username);
+  }
+
+  function whenObtengoColegiosDelTutor(): Promise<ColegioAsociadoTutor[]> {
+    return service.obtenerColegiosDelTutor();
+  }
+
+  function thenSeHizoGetA(url: string): TestRequest {
+    const req = httpMock.expectOne(url);
+    expect(req.request.method).toBe('GET');
+    return req;
+  }
+
+  function thenSeHizoPost(url: string): TestRequest {
+    const req = httpMock.expectOne(url);
+    expect(req.request.method).toBe('POST');
+    return req;
+  }
+
+  function thenSeHizoPostA(url: string, body: unknown): TestRequest {
+    const req = thenSeHizoPost(url);
+    expect(req.request.body).toEqual(body as never);
+    return req;
+  }
+
+  function thenElBodyEsFormDataConFile(req: TestRequest, archivo: File): void {
+    expect(req.request.body instanceof FormData).toBeTrue();
+    const formData = req.request.body as FormData;
+    expect(formData.get('file')).toBe(archivo);
+  }
+
+  async function thenLaPromesaResuelveA<T>(promise: Promise<T>, esperado: T): Promise<void> {
+    await expectAsync(promise).toBeResolvedTo(esperado);
+  }
 });

@@ -15,8 +15,16 @@ describe('ModalComponent', () => {
   });
 
   it('dado el componente, cuando se monta, deberia crearse', () => {
-    fixture.detectChanges();
+    whenMonto();
 
-    expect(component).toBeTruthy();
+    thenElComponenteExiste();
   });
+
+  function whenMonto(): void {
+    fixture.detectChanges();
+  }
+
+  function thenElComponenteExiste(): void {
+    expect(component).toBeTruthy();
+  }
 });
