@@ -360,7 +360,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   }
 
   openEditFormFromInventory(product: ItemResumenInventario): void {
-    this.productService.getById(product.productId).subscribe({
+    this.productService.getById(product.productId, this.buffetId).subscribe({
       next: (fullProduct) => {
         this.openEditForm(this.normalizeEditableProduct(fullProduct));
       },

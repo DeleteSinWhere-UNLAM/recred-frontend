@@ -845,7 +845,7 @@ describe('InventarioPageComponent', () => {
       whenMonto();
       component.openEditFormFromInventory(inventario[0]);
 
-      expect(servicioProducto.getById).toHaveBeenCalledWith(inventario[0].productId);
+      expect(servicioProducto.getById).toHaveBeenCalledWith(inventario[0].productId, BUFFET_ID_TEST);
       expect(component.isFormVisible).toBeTrue();
     });
 
