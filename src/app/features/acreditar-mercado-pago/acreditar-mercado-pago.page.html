@@ -1,153 +1,118 @@
 <div class="acreditar-page">
   <main class="acreditar-page__content">
     @if (presenter.cargando() && !presenter.alumno()) {
-      <div class="acreditar-page__loading">
-        <i class="fa-solid fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
-        <p>Cargando información...</p>
-      </div>
+    <div class="acreditar-page__loading">
+      <i class="fa-solid fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
+      <p>Cargando información...</p>
+    </div>
     } @else {
-      <header class="acreditar-page__header">
-        <h1 class="acreditar-page__titulo">Acreditar a {{ presenter.alumno()?.nombre }}</h1>
-      </header>
-      <div class="acreditar-page__grid">
-                <section class="acreditar-page__form-section">
+    <header class="acreditar-page__header">
+      <h1 class="acreditar-page__titulo">Acreditar a {{ presenter.alumno()?.nombre }}</h1>
+    </header>
+    <div class="acreditar-page__grid">
+      <section class="acreditar-page__form-section">
+        <h2 class="acreditar-page__subtitle">¿Cuánto querés acreditar a {{ presenter.alumno()?.nombre }}?</h2>
+        <form class="acreditar-page__form" (submit)="onSubmit($event)" novalidate>
+          <div class="acreditar-page__input-group">
+            <label for="monto">Monto a cargar ($)</label>
+            <div class="acreditar-page__input-wrapper">
+              <input #montoInput type="number" id="monto" name="monto" min="100" step="100" placeholder="Ej: 5000"
+                (input)="onMontoChange($event)" />
+              <div class="acreditar-page__mp-logo" aria-hidden="true">
+                <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="acreditar-page__mp-svg">
+                  <circle cx="18" cy="18" r="16" fill="#00AEEF" />
+                  <path d="M12 18c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6-6-2.7-6-6z" fill="#FFF" />
+                  <path d="M18 14c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm-1 5.5v-3l2.5 1.5-2.5 1.5z"
+                    fill="#00AEEF" />
+                  <path d="M14 20s1.5-1.5 4-1.5 4 1.5 4 1.5" stroke="#00AEEF" stroke-width="1.5"
+                    stroke-linecap="round" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="acreditar-page__presets-section">
+            <h4 class="acreditar-page__presets-title">Recargas sugeridas</h4>
+            <div class="acreditar-page__presets-grid">
+              <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta"
+                (click)="montoInput.value = '2000'; selectMonto(2000)">
+                <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="acreditar-page__preset-label">$2.000</span>
+              </button>
+              <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta"
+                (click)="montoInput.value = '5000'; selectMonto(5000)">
+                <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="acreditar-page__preset-label">$5.000</span>
+              </button>
+              <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta"
+                (click)="montoInput.value = '10000'; selectMonto(10000)">
+                <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="acreditar-page__preset-label">$10.000</span>
+              </button>
+              <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta"
+                (click)="montoInput.value = '50000'; selectMonto(50000)">
+                <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
+                <span class="acreditar-page__preset-label">$50.000</span>
+              </button>
+            </div>
+          </div>
 
 
-          <form class="acreditar-page__form" (submit)="onSubmit($event)" novalidate>
-            <div class="acreditar-page__input-group">
-              <label for="monto">Monto a cargar ($)</label>
-              <div class="acreditar-page__input-wrapper">
-                <input 
-                  #montoInput
-                  type="number" 
-                  id="monto" 
-                  name="monto" 
-                  min="100" 
-                  step="100"
-                  placeholder="Ej: 5000"
-                  (input)="onMontoChange($event)"
-                />
-                <div class="acreditar-page__mp-logo" aria-hidden="true">
-                  <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="acreditar-page__mp-svg">
-                    <circle cx="18" cy="18" r="16" fill="#00AEEF"/>
-                    <path d="M12 18c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6-6-2.7-6-6z" fill="#FFF"/>
-                    <path d="M18 14c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm-1 5.5v-3l2.5 1.5-2.5 1.5z" fill="#00AEEF"/>
-                    <path d="M14 20s1.5-1.5 4-1.5 4 1.5 4 1.5" stroke="#00AEEF" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
+          <div class="acreditar-page__actions">
+            <button type="submit" class="acreditar-page__btn acreditar-page__btn--primary"
+              [disabled]="presenter.cargando()">
+              @if (presenter.cargando()) {
+              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Procesando...
+              } @else {
+              <i class="fa-solid fa-credit-card" aria-hidden="true" style="margin-right: 8px;"></i>
+              Continuar a Mercado Pago
+              }
+            </button>
+
+            <button type="button" class="acreditar-page__btn acreditar-page__btn--secondary"
+              (click)="presenter.volver()" [disabled]="presenter.cargando()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </section>
+
+
+      <section class="acreditar-page__history-section">
+        <h3>Historial de recargas de {{ presenter.alumno()?.nombre }}</h3>
+        <p class="acreditar-page__history-description">
+          Últimas recargas acreditadas para {{ presenter.nombreCompleto() }}.
+        </p>
+
+        <div class="acreditar-page__history-container">
+          @if (recargas.length === 0) {
+          <div class="acreditar-page__history-empty">
+            <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+            <p>No se registran recargas recientes para {{ presenter.alumno()?.nombre }}.</p>
+          </div>
+          } @else {
+          <div class="acreditar-page__history-list">
+            @for (recarga of recargas; track recarga.id) {
+            <div class="acreditar-page__history-item">
+              <div class="acreditar-page__history-item-left">
+                <div class="acreditar-page__history-icon">
+                  <i class="fa-solid fa-arrow-down-long"></i>
+                </div>
+                <div class="acreditar-page__history-details">
+                  <span class="acreditar-page__history-monto">+ {{ recarga.montoFormateado }}</span>
+                  <span class="acreditar-page__history-fecha">{{ recarga.fechaFormateada }}</span>
                 </div>
               </div>
-            </div>
-            <div class="acreditar-page__presets-section">
-              <h4 class="acreditar-page__presets-title">Recargas sugeridas</h4>
-              <div class="acreditar-page__presets-grid">
-                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '1000'; selectMonto(1000)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$1.000</span>
-                </button>
-                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '2000'; selectMonto(2000)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$2.000</span>
-                </button>
-                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '2500'; selectMonto(2500)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$2.500</span>
-                </button>
-                                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '5000'; selectMonto(5000)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$5.000</span>
-                </button>
-                
-                
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '7500'; selectMonto(7500)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$7.500</span>
-                </button>
-                
-                
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '10000'; selectMonto(10000)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$10.000</span>
-                </button>
-                
-                
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '25000'; selectMonto(25000)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$25.000</span>
-                </button>
-                
-                
-                <button type="button" class="acreditar-page__preset-btn acreditar-page__preset-btn--menta" (click)="montoInput.value = '50000'; selectMonto(50000)">
-                  <span class="acreditar-page__preset-icono"><i class="fa-solid fa-plus"></i></span>
-                  <span class="acreditar-page__preset-label">$50.000</span>
-                </button>
-                
+              <div class="acreditar-page__history-status">
+                <span>{{ recarga.estado }}</span>
               </div>
             </div>
-
-            
-            <div class="acreditar-page__actions">
-              <button 
-                type="submit" 
-                class="acreditar-page__btn acreditar-page__btn--primary"
-                [disabled]="presenter.cargando()"
-              >
-                @if (presenter.cargando()) {
-                  <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Procesando...
-                } @else {
-                  <i class="fa-solid fa-credit-card" aria-hidden="true" style="margin-right: 8px;"></i>
-                  Continuar a Mercado Pago
-                }
-              </button>
-
-              <button 
-                type="button" 
-                class="acreditar-page__btn acreditar-page__btn--secondary"
-                (click)="presenter.volver()"
-                [disabled]="presenter.cargando()"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        </section>
-
-        
-        <section class="acreditar-page__history-section">
-          <h3>Historial de recargas de {{ presenter.alumno()?.nombre }}</h3>
-          <p class="acreditar-page__history-description">
-            Últimas recargas acreditadas para {{ presenter.nombreCompleto() }}.
-          </p>
-
-          <div class="acreditar-page__history-container">
-            @if (recargas.length === 0) {
-              <div class="acreditar-page__history-empty">
-                <i class="fa-solid fa-receipt" aria-hidden="true"></i>
-                <p>No se registran recargas recientes para {{ presenter.alumno()?.nombre }}.</p>
-              </div>
-            } @else {
-              <div class="acreditar-page__history-list">
-                @for (recarga of recargas; track recarga.id) {
-                  <div class="acreditar-page__history-item">
-                    <div class="acreditar-page__history-item-left">
-                      <div class="acreditar-page__history-icon">
-                        <i class="fa-solid fa-arrow-down-long"></i>
-                      </div>
-                      <div class="acreditar-page__history-details">
-                        <span class="acreditar-page__history-monto">+ {{ recarga.montoFormateado }}</span>
-                        <span class="acreditar-page__history-fecha">{{ recarga.fechaFormateada }}</span>
-                      </div>
-                    </div>
-                    <div class="acreditar-page__history-status">
-                      <span>{{ recarga.estado }}</span>
-                    </div>
-                  </div>
-                }
-              </div>
             }
           </div>
-        </section>
+          }
+        </div>
+      </section>
 
-      </div>
+    </div>
     }
   </main>
 </div>
