@@ -214,8 +214,6 @@ export class TrackingPedidosPage implements OnInit {
           const updated = sorted.find((p) => p.id === selected.id);
           this.selectedOrder.set(updated ?? null);
         }
-
-        // Check if there is an order ID in query params to open the modal
         const orderId = this.route.snapshot?.queryParamMap?.get('id');
         if (orderId) {
           const found = sorted.find((p) => p.id === orderId);

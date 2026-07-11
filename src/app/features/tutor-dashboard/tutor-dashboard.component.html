@@ -1,282 +1,295 @@
 <app-navbar></app-navbar>
 <div class="w-full max-w-[1600px] mx-auto p-8 max-md:p-4 min-h-screen bg-[var(--color-fondo)] flex flex-col gap-8">
   @if (isLoading) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Cargando panel global...</p>
-    </div>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando panel global...</p>
+  </div>
   } @else if (globalSummary) {
 
-    <div class="dashboard-top-actions">
-      <button class="btn-back" (click)="volver()" aria-label="Volver al inicio">
-        <i class="fa-solid fa-arrow-left"></i> Volver al Inicio
-      </button>
-    </div>
+  <div class="dashboard-top-actions">
+    <button class="btn-back" (click)="volver()" aria-label="Volver al inicio">
+      <i class="fa-solid fa-arrow-left"></i> Volver al Inicio
+    </button>
+  </div>
 
 
 
-    <!-- Selected Child View -->
-    @if (selectedChild) {
-      @if (esPlanGratuito && dashboardItems.length >= 5) {
-        <div class="dashboard-limit-alert">
-          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-          <span>Límite de 5 tarjetas alcanzado para cuenta gratuita. Pasate a Intermedio para agregar más.</span>
-        </div>
+
+  @if (selectedChild) {
+  @if (esPlanGratuito && dashboardItems.length >= 5) {
+  <div class="dashboard-limit-alert">
+    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+    <span>Límite de 5 tarjetas alcanzado para cuenta gratuita. Pasate a Intermedio para agregar más.</span>
+  </div>
+  }
+  <div class="dashboard-actions"
+    style="margin-bottom: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+    <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addFinanceCard()"
+      style="background-color: var(--color-pizarra); color: white;">
+      <i class="fa-solid fa-plus"></i> Finanzas
+    </button>
+    <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addHealthCard()"
+      style="background-color: var(--color-pizarra); color: white;">
+      <i class="fa-solid fa-plus"></i> Salud y Hábitos
+    </button>
+    <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addLogisticsCard()"
+      style="background-color: var(--color-pizarra); color: white;">
+      <i class="fa-solid fa-plus"></i> Logística del Día
+    </button>
+    <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addTransactionsCard()"
+      style="background-color: var(--color-pizarra); color: white;">
+      <i class="fa-solid fa-plus"></i> Últimos Movimientos
+    </button>
+    <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addSmartCard()"
+      style="background-color: var(--color-pizarra); color: white;">
+      <i class="fa-solid fa-plus"></i> Gráficos
+    </button>
+    <button class="action-btn" (click)="clearAllCards()" style="background-color: #ef4444; color: white;">
+      <i class="fa-solid fa-trash"></i> Limpiar Panel
+    </button>
+  </div>
+
+  <gridster [options]="gridConfig" class="dashboard-gridster">
+    @for (item of dashboardItems; track item.id) {
+    <gridster-item [item]="item" class="card grid-card">
+
+      @if (item.type === 'smart-chart') {
+      <app-smart-chart-widget [children]="globalSummary.children" [config]="item.widgetConfig || {}"
+        (configChange)="onWidgetConfigChange(item, $event)" (closeCard)="removeCard(item.id)"
+        style="width: 100%; height: 100%;">
+      </app-smart-chart-widget>
       }
-      <div class="dashboard-actions" style="margin-bottom: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addFinanceCard()" style="background-color: var(--color-pizarra); color: white;">
-          <i class="fa-solid fa-plus"></i> Finanzas
-        </button>
-        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addHealthCard()" style="background-color: var(--color-pizarra); color: white;">
-          <i class="fa-solid fa-plus"></i> Salud y Hábitos
-        </button>
-        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addLogisticsCard()" style="background-color: var(--color-pizarra); color: white;">
-          <i class="fa-solid fa-plus"></i> Logística del Día
-        </button>
-        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addTransactionsCard()" style="background-color: var(--color-pizarra); color: white;">
-          <i class="fa-solid fa-plus"></i> Últimos Movimientos
-        </button>
-        <button class="action-btn" [disabled]="!puedeAgregarTarjeta" (click)="addSmartCard()" style="background-color: var(--color-pizarra); color: white;">
-          <i class="fa-solid fa-plus"></i> Gráficos
-        </button>
-        <button class="action-btn" (click)="clearAllCards()" style="background-color: #ef4444; color: white;">
-          <i class="fa-solid fa-trash"></i> Limpiar Panel
-        </button>
-      </div>
 
-      <gridster [options]="gridConfig" class="dashboard-gridster">
-        @for (item of dashboardItems; track item.id) {
-          <gridster-item [item]="item" class="card grid-card">
-            
-            @if (item.type === 'smart-chart') {
-              <app-smart-chart-widget 
-                [children]="globalSummary.children" 
-                [config]="item.widgetConfig || {}"
-                (configChange)="onWidgetConfigChange(item, $event)"
-                (closeCard)="removeCard(item.id)"
-                style="width: 100%; height: 100%;">
-              </app-smart-chart-widget>
+      @if (item.type === 'smart-action' && selectedChild.smartAction) {
+      <section class="smart-action-card" style="height: 100%;">
+        <div class="card-header">
+          <i class="fa-solid fa-grip-vertical drag-handler"
+            style="cursor: grab; margin-right: 12px; color: #94a3b8; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
+          <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Sugerencia Inteligente</h3>
+        </div>
+        <div class="smart-action-content" style="padding: 16px;">
+          <h4>{{ selectedChild.smartAction.title }}</h4>
+          <p>{{ selectedChild.smartAction.description }}</p>
+          <button class="action-btn" (click)="openSmartActionModal()">Revisar y Aplicar</button>
+        </div>
+      </section>
+      }
+
+      @if (item.type === 'finance') {
+      @if (getChildData(item); as cardChild) {
+      <section class="finance-card" style="height: 100%; display: flex; flex-direction: column;">
+        <div class="card-header">
+          <i class="fa-solid fa-grip-vertical drag-handler"
+            style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
+          <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
+            <h3 style="margin:0; font-size: 1.17em;">Finanzas</h3>
+            @if (globalSummary.children.length > 1) {
+            <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
+              @for (c of globalSummary.children; track c.studentId) {
+              <option [value]="c.studentId">{{ c.studentName }}</option>
+              }
+            </select>
+            } @else {
+            <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
             }
+            @if (cardChild.balance < 1000) { <span class="badge alert-badge">Saldo Bajo</span>
+              }
+          </div>
+          <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i
+              class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 16px; flex: 1; display: flex; flex-direction: column;">
+          <div class="balance-display">
+            <span class="currency">$</span>
+            <span class="amount">{{ cardChild.balance | number:'1.2-2' }}</span>
+          </div>
+          <p class="prediction-text"><i class="fa-solid fa-chart-line"></i> {{ cardChild.spendingPredictionMessage }}
+          </p>
 
-            @if (item.type === 'smart-action' && selectedChild.smartAction) {
-              <section class="smart-action-card" style="height: 100%;">
-                <div class="card-header">
-                  <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; margin-right: 12px; color: #94a3b8; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
-                  <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Sugerencia Inteligente</h3>
+          @if (cardChild.budget) {
+          <div class="budget-section mt-4" style="margin-top: auto;">
+            <div class="budget-info">
+              <span>Presupuesto {{ cardChild.budget.period }}</span>
+              <span class="limit">${{ cardChild.budget.limit | number:'1.0-0' }}</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar"
+                [ngClass]="{'bg-green-500': (cardChild.budget.spent / cardChild.budget.limit) <= 0.7, 'bg-yellow-500': (cardChild.budget.spent / cardChild.budget.limit) > 0.7 && (cardChild.budget.spent / cardChild.budget.limit) <= 0.9, 'bg-red-500': (cardChild.budget.spent / cardChild.budget.limit) > 0.9}"
+                [style.width.%]="(cardChild.budget.spent / cardChild.budget.limit) * 100"></div>
+            </div>
+            <small class="spent-text">Gastado: ${{ cardChild.budget.spent | number:'1.0-0' }}</small>
+          </div>
+          }
+        </div>
+      </section>
+      }
+      }
+
+      @if (item.type === 'health') {
+      @if (getChildData(item); as cardChild) {
+      <section class="health-card" style="height: 100%; display: flex; flex-direction: column;">
+        <div class="card-header">
+          <i class="fa-solid fa-grip-vertical drag-handler"
+            style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
+          <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
+            <h3 style="margin:0; font-size: 1.17em;">Salud y Hábitos</h3>
+            @if (globalSummary.children.length > 1) {
+            <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
+              @for (c of globalSummary.children; track c.studentId) {
+              <option [value]="c.studentId">{{ c.studentName }}</option>
+              }
+            </select>
+            } @else {
+            <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
+            }
+          </div>
+          <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i
+              class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 16px; flex: 1; overflow-y: auto;">
+          <div class="reward-info">
+            <div class="level-badge">
+              <i class="fa-solid fa-medal"></i> {{ cardChild.health.rewardLevel }}
+            </div>
+            <div class="points-info">
+              <strong>{{ cardChild.health.rewardPoints }} pts</strong>
+              <small>Faltan {{ cardChild.health.pointsToNextLevel }} para próximo nivel</small>
+            </div>
+          </div>
+          <div class="ai-summary">
+            <p>"{{ cardChild.health.weeklyHealthSummary }}"</p>
+          </div>
+        </div>
+      </section>
+      }
+      }
+
+      @if (item.type === 'logistics') {
+      @if (getChildData(item); as cardChild) {
+      <section class="logistics-card" style="height: 100%; display: flex; flex-direction: column;">
+        <div class="card-header">
+          <i class="fa-solid fa-grip-vertical drag-handler"
+            style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
+          <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
+            <h3 style="margin:0; font-size: 1.17em;">Logística del Día</h3>
+            @if (globalSummary.children.length > 1) {
+            <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
+              @for (c of globalSummary.children; track c.studentId) {
+              <option [value]="c.studentId">{{ c.studentName }}</option>
+              }
+            </select>
+            } @else {
+            <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
+            }
+          </div>
+          <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i
+              class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 16px; flex: 1; overflow-y: auto;">
+          @if (cardChild.todayPickups.length > 0) {
+          <ul class="pickup-list">
+            @for (pickup of cardChild.todayPickups; track pickup.id) {
+            <li class="pickup-item">
+              <div class="pickup-icon-wrapper">
+                <i class="fa-solid fa-box-open"></i>
+              </div>
+              <div class="pickup-details">
+                <span class="pickup-name" [title]="pickup.menuName">{{ pickup.menuName }}</span>
+                <div class="pickup-meta">
+                  <span class="pickup-type"
+                    [class.pickup-type--after-hours]="getPickupType(pickup.pickupTime).includes('después')">
+                    <i class="fa-regular fa-clock"></i>
+                    {{ getPickupType(pickup.pickupTime) }}
+                  </span>
+                  @if (getPickupTimeRange(pickup.pickupTime); as range) {
+                  <span class="pickup-range-badge">{{ range }}</span>
+                  }
                 </div>
-                <div class="smart-action-content" style="padding: 16px;">
-                  <h4>{{ selectedChild.smartAction.title }}</h4>
-                  <p>{{ selectedChild.smartAction.description }}</p>
-                  <button class="action-btn" (click)="openSmartActionModal()">Revisar y Aplicar</button>
-                </div>
-              </section>
+              </div>
+            </li>
             }
+          </ul>
+          } @else {
+          <p class="empty-state">No hay retiros programados para hoy.</p>
+          }
+        </div>
+      </section>
+      }
+      }
 
-            @if (item.type === 'finance') {
-              @if (getChildData(item); as cardChild) {
-                <section class="finance-card" style="height: 100%; display: flex; flex-direction: column;">
-                  <div class="card-header">
-                    <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
-                    <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
-                      <h3 style="margin:0; font-size: 1.17em;">Finanzas</h3>
-                      @if (globalSummary.children.length > 1) {
-                        <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
-                          @for (c of globalSummary.children; track c.studentId) {
-                            <option [value]="c.studentId">{{ c.studentName }}</option>
-                          }
-                        </select>
-                      } @else {
-                        <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
-                      }
-                      @if (cardChild.balance < 1000) {
-                        <span class="badge alert-badge">Saldo Bajo</span>
-                      }
-                    </div>
-                    <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i class="fa-solid fa-xmark"></i></button>
-                  </div>
-                  <div style="padding: 16px; flex: 1; display: flex; flex-direction: column;">
-                    <div class="balance-display">
-                      <span class="currency">$</span>
-                      <span class="amount">{{ cardChild.balance | number:'1.2-2' }}</span>
-                    </div>
-                    <p class="prediction-text"><i class="fa-solid fa-chart-line"></i> {{ cardChild.spendingPredictionMessage }}</p>
-                    
-                    @if (cardChild.budget) {
-                      <div class="budget-section mt-4" style="margin-top: auto;">
-                        <div class="budget-info">
-                          <span>Presupuesto {{ cardChild.budget.period }}</span>
-                          <span class="limit">${{ cardChild.budget.limit | number:'1.0-0' }}</span>
-                        </div>
-                        <div class="progress-bar-container">
-                          <div class="progress-bar" 
-                               [ngClass]="{'bg-green-500': (cardChild.budget.spent / cardChild.budget.limit) <= 0.7, 'bg-yellow-500': (cardChild.budget.spent / cardChild.budget.limit) > 0.7 && (cardChild.budget.spent / cardChild.budget.limit) <= 0.9, 'bg-red-500': (cardChild.budget.spent / cardChild.budget.limit) > 0.9}"
-                               [style.width.%]="(cardChild.budget.spent / cardChild.budget.limit) * 100"></div>
-                        </div>
-                        <small class="spent-text">Gastado: ${{ cardChild.budget.spent | number:'1.0-0' }}</small>
-                      </div>
-                    }
-                  </div>
-                </section>
+      @if (item.type === 'transactions') {
+      @if (getChildData(item); as cardChild) {
+      <section class="transactions-card" style="height: 100%; display: flex; flex-direction: column;">
+        <div class="card-header">
+          <i class="fa-solid fa-grip-vertical drag-handler"
+            style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
+          <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
+            <h3 style="margin:0; font-size: 1.17em;">Últimos Movimientos</h3>
+            @if (globalSummary.children.length > 1) {
+            <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
+              @for (c of globalSummary.children; track c.studentId) {
+              <option [value]="c.studentId">{{ c.studentName }}</option>
               }
+            </select>
+            } @else {
+            <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
             }
-
-            @if (item.type === 'health') {
-              @if (getChildData(item); as cardChild) {
-                <section class="health-card" style="height: 100%; display: flex; flex-direction: column;">
-                  <div class="card-header">
-                    <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
-                    <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
-                      <h3 style="margin:0; font-size: 1.17em;">Salud y Hábitos</h3>
-                      @if (globalSummary.children.length > 1) {
-                        <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
-                          @for (c of globalSummary.children; track c.studentId) {
-                            <option [value]="c.studentId">{{ c.studentName }}</option>
-                          }
-                        </select>
-                      } @else {
-                        <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
-                      }
-                    </div>
-                    <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i class="fa-solid fa-xmark"></i></button>
-                  </div>
-                  <div style="padding: 16px; flex: 1; overflow-y: auto;">
-                    <div class="reward-info">
-                      <div class="level-badge">
-                        <i class="fa-solid fa-medal"></i> {{ cardChild.health.rewardLevel }}
-                      </div>
-                      <div class="points-info">
-                        <strong>{{ cardChild.health.rewardPoints }} pts</strong>
-                        <small>Faltan {{ cardChild.health.pointsToNextLevel }} para próximo nivel</small>
-                      </div>
-                    </div>
-                    <div class="ai-summary">
-                      <p>"{{ cardChild.health.weeklyHealthSummary }}"</p>
-                    </div>
-                  </div>
-                </section>
-              }
+          </div>
+          <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i
+              class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="padding: 16px; flex: 1; overflow-y: auto;">
+          <ul class="transaction-list">
+            @for (tx of cardChild.recentTransactions; track tx.id) {
+            <li class="transaction-item">
+              <div class="tx-icon">{{ tx.icon }}</div>
+              <div class="tx-details">
+                <span class="tx-name">{{ tx.name }}</span>
+                <span class="tx-date">{{ tx.date | date:'dd MMM, HH:mm' }}</span>
+              </div>
+              <div class="tx-amount negative">-$ {{ tx.amount | number:'1.2-2' }}</div>
+            </li>
             }
+          </ul>
+        </div>
+      </section>
+      }
+      }
 
-            @if (item.type === 'logistics') {
-              @if (getChildData(item); as cardChild) {
-                <section class="logistics-card" style="height: 100%; display: flex; flex-direction: column;">
-                  <div class="card-header">
-                    <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
-                    <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
-                      <h3 style="margin:0; font-size: 1.17em;">Logística del Día</h3>
-                      @if (globalSummary.children.length > 1) {
-                        <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
-                          @for (c of globalSummary.children; track c.studentId) {
-                            <option [value]="c.studentId">{{ c.studentName }}</option>
-                          }
-                        </select>
-                      } @else {
-                        <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
-                      }
-                    </div>
-                    <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i class="fa-solid fa-xmark"></i></button>
-                  </div>
-                  <div style="padding: 16px; flex: 1; overflow-y: auto;">
-                    @if (cardChild.todayPickups.length > 0) {
-                      <ul class="pickup-list">
-                        @for (pickup of cardChild.todayPickups; track pickup.id) {
-                          <li class="pickup-item">
-                            <div class="pickup-icon-wrapper">
-                              <i class="fa-solid fa-box-open"></i>
-                            </div>
-                            <div class="pickup-details">
-                              <span class="pickup-name" [title]="pickup.menuName">{{ pickup.menuName }}</span>
-                              <div class="pickup-meta">
-                                <span class="pickup-type" [class.pickup-type--after-hours]="getPickupType(pickup.pickupTime).includes('después')">
-                                  <i class="fa-regular fa-clock"></i>
-                                  {{ getPickupType(pickup.pickupTime) }}
-                                </span>
-                                @if (getPickupTimeRange(pickup.pickupTime); as range) {
-                                  <span class="pickup-range-badge">{{ range }}</span>
-                                }
-                              </div>
-                            </div>
-                          </li>
-                        }
-                      </ul>
-                    } @else {
-                      <p class="empty-state">No hay retiros programados para hoy.</p>
-                    }
-                  </div>
-                </section>
-              }
-            }
-
-            @if (item.type === 'transactions') {
-              @if (getChildData(item); as cardChild) {
-                <section class="transactions-card" style="height: 100%; display: flex; flex-direction: column;">
-                  <div class="card-header">
-                    <i class="fa-solid fa-grip-vertical drag-handler" style="cursor: grab; margin-right: 12px; color: #ffffff; font-size: 1.2rem;" title="Arrastrar tarjeta"></i>
-                    <div style="flex: 1; display: flex; align-items: center; gap: 12px;">
-                      <h3 style="margin:0; font-size: 1.17em;">Últimos Movimientos</h3>
-                      @if (globalSummary.children.length > 1) {
-                        <select class="custom-select child-select" [(ngModel)]="item.studentId" (change)="saveLayout()">
-                          @for (c of globalSummary.children; track c.studentId) {
-                            <option [value]="c.studentId">{{ c.studentName }}</option>
-                          }
-                        </select>
-                      } @else {
-                        <span style="color: white; opacity: 0.9;">: {{ cardChild.studentName }}</span>
-                      }
-                    </div>
-                    <button class="close-btn" (click)="removeCard(item.id)" title="Cerrar tarjeta"><i class="fa-solid fa-xmark"></i></button>
-                  </div>
-                  <div style="padding: 16px; flex: 1; overflow-y: auto;">
-                    <ul class="transaction-list">
-                      @for (tx of cardChild.recentTransactions; track tx.id) {
-                        <li class="transaction-item">
-                          <div class="tx-icon">{{ tx.icon }}</div>
-                          <div class="tx-details">
-                            <span class="tx-name">{{ tx.name }}</span>
-                            <span class="tx-date">{{ tx.date | date:'dd MMM, HH:mm' }}</span>
-                          </div>
-                          <div class="tx-amount negative">-$ {{ tx.amount | number:'1.2-2' }}</div>
-                        </li>
-                      }
-                    </ul>
-                  </div>
-                </section>
-              }
-            }
-
-          </gridster-item>
-        }
-      </gridster>
+    </gridster-item>
     }
+  </gridster>
+  }
   }
 
 
 
-  <!-- Smart Action Modal -->
+
   @if (showSmartActionModal && selectedChild?.smartAction) {
-    <div class="modal-overlay">
-      <div class="modal-content smart-modal">
-        <button class="modal-close" (click)="closeSmartActionModal()">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-        
-        <h2 class="modal-title">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          Aplicar Sugerencia
-        </h2>
-        
-        <div class="modal-body">
-          <div class="smart-icon"><i class="fa-solid fa-lightbulb"></i></div>
-          <p class="smart-text">{{ selectedChild!.smartAction?.description }}</p>
-          <div class="modal-alert">
-            <p><i class="fa-solid fa-triangle-exclamation"></i> Esto actualizará las reglas de consumo del alumno.</p>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button class="modal-btn-cancelar" (click)="closeSmartActionModal()">Descartar</button>
-          <button class="modal-btn-confirmar" (click)="applySmartAction()">Aceptar e Implementar</button>
+  <div class="modal-overlay">
+    <div class="modal-content smart-modal">
+      <button class="modal-close" (click)="closeSmartActionModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <h2 class="modal-title">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Aplicar Sugerencia
+      </h2>
+
+      <div class="modal-body">
+        <div class="smart-icon"><i class="fa-solid fa-lightbulb"></i></div>
+        <p class="smart-text">{{ selectedChild!.smartAction?.description }}</p>
+        <div class="modal-alert">
+          <p><i class="fa-solid fa-triangle-exclamation"></i> Esto actualizará las reglas de consumo del alumno.</p>
         </div>
       </div>
+      <div class="modal-actions">
+        <button class="modal-btn-cancelar" (click)="closeSmartActionModal()">Descartar</button>
+        <button class="modal-btn-confirmar" (click)="applySmartAction()">Aceptar e Implementar</button>
+      </div>
     </div>
+  </div>
   }
 </div>

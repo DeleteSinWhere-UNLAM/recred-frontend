@@ -39,25 +39,21 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
     this.usuarioService.setHomeUrl('/tutor');
     this.usuarioService.setNombreNavbar(this.nombreUsuario());
   }
-  
+
   globalSummary: TutorGlobalDashboardSummary | null = null;
   selectedChild: ChildDashboardSummary | null = null;
   isLoading = true;
-  
-  // Modals state
+
   showSmartActionModal = false;
-  
-  // Transfer state
+
   draggedChild: ChildDashboardSummary | null = null;
   transferAmounts: Record<string, number | null> = {};
-  
-  // Modal transfer state
+
   showTransferModal = false;
   transferSourceChild: ChildDashboardSummary | null = null;
   transferTargetChildId = '';
   isTransferring = false;
 
-  // Grid state
   gridConfig: GridsterConfig = {};
   dashboardItems: DashboardWidget[] = [];
 
@@ -81,8 +77,7 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
     this.dashboardService.getGlobalDashboard().subscribe({
       next: (data) => {
         this.globalSummary = data;
-        
-        // Load layout from backend if available, else localStorage, else default
+
         if (data.dashboardConfig) {
           try {
             this.dashboardItems = JSON.parse(data.dashboardConfig);
@@ -95,16 +90,13 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
         }
 
         if (data.children && data.children.length > 0) {
-          // Clean children names to only show first name
           data.children = data.children.map(c => ({
             ...c,
             studentName: c.studentName ? c.studentName.split(' ')[0] : ''
           }));
 
-          // Sort children alphabetically
           data.children.sort((a, b) => (a.studentName || '').localeCompare(b.studentName || ''));
-          
-          // Keep the previous selection if it exists
+
           if (this.selectedChild) {
             this.selectedChild = data.children.find(c => c.studentId === this.selectedChild?.studentId) || data.children[0];
           } else {
@@ -149,7 +141,7 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
     if (percentage < 85) return 'budget-yellow';
     return 'budget-red';
   }
-  
+
   get esPlanGratuito(): boolean {
     return this.perfilService.esPlanGratuito();
   }
@@ -166,7 +158,6 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
     return !this.esPlanGratuito || this.dashboardItems.length < 5;
   }
 
-  // Drag and Drop Logic
   onDragStart(event: DragEvent, child: ChildDashboardSummary): void {
     if (!this.tienePlanAvanzado) {
       event.preventDefault();
@@ -185,14 +176,14 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
     this.draggedChild = null;
     const target = event.target as HTMLElement;
     target.classList.remove('dragging');
-    
+
     document.querySelectorAll('.child-transfer-card').forEach(el => {
       el.classList.remove('drag-over');
     });
   }
 
   onDragOver(event: DragEvent): void {
-    event.preventDefault(); // Necessary to allow dropping
+    event.preventDefault();
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = 'move';
     }
@@ -218,12 +209,12 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
     if (this.draggedChild && this.draggedChild.studentId !== targetChild.studentId) {
       const sourceChild = this.draggedChild;
       const amount = this.transferAmounts[sourceChild.studentId];
-      
+
       if (amount && amount > 0) {
         this.dashboardService.transferBalance(sourceChild.studentId, targetChild.studentId, amount).subscribe({
           next: () => {
-            this.transferAmounts[sourceChild.studentId] = null; // reset the input
-            this.ngOnInit(); // Refresh dashboard to fetch updated balances
+            this.transferAmounts[sourceChild.studentId] = null;
+            this.ngOnInit();
           },
           error: async (err) => {
             console.error('Transfer failed', err);
@@ -239,22 +230,21 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
   openSmartActionModal(): void {
     this.showSmartActionModal = true;
   }
-  
+
   closeSmartActionModal(): void {
     this.showSmartActionModal = false;
   }
-  
+
   applySmartAction(): void {
     this.closeSmartActionModal();
   }
 
-  // Button Transfer Logic
   openTransferModal(sourceChild: ChildDashboardSummary): void {
     if (!this.tienePlanAvanzado) {
       this.dialogService.alert('La transferencia entre hijos está disponible con plan Avanzado.', 'Plan Avanzado');
       return;
     }
-    
+
     const amount = this.transferAmounts[sourceChild.studentId];
     if (!amount || amount <= 0) {
       this.dialogService.alert('Debes ingresar un monto mayor a 0 antes de transferir.', 'Monto Inválido');
@@ -263,8 +253,7 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
 
     this.transferSourceChild = sourceChild;
     this.transferTargetChildId = '';
-    
-    // Si solo hay un destinatario posible, autoseleccionarlo
+
     const possibleTargets = this.globalSummary?.children.filter(c => c.studentId !== sourceChild.studentId) || [];
     if (possibleTargets.length === 1) {
       this.transferTargetChildId = possibleTargets[0].studentId;
@@ -285,9 +274,9 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
       this.dialogService.alert('Debes seleccionar un destinatario.', 'Destinatario Inválido');
       return;
     }
-    
+
     if (this.isTransferring) return;
-    
+
     const amount = this.transferAmounts[this.transferSourceChild.studentId];
     if (!amount || amount <= 0) return;
 
@@ -330,7 +319,7 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
       keepFixedHeightInMobile: true,
       draggable: {
         enabled: true,
-        ignoreContent: true, // only drag from header
+        ignoreContent: true,
         dragHandleClass: 'drag-handler'
       },
       resizable: {
@@ -344,7 +333,6 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
       itemResizeCallback: () => this.saveLayout()
     };
 
-    // Load layout logic is now handled after fetching global summary
   }
 
   private loadLocalOrDefaultLayout() {
@@ -358,7 +346,6 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Default layout
     this.dashboardItems = [
       { id: 'smart-1', type: 'smart-chart', cols: 1, rows: 3, y: 0, x: 0, widgetConfig: { chartType: 'bar', dataSource: 'finance' } },
       { id: 'finance', type: 'finance', cols: 1, rows: 3, y: 0, x: 1 },
@@ -378,8 +365,7 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
   saveLayout() {
     const configStr = JSON.stringify(this.dashboardItems);
     localStorage.setItem('tutorDashboardGrid', configStr);
-    
-    // Persist to backend with debounce
+
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
@@ -494,20 +480,18 @@ export class TutorDashboardComponent implements OnInit, OnDestroy {
 
   getChildData(item: DashboardWidget): ChildDashboardSummary | null {
     if (!this.globalSummary || !this.globalSummary.children) return null;
-    
-    // Si la tarjeta tiene un estudiante asociado, devolverlo
+
     if (item.studentId) {
       const found = this.globalSummary.children.find(c => c.studentId === item.studentId);
       if (found) return found;
     }
-    
-    // Si no tiene estudiante asignado o no se encuentra, usar el primer hijo como default y guardarlo en el item
+
     const defaultChild = this.globalSummary.children[0];
     if (defaultChild) {
       item.studentId = defaultChild.studentId;
       return defaultChild;
     }
-    
+
     return null;
   }
 

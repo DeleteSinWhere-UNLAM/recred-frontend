@@ -25,7 +25,7 @@ export class SupplierDetailPage implements OnInit {
 
   readonly nombreKiosquero = this.usuarioService.nombreNavbar;
 
-  // States
+
   supplierId = '';
   supplier = signal<SupplierResponse | null>(null);
   isLoading = signal<boolean>(false);
@@ -75,7 +75,7 @@ export class SupplierDetailPage implements OnInit {
     });
   }
 
-  // Drag & Drop Handlers
+
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -108,7 +108,7 @@ export class SupplierDetailPage implements OnInit {
   }
 
   private processFile(file: File): void {
-    // 1. Extention validation (.pdf, .csv)
+
     const allowedExtensions = ['pdf', 'csv'];
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
 
@@ -117,14 +117,14 @@ export class SupplierDetailPage implements OnInit {
       return;
     }
 
-    // 2. Size validation (max 5MB = 5 * 1024 * 1024 bytes)
+
     const maxSizeBytes = 5 * 1024 * 1024;
     if (file.size > maxSizeBytes) {
       this.toastService.mostrar('El archivo supera el límite de 5MB.', 'error');
       return;
     }
 
-    // 3. Perform upload
+
     this.uploadPriceList(file);
   }
 
@@ -134,9 +134,8 @@ export class SupplierDetailPage implements OnInit {
       next: (priceList) => {
         this.isUploading.set(false);
         this.toastService.mostrar('Lista de precios subida y procesada correctamente con IA', 'success');
-        this.loadSupplier(); // Refresh details & history
+        this.loadSupplier();
 
-        // Navigate to the mapping page (Vista 3) of the newly uploaded price list
         this.router.navigate(['/kiosquero/proveedores/lista-precio', priceList.id]);
       },
       error: (err) => {
@@ -194,7 +193,6 @@ export class SupplierDetailPage implements OnInit {
     this.router.navigateByUrl('/kiosquero/proveedores');
   }
 
-  // Consultar Precios Modal Handlers
   openPricesModal(): void {
     this.isPricesModalOpen.set(true);
     this.pricesSearchQuery.set('');
@@ -208,7 +206,6 @@ export class SupplierDetailPage implements OnInit {
     const data = this.supplier();
     if (!data || !data.listasPrecios) return [];
 
-    // Sort lists by date ascending so that later lists overwrite earlier ones
     const sortedLists = [...data.listasPrecios].sort(
       (a, b) => new Date(a.creadoEn).getTime() - new Date(b.creadoEn).getTime()
     );

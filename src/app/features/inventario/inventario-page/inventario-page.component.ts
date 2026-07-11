@@ -228,8 +228,8 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     const normalizedSearchQuery = this.normalizeSearchText(this.searchQuery);
     let products = normalizedSearchQuery
       ? this.products.filter((product) =>
-          this.normalizeSearchText(product.nombre).includes(normalizedSearchQuery),
-        )
+        this.normalizeSearchText(product.nombre).includes(normalizedSearchQuery),
+      )
       : this.products;
 
     if (this.activeFilter === 'DISPONIBLE') {
@@ -642,9 +642,7 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
     }
 
     this.updateInventoryManagementValidators();
-    
-    // Sincronizar estadoInventario con disponible si estamos en modo DISPONIBLE_NO_DISPONIBLE
-    // y no se ha tocado explícitamente (o para asegurar consistencia en tests)
+
     const values = this.inventoryManagementForm.value;
     if (values.tipoManejoInventario === 'DISPONIBLE_NO_DISPONIBLE') {
       const targetEstado = values.disponible ? 'DISPONIBLE' : 'DESACTIVADO';
@@ -880,7 +878,6 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
       this.highlightProduct(product.productId);
     }
 
-    // Limpiar el query param para que no se abra de nuevo al refrescar
     this.router.navigate([], {
       queryParams: { productId: null },
       queryParamsHandling: 'merge',
@@ -916,7 +913,6 @@ export class InventarioPageComponent implements OnInit, OnDestroy {
   }
 
   private normalizeEditableProduct(product: Producto): Producto {
-    // Asegurar que los campos numéricos sean números
     return {
       ...product,
       precio: Number(product.precio),

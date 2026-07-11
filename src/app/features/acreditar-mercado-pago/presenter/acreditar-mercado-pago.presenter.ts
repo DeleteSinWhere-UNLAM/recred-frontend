@@ -58,7 +58,7 @@ export class AcreditarMercadoPagoPresenter {
       }
       this.alumnoState.set(alumno);
 
-      // Cargar historial de billetera
+
       const resumen = await firstValueFrom(this.billeteraService.getResumen(alumnoId));
       if (resumen && resumen.movimientos) {
         const recargas = resumen.movimientos
@@ -75,7 +75,7 @@ export class AcreditarMercadoPagoPresenter {
               id: m.id,
               montoFormateado: `$${m.monto.toLocaleString('es-AR')}`,
               fechaFormateada: formatter.format(date),
-              estado: 'APROBADO' // Asumimos aprobado si ya está en la billetera
+              estado: 'APROBADO'
             };
           });
         this.historialRecargasState.set(recargas);

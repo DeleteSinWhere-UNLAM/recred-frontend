@@ -65,9 +65,9 @@ describe('DirectivoPage Integration', () => {
 
       fixture = TestBed.createComponent(DirectivoPage);
 
-      fixture.detectChanges(); // Triggers ngOnInit
+      fixture.detectChanges();
       await new Promise(resolve => setTimeout(resolve, 50));
-      fixture.detectChanges(); // Update DOM after promises resolve
+      fixture.detectChanges();
 
       const dashboardElement = fixture.nativeElement.querySelector('app-directivo-dashboard');
       expect(dashboardElement).toBeTruthy();
@@ -84,9 +84,9 @@ describe('DirectivoPage Integration', () => {
       directivoServiceSpy.obtenerResumenColegio.and.rejectWith(new HttpErrorResponse({ status: 403 }));
 
       fixture = TestBed.createComponent(DirectivoPage);
-      fixture.detectChanges(); // Triggers ngOnInit
+      fixture.detectChanges();
       await new Promise(resolve => setTimeout(resolve, 50));
-      fixture.detectChanges(); // Update DOM after promises resolve
+      fixture.detectChanges();
 
       const errorAlert = fixture.debugElement.query(By.css('.pv__notice--error'));
       expect(errorAlert).toBeTruthy();

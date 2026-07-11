@@ -1,0 +1,189 @@
+src/app/features\acreditar-mercado-pago\acreditar-mercado-pago.mother.ts
+  L14: paymentUrl: 'https://mercadopago.com/pagar',
+
+src/app/features\buffet\buffet.page.ts
+  L202: const defaultPromoImage = 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80';
+  L211: // Derivar bloqueo desde los productos que componen la promo
+  L364: const contenido = motivo.replace(/^Contiene:\s*/i, '');
+
+src/app/features\buffet\components\producto-card\producto-card.component.ts
+  L92: const contenido = motivo.replace(/^Contiene:\s*/i, '');
+  L162: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\buffet\services\buffet.service.ts
+  L204: return 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80';
+  L207: return 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=600&q=80';
+  L210: return 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80';
+  L213: return 'https://resizer.glanacion.com/resizer/v2/12072023-empanadas-argentinas-de-sabores-express-BUHGBZQ5FVAITHTZSF3WOFNTFA?auth=f3392dcb14acedb9c3b4a0cf827c58b6c35708303fb388f708f46599c8ac1ac4&width=768&height=576&quality=70&smart=true';
+  L221: return 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=600&q=80';
+  L224: return 'https://images.unsplash.com/photo-1571748982800-fa51082c2224?auto=format&fit=crop&w=600&q=80';
+  L227: return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80';
+  L230: return 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80';
+  L233: return 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80';
+
+src/app/features\compra\components\carrito-item\carrito-item.component.ts
+  L67: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\directivo\invitar-tutor\invitar-tutor.mother.ts
+  L37: 'http://localhost:4200/invitaciones/tutor?token=abc123',
+
+src/app/features\favoritos\favoritos.mother.ts
+  L27: imagen: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=600&q=80',
+
+src/app/features\favoritos\favoritos.page.ts
+  L37: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\favoritos\services\favoritos.service.ts
+  L121: return 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Coca-Cola_glass_bottle.jpg';
+  L124: return 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Bottled_water.jpg';
+  L127: return 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Ham_and_cheese_sandwich.jpg';
+  L130: return 'https://upload.wikimedia.org/wikipedia/commons/0/07/Empanadas_tucumanas.jpg';
+  L133: return 'https://upload.wikimedia.org/wikipedia/commons/2/22/Alfajores_de_maicena_y_dulce_de_leche.jpg';
+  L136: return 'https://upload.wikimedia.org/wikipedia/commons/3/30/Cereal_bar.jpg';
+  L139: return 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Yogurt_with_strawberries.jpg';
+  L142: return 'https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg';
+  L145: return 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg';
+
+src/app/features\favoritos-alumno\favoritos-alumno.page.ts
+  L97: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\home-alumno\presenter\home-alumno.presenter.ts
+  L84: // Valores por defecto si la data aún no carga o falla
+  L96: // Calculamos el porcentaje usando la data del back
+  L231: /* noop */
+  L246: /* noop */
+
+src/app/features\home-kiosquero\home-kiosquero.page.ts
+  L31: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\home-kiosquero\kiosquero-reportes.page.ts
+  L45: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\home-tutor\components\alumno-card\alumno-card.component.ts
+  L143: /**
+  L146: */
+  L274: // Check both route and context
+
+src/app/features\inventario\components\tabla-producto\tabla-producto.component.ts
+  L249: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\landing\landing.page.ts
+  L156: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 540'>
+
+src/app/features\movimientos\movimientos.page.ts
+  L179: // Default: FECHA_COMPRA
+  L286: // Check if there is an order ID in query params to open the modal
+
+src/app/features\prediccion-gasto\components\analisis-prediccion\analisis-prediccion.component.ts
+  L21: // Opciones del gráfico Doughnut
+
+src/app/features\prediccion-gasto\components\resumen-prediccion\resumen-prediccion.component.ts
+  L30: // Calculate how much the predicted spending takes of the limit
+
+src/app/features\preferencias\components\preferencia-card\preferencia-card.component.ts
+  L27: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png';
+
+src/app/features\proveedores\models\proveedores.interfaces.ts
+  L24: creadoEn: string; // ISO-Date
+
+src/app/features\proveedores\pages\price-list-mapping\price-list-mapping.page.ts
+  L30: // States
+  L38: // Dropdown states for each row
+  L88: // Fetch full supplier details to get items
+  L158: // Dropdown UI Handlers
+
+src/app/features\proveedores\pages\supplier-detail\supplier-detail.page.ts
+  L28: // States
+  L78: // Drag & Drop Handlers
+  L111: // 1. Extention validation (.pdf, .csv)
+  L120: // 2. Size validation (max 5MB = 5 * 1024 * 1024 bytes)
+  L127: // 3. Perform upload
+  L137: this.loadSupplier(); // Refresh details & history
+  L139: // Navigate to the mapping page (Vista 3) of the newly uploaded price list
+  L197: // Consultar Precios Modal Handlers
+  L211: // Sort lists by date ascending so that later lists overwrite earlier ones
+
+src/app/features\proveedores\pages\suppliers-list\suppliers-list.page.ts
+  L26: // States
+  L32: // Computeds
+  L43: // Modal States
+  L48: // Form
+  L147: // Edit mode
+  L161: // Create mode
+
+src/app/features\proveedores\proveedores.mother.ts
+  L54: urlArchivo: 'https://cdn.recred.com/listas/lp-1.pdf',
+
+src/app/features\proveedores\services\supplier.service.ts
+  L20: // CRUD Proveedores
+  L41: // Carga de Lista de Precios
+
+src/app/features\recomendaciones-estacionales\components\modal-aprobar-promocion-ia\modal-aprobar-promocion-ia.component.ts
+  L38: // Por requerimiento, los productos ya no se seleccionan por defecto.
+  L39: // El usuario deberá elegir manualmente cuáles desea incluir en la promoción.
+
+src/app/features\recomendaciones-estacionales\pages\recomendaciones-page\presenter\recomendaciones-page.presenter.ts
+  L143: // Find the resolved product details for selected productIds to get their urlImagen
+
+src/app/features\recomendaciones-estacionales\recomendaciones-estacionales.mother.ts
+  L41: imagen: 'https://cdn.recred.com/promos/invierno.png',
+
+src/app/features\restricciones-horarias\presenter\restricciones-horarias.presenter.ts
+  L151: // Un bloqueo total de recreo es manejable
+  L188: // Find deleted manageable restrictions
+  L193: // Find added restrictions
+  L198: // Execute deletions
+  L203: // Execute additions
+  L213: // Reload
+
+src/app/features\sugerencias\presenter\sugerencias.presenter.ts
+  L151: /** Horizontal bar chart: days without sale per product (sorted worst → best) */
+  L170: /** Vertical bar chart: stock vs ventas per product */
+
+src/app/features\sugerencias\sugerencias.mother.ts
+  L115: urlImagen: 'http://image.url',
+
+src/app/features\sugerencias-agregar\presenter\sugerencias-agregar.presenter.ts
+  L55: /* ── KPI computados ── */
+
+src/app/features\tracking-pedidos\tracking-pedidos.page.ts
+  L218: // Check if there is an order ID in query params to open the modal
+
+src/app/features\transferir-saldo\presenter\transferir-saldo.presenter.ts
+  L68: // Cargar historial de billetera y filtrar transferencias
+  L127: // We add a small epsilon to avoid floating point precision issues causing a rejection when they are virtually equal.
+  L138: // Actualizar saldos locales de los hijos del tutor
+  L141: // Recargar el estado de este componente
+
+src/app/features\tutor-dashboard\components\smart-chart-widget\smart-chart-widget.ts
+  L36: @Input() config: ChartWidgetConfig = {}; // { id, childId, chartType, dataSource }
+  L42: selectedDataSource = 'finance'; // finance, health, logistics
+  L155: if (index === 0) return '#e2e8f0'; // Presupuesto
+  L156: if (index === 1) return '#ef4444'; // Gastado
+  L157: if (index === 2) return this.getBarGradient(context, '#4A6FA5', '#81B29A'); // Saldo Disponible
+
+src/app/features\tutor-dashboard\tutor-dashboard.component.ts
+  L47: // Modals state
+  L50: // Transfer state
+  L54: // Modal transfer state
+  L60: // Grid state
+  L85: // Load layout from backend if available, else localStorage, else default
+  L98: // Clean children names to only show first name
+  L104: // Sort children alphabetically
+  L107: // Keep the previous selection if it exists
+  L169: // Drag and Drop Logic
+  L195: event.preventDefault(); // Necessary to allow dropping
+  L225: this.transferAmounts[sourceChild.studentId] = null; // reset the input
+  L226: this.ngOnInit(); // Refresh dashboard to fetch updated balances
+  L251: // Button Transfer Logic
+  L267: // Si solo hay un destinatario posible, autoseleccionarlo
+  L333: ignoreContent: true, // only drag from header
+  L347: // Load layout logic is now handled after fetching global summary
+  L361: // Default layout
+  L382: // Persist to backend with debounce
+  L498: // Si la tarjeta tiene un estudiante asociado, devolverlo
+  L504: // Si no tiene estudiante asignado o no se encuentra, usar el primer hijo como default y guardarlo en el item
+
+src/app/features\venta-espontanea\venta-espontanea-page.component.ts
+  L198: [src]="producto.imagen || 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png'"
+

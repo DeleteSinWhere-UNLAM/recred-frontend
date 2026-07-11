@@ -106,7 +106,7 @@ describe('Compra (confirmar) Integration', () => {
     whenMonto();
 
     expect(queryTexto('.confirmar-page__titulo')).toBe('Confirmar Compra');
-    expect(fixture.nativeElement.textContent).toContain('Nombre'); // alumno de la mother
+    expect(fixture.nativeElement.textContent).toContain('Nombre');
   });
 
   it('dado sin orden en curso, cuando se monta, deberia redirigir a /compra', () => {

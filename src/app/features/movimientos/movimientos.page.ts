@@ -160,7 +160,7 @@ export class MovimientosPage implements OnInit {
       orderedKeys.sort((a, b) => {
         if (a === fallbackKey) return 1;
         if (b === fallbackKey) return -1;
-        
+
         const parseKey = (k: string) => {
           const parts = k.split(' ');
           if (parts.length === 3) {
@@ -176,7 +176,6 @@ export class MovimientosPage implements OnInit {
         return parseKey(b) - parseKey(a);
       });
     } else {
-      // Default: FECHA_COMPRA
       for (const m of list) {
         const d = new Date(m.date);
         const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -282,8 +281,6 @@ export class MovimientosPage implements OnInit {
           [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         );
         this.cargando.set(false);
-
-        // Check if there is an order ID in query params to open the modal
         const purchaseId = this.route.snapshot?.queryParamMap?.get('id');
         if (purchaseId) {
           const found = this.rawMovimientos().find((m) => m.id === purchaseId);
@@ -467,7 +464,7 @@ export class MovimientosPage implements OnInit {
       this.movimientosService.cancelarCompra(id).subscribe({
         next: () => {
           this.toastService.mostrar('Pedido cancelado y saldo reembolsado', 'success');
-          
+
           this.rawMovimientos.update((list) =>
             list.map((m) =>
               m.id === id
@@ -475,7 +472,7 @@ export class MovimientosPage implements OnInit {
                 : m
             )
           );
-          
+
           const openModal = this.modalMovimiento();
           if (openModal && openModal.id === id) {
             this.modalMovimiento.set({
@@ -499,7 +496,7 @@ export class MovimientosPage implements OnInit {
       this.movimientosService.revertirCancelacionCompra(id).subscribe({
         next: () => {
           this.toastService.mostrar('Cancelación revertida exitosamente', 'success');
-          
+
           this.rawMovimientos.update((list) =>
             list.map((m) =>
               m.id === id
@@ -507,7 +504,7 @@ export class MovimientosPage implements OnInit {
                 : m
             )
           );
-          
+
           const openModal = this.modalMovimiento();
           if (openModal && openModal.id === id) {
             this.modalMovimiento.set({
