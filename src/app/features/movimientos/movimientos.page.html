@@ -273,9 +273,13 @@
                         <button type="button" class="movimientos__cancel-mini-btn" aria-label="Cancelar pedido" title="Cancelar pedido" (click)="cancelarPedido(mov.id); $event.stopPropagation()">
                           <i class="fa-solid fa-xmark"></i>
                         </button>
-                      } @else if (!esVistaAlumno() && mov.tipo === 'ANTICIPADA' && mov.status === 'CANCELADO') {
+                      } @else if (!esVistaAlumno() && mov.tipo === 'ANTICIPADA' && mov.status === 'CANCELADO' && mov.cancelledByRole !== 'VENDEDOR' && mov.cancelledByRole !== 'ADMIN') {
                         <button type="button" class="movimientos__cancel-mini-btn revert-btn" aria-label="Revertir cancelación" title="Revertir cancelación" (click)="revertirCancelacion(mov.id); $event.stopPropagation()">
                           <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                      } @else if (!esVistaAlumno()) {
+                        <button type="button" class="movimientos__cancel-mini-btn disabled-btn" aria-label="No se puede cancelar" title="Ya no se puede cancelar el pedido" disabled>
+                          <i class="fa-solid fa-minus"></i>
                         </button>
                       }
                       <div class="movimientos__iniciales" [attr.data-alumno]="mov.studentId">

@@ -19,4 +19,5 @@ export interface Movimiento {
   pickupSlotDescription?: string;
   pickupDate?: string;
   pickupSlotStartTime?: string;
+  cancelledByRole?: string;
 }
