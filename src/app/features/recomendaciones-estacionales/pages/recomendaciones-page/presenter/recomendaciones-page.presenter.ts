@@ -139,8 +139,7 @@ export class RecomendacionesPagePresenter {
     this.isLoadingState.set(true);
     const buffetId = this.perfilService.obtenerBuffetId() ?? '';
     const suggested = this.suggestedPromotionState();
-    
-    // Find the resolved product details for selected productIds to get their urlImagen
+
     const selectedProducts = this.resolvedProductsState().filter(p => formData.productIds.includes(p.id));
     const imageUrls = selectedProducts.map(p => p.urlImagen);
     const collageUrl = buildCloudinaryCollageUrl(imageUrls);

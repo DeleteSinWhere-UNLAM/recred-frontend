@@ -23,29 +23,29 @@ export class SuppliersListPage implements OnInit {
 
   readonly nombreKiosquero = this.usuarioService.nombreNavbar;
 
-  // States
+
   suppliers = signal<SupplierResponse[]>([]);
   filteredSuppliers = signal<SupplierResponse[]>([]);
   searchQuery = signal<string>('');
   isLoading = signal<boolean>(false);
 
-  // Computeds
+
   readonly isCompararDisabled = computed(() => {
     const list = this.suppliers();
     if (list.length === 0) {
       return true;
     }
-    return !list.some(supplier => 
+    return !list.some(supplier =>
       supplier.listasPrecios && supplier.listasPrecios.length > 0
     );
   });
 
-  // Modal States
+
   isFormModalOpen = signal<boolean>(false);
   isDeleteModalOpen = signal<boolean>(false);
   selectedSupplier = signal<SupplierResponse | null>(null);
 
-  // Form
+
   supplierForm!: FormGroup;
 
   constructor() {
@@ -144,7 +144,7 @@ export class SuppliersListPage implements OnInit {
     this.isLoading.set(true);
 
     if (selected) {
-      // Edit mode
+
       this.supplierService.updateSupplier(selected.id, payload).subscribe({
         next: () => {
           this.toastService.mostrar('Proveedor actualizado exitosamente', 'success');
@@ -158,7 +158,7 @@ export class SuppliersListPage implements OnInit {
         }
       });
     } else {
-      // Create mode
+
       this.supplierService.createSupplier(payload).subscribe({
         next: () => {
           this.toastService.mostrar('Proveedor creado exitosamente', 'success');

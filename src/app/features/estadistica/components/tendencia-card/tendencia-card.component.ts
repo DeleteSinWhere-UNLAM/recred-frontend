@@ -59,7 +59,7 @@ export class TendenciaCardComponent implements OnChanges {
       }
     }
   };
-  
+
   public lineChartData: ChartData<'line'> = {
     labels: [],
     datasets: [{
@@ -71,7 +71,7 @@ export class TendenciaCardComponent implements OnChanges {
       backgroundColor: 'rgba(129, 178, 154, 0.2)'
     }]
   };
-  
+
   public lineChartType: ChartType = 'line';
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -81,22 +81,19 @@ export class TendenciaCardComponent implements OnChanges {
   }
 
   private procesarHistorial() {
-    // Agrupar por fecha
+
     const gastosPorDia = new Map<string, number>();
-    
-    // Asumimos que date es un string ISO
+
+
     const compras = this.historial.filter(m => m.status === 'ENTREGADO' || m.status === 'COMPLETADA' || m.status === 'APROBADO' || m.tipo === 'PRESENCIAL');
-    
+
     compras.forEach(m => {
       const fecha = new Date(m.date).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
       const actual = gastosPorDia.get(fecha) ?? 0;
       gastosPorDia.set(fecha, actual + m.totalAmount);
     });
 
-    // Ordenar por fecha cronológicamente
-    // Como la key es DD/MMM necesitamos ordenarlos usando el string original o solo invirtiendo 
-    // pero this.historial suele venir ordenado descendente.
-    // Lo más seguro es agrupar por YYYY-MM-DD y luego ordenar y formatear
+
     const agruparReal = new Map<string, { total: number, label: string }>();
     compras.forEach(m => {
       const dateObj = new Date(m.date);
@@ -108,7 +105,7 @@ export class TendenciaCardComponent implements OnChanges {
     });
 
     const sortedKeys = Array.from(agruparReal.keys()).sort();
-    
+
     const labels = sortedKeys.map(k => agruparReal.get(k)!.label);
     const data = sortedKeys.map(k => agruparReal.get(k)!.total);
 

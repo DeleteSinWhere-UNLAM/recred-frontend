@@ -27,13 +27,12 @@ export class TutorWelcome implements OnInit {
   private favoritosService = inject(FavoritosService);
 
   readonly alumnos = this.alumnosService.alumnos;
-  
-  // Alertas de saldo bajo
+
+
   readonly alumnosConSaldoBajo = computed(() => {
     return this.alumnos().filter(a => (a.saldo || 0) < 2000);
   });
 
-  // Datos
   readonly ultimosMovimientos = signal<(Movimiento & { alumnoNombre?: string })[]>([]);
   readonly pedidosPendientes = signal<(Movimiento & { alumnoNombre: string })[]>([]);
   readonly promociones = signal<Promotion[]>([]);
@@ -49,7 +48,6 @@ export class TutorWelcome implements OnInit {
     try {
       const alumnosActuales = this.alumnos();
 
-      // 1. Movimientos globales del tutor (historial general)
       this.movimientosService.getHistorialTutor().subscribe(movs => {
         const mapeados = (movs || []).map(mov => {
           const alumno = alumnosActuales.find(a => a.id === mov.studentId);
@@ -61,33 +59,29 @@ export class TutorWelcome implements OnInit {
         this.ultimosMovimientos.set(mapeados.slice(0, 4));
       });
 
-      // 2. Pedidos pendientes (consolidados de todos los alumnos)
-      // Solo se muestran los pedidos cuyo retiro programado (pickupDate) es la fecha de hoy
       const hoy = new Date();
       const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
 
       const todosPendientes: (Movimiento & { alumnoNombre: string })[] = [];
-      
+
       for (const alumno of alumnosActuales) {
         this.movimientosService.getPendientesAlumno(alumno.id).subscribe(pendientes => {
           const mapeados = pendientes
             .filter(p => {
               if (!p.pickupDate) return false;
-              // Comparamos solo la parte de fecha (YYYY-MM-DD) de pickupDate con hoy
+
               return p.pickupDate.startsWith(hoyStr);
             })
             .map(p => ({ ...p, alumnoNombre: alumno.nombre }));
           todosPendientes.push(...mapeados);
-          // Ordenamos por fecha de retiro programado de más temprano a más tarde
           todosPendientes.sort((a, b) => new Date(a.pickupDate!).getTime() - new Date(b.pickupDate!).getTime());
           this.pedidosPendientes.set([...todosPendientes]);
         });
       }
 
-      // 3. Promociones destacadas (consolidadas de los distintos buffets)
       const todasPromos: Promotion[] = [];
       const procesados = new Set<string>();
-      
+
       for (const alumno of alumnosActuales) {
         this.buffetService.obtenerBuffetDelAlumno(alumno.id).subscribe({
           next: (buffet) => {
@@ -105,7 +99,6 @@ export class TutorWelcome implements OnInit {
         });
       }
 
-      // 4. Productos favoritos de los hijos
       const todosFavoritos: { producto: Producto; alumnoNombre: string }[] = [];
       let pendingFavorites = alumnosActuales.length;
 

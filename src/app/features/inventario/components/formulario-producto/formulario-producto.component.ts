@@ -119,7 +119,7 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
         urlImagen: this.product.urlImagen
       });
       this.imagePreview.set(this.product.urlImagen || null);
-      
+
       if (categoryId) {
         this.isBeverage.set(this.checkIfBeverage(categoryId));
       } else {
@@ -158,13 +158,10 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      
-      // Mostrar preview local inmediatamente
       const reader = new FileReader();
       reader.onload = () => this.imagePreview.set(reader.result as string);
       reader.readAsDataURL(file);
 
-      // Subir a Cloudinary vía Backend
       this.uploadImage(file);
     }
   }
@@ -173,9 +170,7 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
     this.isUploadingImage.set(true);
     const formData = new FormData();
     formData.append("image", file);
-
-    // Usamos el endpoint de la IA para subir la imagen y obtener la URL de Cloudinary
-    this.http.post<{url_imagen: string}>(`${environment.apiUrl}/load-stock/upload-image`, formData)
+    this.http.post<{ url_imagen: string }>(`${environment.apiUrl}/load-stock/upload-image`, formData)
       .subscribe({
         next: (res) => {
           this.productForm.patchValue({ urlImagen: res.url_imagen });
@@ -184,7 +179,6 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
         },
         error: () => {
           this.isUploadingImage.set(false);
-          // Opcional: manejar error
         }
       });
   }
@@ -241,7 +235,7 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
     if (!control || !control.errors) return "";
 
     if (control.errors["required"]) return "Este campo es obligatorio";
-    if (control.errors["minlength"]) return `Mínimo ${control.errors["minlength"].requiredLength} caracteres`;        
+    if (control.errors["minlength"]) return `Mínimo ${control.errors["minlength"].requiredLength} caracteres`;
     if (control.errors["min"]) return `El valor mínimo es ${control.errors["min"].min}`;
 
     return "Valor inválido";

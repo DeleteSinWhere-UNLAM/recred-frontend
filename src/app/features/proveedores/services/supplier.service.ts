@@ -17,7 +17,6 @@ export class SupplierService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/suppliers`;
 
-  // CRUD Proveedores
   getSuppliers(): Observable<SupplierResponse[]> {
     return this.http.get<SupplierResponse[]>(this.baseUrl);
   }
@@ -38,7 +37,6 @@ export class SupplierService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  // Carga de Lista de Precios
   uploadPriceList(supplierId: string, file: File): Observable<ListaPrecioProveedorResponse> {
     const formData = new FormData();
     formData.append('file', file);

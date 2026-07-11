@@ -33,13 +33,13 @@ export interface ChartWidgetConfig {
 })
 export class SmartChartWidget implements OnInit, OnChanges {
   @Input() children: ChildDashboardSummary[] = [];
-  @Input() config: ChartWidgetConfig = {}; // { id, childId, chartType, dataSource }
+  @Input() config: ChartWidgetConfig = {};
   @Output() configChange = new EventEmitter<ChartWidgetConfig>();
   @Output() closeCard = new EventEmitter<void>();
 
   selectedChildId = '';
   selectedChartType: ChartType = 'bar';
-  selectedDataSource = 'finance'; // finance, health, logistics
+  selectedDataSource = 'finance';
 
   chartData: ChartData<'bar' | 'pie' | 'line'> = { labels: [], datasets: [] };
   chartOptions: ChartConfiguration['options'] = {
@@ -135,7 +135,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
 
   getBarGradient(context: ScriptContext, colorStart: string, colorEnd: string) {
     const chart = context.chart;
-    const {ctx, chartArea} = chart;
+    const { ctx, chartArea } = chart;
     if (!chartArea) {
       return colorEnd;
     }
@@ -149,12 +149,12 @@ export class SmartChartWidget implements OnInit, OnChanges {
     if (this.selectedChartType !== 'pie' && this.selectedChartType !== 'doughnut') {
       return this.getBarGradient(context, '#4A6FA5', '#81B29A');
     }
-    
+
     const index = context.dataIndex;
     if (type === 'finance') {
-      if (index === 0) return '#e2e8f0'; // Presupuesto
-      if (index === 1) return '#ef4444'; // Gastado
-      if (index === 2) return this.getBarGradient(context, '#4A6FA5', '#81B29A'); // Saldo Disponible
+      if (index === 0) return '#e2e8f0';
+      if (index === 1) return '#ef4444';
+      if (index === 2) return this.getBarGradient(context, '#4A6FA5', '#81B29A');
     } else if (type === 'health') {
       if (index === 0) return this.getBarGradient(context, '#4A6FA5', '#81B29A');
       if (index === 1) return '#e2e8f0';
@@ -180,7 +180,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
         }
       },
       plugins: {
-        legend: { 
+        legend: {
           display: isPieOrDoughnut,
           position: 'bottom',
           labels: {
@@ -207,8 +207,8 @@ export class SmartChartWidget implements OnInit, OnChanges {
         labels: ['Presupuesto', 'Gastado', 'Saldo Disponible'],
         datasets: [{
           data: [
-            child.budget?.limit || 0, 
-            child.budget?.spent || 0, 
+            child.budget?.limit || 0,
+            child.budget?.spent || 0,
             child.balance || 0
           ],
           label: 'Finanzas ($)',
@@ -223,7 +223,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
         labels: ['Puntos Obtenidos', 'Faltan p/ Siguiente Nivel'],
         datasets: [{
           data: [
-            child.health?.rewardPoints || 0, 
+            child.health?.rewardPoints || 0,
             child.health?.pointsToNextLevel || 0
           ],
           label: 'Salud y Gamificación (Pts)',
@@ -234,7 +234,7 @@ export class SmartChartWidget implements OnInit, OnChanges {
         }]
       };
     } else if (this.selectedDataSource === 'logistics') {
-       this.chartData = {
+      this.chartData = {
         labels: ['Retiros Pendientes', 'Retiros Completados'],
         datasets: [{
           data: [child.todayPickups?.length || 0, 0],

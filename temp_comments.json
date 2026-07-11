@@ -1,0 +1,18 @@
+[
+  {
+    "file": "src/app/features\\home-alumno\\presenter\\home-alumno.presenter.ts",
+    "count": 2,
+    "preview": [
+      "/* noop */",
+      "/* noop */"
+    ]
+  },
+  {
+    "file": "src/app/features\\tutor-dashboard\\tutor-dashboard.component.ts",
+    "count": 5,
+    "preview": [
+      "// Modals state",
+      "// Transfer state"
+    ]
+  }
+]

@@ -1,0 +1,118 @@
+### src/app/features/buffet/buffet.page.ts
+  L211 [standalone]: // Derivar bloqueo desde los productos que componen la promo
+
+### src/app/features/home-alumno/presenter/home-alumno.presenter.ts
+  L84 [standalone]: // Valores por defecto si la data aún no carga o falla
+  L96 [standalone]: // Calculamos el porcentaje usando la data del back
+  L231 [standalone]: /* noop */
+  L246 [standalone]: /* noop */
+
+### src/app/features/home-tutor/components/alumno-card/alumno-card.component.ts
+  L143 [standalone]: /**
+  L144 [standalone]: * Establece el alumno activo en el servicio de contexto y navega a la ruta.
+  L145 [standalone]: * Esto permite URLs limpias (sin UUID) en todas las rutas de alumno.
+  L146 [standalone]: */
+  L274 [standalone]: // Check both route and context
+
+### src/app/features/movimientos/movimientos.page.ts
+  L179 [standalone]: // Default: FECHA_COMPRA
+  L286 [standalone]: // Check if there is an order ID in query params to open the modal
+
+### src/app/features/prediccion-gasto/components/analisis-prediccion/analisis-prediccion.component.ts
+  L21 [standalone]: // Opciones del gráfico Doughnut
+
+### src/app/features/prediccion-gasto/components/resumen-prediccion/resumen-prediccion.component.ts
+  L30 [standalone]: // Calculate how much the predicted spending takes of the limit
+
+### src/app/features/proveedores/models/proveedores.interfaces.ts
+  L24 [inline]: creadoEn: string; // ISO-Date
+
+### src/app/features/proveedores/pages/price-list-mapping/price-list-mapping.page.ts
+  L30 [standalone]: // States
+  L38 [standalone]: // Dropdown states for each row
+  L88 [standalone]: // Fetch full supplier details to get items
+  L158 [standalone]: // Dropdown UI Handlers
+
+### src/app/features/proveedores/pages/supplier-detail/supplier-detail.page.ts
+  L28 [standalone]: // States
+  L78 [standalone]: // Drag & Drop Handlers
+  L111 [standalone]: // 1. Extention validation (.pdf, .csv)
+  L120 [standalone]: // 2. Size validation (max 5MB = 5 * 1024 * 1024 bytes)
+  L127 [standalone]: // 3. Perform upload
+  L137 [inline]: this.loadSupplier(); // Refresh details & history
+  L139 [standalone]: // Navigate to the mapping page (Vista 3) of the newly uploaded price list
+  L197 [standalone]: // Consultar Precios Modal Handlers
+  L211 [standalone]: // Sort lists by date ascending so that later lists overwrite earlier ones
+
+### src/app/features/proveedores/pages/suppliers-list/suppliers-list.page.ts
+  L26 [standalone]: // States
+  L32 [standalone]: // Computeds
+  L43 [standalone]: // Modal States
+  L48 [standalone]: // Form
+  L147 [standalone]: // Edit mode
+  L161 [standalone]: // Create mode
+
+### src/app/features/proveedores/services/supplier.service.ts
+  L20 [standalone]: // CRUD Proveedores
+  L41 [standalone]: // Carga de Lista de Precios
+
+### src/app/features/recomendaciones-estacionales/components/modal-aprobar-promocion-ia/modal-aprobar-promocion-ia.component.ts
+  L38 [standalone]: // Por requerimiento, los productos ya no se seleccionan por defecto.
+  L39 [standalone]: // El usuario deberá elegir manualmente cuáles desea incluir en la promoción.
+
+### src/app/features/recomendaciones-estacionales/pages/recomendaciones-page/presenter/recomendaciones-page.presenter.ts
+  L143 [standalone]: // Find the resolved product details for selected productIds to get their urlImagen
+
+### src/app/features/restricciones-horarias/presenter/restricciones-horarias.presenter.ts
+  L151 [standalone]: // Un bloqueo total de recreo es manejable
+  L188 [standalone]: // Find deleted manageable restrictions
+  L193 [standalone]: // Find added restrictions
+  L198 [standalone]: // Execute deletions
+  L203 [standalone]: // Execute additions
+  L213 [standalone]: // Reload
+
+### src/app/features/sugerencias/presenter/sugerencias.presenter.ts
+  L151 [standalone]: /** Horizontal bar chart: days without sale per product (sorted worst → best) */
+  L170 [standalone]: /** Vertical bar chart: stock vs ventas per product */
+
+### src/app/features/sugerencias-agregar/presenter/sugerencias-agregar.presenter.ts
+  L55 [standalone]: /* ── KPI computados ── */
+
+### src/app/features/tracking-pedidos/tracking-pedidos.page.ts
+  L218 [standalone]: // Check if there is an order ID in query params to open the modal
+
+### src/app/features/transferir-saldo/presenter/transferir-saldo.presenter.ts
+  L68 [standalone]: // Cargar historial de billetera y filtrar transferencias
+  L127 [standalone]: // We add a small epsilon to avoid floating point precision issues causing a rejection when they are virtually equal.
+  L138 [standalone]: // Actualizar saldos locales de los hijos del tutor
+  L141 [standalone]: // Recargar el estado de este componente
+
+### src/app/features/tutor-dashboard/components/smart-chart-widget/smart-chart-widget.ts
+  L36 [inline]: @Input() config: ChartWidgetConfig = {}; // { id, childId, chartType, dataSource }
+  L42 [inline]: selectedDataSource = 'finance'; // finance, health, logistics
+  L155 [inline]: if (index === 0) return '#e2e8f0'; // Presupuesto
+  L156 [inline]: if (index === 1) return '#ef4444'; // Gastado
+  L157 [inline]: if (index === 2) return this.getBarGradient(context, '#4A6FA5', '#81B29A'); // Saldo Disponible
+
+### src/app/features/tutor-dashboard/tutor-dashboard.component.ts
+  L47 [standalone]: // Modals state
+  L50 [standalone]: // Transfer state
+  L54 [standalone]: // Modal transfer state
+  L60 [standalone]: // Grid state
+  L85 [standalone]: // Load layout from backend if available, else localStorage, else default
+  L98 [standalone]: // Clean children names to only show first name
+  L104 [standalone]: // Sort children alphabetically
+  L107 [standalone]: // Keep the previous selection if it exists
+  L169 [standalone]: // Drag and Drop Logic
+  L195 [inline]: event.preventDefault(); // Necessary to allow dropping
+  L225 [inline]: this.transferAmounts[sourceChild.studentId] = null; // reset the input
+  L226 [inline]: this.ngOnInit(); // Refresh dashboard to fetch updated balances
+  L251 [standalone]: // Button Transfer Logic
+  L267 [standalone]: // Si solo hay un destinatario posible, autoseleccionarlo
+  L333 [inline]: ignoreContent: true, // only drag from header
+  L347 [standalone]: // Load layout logic is now handled after fetching global summary
+  L361 [standalone]: // Default layout
+  L382 [standalone]: // Persist to backend with debounce
+  L498 [standalone]: // Si la tarjeta tiene un estudiante asociado, devolverlo
+  L504 [standalone]: // Si no tiene estudiante asignado o no se encuentra, usar el primer hijo como default y guardarlo en el item
+

@@ -80,8 +80,7 @@ export class HomeAlumnoPresenter {
 
   readonly rewardStatus = computed<StudentRewardStatus>(() => {
     const data = this.recompensaState();
-    
-    // Valores por defecto si la data aún no carga o falla
+
     if (!data) {
       return {
         puntajeTotal: 0,
@@ -92,8 +91,7 @@ export class HomeAlumnoPresenter {
         porcentajeProgreso: 0,
       };
     }
-    
-    // Calculamos el porcentaje usando la data del back
+
     const totalPointsThreshold = data.totalPoints + data.pointsToNextLevel;
     const progress = totalPointsThreshold > 0 ? (data.totalPoints / totalPointsThreshold) * 100 : 100;
     const percentage = data.nextLevelName ? Math.min(progress, 100) : 100;
@@ -180,11 +178,11 @@ export class HomeAlumnoPresenter {
       if (alumno) {
         this.alumnoState.set(alumno);
         this.contextoService.setAlumnoId(alumno.id);
-        
+
         void firstValueFrom(this.homeAlumnoService.getRecompensasSaludables(alumno.id))
           .then((res) => this.recompensaState.set(res))
           .catch((err) => console.error('Error cargando recompensas saludables:', err));
-          
+
         void this.homeAlumnoService.cargarPedidoEnCurso(alumno.id);
         if (alumno.colegioId) {
           void this.homeAlumnoService.cargarRecreos(alumno.colegioId);

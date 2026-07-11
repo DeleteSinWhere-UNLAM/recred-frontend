@@ -52,8 +52,6 @@ export class SugerenciasAgregarPresenter {
     });
   }
 
-  /* ── KPI computados ── */
-
   get totalProductos(): number {
     return this._sugerencias.getValue().length;
   }
