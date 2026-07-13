@@ -10,6 +10,7 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { AlumnoContextoService } from '../../core/services/alumno-contexto.service';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { AlumnosService } from '../../data-access/services/alumnos.service';
@@ -70,6 +71,7 @@ export class BuffetPage implements OnInit {
   private readonly colegiosService = inject(ColegiosService);
   private readonly carritoService = inject(CarritoService);
   private readonly carritosFavoritosService = inject(CarritosFavoritosService);
+  private readonly router = inject(Router);
   protected readonly presenter = inject(BuffetPresenter);
 
   readonly nombreUsuario = this.usuarioService.nombreNavbar;
@@ -106,6 +108,10 @@ export class BuffetPage implements OnInit {
     this.mostrarModalFavorito = false;
     this.favoritoModalAlumnoId = '';
     this.favoritoModalItems = [];
+  }
+
+  protected irAMiCarrito(): void {
+    void this.router.navigateByUrl('/compra');
   }
   protected readonly diasCalendario = signal<DateCell[]>([]);
 

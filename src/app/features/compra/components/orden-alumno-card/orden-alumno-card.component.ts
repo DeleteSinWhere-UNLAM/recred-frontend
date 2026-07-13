@@ -64,6 +64,7 @@ export class OrdenAlumnoCardComponent {
 
   readonly alumnoActual = computed(() => this.alumnoState());
   readonly itemsActuales = computed(() => this.itemsState());
+  readonly esVistaAlumno = this.usuarioService.esVistaAlumno;
 
   readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
 
