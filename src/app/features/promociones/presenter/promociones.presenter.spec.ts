@@ -9,6 +9,7 @@ import { DialogService } from '../../../shared/services/dialog.service';
 import { Producto } from '../../inventario/models/producto.interface';
 import { ProductoService } from '../../inventario/services/producto.service';
 import { PromocionesPagePresenter } from './promociones.presenter';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 
 class ProductoMother {
   static crear(override: Partial<Producto> = {}): Producto {
@@ -46,6 +47,7 @@ describe('PromocionesPagePresenter', () => {
   let servicioProducto: jasmine.SpyObj<ProductoService>;
   let router: jasmine.SpyObj<Router>;
   let servicioDialog: jasmine.SpyObj<DialogService>;
+  let servicioPerfil: jasmine.SpyObj<PerfilService>;
 
   beforeEach(() => {
     servicioPromocion = jasmine.createSpyObj('PromotionService', [
@@ -56,6 +58,8 @@ describe('PromocionesPagePresenter', () => {
     servicioProducto = jasmine.createSpyObj('ProductoService', ['getById']);
     router = jasmine.createSpyObj('Router', ['navigateByUrl']);
     servicioDialog = jasmine.createSpyObj('DialogService', ['confirm']);
+    servicioPerfil = jasmine.createSpyObj('PerfilService', ['obtenerBuffetId']);
+    servicioPerfil.obtenerBuffetId.and.returnValue('buffet-1');
 
     TestBed.configureTestingModule({
       providers: [
@@ -64,6 +68,7 @@ describe('PromocionesPagePresenter', () => {
         { provide: ProductoService, useValue: servicioProducto },
         { provide: Router, useValue: router },
         { provide: DialogService, useValue: servicioDialog },
+        { provide: PerfilService, useValue: servicioPerfil },
       ],
     });
 
@@ -90,7 +95,19 @@ describe('PromocionesPagePresenter', () => {
       expect(presenter.promotions().length).toBe(1);
       expect(presenter.promotions()[0].name).toBe('Promo 1');
       expect(presenter.promotions()[0].products[0].nombre).toBe('Alfajor');
-      expect(servicioProducto.getById).toHaveBeenCalledWith('p1');
+      expect(servicioProducto.getById).toHaveBeenCalledWith('p1', 'buffet-1');
+    });
+
+    it('dado una promocion sin imageUrl pero cuyos productos tienen urlImagen, deberia generar el collage dinamico', () => {
+      givenPromocionesDelBack([PromocionMother.crear({ imageUrl: undefined, productIds: ['p1', 'p2'] })]);
+      servicioProducto.getById.and.callFake((id: string) => of(ProductoMother.crear({ id, urlImagen: `https://res.cloudinary.com/djzfudbze/image/upload/v12345/${id}.png` })));
+
+      whenCargoPromociones();
+
+      const promo = presenter.promotions()[0];
+      expect(promo.imageUrl).toContain('res.cloudinary.com/djzfudbze/image/upload');
+      expect(promo.imageUrl).toContain('p1');
+      expect(promo.imageUrl).toContain('p2');
     });
 
     it('dado el back devuelve nombres en espanol o snake_case, deberia normalizarlos al modelo interno', () => {

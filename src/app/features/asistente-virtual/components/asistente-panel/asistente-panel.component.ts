@@ -10,6 +10,7 @@ import {
   ViewChild,
   computed,
   effect,
+  inject,
   signal,
 } from '@angular/core';
 import {
@@ -20,6 +21,7 @@ import { MensajeAsistente } from '../../models/mensaje-asistente.model';
 import { InputMensajeComponent } from '../input-mensaje/input-mensaje.component';
 import { MensajeBurbujaComponent } from '../mensaje-burbuja/mensaje-burbuja.component';
 import { SugerenciasChipsComponent } from '../sugerencias-chips/sugerencias-chips.component';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 type GrupoOpcionesId =
   | 'cuenta'
@@ -87,6 +89,7 @@ const GRUPO_POR_CAPACIDAD: Record<CapacidadAsistente, GrupoOpcionesId> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AsistentePanelComponent implements AfterViewInit {
+  private readonly toastService = inject(ToastService);
   private readonly mensajesState = signal<readonly MensajeAsistente[]>([]);
   private readonly sugerenciasState = signal<readonly SugerenciaCapacidad[]>([]);
   private readonly opcionesState = signal<readonly SugerenciaCapacidad[]>([]);
@@ -204,6 +207,16 @@ export class AsistentePanelComponent implements AfterViewInit {
     const input = event.target as HTMLInputElement;
     const valor = input.value;
     if (!valor || this.deshabilitadoState()) return;
+
+    if (this.esFinDeSemana(valor)) {
+      this.toastService.mostrar(
+        'No se pueden seleccionar días sábados o domingos para el retiro de pedidos.',
+        'error',
+      );
+      input.value = '';
+      return;
+    }
+
     if (this.fechaRetiroMinimaState() && valor < this.fechaRetiroMinimaState()) {
       input.value = '';
       return;
@@ -211,6 +224,26 @@ export class AsistentePanelComponent implements AfterViewInit {
 
     this.fechaRetiro.emit(valor);
     input.value = '';
+  }
+
+  private esFinDeSemana(fechaStr: string): boolean {
+    if (!fechaStr) return false;
+    const dateObj = new Date(fechaStr + 'T00:00:00');
+    const day = dateObj.getDay();
+    return day === 0 || day === 6;
+  }
+
+  private siguienteDiaHabil(fechaStr: string): string {
+    const dateObj = new Date(fechaStr + 'T00:00:00');
+    while (true) {
+      dateObj.setDate(dateObj.getDate() + 1);
+      const day = dateObj.getDay();
+      if (day !== 0 && day !== 6) break;
+    }
+    const yyyy = dateObj.getFullYear();
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   protected onToggleAcciones(): void {

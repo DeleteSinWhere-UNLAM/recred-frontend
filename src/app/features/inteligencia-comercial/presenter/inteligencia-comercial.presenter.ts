@@ -166,7 +166,7 @@ export class InteligenciaComercialPresenter {
             startDate: new Date(datosFormulario.startDate).toISOString(),
             endDate: new Date(datosFormulario.endDate).toISOString(),
             productIds: idsProductos,
-            imageUrl: buildCloudinaryCollageUrl(productos.map((producto) => producto.urlImagen)),
+            imageUrl: datosFormulario.imageUrl || buildCloudinaryCollageUrl(productos.map((producto) => producto.urlImagen)),
           };
 
           return this.promotionService.createPromotion(datosPromocion);

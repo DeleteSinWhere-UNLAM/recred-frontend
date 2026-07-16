@@ -18,6 +18,37 @@
       <form (ngSubmit)="saveChanges()" #promoForm="ngForm">
         
         <div class="card-section">
+          <!-- Image upload section -->
+          <div class="promotion-image-section">
+            <div class="promotion-image-preview">
+              @if (imagePreview) {
+                <img [src]="imagePreview" alt="Vista previa de la promoción">
+              } @else {
+                <div class="promotion-image-placeholder">
+                  <i class="fa-solid fa-image"></i>
+                  <span>Usando collage o imagen por defecto</span>
+                </div>
+              }
+              @if (isUploadingImage) {
+                <div class="promotion-image-spinner-overlay">
+                  <span class="btn-spinner"></span>
+                </div>
+              }
+            </div>
+            
+            <div class="promotion-image-actions">
+              <label class="btn btn-outline upload-label">
+                <i class="fa-solid fa-upload"></i> Subir foto
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+              </label>
+              @if (imagePreview) {
+                <button type="button" class="btn btn-outline remove-btn" (click)="removeImage()">
+                  <i class="fa-solid fa-trash-can"></i> Quitar
+                </button>
+              }
+            </div>
+          </div>
+
           <div class="form-group" style="margin-bottom: 24px;">
             <label for="promoName">Nombre de la promoción</label>
             <div class="input-with-icon" style="margin-top: 8px;">

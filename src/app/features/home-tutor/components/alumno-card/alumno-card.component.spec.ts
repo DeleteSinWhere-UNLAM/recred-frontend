@@ -118,7 +118,7 @@ describe('AlumnoCardComponent', () => {
 
   describe('derivaciones de nombre y saldo', () => {
     it('dado un alumno Juan, nombreCompleto e iniciales deberian mostrarse en mayuscula', () => {
-      expect(component.nombreCompleto).toBe('Juan Perez');
+      expect(component.nombreCompleto).toBe('Juan');
       expect(component.iniciales).toBe('J');
     });
 
@@ -399,7 +399,7 @@ describe('AlumnoCardComponent', () => {
 
     it('dado un budget activo y una compra APPROVED en el periodo, deberia calcular budgetSpent', async () => {
       servicioPresupuesto.getPresupuesto.and.resolveTo(presupuestoActivo);
-      const hoy = new Date().toISOString().slice(0, 10);
+      const hoy = new Date().toISOString();
       servicioMovimientos.getHistorialAlumno.and.returnValue(
         of([
           { status: 'APPROVED', totalAmount: 700, date: hoy, items: [] },
@@ -426,7 +426,7 @@ describe('AlumnoCardComponent', () => {
 
     it('dado un budget activo y compras con status desconocido, deberia excluirlas del gasto', async () => {
       servicioPresupuesto.getPresupuesto.and.resolveTo(presupuestoActivo);
-      const hoy = new Date().toISOString().slice(0, 10);
+      const hoy = new Date().toISOString();
       servicioMovimientos.getHistorialAlumno.and.returnValue(
         of([
           { status: 'DESCONOCIDO', totalAmount: 999, date: hoy, items: [] },

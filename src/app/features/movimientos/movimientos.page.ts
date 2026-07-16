@@ -332,7 +332,7 @@ export class MovimientosPage implements OnInit {
     if (!this.esVistaAlumno() && this.selectedAlumnoId() !== 'todos') {
       const alumno = this.alumnosService.getAlumnoById(this.selectedAlumnoId());
       if (alumno) {
-        chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre} ${alumno.apellido}` });
+        chips.push({ id: 'alumno', label: `Hijo: ${alumno.nombre}` });
       }
     }
 
@@ -401,13 +401,16 @@ export class MovimientosPage implements OnInit {
 
   getNombreAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
-    return alumno ? `${alumno.nombre} ${alumno.apellido}`.trim() : 'Alumno';
+    if (!alumno) return 'Alumno';
+    return this.esVistaAlumno() ? `${alumno.nombre} ${alumno.apellido}`.trim() : alumno.nombre;
   }
 
   getInicialesAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
     if (!alumno) return 'AL';
-    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    return this.esVistaAlumno()
+      ? ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase()
+      : (alumno.nombre[0] ?? '').toUpperCase();
   }
 
   getFotoPerfilAlumno(studentId: string): string | null {

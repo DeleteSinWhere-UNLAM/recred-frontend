@@ -95,7 +95,7 @@ export class SugerenciasPresenter {
             startDate: new Date(formData.startDate).toISOString(),
             endDate: new Date(formData.endDate).toISOString(),
             productIds: productIds,
-            imageUrl: collageUrl
+            imageUrl: formData.imageUrl || collageUrl
           };
 
           return this.promotionService.createPromotion(promotionData);

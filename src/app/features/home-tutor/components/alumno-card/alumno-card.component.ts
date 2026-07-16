@@ -127,9 +127,7 @@ export class AlumnoCardComponent implements OnInit {
   }
 
   get nombreCompleto(): string {
-    const primerNombre = (this.alumno.nombre || '').trim().split(' ')[0];
-    const primerApellido = (this.alumno.apellido || '').trim().split(' ')[0];
-    return `${primerNombre} ${primerApellido}`.trim();
+    return (this.alumno.nombre || '').trim();
   }
 
   get iniciales(): string {

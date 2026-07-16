@@ -309,6 +309,23 @@ describe('FormularioProductoComponent', () => {
       expect(component.isBeverage()).toBeTrue();
     });
 
+    it('dado que escribo "Gaseosas" en nuevaCategoriaNombre con NEW, deberia marcar isBeverage true', () => {
+      component.productForm.patchValue({ categoriaId: 'NEW', nuevaCategoriaNombre: 'Gaseosas' });
+
+      expect(component.isBeverage()).toBeTrue();
+    });
+
+    it('dado un producto sin categoriaId pero con categoriaNombre "Gaseosas", deberia marcar isBeverage true', () => {
+      const producto = ProductoMother.crear({
+        categoriaId: null,
+        categoriaNombre: 'Gaseosas',
+      });
+
+      whenSeAsignaElProducto(producto);
+
+      expect(component.isBeverage()).toBeTrue();
+    });
+
     it('dado que escribo "Bebidas" con una categoria existente, no deberia marcar isBeverage', () => {
       component.productForm.patchValue({ categoriaId: 'c1', nuevaCategoriaNombre: 'Bebidas' });
 

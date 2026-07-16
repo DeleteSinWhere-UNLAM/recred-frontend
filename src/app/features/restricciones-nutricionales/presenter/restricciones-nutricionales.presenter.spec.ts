@@ -86,8 +86,8 @@ describe('RestriccionesNutricionalesPresenter', () => {
       await whenInicializo(ALUMNO_ID_TEST);
 
       thenElAlumnoEs(alumnoBase);
-      thenNombreCompletoEs('Julián García');
-      thenInicialesSon('JG');
+      thenNombreCompletoEs('Julián');
+      thenInicialesSon('J');
       thenGradoEs('4to Año A');
       thenRestriccionesSon(RestriccionesNutricionalesMother.crear({ sinTacc: true, sinSodio: true }));
       thenCargandoEs(false);
@@ -273,7 +273,7 @@ describe('RestriccionesNutricionalesPresenter', () => {
 
       await whenInicializo(ALUMNO_ID_TEST);
 
-      thenInicialesSon('L');
+      thenInicialesSon('');
     });
   });
 

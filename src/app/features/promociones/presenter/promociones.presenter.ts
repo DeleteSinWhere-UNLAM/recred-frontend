@@ -5,6 +5,8 @@ import { catchError, finalize, forkJoin, map, Observable, of, switchMap } from '
 import { DialogService } from '../../../shared/services/dialog.service';
 import { ProductoService } from '../../inventario/services/producto.service';
 import { Producto } from '../../inventario/models/producto.interface';
+import { buildCloudinaryCollageUrl } from '../../../shared/utils/cloudinary-collage.helper';
+import { PerfilService } from '../../../data-access/services/perfil.service';
 
 export interface PromotionWithProducts extends Promotion {
   products: Producto[];
@@ -16,6 +18,7 @@ export class PromocionesPagePresenter {
   private readonly productService = inject(ProductoService);
   private readonly router = inject(Router);
   private readonly dialogService = inject(DialogService);
+  private readonly perfilService = inject(PerfilService);
 
   private readonly promotionsState = signal<PromotionWithProducts[]>([]);
   private readonly filterState = signal<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
@@ -144,7 +147,16 @@ export class PromocionesPagePresenter {
 
     return forkJoin(
       promotions.map((promotion) => this.resolveProducts(promotion.productIds).pipe(
-        map((products) => ({ ...promotion, products }))
+        map((products) => {
+          let imageUrl = promotion.imageUrl;
+          if (!imageUrl || imageUrl.includes('logo_sin_fondo_ikciro')) {
+            const productImages = products.map(p => p.urlImagen).filter(url => !!url);
+            if (productImages.length > 0) {
+              imageUrl = buildCloudinaryCollageUrl(productImages);
+            }
+          }
+          return { ...promotion, products, imageUrl };
+        })
       ))
     );
   }
@@ -152,9 +164,11 @@ export class PromocionesPagePresenter {
   private resolveProducts(productIds: string[]): Observable<Producto[]> {
     if (!productIds || productIds.length === 0) return of([]);
 
+    const buffetId = this.perfilService.obtenerBuffetId();
+
     return forkJoin(
       productIds.map((id) =>
-        this.productService.getById(id).pipe(
+        this.productService.getById(id, buffetId).pipe(
           catchError(() => of({
             id,
             nombre: 'Producto no disponible',

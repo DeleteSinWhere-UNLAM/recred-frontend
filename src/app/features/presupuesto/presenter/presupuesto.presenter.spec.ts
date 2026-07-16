@@ -68,8 +68,8 @@ describe('PresupuestoPresenter', () => {
       await presenter.init(ALUMNO_ID_TEST);
 
       expect(presenter.alumno()?.id).toBe(ALUMNO_ID_TEST);
-      expect(presenter.nombreCompleto()).toBe('Mateo López');
-      expect(presenter.iniciales()).toBe('ML');
+      expect(presenter.nombreCompleto()).toBe('Mateo');
+      expect(presenter.iniciales()).toBe('M');
       expect(presenter.grado()).toBe('5to A');
       expect(presenter.categoriasDisponibles().length).toBe(3);
       expect(presenter.reglas().length).toBe(0);

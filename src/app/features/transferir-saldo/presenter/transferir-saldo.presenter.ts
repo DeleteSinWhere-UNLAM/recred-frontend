@@ -33,9 +33,7 @@ export class TransferirSaldoPresenter {
   readonly nombreCompleto = computed(() => {
     const alumno = this.alumnoOrigenState();
     if (!alumno) return '';
-    const primerNombre = (alumno.nombre || '').trim().split(' ')[0];
-    const primerApellido = (alumno.apellido || '').trim().split(' ')[0];
-    return `${primerNombre} ${primerApellido}`.trim();
+    return (alumno.nombre || '').trim().split(' ')[0];
   });
 
   readonly grado = computed(() => this.alumnoOrigenState()?.grado ?? '');
@@ -49,9 +47,7 @@ export class TransferirSaldoPresenter {
 
   formatShortName(alumno: Alumno): string {
     if (!alumno) return '';
-    const primerNombre = (alumno.nombre || '').trim().split(' ')[0];
-    const primerApellido = (alumno.apellido || '').trim().split(' ')[0];
-    return `${primerNombre} ${primerApellido}`.trim();
+    return (alumno.nombre || '').trim().split(' ')[0];
   }
 
   async init(alumnoId: string): Promise<void> {

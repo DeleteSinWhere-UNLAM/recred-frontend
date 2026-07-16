@@ -71,7 +71,7 @@
                 >
                   <option value="todos">Todos los hijos</option>
                   @for (alumno of alumnos(); track alumno.id) {
-                    <option [value]="alumno.id">{{ alumno.nombre }} {{ alumno.apellido }}</option>
+                    <option [value]="alumno.id">{{ alumno.nombre }}</option>
                   }
                 </select>
                 <i class="fa-solid fa-chevron-down select-arrow" aria-hidden="true"></i>

@@ -1,18 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditarPromocionModalComponent } from './editar-promocion-modal.component';
 import { PromotionWithProducts } from '../../presenter/promociones.presenter';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { environment } from '../../../../../environments/environment';
 
 describe('EditarPromocionModalComponent', () => {
   let component: EditarPromocionModalComponent;
   let fixture: ComponentFixture<EditarPromocionModalComponent>;
+  let httpMock: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EditarPromocionModalComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EditarPromocionModalComponent);
     component = fixture.componentInstance;
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   describe('render', () => {
@@ -230,6 +240,51 @@ describe('EditarPromocionModalComponent', () => {
       component.saveChanges();
 
       expect(spy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('gestion de imagen', () => {
+    it('dado que el modal se inicializa con una promocion con imageUrl valida, deberia setear imagePreview', () => {
+      component.promotion = crearPromocion({ imageUrl: 'https://img.com/promo.png' });
+      component.resetForm();
+      expect(component.imagePreview).toBe('https://img.com/promo.png');
+    });
+
+    it('dado una promocion con logo default, deberia dejar imagePreview en null', () => {
+      component.promotion = crearPromocion({ imageUrl: 'https://res.cloudinary.com/djzfudbze/image/upload/v1781748941/logo_sin_fondo_ikciro.png' });
+      component.resetForm();
+      expect(component.imagePreview).toBeNull();
+    });
+
+    it('cuando llamo a removeImage, deberia limpiar el preview a null', () => {
+      component.imagePreview = 'https://img.com/promo.png';
+      component.removeImage();
+      expect(component.imagePreview).toBeNull();
+    });
+
+    it('dado que subo una imagen, deberia hacer un post al endpoint de carga de imagen y actualizar imagePreview', () => {
+      const file = new File(['foo'], 'promo.png', { type: 'image/png' });
+      const input = document.createElement('input');
+      input.type = 'file';
+      Object.defineProperty(input, 'files', {
+        value: {
+          0: file,
+          length: 1,
+          item: (i: number) => (i === 0 ? file : null),
+        },
+      });
+      spyOn(FileReader.prototype, 'readAsDataURL').and.stub();
+      const event = { target: input } as unknown as Event;
+
+      component.onFileSelected(event);
+
+      expect(component.isUploadingImage).toBeTrue();
+      const req = httpMock.expectOne(`${environment.apiUrl}/load-stock/upload-image`);
+      expect(req.request.method).toBe('POST');
+      req.flush({ url_imagen: 'https://cloud/promo_subida.png' });
+
+      expect(component.imagePreview).toBe('https://cloud/promo_subida.png');
+      expect(component.isUploadingImage).toBeFalse();
     });
   });
 

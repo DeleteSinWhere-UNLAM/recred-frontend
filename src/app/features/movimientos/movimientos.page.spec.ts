@@ -253,16 +253,16 @@ describe('MovimientosPage', () => {
       tick();
     }));
 
-    it('dado un studentId conocido, getNombreAlumno deberia devolver "Nombre Apellido"', () => {
-      expect(component.getNombreAlumno('alumno-1')).toBe('Julián García');
+    it('dado un studentId conocido, getNombreAlumno deberia devolver "Nombre Apellido" en vista alumno, pero solo Nombre en vista tutor', () => {
+      expect(component.getNombreAlumno('alumno-1')).toBe('Julián');
     });
 
     it('dado un studentId desconocido, getNombreAlumno deberia devolver "Alumno"', () => {
       expect(component.getNombreAlumno('alumno-desconocido')).toBe('Alumno');
     });
 
-    it('dado un studentId conocido, getInicialesAlumno deberia devolver las iniciales en mayuscula', () => {
-      expect(component.getInicialesAlumno('alumno-1')).toBe('JG');
+    it('dado un studentId conocido, getInicialesAlumno deberia devolver las iniciales de tutor (solo nombre)', () => {
+      expect(component.getInicialesAlumno('alumno-1')).toBe('J');
     });
 
     it('dado un studentId desconocido, getInicialesAlumno deberia devolver "AL"', () => {
@@ -364,7 +364,7 @@ describe('MovimientosPage', () => {
       component.criterioAgrupacion.set('ALUMNO');
 
       const grupos = component.movimientosAgrupados();
-      expect(grupos.map((g) => g.titulo)).toEqual(['Julián García', 'Sofía García']);
+      expect(grupos.map((g) => g.titulo)).toEqual(['Julián', 'Sofía']);
       expect(grupos[0].movimientos.map((m) => m.id).sort()).toEqual(['mov-1', 'mov-3']);
     });
 

@@ -94,7 +94,12 @@ export class FormularioProductoComponent implements OnInit, OnChanges {
 
   private checkIfBeverageName(name: string | null | undefined): boolean {
     if (!name) return false;
-    return name.toLowerCase().includes("bebida") || name.toLowerCase().includes("infusión") || name.toLowerCase().includes("infusion");
+    return (
+      name.toLowerCase().includes("bebida") ||
+      name.toLowerCase().includes("infusión") ||
+      name.toLowerCase().includes("infusion") ||
+      name.toLowerCase().includes("gaseosa")
+    );
   }
 
   get isEditing(): boolean {

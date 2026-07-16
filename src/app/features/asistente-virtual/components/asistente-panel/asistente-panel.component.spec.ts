@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SugerenciaCapacidad } from '../../models/capacidad-asistente.model';
 import { MensajeAsistente } from '../../models/mensaje-asistente.model';
 import { AsistentePanelComponent } from './asistente-panel.component';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 interface ProtegidoAsistente {
   onCerrar(): void;
@@ -37,10 +38,16 @@ class SugerenciaCapacidadMother {
 describe('AsistentePanelComponent', () => {
   let fixture: ComponentFixture<AsistentePanelComponent>;
   let component: AsistentePanelComponent;
+  let toastService: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
+    toastService = jasmine.createSpyObj<ToastService>('ToastService', ['mostrar']);
+
     await TestBed.configureTestingModule({
       imports: [AsistentePanelComponent],
+      providers: [
+        { provide: ToastService, useValue: toastService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AsistentePanelComponent);
@@ -57,6 +64,32 @@ describe('AsistentePanelComponent', () => {
       whenCambioLaFechaEnElSelector('2026-07-03');
 
       thenSeEmitioFechaRetiro('2026-07-03');
+    });
+
+    it('dado el selector visible, cuando elijo un sábado (2026-07-04), no deberia emitir y deberia mostrar un toast de error', () => {
+      givenSpyEnFechaRetiro();
+      givenSelectorVisibleConMinimo('2026-07-03');
+
+      whenCambioLaFechaEnElSelector('2026-07-04');
+
+      thenNoSeEmitioFechaRetiro();
+      expect(toastService.mostrar).toHaveBeenCalledWith(
+        'No se pueden seleccionar días sábados o domingos para el retiro de pedidos.',
+        'error',
+      );
+    });
+
+    it('dado el selector visible, cuando elijo un domingo (2026-07-05), no deberia emitir y deberia mostrar un toast de error', () => {
+      givenSpyEnFechaRetiro();
+      givenSelectorVisibleConMinimo('2026-07-03');
+
+      whenCambioLaFechaEnElSelector('2026-07-05');
+
+      thenNoSeEmitioFechaRetiro();
+      expect(toastService.mostrar).toHaveBeenCalledWith(
+        'No se pueden seleccionar días sábados o domingos para el retiro de pedidos.',
+        'error',
+      );
     });
 
     it('dado el selector visible con fecha minima 2026-07-03, cuando elijo una anterior, no deberia emitirla', () => {

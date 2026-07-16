@@ -331,8 +331,8 @@ describe('MovimientosPendientesPage', () => {
       tick();
     }));
 
-    it('dado un studentId conocido, getInicialesAlumno deberia devolver JG', () => {
-      expect(component.getInicialesAlumno('alumno-1')).toBe('JG');
+    it('dado un studentId conocido, getInicialesAlumno deberia devolver J', () => {
+      expect(component.getInicialesAlumno('alumno-1')).toBe('J');
     });
 
     it('dado un studentId desconocido, getInicialesAlumno deberia devolver AL', () => {

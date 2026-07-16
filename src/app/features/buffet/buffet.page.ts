@@ -24,6 +24,7 @@ import { Recreo } from '../compra/models/orden-compra.model';
 import { Producto, CategoriaProducto, ClasificacionSalud } from './models/producto.model';
 import { CarritoService } from '../compra/services/carrito.service';
 import { CarritosFavoritosService } from '../carritos-favoritos/services/carritos-favoritos.service';
+import { buildCloudinaryCollageUrl } from '../../shared/utils/cloudinary-collage.helper';
 
 export interface DateCell {
   date: Date;
@@ -204,9 +205,15 @@ export class BuffetPage implements OnInit {
       const discountPercentage = promo.discountPercentage || 0;
       const discountedPrice = Math.round(originalPrice * (1 - discountPercentage / 100));
 
-      const firstProductImage = products.find(p => p.imagen)?.imagen;
-      const defaultPromoImage = 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80';
-      const imagen = firstProductImage || defaultPromoImage;
+      let imagen = promo.imageUrl;
+      if (!imagen || imagen.includes('logo_sin_fondo_ikciro')) {
+        const productImages = products.map(p => p.imagen).filter(url => !!url);
+        if (productImages.length > 0) {
+          imagen = buildCloudinaryCollageUrl(productImages);
+        } else {
+          imagen = 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80';
+        }
+      }
 
       const uniqueClasificaciones = Array.from(
         new Map(

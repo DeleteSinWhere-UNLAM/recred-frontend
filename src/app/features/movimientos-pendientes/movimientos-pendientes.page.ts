@@ -243,7 +243,7 @@ export class MovimientosPendientesPage {
   getInicialesAlumno(studentId: string): string {
     const alumno = this.alumnosService.getAlumnoById(studentId);
     if (!alumno) return 'AL';
-    return ((alumno.nombre[0] ?? '') + (alumno.apellido[0] ?? '')).toUpperCase();
+    return (alumno.nombre[0] ?? '').toUpperCase();
   }
 
   getFotoPerfilAlumno(studentId: string): string | null {

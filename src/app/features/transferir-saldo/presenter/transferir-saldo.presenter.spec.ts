@@ -92,7 +92,7 @@ describe('TransferirSaldoPresenter', () => {
       expect(alumnosService.asegurarCargados).toHaveBeenCalled();
       expect(alumnosService.getAlumnoById).toHaveBeenCalledWith(ALUMNO_ID);
       expect(presenter.alumnoOrigen()?.id).toBe(ALUMNO_ID);
-      expect(presenter.nombreCompleto()).toBe('Juan Perez');
+      expect(presenter.nombreCompleto()).toBe('Juan');
       expect(presenter.grado()).toBe('5to A');
       expect(presenter.cargando()).toBeFalse();
     });
