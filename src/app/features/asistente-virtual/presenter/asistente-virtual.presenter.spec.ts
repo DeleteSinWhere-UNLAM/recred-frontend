@@ -13,6 +13,7 @@ import {
 } from '../models/respuesta-asistente.model';
 import { AsistenteVirtualService } from '../services/asistente-virtual.service';
 import { AsistenteVirtualPresenter } from './asistente-virtual.presenter';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import {
   AccionAsistenteMother,
   MensajeAsistenteResponseMother,
@@ -33,6 +34,7 @@ describe('AsistenteVirtualPresenter', () => {
   let servicioAsistente: jasmine.SpyObj<AsistenteVirtualService>;
   let servicioHomeAlumno: jasmine.SpyObj<HomeAlumnoService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
 
   beforeEach(() => {
     servicioPerfil = jasmine.createSpyObj('PerfilService', [
@@ -63,6 +65,9 @@ describe('AsistenteVirtualPresenter', () => {
     servicioHomeAlumno.cargarPedidoEnCurso.and.resolveTo();
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
 
+    servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['asegurarCargados']);
+    servicioAlumnos.asegurarCargados.and.resolveTo([]);
+
     TestBed.configureTestingModule({
       providers: [
         AsistenteVirtualPresenter,
@@ -70,6 +75,7 @@ describe('AsistenteVirtualPresenter', () => {
         { provide: AsistenteVirtualService, useValue: servicioAsistente },
         { provide: HomeAlumnoService, useValue: servicioHomeAlumno },
         { provide: ToastService, useValue: servicioToast },
+        { provide: AlumnosService, useValue: servicioAlumnos },
       ],
     });
 
@@ -390,6 +396,19 @@ describe('AsistenteVirtualPresenter', () => {
       expect(servicioHomeAlumno.cargarPedidoEnCurso).toHaveBeenCalledWith(
         'alumno-1',
       );
+    });
+
+    it('dado una accion ejecutada con compraId y rol ALUMNO, cuando envio, deberia pedirle al AlumnosService que recargue el perfil', async () => {
+      servicioPerfil.obtenerAlumnoId.and.returnValue('alumno-1');
+      givenRespuestaDelBack(
+        RespuestaAsistenteMother.crear({
+          accion: AccionAsistenteMother.crearEjecutadaConCompra(),
+        }),
+      );
+
+      await whenEnvio('confirmar');
+
+      expect(servicioAlumnos.asegurarCargados).toHaveBeenCalledWith(true);
     });
 
     it('dado una accion ejecutada con rol PADRE, cuando envio, no deberia refrescar el pedido', async () => {

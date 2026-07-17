@@ -3,6 +3,7 @@ import { RolUsuario } from '../../../data-access/models/perfil.model';
 import { PerfilService } from '../../../data-access/services/perfil.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { HomeAlumnoService } from '../../home-alumno/services/home-alumno.service';
+import { AlumnosService } from '../../../data-access/services/alumnos.service';
 import {
   SUGERENCIAS_ASISTENTE_POR_ROL,
   SUGERENCIAS_COMPRA_PENDIENTE,
@@ -54,6 +55,7 @@ export class AsistenteVirtualPresenter {
   private readonly asistenteService = inject(AsistenteVirtualService);
   private readonly homeAlumnoService = inject(HomeAlumnoService);
   private readonly toastService = inject(ToastService);
+  private readonly alumnosService = inject(AlumnosService);
 
   private readonly abiertoState = signal(false);
   private readonly mensajesState = signal<MensajeAsistente[]>([]);
@@ -454,6 +456,7 @@ export class AsistenteVirtualPresenter {
     const alumnoId = this.perfilService.obtenerAlumnoId();
     if (!alumnoId) return;
     void this.homeAlumnoService.cargarPedidoEnCurso(alumnoId);
+    void this.alumnosService.asegurarCargados(true);
   }
 
   private esCancelacionCompra(accion: AccionAsistente): boolean {

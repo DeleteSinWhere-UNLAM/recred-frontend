@@ -11,6 +11,7 @@ import { MensajeAsistente } from './models/mensaje-asistente.model';
 import { PerfilMother } from '../../data-access/services/alumno.mother';
 import { RespuestaAsistenteMother } from './asistente-virtual.mother';
 import { ToastService } from '../../shared/services/toast.service';
+import { AlumnosService } from '../../data-access/services/alumnos.service';
 
 @Component({
   selector: 'app-asistente-fab',
@@ -52,6 +53,7 @@ describe('AsistenteVirtual Integration', () => {
   let servicioPerfil: jasmine.SpyObj<PerfilService>;
   let servicioHomeAlumno: jasmine.SpyObj<HomeAlumnoService>;
   let servicioToast: jasmine.SpyObj<ToastService>;
+  let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
 
   beforeEach(async () => {
     servicioAsistente = jasmine.createSpyObj('AsistenteVirtualService', [
@@ -73,6 +75,8 @@ describe('AsistenteVirtual Integration', () => {
     servicioHomeAlumno = jasmine.createSpyObj('HomeAlumnoService', ['cargarPedidoEnCurso']);
     servicioHomeAlumno.cargarPedidoEnCurso.and.resolveTo();
     servicioToast = jasmine.createSpyObj('ToastService', ['mostrar']);
+    servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['asegurarCargados']);
+    servicioAlumnos.asegurarCargados.and.resolveTo([]);
 
     await TestBed.configureTestingModule({
       imports: [AsistenteVirtualComponent],
@@ -81,6 +85,7 @@ describe('AsistenteVirtual Integration', () => {
         { provide: PerfilService, useValue: servicioPerfil },
         { provide: HomeAlumnoService, useValue: servicioHomeAlumno },
         { provide: ToastService, useValue: servicioToast },
+        { provide: AlumnosService, useValue: servicioAlumnos },
       ],
     })
       .overrideComponent(AsistenteVirtualComponent, {

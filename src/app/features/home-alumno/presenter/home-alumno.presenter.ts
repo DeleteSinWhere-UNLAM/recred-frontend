@@ -35,46 +35,50 @@ export class HomeAlumnoPresenter {
   private readonly contextoService = inject(AlumnoContextoService);
   private readonly router = inject(Router);
 
-  private readonly alumnoState = signal<Alumno | undefined>(undefined);
   private readonly fondoPerfilState = signal<FondoPerfil>('nubes');
   private readonly recompensaState = signal<RecompensaResponse | null>(null);
 
-  readonly alumno: Signal<Alumno | undefined> = this.alumnoState.asReadonly();
+  readonly alumno: Signal<Alumno | undefined> = computed(() => {
+    const alumnos = this.alumnosService.alumnos();
+    const alumnoMock = this.usuarioService.getAlumnoActual();
+    const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;
+    return alumnos.find((a) => a.id === alumnoId) ?? alumnos[0];
+  });
   readonly fondoPerfil: Signal<FondoPerfil> = this.fondoPerfilState.asReadonly();
   readonly pedidoEnCurso: Signal<PedidoEnCurso | undefined> = computed(() => {
-    const id = this.alumnoState()?.id;
+    const id = this.alumno()?.id;
     return id ? this.homeAlumnoService.getPedidoEnCurso(id) : undefined;
   });
   readonly proximoRecreo: Signal<Recreo | undefined> = computed(() =>
-    this.homeAlumnoService.getProximoRecreo(this.alumnoState()?.colegioId),
+    this.homeAlumnoService.getProximoRecreo(this.alumno()?.colegioId),
   );
 
-  readonly nombreAlumno = computed(() => this.alumnoState()?.nombre ?? '');
+  readonly nombreAlumno = computed(() => this.alumno()?.nombre ?? '');
 
   readonly nombreCompleto = computed(() => {
-    const a = this.alumnoState();
+    const a = this.alumno();
     return a ? `${a.nombre} ${a.apellido}` : '';
   });
 
-  readonly urlFotoPerfil = computed(() => this.alumnoState()?.urlFotoPerfil ?? null);
+  readonly urlFotoPerfil = computed(() => this.alumno()?.urlFotoPerfil ?? null);
 
   readonly iniciales = computed(() => {
-    const a = this.alumnoState();
+    const a = this.alumno();
     if (!a) return '';
     return ((a.nombre[0] ?? '') + (a.apellido[0] ?? '')).toUpperCase();
   });
 
-  readonly grado = computed(() => this.alumnoState()?.grado ?? '');
+  readonly grado = computed(() => this.alumno()?.grado ?? '');
 
   readonly nombreColegio = computed(() => {
-    const a = this.alumnoState();
+    const a = this.alumno();
     if (!a) return '';
     return (
       this.colegiosService.getColegios().find((c) => c.id === a.colegioId)?.nombre ?? ''
     );
   });
 
-  readonly saldo = computed(() => this.alumnoState()?.saldo ?? 0);
+  readonly saldo = computed(() => this.alumno()?.saldo ?? 0);
   readonly saldoFormateado = computed(() => formateadorSaldo.format(this.saldo()));
   readonly saldoNegativo = computed(() => this.saldo() < 0);
 
@@ -176,7 +180,6 @@ export class HomeAlumnoPresenter {
       const alumnoId = this.perfilService.obtenerAlumnoId() ?? alumnoMock.id;
       const alumno = alumnos.find((a) => a.id === alumnoId) ?? alumnos[0];
       if (alumno) {
-        this.alumnoState.set(alumno);
         this.contextoService.setAlumnoId(alumno.id);
 
         void firstValueFrom(this.homeAlumnoService.getRecompensasSaludables(alumno.id))
@@ -193,7 +196,7 @@ export class HomeAlumnoPresenter {
 
   ejecutarAccion(accion: AccionRapida): void {
     if (!accion.ruta) return;
-    const alumnoId = this.alumnoState()?.id;
+    const alumnoId = this.alumno()?.id;
     if (!alumnoId) return;
     if (accion.id === 'buffet') {
       this.contextoService.setAlumnoId(alumnoId);
@@ -204,7 +207,7 @@ export class HomeAlumnoPresenter {
   }
 
   irAlBuffet(): void {
-    const alumnoId = this.alumnoState()?.id;
+    const alumnoId = this.alumno()?.id;
     if (!alumnoId) return;
     this.contextoService.setAlumnoId(alumnoId);
     void this.router.navigateByUrl('/buffet');

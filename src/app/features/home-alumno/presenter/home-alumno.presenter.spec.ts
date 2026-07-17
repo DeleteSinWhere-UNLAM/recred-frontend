@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { signal, WritableSignal } from '@angular/core';
 import { of } from 'rxjs';
 import { AlumnoContextoService } from '../../../core/services/alumno-contexto.service';
 import { Alumno } from '../../../data-access/models/alumno.model';
@@ -36,6 +37,7 @@ describe('HomeAlumnoPresenter', () => {
   let servicioAlumnos: jasmine.SpyObj<AlumnosService>;
   let servicioHomeAlumno: jasmine.SpyObj<HomeAlumnoService>;
   let servicioContexto: jasmine.SpyObj<AlumnoContextoService>;
+  let alumnosSignal: WritableSignal<Alumno[]>;
 
   beforeEach(() => {
     router = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
@@ -51,8 +53,10 @@ describe('HomeAlumnoPresenter', () => {
     servicioColegios.getColegios.and.returnValue([]);
     servicioColegios.obtenerColegios.and.resolveTo([]);
 
+    alumnosSignal = signal<Alumno[]>([]);
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['asegurarCargados']);
     servicioAlumnos.asegurarCargados.and.resolveTo([]);
+    (servicioAlumnos as any).alumnos = alumnosSignal;
 
     servicioHomeAlumno = jasmine.createSpyObj('HomeAlumnoService', [
       'getPedidoEnCurso',
@@ -383,6 +387,7 @@ describe('HomeAlumnoPresenter', () => {
   function givenAlumnosCargados(alumnos: Alumno[], perfilAlumnoId: string | null): void {
     servicioAlumnos.asegurarCargados.and.resolveTo(alumnos);
     servicioPerfil.obtenerAlumnoId.and.returnValue(perfilAlumnoId);
+    alumnosSignal.set(alumnos);
   }
 
   function givenColegios(colegios: Colegio[]): void {
