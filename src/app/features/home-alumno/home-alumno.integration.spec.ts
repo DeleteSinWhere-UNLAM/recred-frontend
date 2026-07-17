@@ -19,6 +19,7 @@ import { AccionRapida } from './models/accion-rapida.model';
 import { FondoPerfil } from './models/fondo-perfil.model';
 import { PedidoEnCurso } from './models/pedido-en-curso.model';
 import { Recreo } from './models/recreo.model';
+import { Alumno } from '../../data-access/models/alumno.model';
 import { AlumnoMother } from '../../data-access/services/alumno.mother';
 import { PedidoEnCursoMother } from './home-alumno.mother';
 
@@ -96,6 +97,7 @@ describe('HomeAlumno Integration', () => {
 
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['asegurarCargados']);
     servicioAlumnos.asegurarCargados.and.resolveTo([alumno]);
+    (servicioAlumnos as unknown as { alumnos: () => Alumno[] }).alumnos = signal<Alumno[]>([alumno]);
 
     servicioColegios = jasmine.createSpyObj('ColegiosService', ['obtenerColegios', 'getColegios']);
     servicioColegios.obtenerColegios.and.resolveTo([{ id: 'col-1', nombre: 'Colegio A' }]);
