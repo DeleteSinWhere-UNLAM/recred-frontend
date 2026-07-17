@@ -56,7 +56,7 @@ describe('HomeAlumnoPresenter', () => {
     alumnosSignal = signal<Alumno[]>([]);
     servicioAlumnos = jasmine.createSpyObj('AlumnosService', ['asegurarCargados']);
     servicioAlumnos.asegurarCargados.and.resolveTo([]);
-    (servicioAlumnos as any).alumnos = alumnosSignal;
+    (servicioAlumnos as unknown as { alumnos: WritableSignal<Alumno[]> }).alumnos = alumnosSignal;
 
     servicioHomeAlumno = jasmine.createSpyObj('HomeAlumnoService', [
       'getPedidoEnCurso',
