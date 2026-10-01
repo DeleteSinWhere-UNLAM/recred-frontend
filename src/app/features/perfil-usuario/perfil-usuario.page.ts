@@ -16,6 +16,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
 import { ToastService } from '../../shared/services/toast.service';
 import { CropModalComponent } from './components/crop-modal/crop-modal.component';
 import { AuthService } from '../../core/auth/services/auth.service';
+import { ColaboradorService, ColaboradorDTO } from '../../data-access/services/colaborador.service';
 
 type PerfilUsuarioForm = FormGroup<{
   firstName: FormControl<string>;
@@ -39,6 +40,7 @@ export class PerfilUsuarioPage implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly colaboradorService = inject(ColaboradorService);
 
   protected readonly usuario = signal<UsuarioLogueado | null>(null);
   protected readonly passwordForm = new FormGroup({
@@ -82,6 +84,18 @@ export class PerfilUsuarioPage implements OnInit {
   protected readonly ultimaEjecucionFormateada = computed(() =>
     this.formatearFechaPayout(this.ultimaEjecucion()),
   );
+
+  protected readonly colaboradores = signal<ColaboradorDTO[]>([]);
+  protected readonly cargandoColaboradores = signal(false);
+  protected readonly emailColaboradorForm = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.email],
+  });
+  protected readonly invitandoColaborador = signal(false);
+  
+  protected readonly esColaborador = computed(() => {
+    return this.perfilService.perfil()?.esColaborador === true;
+  });
 
   protected readonly esKiosquero = computed(() => {
     const role = this.usuario()?.role || this.perfil()?.role;
@@ -274,6 +288,10 @@ export class PerfilUsuarioPage implements OnInit {
 
       if (role === 'VENDEDOR') {
         await this.cargarConfiguracionPayout();
+      }
+
+      if (role === 'PADRE' && !this.esColaborador()) {
+        await this.cargarColaboradores();
       }
     } catch (err) {
       console.error('Error cargando el perfil del usuario:', err);
@@ -674,5 +692,52 @@ export class PerfilUsuarioPage implements OnInit {
   protected campoPasswordInvalido(campo: keyof typeof this.passwordForm.controls): boolean {
     const control = this.passwordForm.controls[campo];
     return control.invalid && (control.dirty || control.touched);
+  }
+
+  protected async cargarColaboradores(): Promise<void> {
+    this.cargandoColaboradores.set(true);
+    try {
+      const colabs = await this.colaboradorService.listarColaboradores();
+      this.colaboradores.set(colabs);
+    } catch (err) {
+      console.error('Error al cargar colaboradores:', err);
+    } finally {
+      this.cargandoColaboradores.set(false);
+    }
+  }
+
+  protected async invitarColaborador(): Promise<void> {
+    if (this.emailColaboradorForm.invalid || this.invitandoColaborador()) {
+      this.emailColaboradorForm.markAllAsTouched();
+      return;
+    }
+    
+    this.invitandoColaborador.set(true);
+    const email = this.emailColaboradorForm.value.trim();
+    
+    try {
+      await this.colaboradorService.invitarColaborador(email);
+      this.toastService.mostrar(`Invitación enviada a ${email}`, 'success');
+      this.emailColaboradorForm.reset();
+      await this.cargarColaboradores();
+    } catch (err: any) {
+      console.error('Error al invitar colaborador:', err);
+      const msg = err?.error?.message || err.message || 'Error al invitar colaborador.';
+      this.toastService.mostrar(msg, 'error');
+    } finally {
+      this.invitandoColaborador.set(false);
+    }
+  }
+
+  protected async eliminarColaborador(id: string): Promise<void> {
+    if (!confirm('¿Estás seguro de que querés eliminar a este colaborador? Ya no podrá acceder a tus hijos.')) return;
+    try {
+      await this.colaboradorService.eliminarColaborador(id);
+      this.toastService.mostrar('Colaborador eliminado.', 'success');
+      await this.cargarColaboradores();
+    } catch (err) {
+      console.error('Error al eliminar colaborador:', err);
+      this.toastService.mostrar('Error al eliminar colaborador.', 'error');
+    }
   }
 }

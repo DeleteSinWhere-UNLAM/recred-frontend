@@ -51,6 +51,7 @@
       <span class="alumno-card__btn-label">Acreditar</span>
     </a>
 
+    @if (!esColaborador) {
     <a class="alumno-card__btn alumno-card__btn--azul" (click)="navegar('/restricciones-horarias')" (keyup.enter)="navegar('/restricciones-horarias')" tabindex="0"
       [class.active]="isActive('/restricciones-horarias')">
     <span class="alumno-card__btn-icono" aria-hidden="true">
@@ -58,6 +59,7 @@
     </span>
     <span class="alumno-card__btn-label">Horarios</span>
     </a>
+    }
 
     <a class="alumno-card__btn alumno-card__btn--gris" (click)="navegar('/tutor-movimientos')" (keyup.enter)="navegar('/tutor-movimientos')" tabindex="0"
       [class.active]="isActive('/tutor-movimientos')">
@@ -71,6 +73,7 @@
   <div class="alumno-card__extra-wrapper" [class.collapsed]="!mostrarTodosLosBotones()">
     <div class="alumno-card__extra-grid" role="group" aria-label="Más acciones de alumno">
 
+      @if (!esColaborador) {
       <a class="alumno-card__btn alumno-card__btn--melocoton" (click)="navegar('/restricciones-nutricionales')" (keyup.enter)="navegar('/restricciones-nutricionales')" tabindex="0"
         [class.active]="isActive('/restricciones-nutricionales')">
         <span class="alumno-card__btn-icono" aria-hidden="true">
@@ -78,6 +81,7 @@
         </span>
         <span class="alumno-card__btn-label">Restricciones</span>
       </a>
+      }
 
       <a class="alumno-card__btn alumno-card__btn--melocoton" title="Favoritos" (click)="navegar('/favoritos-alumno')" (keyup.enter)="navegar('/favoritos-alumno')" tabindex="0"
         [class.active]="isActive('/favoritos-alumno')">
@@ -105,6 +109,7 @@
         </span>
         <span class="alumno-card__btn-label">Pendientes</span>
       </a>
+      @if (!esColaborador) {
       <a class="alumno-card__btn alumno-card__btn--celeste" (click)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')" (keyup.enter)="navegarConPlan('/prediccion-gasto', 'INTERMEDIO')" tabindex="0"
         [class.active]="isActive('/prediccion-gasto')"
         [class.alumno-card__btn--disabled]="planBloqueado('INTERMEDIO')"
@@ -142,8 +147,9 @@
         </span>
         <span class="alumno-card__btn-label">Presupuesto</span>
       </a>
+      }
 
-      @if (esPadre) {
+      @if (esPadre && !esColaborador) {
       <a class="alumno-card__btn alumno-card__btn--menta" title="Adelanto" (click)="navegar('/adelanto')" (keyup.enter)="navegar('/adelanto')" tabindex="0"
         [class.active]="isActive('/adelanto')" [class.alumno-card__btn--disabled]="planBloqueado('AVANZADO')">
         <span class="alumno-card__btn-icono" aria-hidden="true">

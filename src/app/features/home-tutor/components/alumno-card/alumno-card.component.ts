@@ -251,6 +251,10 @@ export class AlumnoCardComponent implements OnInit {
     return this.perfilService.perfil()?.rol === 'PADRE';
   }
 
+  get esColaborador(): boolean {
+    return this.perfilService.perfil()?.esColaborador ?? false;
+  }
+
   get esPremium(): boolean {
     return !this.perfilService.esPlanGratuito();
   }

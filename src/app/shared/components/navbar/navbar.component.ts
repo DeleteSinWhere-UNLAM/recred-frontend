@@ -76,6 +76,7 @@ export class NavbarComponent implements OnInit {
   protected readonly menuBilleteraAbierto = signal(false);
   protected readonly menuMobileAbierto = signal(false);
   protected readonly temaActivo = this.themeService.theme;
+  protected readonly esColaborador = computed(() => this.perfilService.perfil()?.esColaborador ?? false);
 
   protected toggleTema(): void {
     this.themeService.toggleTheme();

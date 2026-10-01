@@ -92,6 +92,14 @@ export class LandingPage implements OnInit, OnDestroy {
     if (rol !== 'PADRE') {
       return ROL_A_RUTA[rol];
     }
+    
+    const perfil = this.perfilService.getPerfil();
+    console.log('--- DEBUG PERFIL ---', perfil);
+    console.log('ES COLABORADOR:', perfil?.esColaborador);
+    if (perfil?.esColaborador) {
+      return '/tutor';
+    }
+
     try {
       const hijos = await this.alumnosService.cargarHijosDelTutor();
       return hijos.length === 0 ? '/crear-hijo' : '/tutor';

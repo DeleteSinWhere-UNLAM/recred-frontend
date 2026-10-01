@@ -163,6 +163,79 @@
       </form>
     </section>
 
+    @if (esTutor() && !esColaborador()) {
+    <div class="perfil-usuario__divider" aria-hidden="true"></div>
+
+    <section class="perfil-usuario__grid" aria-label="Tutores colaboradores">
+      <article class="perfil-usuario__panel" style="grid-column: 1 / -1;">
+        <h2 class="perfil-usuario__panel-titulo">Tutores colaboradores</h2>
+        <p class="perfil-usuario__subtitulo" style="margin-bottom: 1rem; color: var(--color-texto-claro); font-size: 0.9rem;">
+          Invitá a otros familiares para que puedan gestionar y ver la información de tus hijos.
+        </p>
+
+        <form class="perfil-usuario__form" style="display: flex; gap: 8px; margin-bottom: 1.5rem;" (ngSubmit)="invitarColaborador()">
+          <div style="flex: 1;">
+            <input type="email" [formControl]="emailColaboradorForm" placeholder="Email del colaborador"
+              class="perfil-usuario__input" style="width: 100%; border: 1px solid var(--color-border, #ccc); border-radius: 8px; padding: 10px; background: inherit; color: inherit;"
+              [class.perfil-usuario__input--error]="emailColaboradorForm.invalid && (emailColaboradorForm.dirty || emailColaboradorForm.touched)" />
+            @if (emailColaboradorForm.invalid && (emailColaboradorForm.dirty || emailColaboradorForm.touched)) {
+              <small style="color: #ef4444; font-size: 0.8rem; margin-top: 4px; display: block;">Ingresá un email válido.</small>
+            }
+          </div>
+          <button type="submit" class="perfil-usuario__boton perfil-usuario__boton--primario"
+            [disabled]="invitandoColaborador() || emailColaboradorForm.invalid" style="white-space: nowrap; height: fit-content; padding: 10px 16px;">
+            @if (invitandoColaborador()) {
+              Enviando...
+            } @else {
+              Invitar
+            }
+          </button>
+        </form>
+
+        @if (cargandoColaboradores()) {
+          <div class="perfil-usuario__estado">
+            <span class="perfil-usuario__loader" aria-hidden="true"></span>
+            <p>Cargando colaboradores...</p>
+          </div>
+        } @else if (colaboradores().length > 0) {
+          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px;">
+            @for (colab of colaboradores(); track colab.id) {
+              <li style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid var(--color-border, #eee); border-radius: 8px; background: var(--color-fondo-panel, transparent);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  @if (colab.urlFotoPerfil) {
+                    <img [src]="colab.urlFotoPerfil" alt="Foto de perfil" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                  } @else {
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--color-primario, #4a90e2); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                      {{ (colab.firstName?.[0] || '') + (colab.lastName?.[0] || '') || 'U' }}
+                    </div>
+                  }
+                  <div>
+                    <strong style="display: block; font-size: 0.95rem;">
+                      @if (colab.firstName) {
+                        {{ colab.firstName }} {{ colab.lastName }}
+                      } @else {
+                        Usuario invitado
+                      }
+                    </strong>
+                    <span style="font-size: 0.85rem; color: var(--color-texto-claro, #666);">{{ colab.email }}</span>
+                    @if (colab.activa === false) {
+                      <span style="font-size: 0.75rem; background: #fef3c7; color: #d97706; padding: 2px 6px; border-radius: 12px; margin-left: 8px;">Pendiente</span>
+                    }
+                  </div>
+                </div>
+                <button type="button" (click)="eliminarColaborador(colab.id)" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 8px;" title="Eliminar colaborador">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p style="color: var(--color-texto-claro, #666); font-size: 0.9rem; text-align: center; padding: 1rem 0;">No tenés tutores colaboradores asociados.</p>
+        }
+      </article>
+    </section>
+    }
+
     @if (esKiosquero()) {
     <div class="perfil-usuario__divider" aria-hidden="true"></div>
 

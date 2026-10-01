@@ -197,7 +197,7 @@
           </div>
           }
           }
-          @if (!esVistaAlumno() && !esVistaDirectivo() && !esVistaAdmin()) {
+          @if (!esVistaAlumno() && !esVistaDirectivo() && !esVistaAdmin() && !esColaborador()) {
           <button type="button" class="navbar__menu-item" role="menuitem" (click)="irAPremium()">
             <i class="fa-solid fa-star" aria-hidden="true"></i>
             <span>Suscripción</span>
