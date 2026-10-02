@@ -173,7 +173,7 @@
           Invitá a otros familiares para que puedan gestionar y ver la información de tus hijos.
         </p>
 
-        <form class="perfil-usuario__form" style="display: flex; gap: 8px; margin-bottom: 1.5rem;" (ngSubmit)="invitarColaborador()">
+        <form class="perfil-usuario__form" style="display: flex; gap: 8px; margin-bottom: 1.5rem;" (submit)="invitarColaborador(); $event.preventDefault()">
           <div style="flex: 1;">
             <input type="email" [formControl]="emailColaboradorForm" placeholder="Email del colaborador"
               class="perfil-usuario__input" style="width: 100%; border: 1px solid var(--color-border, #ccc); border-radius: 8px; padding: 10px; background: inherit; color: inherit;"
